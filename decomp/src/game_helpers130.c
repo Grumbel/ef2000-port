@@ -6700,3 +6700,121 @@ uint32_t spawn_event_record_befb8(uint32_t a, uint32_t b, uint32_t c, uint32_t d
 	guest_fn_bc570_x(rec, a, b);
 	return s9 + 1u;
 }
+
+/* Helper of 0x86110: count the entries of the 0x1a52b0 table (rows of 8 words, row lengths in words at 0x1a53b0, row count word 0x1a53c0) that equal word p+0x47 into the byte counter array at COUNTERS. */
+static void count_matching_rows_86110(ef_addr32 p, ef_addr32 counters)
+{
+    int16_t i;
+    int16_t j;
+    for (i = 0; i < (int16_t)EF_U16(0x001a53c0u); i++) {
+        for (j = 0; j < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)i * 2u); j++) {
+            if (EF_U16(0x001a52b0u + (uint32_t)(int32_t)i * 16u + (uint32_t)(int32_t)j * 2u) == EF_U16(p + 0x47u))
+                EF_U8(counters + (uint32_t)(int32_t)j) = (uint8_t)(EF_U8(counters + (uint32_t)(int32_t)j) + 1u);
+        }
+    }
+}
+
+#define SLOT_86110(p) ((p) + (uint32_t)((int32_t)EF_U32((p) + 0x1d4u) >> 24) * 3u)
+#define KIND_86110(p) ((int32_t)EF_U32(SLOT_86110(p) + 0x198u) >> 24)
+#define ENT_86110(p) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((p) + 0x26u) >> 16) * 0xca))
+
+/* 0x86110, 1476 bytes. Per-frame update of the player's object (looked up with 0x7489c): when it exists and the flags 0x122c5c/0x1a363a/0x127d42/0x132ac2 are clear and its weapon slot (+0x1d4 >> 24) is not 0x14, find the muzzle position (page row 0x85c90 rotated by the angle words at +0xc/+0xe/+0x10, scaled by 1/0x6900 and added to the position); if the slot's ammo word (+0x19c + 3*slot) is positive create a unit there (0x87db8), report it (0x8f22c, 0x56f0c), use up a round and for kind 1 adjust the ammo and word 0x20f19e. When the target entry matches 0x125835 and state 0x125846 is 3, count hits per kind in 0x19b960/0x19b96c/0x19b966 and send object codes 4a/4b/4c. With the ammo gone pick the next slot (0x8600c, 0x85f78, 0x8bf00); finally 0x86720. */
+void update_player_weapon_86110(void)
+{
+    ef_addr32 p;
+    ef_addr32 r;
+    ef_addr32 ent;
+    int32_t m[9];
+    int32_t x;
+    int32_t y;
+    int32_t z;
+    int32_t a;
+    int32_t b;
+    int32_t c;
+    int32_t idx;
+    int32_t kind;
+    uint32_t t;
+    if (EF_U8(0x00122c5cu) != 0u)
+        return;
+    p = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    if (p == 0u || EF_U8(0x001a363au) != 0u || EF_U8(0x00127d42u) != 0u || EF_U8(0x00132ac2u) != 0u)
+        return;
+    idx = (int32_t)EF_U32(p + 0x1d4u) >> 24;
+    if (idx == 0x14) {
+        sum_slot_weights_86720();
+        return;
+    }
+    x = (int32_t)EF_U32(p);
+    y = (int32_t)EF_U32(p + 4u);
+    z = (int32_t)EF_U32(p + 8u);
+    r = page_row_85c90((int16_t)idx);
+    c = (int16_t)EF_U16(r);
+    b = (int16_t)EF_U16(r + 2u);
+    a = (int16_t)EF_U16(r + 4u);
+    init_bounds_d0b68((ef_addr32)(uintptr_t)m);
+    update_scene_angle_first((ef_addr32)(uintptr_t)m, EF_U16(p + 0xeu));
+    update_scene_angle_second((ef_addr32)(uintptr_t)m, EF_U16(p + 0xcu));
+    update_scene_angle_third((ef_addr32)(uintptr_t)m, EF_U16(p + 0x10u));
+    x += (int32_t)((uint32_t)m[1] * (uint32_t)b + (uint32_t)m[0] * (uint32_t)c + (uint32_t)m[2] * (uint32_t)a) / 0x6900;
+    y += (int32_t)((uint32_t)m[4] * (uint32_t)b + (uint32_t)m[3] * (uint32_t)c + (uint32_t)m[5] * (uint32_t)a) / 0x6900;
+    z += (int32_t)((uint32_t)m[7] * (uint32_t)b + (uint32_t)m[6] * (uint32_t)c + (uint32_t)m[8] * (uint32_t)a) / 0x6900;
+    if ((int16_t)EF_U16(SLOT_86110(p) + 0x19cu) > 0) {
+        guest_fn_87db8_x((uint32_t)x, (uint32_t)y, (uint32_t)z,
+                         (uint32_t)((int32_t)EF_U32(p + 0xau) >> 16),
+                         (uint32_t)((int32_t)EF_U32(p + 0xcu) >> 16),
+                         (uint32_t)((int32_t)EF_U32(p + 0xeu) >> 16),
+                         EF_U32(0x001a5be4u), (uint32_t)KIND_86110(p),
+                         EF_U32(0x001a8210u), p);
+        kind = KIND_86110(p);
+        if (kind != 9 && kind != 0x14) {
+            guest_fn_8f22c((int32_t)EF_U32(0x001f71c8u) >> 16, EF_U8(p + 0x1d7u));
+            if (EF_U8(0x00127da9u) != 0u)
+                guest_fn_56f0c_x((int32_t)EF_U32(0x001f71c8u) >> 16, EF_U8(p + 0x1d7u));
+        }
+        if (EF_U8(0x0012b368u) == 0u)
+            EF_U16(SLOT_86110(p) + 0x19cu) = (uint16_t)(EF_U16(SLOT_86110(p) + 0x19cu) - 1u);
+        if (KIND_86110(p) == 1) {
+            EF_U8(p + 0x26u) = (uint8_t)(EF_U8(p + 0x26u) | 0x20u);
+            if (EF_U8(0x00127da8u) == 0u) {
+                EF_U16(SLOT_86110(p) + 0x19cu) = (uint16_t)(EF_U16(SLOT_86110(p) + 0x19cu) - 9u);
+                if ((int16_t)EF_U16(SLOT_86110(p) + 0x19cu) < 0)
+                    EF_U16(SLOT_86110(p) + 0x19cu) = 0u;
+            }
+            EF_U16(0x0020f19eu) = EF_U16(SLOT_86110(p) + 0x19cu);
+        }
+        ent = ENT_86110(p);
+        if (EF_U16(0x00125835u) == EF_U16(ent + 0x1cu) && EF_U8(0x00125846u) == 3u) {
+            if (KIND_86110(p) == 6 && EF_U8(ent + 0x1bu) == 0xbu) {
+                count_matching_rows_86110(p, 0x0019b960u);
+                if (EF_U8(0x00125839u) == 1u && EF_U8(0x001357c8u) == 0u)
+                    send_object_code_4a((int16_t)((int32_t)EF_U32(p + 0x45u) >> 16));
+            }
+            ent = ENT_86110(p);
+            kind = KIND_86110(p);
+            if ((EF_U8(ent + 0x1bu) == 9u || EF_U8(ent + 0x1bu) == 0u || EF_U8(ent + 0x1bu) == 0xdu) &&
+                kind >= 2 && kind <= 5) {
+                count_matching_rows_86110(p, 0x0019b96cu);
+                if (EF_U8(0x00125839u) == 1u && EF_U8(0x001357c8u) == 0u)
+                    send_object_code_4b((int16_t)((int32_t)EF_U32(p + 0x45u) >> 16));
+            }
+            ent = ENT_86110(p);
+            if (EF_U8(ent + 0x1bu) == 7u && KIND_86110(p) == 8) {
+                count_matching_rows_86110(p, 0x0019b966u);
+                if (EF_U8(0x00125839u) == 1u && EF_U8(0x001357c8u) == 0u)
+                    send_object_code_4c((int16_t)((int32_t)EF_U32(p + 0x45u) >> 16));
+            }
+        }
+    }
+    if (EF_U16(SLOT_86110(p) + 0x19cu) == 0u) {
+        kind = KIND_86110(p);
+        t = find_next_slot_8600c(EF_U8(0x0012bc94u + (uint32_t)kind * 0x91u));
+        if ((int16_t)t == 0x14) {
+            kind = KIND_86110(p);
+            t = next_matching_slot_85f78(EF_U8(0x0012bc94u + (uint32_t)kind * 0x91u));
+        }
+        EF_U16(0x00198424u) = 1u;
+        if ((int16_t)t != 0x14)
+            set_secondary_object_byte((uint8_t)t);
+    }
+    sum_slot_weights_86720();
+}

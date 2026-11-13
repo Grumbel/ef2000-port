@@ -1692,7 +1692,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00085f78	148	next_matching_slot_85f78	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00085f78.json	docs/compiler-abi.md; Starting after the current slot (byte +0x1d7) of the player's unit, scan its 20 three-byte slots (+0x198) cyclically for; callers 86110@866a9; guest pending
 0x0008600c	179	find_next_slot_8600c	game_helpers47	compiles	game	confirmed	decomp/tests/0x0008600c.json	docs/compiler-abi.md; Find the next slot after the current one that holds the given kind.; callers 86110@8666b; guest pending
 0x000860c0	80	first_nonignored_activity_slot	record_callers	compiles	game	confirmed	decomp/tests/0x000860c0.json	docs/compiler-abi.md; host model; Watcom and guest differential pending
-0x00086110	1476			unknown	game	unverified		
+0x00086110	1476	update_player_weapon_86110	game_helpers130	compiles	game	confirmed	decomp/tests/0x00086110.json	Original 0x86110 (1476 bytes)
 0x000866d4	1	nop_866d4	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000866d4.json	docs/compiler-abi.md; Empty stub (single ret).; callers 87fe4@88038; guest pending
 0x000866e0	64	ui_record_current_is_active	ui_operations	compiles	game	confirmed	decomp/tests/0x000866e0.json	docs/compiler-abi.md; host model; guest differential pending
 0x00086720	146	sum_slot_weights_86720	float_helpers3	compiles	game	confirmed	decomp/tests/0x00086720.json	docs/compiler-abi.md; Sum the weighted entries of the player's slot list into two doubles.; callers 86110@866c6,8cb60@8cc35; guest pending

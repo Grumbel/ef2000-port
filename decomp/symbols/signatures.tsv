@@ -3398,3 +3398,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00092290	select_view_target_92290	DX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Choose the view target and compute its direction words.
 0x0005a468	draw_target_box_5a468			ebx,ecx,edx,esi,edi,ebp	0	Draw the target designator box and X around a projected object.
 0x000befb8	spawn_event_record_befb8	EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32,ECX:ef_addr32	EAX:uint32_t	esi,edi,ebp	40	Original 0xbefb8 (1145 bytes); spawns event record kinds 0x1b/0x1c/0x1d
+0x00086110	update_player_weapon_86110			ebx,ecx,edx,esi,edi,ebp	0	per-frame player weapon update

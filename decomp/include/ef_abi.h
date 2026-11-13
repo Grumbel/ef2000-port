@@ -4484,6 +4484,7 @@ void guest_fn_873a4(uint32_t a, uint32_t out); /* 0x873a4 EAX/EDX */
 void draw_target_box_5a468(void); /* 0x5a468 */
 uint32_t spawn_event_record_befb8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9);
 void guest_fn_b5d8c_x(uint32_t rec, uint32_t edx, uint32_t ebx, uint32_t ecx); /* 0xb5d8c EAX/EDX/EBX/ECX */
+void update_player_weapon_86110(void); /* 0x86110, no inputs */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
