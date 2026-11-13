@@ -2625,3 +2625,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: recovered 0x5b2f0 as `draw_heading_tape_5b2f0` (HUD compass/heading tape: four labelled tick positions via sprintf 0x185f00, text width, boxes when the tick matches the heading, fallback side brackets otherwise). Verified with a stubbed-callee differential (cdf48, ce328, cf78c, a4342, 48c34, 48bb0, cec00, c8ccc; call args + ESP/preserved regs compared): 400/400 agree, 8839 logged calls. Plain isolated fuzz is weak (original faults without real state).
 
 - 0x73964 report_contact_73964: stubbed-callee differential (400 seeded scenarios, 2195 logged calls) agrees on args, registers, ESP and RAM. An earlier 153/400 divergence came from a stale hybrid image, not the C.
+
+- 2026-11-13: 50 gui_jump_thunks_089 entries (pure register-forwarding JMP/CALL thunks) marked blocked: no flat-C expression without inline asm.
