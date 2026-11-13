@@ -3349,3 +3349,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000441fc	draw_group_markers3_441fc	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers and count icons for type-0x31 nodes
 0x000bf81c	process_pending_nodes_bf81c	AX:acc,EDX:list,EBX:p3,ECX:p4,[ESP+4]:p5,[ESP+8]:p6,[ESP+12]:p7,[ESP+16]:p8,[ESP+20]:p9	AX:acc	esi,edi,ebp	20	process pending type-0x31 nodes
 0x000b0df4	assign_slot_flags_b0df4	EAX:ptr,EDX:list,EBX:head		ecx,esi,edi,ebp	0	pick a random slot and set node state flags
+0x00043b14	draw_group_markers4_43b14	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers for type 0x16 group nodes

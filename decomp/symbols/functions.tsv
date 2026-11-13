@@ -781,7 +781,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000436dc	342	draw_map_markers_436dc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000436dc.json	docs/compiler-abi.md; Draw the map markers for the objects of the list at *LIST (nodes of type 0x0e and 0x17, link +4; group flag tables check; callers 45574@4562c; guest pending
 0x00043834	368	draw_extent_markers_43834	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043834.json	docs/compiler-abi.md; Draw the extent markers for list type 0xe.; callers 4bf1c@4c051; guest pending
 0x000439a4	368	draw_extent_markers_439a4	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000439a4.json	docs/compiler-abi.md; Draw the extent markers for list type 0x17.; callers 4bf1c@4c067; guest pending
-0x00043b14	365			unknown	game	unverified		
+0x00043b14	365	draw_group_markers4_43b14	game_helpers130	compiles	game	confirmed	decomp/tests/0x00043b14.json	Original 0x43b14 (365 bytes)
 0x00043c84	368	draw_extent_markers_43c84	hotspot_draw	compiles	game	confirmed	decomp/tests/0x00043c84.json	docs/compiler-abi.md; Draw the extent markers for list type 0xf.; callers 45574@45676,4bf1c@4bff9; guest pending
 0x00043df4	338	draw_group_markers_43df4	game_helpers130	compiles	game	confirmed	decomp/tests/0x00043df4.json	Original 0x43df4 (338 bytes)
 0x00043f48	343	draw_group_markers2_43f48	game_helpers130	compiles	game	confirmed	decomp/tests/0x00043f48.json	Original 0x43f48 (343 bytes)
