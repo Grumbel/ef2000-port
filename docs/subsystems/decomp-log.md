@@ -2462,3 +2462,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered 0x7b3fc `draw_tile_cross_7b3fc` (tile-map cross marker; calls d0278, two 0x16000c line setups). Fuzz 1000/1000 agree (mostly early-exit paths; deep path only lightly exercised).
 
 - 2026-11-13: recovered 0x7b5d4 `trace_line_cells_7b5d4` (previously blocked: the `jmp *%cs:table` was a plain 4-way switch) and 0x7b7d8 `draw_marker_line_7b7d8`. Fuzz: 0x7b5d4 PASS 56 completed (944 skipped by budget/faults), 0x7b7d8 PASS 1000 (mostly early-exit paths).
+
+- 2026-11-13: recovered 0x759c `update_tracked_pair_759c`. Random fuzz PASS 1000 but almost all early exits (0x19726a is 0 in the image), so a controlled differential was used: 200 scenarios with a synthetic object table and 0x73ec stubbed to `ret`: 195 agree (8 reach the 0x73ec call, all branches of the 0x19bb5e/0x15 compare covered), 5 are identical faults in both images (null object base). 0x73ec (430 bytes, still blocked) is called through `guest_fn_73ec_x`.

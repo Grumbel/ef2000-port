@@ -100,7 +100,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00007308	201	maybe_fire_message_7308	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00007308.json	docs/compiler-abi.md; Occasionally fire a message from object B (EDX) at the nearest record of the owner of A (EAX; owner word at +0x15 of... ; callers 73ec@7563; guest pending
 0x000073d4	23	record_value_not_above_limit	low_helpers	compiles	game	confirmed	decomp/tests/0x000073d4.json	docs/compiler-abi.md; !(double record+0x71 > double 0x1803c4); callers 759c@7753; guest pending
 0x000073ec	430			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x0000759c	469			unknown	game	unverified		
+0x0000759c	469	update_tracked_pair_759c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000759c.json	Original 0x759c (469 bytes)
 0x00007780	40	alloc_zero_product_7780	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00007780.json	docs/compiler-abi.md; Allocate and zero a block of the product of both sizes.; callers 77a8@77d1,8748@8841,8748@8904; guest pending
 0x000077a8	280	init_roster_state_77a8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000077a8.json	docs/compiler-abi.md; Initialise the roster state for N units: word 0x1972e4 = N, the table 0x1972e0 from 0x7780(N, 0x22), the anchor/limit lo; callers 49228@495b2; guest pending
 0x000078c0	465			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.

@@ -3865,3 +3865,75 @@ uint32_t draw_marker_line_7b7d8(void)
 	}
 	return 1;
 }
+
+/* Original 0x759c: per-frame update of the tracked target object pair (low-level AI hit bookkeeping). */
+void update_tracked_pair_759c(int32_t id)
+{
+	uint32_t p, base, obj, obj2;
+	uint32_t slot;
+	int32_t v;
+	uint8_t q;
+
+	if (EF_U8(0x0019726au) == 0u)
+		return;
+	if (EF_U16(0x0019bb5cu) == 0u)
+		return;
+	if (EF_U8(0x00121e54u) != 0u) {
+		v = (int16_t)EF_U16(0x0019bb5cu);
+		EF_U8(0x00121e54u) = 0;
+		if (v > 0x12c)
+			EF_U8(0x00197269u) = 1;
+		else
+			EF_U8(0x00197269u) = (uint8_t)(600 / (v * (int32_t)EF_U8(0x0019726au)));
+		if (EF_U8(0x00197269u) == 0u)
+			EF_U8(0x00197269u) = 1;
+		q = (uint8_t)((uint32_t)EF_U8(0x00197269u) / 10u);
+		EF_U8(0x00197268u) = q;
+		if (q == 0u)
+			EF_U8(0x00197268u) = 1;
+	}
+	p = lookup_filtered_indexed_object((int16_t)id);
+	if (p == 0u)
+		return;
+	slot = EF_U8(p + 0x187u);
+	if (slot == 0xffu)
+		return;
+	EF_U16(0x00197266u) = (uint16_t)id;
+	base = EF_U32(0x00197260u);
+	EF_U16(base + slot * 5u + 3u) = (uint16_t)(EF_U16(base + slot * 5u + 3u) + 1u);
+	{
+		uint32_t e = base + (uint32_t)EF_U8(p + 0x187u) * 5u;
+		if (!((int16_t)EF_U16(0x0019bb5cu) > (int16_t)EF_U16(e + 3u)))
+			EF_U16(e + 3u) = 0;
+	}
+	v = (int32_t)EF_U32(p + 0x26u) >> 16;
+	base = EF_U32(0x0019bb58u);
+	obj = (uint32_t)(v * 0xca) + base;
+	if (obj == 0u)
+		return;
+	EF_U16(0x00197264u) = EF_U16(EF_U32(0x00197260u) + (uint32_t)EF_U8(p + 0x187u) * 5u + 3u);
+	v = (int32_t)EF_U32(0x00197262u) >> 16;
+	if (v == 0xff)
+		return;
+	obj2 = base + (uint32_t)(v * 0xca);
+	if (obj2 == 0u)
+		return;
+	if (EF_U8(obj2 + 0x1au) == 0u)
+		return;
+	v = (int32_t)EF_U32(0x0019bb5cu) >> 16;
+	if (v != 0xff) {
+		uint32_t obj3 = base + (uint32_t)(v * 0xca);
+		if (EF_U16(obj + 0x15u) == EF_U16(obj3 + 0x15u)) {
+			EF_U32(0x00121e5cu) = 0u;
+			EF_U32(0x00121e60u) = 0x3ff00000u;
+		} else {
+			EF_U32(0x00121e5cu) = 0u;
+			EF_U32(0x00121e60u) = 0u;
+		}
+	}
+	if (record_value_not_above_limit(obj2) == 0u) {
+		EF_U8(obj2 + 0x21u) = 0;
+		return;
+	}
+	guest_fn_73ec_x(obj, obj2);
+}
