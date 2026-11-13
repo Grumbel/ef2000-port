@@ -3706,3 +3706,49 @@ void draw_menu_box_79ff0(ef_addr32 menu)
     }
     cycle_page_dc280();
 }
+
+/* Original 0x7b3fc: draw a cross marker on the tile map cell (x, y). */
+uint32_t draw_tile_cross_7b3fc(int32_t x, int32_t y)
+{
+	uint32_t esi = ((uint32_t)(2 * x + 1)) << 10;
+	uint32_t edi = ((uint32_t)(2 * (0x18f - y) + 1)) << 10;
+	uint32_t row;
+	uint32_t tile;
+	int32_t tile16;
+	int32_t bx, by, a;
+
+	if (x > 0x18f || x < 0 || y > 0x18f || y < 0)
+		return 0;
+	row = (uint32_t)(400 * x);
+	tile = ((uint32_t)EF_U8(EF_U32(0x001f8eb4u) + row + (uint32_t)y) << 8) |
+	       (uint32_t)EF_U8(EF_U32(0x001f8eb8u) + row + (uint32_t)y);
+	if ((uint16_t)tile == 0xffffu)
+		return 0;
+	tile16 = (int16_t)(uint16_t)tile;
+	if (EF_U8(0x00122c52u) == 1u) {
+		store_bytes_46437d(0xe, 0x88);
+		rotate_page_entries_e8368((uint32_t)tile16, esi, 0u, edi);
+		store_bytes_46437d(0xf, 0x88);
+		draw_entry_boxes_e8484(tile16, esi, 0u, edi);
+	}
+	if (guest_fn_d0278_x((uint32_t)tile16, esi, 0u, edi) == 0u)
+		return 0;
+	EF_U32(0x001f8eb0u) = EF_U32(0x0042090cu) + esi;
+	EF_U32(0x001f8eacu) = EF_U32(0x004208fcu);
+	EF_U32(0x001f8ea8u) = EF_U32(0x00420900u) + edi;
+	if (EF_U8(0x00122c52u) == 1u) {
+		bx = (int16_t)EF_U16(0x001f8eb0u);
+		by = (int16_t)EF_U16(0x001f8eacu);
+		a = (int32_t)EF_U32(0x001f8ea6u) >> 16;
+		setup_rotation_args_16000c(0, 0, 0, 0, (uint32_t)a, (uint32_t)(int16_t)(by + 5),
+			(uint32_t)(int16_t)(bx + 5), (uint32_t)a, (uint32_t)(int16_t)(by - 5),
+			(uint32_t)(int16_t)(bx - 5), 0xffu, 0xfu);
+		bx = (int16_t)EF_U16(0x001f8eb0u);
+		by = (int16_t)EF_U16(0x001f8eacu);
+		a = (int32_t)EF_U32(0x001f8ea6u) >> 16;
+		setup_rotation_args_16000c(0, 0, 0, 0, (uint32_t)a, (uint32_t)(int16_t)(by + 5),
+			(uint32_t)(int16_t)(bx - 5), (uint32_t)a, (uint32_t)(int16_t)(by - 5),
+			(uint32_t)(int16_t)(bx + 5), 0xffu, 0xfu);
+	}
+	return 1;
+}
