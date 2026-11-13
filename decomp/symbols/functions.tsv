@@ -1211,7 +1211,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000658cc	143	advance_countdown_x_658cc	game_helpers27	compiles	game	confirmed	decomp/tests/0x000658cc.json	docs/compiler-abi.md; Advance the horizontal countdown; step to the next frame when it expires.; callers 654b8@6555a; guest pending
 0x00065960	202	reset_target_state_65960	game_helpers40	compiles	game	confirmed	decomp/tests/0x00065960.json	docs/compiler-abi.md; Reset the target-tracking state.; callers 5f60@5f75,5fd8@5fe3; guest pending
 0x00065a50	56	refresh_for_mode_65a50	small_wrappers6	compiles	game	confirmed	decomp/tests/0x00065a50.json	docs/compiler-abi.md; Dispatch on the mode byte at 0x1282c5 (0..8) to the matching refresh routine, then flag the display dirty.; callers 66548@665b7,66548@66689,66548@666b2; guest pending
-0x00065a88	402			unknown	game	unverified		
+0x00065a88	402	select_next_target_65a88	game_helpers130	compiles	game	confirmed	decomp/tests/0x00065a88.json	Advances the target selection through candidate filters; guest differential pending
 0x00065c1c	249	pick_nearest_unit_65c1c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00065c1c.json	docs/compiler-abi.md; Pick the nearest unit of kind 3 (0x6acc) to the viewpoint (dwords 0x1a5bec, 0x1a5bf0, 0x1a5be8 divided by 256) among the; callers 65a50@65a7b; guest pending
 0x00065d18	12	store_631bc_65d18	game_helpers5	compiles	game	confirmed	decomp/tests/0x00065d18.json	docs/compiler-abi.md; ; callers 65a50@65a6d; guest pending
 0x00065d24	235	next_target_65d24	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00065d24.json	docs/compiler-abi.md; Advance the target cursor 0x1a820c to the next visible candidate for the selected object (high word of 0x1f71c8, looked ; callers 65a50@65a74; guest pending

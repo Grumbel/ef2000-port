@@ -416,3 +416,69 @@ void init_nodes_from_grids_caa28(ef_addr32 head, ef_addr32 table_a, ef_addr32 ta
         }
     }
 }
+
+/* 0x65a88, 402 bytes. Advance the current target selection (word 0x1a823e, mirrored to 0x1a8238): starting from the retry budget 0x2119f4 (decremented by 0x1a822a per round), step to the next unit with 0x663a4 (mode 0 when 0x1a8246 is set, or 0x127da8 with 0x12584b == 1; otherwise mode 2 keeping the old value on failure) and reject the candidate object (0x7489c of the index in the high word of 0x1a823c) when it is the player's own record (+0x16 == 0x1f71ca), has byte +0x18d set, its record is inactive or farther than 0x2800 (0x23760 of the position >> 8), has flag 8 at +0x24, or is refused by 0x66bf4. Ends with 0xffff when no candidate is left. */
+void select_next_target_65a88(void)
+{
+    uint16_t budget = EF_U16(0x002119f4u);
+    ef_addr32 obj = guest_fn_7489c((int16_t)((int32_t)EF_S32(0x001f71c8u) >> 16));
+
+    if (obj == 0u) {
+        EF_U16(0x001a823eu) = 0xffffu;
+        EF_U16(0x001a8238u) = 0xffffu;
+        return;
+    }
+    for (;;) {
+        int32_t index;
+
+        if (EF_U8(0x001a8246u) != 0u || (EF_U8(0x00127da8u) != 0u && EF_U8(0x0012584bu) == 1u)) {
+            EF_U16(0x001a823eu) = (uint16_t)find_next_unit_663a4((uint32_t)((int32_t)EF_S32(0x001a823cu) >> 16), 0u);
+        } else {
+            uint16_t old = EF_U16(0x001a823eu);
+            uint16_t found = (uint16_t)find_next_unit_663a4((uint32_t)(int32_t)(int16_t)old, 2u);
+
+            EF_U16(0x001a823eu) = found;
+            if ((int16_t)found == -1)
+                EF_U16(0x001a823eu) = old;
+        }
+        index = (int32_t)EF_S32(0x001a823cu) >> 16;
+        if (index == -1) {
+            EF_U16(0x001a823eu) = 0xffffu;
+            EF_U16(0x001a8238u) = 0xffffu;
+            obj = 0u;
+        } else {
+            obj = guest_fn_7489c(index);
+            if (obj != 0u) {
+                int32_t vec[3];
+                int32_t metric;
+
+                vec[0] = (int32_t)EF_S32(obj) >> 8;
+                vec[1] = (int32_t)EF_S32(obj + 4u) >> 8;
+                vec[2] = (int32_t)EF_S32(obj + 8u) >> 8;
+                metric = guest_fn_23760_x((ef_addr32)(uintptr_t)vec);
+                if (EF_U16(obj + 0x16u) == EF_U16(0x001f71cau))
+                    obj = 0u;
+                if (obj != 0u && EF_U8(obj + 0x18du) != 0u)
+                    obj = 0u;
+                if (obj != 0u) {
+                    uint8_t active = active_unit_record_contains((int16_t)((int32_t)EF_S32(obj + 0x14u) >> 16));
+
+                    if (!(active != 0u && EF_U8(0x00122886u) != 0u) && metric > 0x2800)
+                        obj = 0u;
+                }
+                if (obj != 0u && (EF_U8(obj + 0x24u) & 8u) != 0u)
+                    obj = 0u;
+                if (obj != 0u && request_los_66bf4(obj) != 0u)
+                    obj = 0u;
+            }
+        }
+        budget = (uint16_t)(budget - EF_U16(0x001a822au));
+        if (obj != 0u || (int16_t)budget <= 0)
+            break;
+    }
+    if (obj != 0u && (EF_U8(obj + 0x24u) & 8u) != 0u)
+        obj = 0u;
+    if (obj == 0u)
+        EF_U16(0x001a823eu) = 0xffffu;
+    EF_U16(0x001a8238u) = EF_U16(0x001a823eu);
+}
