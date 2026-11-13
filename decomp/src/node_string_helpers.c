@@ -102,3 +102,42 @@ uint32_t count_positive_filtered_node_matches(uint8_t kind, ef_addr32 list_addr,
     }
     return count;
 }
+
+/* 0xb0018, 184 bytes. Sums, over the node list at [list_addr] (next at +4),
+ * the signed high half of the dword at +0x4f halved toward zero, stores the
+ * total (0x7d0 when zero) in [count_addr], allocates that many 0x36-byte
+ * zeroed records, marks words +0x30/+0x32/+0x34 of each as 0xffff and clears
+ * the globals 0x1379b0 (dword) and 0x1379b8 (word). Returns the table. */
+ef_addr32 allocate_weighted_node_records(ef_addr32 list_addr, ef_addr32 count_addr)
+{
+    ef_addr32 node = EF_U32(list_addr);
+    ef_addr32 table = 0;
+    int32_t i;
+
+    EF_U32(count_addr) = 0;
+    while (node != 0) {
+        int32_t v = (int32_t)EF_U32(node + 0x4f) >> 16;
+
+        EF_S32(count_addr) += (v - (v >> 31)) >> 1;
+        node = EF_U32(node + 4);
+    }
+    if (EF_S32(count_addr) == 0) {
+        EF_U32(count_addr) = 0x7d0;
+    }
+    if (EF_S32(count_addr) > 0) {
+        uint32_t size = (uint32_t)EF_S32(count_addr) * 0x36u;
+
+        table = guest_fn_cc6c0_q(size, 0x18dd14u, size, (uint32_t)EF_S32(count_addr));
+        guest_fn_b3fb0(table, 0, (uint32_t)EF_S32(count_addr) * 0x36u);
+    }
+    for (i = 0; i < EF_S32(count_addr); i++) {
+        ef_addr32 rec = table + (uint32_t)i * 0x36u;
+
+        EF_U16(rec + 0x30) = 0xffff;
+        EF_U16(rec + 0x32) = 0xffff;
+        EF_U16(rec + 0x34) = 0xffff;
+    }
+    EF_U32(0x1379b0) = 0;
+    EF_U16(0x1379b8) = 0;
+    return table;
+}

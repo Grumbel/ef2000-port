@@ -2648,3 +2648,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: recovered count_filtered_node_matches (0xb0850, node_string_helpers.c): counts list nodes passing guest_fn_cc1ac whose type (high word of [node+7]) is in the kind-0 or kind-1 set. Targeted differential against the original passes 3/3 (kind 0, 1, 2); the first failure was a swapped EBX/EDX parameter order, not a logic error.
 
 - 2026-11-13: recovered count_positive_filtered_node_matches (0xb0954, node_string_helpers.c): sibling of 0xb0850 using guest_fn_cc22c and a wider type set (word at +9 zero always counts). Targeted differential 3/3 PASS against the original.
+
+- 2026-11-13: recovered allocate_weighted_node_records (0xb0018, node_string_helpers.c): sums halved high-word weights over a node list, allocates n*0x36 bytes via guest_fn_cc6c0_q and initialises three words per record to 0xffff. Targeted differential PASS only for the negative-total (non-allocating) path; the allocating path cannot run in the cold harness (cc6c0 faults), so it is verified by disassembly review only.
