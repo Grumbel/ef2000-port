@@ -48,6 +48,26 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_changed_instruction_bytes_are_rejected_even_when_effects_match(self):
+        # Replacing NOP with CLC after CLC leaves the same final registers,
+        # flags and RAM. The static-code precondition still must be enforced.
+        source = '''.type root,@function
+root: clc
+mov byte ptr [patched], 0xf8
+patched: nop
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            out = root / 'out'
+            asm_c_program.generate(directory, out, image)
+            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=16)
+            self.assertEqual(report['entries'][0]['counts'], {'mismatch': 16})
+            self.assertTrue(all('C status 6' in p['differences'][0]
+                                for p in report['entries'][0]['probes']))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_composed_call_frames_tail_jumps_and_recursion_match_all_ram(self):
         programs = [
             '''.type root,@function

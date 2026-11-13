@@ -2419,3 +2419,22 @@ state 0xfc795 (192), and indirect callbacks. Segment/string state, service
 bindings, indirect transfers, x87, runtime enforcement of static-code assumptions,
 remaining body-boundary issues and native integration remain active work before
 reliable full bulk coverage can be claimed.
+
+2026-11-13 static-code enforcement: program dispatcher compares current guest
+instruction bytes against payload-bound encodings before each step; status 6
+rejects changed code, including mutations with otherwise identical observable
+outputs. Original bytes remain only in ignored generated artifacts. Host build
+uses one fingerprinted translation unit for stateless helper sharing; Watcom
+still builds separate body/dispatcher objects. Six focused program/build tests
+pass. Full Ghidra 12.1.4 selected corpus unchanged at 1,178 bodies: all Watcom
+objects plus dispatcher warning-free; 18,848 isolated probes reproduce 12,410
+passes, 6,438 original-fault/budget inconclusive, zero mismatches; 523 bodies pass
+all probes. Commands: python3 -m unittest tests.test_asm_c_program
+tests.test_asm_to_c.TranslationTests.test_generated_artifact_provenance_and_bulk_verifier;
+tools/asm_c_program.py --inventory local/asm-body-inventory-20261113 --output
+local/asm-c-guard-program-20261113; tools/asm_c_differential.py --translations
+local/asm-c-guard-program-20261113 --output local/asm-c-guard-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4 for oracle tests). No tracker/native promotion.
+Segment/string state, indirect transfers, runtime bindings, x87 and body-boundary
+cases still prevent reliable full coverage.

@@ -74,21 +74,36 @@ def analyse(records):
 def dispatcher(records):
     prototypes = ['unsigned ef_lift_%08x(ef_lift_state *, uint32_t);' % r['address']
                   for r in records]
-    locations = sorted((i['address'], r['address']) for r in records for i in r['instructions'])
+    locations = sorted((i['address'], r['address'], bytes.fromhex(i['bytes']))
+                       for r in records for i in r['instructions'])
     if not locations:
         raise ValueError('no closed translated instructions')
-    entries = ['    {0x%xu, ef_lift_%08x},' % pair for pair in locations]
+    entries, original = [], bytearray()
+    for pc, address, encoded in locations:
+        if not 1 <= len(encoded) <= 15:
+            raise ValueError('invalid x86 instruction length')
+        entries.append('    {0x%xu, ef_lift_%08x, %du, %du},' %
+                       (pc, address, len(original), len(encoded)))
+        original.extend(encoded)
+    original_lines = ['    ' + ','.join('0x%02x' % byte for byte in original[i:i+16]) + ','
+                      for i in range(0, len(original), 16)]
     return '''/* Generated ASM-derived program dispatcher. NEVER COMMIT. */
 #include "ef_lift_state.h"
 %s
 typedef unsigned (*ef_lift_step_function)(ef_lift_state *, uint32_t);
-typedef struct { uint32_t pc; ef_lift_step_function step; } ef_lift_location;
+typedef struct {
+    uint32_t pc; ef_lift_step_function step;
+    uint32_t code_offset; uint8_t length;
+} ef_lift_location;
 static const ef_lift_location ef_locations[] = {
+%s
+};
+static const uint8_t ef_original_code[] = {
 %s
 };
 unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
     unsigned status;
-    uint32_t low, high, middle;
+    uint32_t low, high, middle, byte_index, code_byte;
     if (s->fault) return s->fault;
     while (fuel--) {
         if (s->pc == stop_pc) return 0;
@@ -100,6 +115,11 @@ unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
         }
         if (low == sizeof(ef_locations) / sizeof(ef_locations[0]) ||
             ef_locations[low].pc != s->pc) return 2;
+        for (byte_index = 0; byte_index < ef_locations[low].length; ++byte_index) {
+            code_byte = ef_read(s, s->pc + byte_index, 8);
+            if (s->fault) return s->fault;
+            if (code_byte != ef_original_code[ef_locations[low].code_offset + byte_index]) return 6;
+        }
         status = ef_locations[low].step(s, 1);
         /* 0: RET executed; 1: one ordinary instruction completed. Both
            consume exactly one unit of the shared guest instruction budget. */
@@ -107,7 +127,7 @@ unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
     }
     return s->pc == stop_pc ? 0 : 1;
 }
-''' % ('\n'.join(prototypes), '\n'.join(entries))
+''' % ('\n'.join(prototypes), '\n'.join(entries), '\n'.join(original_lines))
 
 
 def generate(inventory, output, image):

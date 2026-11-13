@@ -232,3 +232,20 @@ fault/budget inconclusive outcomes, zero worker failures and zero mismatches.
 inconclusive. Artifacts: `local/asm-c-rotdiv-program-20261113` and
 `local/asm-c-rotdiv-diff-20261113`. Synthetic crash regressions are separate
 from these corpus counts. Full coverage and native integration remain unproven.
+
+The program dispatcher now checks each instruction's current guest bytes against
+its payload-bound encoding before execution. Status 6 rejects changed code,
+even when its effects happen to match the old instruction. The immutable byte
+table is generated only under ignored local/; it is not committed. This enforces
+the static-code precondition at runtime rather than assuming it from a decode.
+The standalone per-body lifter still requires static code from its caller.
+
+Host compilation now combines the hash-checked bodies and dispatcher into one
+translation unit, sharing the stateless runtime helpers. Its SHA-256 is recorded
+in the evidence. OpenWatcom continues compiling each body and dispatcher as
+separate objects. Six focused build/program tests pass, including code mutation
+with otherwise identical outputs. The guarded 1,178-body corpus reproduces
+12,410 passes, 6,438 inconclusive outcomes and zero mismatches, with every Watcom
+object warning-free. Artifacts: `local/asm-c-guard-program-20261113` and
+`local/asm-c-guard-diff-20261113`. Self-modifying code remains unsupported and
+is now detected, not silently executed using an obsolete translation.

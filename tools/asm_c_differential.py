@@ -204,8 +204,14 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                 raise ValueError('OpenWatcom compilation failed: ' + source.name)
             watcom_results[source.stem] = hashlib.sha256(obj.read_bytes()).hexdigest()
     library = output / 'translations.so'
+    # The runtime has only stateless helpers. One translation unit shares those
+    # helpers instead of reparsing/optimizing them in thousands of processes.
+    # Watcom still compiles every original source as a separate object above.
+    unit = output / 'translations.c'
+    unit.write_text('\n'.join('#line 1 %s\n%s' % (json.dumps(str(source)), source.read_text())
+                              for source in sources))
     command = [compiler, '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra',
-               '-Werror', '-Wno-unused-function', *map(str, sources), '-o', str(library)]
+               '-Werror', '-Wno-unused-function', '-I', str(directory), str(unit), '-o', str(library)]
     result = subprocess.run(command, capture_output=True, text=True)
     (output / 'compile.log').write_text(result.stdout + result.stderr)
     result.check_returncode()
@@ -233,6 +239,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   payload_sha256=manifest['payload_sha256'],
                   translation_report_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
+                  host_translation_unit_sha256=hashlib.sha256(unit.read_bytes()).hexdigest(),
                   dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
                   process_isolation='fork-per-entry-with-phase-reporting',
