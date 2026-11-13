@@ -24,7 +24,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
 SEGMENTS = ('es', 'cs', 'ss', 'ds', 'fs', 'gs')
-STATE_ABI = 1
+STATE_ABI = 2
 REG = {name: (index, 32, 0) for index, name in enumerate(REGS)}
 for index, name in enumerate(('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')):
     REG[name] = (index, 16, 0)
@@ -56,6 +56,9 @@ typedef struct {
     uint8_t *memory;
     uint32_t memory_size;
     uint32_t segment[6]; /* ES, CS, SS, DS, FS, GS: validated zero-base aliases. */
+    uint32_t x87[8][3]; /* Physical registers: significand low/high, sign/exponent. */
+    uint32_t x87_control, x87_status, x87_tag;
+    uint32_t x87_ip, x87_cs, x87_dp, x87_ds, x87_opcode;
 } ef_lift_state;
 static unsigned ef_segments_valid(ef_lift_state *s) {
     unsigned i;
@@ -501,7 +504,11 @@ def instruction_c(insn, starts):
     code = []
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
-    if mnemonic == 'nop' and not text:
+    if mnemonic == 'fninit' and not text:
+        # FNINIT marks registers empty but preserves their physical contents.
+        code += ['s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;',
+                 's->x87_ip = 0; s->x87_cs = 0; s->x87_dp = 0; s->x87_ds = 0; s->x87_opcode = 0;']
+    elif mnemonic == 'nop' and not text:
         pass
     elif mnemonic == 'mov' and any(part.strip().lower() in SEGMENTS for part in text.split(',')):
         arguments = [operand(part) for part in text.split(',')]

@@ -32,7 +32,51 @@ class State(ctypes.Structure):
     _fields_ = [('r', ctypes.c_uint32 * 8), ('flags', ctypes.c_uint32),
                 ('pc', ctypes.c_uint32), ('fault', ctypes.c_uint32),
                 ('memory', ctypes.POINTER(ctypes.c_uint8)), ('memory_size', ctypes.c_uint32),
-                ('segment', ctypes.c_uint32 * 6)]
+                ('segment', ctypes.c_uint32 * 6), ('x87', (ctypes.c_uint32 * 3) * 8),
+                ('x87_control', ctypes.c_uint32), ('x87_status', ctypes.c_uint32),
+                ('x87_tag', ctypes.c_uint32), ('x87_ip', ctypes.c_uint32),
+                ('x87_cs', ctypes.c_uint32), ('x87_dp', ctypes.c_uint32),
+                ('x87_ds', ctypes.c_uint32), ('x87_opcode', ctypes.c_uint32)]
+
+
+X87_FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',
+                  x87_ip='FIP', x87_cs='FCS', x87_dp='FDP', x87_ds='FDS', x87_opcode='FOP')
+
+
+def capture_x87(cpu):
+    """Capture physical raw-80 registers, including empty slots, and environment.
+
+    This is the oracle's observable state, not a claim that Unicorn implements
+    hardware exception status or instruction-environment updates correctly.
+    """
+    from unicorn import x86_const
+    result = {field: cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + name))
+              for field, name in X87_FIELDS.items()}
+    result['x87'] = []
+    for index in range(8):
+        significand, exponent = cpu.reg_read(x86_const.UC_X86_REG_FP0 + index)
+        result['x87'].append([significand & 0xffffffff, significand >> 32, exponent])
+    return result
+
+
+def bind_x87(cpu, initial=None):
+    from unicorn import x86_const
+    values = {field: 0 for field in X87_FIELDS}
+    values.update(x87_control=0x37f, x87_tag=0xffff, x87=[[0, 0, 0] for _ in range(8)])
+    if initial:
+        values.update(initial)
+    for index, (low, high, exponent) in enumerate(values['x87']):
+        cpu.reg_write(x86_const.UC_X86_REG_FP0 + index, (low | (high << 32), exponent))
+    for field, name in X87_FIELDS.items():
+        cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name), values[field])
+    return capture_x87(cpu)
+
+
+def set_x87(state, snapshot):
+    for field in X87_FIELDS:
+        setattr(state, field, snapshot[field])
+    for index, words in enumerate(snapshot['x87']):
+        state.x87[index][:] = words
 
 
 def bind_flat_segments(cpu):
@@ -63,7 +107,8 @@ def probes(count, seed):
         yield registers, flags
 
 
-def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None):
+def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
+            initial_x87=None):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
     from unicorn import x86_const
 
@@ -79,6 +124,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu.mem_map(0, memory_size)
     cpu.mem_write(0, bytes(memory))
     selectors = bind_flat_segments(cpu)
+    initial_fpu = bind_x87(cpu, initial_x87)
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
@@ -94,6 +140,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
     state.segment[:] = selectors
+    set_x87(state, initial_fpu)
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -115,6 +162,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             differences.append('%s: C=0x%x x86=0x%x' % (name, actual, original))
     if state.pc != sentinel:
         differences.append('return PC')
+    expected_fpu = capture_x87(cpu)
+    for field in X87_FIELDS:
+        if getattr(state, field) != expected_fpu[field]:
+            differences.append('%s: C=0x%x x86=0x%x' %
+                               (field, getattr(state, field), expected_fpu[field]))
+    for index, words in enumerate(state.x87):
+        if list(words) != expected_fpu['x87'][index]:
+            differences.append('x87 physical FP%d raw-80 value' % index)
     if state.flags != cpu.reg_read(x86_const.UC_X86_REG_EFLAGS):
         differences.append('flags: C=0x%x x86=0x%x' %
                            (state.flags, cpu.reg_read(x86_const.UC_X86_REG_EFLAGS)))
@@ -268,6 +323,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
+                  x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report

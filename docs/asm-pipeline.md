@@ -363,3 +363,28 @@ disagreements separately. This is an arithmetic prerequisite, not generated x87
 instruction support or an architectural-state equivalence claim. Noncanonical
 operands, input denormals, tag/stack/environment handling, unmasked exceptions,
 transcendentals, and application integration remain pending.
+
+State ABI 2 adds eight physical x87 registers as three explicit 32-bit words
+(significand low/high and sign/exponent), plus control/status/tag words and
+instruction/data pointers, selectors and opcode. TOP remains in the status
+word. No host `double`, `long double`, or packed native 80-bit struct determines
+the state layout. ABI 1 manifests are rejected before compilation; regenerate
+old translation artifacts. The verifier initializes the oracle and C from the
+same captured x87 state and compares every raw register, including empty-slot
+payloads, and all eight environment fields. Current full-corpus probes begin
+with an empty x87 stack and control word 0x37f; separate seeded tests cover
+nonzero payloads, TOP, tags and environment preservation.
+
+FNINIT resets the environment and tags while retaining physical register
+contents. A hardware FLDENV/FNINIT/FNSTENV check verifies that it clears a seeded
+opcode. Unicorn 2.1.4 leaves that opcode stale; the differential regression
+expects and preserves an explicit mismatch for that case. The default zero-
+opcode probe does not expose this gap. No environment field is masked to pass
+an x87 comparison, and snapshot coverage is not proof of the oracle's hardware
+accuracy. Arithmetic and other stack/environment operations remain unsupported.
+
+The ABI 2 rerun (`local/asm-c-x87-state-diff-20261113`) preserves every previous
+per-body outcome: 18,500 matches, 14,935 inconclusive and the same five target
+coverage failures across 2,090 bodies. Added x87 comparison causes no new
+failure under the empty-stack probe profile; it does not prove broader x87
+support. The gate remains nonzero.

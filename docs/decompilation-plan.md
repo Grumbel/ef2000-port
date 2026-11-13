@@ -2615,3 +2615,46 @@ ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3 -m unitt
 tests.test_asm_softfloat (Python 3.13.12/Unicorn 2.1.4). Build report and
 arithmetic-evidence.json are under that ignored directory; test log:
 local/asm-softfloat-verified-tests-20261113.log. No tracker promotion.
+
+
+**2026-11-13 — Explicit x87 state and comparison ABI 2.**
+Added eight physical raw-80 registers as low/high significand and sign/exponent
+words, plus control/status/tag, instruction/data pointers, selectors and opcode.
+The oracle and C receive identical captured initial state; every raw register
+(including empty-slot payloads) and every environment field is compared. Old
+ABI 1 manifests are rejected before any compilation. No host floating-point
+type determines the state representation. Added FNINIT environment/tag reset,
+retaining physical contents. No arithmetic or broader stack support yet.
+Seeded synthetic tests exercise nonzero TOP, payloads/tags, selectors/pointers,
+control/status/opcode preservation; negative tests mutate every field and an
+empty register and require mismatch. Hardware FLDENV/FNINIT/FNSTENV proves
+FNINIT clears the saved opcode; Unicorn 2.1.4 leaves a seeded nonzero opcode
+stale. The verifier continues to reject that difference explicitly; no field
+masking or false original-vs-C pass. Default empty-stack/zero-opcode probes do
+not expose it. Architectural-state completeness of the oracle remains unproven.
+89-test ASM/Ghidra suite passes; all five current x87 tests pass separately
+(including the subsequently added ABI rejection test). Synthetic FNINIT also
+compiles warning-free with Watcom; all 2,090 corpus bodies and dispatcher do too.
+Commands: python3 -m unittest tests.test_asm_c_x87 tests.test_asm_c_segments
+tests.test_asm_c_program tests.test_asm_to_c tests.test_asm_inventory
+tests.test_asm_diff tests.test_ghidra_ef2000; python3 -m unittest
+tests.test_asm_c_x87; tools/asm_c_program.py --inventory
+local/asm-observed-body-inventory-20261113 --output
+local/asm-c-x87-state-program-20261113 (ABI 2, same 2,090 selected bodies,
+269,778 body bytes). Evidence: local/asm-c-x87-state-{full-tests,tests}-20261113.log,
+local/asm-c-x87-fninit-watcom-20261113/compile.log. Python 3.13.12/Unicorn 2.1.4;
+Watcom v2 -bt=dos -3r -za99 -w1 -we. No tracker promotion or full-bulk claim.
+
+Final ABI 2 corpus comparison completes: all 2,090 per-body probe counts are
+unchanged from the count/shift corpus. 33,440 probes: 18,500 matches, 14,935
+original-fault/budget inconclusive, five uncovered-PC failures across the same
+three bodies (0xded86, 0xed133, 0x11f7ef); 750 bodies pass all probes, 1,337
+inconclusive, three fail. Added x87 comparisons introduce no new failure for
+the default empty-stack initial profile. This does not establish x87 arithmetic
+or nonempty application-state equivalence. Exit 1 remains the correct gate.
+Command: tools/asm_c_differential.py --translations
+local/asm-c-x87-state-program-20261113 --output
+local/asm-c-x87-state-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4). Final report binds ABI 2 and explicitly records
+x87 oracle limitations. Full reliable translation remains active.
