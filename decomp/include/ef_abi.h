@@ -92,7 +92,7 @@ uint32_t env_bomb_hit_water_dbcec(void); /* 0xdbcec */
 uint32_t env_bomb_hit_ground_dbd38(void); /* 0xdbd38 */
 uint32_t env_depth_fade_dbd84(void); /* 0xdbd84 */
 void env_unfix_horizon_db8a8(void);
-void env_load_horizon_db8b0(void);
+uint32_t env_load_horizon_db8b0(uint32_t eax);
 void env_corridor_dbe28(void);
 uint32_t env_planet2_dbe30(uint32_t eax);
 void env_space_dbe54(void);

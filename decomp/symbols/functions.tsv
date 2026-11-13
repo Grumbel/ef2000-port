@@ -3184,8 +3184,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000db654	218	sun_texture	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 16-byte list node insertion and signed index warning
 0x000db730	214	cannon_hit	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; two 18-byte hit records and count guard
 0x000db808	158	fix_horizon	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; counted horizon line consumption and callback
-0x000db8a8	8	unfix_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
-0x000db8b0	9	load_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
+0x000db8a8	8	env_unfix_horizon_db8a8	environment_mode_flags	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; hand object redirected, differential vs original 120/120 ok
+0x000db8b0	9	env_load_horizon_db8b0	environment_mode_flags	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; hand object redirected, differential vs original 120/120 ok
 0x000db8bc	160	heavenly_body	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 40 five-byte sky entries and guest type lookup
 0x000db95c	74	env_craft_hit_water_db95c	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
 0x000db9a8	74	env_craft_hit_ground_db9a8	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
@@ -3203,16 +3203,16 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000dbd38	74	env_bomb_hit_ground_dbd38	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
 0x000dbd84	74	env_depth_fade_dbd84	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
 0x000dbdd0	88	normal	environment_normal	drafted	game	confirmed		Space-skip parser and print hook; guest formatting pending
-0x000dbe28	8	corridor	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 2; guest pending
-0x000dbe30	33	planet2	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 4 in two globals; guest pending
-0x000dbe54	8	space	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bits 0x42; guest pending
-0x000dbe5c	33	spacecorr	environment_mode_flags	drafted	game	confirmed		Both mode masks updated and AH returned; guest replay pending
-0x000dbe80	41	rings	environment_mode_flags	drafted	game	confirmed		Both masks plus ring flag and AH return; guest replay pending
-0x000dbeac	46	moon	environment_mode_flags	drafted	game	confirmed		Word feature mask and moon flag; guest replay pending
-0x000dbedc	8	inferno	environment_mode_flags	drafted	game	confirmed		OR feature byte with 10; guest replay pending
-0x000dbee4	8	shield	environment_mode_flags	drafted	game	confirmed		OR feature byte with 01; guest replay pending
-0x000dbeec	9	city	environment_mode_flags	drafted	game	confirmed		OR feature byte with 22; guest replay pending
-0x000dbef8	41	day	environment_mode_flags	drafted	game	confirmed		Clear day flag and OR high mask; guest replay pending
+0x000dbe28	8	env_corridor_dbe28	environment_mode_flags	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 2; hand object redirected, differential vs original 120/120 ok
+0x000dbe30	33	env_planet2_dbe30	environment_mode_flags	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 4 in two globals; hand object redirected, differential vs original 120/120 ok
+0x000dbe54	8	env_space_dbe54	environment_mode_flags	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bits 0x42; hand object redirected, differential vs original 120/120 ok
+0x000dbe5c	33	env_spacecorr_dbe5c	environment_mode_flags	compiles	game	confirmed		Both mode masks updated and AH returned; hand object redirected, differential vs original 120/120 ok
+0x000dbe80	41	env_rings_dbe80	environment_mode_flags	compiles	game	confirmed		Both masks plus ring flag and AH return; hand object redirected, differential vs original 120/120 ok
+0x000dbeac	46	env_moon_dbeac	environment_mode_flags	compiles	game	confirmed		Word feature mask and moon flag; hand object redirected, differential vs original 120/120 ok
+0x000dbedc	8	env_inferno_dbedc	environment_mode_flags	compiles	game	confirmed		OR feature byte with 10; hand object redirected, differential vs original 120/120 ok
+0x000dbee4	8	env_shield_dbee4	environment_mode_flags	compiles	game	confirmed		OR feature byte with 01; hand object redirected, differential vs original 120/120 ok
+0x000dbeec	9	env_city_dbeec	environment_mode_flags	compiles	game	confirmed		OR feature byte with 22; hand object redirected, differential vs original 120/120 ok
+0x000dbef8	41	env_day_dbef8	environment_mode_flags	compiles	game	confirmed		Clear day flag and OR high mask; hand object redirected, differential vs original 120/120 ok
 0x000dbf3c	186	load_companion_files_dbf3c	load_planes1	compiles	game	confirmed	decomp/tests/0x000dbf3c.json	docs/compiler-abi.md; Load two companion files named from part b: the first into dest (complaining when missing), then, if the second exists, ; callers da644@da6a9,da644@da6fe,da7fc@da8a0; guest pending
 0x000dbff8	153	init3d_file	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; short file name with suffix and init callback
 0x000dc094	143	east_west_palettes	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; palette name length check and loader

@@ -10,10 +10,11 @@ void env_unfix_horizon_db8a8(void)
     EF_U8(0x425c86u) = 1u;
 }
 
-/* 0xdb8b0, 9 bytes: clear the flag via AH=0, preserving AL. */
-void env_load_horizon_db8b0(void)
+/* 0xdb8b0, 9 bytes: clear the flag via AH=0 (EAX returned with AH cleared). */
+uint32_t env_load_horizon_db8b0(uint32_t eax)
 {
     EF_U8(0x425c86u) = 0u;
+    return eax & ~0xff00u;
 }
 
 /* 0xdbe28, 8 bytes: accumulate corridor bit, not assignment. */

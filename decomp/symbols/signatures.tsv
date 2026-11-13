@@ -3415,3 +3415,15 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000dbcec	env_bomb_hit_water_dbcec		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	loads its destination pointer in EAX and tail-jumps to the shared parameter-line scanner (which saves/restores ebx,ecx,edx); returns scanned value in EAX; no stack args
 0x000dbd38	env_bomb_hit_ground_dbd38		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	loads its destination pointer in EAX and tail-jumps to the shared parameter-line scanner (which saves/restores ebx,ecx,edx); returns scanned value in EAX; no stack args
 0x000dbd84	env_depth_fade_dbd84		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	loads its destination pointer in EAX and tail-jumps to the shared parameter-line scanner (which saves/restores ebx,ecx,edx); returns scanned value in EAX; no stack args
+0x000db8a8	env_unfix_horizon_db8a8			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000db8b0	env_load_horizon_db8b0	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x000dbe28	env_corridor_dbe28			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000dbe30	env_planet2_dbe30	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x000dbe54	env_space_dbe54			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000dbe5c	env_spacecorr_dbe5c	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x000dbe80	env_rings_dbe80	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x000dbeac	env_moon_dbeac	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
+0x000dbedc	env_inferno_dbedc			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000dbee4	env_shield_dbee4			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000dbeec	env_city_dbeec			ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; only memory flags change; no stack args
+0x000dbef8	env_day_dbef8	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	entry point of the environment mode flag setters; AH is rewritten, rest of EAX preserved; no stack args
