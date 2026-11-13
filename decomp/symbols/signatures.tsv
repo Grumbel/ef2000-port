@@ -3345,3 +3345,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000c630	replay_elapsed_steps_c630			ebx,ecx,edx,esi,edi	0	fast-forward elapsed steps
 0x0003d7b0	draw_outline_segments_3d7b0	AL:a,DL:d,BX:b		ecx,esi,edi,ebp	0	draw nine clipped outline segments
 0x00043df4	draw_group_markers_43df4	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers for matching group nodes
+0x00043f48	draw_group_markers2_43f48	EAX:head,EDX:list		ebx,ecx,esi,edi,ebp	0	draw map markers for type 0x18/0xd group nodes
