@@ -4350,6 +4350,7 @@ void draw_text_box_1f994(int16_t index, ef_addr32 fallbackBitmap);
 void record_track_sample_2e494(void);
 void draw_debug_overlay_58714(void);
 void odometer_text_5e21c(int32_t xOffset, int32_t yOffset, ef_addr32 text);
+int32_t update_screen_palette_76370(uint32_t xIndex, uint32_t yIndex);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

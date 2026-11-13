@@ -1786,3 +1786,73 @@ void odometer_text_5e21c(int32_t xOffset, int32_t yOffset, ef_addr32 text)
         }
     }
 }
+
+/* Original 0x76370 (688 bytes). Palette fade/tint update for the current
+ * screen mode (byte 0x12db9e); returns the blend factor (nominally 25). */
+int32_t update_screen_palette_76370(uint32_t xIndex, uint32_t yIndex)
+{
+    int32_t a = EF_S32(0x00142e06u + ((xIndex & 0xffffu) >> 3) * 2u) >> 31;
+    int32_t b = EF_S32(0x00142e06u + ((yIndex & 0xffffu) >> 3) * 2u) >> 31;
+    int32_t factor = (int32_t)((int16_t)a * (int32_t)(int16_t)b) / 0x19 + 0x19;
+    uint8_t mode, slot;
+
+    if (EF_U8(0x001f88eau) != EF_U8(0x0012db9eu))
+        EF_U8(0x00128548u) = 1u;
+    if ((int16_t)factor != EF_S16(0x0012855cu) || EF_U8(0x00128548u) != 0u) {
+        EF_U16(0x0012855cu) = (uint16_t)factor;
+        EF_U16(0x001f88eau) = (uint16_t)EF_U8(0x0012db9eu);
+    }
+    blend_palette_757bc((int16_t)factor, 0x001f74e0u, 0x001f71e0u, 0x001f74e0u, 0x100u, 0u);
+    if (EF_U8(0x001f88fau) != 0u) {
+        blend_palette_758c0(EF_U8(0x001f88fau), 0x001f74e0u, 0x001f74e0u, 0x3fu, 0x3fu, 0x3fu);
+        EF_U8(0x001f88fau) = (uint8_t)(EF_U8(0x001f88fau) + 1u);
+        if (EF_U8(0x001f88fau) > 0x32u)
+            EF_U8(0x001f88fau) = 0u;
+    }
+    mode = EF_U8(0x0012db9eu);
+    if (mode == 0x0cu || (mode >= 0x12u && mode <= 0x16u) || mode == 0x1bu || mode == 0x20u ||
+        mode == 0x29u || mode == 0x30u || mode == 0x35u || mode == 0x36u || mode == 0x46u ||
+        mode == 0x47u) {
+        slot = EF_U8(0x001f88fbu);
+        if (slot == 1u) {
+            claim_ui_slot_801e4(0x41, 1u, 0u);
+            blend_palette_758c0((uint16_t)(EF_S32(0x001f88eeu) >> 16), 0x001f74e0u,
+                                0x001f74e0u, 0x3fu, 0u, 0u);
+        } else if (slot == 2u) {
+            claim_ui_slot_801e4(0x41, 1u, 0u);
+            blend_palette_758c0((uint16_t)(EF_S32(0x001f88ecu) >> 16), 0x001f74e0u,
+                                0x001f74e0u, 0u, 0u, 0u);
+        }
+    }
+    mode = EF_U8(0x0012db9eu);
+    if (mode == 0x10u || mode == 0x21u) {
+        if (EF_U8(0x0012854cu) == 0u) {
+            apply_palette_d663c(0x00425190u);
+            EF_U8(0x0012854cu) = 1u;
+        }
+        return factor;
+    }
+    if ((EF_U8(0x00159130u) & 0x80u) != 0u && EF_U8(0x0012854au) != 0u &&
+        EF_U8(0x00122c53u) == 0u &&
+        (mode == 0x12u || mode == 0x0cu || mode == 0x13u || mode == 0x14u || mode == 0x36u ||
+         mode == 0x15u || mode == 0x16u || mode == 0x29u || mode == 0x18u)) {
+        if (EF_U8(0x0012854cu) == 0u) {
+            apply_palette_d663c(0x00425190u);
+            EF_U8(0x0012854cu) = 1u;
+        }
+        return factor;
+    }
+    if (EF_U8(0x00128548u) != 0u) {
+        fade_palette_76948();
+        apply_palette_d663c(0x001f74e0u);
+        EF_U8(0x00128548u) = 0u;
+        EF_U8(0x0012854cu) = 0u;
+        return factor;
+    }
+    if (EF_U8(0x0012854cu) != 0u) {
+        apply_palette_d663c(0x001f74e0u);
+        EF_U8(0x00128548u) = 0u;
+        EF_U8(0x0012854cu) = 0u;
+    }
+    return factor;
+}

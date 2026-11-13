@@ -3328,3 +3328,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0002e494	record_track_sample_2e494			ebx,ecx,edx,esi,edi,ebp	0	Original 0x2e494 (681 bytes)
 0x00058714	draw_debug_overlay_58714			ebx,ecx,edx,esi,edi	0	Original 0x58714 (610 bytes)
 0x0005e21c	odometer_text_5e21c	EAX:int32_t,EDX:int32_t,EBX:ef_addr32		esi,edi,ebp,ecx	0	Original 0x5e21c (677 bytes); odometer number renderer; destructively truncates string
+0x00076370	update_screen_palette_76370	EAX:uint32_t,EDX:uint32_t	EAX:int32_t	ebx,ecx,esi	0	Original 0x76370 (688 bytes); palette fade/tint update
