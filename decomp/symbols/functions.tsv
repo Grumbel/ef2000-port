@@ -860,7 +860,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004be88	56	check_flags_4be88	game_helpers5	compiles	game	confirmed	decomp/tests/0x0004be88.json	docs/compiler-abi.md; ; callers 4bc40@4bc64; guest pending
 0x0004bec0	45	mpRedrawMap	mission_map_callbacks	drafted	game	unverified		Original disassembly; dirty redraw and latch reset; host-tested in batch 084
 0x0004bef0	42	mpMapSelect	mission_map_callbacks	drafted	game	unverified		Original disassembly; map layers and mode-4 height widgets; host-tested in batch 084
-0x0004bf1c	516			unknown	game	unverified		
+0x0004bf1c	516	draw_map_layers_4bf1c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0004bf1c.json	Original 0x4bf1c (516 bytes)
 0x0004c120	446			blocked	game	unverified		Skipped as too difficult: a branch leaves the function body (shared tail or Ghidra boundary split); needs the neighbouring code recovered together.
 0x0004c33c	126	mpClickMap		named	game	unverified		
 0x0004c3bc	593			unknown	game	unverified		

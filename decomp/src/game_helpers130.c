@@ -4479,3 +4479,60 @@ uint8_t object_fire_request_298f0(int16_t id, uint8_t slot)
 	}
 	return 1;
 }
+
+/* 0x4bf1c, 516 bytes. Redraw the map layers: for the current map mode (word at 0x1a54f4) run the matching marker/hotspot drawers, then the group markers and the two sprite passes. `a` is the map record, `b` the node list head and `c` the group list. */
+void draw_map_layers_4bf1c(uint32_t a, uint32_t b, uint32_t c)
+{
+	EF_U16(0x00126554u) = 1u;
+	EF_U16(0x00126558u) = 1u;
+	EF_U16(0x00126556u) = 1u;
+	guest_fn_4c120_x(a, c);
+	guest_fn_4c3bc_x(a, b);
+	EF_U16(0x00126558u) = 1u;
+	EF_U16(0x00126556u) = 1u;
+	EF_U16(0x00126554u) = 0u;
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x1d)
+		draw_hotspots_447ec(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x4f)
+		draw_hotspots_453f4(a, b);
+	if (EF_U16(0x001a54f4u) == 0u)
+		draw_node_markers_44aec(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x13)
+		draw_hotspots_4496c(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x26)
+		draw_hotspots_44de8(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x49)
+		draw_hotspots_45274(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0xf)
+		draw_extent_markers_43c84(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x11)
+		draw_group_markers_43df4(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x31)
+		draw_group_markers3_441fc(a, b);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x39)
+		draw_map_markers_4357c(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0xe)
+		draw_extent_markers_43834(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x17)
+		draw_extent_markers_439a4(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x16)
+		draw_group_markers4_43b14(a, c);
+	if ((EF_S32(0x001a54f2u) >> 16) == 0x10)
+		draw_group_icons_433fc(a, c);
+	EF_U16(0x00126558u) = 0u;
+	EF_U16(0x00126554u) = 1u;
+	EF_U16(0x00126556u) = 0u;
+	draw_group_markers3_441fc(a, b);
+	if (EF_U8(0x001a553au) != 0u)
+		draw_group_icons_433fc(a, c);
+	if (EF_U8(0x001a53dcu) == 4u) {
+		EF_U16(0x00126558u) = 0u;
+		EF_U16(0x00126554u) = 1u;
+		EF_U16(0x00126556u) = 0u;
+		draw_group_markers3_441fc(a, b);
+		if (EF_U8(0x001a553au) != 0u)
+			draw_group_icons_433fc(a, c);
+	}
+	draw_sprite_4d114();
+	draw_sprite_4d180();
+}

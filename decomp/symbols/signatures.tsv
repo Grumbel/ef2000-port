@@ -3368,3 +3368,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00021e04	draw_marker_box_21e04	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x21e04 (616 bytes); draws marker box and labels for a 10-byte table entry
 0x0002a1fc	fire_object_slot_2a1fc	AX:int16_t,DL:uint8_t,EBX:uint32_t		ecx,esi,edi,ebp	0	Original 0x2a1fc (668 bytes); spawns projectile(s) for a weapon slot via 0x87db8; callers 298f0
 0x000298f0	object_fire_request_298f0	AX:int16_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0x298f0 (491 bytes); fire request; callers unknown
+0x0004bf1c	draw_map_layers_4bf1c	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x4bf1c (516 bytes); map layer redraw dispatcher
