@@ -2254,3 +2254,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 resource-read integration: 0x9cde8 isolated and ABI corrected; nine routing/padding comparisons and four composed parser/read cases pass. Real archive/handle I/O, copy/fill integration and source-only main menu remain incomplete.
 
 2026-11-13 copy integration: valid flat segment descriptors permit unchanged original ES saves/restores; 27 copy cases and four parser/read/arena/list/copy cases pass. Synthetic fill and real archive/handle I/O remain, as do source-only startup and menu integration.
+
+2026-11-13 memory-parser composition: self-contained C fill removes the final service stub from the eight-function RAM-backed parser fixture; four comparisons pass. This is synthetic input and prepared state, not actual menu resources or cold startup. Pure-C working main menu remains incomplete.

@@ -121,30 +121,6 @@ void build_default_path_abaf0(ef_addr32 buffer)
     build_path_9c9c0(buffer, 0x0018da80u);
 }
 
-/* 0xb3fb0, 24 bytes. Fill bytes of a block with one value. */
-#if defined(__WATCOMC__)
-static void fill_bytes_preserve_eax(ef_addr32 dst, uint32_t value,
-                                   uint32_t count);
-#pragma aux fill_bytes_preserve_eax parm [eax] [edx] [ecx] modify [ecx edx] = \
-    "push esi" \
-    "push eax" \
-    "mov esi,0x000deb50" \
-    "call esi" \
-    "pop eax" \
-    "pop esi"
-#endif
-
-void fill_bytes_b3fb0(ef_addr32 dst, uint8_t value, uint32_t count)
-{
-    uint32_t repeated = (uint32_t)value * 0x01010101u;
-#if defined(__WATCOMC__)
-    /* Keep EAX live without changing the stack under the compiler's locals. */
-    fill_bytes_preserve_eax(dst, repeated, count);
-#else
-    guest_fn_deb50_f(dst, repeated, count);
-#endif
-}
-
 /* 0xb3fd0, 9 bytes. Square of a double. */
 double square_double_b3fd0(double x)
 {
