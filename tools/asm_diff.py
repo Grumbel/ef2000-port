@@ -41,7 +41,7 @@ def original_listing(image, address, length, *, objdump='objdump', runner=subpro
 def omf_listing(obj, *, wdis='wdis', runner=subprocess.run):
     with tempfile.TemporaryDirectory(prefix='ef2000-asm-diff-') as temporary:
         listing = Path(temporary) / 'object.asm'
-        runner([wdis, str(obj), '-r', '-l=' + str(listing)], check=True,
+        runner([wdis, str(obj), '-e', '-p', '-l=' + str(listing)], check=True,
                capture_output=True, text=True)
         if not listing.is_file() or listing.stat().st_size == 0:
             raise ValueError('wdis did not produce an OMF listing')

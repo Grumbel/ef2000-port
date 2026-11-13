@@ -26,7 +26,9 @@ class AsmDiffTests(unittest.TestCase):
                     return subprocess.CompletedProcess(argv, 0,
                         '  4050: 53                    push ebx\n', '')
                 self.assertEqual(argv[0], 'wdis')
-                self.assertIn('-r', argv)
+                self.assertIn('-e', argv)
+                self.assertIn('-p', argv)
+                self.assertNotIn('-r', argv)
                 Path(next(a[3:] for a in argv if a.startswith('-l='))).write_text(
                     'fixture_symbol: add eax,1 ; FIXUP external_symbol\n')
                 return subprocess.CompletedProcess(argv, 0, '', '')
