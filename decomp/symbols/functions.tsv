@@ -714,7 +714,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0003d308	97	draw_formatted_text_3d308	game_helpers131	compiles	game	confirmed	decomp/tests/0x0003d308.json	docs/compiler-abi.md; Draw a formatted string at character cell (col, row) with a one-pixel shadow: col * 8, row * 9 pixels (cdecl, variadic).; callers 3d4b0@3d55e,3d4b0@3d576,3d4b0@3d592; guest pending
 0x0003d37c	306			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x0003d4b0	765			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x0003d7b0	338			unknown	game	unverified		
+0x0003d7b0	338	draw_outline_segments_3d7b0	game_helpers130	compiles	game	confirmed	decomp/tests/0x0003d7b0.json	Original 0x3d7b0 (338 bytes)
 0x0003d904	73	draw_grid_3d904	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003d904.json	docs/compiler-abi.md; Draw the 16x16 grid of 10x10 cells.; callers 3dd30@3e458; guest pending
 0x0003d950	210	scan_triggers_3d950	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003d950.json	docs/compiler-abi.md; For each of the [0x1a5a86] 26-byte trigger records at 0x12b268 whose flag test (0xa0e98 on the id word) succeeds and whi; callers 3dd30@3dfae; guest pending
 0x0003da24	92	all_entries_ready_3da24	game_helpers8	compiles	game	confirmed	decomp/tests/0x0003da24.json	docs/compiler-abi.md; Are all entries of the table at 0x12b268 satisfied?; callers none direct; guest pending

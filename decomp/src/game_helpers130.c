@@ -3099,3 +3099,70 @@ void replay_elapsed_steps_c630(void)
     clear_word_tables_92f0();
     guest_fn_d68c_x();
 }
+
+/* Original 0x3d7b0 (338 bytes). Draw up to nine clipped line segments of a
+ * 3D shape outline (record a, table d) in colour b. The original keeps the
+ * clip results in an unaligned stack buffer; `loc` mirrors that frame. */
+static int32_t loc_rd32_3d7b0(const uint8_t *loc, int off)
+{
+    uint32_t v = (uint32_t)loc[off] | ((uint32_t)loc[off + 1] << 8) |
+                 ((uint32_t)loc[off + 2] << 16) | ((uint32_t)loc[off + 3] << 24);
+    return (int32_t)v;
+}
+
+static void loc_wr32_3d7b0(uint8_t *loc, int off, uint32_t v)
+{
+    loc[off] = (uint8_t)v;
+    loc[off + 1] = (uint8_t)(v >> 8);
+    loc[off + 2] = (uint8_t)(v >> 16);
+    loc[off + 3] = (uint8_t)(v >> 24);
+}
+
+void draw_outline_segments_3d7b0(uint8_t a, uint8_t d, uint16_t b)
+{
+    uint8_t loc[0x28];
+    int16_t i;
+    int w, h;
+
+    for (w = 0; w < (int)sizeof(loc); w++) loc[w] = 0;
+    h = (int)EF_U32(0x0015b748u);
+    w = (int)EF_U32(0x0015b744u);
+    guest_fn_ce328_w(0, w - 1, 0, h - 1);
+    h = (int)EF_U32(0x0015b748u);
+    w = (int)EF_U32(0x0015b744u);
+    guest_fn_cdf48(0u, (uint32_t)(w - 1), 0u, (uint32_t)(h - 1));
+    for (i = 0; i < 9; i++) {
+        uint32_t rec = EF_U32(0x001972e0u) + (uint32_t)a * 0x22u;
+        uint32_t p = EF_U32(rec + 0x1au) + (uint32_t)d * 0x2au + (uint32_t)((int32_t)i * 4);
+        int32_t t8, t12, x0, y0, e4, e10, c0, cl;
+        uint32_t p6;
+
+        t8 = (int32_t)(EF_U32(rec + 8u) << 11);
+        x0 = ((int32_t)EF_U32(p + 2u) >> 16) + t8;
+        p6 = EF_U32(p + 6u);
+        t12 = (int32_t)(EF_U32(rec + 0xcu) << 11);
+        c0 = (int32_t)EF_U32(p);
+        y0 = ((int32_t)EF_U32(p + 4u) >> 16) + t12;
+        loc_wr32_3d7b0(loc, 8, 0u);
+        loc_wr32_3d7b0(loc, 0xc, 0u);
+        loc_wr32_3d7b0(loc, 0x14, (uint32_t)(y0 + 0x400));
+        e10 = t8 + ((int32_t)p6 >> 16) + 0x400;
+        cl = (c0 >> 16) + t12 + 0x400;
+        loc_wr32_3d7b0(loc, 0x10, (uint32_t)e10);
+        if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)cl,
+                              (uint32_t)(loc_rd32_3d7b0(loc, 6) >> 16),
+                              (uint32_t)(int32_t)(int16_t)(x0 + 0x400),
+                              (ef_addr32)(uintptr_t)&loc[4]) == 0u)
+            continue;
+        if (guest_fn_15c0c4_x((uint32_t)(loc_rd32_3d7b0(loc, 0x12) >> 16),
+                              (uint32_t)(loc_rd32_3d7b0(loc, 0xa) >> 16),
+                              (uint32_t)(loc_rd32_3d7b0(loc, 0xe) >> 16),
+                              (ef_addr32)(uintptr_t)&loc[0]) == 0u)
+            continue;
+        guest_fn_c8ccc_x((uint32_t)(int32_t)(int16_t)(loc[2] | (loc[3] << 8)),
+                         (uint32_t)(int32_t)(int16_t)(loc[0] | (loc[1] << 8)),
+                         (uint32_t)(int32_t)(int16_t)(loc[6] | (loc[7] << 8)),
+                         (uint32_t)(int32_t)(int16_t)(loc[4] | (loc[5] << 8)),
+                         (uint32_t)(int32_t)(int16_t)b);
+    }
+}

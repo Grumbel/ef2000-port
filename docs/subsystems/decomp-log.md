@@ -2436,3 +2436,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `centre_view_sample_39744` (0x39744) from disassembly; differential fuzz weak (0 of 1000 cases complete, original faults on random state), so verified by disassembly review only.
 
 - 2026-11-13: recovered `replay_elapsed_steps_c630` (0xc630) from disassembly; added `guest_fn_d68c_x` wrapper. Fuzz weak (0 of 1000 cases complete); disassembly-checked only.
+
+- 2026-11-13: recovered `draw_outline_segments_3d7b0` (0x3d7b0); fuzz PASS 222 completed. Clip results live in a local buffer mirroring the original unaligned stack frame.
