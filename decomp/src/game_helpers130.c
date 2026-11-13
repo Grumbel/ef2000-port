@@ -4985,3 +4985,73 @@ void refresh_selected_label_5c354(void)
 	guest_fn_c8ccc_x((uint32_t)(pt[1] + k), (uint32_t)(pt[0] - k), (uint32_t)(pt[1] - k),
 	                 (uint32_t)(pt[0] + k), EF_U8(0x00128148u));
 }
+
+/* Original 0x87700 (454 bytes): resolve the 0x91-byte record table text
+ * references, then link the 0x8f-byte node pool into a free list. */
+void init_record_tables_87700(void)
+{
+	int32_t i, base, rec, link;
+	uint32_t p;
+	uint16_t node;
+
+	EF_U16(0x0020f192u) = (uint16_t)guest_fn_de864(0x0018a420u);
+	EF_U16(0x0020f19eu) = 0x06e0u;
+	EF_U16(0x0012d7a8u) = 0u;
+	EF_U32(0x0020f15cu) = 0u;
+	i = 1;
+	for (;;) {
+		base = (int16_t)i;
+		if (EF_U32(0x0012bc68u + (uint32_t)(base * 0x91)) == 0u)
+			break;
+		i++;
+	}
+	start_transfer_985b0(2u, 0x00132958u, 1u, (uint32_t)(base - 1));
+	i = 1;
+	for (;;) {
+		rec = (int16_t)i * 0x91;
+		if (EF_U32(0x0012bc68u + (uint32_t)rec) == 0u)
+			break;
+		update_progress_985f4(2u, (int32_t)(int16_t)i);
+		EF_U16(0x0012bc8au + (uint32_t)rec) =
+			(uint16_t)guest_fn_de864(EF_U32(0x0012bc74u + (uint32_t)rec));
+		EF_U16(0x0012bc92u + (uint32_t)rec) = 0u;
+		EF_U16(0x0012bc90u + (uint32_t)rec) = 0u;
+		EF_U16(0x0012bc8eu + (uint32_t)rec) = 0u;
+		p = EF_U32(0x0012bc70u + (uint32_t)rec);
+		EF_U16(0x0012bc88u + (uint32_t)rec) = 0u;
+		if (p != 0u)
+			EF_U16(0x0012bc88u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+		rec = (int16_t)i * 0x91;
+		p = EF_U32(0x0012bc7cu + (uint32_t)rec);
+		if (p != 0u)
+			EF_U16(0x0012bc8eu + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+		rec = (int16_t)i * 0x91;
+		p = EF_U32(0x0012bc80u + (uint32_t)rec);
+		if (p != 0u)
+			EF_U16(0x0012bc90u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+		rec = (int16_t)i * 0x91;
+		p = EF_U32(0x0012bc84u + (uint32_t)rec);
+		if (p != 0u)
+			EF_U16(0x0012bc92u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+		rec = (int16_t)i * 0x91;
+		p = EF_U32(0x0012bc78u + (uint32_t)rec);
+		i++;
+		EF_U16(0x0012bc8cu + (uint32_t)rec) = (uint16_t)call_9de08_9ddfc(p);
+	}
+	EF_U32(0x0020f164u) = 0x001fd9fcu;
+	EF_U32(0x0020f160u) = 0x001fda8bu;
+	EF_U32(0x0020f158u) = 0x001fd9fcu;
+	EF_U32(0x001fda30u) = 0x001fd9fcu;
+	EF_U32(0x001fda34u) = 0x001fd9fcu;
+	EF_U32(0x001fdabfu) = 0x001fd9fcu;
+	EF_U32(0x001fdac3u) = 0x001fd9fcu;
+	link = 0;
+	for (node = 2u; (int16_t)node < 0x1f4; node++) {
+		uint32_t n = (uint32_t)((int32_t)(int16_t)node * 0x8f) + 0x001fd9fcu;
+		EF_U32(n + 0x34u) = (uint32_t)link;
+		EF_U16(n + 0x54u) = node;
+		link = (int32_t)n;
+	}
+	EF_U16(0x0020f198u) = 0u;
+	EF_U32(0x0020f168u) = (uint32_t)link;
+}

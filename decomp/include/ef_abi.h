@@ -4417,6 +4417,7 @@ void reset_object_position_8cd78(int16_t id); /* 0x8cd78 */
 void show_title_sequence_97dcc(void); /* 0x97dcc */
 uint16_t scan_list_bed1c(ef_addr32 list, uint16_t value, uint8_t kind, uint32_t ctx, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5); /* 0xbed1c */
 void refresh_selected_label_5c354(void); /* 0x5c354 */
+void init_record_tables_87700(void); /* 0x87700 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

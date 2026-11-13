@@ -1702,7 +1702,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00086f7c	843	query_projected_object_position	unk_geometry	typed	game	confirmed		docs/compiler-abi.md; AX selector, EDX output pair pointer, BX iteration count; returns signed EAX; caller sites 0x5c7b9/0x5ca6e; indirect callback effects remain replay concern
 0x000872c8	217	spawn_at_selected_872c8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000872c8.json	docs/compiler-abi.md; Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (noth; callers 873a4@873cd; guest pending
 0x000873a4	432			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
-0x00087700	454			unknown	game	unverified		
+0x00087700	454	init_record_tables_87700	game_helpers130	compiles	game	confirmed	decomp/tests/0x00087700.json	Original 0x87700 (454 bytes)
 0x000878c8	165	release_object_878c8	game_helpers35	compiles	game	confirmed	decomp/tests/0x000878c8.json	docs/compiler-abi.md; Remove an object from the active list and put it on the free list.; callers 56954@5696c,879c4@879d4,880c8@880e9; guest pending
 0x00087970	81	refresh_record_selection	record_transitions	compiles	game	confirmed	decomp/tests/0x00087970.json	docs/compiler-abi.md; host model; guest differential pending
 0x000879c4	89	rotate_ui_record_ring	record_transitions	compiles	game	confirmed	decomp/tests/0x000879c4.json	docs/compiler-abi.md; host model; guest differential pending
@@ -2592,7 +2592,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b8cf8	1057			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000b914c	1623			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000b97a4	768			unknown	game	unverified		
-0x000b9aa4	450			unknown	game	unverified		
+0x000b9aa4	450			blocked	game	unverified		Skipped as too difficult: callees 0xb52bc (x87) and 0xb8cf8 (segment/port access) are blocked; 6-stack-arg loop untestable without them
 0x000b9c68	426	build_object_records_b9c68	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b9c68.json	Original 0xb9c68 (426 bytes)
 0x000b9e9c	164	class_selector_code_b9e9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b9e9c.json	docs/compiler-abi.md; Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absen; callers 9820@9bf9; guest pending
 0x000ba0e4	43	map_code_ba0e4	code_maps1	compiles	game	confirmed	decomp/tests/0x000ba0e4.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 0).; callers b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc; guest pending
