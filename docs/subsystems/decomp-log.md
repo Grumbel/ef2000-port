@@ -2598,3 +2598,8 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
   branches and kind 2 entries) agrees on call logs, stack args, end registers
   and the written 0xc4756/0x159094 globals (400/400). Wrappers added for
   c39f0, dc21c, dc334, d86e0, 7ac74, 87fe4, dc314, 5fc80.
+
+- 2026-11-13: recovered `draw_waypoint_boxes_5f220` (0x5f220). Controlled
+  differential (7 stubbed callees, 15c0c4 writing scripted point words,
+  400 random scenarios, 900 box draws) agrees on all call logs, stack args
+  and end registers (400/400). Wrappers added for 5f588, 59420, 5c0cc.

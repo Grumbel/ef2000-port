@@ -1167,7 +1167,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005ebb8	711			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0005ee80	198	find_entry_in_range_5ee80	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005ee80.json	docs/compiler-abi.md; Find the entry (0x54-byte records at 0x1a6b3c, count byte at [[0x1a6b08] + 0x13]) whose position is within 0x7fff of the; callers 9114@9160; guest pending
 0x0005f1ec	52	sample_active_coordinates	runtime_predicates	compiles	game	confirmed	decomp/tests/0x0005f1ec.json	docs/compiler-abi.md; 80 isolated GCC32 guest cases memory and preserved registers pass; Watcom/OMF and replay pending
-0x0005f220	871			unknown	unclassified	unverified		
+0x0005f220	871	draw_waypoint_boxes_5f220	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005f220.json	Original 0x5f220 (871 bytes)
 0x0005f588	172	turn_direction_5f588	game_helpers38	compiles	game	confirmed	decomp/tests/0x0005f588.json	docs/compiler-abi.md; Turn direction of three points: 1, -1 (0xff) or 0, with a collinear tiebreak.; callers 5f220@5f467; guest pending
 0x0005f634	98	reset_menu_page_5f634	leaf_helpers4	compiles	game	confirmed	decomp/tests/0x0005f634.json	docs/compiler-abi.md; Reset the page state and rebuild the menu.; callers 5f60@5f7a,5fd8@5fe8; guest pending
 0x0005f698	528	draw_view_box_5f698	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005f698.json	Original 0x5f698 (528 bytes)

@@ -6334,3 +6334,69 @@ void render_table_entry_63d5c(uint32_t ax)
 		guest_fn_5fc80((uint32_t)idx);
 	guest_fn_c39ac();
 }
+
+/* 0x5f220, 871 bytes. Draw the interpolated corner boxes of the active
+ * waypoint record when the camera is within ~6 units, then refresh the
+ * tactical coordinate display. No arguments. */
+void draw_waypoint_boxes_5f220(void)
+{
+	uint32_t k = EF_U8(0x001a6d1bu);
+	uint32_t e = 0x00128170u + k * 15u;
+	int16_t w1c = (int16_t)EF_U16(e);
+	int32_t m = (int16_t)EF_U16(e + 6u);
+	int16_t w20 = (int16_t)((m * 3) / 6);
+	int32_t s = (int16_t)EF_U16(0x001a6cceu);
+	uint32_t p = EF_U32(0x001972e0u) + (uint32_t)(s * 34);
+	uint32_t d1 = EF_U32(p + 8u) - (uint32_t)(((int32_t)EF_U32(0x001a5becu)) >> 11);
+	uint32_t d2 = EF_U32(p + 0xcu) - (uint32_t)(((int32_t)EF_U32(0x001a5be8u)) >> 11);
+	int16_t i, j;
+	if ((int32_t)(d1 * d1 + d2 * d2) > 0x24)
+		return;
+	guest_fn_ce328_w((uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf2u), (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf8u),
+			 (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf0u), (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf6u));
+	guest_fn_cdf48((uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf2u), (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf8u),
+		       (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf0u), (uint32_t)(int32_t)(int16_t)EF_U16(0x001a6cf6u));
+	if (EF_U16(0x001a6ccau) != 0u) {
+		for (i = 0; (int32_t)i < 2 * (int32_t)(int16_t)EF_U16(0x001a6ccau); i++) {
+			for (j = 0; (int32_t)j < 6; j++) {
+				uint32_t bp = 0x001a6b20u + (uint32_t)((int32_t)i * 42);
+				int32_t jj = j;
+				int32_t a, b, c;
+				int16_t Lw[8];
+				uint32_t lb = (uint32_t)(uintptr_t)Lw;
+				int32_t t0 = (int32_t)EF_U32(bp + 0xcu);
+				int32_t t1 = (int32_t)EF_U32(bp + 0x10u);
+				int32_t t2 = (int32_t)EF_U32(bp + 0x14u);
+				int32_t w18 = (int16_t)EF_U16(bp + 0x18u);
+				int32_t w1a = (int16_t)EF_U16(bp + 0x1au);
+				a = (int32_t)((uint32_t)(int32_t)(EF_U32(bp) - (uint32_t)t0) * (uint32_t)jj) / 5 + t0;
+				b = (int32_t)((uint32_t)(int32_t)(EF_U32(bp + 4u) - (uint32_t)t1) * (uint32_t)jj) / 5 + t1;
+				c = (int32_t)((uint32_t)(int32_t)(EF_U32(bp + 8u) - (uint32_t)t2) * (uint32_t)jj) / 5 + t2;
+				if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)(c - w1a), (uint32_t)(int32_t)(int16_t)(b - 10),
+						      (uint32_t)(int32_t)(int16_t)(a - w18), lb + 12u) == 0u)
+					continue;
+				if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)(c + w1a), (uint32_t)(int32_t)(int16_t)(b - 10),
+						      (uint32_t)(int32_t)(int16_t)(a + w18), lb + 8u) == 0u)
+					continue;
+				if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)(c - w1a), (uint32_t)(int32_t)(int16_t)(b + 10),
+						      (uint32_t)(int32_t)(int16_t)(a - w18), lb + 4u) == 0u)
+					continue;
+				if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)(c + w1a), (uint32_t)(int32_t)(int16_t)(b + 10),
+						      (uint32_t)(int32_t)(int16_t)(a + w18), lb) == 0u)
+					continue;
+				if ((int8_t)guest_fn_5f588(lb + 12u, lb + 8u, lb + 4u) != -1)
+					continue;
+				guest_fn_c8ccc_x((uint32_t)(int32_t)Lw[5], (uint32_t)(int32_t)Lw[4], (uint32_t)(int32_t)Lw[7],
+						 (uint32_t)(int32_t)Lw[6], EF_U8(0x00128148u));
+				guest_fn_c8ccc_x((uint32_t)(int32_t)Lw[1], (uint32_t)(int32_t)Lw[0], (uint32_t)(int32_t)Lw[3],
+						 (uint32_t)(int32_t)Lw[2], EF_U8(0x00128148u));
+				guest_fn_c8ccc_x((uint32_t)(int32_t)Lw[3], (uint32_t)(int32_t)Lw[2], (uint32_t)(int32_t)Lw[7],
+						 (uint32_t)(int32_t)Lw[6], EF_U8(0x00128148u));
+				guest_fn_c8ccc_x((uint32_t)(int32_t)Lw[1], (uint32_t)(int32_t)Lw[0], (uint32_t)(int32_t)Lw[5],
+						 (uint32_t)(int32_t)Lw[4], EF_U8(0x00128148u));
+			}
+		}
+	}
+	guest_fn_59420_w((uint32_t)(int32_t)w1c, (uint32_t)(int32_t)w20, 0x00186014u);
+	guest_fn_5c0cc();
+}
