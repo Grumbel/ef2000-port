@@ -1437,7 +1437,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007957c	1111			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000799d4	835			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00079d18	719			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x00079ff0	420			unknown	game	unverified		
+0x00079ff0	420	draw_menu_box_79ff0	game_helpers130	compiles	game	confirmed	decomp/tests/0x00079ff0.json	Original 0x79ff0 (420 bytes)
 0x0007a194	251	run_choice_prompt_7a194	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007a194.json	docs/compiler-abi.md; Full-screen choice prompt: clip to the screen (0xce328, 0xcdf48), draw the page chosen by byte 0x125846 (1: 0x12aeb8, 2:; callers 7a290@7a290; guest pending
 0x0007a290	8	low_byte_7a290	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x0007a290.json	docs/compiler-abi.md; Low byte of 0x7a194's result.; callers 19a80@19a86; guest pending
 0x0007a298	10	call_79ff0_12af60	mid_helpers	compiles	game	confirmed	decomp/tests/0x0007a298.json	docs/compiler-abi.md; tail 0x79ff0 with EAX=0x12af60; callers 3dd30@3e877; guest pending

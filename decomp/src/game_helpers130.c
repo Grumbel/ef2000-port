@@ -3637,3 +3637,72 @@ void draw_tile_window_7ac74(int32_t mode, int32_t x, uint32_t unused_ebx, int32_
         outer++;
     } while (outer < (int16_t)EF_U16(0x0012afd6u));
 }
+
+/* Original 0x79ff0 (420 bytes). Draw a centred ten-pixel-per-row text menu:
+ * MENU holds a word count at +0 followed by 9-byte entries whose first dword
+ * (+2) is the string pointer. Latch the full-screen clip, measure the widest
+ * string, fill the ten 256-byte background rows at 0x1f77e0, fill in the box
+ * rectangle words at 0x12afaa..0x12afb8 (doubled in 8 slots when 0x12b369 is
+ * set), render the background through 0xc4b95 with block 0x12af98, draw each
+ * string with 0x48c90 and flip the page. */
+void draw_menu_box_79ff0(ef_addr32 menu)
+{
+    int16_t count, i, x0, n;
+    int32_t edi;
+    uint32_t edx = 0, v;
+    ef_addr32 ptr;
+
+    latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    count = (int16_t)EF_U16(menu);
+    if (count > 0) {
+        i = 0;
+        do {
+            uint32_t len = guest_string_length(EF_U32(menu + 2u + (uint32_t)((int32_t)i * 9)));
+
+            if ((int16_t)len > (int16_t)edx)
+                edx = len;
+            i++;
+        } while (i < (int16_t)EF_U16(menu));
+    }
+    edi = ((0xc8 - 10 * (int32_t)(int16_t)EF_U16(menu)) >> 1) - 4;
+    edx <<= 2;
+    x0 = (int16_t)((0x140 - (int32_t)(int16_t)edx) >> 1);
+    EF_U16(0x0012afb0u) = (uint16_t)(edi - 4);
+    EF_U16(0x0012afacu) = (uint16_t)(edi - 4);
+    v = (uint32_t)(edi + 4 + 10 * (int32_t)(int16_t)EF_U16(menu));
+    EF_U16(0x0012afb8u) = (uint16_t)v;
+    EF_U16(0x0012afb4u) = (uint16_t)v;
+    EF_U16(0x0012afb6u) = (uint16_t)(x0 - 4);
+    edx += (uint32_t)(int32_t)(x0 - 4);
+    EF_U16(0x0012afaau) = (uint16_t)(x0 - 4);
+    edx += 8u;
+    EF_U16(0x0012afb2u) = (uint16_t)edx;
+    EF_U16(0x0012afaeu) = (uint16_t)edx;
+    ptr = 0x001f77e0u;
+    n = 10;
+    do {
+        fill_bytes_b3fb0(ptr, 6u, 10u);
+        n--;
+        ptr += 0x100u;
+    } while (n > 0);
+    if (EF_U8(0x0012b369u) != 0u) {
+        for (i = 0; i < 8; i++)
+            EF_U16(0x0012afaau + 2u * (uint32_t)i) = (uint16_t)(EF_U16(0x0012afaau + 2u * (uint32_t)i) << 1);
+    }
+    edi += 2;
+    EF_U32(0x00159080u) = 0x001f77e0u;
+    guest_fn_c4b95_x(0x0012af98u);
+    count = (int16_t)EF_U16(menu);
+    i = 0;
+    if (count > 0) {
+        do {
+            EF_U8(0x00127b1au) = 1;
+            draw_shadowed_text_48c90(0xfu, (int32_t)x0, (int32_t)(int16_t)edi,
+                                     EF_U32(menu + 2u + (uint32_t)((int32_t)i * 9)));
+            i++;
+            edi += 10;
+        } while (i < (int16_t)EF_U16(menu));
+    }
+    cycle_page_dc280();
+}

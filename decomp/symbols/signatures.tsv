@@ -3353,3 +3353,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c0624	process_group_nodes_c0624	AX:uint16_t,DL:uint8_t,BL:uint8_t,ECX:ef_addr32	AX:uint16_t	esi,edi,ebp	24	Original 0xc0624 (377 bytes); ret 0x18, list is the third stack argument
 0x00074584	release_object_74584	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x74584 (404 bytes)
 0x0007ac74	draw_tile_window_7ac74	EAX:int32_t,EDX:int32_t,ECX:int32_t		esi,edi,ebp	4	Original 0x7ac74 (405 bytes); ret 4
+0x00079ff0	draw_menu_box_79ff0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x79ff0 (420 bytes)
