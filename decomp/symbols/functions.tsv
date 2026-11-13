@@ -40,7 +40,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000020ec	3211			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00002d78	117	schedule_allows_2d78	game_helpers13	compiles	game	confirmed	decomp/tests/0x00002d78.json	docs/compiler-abi.md; True when both owner bytes of the 62-byte record match and the time is in range.; callers 20ec@24d9,20ec@24fd,20ec@2521; guest pending
 0x00002e04	1456			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000033b4	689			unknown	game	unverified		
+0x000033b4	689			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00003668	1022			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00003aa8	61	map_code_3aa8	code_maps1	compiles	game	confirmed	decomp/tests/0x00003aa8.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 26).; callers 2e04@2edf,2e04@2f95,3d74@3d94; guest pending
 0x00003b1c	59	map_code_3b1c	code_maps1	compiles	game	confirmed	decomp/tests/0x00003b1c.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 26).; callers 3d74@3dcd; guest pending
@@ -247,7 +247,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00011d20	35	set_runtime_slot_flag	low_helpers	compiles	game	confirmed	decomp/tests/0x00011d20.json	docs/compiler-abi.md; byte 0x121fb4+29*AX = DL then 0x11e7c; callers 12210@12259,12210@12297; guest pending
 0x00011d44	156	step_letter_table_11d44	game_helpers73	compiles	game	confirmed	decomp/tests/0x00011d44.json	docs/compiler-abi.md; Advance the letter table walk; emits up to 18 letters per step for the active mode.; callers 601c@60aa,11de0@11e70; guest pending
 0x00011de0	155	find_letter_entry_11de0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00011de0.json	docs/compiler-abi.md; Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): sc; callers 1a47c@1a4e3; guest pending
-0x00011e7c	706			unknown	game	unverified		
+0x00011e7c	706			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00012140	29	refresh_all_runtime_slots	low_helpers	compiles	game	confirmed	decomp/tests/0x00012140.json	docs/compiler-abi.md; 0x11e7c for 0..53; callers 11d44@11dd1; guest pending
 0x00012160	84	reinitialize_runtime_slots	runtime_indexed	blocked	game	confirmed	decomp/tests/0x0012160.json	54 records at stride 29; cockpit capture has 49 nonzero callback pointers. Original indirect call enters with EAX=record-table byte offset and EDX=index; current C helper wrappers do not encode that ABI. OpenWatcom emits a 124-byte body for the 84-byte extent and leaves guest_refresh_runtime_slot_/guest_invoke_runtime_slot_ unresolved for OMF splice. Blocked pending callback ABI/lowering.
 0x000121cc	33	read_runtime_slot_flag	runtime_indexed	verified	game	confirmed	decomp/tests/0x00121cc.json	Signed DX offset to overlapping high-word base then AX slot; callers 6460@65a6/1f878@1f8a8; 380 isolated cases, 3 captured calls, cockpit replay
@@ -347,13 +347,13 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001f878	74	push_event_1f878	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0001f878.json	docs/compiler-abi.md; Push an entry onto the ten-entry stack at 0x19b0d0 and request an event.; callers 14c5c@14d33,1a3cc@1a448,1a3cc@1a466; guest pending
 0x0001f8c4	75	queue_pop_1f8c4	game_helpers7	compiles	game	confirmed	decomp/tests/0x0001f8c4.json	docs/compiler-abi.md; Pop the head of the queue at 0x19b0d0.; callers 1f994@1fd73; guest pending
 0x0001f960	50	reset_scroll_state_1f960	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0001f960.json	docs/compiler-abi.md; Reset the scroll state.; callers 5f60@5f7f; guest pending
-0x0001f994	1011			unknown	unclassified	unverified		
+0x0001f994	1011			blocked	unclassified	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x0001fd88	195	build_circle_1fd88	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fd88.json	docs/compiler-abi.md; Build the 0x19b030/0x19b080 circle tables (full turn is 0xc000 steps).; callers 2065c@2067b; guest pending
 0x0001fe4c	192	build_circle_1fe4c	game_helpers15	compiles	game	confirmed	decomp/tests/0x0001fe4c.json	docs/compiler-abi.md; Build the 0x19afe0/0x19af90 circle tables from the two radius bytes.; callers 1ff0c@1ff6b; guest pending
 0x0001ff0c	1871			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0002065c	1182			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x00020b10	2881			blocked	unclassified	unverified		Skipped as too difficult: dispatches through an indirect jump (interpreter-style handler with implicit registers).
-0x00021654	1967			unknown	unclassified	unverified		
+0x00021654	1967			blocked	unclassified	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00021e04	616			blocked	unclassified	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x00022e98	142	highlight_widget_22e98	game_helpers110	compiles	game	confirmed	decomp/tests/0x00022e98.json	docs/compiler-abi.md; Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta; callers 1f960@1f968; guest pending
 0x00022f28	241	draw_indicator_22f28	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00022f28.json	docs/compiler-abi.md; Draw the HUD indicator for slot idx (10-byte records at 0x127a96): if its text slot exists and its enable byte (0x1a81d8; callers none direct; guest pending
@@ -496,7 +496,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002e030	90	reset_grid_cell_state	world_grid_control	compiles	game	confirmed	decomp/tests/0x0002e030.json	reset and copy pending dwords; original derived update unresolved
 0x0002e08c	201	recompute_grid_limit	world_grid_limits	compiles	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only
 0x0002e184	783			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x0002e494	681			unknown	game	unverified		
+0x0002e494	681			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x0002e740	461			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x0002e910	57	grid_event_matches	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002e910.json	AL/DL truth table tested across all 65536 byte pairs
 0x0002f740	160	draw_markers_2f740	game_helpers17	compiles	game	confirmed	decomp/tests/0x0002f740.json	docs/compiler-abi.md; Draw every marker of the 16-byte table that is in range.; callers 3dd30@3e1e4; guest pending
@@ -1102,7 +1102,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00058028	107	rebuild_slot_mask_58028	game_helpers9	compiles	game	confirmed	decomp/tests/0x00058028.json	docs/compiler-abi.md; Rebuild the bit mask of the slots 1..count-1.; callers 3ea0c@3ee41; guest pending
 0x00058094	5	tail_jump_58094	leaf_helpers1	compiles	game	confirmed	decomp/tests/0x00058094.json	docs/compiler-abi.md; tail jump. Forward to 0xa3f30.; callers 3dd30@3e071,3dd30@3e092,7e5a0@7e622; guest pending
 0x000581b0	1380			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x00058714	610			unknown	game	unverified		
+0x00058714	610			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000589c0	741			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00058d04	29	set_mode_limits_4_5	marker_packets	compiles	game	confirmed	decomp/tests/0x00058d04.json	docs/compiler-abi.md; Words 0x1a6ce2=4 and 0x1a6ce8=5; sole direct caller 597d8@5986c,597d8@598b5; guest pending
 0x00058d24	29	initialize_mode_limits	runtime_control	verified	game	confirmed	decomp/tests/0x00058d24.json	OpenWatcom stores match original; 37 isolated + 1 captured call pass; 9-instruction cadence retained; repeated replay passes with one cockpit hit
@@ -1157,7 +1157,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005de14	243	draw_heading_marker_5de14	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005de14.json	docs/compiler-abi.md; Draw a small direction marker: with SIZE (EBX, signed word) the two points (0, 2 * SIZE) and (0, SIZE * 4 / 3) are rotat; callers 5d1c4@5d2d4,5d1c4@5d430; guest pending
 0x0005df08	678			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x0005e1b0	106	draw_cell_text_5e1b0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005e1b0.json	docs/compiler-abi.md; Draw the format string FMT at cell (A, B) (scaled by the shift at 0x12b369, offset by 0x1a6cfc/0x1a6cfa) and continue wi; callers 5bd8c@5beca; guest pending
-0x0005e21c	677			unknown	game	unverified		
+0x0005e21c	677			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x0005e4c4	403			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x0005e658	12	reset_unit_counter	runtime_control	verified	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clear word 0x12814e; OpenWatcom direct-store body 10 bytes, preserves all GPRs; 37 isolated and 1 captured call differential pass; caller flags are overwritten before conditional use. Repeated menu/setup/cockpit replay passes; 22 cockpit hits, matching selected BSS/framebuffer/status/tick/interrupt state.
 0x0005e664	535			blocked	unclassified	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
@@ -1386,7 +1386,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00075ca0	608			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00075f00	1065			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x0007632c	68	expand_table_7632c	game_helpers6	compiles	game	confirmed	decomp/tests/0x0007632c.json	docs/compiler-abi.md; Copy the 3-byte payloads of the 4-byte entries at 0x421750 until 0xff.; callers 767f4@76871; guest pending
-0x00076370	688			unknown	game	unverified		
+0x00076370	688			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00076620	228	setup_viewport_window_76620	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00076620.json	docs/compiler-abi.md; Set up the view window for the current viewport record (28-byte records at 0x125ad6, index byte 0x12db9e; X = dword +0 h; callers 3dd30@3e01a; guest pending
 0x00076704	239			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
 0x000767f4	136	reset_colour_tables_767f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000767f4.json	docs/compiler-abi.md; Reset the 256-entry colour tables: fill 0x1f71e0 with (0x3f, 0, 0x3f), zero the first entry at 0x464060, copy the 256 tr; callers 58d64@58d73; guest pending
@@ -1902,8 +1902,8 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00092070	169	classify_angle_92070	game_helpers36	compiles	game	confirmed	decomp/tests/0x00092070.json	docs/compiler-abi.md; Classify the signed angle word into a -2..1 step (kept when out of range).; callers 942cc@942f4,94370@94398,94484@944a9; guest pending
 0x00092254	59	prepare_navigation_component	ui_secondary	compiles	game	confirmed	decomp/tests/0x00092254.json	docs/compiler-abi.md; host model; guest differential pending
 0x00092290	928			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
-0x00092668	793			unknown	game	unverified		
-0x00092984	633			unknown	game	unverified		
+0x00092668	793			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
+0x00092984	633			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00092c28	520			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00092e30	222	load_camera_92e30	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00092e30.json	docs/compiler-abi.md; Load the camera record 0x214378 from the object UNIT (word in EDX, 0x7489c): convert the float 0x1a5bb8 to the dword 0x1; callers 92c28@92dcb,95e58@96a53,95e58@96b3b; guest pending
 0x00092f10	135	reset_scene_record_92f10	float_helpers4	compiles	game	confirmed	decomp/tests/0x00092f10.json	docs/compiler-abi.md; Reset the scene record from the current object and the scene angle record.; callers 95e58@96ce1; guest pending
@@ -1982,7 +1982,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00098558	27	install_allocator_hooks	misc_state	compiles	game	confirmed	decomp/tests/0x00098558.json	docs/compiler-abi.md; dword 0x12dd9c=0x9850c, 0x408580=0x1f4000; callers 49228@494ef; guest pending
 0x000985b0	66	start_transfer_985b0	runtime_helpers21	compiles	game	confirmed	decomp/tests/0x000985b0.json	docs/compiler-abi.md; Store a range and start the transfer; abort when the range is negative.; callers 49228@49737,7a844@7a88c,7e8c0@7ea77; guest pending
 0x000985f4	97	update_progress_985f4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000985f4.json	docs/compiler-abi.md; Percentage of progress (value - dword 0x40c120) * 100 / dword 0x40c118, reported on change.; callers 49228@49753,7a844@7a89a,7e8c0@7eac1; guest pending
-0x00098658	1126			unknown	game	unverified		
+0x00098658	1126			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x00098ac0	166	restore_strip_98ac0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098ac0.json	docs/compiler-abi.md; Restore the screen strip saved at 0x40cd72/0x40cd74: when a saved position exists, put the 0x23x0x1e strip at 0x12dda4 b; callers 98658@98666; guest pending
 0x00098b68	104	save_and_draw_strip_98b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098b68.json	docs/compiler-abi.md; Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/; callers 98658@987f2,98658@98a19; guest pending
 0x00098bec	160			blocked	unclassified	unverified		Skipped as too difficult: mid-function entry/x87 region reached by jmp; not a clean function
@@ -2442,7 +2442,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000aca94	41	set_word_41eeda	list_helpers	compiles	game	confirmed	decomp/tests/0x000aca94.json	docs/compiler-abi.md; Word 0x41eeda = 1; when word 0x41eedc is zero, clear * word 0x41eede and run 0xaca14.; callers bfcc@c4af,bfcc@c4d2,345e8@346bc; guest pending
 0x000acac0	166	select_video_mode_acac0	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000acac0.json	docs/compiler-abi.md; Select the video mode named by the argument.; callers ac16c@ac1fd,e1958@e19ee,e1958@e1b51; guest pending
 0x000acb68	124	latch_previous_acb68	entity_helpers	compiles	game	confirmed	decomp/tests/0x000acb68.json	docs/compiler-abi.md; Latch "previous" copies of the fields and shift flag bits 0..2 to 3..5 of byte +0x1e.; callers ac5f8@ac67c; guest pending
-0x000acbe4	980			unknown	game	unverified		
+0x000acbe4	980			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000acfb8	1158			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x000ad440	81	open_resource_by_name_ad440	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000ad440.json	docs/compiler-abi.md; Open the resource NAME (EAX) from the default directory plus the subdirectory 0x18dc8c: build the path (0x9c980, strcat ; callers 49228@49390,b0f5c@b1011,b0f5c@b120c; guest pending
 0x000afc5c	902			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
@@ -2489,7 +2489,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1bb0	70	print_to_handle_b1bb0	game_helpers126	compiles	game	confirmed	decomp/tests/0x000b1bb0.json	docs/compiler-abi.md; printf to a handle (100..105): format into a 0x7c-byte buffer and write it (cdecl, variadic; all arguments on the stack); callers 5630@56e0,5630@56ee,5630@56fc; guest pending
 0x000b1bf8	57	print_status_lines_b1bf8	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000b1bf8.json	docs/compiler-abi.md; Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle.; callers b3084@b3099; guest pending
 0x000b1c34	77	dump_entry_list_b1c34	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b1c34.json	docs/compiler-abi.md; Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1; callers b3084@b310c; guest pending
-0x000b1f80	618			unknown	game	unverified		
+0x000b1f80	618			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
 0x000b23bc	226	dump_record_b23bc	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b23bc.json	docs/compiler-abi.md; Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words; callers b2560@b26a9; guest pending
 0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending
@@ -2676,7 +2676,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bd7cc	157	shrink_counter_bd7cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bd7cc.json	docs/compiler-abi.md; Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2,; callers bd86c@bd8a7; guest pending
 0x000bd86c	92	record_has_valid_entry_bd86c	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd86c.json	docs/compiler-abi.md; True when a non-kind-2 record has a filled entry (scanned from the end) that passes the check.; callers bdbf8@bdc78,bdbf8@bdcc2,bdbf8@bdd11; guest pending
 0x000bd8c8	100	nth_match_exists_bd8c8	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd8c8.json	docs/compiler-abi.md; True when the list's index-th node matching the criteria exists.; callers bd92c@bda20; guest pending
-0x000bd92c	666			unknown	game	unverified		
+0x000bd92c	666			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000bdbc8	47	count_nonzero_entries	list_lookup	compiles	game	confirmed	decomp/tests/0x000bdbc8.json	docs/compiler-abi.md; Count the 10-byte entries (pointer +6, count byte +5) * whose first word is nonzero.; callers bd5f8@bd618,be59c@be5af,be59c@be605; guest pending
 0x000bdbf8	340			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x000bdd64	391			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
@@ -2688,7 +2688,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000be480	281	build_record_be480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000be480.json	docs/compiler-abi.md; Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11, ; callers be59c@be691; guest pending
 0x000be59c	477			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x000be77c	104	transfer_entry_weights_be77c	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be77c.json	docs/compiler-abi.md; Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25.; callers be59c@be74e,f8e44@f908d; guest pending
-0x000be7e4	827			unknown	game	unverified		
+0x000be7e4	827			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000beb20	353	scan_code_to_function_key_beb20	game_helpers60	compiles	game	confirmed	decomp/tests/0x000beb20.json	docs/compiler-abi.md; Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none.; callers bed1c@bed9a; guest pending
 0x000bec84	59	is_active_bec84	list_helpers	compiles	game	confirmed	decomp/tests/0x000bec84.json	docs/compiler-abi.md; ; callers becc0@becde,faafc@fab1a,fabf0@fac0e; guest pending
 0x000becc0	55	count_valid_entries_becc0	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000becc0.json	docs/compiler-abi.md; Count the 21-byte entries of the object that pass the check.; callers becf8@bed07,fac78@facb1,fac78@facd1; guest pending
@@ -2932,7 +2932,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cc894	74	pick_variant_cc894	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cc894.json	docs/compiler-abi.md; ; callers afc5c@afca9; guest pending
 0x000cc8e0	3	return_esc_cc8e0	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x000cc8e0.json	docs/compiler-abi.md; Returns the ESC scan code.; callers bcf44@bcff2; guest pending
 0x000cc90c	1199			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000ccdbc	882			unknown	game	unverified		
+0x000ccdbc	882			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000cd12e	34	stdout_printf_cd12e	runtime_helpers42	compiles	game	confirmed	decomp/tests/0x000cd12e.json	docs/compiler-abi.md; printf to the standard output stream at 0x16043e (cdecl, variadic).; callers fecc@ff8b,1001c@1034d,1001c@10524; guest pending
 0x000cd150	113	open_entry_cd150	engine_helpers	compiles	game	confirmed	decomp/tests/0x000cd150.json	docs/compiler-abi.md; ; callers 1e214@1e220,1e28c@1e2c6,1e3c4@1e3f3; guest pending
 0x000cd20c	63	script_store_step_cd20c	engine_helpers3	compiles	game	confirmed	decomp/tests/0x000cd20c.json	docs/compiler-abi.md; Store value into the output table and step the script cursor.; callers 57480@575f3,8d11c@8d18c,8d330@8d39f; guest pending
@@ -3006,7 +3006,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000cfc68	380			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000cfde4	381	ray_hits_plane_cfde4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000cfde4.json	Ray/plane intersection plus polygon test via 0xcf960; guest differential pending
 0x000cff64	26	forward_triple_cff64	code_predicates	compiles	game	confirmed	decomp/tests/0x000cff64.json	docs/compiler-abi.md; 0xb3830(signed word +0, high words of +2 and +6), as signed 16.; callers cff80@cffc4,cff80@cffce,cff80@d0057; guest pending
-0x000cff80	728			unknown	game	unverified		
+0x000cff80	728			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000d0278	473			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000d0470	780			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000d0858	55	copy_record9_d0858	engine_helpers3	spliced	game	confirmed	decomp/tests/0x000d0858.json	docs/compiler-abi.md; Copies nine dwords in original order 0,3,6,1,4,7,2,5,8 using nested C loops; preserves EAX and EFLAGS. 49-byte OpenWatcom body matches fixture and fits 55-byte extent. 8 isolated plus 1 captured call pass with EAX, EFLAGS, and all 36 writes. Cockpit replay hits 42 times but BSS hash differs; g_filtered_object_lookup_calls at 0x1a3580 is 0x8efe original / 0x8ef9 patched. Remains spliced pending replay divergence.
@@ -3343,7 +3343,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e1948	16	fatal_with_arg_e1948	runtime_helpers30	compiles	game	confirmed	decomp/tests/0x000e1948.json	docs/compiler-abi.md; Abort with a message that includes the argument.; callers e1e6c@e1efb,e1e6c@e1fc8,e1e6c@e20c5; guest pending
 0x000e1958	956			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
 0x000e1df0	123	text_width_e1df0	game_helpers89	compiles	game	confirmed	decomp/tests/0x000e1df0.json	docs/compiler-abi.md; Pixel width of up to len characters of a string for the given font (spaces use the font's space width).; callers e1958@e1a87,e1958@e1baa,e1958@e1bee; guest pending
-0x000e1e6c	1257			unknown	game	unverified		
+0x000e1e6c	1257			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000e2374	493			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x000e2564	186	visit_overlapping_nodes_e2564	list_ops1	compiles	game	confirmed	decomp/tests/0x000e2564.json	docs/compiler-abi.md; Walk the node list at obj+0xc7 (next at +0xa) and call 0xe2374 for every node whose position, widened by a per-kind marg; callers a5b70@a5c56; guest pending
 0x000e26bc	400			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads si on entry) or carry-flag results that the C ABI cannot express.
@@ -3397,7 +3397,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000e5114	88	save_rect_list_e5114	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e5114.json	docs/compiler-abi.md; Copy every rectangle of the list at 0x43399e (8-byte entries, count in the word at 0x433eac) from the screen into the ba; callers a5ef8@a5f81,a60a8@a60da,a6d00@a6d69; guest pending
 0x000e516c	88	restore_rect_list_e516c	copy_rects1	compiles	game	confirmed	decomp/tests/0x000e516c.json	docs/compiler-abi.md; Copy every rectangle of the list at 0x43399e from the backing buffer back to the screen.; callers a5ef8@a6003,a60a8@a61a1,a6d00@a70d6; guest pending
 0x000e51c4	224	add_dirty_rect_e51c4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000e51c4.json	docs/compiler-abi.md; Add a clipped rectangle to the dirty-rectangle list at 0x4339a0 (8-byte entries, running index in dword 0x433ea0, count ; callers e52a4@e56ff,e52a4@e5739,e52a4@e579e; guest pending
-0x000e52a4	1417			unknown	game	unverified		
+0x000e52a4	1417			blocked	game	unverified		Skipped as too difficult: Skipped as too difficult: large function (600+ bytes) with many interleaved callees; deferred
 0x000e5830	62	refresh_slot_e5830	runtime_helpers4	compiles	game	confirmed	decomp/tests/0x000e5830.json	docs/compiler-abi.md; ; callers a6d00@a6d44; guest pending
 0x000e5870	25	apply_record_e5870	math_string	compiles	game	confirmed	decomp/tests/0x000e5870.json	docs/compiler-abi.md; 0xe599c(record), then 0xe52a4(byte +0x10, 1).; callers a5ef8@a5f6e; guest pending
 0x000e588c	25	apply_record_e588c	math_string	compiles	game	confirmed	decomp/tests/0x000e588c.json	docs/compiler-abi.md; As 0xe5870 through 0xe5960.; callers a60a8@a60bd; guest pending
