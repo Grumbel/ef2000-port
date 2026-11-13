@@ -249,3 +249,35 @@ void dump_state_b3084(ef_addr32 name, ef_addr32 list_a, ef_addr32 list_b, uint32
     guest_fn_cc768(header);
     close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
 }
+
+/* 0xdb32c, 244 bytes. Parse one text line of the parameter file at the cursor 0x425af8 (split at LF/NUL; as in the 15 sibling readers the byte before the terminator is cleared too): scan a word plus three integers, append a suffix string, store the word value at 0x425bb8, then rotate a point by the two angles (the integers scaled from degrees by 1/360 of a full turn, 16-bit) and store the resulting words at 0x425bb2, 0x425bb4 and 0x425bb0. */
+void parse_angle_line_db32c(void)
+{
+    char text[0x14];
+    int16_t pt[2];
+    int32_t a18;
+    int32_t a1c;
+    int32_t a20;
+    ef_addr32 start = EF_U32(0x425af8u);
+    ef_addr32 end = start;
+    int16_t saved;
+
+    while (EF_U8(end) != 0u && EF_U8(end) != 10u)
+        ++end;
+    EF_U8(end) = 0u;
+    ++end;
+    EF_U8(end - 2u) = 0u;
+    EF_U32(0x425af8u) = end;
+    sscanf_df26f(0u, 0u, 0u, 0u, start, 0x00190328u, (uint32_t)(uintptr_t)text, (uint32_t)(uintptr_t)&a20,
+                 (uint32_t)(uintptr_t)&a1c, (uint32_t)(uintptr_t)&a18);
+    strcat_9ca57((ef_addr32)(uintptr_t)text, 0x00190324u);
+    EF_U16(0x425bb8u) = guest_load_halfword((ef_addr32)(uintptr_t)text);
+    load_sincos_dc7bc((uint32_t)((int32_t)((uint32_t)a18 << 16) / 0x168) & 0xffffu);
+    rotate_point_dc7e4((ef_addr32)(uintptr_t)pt, (int16_t)a20, 0);
+    load_sincos_dc7bc((uint32_t)((int32_t)((uint32_t)a1c << 16) / 0x168) & 0xffffu);
+    saved = pt[1];
+    rotate_point_dc7e4((ef_addr32)(uintptr_t)pt, 0, pt[0]);
+    EF_U16(0x425bb2u) = (uint16_t)pt[0];
+    EF_U16(0x425bb4u) = (uint16_t)saved;
+    EF_U16(0x425bb0u) = (uint16_t)pt[1];
+}

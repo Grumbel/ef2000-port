@@ -3178,7 +3178,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000db1c4	85	set_nb_flak	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; parser and guest-call boundary
 0x000db21c	110	load_flak	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; signed threshold and load callback
 0x000db28c	157	sun_flare	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; flare parameters and unresolved texture lookup
-0x000db32c	244			unknown	game	unverified		
+0x000db32c	244	parse_angle_line_db32c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000db32c.json	Parses a parameter-file line (word + two angles) and rotates a point; guest differential pending
 0x000db420	179	cloud_fade	environment_world_090	drafted	game	unverified		docs/subsystems/decomp-batch-090.md; five-field record writer and decrement
 0x000db4d4	383	tmsun_flare		named	game	unverified		
 0x000db654	218	sun_texture	environment_records_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 16-byte list node insertion and signed index warning

@@ -2351,3 +2351,4 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: recovered `draw_segment_records_418c4` (0x418c4); isolated fuzz PASS 800 cases.
 - 2026-11-13: recovered `scan_nodes_bfa58` (0xbfa58, calls 0xbe59c with 11 stack args and 0xbdbf8 as guest functions). Compiled pushes match the original. Isolated fuzz: 52 completed, 3 patched-only faults; its callees 0xfc0ec/0xb16c0 were never verified (weak), so the divergence is probably theirs but is not attributed. State `compiles`.
 - 2026-11-13: recovered `dump_state_b3084` (0xb3084); call sequence and ret 0x1c match the original; isolated fuzz weak (file I/O, 0 completed cases).
+- 2026-11-13: recovered `parse_angle_line_db32c` (0xdb32c); builds; isolated fuzz weak (reads the global text cursor, the original faults on random pointers), no instruction-level comparison done.
