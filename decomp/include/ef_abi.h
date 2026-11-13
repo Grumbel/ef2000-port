@@ -4333,6 +4333,7 @@ void apply_camera_keys_3287c(void);
 void dump_selected_group_a3dc(void);
 void rewrite_status_file_82e40(void);
 void dump_node_list_b3648(ef_addr32 list_head, uint32_t stream, uint32_t tag);
+void draw_unit_info_78f3c(void);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

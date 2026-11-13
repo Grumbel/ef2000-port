@@ -1071,3 +1071,64 @@ void dump_node_list_b3648(ef_addr32 list_head, uint32_t stream, uint32_t tag)
         node = EF_U32(node + 4u);
     }
 }
+
+/* 0x78f3c, 489 bytes. Draw the info panel for the unit selected by the key in 0x12db9e ('-', '>' or '+'): pick its object id (the '+' key goes through the current group record table at 0x19bb58 and byte 0x12dc34), then print its uppercase name, a status word, its number plus group name and, when flag 0x127da9 is set, the labels of the eight table entries whose id matches the object's. */
+void draw_unit_info_78f3c(void)
+{
+    char text[0x64];
+    char name[0x34];
+    ef_addr32 buf = (ef_addr32)(uintptr_t)text;
+    ef_addr32 object;
+    ef_addr32 rec;
+    uint32_t id;
+    uint8_t key = EF_U8(0x0012db9eu);
+    uint8_t i;
+    uint16_t state;
+    uint32_t fmt;
+
+    if (key == 0x2du) {
+        id = EF_U32(0x001a8234u);
+    } else if (key == 0x3eu) {
+        id = EF_U32(0x001a823au);
+    } else if (key == 0x2bu) {
+        if (lookup_filtered_indexed_object((int16_t)(EF_S32(0x001f71c8u) >> 16)) == 0u)
+            return;
+        id = EF_U32(EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(0x0019bb5cu) >> 16) * 0xcau + 0x4eu +
+                    (uint32_t)EF_U8(0x0012dc34u) * 2u);
+    } else {
+        return;
+    }
+    object = lookup_filtered_indexed_object((int16_t)((int32_t)id >> 16));
+    if (object == 0u)
+        return;
+    build_unit_name_7548c(buf, (uint32_t)(EF_S32(object + 0x14u) >> 16));
+    uppercase_string(buf);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0xfu, 0xa, 0x14, buf);
+    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    state = EF_U16(rec + 0x15u);
+    if (state == 1u || state == 4u)
+        fmt = 0x0012f4c8u;
+    else if (state == 0u)
+        fmt = 0x0012f4cdu;
+    else
+        fmt = 0x0012f4d7u;
+    guest_sprintf_a4342(buf, fmt);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0xfu, 0xa, 0x1e, buf);
+    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    guest_sprintf_a4342(buf, 0x0012f4e0u, (EF_S32(rec + 0x1au) >> 16) + 1);
+    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    copy_string_9d749((ef_addr32)(uintptr_t)name, 0x00125708u + (uint32_t)EF_U8(rec + 0x1bu) * 20u);
+    strcat_9ca57(buf, (ef_addr32)(uintptr_t)name);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0xfu, 0xa, 0x28, buf);
+    if (EF_U8(0x00127da9u) == 0u)
+        return;
+    for (i = 0u; i < 8u; i++) {
+        if (EF_U16(object + 0x16u) == EF_U16(0x001a5c30u + (uint32_t)i * 27u)) {
+            EF_U8(0x00127b1au) = 1u;
+            draw_shadowed_text_48c90(0xcu, 0xa, 0x32, 0x001a62f0u + (uint32_t)i * 17u);
+        }
+    }
+}
