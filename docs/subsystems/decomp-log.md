@@ -2370,3 +2370,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0x31b40 `update_view_angles_31b40`: view-angle results from camera state (fuzz PASS 1000).
 
 - 0x324b0 `aim_angles_to_point_324b0`: direction angles with clamp windows (fuzz PASS 381).
+
+- 0x3287c `apply_camera_keys_3287c`: key-driven camera zoom/angle steps with limit windows (fuzz PASS 1000).

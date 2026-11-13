@@ -523,7 +523,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000324b0	488	aim_angles_to_point_324b0	game_helpers130	compiles	game	confirmed	decomp/tests/0x000324b0.json	Original 0x324b0 (488 bytes)
 0x000326d8	263	build_mode_label_326d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000326d8.json	docs/compiler-abi.md; Build the label text at 0x19e4da: copy a short constant chosen by byte 0x19e555 (0..7, else a default; 5 to 8 bytes each; callers 2fbc4@2ff34,3122c@31363; guest pending
 0x000327e0	156	latch_vectors_327e0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000327e0.json	docs/compiler-abi.md; Latch the position and target vectors.; callers 3122c@31246; guest pending
-0x0003287c	512			unknown	game	unverified		
+0x0003287c	512	apply_camera_keys_3287c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0003287c.json	Original 0x3287c (512 bytes)
 0x00032b3c	10	call_32c04_182ad8	low_helpers	compiles	game	confirmed	decomp/tests/0x00032b3c.json	docs/compiler-abi.md; tail 0x32c04 with EAX=0x182ad8; callers none direct; guest pending
 0x00032b48	10	call_32c04_182adc	low_helpers	compiles	game	confirmed	decomp/tests/0x00032b48.json	docs/compiler-abi.md; tail 0x32c04 with EAX=0x182adc; callers none direct; guest pending
 0x00032b54	10	call_32c04_182ae0	low_helpers	compiles	game	confirmed	decomp/tests/0x00032b54.json	docs/compiler-abi.md; tail 0x32c04 with EAX=0x182ae0; callers none direct; guest pending

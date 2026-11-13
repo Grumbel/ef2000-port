@@ -856,3 +856,59 @@ void aim_angles_to_point_324b0(ef_addr32 from, ef_addr32 angles, ef_addr32 to, e
     EF_U16(out) = ang[0];
     EF_U16(out + 2u) = ang[1];
 }
+
+/* 0x3287c, 512 bytes. Apply the direction key bits at 0x2144aa to the camera: in mode 1 (byte 0x19e557) bits 0x10/0x20 change the zoom dword at 0x19e597 (clamped to 0x19e59b..0x19e59f) and the arrow bits step the two angle words at 0x19e5a5/0x19e5a7 by 500; otherwise only the angle words are stepped and then snapped into their limit windows (0x19e5ab/ad, 0x19e5b1/b3) when the limit flags are 1. */
+void apply_camera_keys_3287c(void)
+{
+    uint32_t keys;
+    uint32_t w;
+    uint32_t hi;
+    uint32_t lo;
+
+    if (EF_U8(0x0019e557u) == 1u) {
+        if (EF_U8(0x002144aau) & 0x10u)
+            EF_U32(0x0019e597u) -= (uint32_t)(EF_S32(0x0019e5a1u) >> 16);
+        if (EF_U8(0x002144aau) & 0x20u)
+            EF_U32(0x0019e597u) += (uint32_t)(EF_S32(0x0019e5a1u) >> 16);
+        if (EF_U32(0x0019e597u) < EF_U32(0x0019e59bu))
+            EF_U32(0x0019e597u) = EF_U32(0x0019e59bu);
+        if (EF_U32(0x0019e597u) > EF_U32(0x0019e59fu))
+            EF_U32(0x0019e597u) = EF_U32(0x0019e59fu);
+        if (EF_U8(0x002144aau) & 0x08u)
+            EF_U16(0x0019e5a5u) = (uint16_t)(EF_U16(0x0019e5a5u) - 0x1f4u);
+        if (EF_U8(0x002144aau) & 0x04u)
+            EF_U16(0x0019e5a5u) = (uint16_t)(EF_U16(0x0019e5a5u) + 0x1f4u);
+        if (EF_U8(0x002144aau) & 0x01u)
+            EF_U16(0x0019e5a7u) = (uint16_t)(EF_U16(0x0019e5a7u) - 0x1f4u);
+        if (EF_U8(0x002144aau) & 0x02u)
+            EF_U16(0x0019e5a7u) = (uint16_t)(EF_U16(0x0019e5a7u) + 0x1f4u);
+        return;
+    }
+    keys = EF_U8(0x002144aau);
+    if (keys & 0x08u)
+        EF_U16(0x0019e5a5u) = (uint16_t)(EF_U16(0x0019e5a5u) - 0x1f4u);
+    if (EF_U8(0x002144aau) & 0x04u)
+        EF_U16(0x0019e5a5u) = (uint16_t)(EF_U16(0x0019e5a5u) + 0x1f4u);
+    if (EF_U8(0x002144aau) & 0x01u)
+        EF_U16(0x0019e5a7u) = (uint16_t)(EF_U16(0x0019e5a7u) - 0x1f4u);
+    if (EF_U8(0x002144aau) & 0x02u)
+        EF_U16(0x0019e5a7u) = (uint16_t)(EF_U16(0x0019e5a7u) + 0x1f4u);
+    w = EF_U16(0x0019e5a5u);
+    hi = EF_U16(0x0019e5abu);
+    lo = EF_U16(0x0019e5adu);
+    if (EF_U16(0x0019e5a9u) == 1u && w < hi && w > lo) {
+        int32_t d1 = (int32_t)abs_a28f2((int32_t)(hi - w));
+        int32_t d2 = (int32_t)abs_a28f2((int32_t)(lo - w));
+
+        EF_U16(0x0019e5a5u) = (d1 > d2) ? (uint16_t)lo : (uint16_t)hi;
+    }
+    w = EF_U16(0x0019e5a7u);
+    hi = EF_U16(0x0019e5b1u);
+    lo = EF_U16(0x0019e5b3u);
+    if (EF_U16(0x0019e5afu) == 1u && w < hi && w > lo) {
+        int32_t d1 = (int32_t)abs_a28f2((int32_t)(hi - w));
+        int32_t d2 = (int32_t)abs_a28f2((int32_t)(lo - w));
+
+        EF_U16(0x0019e5a7u) = (d1 > d2) ? (uint16_t)lo : (uint16_t)hi;
+    }
+}
