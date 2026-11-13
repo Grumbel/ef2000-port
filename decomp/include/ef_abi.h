@@ -4371,6 +4371,9 @@ void replay_elapsed_steps_c630(void);
 void draw_outline_segments_3d7b0(uint8_t a, uint8_t d, uint16_t b);
 void draw_group_markers_43df4(ef_addr32 head, ef_addr32 list);
 void draw_group_markers2_43f48(ef_addr32 head, ef_addr32 list);
+uint32_t guest_fn_ca620_e(int32_t address, int32_t x, int32_t y, uint32_t a, uint32_t b, uint32_t c); /* 0xca620, returns the ECX it leaves */
+uint32_t guest_fn_440f4_e(uint32_t a, int32_t x, int32_t y, uint32_t w, uint32_t s0, uint32_t s1); /* 0x440f4, returns the ECX it leaves */
+void draw_group_markers3_441fc(ef_addr32 head, ef_addr32 list);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7253,6 +7256,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_15c0c4_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d86e0_x modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d68c_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_ca620_e value [ecx] modify [eax ebx edx]
+#pragma aux guest_fn_440f4_e value [ecx] modify [eax ebx edx]
 #pragma aux guest_fn_dc519_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_c8ccc_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_f9ee0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]

@@ -786,7 +786,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00043df4	338	draw_group_markers_43df4	game_helpers130	compiles	game	confirmed	decomp/tests/0x00043df4.json	Original 0x43df4 (338 bytes)
 0x00043f48	343	draw_group_markers2_43f48	game_helpers130	compiles	game	confirmed	decomp/tests/0x00043f48.json	Original 0x43f48 (343 bytes)
 0x000440f4	262	draw_table_sprite_440f4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000440f4.json	docs/compiler-abi.md; Draw a sprite from the table selected by SEL (EAX low byte; EDX, EBX, ECX, then the two stack arguments S0, S1, ret 8; t; callers 433fc@43560,4357c@436c3,436dc@43819; guest pending
-0x000441fc	450			unknown	game	unverified		
+0x000441fc	450	draw_group_markers3_441fc	game_helpers130	compiles	game	confirmed	decomp/tests/0x000441fc.json	Original 0x441fc (450 bytes)
 0x000443fc	1007			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000447ec	382	draw_hotspots_447ec	hotspot_draw	compiles	game	confirmed	decomp/tests/0x000447ec.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x1d.; callers 45574@455aa,4bf1c@4bf78; guest pending
 0x0004496c	382	draw_hotspots_4496c	hotspot_draw	compiles	game	confirmed	decomp/tests/0x0004496c.json	docs/compiler-abi.md; Draw the hotspot markers for list type 0x13.; callers 45574@455fd,4bf1c@4bfb7; guest pending

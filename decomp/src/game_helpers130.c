@@ -3266,3 +3266,62 @@ void draw_group_markers2_43f48(ef_addr32 head, ef_addr32 list)
         node = EF_U32(node + 4u);
     }
 }
+
+/* Original 0x441fc (450 bytes). Draw the map marker, cursor and count icon
+ * for every type-0x31 node whose group flag matches. The count icon call
+ * receives whatever 0xca620/0x440f4 left in ECX, so those two are called
+ * through ECX-returning wrappers. */
+void draw_group_markers3_441fc(ef_addr32 head, ef_addr32 list)
+{
+    ef_addr32 node, ptr = 0;
+    uint8_t found;
+
+    node = EF_U32(list);
+    while (node != 0u) {
+        if (EF_U8(node + 0xbu) == 0x31u) {
+            int32_t row, col;
+
+            found = 0;
+            if ((uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 9u), head) != 0u &&
+                EF_U16(0x00126554u) != 0u) {
+                row = (int32_t)EF_U32(0x001342d4u) >> 16;
+                col = (int32_t)EF_U32(0x001342d2u) >> 16;
+                ptr = EF_U32(0x00126570u) + (uint32_t)(col + row * 0x280);
+                found = 1;
+            } else if ((uint16_t)group_flag_negative_cc1ac(0u, EF_U8(node + 9u), head) != 0u &&
+                       EF_U16(0x00126556u) != 0u) {
+                row = (int32_t)EF_U32(0x001342cbu) >> 16;
+                col = (int32_t)EF_U32(0x001342c9u);
+                ptr = EF_U32(0x00126570u) + (uint32_t)((col >> 16) + row * 0x280);
+                found = 1;
+            } else if ((uint16_t)group_flag_zero_cc1ec(0u, EF_U8(node + 9u), head) != 0u &&
+                       EF_U16(0x00126558u) != 0u) {
+                row = (int32_t)EF_U32(0x001342ddu) >> 16;
+                col = (int32_t)EF_U32(0x001342dbu);
+                ptr = EF_U32(0x00126570u) + (uint32_t)((col >> 16) + row * 0x280);
+                found = 1;
+            }
+            if ((uint16_t)guest_fn_bc7ec(node) != 0u || EF_U16(node + 0x36u) == 0u) {
+                row = (int32_t)EF_U32(0x00134742u) >> 16;
+                col = (int32_t)EF_U32(0x00134740u) >> 16;
+                ptr = EF_U32(0x00126570u) + (uint32_t)(col + row * 0x280);
+                found = 1;
+            }
+            if (found != 0) {
+                uint16_t xs = EF_U16(node + 0x16u);
+                uint16_t bx = EF_U16(node + 0x1au);
+                uint16_t yv = (uint16_t)(0x190u - bx);
+                int32_t y = (int16_t)(uint16_t)(0x190u - bx - 0xau);
+                int32_t x = (int16_t)(uint16_t)(xs - 0xau);
+                uint32_t ecx;
+
+                ecx = guest_fn_ca620_e((int32_t)ptr, x, y, 0x14u, 0x14u, 0x280u);
+                blit_cursor_4d1ec((int16_t)xs, (int16_t)yv, node);
+                if (EF_U16(0x0012656au) != 0u)
+                    ecx = guest_fn_440f4_e(EF_U8(node + 9u), x, y, 0x14u, 0x1au, 0x280u);
+                draw_count_icon_4d24c((uint32_t)(int32_t)(int16_t)xs, (uint32_t)(int32_t)(int16_t)yv, node, ecx);
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+}

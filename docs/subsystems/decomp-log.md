@@ -2442,3 +2442,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13: recovered `draw_group_markers_43df4` (0x43df4). Fuzz: 98 of 100 completed cases agree; the 2 FAILs (cases 754, 822) are a harness artifact: the random list pointer 0x300132a lands inside the patched image's hand-object arena, whose bytes differ from the unpatched image's zeros (traced: next-node read hits code bytes, then faults). Callee conventions from disassembly (cc22c/cc1ec/cc1ac, ca620, 440f4).
 
 - 2026-11-13: recovered `draw_group_markers2_43f48` (0x43f48); fuzz PASS 96 completed (marker-drawing paths mostly unreached; disassembly-checked).
+
+- 2026-11-13: recovered `draw_group_markers3_441fc` (0x441fc). 0xca620/0x440f4 clobber ECX and the count-icon call at 0x4d24c consumes that leftover, so they are called through ECX-returning wrappers `guest_fn_ca620_e`/`guest_fn_440f4_e` (pragma `value [ecx]`). Fuzz: 85 of 86 completed cases agree; the single FAIL (case 32) is the harness artifact where the random list pointer 0x3006c42 lies in the patched image's hand-object arena.
