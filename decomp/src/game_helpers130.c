@@ -4710,3 +4710,46 @@ void init_game_state_58d64(void)
 	EF_U8(0x00122c53u) = 0;
 	probe_scene_pair_state(0xff, 4, 0, 3);
 }
+
+/* Original 0xa1ec8 (405 bytes): read one record from the stream at 0xa1afc into
+ * the structure at 0x417174 (table 0x41717c gives the byte counts).  When the
+ * stored name hash or either count differs the stream is skipped instead. */
+void load_record_a1ec8(void)
+{
+	uint8_t buf[0x80];
+	uint8_t tmp[0x2b];
+	uint8_t hdr[0x10];
+	uint32_t p;
+	uint32_t rec;
+	uint32_t cur;
+	int16_t i;
+	uint8_t b;
+
+	read_checked_a1afc((uint32_t)(uintptr_t)hdr, 0xd);
+	rec = EF_U32(0x00417174u);
+	p = EF_U32(0x0041717cu);
+	if (name_hash_ebfd0(EF_U32(0x00411080u + (uint32_t)EF_U16(rec) * 4u)) != *(uint32_t *)hdr ||
+	    EF_U8(p) != hdr[4] || EF_U8(p + 1u) != hdr[5]) {
+		for (i = 0; i < (int16_t)hdr[5]; i++)
+			read_checked_a1afc((uint32_t)(uintptr_t)tmp, 0x2b);
+		read_checked_a1afc((uint32_t)(uintptr_t)buf, EF_U8(EF_U32(0x0041717cu)));
+		return;
+	}
+	b = hdr[6];
+	EF_U8(rec + 0xau) = (uint8_t)((((EF_U8(rec + 0xau) & 0xf0u) | (b & 0xfu)) & 0xefu) | (b & 0x10u));
+	EF_U16(rec + 2u) = *(uint16_t *)(hdr + 7);
+	EF_U16(rec + 4u) = *(uint16_t *)(hdr + 9);
+	EF_U16(rec + 6u) = *(uint16_t *)(hdr + 11);
+	cur = rec + 0xbu;
+	for (i = 0; i < (int16_t)EF_U8(EF_U32(0x0041717cu) + 1u); i++) {
+		uint32_t e = cur + (uint32_t)((int32_t)i * 0x1d);
+		read_checked_a1afc((uint32_t)(uintptr_t)tmp, 0x2b);
+		memcpy_dc832(e + 0x14u, (ef_addr32)(uintptr_t)tmp, 8);
+		EF_U8(e + 0x1cu) = tmp[8];
+		memcpy_dc832(e + 2u, (ef_addr32)(uintptr_t)(tmp + 0x19), 0x10);
+		EF_U16(e + 0x12u) = *(uint16_t *)(tmp + 0x29);
+		EF_U16(e) = (uint16_t)guest_fn_de864((ef_addr32)(uintptr_t)(tmp + 9));
+	}
+	p = EF_U32(0x0041717cu);
+	read_checked_a1afc(EF_U32(0x00417174u) + 0xbu + (uint32_t)EF_U8(p + 1u) * 0x1du, EF_U8(p));
+}
