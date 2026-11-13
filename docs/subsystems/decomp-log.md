@@ -2406,3 +2406,7 @@ Recovered the scrolling text box step (one character per call, wrapping, tab/`>`
 ### 2026-11-13 record_track_sample_2e494 (0x2e494)
 
 Recovered the flight-track sampler: appends the tracked group's scaled position to the 10-byte sample table at 0x1a3650 unless it is within one unit of the previous sample (then only the trailing words are refreshed). Fuzz PASS 1000 completed cases. 0x21654 (1967 bytes) was blocked in the same pass: it is x87 floating-point code.
+
+### 2026-11-13 draw_debug_overlay_58714 (0x58714)
+
+Recovered from disassembly: debug overlay printing the selected object's header lines and one line per non-empty row of the 80x8-word table at 0x1a5df0. Fuzz is weak (0 completed cases: the original faults on every random scenario), so this is verified by disassembly only.

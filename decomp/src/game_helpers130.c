@@ -1649,3 +1649,58 @@ void record_track_sample_2e494(void)
         EF_U16(prev + 8u) = EF_U16(0x00125840u);
     }
 }
+
+/* 0x58714, 610 bytes. Debug overlay: clip to the full screen, print the selected object's header lines (object looked up by the id word at 0x1a823c, flag bits of +0x24, owner record +0x28) and then one line per non-empty row of the 80x8-word table at 0x1a5df0. */
+void draw_debug_overlay_58714(void)
+{
+    uint32_t width = EF_U32(0x0015b744u);
+    uint32_t height = EF_U32(0x0015b748u);
+    ef_addr32 obj;
+    int32_t y = 0x10;
+    int16_t row;
+
+    latch_values_ce328(0u, width - 1u, 0u, height - 1u);
+    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    obj = lookup_filtered_indexed_object((int16_t)EF_U16(0x001a823cu));
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0x0cu, 0, 0, 0x00185d30u);
+    EF_U8(0x00127b1au) = 1u;
+    draw_shadowed_text_48c90(0x0fu, 0, 8, 0x00185d40u, EF_U8(0x00127da9u), EF_U8(0x0012583au), EF_U8(0x00127da4u));
+    if (obj != 0u) {
+        uint16_t flags;
+        int32_t owner;
+
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(0x0cu, 0, 0x10, 0x00185d64u, EF_S32(obj + 0x16u) >> 16, EF_U8(0x001a666bu));
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(0x0cu, 0, 0x18, 0x00185d7cu, EF_S32(obj + 0x14u) >> 16,
+                                 EF_S32(0x001f71c8u) >> 16);
+        flags = EF_U16(obj + 0x24u);
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(0x0cu, 0, 0x20, 0x00185d8cu, (uint32_t)((flags >> 3) & 1u),
+                                 (uint32_t)((flags >> 2) & 1u), (uint32_t)((flags >> 1) & 1u));
+        owner = EF_S32(obj + 0x26u) >> 16;
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(0x0cu, 0, 0x28, 0x00185da8u, owner,
+                                 (uint32_t)EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(owner * 0xca) + 0x20u));
+        y = 0x30;
+    }
+    latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    for (row = 0; row < 0x50; row++) {
+        uint32_t base = 0x001a5df0u + ((uint32_t)(int32_t)row << 4);
+        uint16_t sum = 0u;
+        int32_t k;
+
+        for (k = 0; k < 8; k++)
+            sum = (uint16_t)(sum + EF_U16(base + (uint32_t)(k * 2)));
+        if (sum == 0u)
+            continue;
+        EF_U8(0x00127b1au) = 1u;
+        draw_shadowed_text_48c90(0x0fu, 0, (int16_t)y, 0x00185dc0u, (int32_t)row,
+                                 EF_S32(base - 2u) >> 16, EF_S32(base) >> 16, EF_S32(base + 2u) >> 16,
+                                 EF_S32(base + 4u) >> 16, EF_S32(base + 6u) >> 16, EF_S32(base + 8u) >> 16,
+                                 EF_S32(base + 10u) >> 16, EF_S32(base + 12u) >> 16);
+        y += 8;
+    }
+}
