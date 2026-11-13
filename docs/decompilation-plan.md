@@ -2264,3 +2264,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 scene-resolution continuation: recovered 0xaa350, six targeted synthetic-service comparisons pass, and two real-resource sequential parse/fixup/scene checks pass. Resolver helper replacements, names/resources and source-only startup/menu remain incomplete.
 
 2026-11-13 scene-helper composition: recovered missing 0xaa198/0xaa1c0, eight isolated cases pass; scene pass with four real C helpers passes three composed cases. Post-load resource/name setup and source-only startup/menu remain incomplete.
+
+2026-11-13 list-name pass: isolated/audited 0xaa3dc, ten targeted comparisons pass, and native build/bootstrap checks pass. Heap/string-copy composition, actual post-load setup and source-only startup/menu remain incomplete.
