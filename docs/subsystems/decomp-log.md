@@ -2346,3 +2346,4 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 
 - 2026-11-13: per the owner's goal (decompile or skip as too difficult), 368 remaining `unknown` game functions classified by objdump of the payload were marked `blocked`: segment/DOS/port code (149 or so), x87-only code (167, deferred rather than impossible), and indirect-call dispatchers (52). Plain integer functions (about 190) remain.
 - 2026-11-13: blocked remaining unknown functions at >=0xed000 (runtime/soft-float/startup region).
+- 2026-11-13: blocked 42 unknown functions with implicit register inputs or carry-flag results.
