@@ -2627,3 +2627,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 0x73964 report_contact_73964: stubbed-callee differential (400 seeded scenarios, 2195 logged calls) agrees on args, registers, ESP and RAM. An earlier 153/400 divergence came from a stale hybrid image, not the C.
 
 - 2026-11-13: 50 gui_jump_thunks_089 entries (pure register-forwarding JMP/CALL thunks) marked blocked: no flat-C expression without inline asm.
+
+- 2026-11-13: promoted the 15 `environment_damage_params` entry points (0xdb95c..0xdbd84) to `compiles`. Differential run against the original (120 random cases each, sscanf wrapper 0xdf26f stubbed with a deterministic hook) agrees on all registers and memory with the hand-written object actually linked (`handwritten_patched: 15`). Earlier runs had silently tested the mechanical objects: hybrid_link matches hand objects by `functions.tsv` name == C symbol, so rows were renamed to the C names, signature rows added, and the sscanf external given a `/* 0xdf26f */` alias in `ef_abi.h`. Remember this when promoting other drafted modules.

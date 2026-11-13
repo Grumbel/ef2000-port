@@ -3187,21 +3187,21 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000db8a8	8	unfix_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
 0x000db8b0	9	load_horizon	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; host flag model; guest pending
 0x000db8bc	160	heavenly_body	environment_sky_091	drafted	game	unverified		docs/subsystems/decomp-batch-091.md; 40 five-byte sky entries and guest type lookup
-0x000db95c	74	craft_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000db9a8	74	craft_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000db9f4	74	cannon_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dba40	74	missile_hit	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dba8c	74	cannon_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbad8	74	cannon_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbb24	74	missile_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbb70	74	bomb_hit	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbbbc	74	missile_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbc08	74	missile_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbc54	74	bomb_hit_concrete	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbca0	74	craft_hit_building	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbcec	74	bomb_hit_water	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbd38	74	bomb_hit_ground	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
-0x000dbd84	74	depth_fade	environment_damage_params	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; guest pending
+0x000db95c	74	env_craft_hit_water_db95c	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000db9a8	74	env_craft_hit_ground_db9a8	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000db9f4	74	env_cannon_hit_concrete_db9f4	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dba40	74	env_missile_hit_dba40	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dba8c	74	env_cannon_hit_water_dba8c	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbad8	74	env_cannon_hit_ground_dbad8	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbb24	74	env_missile_hit_concrete_dbb24	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbb70	74	env_bomb_hit_dbb70	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbbbc	74	env_missile_hit_water_dbbbc	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbc08	74	env_missile_hit_ground_dbc08	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbc54	74	env_bomb_hit_concrete_dbc54	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbca0	74	env_craft_hit_building_dbca0	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbcec	74	env_bomb_hit_water_dbcec	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbd38	74	env_bomb_hit_ground_dbd38	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
+0x000dbd84	74	env_depth_fade_dbd84	environment_damage_params	compiles	game	confirmed		docs/subsystems/decomp-batch-087.md; 74-byte parser; differential vs original 120/120 (stubbed sscanf wrapper, hand object linked)
 0x000dbdd0	88	normal	environment_normal	drafted	game	confirmed		Space-skip parser and print hook; guest formatting pending
 0x000dbe28	8	corridor	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 2; guest pending
 0x000dbe30	33	planet2	environment_mode_flags	drafted	game	confirmed		docs/subsystems/decomp-batch-087.md; OR bit 4 in two globals; guest pending

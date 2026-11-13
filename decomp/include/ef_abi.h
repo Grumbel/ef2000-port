@@ -75,22 +75,22 @@ void gui_alter_size_ca40(void);
 /* Batch 087: 15 original damage/environment parameter readers. The parser
  * hook represents the untouched guest sscanf, not a confirmed Watcom ABI. */
 uint32_t environment_scan_value_087(ef_addr32 source, ef_addr32 format,
-                                    ef_addr32 output);
-uint32_t env_craft_hit_water_db95c(void);
-uint32_t env_craft_hit_ground_db9a8(void);
-uint32_t env_cannon_hit_concrete_db9f4(void);
-uint32_t env_missile_hit_dba40(void);
-uint32_t env_cannon_hit_water_dba8c(void);
-uint32_t env_cannon_hit_ground_dbad8(void);
-uint32_t env_missile_hit_concrete_dbb24(void);
-uint32_t env_bomb_hit_dbb70(void);
-uint32_t env_missile_hit_water_dbbbc(void);
-uint32_t env_missile_hit_ground_dbc08(void);
-uint32_t env_bomb_hit_concrete_dbc54(void);
-uint32_t env_craft_hit_building_dbca0(void);
-uint32_t env_bomb_hit_water_dbcec(void);
-uint32_t env_bomb_hit_ground_dbd38(void);
-uint32_t env_depth_fade_dbd84(void);
+                                    ef_addr32 output); /* 0xdf26f */
+uint32_t env_craft_hit_water_db95c(void); /* 0xdb95c */
+uint32_t env_craft_hit_ground_db9a8(void); /* 0xdb9a8 */
+uint32_t env_cannon_hit_concrete_db9f4(void); /* 0xdb9f4 */
+uint32_t env_missile_hit_dba40(void); /* 0xdba40 */
+uint32_t env_cannon_hit_water_dba8c(void); /* 0xdba8c */
+uint32_t env_cannon_hit_ground_dbad8(void); /* 0xdbad8 */
+uint32_t env_missile_hit_concrete_dbb24(void); /* 0xdbb24 */
+uint32_t env_bomb_hit_dbb70(void); /* 0xdbb70 */
+uint32_t env_missile_hit_water_dbbbc(void); /* 0xdbbbc */
+uint32_t env_missile_hit_ground_dbc08(void); /* 0xdbc08 */
+uint32_t env_bomb_hit_concrete_dbc54(void); /* 0xdbc54 */
+uint32_t env_craft_hit_building_dbca0(void); /* 0xdbca0 */
+uint32_t env_bomb_hit_water_dbcec(void); /* 0xdbcec */
+uint32_t env_bomb_hit_ground_dbd38(void); /* 0xdbd38 */
+uint32_t env_depth_fade_dbd84(void); /* 0xdbd84 */
 void env_unfix_horizon_db8a8(void);
 void env_load_horizon_db8b0(void);
 void env_corridor_dbe28(void);

@@ -4,6 +4,14 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+/* The guest sscanf wrapper takes three stack arguments (caller pops) and
+ * saves/restores EBX, ECX and EDX itself, so only EAX is clobbered. */
+#pragma aux environment_scan_value_087 parm caller [] modify [eax]
+/* The shared body therefore also preserves every register but EAX. */
+#pragma aux scan_parameter_line parm [eax] value [eax] modify [eax]
+#endif
+
 /* Common 74-byte body of 15 distinct, named X-32 entry points. All read
  * 0x425af8, split at LF or NUL and call the same guest sscanf at 0xdf26f,
  * with the 0x18fffc format and their own global destination. The callee's
