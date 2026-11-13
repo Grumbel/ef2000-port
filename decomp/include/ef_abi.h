@@ -4445,6 +4445,8 @@ void report_contact_73964(int16_t a, int16_t b); /* 0x73964 AX/DX */
 uint32_t guest_fn_2bb64(int32_t id); /* 0x2bb64 AX -> AX */
 void compute_view_marker_75f00(void);
 uint32_t guest_fn_dec4c(int32_t x, int32_t y); /* 0xdec4c EAX/EDX */
+void draw_object_marker_5d520(int32_t a, int32_t b, ef_addr32 obj);
+void guest_fn_5dc20(int32_t a, int32_t b, int32_t s, uint32_t obj); /* 0x5dc20 EAX/EDX/EBX/ECX */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

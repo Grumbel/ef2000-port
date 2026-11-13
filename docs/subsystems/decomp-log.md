@@ -2566,3 +2566,13 @@ table and hands it to 0xc4b95 when in range, and sets the proximity bytes
 logged): 400/400 agree (388 non-faulting; c4b95 reached 19 times, b3fb0 loop
 782 calls); both-fault idiv cases treated as equivalent; `functions_redirected`
 verified as 1. New wrapper: `guest_fn_dec4c`.
+
+### 0x5d520 `draw_object_marker_5d520`
+
+Recovered (859 bytes): draws the four-line target box around (a, b), the two
+diagonals for the tracked contact (after calling 0x5dc20 for the non-type-1
+case), and the shadowed two-colour label via 0x48da0/0x48bb0. Controlled
+differential with 0xc8ccc/0x5dc20/0x48da0/0x48bb0 stubbed (scripted width
+returns): 400/400 agree (326 non-faulting; 154 label draws); isolated
+isofuzz PASS 170/300; `functions_redirected` verified 1. New wrapper:
+`guest_fn_5dc20`. Harness note: reset the scripted-return counter per run.
