@@ -1,1 +1,81 @@
-{"address":"0x00120485","function_size":49,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0x00120485",
+  "function_size": 49,
+  "cases": [
+    {
+      "name": "hook_00000000",
+      "memory": [
+        {
+          "address": "0x160790",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x132a69",
+          "hex": "78563412"
+        },
+        {
+          "address": "0x120746",
+          "hex": "ff0500001e00c3"
+        },
+        {
+          "address": "0x120800",
+          "hex": "ff0504001e00c3"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "0000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "hook_001207a3",
+      "memory": [
+        {
+          "address": "0x160790",
+          "hex": "a3071200"
+        },
+        {
+          "address": "0x132a69",
+          "hex": "78563412"
+        },
+        {
+          "address": "0x120746",
+          "hex": "ff0500001e00c3"
+        },
+        {
+          "address": "0x120800",
+          "hex": "ff0504001e00c3"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "0000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "hook_deadbeef",
+      "memory": [
+        {
+          "address": "0x160790",
+          "hex": "efbeadde"
+        },
+        {
+          "address": "0x132a69",
+          "hex": "78563412"
+        },
+        {
+          "address": "0x120746",
+          "hex": "ff0500001e00c3"
+        },
+        {
+          "address": "0x120800",
+          "hex": "ff0504001e00c3"
+        },
+        {
+          "address": "0x1e0000",
+          "hex": "0000000000000000"
+        }
+      ]
+    }
+  ]
+}

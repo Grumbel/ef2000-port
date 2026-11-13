@@ -2005,7 +2005,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003dccc	reset_channels_3dccc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003dccc (56 bytes); Reset the drivers and step the four channels, then refresh the matching table.; callers 3dd30@3de1a; docs/compiler-abi.md
 0x000bc421	open_list_node_bc421	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000bc421 (47 bytes); Find the list node with the given key and open it; -1 when absent.; callers 9ea0@a3ca,a3dc@a5aa,357ec@35a99; docs/compiler-abi.md
 0x000a61b0	run_pending_handlers_a61b0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a61b0 (58 bytes); Run the pending handler for every listed object that has one set.; callers c9fc4@c9fd5; docs/compiler-abi.md
-0x00120485	install_runtime_hook_120485			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00120485 (49 bytes); Install the runtime hook once.; callers none direct; docs/compiler-abi.md
+0x00120485	install_runtime_hook_120485			eax,ebx,ecx,edx,esi,edi,ebp	0	0x120485 saves EBX/ECX; EAX/EDX unchanged by both preserving helpers 0x120746/0x120800; always calls 0x120800, including installed case.
 0x000f7518	merge_pending_flags2_f7518			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f7518 (98 bytes); Merge the pending flag word into the second flag field, or clear it (mode 2 skips the refresh).; callers none direct; docs/compiler-abi.md
 0x00088cd0	copy_detail_fields_88cd0	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00088cd0 (53 bytes); Copy three 8-byte fields of an object's detail block into caller buffers.; callers 8a1dc@8a20b; docs/compiler-abi.md
 0x0006e320	forward_table_entry_6e320	AL:uint8_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006e320 (110 bytes); Gather six table dwords for a (kind, slot) pair and forward them.; callers 6e390@6e39b; docs/compiler-abi.md
@@ -3450,3 +3450,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004eb8c	mpWPZoomToggle			ebx,ecx,edx,esi	0	Original 0x0004eb8c (135 bytes); waypoint slot from cursor; pushes ebx,ecx,edx,esi
 0x00040ec4	gc_performance_yes_40ec4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x40ec4 XOR AH,AH; store AH at 0x1a364c; RET. Callback entry; EAX upper/lower bytes retained.
 0x00040ebc	gc_start_new_campaign_40ebc			eax,ebx,ecx,edx,esi,edi,ebp	0	0x40ebc MOV byte [0x1a364c],1; RET; no register inputs or clobbers; GUI callback.
+0x00120746	initialize_x87_runtime_120746			eax,ebx,ecx,edx,esi,edi,ebp	0	Original early RET or PUSH/POP EAX EBX ECX EDX ES DS around initialization; ECX retained for caller 0x120485.

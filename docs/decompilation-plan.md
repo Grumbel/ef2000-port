@@ -2230,3 +2230,5 @@ files from `local/`, no pseudo-C, no game assets, attribution trailer.
 Current user direction prioritizes matching generated assembly over game runs, superseding the earlier instruction in section 2.2 to avoid instruction matching. Full C coverage remains primary; pure-C menu and cockpit are secondary milestones. Corrected the EAX/AH contract of campaign callback 0x40ec4; compilation and static assembly review recorded in docs/subsystems/decomp-log.md. This entry remains unspliced and is not counted as verified.
 
 2026-11-13 continuation: campaign flag callbacks 0x40ebc/0x40ec4 now independently arena-link and pass five isolated differential cases each; source-only menu remains incomplete.
+
+2026-11-13 startup audit: corrected unconditional x87 helper dispatch in 0x120485; stubbed-callee differential passes all three hook-state cases. The native source-only startup boundary at 0x11d24e remains; neither this isolated check nor hybrid linkage establishes a source-only menu.
