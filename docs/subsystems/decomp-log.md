@@ -2644,3 +2644,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 
 - 2026-11-13: correction: the 120 rows classified above were triaged by category and not individually attempted; their notes now say so. First individual attempts: list_has_matching_node (0xb0208, func_fuzz PASS, 14 completed cases) and strlen_ds (0xb1b8b, links; original cannot run in the flat harness because `pop es` faults) recovered as real C in node_string_helpers.c and moved to compiles.
 - 2026-11-13: individual attempts on 0x4a90 (falls through into 0x4aa0), 0x3444c (jumps into 0x34287), 0xf8248 (thunk to 0x1100b1) and 0xb00d0 (stack-arg callee 0xcc6c0): each stays blocked with that concrete difficulty in its note.
+
+- 2026-11-13: recovered count_filtered_node_matches (0xb0850, node_string_helpers.c): counts list nodes passing guest_fn_cc1ac whose type (high word of [node+7]) is in the kind-0 or kind-1 set. Targeted differential against the original passes 3/3 (kind 0, 1, 2); the first failure was a swapped EBX/EDX parameter order, not a logic error.

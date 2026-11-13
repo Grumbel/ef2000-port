@@ -29,3 +29,37 @@ uint32_t list_has_matching_node(ef_addr32 head_addr, uint8_t a, uint8_t b)
     }
     return 0;
 }
+
+/* 0xb0850, 260 bytes. Counts list nodes (head at [list_addr], next at +4)
+ * whose flag test passes and whose type (signed 16.16 high half at +7) is in
+ * the set selected by kind (0: 1-6,8,9,11-14; 1: 0x11-0x16,0x18-0x1a). */
+uint32_t count_filtered_node_matches(uint8_t kind, ef_addr32 list_addr, ef_addr32 aux)
+{
+    uint32_t count = 0;
+    ef_addr32 node = EF_U32(list_addr);
+
+    if (node == 0) {
+        return 0;
+    }
+    if (kind > 1) {
+        return 0;
+    }
+    while (node != 0) {
+        if ((uint16_t)guest_fn_cc1ac(kind, EF_U8(node + 0xb), aux) != 0) {
+            int32_t type = (int32_t)EF_U32(node + 7) >> 16;
+
+            if (kind == 0) {
+                if ((type >= 1 && type <= 6) || type == 8 || type == 9 ||
+                    (type >= 11 && type <= 14)) {
+                    count++;
+                }
+            } else {
+                if ((type >= 0x11 && type <= 0x16) || (type >= 0x18 && type <= 0x1a)) {
+                    count++;
+                }
+            }
+        }
+        node = EF_U32(node + 4);
+    }
+    return count;
+}
