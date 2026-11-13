@@ -2302,3 +2302,19 @@ longer tests stale upper EAX bits (0x90c0 now PASS and re-included).
 callee's upper bits; `update_unit_90c0` casts explicitly. A full-link fuzz
 against a baseline build showed no other regressions (123 pre-existing
 FAILs unchanged).
+
+## 2026-11-13 — Unknown functions: self-contained integer leaves
+
+Triage of the 591 `unknown` game functions: 172 draft mechanically and
+compile (kept excluded as unreviewed), 290 have only recovered callees and no
+indirect calls, and 119 of those are self-contained integer code (no x87, no
+segment registers, no branches leaving the body). The rest are fragments that
+jump into other functions, x87/soft-float helpers, DOS bridges and rasteriser
+inner loops that are hand-written assembly.
+
+`0xb3168` (`dump_lists_to_file_b3168`, 9 arguments, `ret 0x14`) is recovered by
+hand from the disassembly. `report_message_b3374` returned nothing although the
+original returns the duplicated message buffer in EAX; it now returns it. The
+fuzz harness cannot exercise either function (file I/O: 0 completed cases), so
+the check is static: the compiled body matches the original's call sequence,
+stack offsets, push order and `ret 0x14`.

@@ -69,12 +69,12 @@ void print_status_lines_b1bf8(uint32_t handle)
 }
 
 /* 0xb3374, 56 bytes. Format a message from the global at 0x197674, the argument and the latch value, and pass it to 0xcc744. */
-void report_message_b3374(uint32_t value)
+uint32_t report_message_b3374(uint32_t value)
 {
     uint8_t buf[0xc8];
     uint32_t latched = latch_and_forward_b33ac();
     guest_sprintf_a4342((uint32_t)(uintptr_t)buf, 0x0018e5d0u, EF_U32(0x00197674u), value, latched);
-    alloc_checked_cc744((uint32_t)(uintptr_t)buf);
+    return alloc_checked_cc744((uint32_t)(uintptr_t)buf);
 }
 
 /* 0x65a50, 56 bytes. Dispatch on the mode byte at 0x1282c5 (0..8) to the matching refresh routine, then flag the display dirty. */

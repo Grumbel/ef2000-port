@@ -4301,6 +4301,8 @@ int32_t can_reactivate_c117c(ef_addr32 rec, ef_addr32 list_a, ef_addr32 list_b);
 /* game_helpers130.c */
 void init_sub_records_b4fb4(ef_addr32 obj, ef_addr32 tmpl);
 void dump_area_list_b31f0(ef_addr32 list_holder, uint32_t handle);
+void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
+                              uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
 uint32_t guest_alloc_fmt_cc6c0(uint32_t size, ef_addr32 fmt, ...); /* 0xcc6c0 cdecl, variadic */
 
 /* runtime_helpers39.c */
@@ -4650,7 +4652,7 @@ void guest_fn_11b134_x(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0
 void guest_fn_9e0c4_x(int32_t value); /* 0x9e0c4 EAX */
 
 void print_status_lines_b1bf8(uint32_t handle);
-void report_message_b3374(uint32_t value);
+uint32_t report_message_b3374(uint32_t value);
 void refresh_for_mode_65a50(void);
 void guest_fn_65a88_x(void); /* 0x65a88 no arguments */
 void guest_fn_65d24_x(void); /* 0x65d24 no arguments */

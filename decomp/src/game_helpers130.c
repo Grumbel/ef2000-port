@@ -86,3 +86,19 @@ void dump_area_list_b31f0(ef_addr32 list_holder, uint32_t handle)
         }
     }
 }
+
+/* 0xb3168, 136 bytes. (ret 0x14) Write a debug dump to the file NAME (EAX): the list LIST (EDX; first node at +0, links at +4) with header text from 0xb3374, the window words S1..S4 (low halves, signed) and the word S0 for the point list POINTS (ECX), then the area list of LIST; EDX/EBX of 0xb2d04 are passed through. The file is closed afterwards. */
+void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
+                              uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4)
+{
+    int32_t handle = open_slot_a7948(0u, 0u, 0u, 0u, name);
+    ef_addr32 header = report_message_b3374(0x0018e56cu);
+
+    dump_list_b2d04(list, e, (uint32_t)handle, header, (uint32_t)(int32_t)(int16_t)s1,
+                    (uint32_t)(int32_t)(int16_t)s2, (uint32_t)(int32_t)(int16_t)s3,
+                    (uint32_t)(int32_t)(int16_t)s4);
+    guest_fn_cc768(header);
+    dump_point_list_b2e28((uint32_t)handle, points, (int16_t)s0, 0x0018e590u);
+    dump_area_list_b31f0(list, (uint32_t)handle);
+    close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
+}

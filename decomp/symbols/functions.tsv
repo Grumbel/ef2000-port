@@ -2509,7 +2509,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b2f48	238	dump_group_b2f48	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b2f48.json	docs/compiler-abi.md; Dump one group record: its id, type name, extent words and, when any member byte at +5 is not 0x64, the member bytes.; callers b3038@b3072; guest pending
 0x000b3038	73	dump_group_list_b3038	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b3038.json	docs/compiler-abi.md; Dump a group list: heading with a title, the entry count, then each group via 0xb2f48.; callers b3084@b30ee; guest pending
 0x000b3084	226			unknown	game	unverified		
-0x000b3168	136			unknown	game	unverified		
+0x000b3168	136	dump_lists_to_file_b3168	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b3168.json	debug dump of a list, its point list and area list to a named file; callers 69d10@69dd0,69d10@69e5d; guest differential pending
 0x000b31f0	388	dump_area_list_b31f0	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b31f0.json	docs/compiler-abi.md; Dump the area list: the number of matching entries (type 0x14 whose first byte pairs with the entry's kind), then each m; callers b3168@b31dc; guest pending
 0x000b3374	56	report_message_b3374	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000b3374.json	docs/compiler-abi.md; Format a message from the global at 0x197674, the argument and the latch value, and pass it to 0xcc744.; callers b3084@b30e3,b3084@b3101,b3084@b311f; guest pending
 0x000b33ac	22	latch_and_forward_b33ac	list_helpers	compiles	game	confirmed	decomp/tests/0x000b33ac.json	docs/compiler-abi.md; Dword 0x41f354 = 0xa4574(0); tail-call 0xf9ecd(0x41f354).; callers b3374@b337d; guest pending
