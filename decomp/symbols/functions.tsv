@@ -1830,7 +1830,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008e5f0	115	draw_record_8e5f0	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008e5f0.json	docs/compiler-abi.md; Draw a record: low records use the primary routine, deeper ones the offset one.; callers 8e664@8e909; guest pending
 0x0008e664	729			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads edi on entry) or carry-flag results that the C ABI cannot express.
 0x0008e940	924			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x0008ecdc	604			unknown	game	unverified		
+0x0008ecdc	604	scan_neighbours_8ecdc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0008ecdc.json	Original 0x8ecdc (604 bytes)
 0x0008ef38	270	clear_named_references_8ef38	game_helpers66	compiles	game	confirmed	decomp/tests/0x0008ef38.json	docs/compiler-abi.md; Clear nine named object references for the object's id.; callers 8c49c@8c8c1,8d11c@8d1a3,8d330@8d3b6; guest pending
 0x0008f07c	377			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x0008f22c	341			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.

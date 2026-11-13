@@ -5280,3 +5280,85 @@ void animate_corner_table_5e664(void)
 			guest_fn_5e658_w();
 	}
 }
+
+/* Original 0x8ecdc (604 bytes): for every active record (0x19bb58 table,
+ * 0xca bytes each) walk its six linked object slots, test whether the
+ * neighbour at (X=edx, Z=ecx) is within range and visible, notify 0x8e940
+ * and count the hits.  The single stack argument is unused. */
+uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3, uint32_t unused)
+{
+	uint16_t cnt = 0;
+	int16_t o, j;
+	uint32_t rec, obj, cur, ah;
+	int32_t id;
+
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+	(void)unused;
+	if ((int16_t)EF_U16(0x0019bb5cu) <= 0)
+		return (uint8_t)cnt;
+	o = 0;
+	do {
+		if ((int32_t)o != 0xff) {
+			rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+			if (EF_U8(rec + 0x20u) == 1u) {
+				for (j = 0; j < 6; j++) {
+					rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+					id = HI(rec + 0x4eu + (uint32_t)((int32_t)j * 2));
+					obj = guest_fn_7489c(id);
+					cur = EF_U32(0x0020f430u);
+					if (obj == 0u)
+						continue;
+					if ((int32_t)guest_fn_cf94a(EF_U32(obj) - p1) > 0x80000)
+						continue;
+					if ((int32_t)guest_fn_cf94a(EF_U32(obj + 8u) - p3) > 0x80000)
+						continue;
+					ah = EF_U8(obj + 0x24u);
+					if (ah & 4u)
+						continue;
+					if (ah & 8u)
+						continue;
+					if (obj == cur)
+						continue;
+					if (EF_U16(0x00198438u) != 0u && EF_U8(0x001a364au) != 0u &&
+					    (uint16_t)o == EF_U16(0x0019bb5eu))
+						continue;
+					if (guest_fn_d0470(HI(obj + 0x1eu) , (int32_t)EF_U32(obj) >> 8,
+					                   (int32_t)EF_U32(obj + 4u) >> 8,
+					                   (int32_t)EF_U32(obj + 8u) >> 8) == 0u)
+						continue;
+					cnt++;
+					if (cur != 0u)
+						EF_U16(0x00197c28u) = EF_U16(cur + 0x16u);
+					rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+					guest_fn_8e940_x((uint32_t)HI(rec + 0x4eu + (uint32_t)((int32_t)j * 2)),
+					                 p0, p1, p2, p3);
+					if (!(EF_U8(obj + 0x24u) & 4u))
+						continue;
+					if (cur == 0u)
+						continue;
+					if (cur != guest_fn_7489c(HI(cur + 0x14u)))
+						continue;
+					if (EF_U16(0x001f71cau) != EF_U16(cur + 0x16u))
+						continue;
+					if (EF_U8(0x001a666bu) >= 8u)
+						continue;
+					if ((uint16_t)EF_U8(0x001a666bu) == EF_U16(obj + 0x18u))
+						continue;
+					if (HI(obj + 0x16u) == 0xff)
+						continue;
+					if (EF_U8(0x0012584bu) != 1u) {
+						uint32_t b = EF_U32(0x0019bb58u) + (uint32_t)(HI(obj + 0x26u) * 0xca);
+						uint32_t d = EF_U32(0x0019bb58u) + (uint32_t)(HI(cur + 0x26u) * 0xca);
+						if (EF_U16(b + 0x15u) == EF_U16(d + 0x15u))
+							continue;
+					}
+					EF_U16(0x001a6388u + (uint32_t)EF_U8(0x001a666bu) * 2u) =
+						(uint16_t)(EF_U16(0x001a6388u + (uint32_t)EF_U8(0x001a666bu) * 2u) + 1u);
+				}
+			}
+		}
+		o++;
+	} while (o < (int16_t)EF_U16(0x0019bb5cu));
+#undef HI
+	return (uint8_t)cnt;
+}
