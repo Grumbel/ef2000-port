@@ -1,0 +1,134 @@
+{
+  "address": "0x0010d80b",
+  "function_size": 324,
+  "cases": [
+    {
+      "name": "real_helpers_size_0",
+      "registers": {
+        "eax": 0
+      },
+      "memory": [
+        {
+          "address": "0x235",
+          "hex": "a304001e008705302a1300c3"
+        },
+        {
+          "address": "0x132a5e",
+          "hex": "000001"
+        },
+        {
+          "address": "0x132a30",
+          "hex": "00101e00"
+        },
+        {
+          "address": "0x17e5dc",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x17d400",
+          "hex": "00100000"
+        },
+        {
+          "address": "0x16464c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "real_helpers_size_15",
+      "registers": {
+        "eax": 15
+      },
+      "memory": [
+        {
+          "address": "0x235",
+          "hex": "a304001e008705302a1300c3"
+        },
+        {
+          "address": "0x132a5e",
+          "hex": "000001"
+        },
+        {
+          "address": "0x132a30",
+          "hex": "00101e00"
+        },
+        {
+          "address": "0x17e5dc",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x17d400",
+          "hex": "00100000"
+        },
+        {
+          "address": "0x16464c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "real_helpers_size_4096",
+      "registers": {
+        "eax": 4096
+      },
+      "memory": [
+        {
+          "address": "0x235",
+          "hex": "a304001e008705302a1300c3"
+        },
+        {
+          "address": "0x132a5e",
+          "hex": "000001"
+        },
+        {
+          "address": "0x132a30",
+          "hex": "00101e00"
+        },
+        {
+          "address": "0x17e5dc",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x17d400",
+          "hex": "00100000"
+        },
+        {
+          "address": "0x16464c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "real_helpers_size_8192",
+      "registers": {
+        "eax": 8192
+      },
+      "memory": [
+        {
+          "address": "0x235",
+          "hex": "a304001e008705302a1300c3"
+        },
+        {
+          "address": "0x132a5e",
+          "hex": "000001"
+        },
+        {
+          "address": "0x132a30",
+          "hex": "00101e00"
+        },
+        {
+          "address": "0x17e5dc",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x17d400",
+          "hex": "00100000"
+        },
+        {
+          "address": "0x16464c",
+          "hex": "00000000"
+        }
+      ]
+    }
+  ]
+}

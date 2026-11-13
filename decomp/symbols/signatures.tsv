@@ -3456,3 +3456,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000aa5c4	load_menu_stream_aa5c4	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0xaa5c4..0xaaa0d saves six GPRs; EAX file handle; caller 0xaae2c; read EAX/EDX/EBX and allocator EAX.
 0x000fc795	allocate_heap_fc795	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original saves GPRs and segment registers; DS only read for heap_alloc; callers c3f70 tail and e8733; invalid size early return.
 0x0010d63b	guest_fn_10d63b		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original saves EBX/EDX, optional LSL DS, returns adjacent tail size or zero; callers 10d94f and 10d986.
+0x0010d80b	heap_grow_10d80b	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original saves EBX ECX EDX ESI EBP; EDI untouched by body; called from fc795.
