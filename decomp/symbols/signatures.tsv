@@ -3393,3 +3393,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005d520	draw_object_marker_5d520	EAX:int32_t,EDX:int32_t,EBX:ef_addr32		ecx,esi,edi,ebp	0	Draw target box, optional diagonals and shadowed label for a contact.
 0x0007e2a8	update_flight_options_widgets_7e2a8			ebx,ecx,edx,esi,edi,ebp	0	Refresh the flight-options screen widgets from the option bytes.
 0x000b97a4	build_slot_records_b97a4	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,CX:uint16_t,[ESP+4]:uint32_t		esi,edi,ebp	4	Build the per-slot records for a found node.
+0x00063d5c	render_table_entry_63d5c	AX:uint16_t		ebx,ecx,edx,esi,edi,ebp	0	Render one entry of the 0x127a98 table.

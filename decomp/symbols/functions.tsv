@@ -1188,7 +1188,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000631fc	45	history_contains_631fc	game_helpers28	compiles	game	confirmed	decomp/tests/0x000631fc.json	docs/compiler-abi.md; True when a value is present in the history ring.; callers 66548@6673b; guest pending
 0x0006322c	206	step_damage_level_6322c	game_helpers40	compiles	game	confirmed	decomp/tests/0x0006322c.json	docs/compiler-abi.md; Step the damage level down when the weakest live part dropped far enough.; callers 62454@624e6; guest pending
 0x000633ac	528			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x00063d5c	820			unknown	unclassified	unverified		
+0x00063d5c	820	render_table_entry_63d5c	game_helpers130	compiles	game	confirmed	decomp/tests/0x00063d5c.json	Original 0x63d5c (820 bytes)
 0x000640b8	388			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00064498	140	build_ring_table_64498	game_helpers32	compiles	game	confirmed	decomp/tests/0x00064498.json	docs/compiler-abi.md; Build a 36-entry table of scaled sine/cosine pairs (radius 50, truncating).; callers 646d4@6474b; guest pending
 0x00064524	38	apply_runtime_word_negated	marker_packets	compiles	game	confirmed	decomp/tests/0x00064524.json	docs/compiler-abi.md; Acquire 0x1a7c30 via 0xd0b68, set via 0xd0ebc with 16-bit negation of word 0x127d3e; sole direct caller 646d4@64d7b; guest pending

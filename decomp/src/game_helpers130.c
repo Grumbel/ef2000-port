@@ -6250,3 +6250,87 @@ void build_slot_records_b97a4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint
 	}
 #undef BASE
 }
+
+/* 0x63d5c, 820 bytes. Render one entry of the 10-byte table at 0x127a98
+ * (centre X/Y, half-extents Z/W, kind): clear the clip box, scan-convert
+ * it with the saved camera (list head 0x20f15c or the defaults), then
+ * restore the view; entries of kind 2 also call 0x5fc80. */
+void render_table_entry_63d5c(uint32_t ax)
+{
+	int32_t idx = (int16_t)ax;
+	uint32_t t = 0x00127a98u + (uint32_t)(idx * 10);
+	int32_t x, y, hz, hw, loc0, loc4, loc8, head;
+	int32_t zv = (int16_t)EF_U16(t + 4u);
+	x = (int16_t)EF_U16(t);
+	y = (int16_t)EF_U16(t + 2u);
+	hz = zv >> 1;
+	hw = ((int32_t)(int16_t)EF_U16(t + 6u)) >> 1;
+	{
+		uint32_t r = guest_fn_cd7f0((int32_t)(int8_t)EF_U8(t + 8u));
+		if (r == 0u)
+			return;
+		guest_fn_c39f0(r);
+	}
+	guest_fn_ceccc(3u, (uint32_t)(x - hz), (uint32_t)(y - hw), (uint32_t)(x + hz), (uint32_t)(y + hw));
+	guest_fn_ce328_w((uint32_t)(x - hz), (uint32_t)(x + hz), (uint32_t)(y - hw), (uint32_t)(y + hw));
+	guest_fn_cdf48((uint32_t)(x - hz), (uint32_t)(x + hz), (uint32_t)(y - hw), (uint32_t)(y + hw));
+	guest_fn_ceccc(3u, (uint32_t)(x - hz), (uint32_t)(y - hw), (uint32_t)(x + hz), (uint32_t)(y + hw));
+	if (EF_U8(t + 9u) != 0u) {
+		head = (int32_t)EF_U32(0x0020f15cu);
+		if (head != 0) {
+			loc0 = (int32_t)EF_U32((uint32_t)head);
+			loc4 = (int32_t)EF_U32((uint32_t)head + 4u);
+			loc8 = (int32_t)EF_U32((uint32_t)head + 8u);
+		} else {
+			loc0 = (int32_t)EF_U32(0x001a5becu);
+			loc4 = (int32_t)EF_U32(0x001a5bf0u);
+			loc8 = (int32_t)EF_U32(0x001a5be8u);
+		}
+		guest_fn_c4105_x();
+		guest_fn_dc21c_s((uint32_t)(y + hw), (uint32_t)(x + hz), (uint32_t)y, (uint32_t)x);
+		guest_fn_dc71b_x((uint32_t)y, (uint32_t)(y + hw), (uint32_t)(y - hw), (uint32_t)(x + hz), (uint32_t)(x - hz));
+		head = (int32_t)EF_U32(0x0020f15cu);
+		if (head != 0) {
+			uint32_t h = (uint32_t)head;
+			EF_U32(0x000c4756u) = (uint32_t)loc0 << 8;
+			EF_U32(0x000c475cu) = (uint32_t)loc4 << 8;
+			EF_U32(0x000c4762u) = (uint32_t)loc8 << 8;
+			EF_U16(0x00159094u) = (uint16_t)(((int32_t)EF_U32(0x000c4756u)) >> 16);
+			EF_U16(0x00159098u) = (uint16_t)(((int32_t)EF_U32(0x000c475cu)) >> 16);
+			EF_U16(0x0015909cu) = (uint16_t)(((int32_t)EF_U32(0x000c4762u)) >> 16);
+			guest_fn_c4654((uint32_t)(-(int32_t)(int16_t)EF_U16(h + 0x10u)),
+				       (uint32_t)(-(int32_t)(int16_t)EF_U16(h + 0xeu)),
+				       (uint32_t)(-(int32_t)(int16_t)EF_U16(h + 0xcu)));
+		} else {
+			EF_U32(0x000c4756u) = (uint32_t)loc0 << 16;
+			EF_U32(0x000c475cu) = (uint32_t)loc4 << 16;
+			EF_U32(0x000c4762u) = (uint32_t)loc8 << 16;
+			EF_U16(0x00159094u) = (uint16_t)(((int32_t)EF_U32(0x000c4756u)) >> 16);
+			EF_U16(0x00159098u) = (uint16_t)(((int32_t)EF_U32(0x000c475cu)) >> 16);
+			EF_U16(0x0015909cu) = (uint16_t)(((int32_t)EF_U32(0x000c4762u)) >> 16);
+			guest_fn_c4654((uint32_t)(-(int32_t)(int16_t)EF_U16(0x00127d40u)),
+				       (uint32_t)(-(int32_t)(int16_t)EF_U16(0x00127d3eu)),
+				       (uint32_t)(-(int32_t)(int16_t)EF_U16(0x00127d3cu)));
+		}
+		guest_fn_dc334_s((uint32_t)-2, (uint32_t)-2);
+		head = (int32_t)EF_U32(0x0020f15cu);
+		if (head != 0) {
+			uint32_t h = (uint32_t)head;
+			guest_fn_d86e0_w((uint16_t)(-(int32_t)EF_U16(h + 0xcu)), (uint16_t)(-(int32_t)EF_U16(h + 0x10u)),
+					 (uint32_t)loc4, (uint32_t)loc8);
+			guest_fn_7ac74_w((uint32_t)(((int32_t)EF_U32(0x001a35f8u)) >> 16), (uint32_t)(loc0 >> 8),
+					 (uint32_t)(loc4 >> 8), (uint32_t)(loc8 >> 8), 0u);
+		} else {
+			guest_fn_d86e0_w((uint16_t)(-(int32_t)EF_U16(0x00127d3cu)), (uint16_t)(-(int32_t)EF_U16(0x00127d40u)),
+					 (uint32_t)loc4, (uint32_t)loc8);
+			guest_fn_7ac74_w((uint32_t)(((int32_t)EF_U32(0x001a35f8u)) >> 16), (uint32_t)loc0,
+					 (uint32_t)loc4, (uint32_t)loc8, 0u);
+		}
+		guest_fn_87fe4();
+		guest_fn_c4167_x();
+		guest_fn_dc314();
+	}
+	if (EF_U8(t + 9u) == 2u)
+		guest_fn_5fc80((uint32_t)idx);
+	guest_fn_c39ac();
+}

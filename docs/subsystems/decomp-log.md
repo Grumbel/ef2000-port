@@ -2592,3 +2592,9 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
   call logs, stack args, end registers and written record/buffer memory
   (400/400, 534 slot iterations). Wrappers added for b55f8/b5580/b55a4/cc6c0/
   b8cf8/b5640/b52bc/b5800/b570c/b4e74.
+
+- 2026-11-13: recovered `render_table_entry_63d5c` (0x63d5c). Controlled
+  differential (17 stubbed callees, 400 random scenarios, both camera-list
+  branches and kind 2 entries) agrees on call logs, stack args, end registers
+  and the written 0xc4756/0x159094 globals (400/400). Wrappers added for
+  c39f0, dc21c, dc334, d86e0, 7ac74, 87fe4, dc314, 5fc80.
