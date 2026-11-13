@@ -3636,6 +3636,8 @@ void init_camera_table_d7b6c(void);
 uint32_t open_stream_formats_d9c30(void);
 void read_stream_header_d9dc0(void);
 void draw_active_marker_e5088(void);
+void mpWPZoomToggle(void); /* 0x4eb8c */
+void guest_fn_4f0d4(void); /* 0x4f0d4 */
 void WarWonLostStartup(uint32_t arg); /* 0x42b04 EAX */
 void guest_fn_426a4(uint32_t arg); /* 0x426a4 EAX */
 void guest_fn_456e8(void); /* 0x456e8 */

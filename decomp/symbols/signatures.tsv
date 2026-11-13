@@ -3446,3 +3446,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000426a4	guest_fn_426a4	EAX:uint32_t			0	callee of 0x42b04@42b25; registers unknown, assumed clobbered
 0x000456e8	guest_fn_456e8				0	callee of 0x42b04@42b71; registers unknown, assumed clobbered
 0x00042b04	WarWonLostStartup	EAX:uint32_t		ebx,ecx,edx,edi	0	Original 0x00042b04 (131 bytes); mission start refresh; pushes ebx,ecx,edx,edi
+0x0004f0d4	guest_fn_4f0d4				0	callee of 0x4eb8c@4ec09; registers unknown, assumed clobbered
+0x0004eb8c	mpWPZoomToggle			ebx,ecx,edx,esi	0	Original 0x0004eb8c (135 bytes); waypoint slot from cursor; pushes ebx,ecx,edx,esi

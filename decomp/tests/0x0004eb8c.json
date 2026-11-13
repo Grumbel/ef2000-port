@@ -1,0 +1,232 @@
+{
+  "address": "0x0004eb8c",
+  "function_size": 135,
+  "max_instructions": 400000,
+  "cases": [
+    {
+      "name": "normal",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "01"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "flag",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "01"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "01"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "neg_value",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "0000c8003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "01"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "slot0",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014000500"
+        },
+        {
+          "address": "0x001a5672",
+          "hex": "01"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "type11",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "11"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "type5",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "05"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "type8",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "000014003200"
+        },
+        {
+          "address": "0x001a5675",
+          "hex": "08"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "neg_y",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "00001400e2ff"
+        },
+        {
+          "address": "0x001a5672",
+          "hex": "01"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    },
+    {
+      "name": "slot_big",
+      "memory": [
+        {
+          "address": "0x001a55a1",
+          "hex": "00"
+        },
+        {
+          "address": "0x0041eef0",
+          "hex": "00001400aa00"
+        },
+        {
+          "address": "0x001a567b",
+          "hex": "03"
+        },
+        {
+          "address": "0x0004e7b8",
+          "hex": "a300001e00c3"
+        },
+        {
+          "address": "0x0004f0d4",
+          "hex": "ff0504001e00c3"
+        }
+      ]
+    }
+  ]
+}
