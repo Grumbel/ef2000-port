@@ -3339,3 +3339,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ccdbc	build_group_request_ccdbc	EAX:uint32_t,DL:uint8_t,BL:uint8_t,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:ef_addr32,[ESP+16]:uint32_t,[ESP+20]:uint32_t	EAX:uint32_t	esi,edi,ebp	20	Original 0xccdbc (882 bytes); build group request
 0x000cff80	nearest_segment_hit_cff80	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0xcff80 (728 bytes); nearest segment/plane hit
 0x000e1e6c	wrap_text_lines_e1e6c	EAX:ef_addr32,EDX:ef_addr32,BL:uint8_t		ecx,esi,edi,ebp	0	Original 0xe1e6c (1257 bytes); word-wrap text into line nodes
+0x000e52a4	clip_against_windows_e52a4	EAX:uint32_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0xe52a4 (1417 bytes); window overlap / dirty rect clipping

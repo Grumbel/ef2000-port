@@ -2830,3 +2830,135 @@ post:
         return;
     guest_fn_a5ef8(EF_U8(obj + 0x10u));
 }
+
+#define E52A4_S16(a) ((int16_t)EF_U16(a))
+#define E52A4_X(v) ((uint32_t)(int32_t)(int16_t)(v))
+
+/* Original 0xe52a4 (1417 bytes). Clip the pending screen rectangle at
+ * 0x41ec08 (x, y, w, h words), then test it against every overlapping
+ * window of the list after window ID's slot: fully covered -> returns 2,
+ * partly covered windows get their border dirty rects added (and, with
+ * RECORD set, the overlap rectangles are collected at 0x4339a0). Returns 1
+ * when any overlap was found, else 0. */
+uint8_t clip_against_windows_e52a4(uint32_t id, uint8_t record)
+{
+    uint16_t di;
+    ef_addr32 win;
+    int16_t rx, ry, rw, rh;
+    int16_t px, py, pw, ph;
+    int16_t g4, g6, g8, ga, bx, cx, dx;
+    uint16_t lim_c, lim_8, lim_10;
+    uint8_t slot;
+
+    EF_U8(0x00433eaeu) = 0u;
+    if (record != 0u) {
+        EF_U16(0x00433eacu) = 0u;
+        fill_bytes_b3fb0(0x004339a0u, 0u, 0x500u);
+    }
+    rx = E52A4_S16(0x0041ec08u);
+    ry = E52A4_S16(0x0041ec0au);
+    rw = E52A4_S16(0x0041ec0cu);
+    rh = E52A4_S16(0x0041ec0eu);
+    if ((int32_t)rw + rx <= 0 || (int32_t)ry + rh <= 0 ||
+        (int32_t)rx >= (int32_t)EF_U32(0x0015b744u) || (int32_t)ry >= (int32_t)EF_U32(0x0015b748u) ||
+        rw <= 0 || rh <= 0)
+        return 2u;
+    clip_rect_to_screen_e58a8();
+    slot = (uint8_t)find_id_a4640((uint16_t)id);
+    if (EF_U16(0x0041edaau + (uint32_t)slot * 2u) == 0u)
+        return 0u;
+    di = (uint16_t)((uint16_t)slot + 1u);
+    EF_U32(0x00433ea0u) = 0u;
+    if (di >= EF_U16(0x0041eed8u))
+        return EF_U8(0x00433eaeu);
+    for (;;) {
+        uint16_t entry = EF_U16(0x0041eda8u + (uint32_t)di * 2u);
+
+        if (entry == 0u)
+            break;
+        win = EF_U32(0x0041edfcu + (uint32_t)entry * 4u);
+        if (win == 0u)
+            break;
+        /* re-read the (possibly clipped) rectangle for every window */
+        rx = E52A4_S16(0x0041ec08u);
+        ry = E52A4_S16(0x0041ec0au);
+        rw = E52A4_S16(0x0041ec0cu);
+        rh = E52A4_S16(0x0041ec0eu);
+        if (EF_U8(win + 0x10u) != (uint16_t)id) {
+            px = E52A4_S16(win + 0x41u);
+            py = E52A4_S16(win + 0x43u);
+            pw = E52A4_S16(win + 0x45u);
+            ph = E52A4_S16(win + 0x47u);
+            if ((int32_t)px < (int32_t)rx + rw && (int32_t)py < (int32_t)ry + rh &&
+                (int32_t)px + pw > (int32_t)rx && (int32_t)py + ph > (int32_t)ry) {
+                g6 = (px > rx) ? px : rx;
+                ga = (py > ry) ? py : ry;
+                g4 = (int16_t)(((int32_t)px + pw < (int32_t)rx + rw) ? (int32_t)px + pw : (int32_t)rx + rw);
+                g8 = (int16_t)(((int32_t)py + ph < (int32_t)ry + rh) ? (int32_t)py + ph : (int32_t)ry + rh);
+                EF_U16(0x00433ea6u) = (uint16_t)g6;
+                EF_U16(0x00433eaau) = (uint16_t)ga;
+                EF_U16(0x00433ea4u) = (uint16_t)g4;
+                EF_U16(0x00433ea8u) = (uint16_t)g8;
+                lim_c = (uint16_t)(px + 2);
+                cx = (int16_t)(py + 1);
+                if (EF_U16(win + 0xc5u) != 0u) {
+                    bx = (int16_t)(px + EF_U16(win + 0xc5u) + 4);
+                    dx = (int16_t)(py + 0x11);
+                } else {
+                    bx = (int16_t)(px + pw);
+                    dx = cx;
+                }
+                lim_8 = (uint16_t)(py + ph - 3);
+                lim_10 = (uint16_t)(px + pw - 3);
+                if (!(g4 > (int16_t)lim_c) && cx >= g8)
+                    goto next;
+                if (!(bx > g6) && dx >= g8)
+                    goto next;
+                if (!(g6 < (int16_t)lim_10) && ga >= (int16_t)lim_8)
+                    goto next;
+                if ((g6 > (int16_t)lim_c || cx < ga) && (bx > g4 || dx < ga) &&
+                    ((int16_t)lim_10 > g4 || (int16_t)lim_8 > g8)) {
+                    if (g6 == E52A4_S16(0x0041ec08u) && ga == E52A4_S16(0x0041ec0au) &&
+                        (int32_t)(int16_t)(g4 - g6) == (int32_t)E52A4_S16(0x0041ec0cu) &&
+                        (int32_t)(int16_t)(g8 - ga) == (int32_t)E52A4_S16(0x0041ec0eu))
+                        return 2u;
+                    if (record != 0u) {
+                        uint32_t n = EF_U32(0x00433ea0u);
+                        uint16_t cnt = (uint16_t)(EF_U16(0x00433eacu) + 1u);
+
+                        EF_U16(0x004339a0u + n * 8u) = (uint16_t)g6;
+                        EF_U16(0x004339a2u + n * 8u) = (uint16_t)ga;
+                        EF_U16(0x004339a4u + n * 8u) = (uint16_t)(g4 - g6);
+                        EF_U16(0x004339a6u + n * 8u) = (uint16_t)(g8 - ga);
+                        EF_U32(0x00433ea0u) = n + 1u;
+                        EF_U16(0x00433eacu) = cnt;
+                    }
+                    EF_U8(0x00433eaeu) = 1u;
+                    goto next;
+                }
+                if (EF_U16(win + 0xc5u) != 0u) {
+                    add_dirty_rect_e51c4(E52A4_X(px + 3), E52A4_X(py),
+                                         E52A4_X(px + EF_U16(win + 0xc5u) + 4),
+                                         E52A4_X(py + 3), record);
+                    add_dirty_rect_e51c4(E52A4_X(px), E52A4_X(py + 3),
+                                         E52A4_X(px + 3 + EF_U16(win + 0xc5u) + 1),
+                                         E52A4_X(py + 0x12), record);
+                    add_dirty_rect_e51c4(E52A4_X(px), E52A4_X(py + 0x12), E52A4_X(px + pw),
+                                         E52A4_X(py + ph - 3), record);
+                } else {
+                    add_dirty_rect_e51c4(E52A4_X(px + 3), E52A4_X(py), E52A4_X(px + pw),
+                                         E52A4_X(py + 3), record);
+                    add_dirty_rect_e51c4(E52A4_X(px), E52A4_X(py + 3), E52A4_X(px + pw),
+                                         E52A4_X(py + ph - 3), record);
+                }
+                add_dirty_rect_e51c4(E52A4_X(px), E52A4_X(py + ph - 3), E52A4_X(px + pw - 3),
+                                     E52A4_X(py + ph), record);
+            }
+        }
+next:
+        di++;
+        if (di >= EF_U16(0x0041eed8u))
+            break;
+    }
+    return EF_U8(0x00433eaeu);
+}

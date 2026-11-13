@@ -2428,3 +2428,5 @@ Recovered from disassembly: debug overlay printing the selected object's header 
 - 2026-11-13 `nearest_segment_hit_cff80` (0xcff80): segment-vs-plane nearest hit recovered; isolated fuzz PASS (148 completed of 1000).
 
 - 2026-11-13 `wrap_text_lines_e1e6c` (0xe1e6c): text word-wrap into line nodes recovered with goto-structured C; isolated fuzz PASS 1000 (many cases likely exit early on the font/enable checks, so deep paths are covered mainly by disassembly review).
+
+- 2026-11-13 `clip_against_windows_e52a4` (0xe52a4): window overlap / dirty-rect clipping recovered; isolated fuzz PASS 1000, but the initial-image rectangle is empty so nearly all cases take the early "return 2" exit; the overlap and border paths are verified from disassembly only.
