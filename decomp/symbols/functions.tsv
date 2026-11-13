@@ -2697,7 +2697,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000beebc	109	for_each_entry_beebc	game_helpers131	compiles	game	confirmed	decomp/tests/0x000beebc.json	docs/compiler-abi.md; Run 0xbed1c once for every entry of a list (count from 0xbc5d0), passing the index as a byte in EBX and forwarding the other arguments; returns the last result; callers bc610@bc793; guest pending
 0x000bef2c	99	sum_char_table_diff_bef2c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bef2c.json	docs/compiler-abi.md; Sum, over up to 8 leading characters of the string returned by 0xfb87c (stopping at '%'), of the difference of two per-c; callers bf444@bf4b2; guest pending
 0x000bef90	40	find_node_by_pair	list_lookup	compiles	game	confirmed	decomp/tests/0x000bef90.json	docs/compiler-abi.md; Find the node in the list at *EBX with dword +0x16 == * signed AX and dword +0x1a == signed DX.; callers befb8@bf1f2; guest pending
-0x000befb8	1145			unknown	game	unverified		
+0x000befb8	1145	spawn_event_record_befb8	game_helpers130	compiles	game	confirmed	decomp/tests/0x000befb8.json	Original 0xbefb8 (1145 bytes)
 0x000bf444	984			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000bf81c	356	process_pending_nodes_bf81c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000bf81c.json	Original 0xbf81c (356 bytes)
 0x000bf980	82	records_differ_bf980	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000bf980.json	docs/compiler-abi.md; Do the records at +0x33 and +0x37 differ in the bytes at +0x20 or +0x21?; callers bf81c@bf889; guest pending

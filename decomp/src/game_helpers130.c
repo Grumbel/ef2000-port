@@ -6613,3 +6613,90 @@ void draw_target_box_5a468(void)
 }
 #undef LW
 #undef LD
+
+/* 0xbefb8, 1145 bytes. Spawn an event record of KIND s0 (0x1b/0x1c/0x1d; other kinds do nothing): allocate the 0x1b-byte record and its 0x7c-byte sub-record, fill both from the arguments and link the record into the list with bc570 (EAX/EDX/EBX = a/b/c). Kind 0x1c additionally builds a 0x19-byte position block whose Z span comes from the first 0xff entry of the node found by find_node_by_pair. Returns s9 + 1. */
+uint32_t spawn_event_record_befb8(uint32_t a, uint32_t b, uint32_t c, uint32_t d,
+	uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4,
+	uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9)
+{
+	uint8_t kind = (uint8_t)s0;
+	int16_t px = (int16_t)s6;
+	int16_t py = (int16_t)s7;
+	uint32_t rec;
+	uint32_t sub;
+
+	if (kind != 0x1bu && kind != 0x1cu && kind != 0x1du)
+		return s9 + 1u;
+	rec = guest_fn_cc6c0_x(0x1bu, 0x0018ec88u);
+	EF_U8(rec + 9u) = (kind == 0x1bu) ? 0u : (kind == 0x1cu) ? 2u : 1u;
+	EF_U8(rec + 0xau) = kind;
+	EF_U8(rec + 0x12u) = 1u;
+	EF_U8(rec + 0xbu) = (uint8_t)s2;
+	EF_U16(rec + 0x10u) = (uint16_t)s9;
+	EF_U8(rec + 0xcu) = 0u;
+	EF_U8(rec + 0xdu) = 0u;
+	EF_U16(rec + 0xeu) = (kind == 0x1bu) ? 0u : 0xffffu;
+	sub = guest_fn_cc6c0_z(0x7cu, 0x0018eca0u, (uint32_t)EF_U8(rec + 0x12u));
+	EF_U32(rec + 0x13u) = sub;
+	fill_bytes_b3fb0(sub, 0u, 0x7cu);
+	EF_U8(sub) = (uint8_t)s1;
+	EF_U8(sub + 1u) = (uint8_t)s5;
+	EF_U8(sub + 2u) = (uint8_t)s3;
+	EF_U8(sub + 3u) = 0u;
+	EF_U32(sub + 0x69u) = 0u;
+	EF_U32(sub + 0x24u) = 0u;
+	EF_U32(sub + 0x78u) = 0u;
+	EF_U32(sub + 0x3bu) = 0u;
+	EF_U32(sub + 0x51u) = 0u;
+	EF_U32(sub + 0x74u) = 0u;
+	if (kind == 0x1cu) {
+		uint32_t x;
+		uint32_t node;
+		uint16_t found = 1u;
+
+		EF_U16(sub + 0x1au) = 0u;
+		EF_U16(sub + 0x1cu) = 1u;
+		EF_U16(sub + 0x1eu) = 0u;
+		x = guest_fn_cc6c0_z(0x19u, 0x0018ed24u, 0x19u);
+		EF_U32(sub + 0x20u) = x;
+		EF_U32(x) = (uint32_t)(int32_t)px;
+		EF_U32(x + 4u) = (uint32_t)(int32_t)py;
+		node = find_node_by_pair(px, py, c);
+		if (node != 0u) {
+			int16_t i = (int16_t)(EF_U16(node + 0x2au) - 1u);
+
+			while (i >= 0 && found != 0u) {
+				uint32_t entry = EF_U32(node + 0x2cu) + (uint32_t)((int32_t)i * 0x15);
+
+				if (EF_U8(entry) == 0xffu) {
+					EF_U16(x + 8u) = EF_U16(entry + 7u);
+					EF_U16(x + 0xau) = EF_U16(entry + 9u);
+					found = 0u;
+				}
+				i--;
+			}
+		}
+		if (found != 0u) {
+			EF_U16(x + 8u) = 0x64u;
+			EF_U16(x + 0xau) = 0xff9cu;
+		}
+		EF_U16(x + 0xcu) = 0u;
+		EF_U16(x + 0xeu) = 0u;
+		EF_U16(x + 0x10u) = EF_U16(0x001379a0u);
+		EF_U16(x + 0x12u) = EF_U16(0x001379a2u);
+		EF_U16(x + 0x14u) = EF_U16(0x001379a4u);
+		EF_U16(x + 0x16u) = 0u;
+		EF_U8(x + 0x18u) = (uint8_t)(0xeu + ((uint16_t)node_has_negative_flag_cc468((uint8_t)s2, d) != 0u));
+		EF_U32(sub + 8u) = EF_U32(x);
+		EF_U32(sub + 0xcu) = EF_U32(x + 4u);
+		EF_U16(sub + 0x14u) = EF_U16(x + 8u);
+		EF_U16(sub + 0x16u) = EF_U16(x + 0xau);
+		guest_fn_bc570_x(rec, a, b);
+		return s9 + 1u;
+	}
+	if (kind == 0x1bu)
+		init_event_record_bb324(sub + 0x55u, (uint32_t)EF_U8(sub), s4);
+	guest_fn_b5d8c_x(rec, (uint32_t)(int32_t)px, (uint32_t)(int32_t)py, (uint32_t)(int32_t)(int16_t)s8);
+	guest_fn_bc570_x(rec, a, b);
+	return s9 + 1u;
+}

@@ -2617,3 +2617,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
   triangle and an X. Differential with 10 stubbed callees (7489c, ce328,
   cdf48, 84e3c, 873a4, dc7bc, dc7e4, 7b16c, 5cb1c, c8ccc) agreed 400/400
   including the 0x14 object-type branch; isolated fuzz PASS 300.
+
+- 2026-11-13: recovered 0xbefb8 as `spawn_event_record_befb8` (event record kinds 0x1b/0x1c/0x1d, allocates record plus 0x7c sub-record, links via bc570; kind 0x1c builds a position block from find_node_by_pair). Isolated fuzz: 299 completed cases, PASS, redirected=1. Added register-only `guest_fn_b5d8c_x` prototype for the blocked callee 0xb5d8c.
