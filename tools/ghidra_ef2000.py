@@ -360,6 +360,28 @@ def recover_calls(args):
     return created
 
 
+def recover_observed_leaves(args):
+    """Audit or apply three reviewed leaf boundaries exposed by indirect execution."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'observed-leaves.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous = output.stat().st_mtime_ns if output.exists() else -1
+    digest = hashlib.sha256((workspace / IMAGE_NAME).read_bytes()).hexdigest()
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-postScript',
+        'EF2000RecoverObservedLeaves.java', str(output), 'apply' if args.apply else 'report', digest]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous:
+        raise ValueError('Ghidra returned without a fresh observed-leaf report')
+    with output.open(newline='') as stream:
+        rows = list(csv.DictReader(stream, delimiter='\t'))
+    if ({row['entry'] for row in rows} != {'0x000a432f', '0x000e300f', '0x000c64d0'} or
+            len(rows) != 3 or any(row['result'] not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
+        raise ValueError('invalid observed-leaf report')
+    print(f'Ghidra observed leaves: {len(rows)} reviewed boundaries; output: {output}')
+    return rows
+
+
 def repair_boundaries(args):
     """Audit or explicitly repair known instruction overlaps blocking a function body."""
     workspace = validated_workspace(args.workspace)
@@ -674,7 +696,7 @@ def main(argv=None):
     default_workspace = Path(os.environ.get('EF2000_GHIDRA_WORKSPACE',
                                             str(ROOT / 'local/ghidra'))).expanduser()
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
-                 'recover-orphans', 'recover-calls', 'repair-boundaries', 'audit-flow-gaps',
+                 'recover-orphans', 'recover-calls', 'recover-observed-leaves', 'repair-boundaries', 'audit-flow-gaps',
                  'audit-body-holes', 'function-facts', 'subsystem-map',
                  'callback-tables', 'name-callbacks', 'rebuild',
                  'apply-symbols', 'export-symbols'):
@@ -722,6 +744,9 @@ def main(argv=None):
                         help='maximum function creations (0 means all; only with --apply)')
     direct.add_argument('--tier', choices=('padding', 'adjacent-ret'), default='padding',
                         help='strong alignment-padding evidence, or opt-in immediate preceding RET byte')
+    observed = subparsers.choices['recover-observed-leaves']
+    observed.add_argument('--output', type=Path)
+    observed.add_argument('--apply', action='store_true', help='apply reviewed leaf boundaries; default rolls back')
     boundaries = subparsers.choices['repair-boundaries']
     boundaries.add_argument('--output', type=Path,
                             help='TSV audit (default: workspace/boundary-repairs.tsv)')
@@ -783,6 +808,7 @@ def main(argv=None):
         {'import': import_image, 'decompile': decompile, 'copy-callers': copy_callers,
          'inventory': export_all, 'export-all': export_all,
          'recover-orphans': recover_orphans, 'recover-calls': recover_calls,
+         'recover-observed-leaves': recover_observed_leaves,
          'repair-boundaries': repair_boundaries,
          'audit-flow-gaps': audit_flow_gaps,
          'audit-body-holes': audit_body_holes,

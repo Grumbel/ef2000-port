@@ -2475,3 +2475,22 @@ tools/asm_c_differential.py --translations local/asm-c-segstr-final-program-2026
 No tracker promotion or native/source-only game claim. Checked indirect calls/
 jumps, nonflat selector bindings, runtime services, x87, remaining body boundaries
 and stronger application-level evidence remain before full reliable coverage.
+
+
+**2026-11-13 — Reviewed boundaries exposed by indirect translation.**
+Checked indirect execution exposed two missing formatter callbacks at 0xa432f
+and 0xe300f. Reviewed disassembly, containing caller MOV ECX literals at
+0xa4352/0xe3026, neighboring function boundaries and terminating RET establish
+19-byte leaves. The 0xc64d0 XLAT leaf was truncated at 20 bytes: its trailing
+store and RET extend the body to 26 bytes (exclusive end 0xc64ea). The only
+cleared false datum is the reviewed four-byte address operand at 0xc64e5.
+Added payload-bound, transactional report/apply recovery; unknown ownership,
+data conflicts, unexpected instruction classes or boundaries abort the repair.
+Headless Ghidra audit, apply and repeat audit succeed; repeat reports all three
+already recovered. Fresh inventory contains 4,279 functions and 943,490
+instruction bytes. Tracker adds the two named callbacks and corrects only the
+XLAT leaf size; no verification or ABI promotion. Evidence under ignored local/:
+observed-leaves-{audit,apply,repeat}-20261113.tsv and
+observed-body-inventory-20261113. Commands: tools/ghidra_ef2000.py
+recover-observed-leaves [--apply] --output <report>; tools/ghidra_ef2000.py
+inventory --output local/ghidra/observed-body-inventory-20261113.

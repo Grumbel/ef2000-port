@@ -159,6 +159,27 @@ class GhidraWorkflowTests(unittest.TestCase):
                 ghidra.copy_callers(args)
             run.assert_not_called()
 
+    def test_observed_leaf_audit_binds_payload_and_requires_fresh_evidence(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False)
+        def run(command, check):
+            self.assertIn('EF2000RecoverObservedLeaves.java', command)
+            self.assertEqual(command[-2:], ['report', hashlib.sha256(self.image).hexdigest()])
+            (self.workspace / 'observed-leaves.tsv').write_text(
+                'entry\tend_exclusive\tname\tbody_bytes_before\tbody_bytes_after\tresult\n'
+                '0x000a432f\t0x000a4342\tfirst\t0\t19\tproposed\n'
+                '0x000e300f\t0x000e3022\tsecond\t0\t19\tproposed\n'
+                '0x000c64d0\t0x000c64ea\tthird\t20\t26\tproposed\n')
+        with patch.object(ghidra.subprocess, 'run', side_effect=run):
+            self.assertEqual(len(ghidra.recover_observed_leaves(args)), 3)
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'fresh observed-leaf report'):
+                ghidra.recover_observed_leaves(args)
+
     def test_inventory_produces_full_program_index_and_calls(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
