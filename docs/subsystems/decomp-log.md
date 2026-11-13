@@ -2368,3 +2368,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0x6c1c `update_damage_flags_6c1c`: damage-bit randomiser (fuzz PASS 1000).
 
 - 0x31b40 `update_view_angles_31b40`: view-angle results from camera state (fuzz PASS 1000).
+
+- 0x324b0 `aim_angles_to_point_324b0`: direction angles with clamp windows (fuzz PASS 381).

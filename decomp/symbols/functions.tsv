@@ -520,7 +520,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000322ac	207	jitter_offset_322ac	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000322ac.json	docs/compiler-abi.md; Jitter the word 0x19e5cd (e.g. a shake offset) while the flags allow it (byte 0x19e557 is not 1, byte 0x19e5de is set, t; callers 3122c@3130c; guest pending
 0x0003237c	150	update_distance_minima_3237c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0003237c.json	docs/compiler-abi.md; Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b1; callers 31e2c@32057; guest pending
 0x00032414	155	rotate_vector_by_angles_32414	game_helpers84	compiles	game	confirmed	decomp/tests/0x00032414.json	docs/compiler-abi.md; Rotate an integer vector by the angle triple (yaw/pitch/roll words) with a 1.15 matrix.; callers 316b8@316ca,3170c@3172e,31774@317bd; guest pending
-0x000324b0	488			unknown	game	unverified		
+0x000324b0	488	aim_angles_to_point_324b0	game_helpers130	compiles	game	confirmed	decomp/tests/0x000324b0.json	Original 0x324b0 (488 bytes)
 0x000326d8	263	build_mode_label_326d8	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000326d8.json	docs/compiler-abi.md; Build the label text at 0x19e4da: copy a short constant chosen by byte 0x19e555 (0..7, else a default; 5 to 8 bytes each; callers 2fbc4@2ff34,3122c@31363; guest pending
 0x000327e0	156	latch_vectors_327e0	line_of_sight	compiles	game	confirmed	decomp/tests/0x000327e0.json	docs/compiler-abi.md; Latch the position and target vectors.; callers 3122c@31246; guest pending
 0x0003287c	512			unknown	game	unverified		

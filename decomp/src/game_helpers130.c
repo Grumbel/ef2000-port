@@ -807,3 +807,52 @@ void update_view_angles_31b40(void)
         EF_U16(0x0019e5d7u) = (uint16_t)angle_d13ec(scene);
     }
 }
+
+/* 0x324b0, 488 bytes. Rotate the (to - from) offset (x,y scaled >>8) into the frame given by the angle triple ANGLES, take its direction angles into OUT (two words) and, when the limit flags at 0x19e5a9/0x19e5af are 1, clamp each angle into its [min,max] window at 0x19e5ab/ad and 0x19e5b1/b3 by snapping to the nearer bound. */
+void aim_angles_to_point_324b0(ef_addr32 from, ef_addr32 angles, ef_addr32 to, ef_addr32 out)
+{
+    uint32_t m[9];
+    int32_t v[3];
+    int32_t r[3];
+    uint32_t zero[3] = {0u, 0u, 0u};
+    uint16_t ang[2];
+    ef_addr32 scene = (ef_addr32)(uintptr_t)m;
+    int32_t dz;
+    uint32_t w;
+    uint32_t hi;
+    uint32_t lo;
+
+    v[0] = (EF_S32(to) - EF_S32(from)) >> 8;
+    v[1] = (EF_S32(to + 4u) - EF_S32(from + 4u)) >> 8;
+    dz = EF_S32(to + 8u) - EF_S32(from + 8u);
+    init_bounds_d0b68(scene);
+    update_scene_angle_first(scene, EF_U16(angles + 2u));
+    update_scene_angle_second(scene, EF_U16(angles));
+    v[2] = dz >> 8;
+    update_scene_angle_third(scene, EF_U16(angles + 4u));
+    r[0] = (int32_t)((uint32_t)(v[1] * (int32_t)m[3] + v[0] * (int32_t)m[0] + v[2] * (int32_t)m[6]) ) >> 15;
+    r[1] = (int32_t)((uint32_t)(v[0] * (int32_t)m[1] + v[1] * (int32_t)m[4] + v[2] * (int32_t)m[7])) >> 15;
+    r[2] = (int32_t)((uint32_t)(v[0] * (int32_t)m[2] + v[1] * (int32_t)m[5] + v[2] * (int32_t)m[8])) >> 15;
+    direction_angles_dc91c((ef_addr32)(uintptr_t)ang, (ef_addr32)(uintptr_t)r,
+                           (ef_addr32)(uintptr_t)zero);
+    w = ang[0];
+    hi = EF_U16(0x0019e5abu);
+    lo = EF_U16(0x0019e5adu);
+    if (EF_U16(0x0019e5a9u) == 1u && w < hi && w > lo) {
+        int32_t d1 = (int32_t)abs_a28f2((int32_t)(hi - w));
+        int32_t d2 = (int32_t)abs_a28f2((int32_t)(lo - w));
+
+        ang[0] = (d1 > d2) ? (uint16_t)lo : (uint16_t)hi;
+    }
+    w = ang[1];
+    hi = EF_U16(0x0019e5b1u);
+    lo = EF_U16(0x0019e5b3u);
+    if (EF_U16(0x0019e5afu) == 1u && w < hi && w > lo) {
+        int32_t d1 = (int32_t)abs_a28f2((int32_t)(hi - w));
+        int32_t d2 = (int32_t)abs_a28f2((int32_t)(lo - w));
+
+        ang[1] = (d1 > d2) ? (uint16_t)lo : (uint16_t)hi;
+    }
+    EF_U16(out) = ang[0];
+    EF_U16(out + 2u) = ang[1];
+}
