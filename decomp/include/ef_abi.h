@@ -4304,6 +4304,7 @@ void write_planar_image_d1afc(void);
 /* game_helpers130.c */
 void init_sub_records_b4fb4(ef_addr32 obj, ef_addr32 tmpl);
 void dump_area_list_b31f0(ef_addr32 list_holder, uint32_t handle);
+uint32_t position_in_box_bfb88(ef_addr32 obj, ef_addr32 b, ef_addr32 head);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
 uint32_t guest_alloc_fmt_cc6c0(uint32_t size, ef_addr32 fmt, ...); /* 0xcc6c0 cdecl, variadic */

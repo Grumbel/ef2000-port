@@ -102,3 +102,53 @@ void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_add
     dump_area_list_b31f0(list, (uint32_t)handle);
     close_handle_a7990(0u, 0u, 0u, 0u, (uint32_t)handle);
 }
+
+/* 0xbfb88, 336 bytes. Test whether the record OBJ (byte +0xb is its side, dwords +0xf/+0x13 and +0x11/+0x15 two positions, the high words of the first pair index a cell) falls inside a box: a base size (12 or 36 wide, 12 or 24 high, depending on the side) is shifted by the bytes 0x1a364b (when 0x1a364c is set; scaled by 1/3 above 0x46 or below 0x1e) and 0x1264e2 (9 - value), in opposite directions for the two sides. HEAD (EBX) is the cell list for 0xbfb2c and B (EDX) for 0xfba6c. Returns 1 when the cell count exceeds the box width and the match count is below its height. */
+uint32_t position_in_box_bfb88(ef_addr32 obj, ef_addr32 b, ef_addr32 head)
+{
+    int32_t width = 0xc;
+    int32_t height = 0xc;
+    int32_t shift;
+    int32_t half;
+    int32_t extra;
+    int16_t cells;
+    int16_t matches;
+    uint32_t first_side = (uint32_t)EF_U8(obj + 0xbu);
+
+    if (first_side != 1u) {
+        width = 0x24;
+        height = 0x18;
+    }
+    if (EF_U8(0x001a364cu) != 0u) {
+        int32_t level = (int32_t)EF_U8(0x001a364bu);
+
+        shift = 0;
+        if (level >= 0x46)
+            shift = (level - 0x46) / 3;
+        level = (int32_t)EF_U8(0x001a364bu);
+        if (level <= 0x1e)
+            shift = -(0x1e - level) / 3;
+        half = (int32_t)(int16_t)shift;
+        half = half / 2;
+        if (EF_U8(obj + 0xbu) != 1u) {
+            width -= shift;
+            height = (int32_t)(int16_t)height - half;
+        } else {
+            width += shift;
+            height = (int32_t)(int16_t)height + half;
+        }
+    }
+    extra = 9 - (int32_t)EF_U8(0x001264e2u);
+    half = extra / 2;
+    if (EF_U8(obj + 0xbu) != 1u) {
+        width -= extra;
+        height = (int32_t)(int16_t)height - half;
+    } else {
+        width += extra;
+        height = (int32_t)(int16_t)height + half;
+    }
+    cells = (int16_t)count_records_at_cell_bfb2c((int16_t)((int32_t)EF_U32(obj + 0xfu) >> 16),
+                                                 (int16_t)((int32_t)EF_U32(obj + 0x13u) >> 16), head);
+    matches = (int16_t)count_matching_entries_fba6c(EF_U32(obj + 0x11u), EF_U32(obj + 0x15u), b);
+    return (int16_t)width > cells && matches < (int16_t)height;
+}

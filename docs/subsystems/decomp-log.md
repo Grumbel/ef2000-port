@@ -2329,3 +2329,8 @@ the original's frame, checks and call sequence.
 Goal (user, 2026-11-13): every function is either decompiled or skipped as too
 difficult. Functions skipped as too hard are marked `blocked` in the tracker
 with the reason in the notes column.
+
+`0xbfb88` (`position_in_box_bfb88`, EAX/EDX/EBX in, 0/1 out) recovered; EBX is
+an unpushed hidden input forwarded to `0xbfb2c`. Fuzz with 1,500 cases: PASS
+(6 completed; random pointers make most scenarios fault in the original, use
+`--cases 1000+` for pointer-heavy functions).
