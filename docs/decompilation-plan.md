@@ -2252,3 +2252,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 GUI arena integration: corrected and recovered allocator 0xa7b98 (old-cursor EAX return), five isolated cases pass; composed parser, allocator and three linking helpers pass four cases. Resource reads, byte fill, startup and source-only main menu remain incomplete.
 
 2026-11-13 resource-read integration: 0x9cde8 isolated and ABI corrected; nine routing/padding comparisons and four composed parser/read cases pass. Real archive/handle I/O, copy/fill integration and source-only main menu remain incomplete.
+
+2026-11-13 copy integration: valid flat segment descriptors permit unchanged original ES saves/restores; 27 copy cases and four parser/read/arena/list/copy cases pass. Synthetic fill and real archive/handle I/O remain, as do source-only startup and menu integration.

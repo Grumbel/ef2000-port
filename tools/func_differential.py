@@ -202,7 +202,7 @@ def visible_ranges(writes, stack, scratch):
 
 
 def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
-            function_size):
+            function_size, flat_segments=False):
     # Deferred so pure unit tests do not require Python Unicorn installed.
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_MEM_WRITE, UC_HOOK_BLOCK
     from unicorn.x86_const import UC_X86_REG_EIP, UC_X86_REG_EFLAGS
@@ -221,6 +221,16 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
     for reg, value in registers.items():
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + reg.upper()), value)
     cpu.reg_write(UC_X86_REG_EFLAGS, inputs.get('eflags', 0x202))
+
+    if flat_segments:
+        # Separate from guest RAM and stack; descriptors are setup, not payload.
+        gdt = 0x10000000
+        cpu.mem_map(gdt, 0x1000)
+        cpu.mem_write(gdt, bytes(8) + struct.pack('<QQ',
+                      0x00cf9a000000ffff, 0x00cf92000000ffff))
+        cpu.reg_write(x86_const.UC_X86_REG_GDTR, (0, gdt, 23, 0))
+        for segment in ('DS', 'ES', 'SS'):
+            cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + segment), 16)
 
     writes = []
     blocks = set()
@@ -263,13 +273,13 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
 
 def compare_case(original, patched, signature, scenario, guest_size, stack,
                  sentinel, scratch, budget, function_size, flags_mask=0,
-                 patched_scenario=None):
+                 patched_scenario=None, flat_segments=False):
     name = scenario[0]
     left, left_regs, left_writes, blocks = execute(
-        original, signature, scenario, guest_size, stack, sentinel, budget, function_size)
+        original, signature, scenario, guest_size, stack, sentinel, budget, function_size, flat_segments)
     right, right_regs, right_writes, _ = execute(
         patched, signature, patched_scenario or scenario, guest_size, stack,
-        sentinel, budget, function_size)
+        sentinel, budget, function_size, flat_segments)
     diffs = []
     expected_sp = stack + 4 + signature.stack_bytes
     if left_regs['esp'] != expected_sp or right_regs['esp'] != expected_sp:
@@ -329,6 +339,8 @@ def main():
                         help='per captured function call (default: 20000)')
     parser.add_argument('--signatures', type=Path, default=ROOT / 'decomp/symbols/signatures.tsv')
     parser.add_argument('--functions', type=Path, default=ROOT / 'decomp/symbols/functions.tsv')
+    parser.add_argument("--flat-segments", action="store_true",
+                        help="install flat data descriptors for original DS/ES saves")
     args = parser.parse_args()
     try:
         address = number(args.address, 'address')
@@ -375,7 +387,8 @@ def main():
             diffs, blocks, written = compare_case(original, patched, signature, scenario,
                                                  guest_size, case_stack, sentinel, scratch,
                                                  budget, function_size, flags_mask,
-                                                 patched_scenario=replacement)
+                                                 patched_scenario=replacement,
+                                                 flat_segments=args.flat_segments)
             print(f'{scenario[0]}: {"FAIL" if diffs else "PASS"} '
                   f'original_blocks={len(blocks)} compared_ram_bytes={written}')
             for diff in diffs:

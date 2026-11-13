@@ -103,8 +103,7 @@ class FunctionDifferentialTests(unittest.TestCase):
         self.assertEqual(signature.outputs, ('AL',))
         self.assertEqual(differential.get_part({'eax': 0xabcd2345}, 'al'), 0x45)
         self.assertEqual(differential.get_part({'eax': 0xabcd2345}, 'ax'), 0x2345)
-        with self.assertRaisesRegex(ValueError, 'x87 not yet supported'):
-            differential.read_signature(path, 0xf8250)
+        self.assertEqual(differential.read_signature(path, 0xf8250).outputs, ('ST0',))
         # The high-score leaf has since advanced from a named candidate to
         # a confirmed, compiled draft; this check must follow the tracker.
         self.assertEqual(differential.read_function_extent(
@@ -166,6 +165,18 @@ class FunctionDifferentialTests(unittest.TestCase):
             scratch, budget, size)
         self.assertTrue(any('EAX' in issue for issue in differences))
         self.assertTrue(any('guest RAM' in issue for issue in differences))
+
+    @unittest.skipUnless(importlib.util.find_spec('unicorn'), 'requires Python Unicorn')
+    def test_flat_segments_allow_original_es_save_restore(self):
+        signature, spec, original, _ = fixture()
+        guest, stack, sentinel, scratch, budget, size, cases = differential.validate_spec(
+            spec, signature, len(original))
+        code = bytearray(original)
+        code[signature.address:signature.address + 3] = bytes.fromhex('0607c3')
+        differences, _, _ = differential.compare_case(
+            bytes(code), bytes(code), signature, cases[0], guest, stack,
+            sentinel, scratch, budget, 3, flat_segments=True)
+        self.assertEqual(differences, [])
 
 
 if __name__ == '__main__':

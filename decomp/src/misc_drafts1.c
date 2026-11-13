@@ -3449,24 +3449,6 @@ uint32_t inp_9c430(uint32_t port)
     return guest_inp_x(port) & 0xffu;
 }
 
-/* 0xdc832, 37 bytes. memcpy: copy COUNT bytes from SRC to DST (dwords first, then the tail bytes); returns DST. */
-ef_addr32 memcpy_dc832(ef_addr32 dst, ef_addr32 src, uint32_t count)
-{
-    uint32_t i;
-    uint32_t n = count >> 2;
-    uint32_t d = dst;
-    for (i = 0u; i < n; i++) {
-        EF_U32(d) = EF_U32(src);
-        d += 4u;
-        src += 4u;
-    }
-    for (i = 0u; i < (count & 3u); i++) {
-        EF_U8(d) = EF_U8(src);
-        d++;
-        src++;
-    }
-    return dst;
-}
 
 /* 0x9c858, 90 bytes. getenv: search the environment table at [0x160a18] (null terminated array of "NAME=value" strings) for NAME, ignoring case; returns the address of the value or 0. */
 ef_addr32 getenv_9c858(ef_addr32 name)
