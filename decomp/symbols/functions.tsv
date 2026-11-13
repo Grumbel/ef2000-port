@@ -430,7 +430,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00029f54	532			blocked	game	unverified		Skipped as too difficult: uses carry-chain arithmetic (adc/sbb/rcl/rcr) that needs inline assembly to reproduce.
 0x0002a168	92	refresh_object_2a168	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a168.json	docs/compiler-abi.md; ; callers 2541c@25450; guest pending
 0x0002a1c4	54	refresh_record_2a1c4	game_helpers23	compiles	game	confirmed	decomp/tests/0x0002a1c4.json	docs/compiler-abi.md; Re-evaluate a record's state byte and refresh the object.; callers 2541c@25457; guest pending
-0x0002a1fc	668			unknown	game	unverified		
+0x0002a1fc	668	fire_object_slot_2a1fc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0002a1fc.json	Original 0x2a1fc (668 bytes)
 0x0002a4a0	40	point_range_contains_limits	low_helpers	compiles	game	confirmed	decomp/tests/0x0002a4a0.json	docs/compiler-abi.md; signed range check against 0x1a5bec and 0x1a5be8; callers 2a4c8@2a57a; guest pending
 0x0002a4c8	600			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0002a720	113	init_entries_2a720	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x0002a720.json	docs/compiler-abi.md; Reset counters and link the twenty 22-byte entries at 0x19b980.; callers 3cfc0@3d1c5; guest pending

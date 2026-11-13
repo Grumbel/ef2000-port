@@ -4371,3 +4371,67 @@ void draw_marker_box_21e04(int16_t n)
 	if (EF_U8(0x00127aa1u + b) != 0u)
 		label_box_5fc80((uint32_t)(int32_t)n);
 }
+
+/* 0x2a1fc, 668 bytes. Fire one round of the weapon slot of unit `id`: advance the muzzle position by the page-row offset rotated by the unit's angles, spawn the projectile(s) through 0x87db8, and when the slot runs dry notify the unit. */
+void fire_object_slot_2a1fc(int16_t id, uint8_t slot, uint32_t arg)
+{
+	int32_t m[9];
+	int32_t pos[3];
+	ef_addr32 mp = (ef_addr32)(uintptr_t)m;
+	ef_addr32 obj, ent, row, p;
+	int32_t cx, di, bx, k;
+	int16_t n;
+	int32_t lim;
+
+	obj = lookup_filtered_indexed_object(id);
+	if (obj == 0u || slot == 0x14u)
+		return;
+	ent = obj + (uint32_t)slot * 3u;
+	if (EF_U16(ent + 0x19cu) == 0u)
+		return;
+	if ((EF_S32(ent + 0x198u) >> 24) == 1)
+		EF_U8(obj + 0x26u) |= 0x20u;
+	pos[0] = EF_S32(obj);
+	pos[1] = EF_S32(obj + 4u);
+	pos[2] = EF_S32(obj + 8u);
+	row = page_row_85c90((int16_t)(EF_S32(obj + 0x1d4u) >> 24));
+	cx = EF_S16(row);
+	di = EF_S16(row + 2u);
+	bx = EF_S16(row + 4u);
+	init_bounds_d0b68(mp);
+	update_scene_angle_first(mp, EF_U16(obj + 0xeu));
+	update_scene_angle_second(mp, EF_U16(obj + 0xcu));
+	update_scene_angle_third(mp, EF_U16(obj + 0x10u));
+	pos[0] += (int32_t)((uint32_t)m[1] * (uint32_t)di + (uint32_t)m[0] * (uint32_t)cx + (uint32_t)m[2] * (uint32_t)bx) / 0x6900;
+	pos[1] += (int32_t)((uint32_t)m[4] * (uint32_t)di + (uint32_t)m[3] * (uint32_t)cx + (uint32_t)m[5] * (uint32_t)bx) / 0x6900;
+	pos[2] += (int32_t)((uint32_t)m[7] * (uint32_t)di + (uint32_t)m[6] * (uint32_t)cx + (uint32_t)m[8] * (uint32_t)bx) / 0x6900;
+	k = EF_S32(ent + 0x198u) >> 24;
+	if (k == 9 || k == 0x14) {
+		n = 0;
+		for (;;) {
+			lim = EF_S32(ent + 0x19au) >> 16;
+			if (lim >= 8)
+				lim = 8;
+			if ((int32_t)n >= lim)
+				break;
+			guest_fn_87db8_x((uint32_t)pos[0], (uint32_t)pos[1], (uint32_t)pos[2], (uint32_t)(EF_S32(obj + 0xau) >> 16),
+			                 (uint32_t)(EF_S32(obj + 0xcu) >> 16), 0u, (uint32_t)(EF_S32(obj + 0x12u) >> 16),
+			                 (uint32_t)(EF_S32(ent + 0x198u) >> 24), arg, obj);
+			n = (int16_t)(n + 1);
+			EF_U16(ent + 0x19cu) = (uint16_t)(EF_U16(ent + 0x19cu) - 1u);
+		}
+	} else {
+		guest_fn_87db8_x((uint32_t)pos[0], (uint32_t)pos[1], (uint32_t)pos[2], (uint32_t)(EF_S32(obj + 0xau) >> 16),
+		                 (uint32_t)(EF_S32(obj + 0xcu) >> 16), 0u, (uint32_t)(EF_S32(obj + 0x12u) >> 16),
+		                 (uint32_t)k, arg, obj);
+		EF_U16(ent + 0x19cu) = (uint16_t)(EF_U16(ent + 0x19cu) - 1u);
+	}
+	if (EF_U16(ent + 0x19cu) != 0u)
+		return;
+	k = EF_S32(ent + 0x198u) >> 24;
+	if (k == 9 || k == 0x14)
+		return;
+	guest_fn_8f22c((int32_t)id, (uint32_t)slot);
+	if (EF_U8(0x00127da9u) != 0u)
+		send_object_state_packet(id, slot);
+}

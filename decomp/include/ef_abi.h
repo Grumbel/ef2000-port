@@ -4404,6 +4404,7 @@ void print_page_entries_ca5c(ef_addr32 fp); /* 0xca5c */
 void draw_marker_box_21e04(int16_t n); /* 0x21e04 */
 void guest_fn_2065c_x(int32_t a, int32_t b, int32_t c, int32_t d, uint32_t s0); /* 0x2065c EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 void guest_fn_1ff0c_x(int32_t a, int32_t b, int32_t c); /* 0x1ff0c EAX/EDX/EBX */
+void fire_object_slot_2a1fc(int16_t id, uint8_t slot, uint32_t arg);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
