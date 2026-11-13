@@ -9,6 +9,8 @@
 /* Game entry path from the SHA-pinned original, recovered from instruction
  * flow. These C interfaces are not yet Watcom splice-verified. */
 int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);
+uint32_t strlen_ds(ef_addr32 s); /* 0xb1b8b EAX */
+uint32_t list_has_matching_node(ef_addr32 head_addr, uint8_t a, uint8_t b); /* 0xb0208 EAX/DL/BL */
 uint32_t candidate_game_main(uint32_t argc, ef_addr32 argv);
 void guest_fn_8b2d8(void); /* 0x8b2d8: unresolved playvideo reset path */
 void guest_fn_8b39c(void); /* 0x8b39c: unresolved TACTCOM init */

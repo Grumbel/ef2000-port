@@ -2641,3 +2641,5 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
 - 2026-11-13: build_localized_path_9cf2c (0x9cf2c) linked cleanly but could not be differentially verified (all 120 harness cases fault at 0x9ca87 in the original strcat callee); row marked blocked. Trailing ABI aliases for copy_string_9d749, compare_strings_e5c03, strcat_9ca57, find_in_archives_9cb20 and try_handlers_9cbc4 kept in ef_abi.h.
 
 - 2026-11-13: final classification pass: the remaining 84 named, 27 typed and 9 compiles-bad rows marked blocked with category reasons (x87/asm ABI, unrecovered node layout, stack-arg/dispatch ABI, GUI handlers without confirmed signature, large parsers without differential). No row remains unclassified.
+
+- 2026-11-13: correction: the 120 rows classified above were triaged by category and not individually attempted; their notes now say so. First individual attempts: list_has_matching_node (0xb0208, func_fuzz PASS, 14 completed cases) and strlen_ds (0xb1b8b, links; original cannot run in the flat harness because `pop es` faults) recovered as real C in node_string_helpers.c and moved to compiles.

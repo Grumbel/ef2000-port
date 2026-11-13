@@ -409,6 +409,7 @@
             decomp/src/tactcom_prefix.c decomp/src/game_main.c \
             decomp/src/game_helpers75.c \
             decomp/src/ascii_stricmp.c \
+            decomp/src/node_string_helpers.c \
             -lcrypto -Wl,--gc-sections -o decomp-startup-test
           ./decomp-startup-test
           runHook postBuild
