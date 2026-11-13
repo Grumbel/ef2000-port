@@ -501,7 +501,6 @@ addr	reason
 0x0010d80b	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00112c10	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00118b60	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x0015c071	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00120746	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2: broke the main menu with 0x120485)
 0x0002a8ac	abi_check --stack-clobbers: stack-cleaning original preserves edi,esi, which the C clobbers and Watcom cannot save; keep original
 0x0002d894	abi_check --stack-clobbers: stack-cleaning original preserves edi,esi, which the C clobbers and Watcom cannot save; keep original
