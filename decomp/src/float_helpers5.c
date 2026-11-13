@@ -179,3 +179,12 @@ void gpw_map_mode_selected_42a98(ef_addr32 root)
         }
     }
 }
+
+/* 0xbf70, 91 bytes. onleaveOptions: dump the pending record (0xb3084 with text 0x18086c and the records at 0x137988, 0x137970, 0x137980) followed by text 0x134d8a and six signed high words. */
+void onleaveOptions(void)
+{
+	guest_fn_b3084_x(0x0018086cu, 0x00137988u, 0x00137970u, 0x00137980u, 0x00134d8au,
+	                 (uint32_t)((int32_t)EF_U32(0x0013799cu) >> 16), (uint32_t)((int32_t)EF_U32(0x0013799eu) >> 16),
+	                 (uint32_t)((int32_t)EF_U32(0x001379a0u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32cu) >> 16),
+	                 (uint32_t)((int32_t)EF_U32(0x0041f328u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32au) >> 16));
+}
