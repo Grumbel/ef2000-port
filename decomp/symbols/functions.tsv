@@ -1160,7 +1160,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005e21c	677	odometer_text_5e21c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005e21c.json	Original 0x5e21c (677 bytes)
 0x0005e4c4	403			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x0005e658	12	reset_unit_counter	runtime_control	verified	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clear word 0x12814e; OpenWatcom direct-store body 10 bytes, preserves all GPRs; 37 isolated and 1 captured call differential pass; caller flags are overwritten before conditional use. Repeated menu/setup/cockpit replay passes; 22 cockpit hits, matching selected BSS/framebuffer/status/tick/interrupt state.
-0x0005e664	535			unknown	unclassified	unverified		
+0x0005e664	535	animate_corner_table_5e664	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005e664.json	Original 0x5e664 (535 bytes)
 0x0005e87c	485	draw_corner_table_5e87c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005e87c.json	Original 0x5e87c (485 bytes)
 0x0005ea64	62	reset_range_5ea64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0005ea64.json	docs/compiler-abi.md; ; callers 5f634@5f688; guest pending
 0x0005eaa4	276	scan_nearest_record_5eaa4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005eaa4.json	docs/compiler-abi.md; Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be; callers 601c@62d9; guest pending
@@ -1812,7 +1812,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008cf10	287	destroy_unit_8cf10	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008cf10.json	docs/compiler-abi.md; Remove unit UNIT (AX, sign extended) from play unless its flag +0x24 bit 2 is set. When it is the local player's unit (w; callers 8de9c@8e01c; guest pending
 0x0008d030	176	check_cell_trigger_8d030	game_helpers48	compiles	game	confirmed	decomp/tests/0x0008d030.json	docs/compiler-abi.md; Fire the cell trigger when the player's unit stands on a special terrain value.; callers 8dd48@8de90; guest pending
 0x0008d0e0	57	mark_ui_links_by_slot	ui_grid_helpers	compiles	game	confirmed	decomp/tests/0x0008d0e0.json	docs/compiler-abi.md; host model pass; Watcom, splice and guest differential pending
-0x0008d11c	531			unknown	game	unverified		
+0x0008d11c	531			blocked	game	unverified		Skipped as too difficult: stores ECX clobbered by 0x91c48 chain and passes leaked EBX/ECX/EDX into blocked 0x913dc; blocked callee 0x7ee8
 0x0008d330	161	retire_unit_8d330	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0008d330.json	docs/compiler-abi.md; Retire the unit INDEX: skipped when its owner byte (+0x18) equals the current player byte 0x1a666b or the owner word is ; callers 8d59c@8d6e7; guest pending
 0x0008d3d4	384			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x0008d554	70	maybe_retarget_8d554	game_helpers6	compiles	game	confirmed	decomp/tests/0x0008d554.json	docs/compiler-abi.md; ; callers 8dd48@8de76; guest pending

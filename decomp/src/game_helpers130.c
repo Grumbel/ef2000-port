@@ -5221,3 +5221,62 @@ void draw_view_box_5f698(void)
 	guest_fn_c8ccc_x((uint32_t)(w1 + s), (uint32_t)(w0 + e), (uint32_t)(w1 - s),
 	                 (uint32_t)(w0 + e), color);
 }
+
+/* Original 0x5e664 (535 bytes): when the unit counter at 0x12814e is set,
+ * draw the polyline/box from the 0x1a666a corner table (like 0x5e87c) and
+ * advance the animation counters at 0x1a6cd0/0x1a6cd4. */
+void animate_corner_table_5e664(void)
+{
+	int16_t i, n, a, b;
+	uint32_t sh, x0, y0, color, idx;
+
+	if (EF_U16(0x0012814eu) == 0u)
+		return;
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+	latch_values_ce328((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	                   (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	for (i = 1; i < (int16_t)EF_U16(0x001a6cd4u); i++) {
+		color = EF_U8(0x00128148u);
+		idx = (uint32_t)(int32_t)i * 4u;
+		sh = EF_U8(0x0012b369u) & 31u;
+		x0 = (uint32_t)HI(0x001a6cfau);
+		y0 = (uint32_t)HI(0x001a6cf8u);
+		guest_fn_c8ccc_x(((uint32_t)HI(0x001a6670u + idx) << sh) + y0,
+		                 ((uint32_t)HI(0x001a666eu + idx) << sh) + x0,
+		                 ((uint32_t)HI(0x001a666cu + idx) << sh) + y0,
+		                 ((uint32_t)HI(0x001a666au + idx) << sh) + x0,
+		                 color);
+	}
+	n = (int16_t)EF_U16(0x001a6cd4u);
+	idx = (uint32_t)(int32_t)n * 4u;
+	color = EF_U8(0x00128148u);
+	sh = EF_U8(0x0012b369u) & 31u;
+	x0 = (uint32_t)HI(0x001a6cfau);
+	y0 = (uint32_t)HI(0x001a6cf8u);
+	guest_fn_c8ccc_x(((uint32_t)HI(0x001a689cu + idx) << sh) + y0,
+	                 ((uint32_t)HI(0x001a689au + idx) << sh) + x0,
+	                 ((uint32_t)HI(0x001a6784u + idx) << sh) + y0,
+	                 ((uint32_t)HI(0x001a6782u + idx) << sh) + x0,
+	                 color);
+	color = EF_U8(0x00128148u);
+	sh = EF_U8(0x0012b369u) & 31u;
+	x0 = (uint32_t)HI(0x001a6cfau);
+	y0 = (uint32_t)HI(0x001a6cf8u);
+	guest_fn_c8ccc_x(((uint32_t)HI(0x001a68a0u) << sh) + y0,
+	                 ((uint32_t)HI(0x001a689eu) << sh) + x0,
+	                 ((uint32_t)HI(0x001a6788u) << sh) + y0,
+	                 ((uint32_t)HI(0x001a6786u) << sh) + x0,
+	                 color);
+#undef HI
+	a = (int16_t)(EF_U16(0x001a6cd0u) + EF_U16(0x00127d92u));
+	b = (int16_t)EF_U16(0x001a6cc8u);
+	EF_U16(0x001a6cd0u) = (uint16_t)a;
+	if (a > b) {
+		EF_U16(0x001a6cd0u) = (uint16_t)(a - b);
+		EF_U16(0x001a6cd4u) = (uint16_t)(EF_U16(0x001a6cd4u) - 1u);
+		if (EF_U16(0x001a6cd4u) == 0u)
+			guest_fn_5e658_w();
+	}
+}

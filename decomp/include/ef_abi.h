@@ -4425,6 +4425,7 @@ void init_record_tables_87700(void); /* 0x87700 */
 void draw_corner_table_5e87c(int16_t count); /* 0x5e87c */
 void draw_offset_frame_5b080(void); /* 0x5b080 */
 void draw_view_box_5f698(void); /* 0x5f698 */
+void animate_corner_table_5e664(void); /* 0x5e664 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
