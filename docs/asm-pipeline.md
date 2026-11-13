@@ -433,3 +433,33 @@ The stack-runtime corpus rerun (`local/asm-c-x87-stack-diff-20261113`) keeps all
 same five target failures. All 93 tests pass. Syntax support rises to 3,600;
 dependency closure and selected byte coverage remain unchanged. Full x87 and
 application-level reliability remain pending; the bulk gate stays nonzero.
+
+Extended-memory support includes FLD/FSTP TBYTE with exact ten-byte transfers.
+There is no host floating conversion: signaling NaNs, denormals, pseudo-
+denormals and unnormal encodings retain their bits. A pending x87 exception
+stops before address access; complete operand bounds are checked before stack
+fault/status effects or RAM writes. Masked stack faults load/store indefinite;
+unmasked invalid leaves stack and memory unchanged while recording the pending
+exception. Instruction and data environment fields still update for deferred
+stack faults; pending delivery or invalid RAM stops before those updates.
+
+The renderer derives default DS/SS from ModRM/SIB base, including no-base SIB
+and EBP used as index, and honors encoded segment overrides. Unsupported
+address/operand-size prefixes are rejected. Tests compare 81,920 generated-body
+cases with hardware across every TOP/occupancy mask, ten payload classes and
+masked/unmasked invalid, including instruction/data pointer relocation, opcode,
+raw registers/tags/status, RAM and return state. Child-process hardware probes
+confirm pending-#MF priority over memory faults and memory faults over stack
+faults; C bounds/pending checks also test no partial state or RAM mutation.
+This is a checked flat-RAM model, not complete page-fault or exception delivery
+emulation. Twenty addressing variants compile with Watcom warnings-as-errors.
+
+Extended-memory corpus: 2,091 bodies, 269,815 bytes, all Watcom warning-free.
+All 95 tests pass. The full run has 18,500 matches, 14,937 inconclusive and 19
+mismatches. Previous outcomes are unchanged; new helper 0x120a2d contributes
+fourteen status/opcode differences and two inconclusive reads. Execution of its
+actual original bytes on host x87 confirms C's disputed status/opcode in all
+fourteen cases (long-mode probe, limited to those fields). These remain explicit
+Unicorn mismatches; the gate is nonzero. Artifacts:
+`local/asm-c-x87-memory-diff-20261113` and
+`local/asm-x87-original-memory-probe-20261113/evidence.json`.

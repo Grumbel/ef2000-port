@@ -2743,3 +2743,63 @@ closure still excludes them. Command: tools/asm_c_differential.py --translations
 local/asm-c-x87-stack-program-20261113 --output local/asm-c-x87-stack-diff-20261113
 --watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
 Final report exists. Full reliable translation remains active.
+
+
+**2026-11-13 — Raw extended-memory x87 transfers.**
+Added FLD/FSTP TBYTE with exact ten-byte little-endian access, stack/tag/status
+handling and complete instruction/data environment updates. No host floating
+type or conversion is used: hardware preserves signaling NaNs, denormals,
+pseudo-denormals and unnormal payload encodings for this operand size.
+Pending #MF stops before RAM access; operand bounds are checked before stack
+fault effects. Masked stack faults transfer indefinite; unmasked IE preserves
+stack/RAM and defers delivery while recording the faulting environment.
+Data segment selection is decoded from ModRM/SIB, distinguishing EBP-as-index,
+no-base SIB and SS bases, plus segment overrides. Unknown prefix forms remain
+unsupported. This remains checked flat RAM, not complete page/segment fault or
+exception delivery emulation.
+81,920 generated-body cases match hardware across TOP/occupancy, masked and
+unmasked IE, and ten payload classes as both loads and actual store sources.
+Compare raw registers, tags/status, opcode, relocated instruction/data context,
+RAM and return state. Sixteen child-process hardware fault probes (cores disabled)
+establish pending #MF over memory fault and memory fault over stack fault.
+C tests cover partial-span rejection, RAM smaller than the operand, wraparound,
+last valid unaligned span and no state/RAM mutation on failure. Twenty address
+variants compile warning-free with Watcom -bt=dos -3r -za99 -w1 -we.
+All 95 ASM/Ghidra tests pass (132 s); latest two memory tests pass separately
+after broadening store sources and boundary cases. Corpus: 3,601 syntax-
+supported, 2,091 selected bodies, 269,815 bytes (+one 37-byte body at 0x120a2d).
+All selected bodies and dispatcher compile warning-free with Watcom. No tracker
+promotion or reliable full-bulk claim; narrower-format conversion, arithmetic,
+comparisons, exception delivery and oracle accuracy remain unresolved.
+Commands: python3 -m unittest tests.test_asm_x87_memory tests.test_asm_x87_stack
+tests.test_asm_c_x87 tests.test_asm_c_segments tests.test_asm_c_program
+tests.test_asm_to_c tests.test_asm_inventory tests.test_asm_diff
+tests.test_ghidra_ef2000; python3 -m unittest tests.test_asm_x87_memory;
+tools/asm_c_program.py --inventory local/asm-observed-body-inventory-20261113
+--output local/asm-c-x87-memory-program-20261113. Logs:
+local/asm-c-x87-memory-full-tests-20261113.log,
+local/asm-x87-memory-final-tests-20261113.log,
+local/asm-x87-memory-watcom-20261113/compile.log (Python 3.13.12/Unicorn 2.1.4
+for full suite; standalone hardware tests also run on Python 3.13.17).
+
+Final 2,091-body comparison: 33,456 probes, 18,500 matches, 14,937 original-fault/
+budget inconclusive and 19 mismatches across four bodies. Every previous
+per-body outcome is unchanged. New 0x120a2d has fourteen mismatches and two
+original-unmapped-read inconclusive probes. All fourteen differ only in x87
+status (C IE/SF=0x41 versus Unicorn zero) and saved opcode (C 0x32e or 0x1f6
+versus Unicorn zero); GPRs, RAM and all other compared state match. The original
+helper bytes, extracted only under ignored local/, also execute on host x87
+with the same fourteen prepared inputs: hardware confirms the disputed C
+status/opcode in every case. This long-mode probe has balanced 64-bit push/pop
+versus original 32-bit push/pop and proves only those disputed x87 fields,
+not full guest ABI/RAM equivalence. Evidence binds original payload/body,
+comparison report and native probe library hashes:
+local/asm-x87-original-memory-probe-20261113/evidence.json.
+The existing five target failures persist (0xded86/0xed133/0x11f7ef). No oracle
+difference is masked, reclassified as a pass, or waived: the gate exits 1;
+750 bodies pass all prepared probes, 1,337 inconclusive, four fail. The emulator
+itself is unchanged. Suitable independent x87 verification remains required.
+Command: tools/asm_c_differential.py --translations
+local/asm-c-x87-memory-program-20261113 --output local/asm-c-x87-memory-diff-20261113
+--watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
+Final report exists; full reliable bulk translation remains active.

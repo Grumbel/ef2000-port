@@ -261,7 +261,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 }
 #endif
 '''
-RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + '\n#endif\n')
+RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME + '\n#endif\n')
 
 
 class Unsupported(ValueError):
@@ -305,10 +305,10 @@ def operand(text):
         if not -0x80000000 <= value <= 0xffffffff:
             raise Unsupported('immediate wider than 32 bits')
         return ('imm', value & 0xffffffff)
-    match = re.fullmatch(r'(?:(byte|word|dword|fword) ptr )?(?:(es|cs|ss|ds|fs|gs):)?(?:\[([^]]+)\]|(0x[0-9a-f]+))', text)
+    match = re.fullmatch(r'(?:(byte|word|dword|fword|qword|tbyte) ptr )?(?:(es|cs|ss|ds|fs|gs):)?(?:\[([^]]+)\]|(0x[0-9a-f]+))', text)
     if match:
         size, _, expression, absolute = match.groups()
-        width = {'byte': 8, 'word': 16, 'dword': 32, 'fword': 48}.get(size)
+        width = {'byte': 8, 'word': 16, 'dword': 32, 'fword': 48, 'qword': 64, 'tbyte': 80}.get(size)
         return ('mem', address_expression(expression or absolute), width)
     raise Unsupported('unsupported operand: ' + text)
 
@@ -507,7 +507,18 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
-    if stack_operation is not None:
+    if mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr '):
+        op = operand(text)
+        try:
+            segment, opcode = asm_x87.memory80_encoding(insn)
+        except ValueError as error:
+            raise Unsupported(str(error)) from error
+        code += ['b = %s;' % op[1],
+                 'a = ef_x87_memory80(s, b, %d); if (a) return a;' % (mnemonic == 'fld'),
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
+                 (insn['address'], opcode),
+                 's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif stack_operation is not None:
         operation, argument = stack_operation
         encoded = bytes.fromhex(insn['bytes'])
         if len(encoded) != 2 or not 0xd8 <= encoded[0] <= 0xdf or encoded[1] < 0xc0:

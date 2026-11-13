@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Raw x87 stack primitives for the explicit-state translator.
+"""Raw x87 register/memory primitives for the explicit-state translator.
 
 These model register/tag/status effects, not instruction environment updates.
 The instruction renderer must separately supply guest IP/opcode/selector effects.
@@ -20,6 +20,27 @@ def stack_operation(mnemonic, text):
     if mnemonic in register and match:
         return register[mnemonic], int(match[1] or 0)
     return None
+
+
+def memory80_encoding(insn):
+    """Return encoded data segment and FOP; reject unmodeled prefix/address forms."""
+    encoded = bytes.fromhex(insn['bytes'])
+    segments = {0x26: 0, 0x2e: 1, 0x36: 2, 0x3e: 3, 0x64: 4, 0x65: 5}
+    explicit = segments.get(encoded[0]) if encoded else None
+    offset = 1 if explicit is not None else 0
+    if len(encoded) < offset + 2 or encoded[offset] != 0xdb:
+        raise ValueError('unsupported x87 memory encoding')
+    modrm = encoded[offset+1]
+    group = 5 if insn['mnemonic'] == 'fld' else 7
+    mode, base = modrm >> 6, modrm & 7
+    if mode == 3 or ((modrm >> 3) & 7) != group:
+        raise ValueError('unsupported x87 memory encoding')
+    if base == 4:
+        if len(encoded) < offset + 3:
+            raise ValueError('missing x87 SIB')
+        base = encoded[offset+2] & 7
+    segment = explicit if explicit is not None else (2 if base in (4, 5) and not (mode == 0 and base == 5) else 3)
+    return segment, ((encoded[offset] & 7) << 8) | modrm
 
 
 STACK_RUNTIME = r'''
@@ -110,6 +131,41 @@ static unsigned ef_x87_stack(ef_lift_state *s, unsigned operation, unsigned argu
             else value[2] &= 0x7fffu;
         }
         ef_x87_put(s, top, value);
+    }
+    return 0;
+}
+'''
+
+MEMORY80_RUNTIME = r'''
+static unsigned ef_x87_memory80(ef_lift_state *s, uint32_t address, unsigned load) {
+    uint32_t value[3];
+    unsigned top = ef_x87_index(s, 0), destination = (top + 7u) & 7u, word;
+    if (s->x87_status & 0x80u) return 8;
+    /* Validate the full ten-byte operand before any stack/status effect. */
+    if (s->memory_size < 10u || address > s->memory_size - 10u) {
+        s->fault = 3; return 3;
+    }
+    if ((load && !ef_x87_empty(s, destination)) || (!load && ef_x87_empty(s, top))) {
+        if (!ef_x87_stack_fault(s, load)) return 0;
+        value[0] = 0; value[1] = 0xc0000000u; value[2] = 0xffffu;
+    } else {
+        s->x87_status &= ~0x200u;
+        if (load) {
+            value[0] = ef_read(s, address, 32);
+            value[1] = ef_read(s, address + 4u, 32);
+            value[2] = ef_read(s, address + 8u, 16);
+        } else for (word = 0; word < 3; ++word) value[word] = s->x87[top][word];
+    }
+    /* Extended loads/stores preserve encodings, including sNaNs/unnormals;
+       unlike narrow memory operands they do not perform a conversion. */
+    if (load) {
+        ef_x87_put(s, destination, value); ef_x87_top(s, destination);
+    } else {
+        ef_write(s, address, 32, value[0]);
+        ef_write(s, address + 4u, 32, value[1]);
+        ef_write(s, address + 8u, 16, value[2]);
+        s->x87_tag |= 3u << (top * 2);
+        ef_x87_top(s, top + 1u);
     }
     return 0;
 }
