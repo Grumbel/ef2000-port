@@ -2364,3 +2364,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0xb9c68 `build_object_records_b9c68`: object record builder; fuzz weak (0 completed, global pointers), logic decoded from disassembly.
 
 - 0x9a6fc `classify_target_flags_9a6fc`: flag-group counters over target list (fuzz PASS 769).
+
+- 0x6c1c `update_damage_flags_6c1c`: damage-bit randomiser (fuzz PASS 1000).

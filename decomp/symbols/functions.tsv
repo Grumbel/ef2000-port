@@ -90,7 +90,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00006b1c	50	update_flag_6b1c	game_helpers4	compiles	game	confirmed	decomp/tests/0x00006b1c.json	docs/compiler-abi.md; ; callers 5f60@5fb5; guest pending
 0x00006b50	163	copy_pending_name_6b50	runtime_helpers27	compiles	game	confirmed	decomp/tests/0x00006b50.json	docs/compiler-abi.md; Copy the pending name into a fresh string slot according to the mode.; callers 5f60@5fba,56d18@56d39; guest pending
 0x00006bf4	40	clear_command_state_6bf4	low_helpers	compiles	game	confirmed	decomp/tests/0x00006bf4.json	docs/compiler-abi.md; clear words 0x197244/46/48 and bytes 0x197254, 0x121e4f; callers 5f60@5fb0,5fd8@6003; guest pending
-0x00006c1c	461			unknown	game	unverified		
+0x00006c1c	461	update_damage_flags_6c1c	game_helpers130	compiles	game	confirmed	decomp/tests/0x00006c1c.json	Original 0x6c1c (461 bytes)
 0x00006df0	38	alloc_zero_5x_6df0	runtime_helpers19	compiles	game	confirmed	decomp/tests/0x00006df0.json	docs/compiler-abi.md; Allocate and zero five bytes per unit.; callers 6e18@6e35; guest pending
 0x00006e18	89	reset_slots_6e18	game_state_helpers	compiles	game	confirmed	decomp/tests/0x00006e18.json	docs/compiler-abi.md; ; callers 49228@495bc; guest pending
 0x00006e74	211	bind_object_slot_6e74	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00006e74.json	docs/compiler-abi.md; Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries;; callers 8c49c@8c88c; guest pending

@@ -693,3 +693,64 @@ uint32_t classify_target_flags_9a6fc(ef_addr32 request)
     }
     return result;
 }
+
+/* 0x6c1c, 461 bytes. Sum the 12 status bytes (+0x18e) of the object selected by 0x1f71c8, average them to a percentage (forced to 100 by 0x121e51), and when above 25% randomly clear or set bits in the damage-word table at 0x197244 on a countdown (0x121e52, reloaded to 50), setting the flicker byte 0x197254 from a random roll; when the byte at 0x121e50 is zero, clear the counters and refresh the label display instead. */
+void update_damage_flags_6c1c(void)
+{
+    int32_t sum = 0;
+    int16_t pct;
+    int16_t step;
+    int16_t i;
+    ef_addr32 object = lookup_filtered_indexed_object((int16_t)(EF_S32(0x001f71c8u) >> 16));
+
+    if (EF_U8(0x00121e50u) != 0u) {
+        if (object != 0u) {
+            for (i = 0; i < 12; i++)
+                sum += EF_U8(object + 0x18eu + (uint32_t)i);
+        }
+    } else {
+        EF_U16(0x00197244u) = 0u;
+        EF_U16(0x00197246u) = 0u;
+        EF_U16(0x00197248u) = 0u;
+        EF_U8(0x00121e4eu) = 0u;
+        EF_U8(0x00197254u) = 0u;
+        if (EF_U8(0x00121e4fu) != 0u) {
+            refresh_all_event_slots();
+            draw_label_entries_150d4();
+            EF_U8(0x00121e4fu) = 0u;
+        }
+    }
+    pct = (int16_t)((int16_t)sum / 5);
+    if (EF_U8(0x00121e51u) != 0u)
+        pct = 100;
+    if (pct <= 0x19)
+        return;
+    step = pct < 0x4b ? 2 : 8;
+    EF_U16(0x00121e52u) = (uint16_t)(EF_U16(0x00121e52u) - EF_U16(0x00127d92u));
+    if ((int16_t)EF_U16(0x00121e52u) <= 0) {
+        uint32_t slot = (uint16_t)step_generator_a45b3() % 4u;
+
+        if ((int16_t)slot < 3) {
+            uint32_t offset;
+
+            if ((uint16_t)step_generator_a45b3() % (uint32_t)(int32_t)step == 0u) {
+                uint32_t bit = (uint16_t)step_generator_a45b3() % 4u;
+
+                offset = slot * 2u;
+                EF_U16(0x00197244u + offset) = (uint16_t)((uint32_t)(EF_S32(0x00197242u + offset) >> 16) & ~(1u << bit));
+            } else {
+                offset = slot * 2u;
+                if ((uint16_t)step_generator_a45b3() % 4u == 0u) {
+                    uint32_t bit = (uint16_t)step_generator_a45b3() % 4u;
+
+                    EF_U16(0x00197244u + offset) = (uint16_t)((uint32_t)(EF_S32(0x00197242u + offset) >> 16) | (1u << bit));
+                }
+            }
+        }
+        EF_U16(0x00121e52u) = 0x32u;
+    }
+    if ((uint16_t)step_generator_a45b3() % (uint32_t)(10 - step) == 0u)
+        EF_U8(0x00197254u) = 1u;
+    else
+        EF_U8(0x00197254u) = 0u;
+}
