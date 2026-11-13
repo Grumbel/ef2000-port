@@ -4478,6 +4478,10 @@ uint32_t guest_fn_92668(void); /* 0x92668 -> EAX */
 void guest_fn_d0fb8_q(uint32_t record, uint32_t value); /* 0xd0fb8 EAX/EDX */
 void guest_fn_d0b68_q(uint32_t record); /* 0xd0b68 EAX */
 void guest_fn_d0dbc_q(uint32_t record, uint32_t value); /* 0xd0dbc EAX/EDX */
+void guest_fn_dc7bc(uint32_t angle); /* 0xdc7bc EAX */
+void guest_fn_dc7e4(uint32_t out, uint32_t a, uint32_t b); /* 0xdc7e4 EAX/EDX/EBX */
+void guest_fn_873a4(uint32_t a, uint32_t out); /* 0x873a4 EAX/EDX */
+void draw_target_box_5a468(void); /* 0x5a468 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

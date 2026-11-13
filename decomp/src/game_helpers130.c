@@ -6515,3 +6515,101 @@ done:
 	return;
 }
 #undef SMUL
+
+
+/* Original 0x5a468: draw the target-designator marker (two rotated
+ * triangles/boxes and an X) around the projected position of an object. */
+#define LW(o) (*(int16_t *)(L + (o)))
+#define LD(o) (*(uint32_t *)(L + (o)))
+void draw_target_box_5a468(void)
+{
+	uint8_t L[0x28];
+	uint32_t obj, idx, b, k, off, eax, ebx, ecx, esi, edx, edi, col;
+	int32_t sh;
+
+	obj = guest_fn_7489c((int32_t)EF_S32(0x001f71c8u) >> 16);
+	if (obj == 0u)
+		return;
+	idx = (uint32_t)EF_U8(0x001a6d1bu);
+	b = (uint32_t)EF_U8(0x0012b369u);
+	sh = (int32_t)((1u - b) & 31u);
+	ebx = (uint32_t)((EF_S32(0x001a6ceeu) >> 16) - ((EF_S32(0x00128172u + idx * 15u) >> 16) >> sh));
+	guest_fn_ce328_w(EF_S32(0x001a6cf0u) >> 16, EF_S32(0x001a6cf6u) >> 16, (int32_t)ebx, EF_S32(0x001a6cf4u) >> 16);
+	b = (uint32_t)EF_U8(0x0012b369u);
+	sh = (int32_t)((1u - b) & 31u);
+	ebx = (uint32_t)((EF_S32(0x001a6ceeu) >> 16) - ((EF_S32(0x00128172u + idx * 15u) >> 16) >> sh));
+	guest_fn_cdf48((uint32_t)(EF_S32(0x001a6cf0u) >> 16), (uint32_t)(EF_S32(0x001a6cf6u) >> 16), ebx,
+		       (uint32_t)(EF_S32(0x001a6cf4u) >> 16));
+	eax = (uint32_t)((int32_t)EF_S32(0x0019bb5cu) >> 16) * 0xcau;
+	guest_fn_84e3c_x((uint32_t)(uintptr_t)(L + 0x18), (uint32_t)(EF_S32(0x001f71c8u) >> 16),
+			 (uint32_t)EF_U8(EF_U32(0x0019bb58u) + eax + 0x8eu));
+	eax = (uint32_t)((int32_t)EF_U32(obj + 0x1d4u) >> 24);
+	if ((int32_t)eax != 0x14)
+		guest_fn_873a4((uint32_t)((int32_t)EF_U32(obj + 0x198u + eax * 3u) >> 24), (uint32_t)(uintptr_t)(L + 0x24));
+	guest_fn_dc7bc((uint32_t)EF_U16(obj + 0x10u));
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 0x10), 0u,
+		       (uint32_t)(int32_t)(int16_t)(uint16_t)(EF_U16(0x001a6cf0u) - (uint16_t)LW(0x26)));
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 0x14), 0u,
+		       (uint32_t)(int32_t)(int16_t)(uint16_t)(EF_U16(0x001a6cf6u) - (uint16_t)LW(0x26)));
+	col = (uint32_t)EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)((int32_t)LW(0x16) + LW(0x26)), (uint32_t)((int32_t)LW(0x24) + LW(0x14)),
+			 (uint32_t)((int32_t)LW(0x12) + LW(0x26)), (uint32_t)((int32_t)LW(0x10) + LW(0x24)), col);
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 0x10), (uint32_t)(int32_t)(int16_t)(0u - (3u << (b & 31u))), 0u);
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 0x14), (uint32_t)(int32_t)(int16_t)(3u << (b & 31u)), 0u);
+	col = (uint32_t)EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)((int32_t)LW(0x16) + LW(0x26)), (uint32_t)((int32_t)LW(0x24) + LW(0x14)),
+			 (uint32_t)((int32_t)LW(0x12) + LW(0x26)), (uint32_t)((int32_t)LW(0x10) + LW(0x24)), col);
+	{
+		uint32_t r = guest_fn_7b16c_x(0u, LD(0x18), LD(0x1c));
+		if (guest_fn_5cb1c_x((uint32_t)(uintptr_t)(L + 0x20), (int32_t)LD(0x18), (int32_t)(0u - r), (int32_t)LD(0x1c)) == 0u)
+			return;
+	}
+	off = (uint32_t)(EF_U16(obj + 0x10u) >> 3) * 2u;
+	if (EF_U16(0x00142e08u + off) == 0u)
+		LW(0x10) = 0;
+	else
+		LW(0x10) = (int16_t)(((int32_t)LW(0x26) - (int32_t)LW(0x22)) * (int32_t)EF_S16(0x00141e08u + off)
+				     / (int32_t)EF_S16(0x00142e08u + off));
+	LW(0x00) = (int16_t)EF_U8(0x00128148u);
+	LW(0x02) = 3;
+	b = (uint32_t)EF_U8(0x0012b369u);
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 4), 0u, (uint32_t)(int32_t)(int16_t)((uint32_t)-8 << (b & 31u)));
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 8), (uint32_t)(int32_t)(int16_t)(4u << (b & 31u)), 0u);
+	guest_fn_dc7e4((uint32_t)(uintptr_t)(L + 0xc), (uint32_t)(int32_t)(int16_t)((uint32_t)-4 << (b & 31u)), 0u);
+	eax = LD(0x24) + LD(0x10);
+	ebx = LD(4) + eax;
+	ecx = LD(8) + eax;
+	esi = LD(0xc) + eax;
+	eax = LD(0x22);
+	LW(4) = (int16_t)ebx;
+	edi = LD(6) + eax;
+	edx = LD(0xa) + eax;
+	ebx = LD(0xe) + eax;
+	col = (uint32_t)EF_U8(0x00128148u);
+	LW(6) = (int16_t)edi;
+	LW(8) = (int16_t)ecx;
+	LW(0xa) = (int16_t)edx;
+	LW(0xc) = (int16_t)esi;
+	LW(0xe) = (int16_t)ebx;
+	guest_fn_c8ccc_x((uint32_t)(int32_t)LW(0xa), (uint32_t)(int32_t)LW(8), (uint32_t)(int32_t)LW(6),
+			 (uint32_t)(int32_t)LW(4), col);
+	col = (uint32_t)EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(int32_t)LW(0xe), (uint32_t)(int32_t)LW(0xc), (uint32_t)(int32_t)LW(0xa),
+			 (uint32_t)(int32_t)LW(8), col);
+	col = (uint32_t)EF_U8(0x00128148u);
+	guest_fn_c8ccc_x((uint32_t)(int32_t)LW(6), (uint32_t)(int32_t)LW(4), (uint32_t)(int32_t)LW(0xe),
+			 (uint32_t)(int32_t)LW(0xc), col);
+	b = (uint32_t)EF_U8(0x0012b369u);
+	col = (uint32_t)EF_U8(0x00128148u);
+	k = 5u << (b & 31u);
+	{
+		int32_t x = LW(0x20), y = LW(0x22);
+		guest_fn_c8ccc_x((uint32_t)(y + (int32_t)k), (uint32_t)(x + (int32_t)k), (uint32_t)(y - (int32_t)k),
+				 (uint32_t)(x - (int32_t)k), col);
+		col = (uint32_t)EF_U8(0x00128148u);
+		guest_fn_c8ccc_x((uint32_t)(y + (int32_t)k), (uint32_t)(x - (int32_t)k), (uint32_t)(y - (int32_t)k),
+				 (uint32_t)(x + (int32_t)k), col);
+	}
+}
+#undef LW
+#undef LD

@@ -2611,3 +2611,9 @@ calls; `functions_redirected` verified 1. New wrappers: `guest_fn_7e0a4`.
   0x214454/0x2140e8/0x2143e4/0x1a6cfe memory (400/400). The existing
   d0b68/d0dbc/d0fb8 prototypes compile with spurious stack pushes, so
   register-only `_q` wrappers were added.
+
+- 2026-11-13: recovered `draw_target_box_5a468` (0x5a468, 1127 bytes, no
+  args): projects the designated object, draws two rotated line sets, a
+  triangle and an X. Differential with 10 stubbed callees (7489c, ce328,
+  cdf48, 84e3c, 873a4, dc7bc, dc7e4, 7b16c, 5cb1c, c8ccc) agreed 400/400
+  including the 0x14 object-type branch; isolated fuzz PASS 300.
