@@ -4366,6 +4366,8 @@ void select_view_angles_91afc(uint32_t yaw, uint32_t pitch);
 void guest_fn_d86e0_x(uint32_t a, uint32_t b); /* 0xd86e0 EAX/EDX */
 void guest_fn_dc519_x(uint32_t first, uint32_t second); /* 0xdc519 two callee-cleaned stack words */
 uint8_t centre_view_sample_39744(int16_t a, uint16_t d, int16_t b, uint16_t c);
+void guest_fn_d68c_x(void); /* 0xd68c, no inputs, preserves registers */
+void replay_elapsed_steps_c630(void);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7247,6 +7249,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_35de0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_15c0c4_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d86e0_x modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_d68c_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dc519_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_c8ccc_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_f9ee0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]

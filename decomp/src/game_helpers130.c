@@ -3045,3 +3045,57 @@ uint8_t centre_view_sample_39744(int16_t a, uint16_t d, int16_t b, uint16_t c)
     load_origin_and_run_c46bc();
     return sample;
 }
+
+/* Original 0xc630 (311 bytes). Fast-forward the simulation by the minutes
+ * elapsed since the stored clock: for every elapsed step run the three
+ * per-table update loops, then rebuild the derived state. */
+void replay_elapsed_steps_c630(void)
+{
+    int32_t steps, step;
+    int16_t i, count;
+    int32_t secs;
+
+    secs = clock_words_to_seconds(0x0012583cu);
+    steps = (int32_t)EF_U32(0x0019766cu) - secs / 60;
+    if (steps > 0) {
+        store_runtime_control_word(0x0bb8u);
+        for (step = 0; (int16_t)step < steps; step++) {
+            i = 0;
+            if ((int16_t)EF_U16(0x0019bb5cu) > 0) {
+                do {
+                    guest_fn_2e740_x((int32_t)i, 60.0, 1u);
+                    i++;
+                    if (i == 0xff) i++;
+                } while (i < (int16_t)EF_U16(0x0019bb5cu));
+            }
+            i = 0;
+            if ((int16_t)EF_U16(0x001a1506u) > 0) {
+                do {
+                    guest_fn_37eac_x((int32_t)i, 60.0, 1u);
+                    i++;
+                    if (i == 0xff) i++;
+                } while (i < (int16_t)EF_U16(0x001a1506u));
+            }
+            i = 0;
+            if ((int16_t)EF_U16(0x001972e6u) > 0) {
+                do {
+                    guest_fn_8f4c((uint32_t)(uint8_t)i);
+                    count = (int16_t)EF_U16(0x001972e6u);
+                    i++;
+                } while (i < count);
+            }
+            i = 0;
+            while (i < (int32_t)EF_U8(0x0019726au)) {
+                int32_t off = (int32_t)i * 5;
+                int32_t v = (int16_t)EF_U16(EF_U32(0x00197260u) + (uint32_t)off + 1u);
+                i++;
+                guest_fn_759c(v);
+            }
+            guest_fn_407c4_x(0x0012583cu, 0x0bb8);
+        }
+        store_runtime_control_word(0u);
+    }
+    guest_fn_d290_w();
+    clear_word_tables_92f0();
+    guest_fn_d68c_x();
+}
