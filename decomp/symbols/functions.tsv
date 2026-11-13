@@ -1161,7 +1161,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0005e4c4	403			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
 0x0005e658	12	reset_unit_counter	runtime_control	verified	game	confirmed	decomp/tests/0x0005e658.json	docs/compiler-abi.md; Clear word 0x12814e; OpenWatcom direct-store body 10 bytes, preserves all GPRs; 37 isolated and 1 captured call differential pass; caller flags are overwritten before conditional use. Repeated menu/setup/cockpit replay passes; 22 cockpit hits, matching selected BSS/framebuffer/status/tick/interrupt state.
 0x0005e664	535			unknown	unclassified	unverified		
-0x0005e87c	485			unknown	game	unverified		
+0x0005e87c	485	draw_corner_table_5e87c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0005e87c.json	Original 0x5e87c (485 bytes)
 0x0005ea64	62	reset_range_5ea64	game_helpers5	compiles	game	confirmed	decomp/tests/0x0005ea64.json	docs/compiler-abi.md; ; callers 5f634@5f688; guest pending
 0x0005eaa4	276	scan_nearest_record_5eaa4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0005eaa4.json	docs/compiler-abi.md; Advance the nearest-record scan: for the current index compute the squared distance to the view position and, when it be; callers 601c@62d9; guest pending
 0x0005ebb8	711			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
@@ -2686,7 +2686,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000be3f4	68	copy_ids_of_colocated_records_be3f4	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be3f4.json	docs/compiler-abi.md; For each flag-less record of the first list copy the id of every record of the second list that shares its position.; callers b0f5c@b118f,b0f5c@b147c; guest pending
 0x000be438	69	find_target_be438	runtime_helpers12	compiles	game	confirmed	decomp/tests/0x000be438.json	docs/compiler-abi.md; Find the kind-2 node of the list whose target matches the two keys and is valid.; callers be480@be526,c1438@c1781; guest pending
 0x000be480	281	build_record_be480	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000be480.json	docs/compiler-abi.md; Build a 0x78-byte record DST from SRC1 (EDX), SRC2 (EBX) and SRC3 (ECX): copy header bytes and 18 bytes from SRC2+0x11, ; callers be59c@be691; guest pending
-0x000be59c	477			unknown	game	unverified		
+0x000be59c	477			blocked	game	unverified		Skipped as too difficult: 11 stack args (ret 0x2c) with 9 callees, one taking 7 stack args; stack-slot bookkeeping too intricate
 0x000be77c	104	transfer_entry_weights_be77c	game_helpers85	compiles	game	confirmed	decomp/tests/0x000be77c.json	docs/compiler-abi.md; Find the record whose id matches the object's and move its entries' weights from field 0x23 to field 0x25.; callers be59c@be74e,f8e44@f908d; guest pending
 0x000be7e4	827	collect_group_nodes_be7e4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000be7e4.json	Original 0xbe7e4 (827 bytes)
 0x000beb20	353	scan_code_to_function_key_beb20	game_helpers60	compiles	game	confirmed	decomp/tests/0x000beb20.json	docs/compiler-abi.md; Map a keyboard scan code to the 1..23 index of the matching function key, 0 for none.; callers bed1c@bed9a; guest pending

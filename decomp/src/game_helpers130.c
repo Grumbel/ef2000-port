@@ -5055,3 +5055,53 @@ void init_record_tables_87700(void)
 	EF_U16(0x0020f198u) = 0u;
 	EF_U32(0x0020f168u) = (uint32_t)link;
 }
+
+/* Original 0x5e87c (485 bytes): draw the clipped polyline/box from the
+ * 0x1a666a corner table, then the closing segments for entry n. */
+void draw_corner_table_5e87c(int16_t count)
+{
+	int16_t n = count;
+	int16_t i;
+	uint32_t sh, x0, y0, color, idx;
+
+	if (n > (int16_t)EF_U16(0x001a6cd2u))
+		n = (int16_t)EF_U16(0x001a6cd2u);
+	if (n == 0)
+		return;
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+	latch_values_ce328((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	                   (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	for (i = 1; i < n; i++) {
+		x0 = (uint32_t)HI(0x001a6cfau);
+		color = EF_U8(0x00128148u);
+		idx = (uint32_t)(int32_t)i * 4u;
+		sh = EF_U8(0x0012b369u) & 31u;
+		guest_fn_c8ccc_x(((uint32_t)HI(0x001a6670u + idx) << sh) + (uint32_t)HI(0x001a6cf8u),
+		                 ((uint32_t)HI(0x001a666eu + idx) << sh) + x0,
+		                 ((uint32_t)HI(0x001a666cu + idx) << sh) + (uint32_t)HI(0x001a6cf8u),
+		                 ((uint32_t)HI(0x001a666au + idx) << sh) + x0,
+		                 color);
+	}
+	idx = (uint32_t)(int32_t)n * 4u;
+	color = EF_U8(0x00128148u);
+	sh = EF_U8(0x0012b369u) & 31u;
+	x0 = (uint32_t)HI(0x001a6cfau);
+	y0 = (uint32_t)HI(0x001a6cf8u);
+	guest_fn_c8ccc_x(((uint32_t)HI(0x001a689cu + idx) << sh) + y0,
+	                 ((uint32_t)HI(0x001a689au + idx) << sh) + x0,
+	                 ((uint32_t)HI(0x001a6784u + idx) << sh) + y0,
+	                 ((uint32_t)HI(0x001a6782u + idx) << sh) + x0,
+	                 color);
+	color = EF_U8(0x00128148u);
+	sh = EF_U8(0x0012b369u) & 31u;
+	x0 = (uint32_t)HI(0x001a6cfau);
+	y0 = (uint32_t)HI(0x001a6cf8u);
+	guest_fn_c8ccc_x(((uint32_t)HI(0x001a68a0u) << sh) + y0,
+	                 ((uint32_t)HI(0x001a689eu) << sh) + x0,
+	                 ((uint32_t)HI(0x001a6788u) << sh) + y0,
+	                 ((uint32_t)HI(0x001a6786u) << sh) + x0,
+	                 color);
+#undef HI
+}
