@@ -4644,3 +4644,69 @@ void draw_route_overlay_4e360(void)
 		i++;
 	}
 }
+
+/* Original 0x58d64 (437 bytes): reset the in-flight game state - latches,
+ * object links, colour tables, limits and angle tables - then the scalar
+ * defaults of the mission/HUD state; the mode limits and the 0xff pair probe
+ * run last. */
+void init_game_state_58d64(void)
+{
+	int16_t i;
+	int theatre;
+
+	reset_dialog_latches();
+	reset_object_link_controls();
+	reset_colour_tables_767f4();
+	set_limit_768fc();
+	init_angle_tables_3bd50();
+	draw_label_entries_150d4();
+	EF_U16(0x001f88f4u) = 0;
+	EF_U16(0x001f88f2u) = 0x1c;
+	EF_U16(0x001f88f6u) = 0xffff;
+	EF_U16(0x001f88f8u) = 0xffff;
+	EF_U16(0x00198460u) = 0xffff;
+	EF_U16(0x0019845eu) = 0xffff;
+	EF_U8(0x001f88fcu) = 2;
+	EF_U16(0x0012d7b0u) = 0x96;
+	EF_U16(0x0012d7aeu) = 0x96;
+	EF_U16(0x00128156u) = 0x270f;
+	EF_U8(0x00197de5u) = 0;
+	EF_U8(0x00197de4u) = 0;
+	theatre = EF_S32(0x001a5a82u) >> 16;
+	EF_U16(0x00128154u) = 0xa;
+	if (theatre == 1)
+		EF_U8(0x00197de4u) = 1;
+	EF_U16(0x00123770u) = 3;
+	EF_U16(0x00123772u) = 2;
+	EF_U8(0x00128162u) = 0;
+	EF_U8(0x00128168u) = 1;
+	EF_U8(0x00128163u) = 0;
+	EF_U32(0x00128164u) = 0;
+	EF_U8(0x00128151u) = 1;
+	EF_U8(0x0012289fu) = 0;
+	EF_U16(0x0012b360u) = 0;
+	EF_U8(0x0012854au) = 0;
+	for (i = 0; i < 12; i++)
+		EF_U8(0x00123764u + (uint32_t)i) = 2;
+	theatre = EF_S32(0x001a5a82u) >> 16;
+	EF_U16(0x0012815cu) = 2;
+	if (theatre == 1) {
+		EF_U16(0x0012815eu) = 2;
+		EF_U16(0x00128160u) = 4;
+	} else {
+		EF_U16(0x0012815eu) = 0;
+		EF_U16(0x00128160u) = 0;
+	}
+	EF_U32(0x0019f2f8u) = 0;
+	EF_U32(0x0019f2f4u) = 0;
+	EF_U32(0x0019f2f0u) = 0;
+	EF_U32(0x001258f8u) = 0;
+	EF_U32(0x001258f4u) = 0;
+	EF_U32(0x001228a4u) = 0;
+	EF_U16(0x001a6cdeu) = 0;
+	EF_U8(0x00128159u) = 0;
+	EF_U8(0x00128152u) = 3;
+	initialize_mode_limits();
+	EF_U8(0x00122c53u) = 0;
+	probe_scene_pair_state(0xff, 4, 0, 3);
+}
