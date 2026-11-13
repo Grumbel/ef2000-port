@@ -3527,7 +3527,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000eb4a0	30	alloc_block_checked_eb4a0	runtime_helpers26	compiles	game	confirmed	decomp/tests/0x000eb4a0.json	docs/compiler-abi.md; Allocate a block or abort.; callers ebb58@ebbe0; guest pending
 0x000eb4c0	26	release_pointer_eb4c0	math_string	compiles	game	confirmed	decomp/tests/0x000eb4c0.json	docs/compiler-abi.md; Release the pointer stored at EAX through 0xc3f80 and clear it.; callers ebcd8@ebceb; guest pending
 0x000eb4dc	65	bsearch_entries_eb4dc	runtime_helpers17	compiles	game	confirmed	decomp/tests/0x000eb4dc.json	docs/compiler-abi.md; Binary search 12-byte entries sorted by their first signed dword.; callers eb520@eb684; guest pending
-0x000eb520	373			unknown	game	unverified		
+0x000eb520	373	lookup_name_entry_eb520	game_helpers130	compiles	game	confirmed	decomp/tests/0x000eb520.json	Original 0xeb520 (373 bytes)
 0x000eb698	71	seek_record_eb698	game_helpers121	compiles	game	confirmed	decomp/tests/0x000eb698.json	docs/compiler-abi.md; Seek the context's handle to the given position; on a position change first reread the 8-byte header into context+0x148 ; callers eb9f8@eba16,eba64@eba9c,ebb58@ebb92; guest pending
 0x000eb9f8	84	resolve_entry_eb9f8	runtime_helpers2	compiles	game	confirmed	decomp/tests/0x000eb9f8.json	docs/compiler-abi.md; ; callers 9cb20@9cb3a,9cb20@9cb5a; guest pending
 0x000eba4c	21	lookup_field_eba4c	misc_helpers2	compiles	game	confirmed	decomp/tests/0x000eba4c.json	docs/compiler-abi.md; Zero when EDX is zero, else dword +8 of 0xeb520's result (or 0).; callers 9cb70@9cb8a,9cb70@9cbaa; guest pending

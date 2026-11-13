@@ -532,3 +532,59 @@ void draw_framed_box_14d58(int16_t index)
     forward_record_cf78c();
     leave_scroll_mode_c39ac();
 }
+
+/* 0xeb520, 373 bytes. Normalise NAME into a lowercase key (strip the context prefix at +0x94/+0x124, replace a leading known directory prefix by its index digit and a known extension by its letter), hash it and binary-search the context's entry table; returns the entry or 0. */
+ef_addr32 lookup_name_entry_eb520(ef_addr32 name, ef_addr32 context)
+{
+    char key[0x90];
+    char work[0x9c];
+    uint32_t hash;
+    uint32_t index;
+    uint32_t prefix;
+    ef_addr32 dot;
+    ef_addr32 keyAddr = (ef_addr32)(uintptr_t)key;
+    ef_addr32 workAddr = (ef_addr32)(uintptr_t)work;
+
+    if (context == 0u)
+        return 0u;
+    copy_string_9d749(workAddr, name);
+    lowercase_string(workAddr);
+    prefix = EF_U32(context + 0x124u);
+    if (prefix != 0u && compare_strings_e5c03(workAddr, context + 0x94u, prefix) == 0)
+        copy_string_9d749(workAddr, workAddr + prefix + 1u);
+    copy_string_9d749(keyAddr, workAddr);
+    for (index = 0u;; index++) {
+        uint32_t entry;
+
+        if ((int32_t)index >= EF_S32(context + 0x12cu))
+            break;
+        entry = EF_U32(EF_U32(context + 0x134u) + index * 4u);
+        if (compare_strings_e5c03(keyAddr, EF_U32(EF_U32(context + 0x134u) + index * 4u),
+                                  guest_fn_b1b8b(entry)) != 0)
+            break;
+    }
+    if ((int32_t)index < EF_S32(context + 0x12cu)) {
+        uint32_t len = guest_fn_b1b8b(EF_U32(EF_U32(context + 0x134u) + index * 4u));
+
+        copy_string_9d749(keyAddr + 1u, keyAddr + len);
+        key[0] = (char)(index + 0x30u);
+    }
+    dot = find_last_char(keyAddr, 0x2eu);
+    if (dot != 0u) {
+        for (index = 0u;; index++) {
+            if ((int32_t)index >= EF_S32(context + 0x130u))
+                break;
+            if (guest_strcmp(dot, EF_U32(EF_U32(context + 0x138u) + index * 4u)) == 0)
+                break;
+        }
+        if ((int32_t)index < EF_S32(context + 0x130u)) {
+            *(uint8_t *)(uintptr_t)dot = (uint8_t)(index + 0x41u);
+            *(uint8_t *)(uintptr_t)(dot + 1u) = 0u;
+        } else {
+            copy_string_9d749(dot, dot + 1u);
+        }
+    }
+    hash = name_hash_ebfd0(keyAddr);
+    return bsearch_entries_eb4dc((ef_addr32)(uintptr_t)&hash, EF_U32(context + 0x144u),
+                                 EF_S32(context + 0x128u));
+}

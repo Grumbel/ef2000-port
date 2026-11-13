@@ -2358,3 +2358,5 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 2026-11-13: recovered `select_next_target_65a88` (0x65a88); isolated fuzz PASS 1000 cases.
 
 - 0x14d58 `draw_framed_box_14d58`: framed box from 19-byte record table (fuzz PASS 1000).
+
+- 0xeb520 `lookup_name_entry_eb520`: name normalisation + hash bsearch (fuzz PASS 15 completed).
