@@ -3478,3 +3478,50 @@ void draw_group_markers4_43b14(ef_addr32 head, ef_addr32 list)
         node = EF_U32(node + 4u);
     }
 }
+
+/* Original 0xc0624 (377 bytes). For every node of LIST whose group flag (read
+ * with GROUP/HEAD through 0xcc1ac) is negative and whose type byte (+0xa)
+ * equals TYPE and whose record (+0x13) holds two values in 16..384, create a
+ * slot record (0xfbad8; its selector byte is 9 for type 0xe, 0x17 for type
+ * 0x16 and otherwise an untouched stack byte, modelled as 0), and if 0xbdd64
+ * finds a match run the 0xbe59c request with it, replacing VALUE with its
+ * result; the slot record is then freed (0xb16c0). Returns VALUE. */
+uint16_t process_group_nodes_c0624(uint16_t value, uint8_t type, uint8_t group, ef_addr32 head,
+                                   uint32_t p0, uint32_t p1, ef_addr32 list, uint32_t p3,
+                                   uint32_t p4, uint32_t p5)
+{
+    ef_addr32 node = EF_U32(list);
+    uint8_t sel = 0;
+
+    while (node != 0u) {
+        if ((uint16_t)group_flag_negative_cc1ac(group, EF_U8(node + 0xbu), head) != 0u &&
+            EF_U8(node + 0xau) == type) {
+            ef_addr32 p13 = EF_U32(node + 0x13u);
+            int32_t a = (int32_t)EF_U32(p13 + 8u);
+            int32_t b = (int32_t)EF_U32(p13 + 0xcu);
+
+            if (a > 0xf && a < 0x181 && b > 0xf && b < 0x181) {
+                int16_t count = 0;
+
+                while (count < 1) {
+                    ef_addr32 rec, hit;
+                    int32_t val;
+
+                    if (type == 0xeu)
+                        sel = 9;
+                    else if (type == 0x16u)
+                        sel = 0x17;
+                    rec = guest_fn_fbad8_x(0u, group, list, node, sel);
+                    val = (int32_t)(int16_t)value;
+                    hit = guest_fn_bdd64_x(rec, p0, p1, (uint32_t)a, (uint32_t)b, (uint32_t)val, p4, head, list);
+                    if (hit != 0u)
+                        value = guest_fn_be59c(rec, 0u, node, hit, (uint32_t)val, 0u, 1u, list, p3, p5, p4, p0, p1, 0u, head);
+                    free_entry_array_b16c0(rec);
+                    count++;
+                }
+            }
+        }
+        node = EF_U32(node + 4u);
+    }
+    return value;
+}
