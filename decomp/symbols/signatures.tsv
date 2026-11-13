@@ -3387,3 +3387,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005c518	draw_tactical_marker_5c518			ebx,ecx,edx,esi,edi,ebp	0	mode 3/4 tactical marker draw
 0x0005df08	draw_range_marker_5df08			ebx,ecx,edx,esi,edi,ebp	0	tracked-object range bar
 0x0005d1c4	draw_contact_labels_5d1c4			ebx,ecx,edx,esi,edi,ebp	0	contact letter labels
+0x0006bee8	update_player_target_6bee8			ebx,ecx,edx,esi,edi,ebp	0	player target slot state machine

@@ -5688,3 +5688,114 @@ void draw_contact_labels_5d1c4(void)
 	}
 #undef LS
 }
+
+/* 0x6bee8: update the player's target/lock slot (+0x146) and copy the target's state. */
+void update_player_target_6bee8(void)
+{
+	ef_addr32 P = EF_U32(0x001f71bcu);
+	ef_addr32 obj;
+	uint32_t v;
+	uint32_t si = 0;
+#define RECB(o) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
+	if (EF_U8(P + 0x16cu) == 1u) {
+		uint32_t cx = EF_U16(RECB(P) + 0x50u);
+		if ((int32_t)cx != HI(0x001f71c6u))
+			EF_U16(P + 0x146u) = (uint16_t)cx;
+	}
+	P = EF_U32(0x001f71bcu);
+	v = EF_U8(P + 0x16cu);
+	if (v == 3u || v == 4u) {
+		P = EF_U32(0x001f71bcu);
+		v = EF_U8(P + 0x2au);
+		if (v == 1u || v == 3u)
+			EF_U16(P + 0x146u) = EF_U16(P + 0x43u);
+	}
+	P = EF_U32(0x001f71bcu);
+	v = EF_U8(P + 0x16cu);
+	if (v == 0xfu || v == 0x10u || v == 0xeu)
+		EF_U16(P + 0x146u) = EF_U16(P + 0x188u);
+	P = EF_U32(0x001f71bcu);
+	obj = guest_fn_7489c(HI(P + 0x144u));
+	if (obj == 0) {
+		P = EF_U32(0x001f71bcu);
+		if (EF_U8(P + 0x16cu) != 2u)
+			return;
+		if (EF_U32(P + 0x1cu) != 0) {
+			EF_U16(P + 0x146u) = 0xffu;
+			return;
+		}
+		if (guest_fn_6aeb4(HI(0x001f71c6u)) != 0)
+			return;
+		guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+		P = EF_U32(0x001f71bcu);
+		EF_U16(P + 0x146u) = 0xffu;
+		EF_U32(P + 0x150u) = 0;
+		EF_U32(P + 0x154u) = 0;
+		return;
+	}
+	P = EF_U32(0x001f71bcu);
+	if (EF_U8(P + 0x16cu) == 2u) {
+		uint8_t fl = EF_U8(obj + 0x24u);
+		int matched = 0;
+		if (!((fl & 4u) || (fl & 8u))) {
+			uint32_t pr = EF_U8(RECB(P) + 0x15u);
+			uint32_t orr = EF_U8(RECB(obj) + 0x15u);
+			matched = (guest_fn_2e910_x(orr, pr) != 0);
+		}
+		if (!matched) {
+			P = EF_U32(0x001f71bcu);
+			EF_U16(P + 0x146u) = 0xffu;
+			EF_U32(P + 0x150u) = 0;
+			EF_U32(P + 0x154u) = 0;
+			if (guest_fn_6aeb4(HI(0x001f71c6u)) != 0)
+				goto copy;
+			goto call_clear;
+		}
+		if (EF_U32(obj + 0x1cu) == 0)
+			goto copy;
+		P = EF_U32(0x001f71bcu);
+		si = EF_U16(P + 0x146u);
+		if (guest_fn_6aeb4(HI(0x001f71c6u)) == 0) {
+			guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+			P = EF_U32(0x001f71bcu);
+			EF_U16(P + 0x146u) = 0xffu;
+			EF_U32(P + 0x150u) = 0;
+			obj = 0;
+			EF_U32(P + 0x154u) = 0;
+		}
+		P = EF_U32(0x001f71bcu);
+		if ((uint32_t)EF_U16(P + 0x146u) != (uint32_t)(int32_t)(int16_t)si)
+			EF_U32(P + 0x150u) = 0;
+		else
+			goto copy;
+		EF_U32(P + 0x154u) = 0;
+		goto copy;
+	} else {
+		uint8_t fl = EF_U8(obj + 0x24u);
+		if (!((fl & 4u) || (fl & 8u)))
+			goto copy;
+		P = EF_U32(0x001f71bcu);
+		if (EF_U8(P + 0x16cu) == 5u)
+			goto clear;
+	}
+call_clear:
+	guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+clear:
+	P = EF_U32(0x001f71bcu);
+	EF_U16(P + 0x146u) = 0xffu;
+	EF_U32(P + 0x150u) = 0;
+	obj = 0;
+	EF_U32(P + 0x154u) = 0;
+copy:
+	if (obj == 0)
+		return;
+	EF_U32(0x001f7020u) = EF_U32(obj + 0x49u);
+	EF_U32(0x001f7024u) = EF_U32(obj + 0x4du);
+	EF_U32(0x001f7028u) = EF_U32(obj + 0x51u);
+	EF_U32(0x001f702cu) = EF_U32(obj + 0x55u);
+	EF_U32(0x001f7030u) = EF_U32(obj + 0x59u);
+	EF_U32(0x001f7034u) = EF_U32(obj + 0x5du);
+	EF_U32(0x001f6fe0u) = EF_U32(obj + 0x91u);
+	EF_U32(0x001f6fe4u) = EF_U32(obj + 0x95u);
+#undef RECB
+}

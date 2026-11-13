@@ -2539,3 +2539,8 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   callee-stubbed differential (12 stubs: cdf48, ce328, 7489c, 5ca88, 5d87c, 5de14, 5dbc8,
   5d48c, 48da0, 48bb0, 5d520, 62548; label string bytes logged) agrees 400/400 with
   4588 logged calls. New wrappers: guest_fn_5d87c, guest_fn_5de14, guest_fn_62548.
+
+- 0x6bee8 `update_player_target_6bee8` recovered (773 bytes, void; player target slot
+  +0x146/+0x150/+0x154 state machine, copies target fields to 0x1f7020../0x1f6fe0).
+  Isolated fuzz PASS 300; callee-stubbed differential (7489c, 2e910, 6aeb4, 6a1d0;
+  RAM dump of the player slot block and copy targets) agrees 400/400.
