@@ -2803,3 +2803,61 @@ Command: tools/asm_c_differential.py --translations
 local/asm-c-x87-memory-program-20261113 --output local/asm-c-x87-memory-diff-20261113
 --watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
 Final report exists; full reliable bulk translation remains active.
+
+
+**2026-11-13 — Exact binary32/binary64 x87 memory loads.**
+Added FLD DWORD/QWORD via integer IEEE-field widening and bounded denormal
+normalization, without native floating types or rounding. Preserve signs,
+zeros, infinities, NaN payloads; quiet sNaN and set IE. Input subnormals set DE
+and normalize exactly. Hardware proves the nonuniform unmasked behavior:
+IE suppresses the push, while DE commits it and records deferred delivery.
+Full-stack fault precedes source-format exceptions; normal RAM/pending priority
+and guest instruction/data environment remain intact. Share the encoded
+ModRM/SIB/segment decoder with extended loads. Narrowing stores/arithmetic and
+pending delivery remain unsupported.
+473,088 generated-body hardware comparisons pass under UBSan: every exponent,
+both signs, mantissa boundaries, all three standard precision controls/four
+round modes, TOP/occupancy and independent IE/DE masks. Compare raw registers,
+tags/status, opcode, relocated context, RAM and flags. Boundary checks cover
+invalid/short/wrapping spans and the last valid operand. Twenty real-load
+address variants compile warning-free with Watcom -bt=dos -3r -za99 -w1 -we.
+All 96 ASM/Ghidra tests pass (144 s); focused latest load tests pass separately.
+Regeneration: 3,606 syntax-supported, 2,096 selected bodies, 270,162 body bytes
+(+5 selected, +347 bytes): 0x45b60, 0x84f60, 0x11ac3c, 0x11b3c0, 0x120a60.
+All selected bodies and dispatcher compile warning-free with Watcom. No tracker
+promotion or full-bulk/game integration claim; oracle gaps stay explicit.
+Commands: python3 -m unittest tests.test_asm_x87_load tests.test_asm_x87_memory
+tests.test_asm_x87_stack tests.test_asm_c_x87 tests.test_asm_c_segments
+tests.test_asm_c_program tests.test_asm_to_c tests.test_asm_inventory
+tests.test_asm_diff tests.test_ghidra_ef2000;
+python3 -m unittest tests.test_asm_x87_load;
+tools/asm_c_program.py --inventory local/asm-observed-body-inventory-20261113
+--output local/asm-c-x87-real-load-program-20261113. Evidence:
+local/asm-c-x87-real-load-full-tests-20261113.log,
+local/asm-x87-real-load-final-tests-20261113.log,
+local/asm-x87-real-load-watcom-20261113/compile.log. Full suite Python 3.13.12/
+Unicorn 2.1.4; standalone hardware grid also Python 3.13.17.
+
+Final 2,096-body comparison completes: 33,536 probes, 18,500 matches, 14,969
+original-fault/budget inconclusive and 67 mismatches across seven bodies.
+All prior 2,091 per-body outcomes are unchanged. New 0x45b60/0x11ac3c each have
+16 inconclusive probes. New 0x84f60/0x11b3c0/0x120a60 each have 16 mismatches,
+all exclusively saved x87 opcode (C 0x504/0x505 versus Unicorn zero). Raw FP
+values, tags/status, GPRs, flags, RAM and other environment fields match in
+those completed probes. Added focused hardware SIB/displacement opcode tests
+independently confirm 0x504/0x505; host RIP-relative form shares ModRM opcode
+encoding with guest absolute form, without asserting identical addressing.
+Latest two load tests pass; the opcode method passes again after replacing its
+raw encoding with equivalent assembler syntax. Logs:
+local/asm-x87-real-load-final-tests-20261113.log and
+local/asm-x87-real-load-opcode-tests-20261113.log. No original bytes committed.
+The remaining 19 failures persist: five uncovered-target probes and fourteen
+previously hardware-confirmed status/opcode disagreements at 0x120a2d. No field
+masking, waived mismatch or oracle rewrite: bulk CLI exits 1. 750 bodies pass
+all probes, 1,339 inconclusive, seven fail. Full reliability remains unproven;
+independent x87 oracle coverage and remaining instruction/runtime families stay
+active. Command: tools/asm_c_differential.py --translations
+local/asm-c-x87-real-load-program-20261113 --output
+local/asm-c-x87-real-load-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
+Final report exists and binds the current runtime.

@@ -24,14 +24,17 @@ def stack_operation(mnemonic, text):
 
 def memory80_encoding(insn):
     """Return encoded data segment and FOP; reject unmodeled prefix/address forms."""
+    return memory_encoding(insn, 0xdb, 5 if insn['mnemonic'] == 'fld' else 7)
+
+
+def memory_encoding(insn, opcode, group):
     encoded = bytes.fromhex(insn['bytes'])
     segments = {0x26: 0, 0x2e: 1, 0x36: 2, 0x3e: 3, 0x64: 4, 0x65: 5}
     explicit = segments.get(encoded[0]) if encoded else None
     offset = 1 if explicit is not None else 0
-    if len(encoded) < offset + 2 or encoded[offset] != 0xdb:
+    if len(encoded) < offset + 2 or encoded[offset] != opcode:
         raise ValueError('unsupported x87 memory encoding')
     modrm = encoded[offset+1]
-    group = 5 if insn['mnemonic'] == 'fld' else 7
     mode, base = modrm >> 6, modrm & 7
     if mode == 3 or ((modrm >> 3) & 7) != group:
         raise ValueError('unsupported x87 memory encoding')
@@ -167,6 +170,62 @@ static unsigned ef_x87_memory80(ef_lift_state *s, uint32_t address, unsigned loa
         s->x87_tag |= 3u << (top * 2);
         ef_x87_top(s, top + 1u);
     }
+    return 0;
+}
+'''
+
+REAL_LOAD_RUNTIME = r'''
+static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned width) {
+    uint32_t low, high = 0, exponent, maximum, bias, sign, flags = 0, value[3];
+    uint64_t fraction, implicit, significand;
+    unsigned fraction_bits, shift, destination = (ef_x87_index(s, 0) + 7u) & 7u;
+    if (width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
+        s->fault = 3; return 3;
+    }
+    if (!ef_x87_empty(s, destination)) {
+        if (!ef_x87_stack_fault(s, 1)) return 0;
+        value[0] = 0; value[1] = 0xc0000000u; value[2] = 0xffffu;
+    } else {
+        s->x87_status &= ~0x200u;
+        low = ef_read(s, address, 32);
+        if (width == 64) high = ef_read(s, address + 4u, 32);
+        if (width == 32) {
+            fraction_bits = 23; maximum = 255; bias = 16256;
+            sign = (low >> 16) & 0x8000u; exponent = (low >> 23) & 255u;
+            fraction = low & 0x7fffffu;
+        } else {
+            fraction_bits = 52; maximum = 2047; bias = 15360;
+            sign = (high >> 16) & 0x8000u; exponent = (high >> 20) & 2047u;
+            fraction = ((uint64_t)(high & 0xfffffu) << 32) | low;
+        }
+        implicit = (uint64_t)1 << fraction_bits;
+        shift = 63u - fraction_bits;
+        if (exponent == maximum) {
+            if (fraction && !(fraction & (implicit >> 1))) flags = 1;
+            significand = ((uint64_t)1 << 63) | (fraction << shift);
+            if (fraction) significand |= (uint64_t)1 << 62;
+            exponent = 0x7fffu;
+        } else if (exponent) {
+            significand = (implicit | fraction) << shift;
+            exponent += bias;
+        } else if (fraction) {
+            flags = 2; exponent = bias + 1u;
+            while (!(fraction & implicit)) { fraction <<= 1; --exponent; }
+            significand = fraction << shift;
+        } else significand = 0;
+        s->x87_status |= flags;
+        if (flags & ~s->x87_control) {
+            s->x87_status |= 0x8080u;
+            /* Unmasked IE suppresses the push. Unmasked DE still loads the
+               exact normalized result and defers delivery until a wait. */
+            if (flags & 1u) return 0;
+        }
+        value[0] = (uint32_t)significand; value[1] = (uint32_t)(significand >> 32);
+        value[2] = sign | exponent;
+    }
+    ef_x87_put(s, destination, value); ef_x87_top(s, destination);
     return 0;
 }
 '''

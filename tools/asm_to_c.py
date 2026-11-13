@@ -261,7 +261,8 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 }
 #endif
 '''
-RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME + '\n#endif\n')
+RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
+                          asm_x87.REAL_LOAD_RUNTIME + '\n#endif\n')
 
 
 class Unsupported(ValueError):
@@ -507,14 +508,17 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
-    if mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr '):
+    real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
+    if real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
-            segment, opcode = asm_x87.memory80_encoding(insn)
+            segment, opcode = (asm_x87.memory_encoding(insn, 0xd9 if width_of(op) == 32 else 0xdd, 0)
+                               if real_load else asm_x87.memory80_encoding(insn))
         except ValueError as error:
             raise Unsupported(str(error)) from error
         code += ['b = %s;' % op[1],
-                 'a = ef_x87_memory80(s, b, %d); if (a) return a;' % (mnemonic == 'fld'),
+                 ('a = ef_x87_load_real(s, b, %d); if (a) return a;' % width_of(op) if real_load else
+                  'a = ef_x87_memory80(s, b, %d); if (a) return a;' % (mnemonic == 'fld')),
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]

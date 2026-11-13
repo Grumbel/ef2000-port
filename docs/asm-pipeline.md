@@ -463,3 +463,30 @@ fourteen cases (long-mode probe, limited to those fields). These remain explicit
 Unicorn mismatches; the gate is nonzero. Artifacts:
 `local/asm-c-x87-memory-diff-20261113` and
 `local/asm-x87-original-memory-probe-20261113/evidence.json`.
+
+FLD DWORD/QWORD widens IEEE binary32/binary64 exactly into raw 80-bit state
+using integer fields and bounded subnormal normalization. Precision and rounding
+control do not round a load. Signed zeros, infinities and NaN payloads/signs
+are retained; signaling NaNs are quieted with IE. Source denormals set DE and
+produce an exact normalized extended value. A full destination stack takes
+priority over source-format exceptions. Unmasked IE suppresses the push;
+unmasked DE still commits the normalized load and records pending delivery.
+The normal bounds/segment/environment rules also apply. Pending delivery still
+stops with status 8; no host floating conversion or original-code fallback.
+
+Hardware tests compare 473,088 generated-body cases: every exponent, both signs,
+key mantissa boundaries, all standard precision/rounding modes, each TOP and
+occupancy mask, and independent IE/DE masks. They compare raw values, tags/status,
+flags, opcode and relocated instruction/data environment. C runs under UBSan;
+bounds/pending tests include the last valid operand span. Twenty addressing
+variants also compile warning-free with Watcom. Arithmetic and narrowing stores
+remain unsupported and need their own rounding/exception validation.
+
+Real-load corpus: 2,096 bodies, 270,162 bytes, all Watcom warning-free. All 96
+full-suite tests pass, with focused opcode tests added afterward. Of 33,536
+probes, 18,500 match, 14,969 are inconclusive and 67 fail. Previous outcomes
+are unchanged; three new bodies add 48 saved-opcode-only mismatches (0x504/
+0x505 versus Unicorn zero), confirmed by hardware addressing-form probes.
+Two new bodies have only inconclusive probes. The bulk gate remains nonzero;
+none of these differences is waived. Artifacts:
+`local/asm-c-x87-real-load-diff-20261113`.
