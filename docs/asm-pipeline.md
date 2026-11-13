@@ -81,3 +81,50 @@ ranges; no body overlaps; instruction layouts agree for 4,275. Entries 0xfa3d4
 and 0x11f6d8 disagree and need review. Thirteen additional tracker entries have
 no Ghidra body and are already blocked. The selected full-body export and the
 explicit missing-entry tracker are under ignored `local/`; none are promoted.
+
+The conservative ASM-to-C path is `tools/asm_to_c.py`. It emits one draft C
+function per supported body, with explicit x86 GPRs, EFLAGS, PC and flat guest
+RAM. It does not infer C signatures from Ghidra. Only byte-checked bodies with
+matching instruction layouts are eligible; it re-decodes the bytes before
+translation. Unsupported instructions or external/unresolved branches reject
+the entire body with a reason. No guest-state or recovery tracker is promoted.
+
+```sh
+python3 tools/asm_to_c.py --inventory local/asm-body-inventory-20261113 \
+  --output local/asm-c-draft
+python3 tools/asm_c_differential.py --translations local/asm-c-draft \
+  --output local/asm-c-evidence --watcom /path/to/wcc386
+```
+
+Use fresh output directories. Both CLIs enforce ignored `local/` output. The
+verifier requires Python Unicorn and a host C compiler; `--watcom` also compiles
+every generated body with OpenWatcom and warnings treated as errors. Source,
+runtime, payload and compiled-artifact digests tie the evidence to its inputs.
+A final report appears only on completion; `progress.jsonl` records completed
+entries while a run is live.
+
+The first supported instruction families are MOV/LEA/extensions, ADD/SUB/CMP,
+INC/DEC/NEG/NOT, AND/OR/XOR/TEST, direct internal branches, carry-bit operations,
+and 32-bit PUSH/POP/LEAVE/RET. Partial registers preserve their untouched bits.
+RAM uses explicit little-endian byte accesses; integer operations use unsigned
+arithmetic. Invalid PCs, fuel exhaustion and unmapped RAM return explicit
+statuses. Logical operations use the Unicorn oracle's zero value for undefined
+AF. This is a static-code, flat-segment intermediate representation, not native
+ABI recovery, precise exception emulation or source-only game integration.
+
+The differential runner executes original x86 without guest-service stubs and
+compares all eight GPRs, EFLAGS, return PC and all 4 MiB of RAM with the host C
+execution. Sixteen deterministic prepared probes per body include scalar edges
+and scratch objects. Original faults, fuel exhaustion and C faults are
+**inconclusive**, never passes. `probes-pass` means those probes passed; it does
+not establish correctness for all possible inputs, instruction coverage or
+compatibility of generated OpenWatcom objects with original callers.
+
+2026-11-13 first corpus: 404 generated drafts, 3,873 unsupported bodies; all
+404 compile warning-free with OpenWatcom v2 and the host compiler. The 6,464
+probes produce 4,585 passes, 1,879 inconclusive outcomes and zero mismatches;
+211 bodies pass all probes, 193 remain inconclusive. Sixty-four focused tests
+pass, including 1,568 synthetic program probes and exhaustive ADD/SUB byte pairs
+(131,072 comparisons). Main next blockers are calls, shifts, multiplication,
+external branches, ambiguous operand widths, sign-extension instructions and
+x87. No reliable full-coverage or native game replacement claim is made.

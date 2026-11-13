@@ -2309,3 +2309,26 @@ tests.test_ghidra_ef2000` (56 pass); `python3 tools/ghidra_ef2000.py inventory
 local/ghidra/body-layout-20261113/body-ranges.json --output
 local/asm-body-inventory-20261113` (4,277 exported). Translation, ABI and semantic
 equivalence remain separate gates; reliable bulk C translation is not yet achieved.
+
+2026-11-13 conservative ASM-to-C translation: added tools/asm_to_c.py and
+asm_c_differential.py. Explicit-state C preserves partial GPRs, flags, flat RAM
+and control flow for a bounded instruction subset; unsupported bodies fail
+closed. Re-decodes inventory bytes, binds generated source/runtime digests and
+keeps all derived output under ignored local/. Full 4,277-body pass generates
+404 drafts and reports 3,873 unsupported; OpenWatcom v2 -we and host compiler
+accept all 404. Sixteen probes each: 4,585 matches, 1,879 inconclusive, zero
+mismatches; 211 bodies pass all probes, 193 remain inconclusive. Comparison checks
+all GPRs, EFLAGS, PC and all 4 MiB RAM with original x86, without service stubs.
+Original faults/budget exits do not pass. Focused suite: 64 tests, including
+131,072 exhaustive byte ADD/SUB comparisons and 1,568 synthetic program probes.
+Commands: tools/asm_to_c.py --inventory local/asm-body-inventory-20261113 --output
+local/asm-c-checked-20261113; tools/asm_c_differential.py --translations
+local/asm-c-checked-20261113 --output local/asm-c-diff-checked-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386;
+python3 -m unittest tests.test_asm_to_c tests.test_asm_inventory tests.test_asm_diff
+tests.test_ghidra_ef2000 (Python 3.13.12 / Unicorn 2.1.4). Existing Ghidra-to-C
+baseline: 357 unrecovered compile-ok, 499 manual (no semantic claim).
+Reliable bulk coverage remains active: calls, shifts, multiplication, unresolved
+branches, ambiguous widths, x87, native ABI/integration and stronger state
+coverage remain. Generated explicit-state functions are not hybrid replacements
+and do not promote tracker states or establish a source-only menu.
