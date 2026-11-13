@@ -353,7 +353,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0001ff0c	1871			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0002065c	1182			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x00020b10	2881			blocked	unclassified	unverified		Skipped as too difficult: dispatches through an indirect jump (interpreter-style handler with implicit registers).
-0x00021654	1967			unknown	unclassified	unverified		
+0x00021654	1967			blocked	unclassified	unverified		Skipped as too difficult: x87 floating-point code (fld/fmul/fcomp/fistp) that the differential harness cannot execute
 0x00021e04	616			blocked	unclassified	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x00022e98	142	highlight_widget_22e98	game_helpers110	compiles	game	confirmed	decomp/tests/0x00022e98.json	docs/compiler-abi.md; Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta; callers 1f960@1f968; guest pending
 0x00022f28	241	draw_indicator_22f28	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00022f28.json	docs/compiler-abi.md; Draw the HUD indicator for slot idx (10-byte records at 0x127a96): if its text slot exists and its enable byte (0x1a81d8; callers none direct; guest pending
@@ -496,7 +496,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002e030	90	reset_grid_cell_state	world_grid_control	compiles	game	confirmed	decomp/tests/0x0002e030.json	reset and copy pending dwords; original derived update unresolved
 0x0002e08c	201	recompute_grid_limit	world_grid_limits	compiles	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only
 0x0002e184	783			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x0002e494	681			unknown	game	unverified		
+0x0002e494	681	record_track_sample_2e494	game_helpers130	compiles	game	confirmed	decomp/tests/0x0002e494.json	Original 0x2e494 (681 bytes)
 0x0002e740	461			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x0002e910	57	grid_event_matches	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002e910.json	AL/DL truth table tested across all 65536 byte pairs
 0x0002f740	160	draw_markers_2f740	game_helpers17	compiles	game	confirmed	decomp/tests/0x0002f740.json	docs/compiler-abi.md; Draw every marker of the 16-byte table that is in range.; callers 3dd30@3e1e4; guest pending

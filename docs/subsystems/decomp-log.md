@@ -2402,3 +2402,7 @@ Recovered: draws button AX (29-byte records at 0x121fb4) as a masked frame blit 
 ### 2026-11-13 draw_text_box_1f994 (0x1f994)
 
 Recovered the scrolling text box step (one character per call, wrapping, tab/`>` stops, scroll-up when the cursor passes the bottom). Quirk: when the record has no text slot the original draws into the caller's EDI, so the function takes EDI as a second register input (`#pragma aux ... parm [eax] [edi]`; a `modify exact` list made the build fault).
+
+### 2026-11-13 record_track_sample_2e494 (0x2e494)
+
+Recovered the flight-track sampler: appends the tracked group's scaled position to the 10-byte sample table at 0x1a3650 unless it is within one unit of the previous sample (then only the trailing words are refreshed). Fuzz PASS 1000 completed cases. 0x21654 (1967 bytes) was blocked in the same pass: it is x87 floating-point code.

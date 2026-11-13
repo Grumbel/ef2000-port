@@ -1581,3 +1581,71 @@ after_char:
         }
     }
 }
+
+/* 0x2e494, 681 bytes. Append the current position of the tracked group (S16 0x1f71cc, 0xca-byte records at 0x19bb58; doubles at +0x69 and +0x61 scaled by 0xb4250, y mirrored as 0x190 - y) to the 10-byte sample table at 0x1a3650 (count at 0x126550, limit 0x1f3) together with the three words at 0x12583c..0x125840; when the new point lies within one unit of the previous sample only the three trailing words of that sample are overwritten. Skipped when 0x126518 or 0x1a666b is set or the group is 0xff. */
+static int32_t scaled_double_2e494(ef_addr32 addr)
+{
+    union {
+        uint32_t w[2];
+        double d;
+    } v;
+
+    v.w[0] = EF_U32(addr);
+    v.w[1] = EF_U32(addr + 4u);
+    return double_to_scaled_b4250(v.d);
+}
+
+static void append_track_sample_2e494(void)
+{
+    int32_t group = (int16_t)EF_U16(0x001f71ccu);
+    uint32_t sample;
+    uint32_t scaledX;
+    uint32_t scaledY;
+
+    scaledX = (uint32_t)scaled_double_2e494(EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca) + 0x69u);
+    sample = 0x001a3650u + (uint32_t)((int32_t)(int16_t)EF_U16(0x00126550u) * 10);
+    EF_U16(sample) = (uint16_t)scaledX;
+    group = (int16_t)EF_U16(0x001f71ccu);
+    scaledY = 0x190u - (uint32_t)scaled_double_2e494(EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca) + 0x61u);
+    sample = 0x001a3650u + (uint32_t)((int32_t)(int16_t)EF_U16(0x00126550u) * 10);
+    EF_U16(sample + 2u) = (uint16_t)scaledY;
+    EF_U16(sample + 4u) = EF_U16(0x0012583cu);
+    EF_U16(sample + 6u) = EF_U16(0x0012583eu);
+    EF_U16(sample + 8u) = EF_U16(0x00125840u);
+    EF_U16(0x00126550u) = (uint16_t)(EF_U16(0x00126550u) + 1u);
+}
+
+void record_track_sample_2e494(void)
+{
+    int32_t count = (int16_t)EF_U16(0x00126550u);
+    int32_t group;
+
+    if (count >= 0x1f3 || EF_U16(0x00126518u) != 0u || EF_U8(0x001a666bu) != 0u)
+        return;
+    group = (int16_t)EF_U16(0x001f71ccu);
+    if (group == 0xff)
+        return;
+    if (EF_U16(0x00126550u) == 0u) {
+        append_track_sample_2e494();
+        return;
+    }
+    {
+        uint32_t prev = 0x001a3650u + (uint32_t)((count - 1) * 10);
+        int16_t prevX = (int16_t)EF_U16(prev);
+        int16_t prevY = (int16_t)EF_U16(prev + 2u);
+        uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca);
+        int32_t nx = scaled_double_2e494(rec + 0x69u);
+        int32_t ny;
+
+        rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x001f71ccu) * 0xca);
+        ny = 0x190 - scaled_double_2e494(rec + 0x61u);
+        if (abs_a28f2((int32_t)prevX - (int16_t)nx) > 1u || abs_a28f2((int32_t)prevY - (int16_t)ny) > 1u) {
+            append_track_sample_2e494();
+            return;
+        }
+        prev = 0x001a3650u + (uint32_t)(((int32_t)(int16_t)EF_U16(0x00126550u) - 1) * 10);
+        EF_U16(prev + 4u) = EF_U16(0x0012583cu);
+        EF_U16(prev + 6u) = EF_U16(0x0012583eu);
+        EF_U16(prev + 8u) = EF_U16(0x00125840u);
+    }
+}
