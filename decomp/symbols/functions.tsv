@@ -893,7 +893,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004dee0	209	find_icon_at_4dee0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004dee0.json	docs/compiler-abi.md; Hit test the 24 map icons (index 1..24) against the point (X, Y) (16-bit signed): icon I has its centre at the words 0x1; callers 4dcd8@4dd39,4dcd8@4de13; guest pending
 0x0004dfb4	281	find_slot_at_point_4dfb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004dfb4.json	docs/compiler-abi.md; Find the first slot 1..0x17 whose box contains the point (X = low word of EAX, Y = low word of EDX; signed): the slot ce; callers 4dcd8@4dd4c; guest pending
 0x0004e0d0	306	click_panel_slot_4e0d0	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e0d0.json	docs/compiler-abi.md; Pointer click X (EAX), Y (EDX; both signed words) on the current panel slot (byte 0x1a559f): slot state 5 ignores the cl; callers 4dcd8@4ddd9,4dcd8@4de96; guest pending
-0x0004e204	347			unknown	game	unverified		
+0x0004e204	347	pick_target_at_4e204	game_helpers130	compiles	game	confirmed	decomp/tests/0x0004e204.json	Picks a target near a screen point into per-slot tables; guest differential pending
 0x0004e360	602			unknown	game	unverified		
 0x0004e5bc	256	insert_midpoint_4e5bc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0004e5bc.json	docs/compiler-abi.md; Insert an interpolated entry into the 24-slot waypoint arrays when byte 0x1a568a is 0x11 and the entry kind at 0x1a5673[; callers 4dcd8@4dd6d; guest pending
 0x0004e6bc	169	shift_queue_4e6bc	game_helpers35	compiles	game	confirmed	decomp/tests/0x0004e6bc.json	docs/compiler-abi.md; Drop the oldest queued entry by shifting the 24-entry queue down.; callers 4dcd8@4decc; guest pending

@@ -281,3 +281,43 @@ void parse_angle_line_db32c(void)
     EF_U16(0x425bb4u) = (uint16_t)saved;
     EF_U16(0x425bb0u) = (uint16_t)pt[1];
 }
+
+/* 0x4e204, 347 bytes. Pick a target at the screen point (X, Y) for the slot byte at 0x1a559f: unless its state byte (0x1a5672 + slot) is 8 (done) or the latch 0x1a5709 is already set, set the state to 0x12 (state 5 first clears the latch) and scan the list at 0x137960 for type-0x10 nodes accepted by 0xcc22c whose box words (+8, 0x190 - +0xc of the record at +0x13) are within 7 of the point; the last match's words and its value (a word at +0x55 of the record at +0x20, times 100) are stored in the slot's tables (0x1a55a2, 0x1a55d6, 0x1a560a), the state becomes 5 and the latch is set. */
+void pick_target_at_4e204(int16_t x, int16_t y)
+{
+    uint32_t node = EF_U32(0x00137960u);
+    uint32_t slot = EF_U8(0x001a559fu);
+    int32_t value = 0;
+    uint32_t found_x = 0u;
+    uint32_t found_y = 0u;
+
+    if (EF_U8(0x001a5672u + slot) == 8u)
+        return;
+    if (EF_U8(0x001a5672u + slot) == 5u)
+        EF_U8(0x001a5709u) = 0u;
+    EF_U8(0x001a5672u + EF_U8(0x001a559fu)) = 0x12u;
+    if (EF_U8(0x001a5709u) == 1u)
+        return;
+    for (; node != 0u; node = EF_U32(node + 4u)) {
+        if (EF_U8(node + 0xau) == 0x10u
+            && (uint16_t)group_flag_positive_cc22c(0u, EF_U8(node + 0xbu), 0x00137980u) != 0u) {
+            ef_addr32 ext = EF_U32(node + 0x13u);
+            int16_t bx = EF_S16(ext + 8u);
+            int16_t by = (int16_t)(0x190u - EF_U16(ext + 0xcu));
+
+            if (x > (int32_t)bx - 7 && x < (int32_t)bx + 7 && y > (int32_t)by - 7 && y < (int32_t)by + 7) {
+                value = ((int32_t)EF_U32(EF_U32(ext + 0x20u) + 0x55u) >> 16) * 100;
+                found_x = (uint16_t)bx;
+                found_y = (uint16_t)by;
+            }
+        }
+    }
+    if ((uint16_t)found_x == 0u && (uint16_t)found_y == 0u)
+        return;
+    slot = EF_U8(0x001a559fu);
+    EF_U16(0x001a55a2u + slot * 2u) = (uint16_t)found_x;
+    EF_U16(0x001a55d6u + EF_U8(0x001a559fu) * 2u) = (uint16_t)found_y;
+    EF_U8(0x001a5672u + EF_U8(0x001a559fu)) = 5u;
+    EF_U32(0x001a560au + EF_U8(0x001a559fu) * 4u) = (uint32_t)value;
+    EF_U8(0x001a5709u) = 1u;
+}
