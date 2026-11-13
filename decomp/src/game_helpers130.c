@@ -5889,3 +5889,138 @@ void report_contact_73964(int16_t a, int16_t b)
 #undef RECB
 }
 #undef HI
+
+/* 0x75f00, 1065 bytes. Project the player position into the 8-bit plane,
+ * probe the plane around it, fill the 17x17 row scratch table from the
+ * footprint record at 0x425b20, walk the record list scaling its points into
+ * a local table and hand it to the texture stream when in range, then set the
+ * proximity marker bytes at 0x1f88fa/0x1f88ec. */
+void compute_view_marker_75f00(void)
+{
+	uint8_t Lb[0x440];
+	uint32_t L = (uint32_t)(uintptr_t)Lb;
+	uint32_t s, rec, p;
+	int32_t a, b, e, d;
+	int32_t w74, w6c, w70, w64;
+	int32_t n1, n2;
+	int32_t di;
+#define A16() ((int32_t)(int16_t)EF_U16(L + 0x54u))
+#define B16() ((int32_t)(int16_t)EF_U16(L + 0x56u))
+	guest_fn_ce328_w(0, (int32_t)EF_U32(0x0015b744u) - 1, 0, (int32_t)EF_U32(0x0015b748u) - 1);
+	if (EF_U8(0x0012524cu) != 0u) {
+		EF_U8(0x001f88fau) = 0x28u;
+		EF_U8(0x0012524cu) = 0u;
+		return;
+	}
+	EF_U8(0x001f88fau) = 0u;
+	if (EF_U16(0x00425bc8u) != 0u) {
+		if (((int32_t)EF_U32(0x00425bceu) >> 16) <= (int32_t)EF_U32(0x00214448u))
+			return;
+	}
+	if (guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)(uint16_t)(EF_U16(0x00214450u) - EF_U16(0x00425bb0u)),
+			      (uint32_t)(int32_t)(int16_t)(uint16_t)(EF_U16(0x00214448u) - EF_U16(0x00425bb4u)),
+			      (uint32_t)(((int32_t)EF_U32(0x0021444au)) >> 16), L + 0x54u) == 0u)
+		return;
+	if (EF_U8(0x0012db9eu) == 0x2du)
+		return;
+	a = A16();
+	b = B16();
+	guest_fn_dec4c(a, b);
+	s = EF_U8(0x0012b369u) & 31u;
+	guest_fn_dec4c(A16() - (3 << s), B16());
+	s = EF_U8(0x0012b369u) & 31u;
+	guest_fn_dec4c(A16() + (3 << s), B16());
+	s = EF_U8(0x0012b369u) & 31u;
+	guest_fn_dec4c(A16(), B16() - (3 << s));
+	s = EF_U8(0x0012b369u) & 31u;
+	guest_fn_dec4c(A16(), B16() + (3 << s));
+	if (EF_U32(0x00425b20u) != 0u && EF_U8(0x0015b7e4u) > 1u && EF_U8(0x0021454au) != 0u) {
+		w74 = (int32_t)EF_U32(L + 0x54u);
+		w6c = (int32_t)EF_U32(L + 0x56u);
+		d = ((int32_t)EF_U32(0x0015b744u) >> 1) - A16();
+		EF_U16(L + 0x60u) = (uint16_t)(d * 2);
+		d = ((int32_t)EF_U32(0x0015b748u) >> 1) - B16();
+		rec = EF_U32(0x00425b20u);
+		EF_U32(0x00159080u) = 0x001f77e0u;
+		EF_U16(L + 0x68u) = (uint16_t)(d * 2);
+		{
+			uint32_t dst = 0x001f77e0u;
+			int32_t cnt = 0x11;
+			do {
+				guest_fn_b3fb0(dst, (uint32_t)(int32_t)(int8_t)EF_U8(rec), 0x11u);
+				cnt--;
+				dst += 0x100u;
+			} while ((int16_t)cnt > 0);
+		}
+		while (rec != 0u) {
+			int32_t sc = (int32_t)EF_U8(rec + 2u);
+			int32_t n8;
+			p = rec + 0x10u;
+			w70 = ((int32_t)(int16_t)EF_U16(L + 0x60u) * sc) / 100;
+			w64 = ((int32_t)(int16_t)EF_U16(L + 0x68u) * sc) / 100;
+			n8 = (int32_t)(int8_t)EF_U8(rec + 1u);
+			EF_U16(L) = (uint16_t)n8;
+			for (di = 0; (int16_t)di < (int16_t)n8; di++) {
+				int32_t i = (int16_t)di;
+				int32_t o = i * 2;
+				uint32_t sh = EF_U8(0x0012b369u) & 31u;
+				int32_t q;
+				q = (((int32_t)(int8_t)EF_U8(p + (uint32_t)o)) << 3) / (int32_t)EF_U8(rec + 3u);
+				EF_U16(L + 2u + (uint32_t)i * 4u) = (uint16_t)(q + 8);
+				q = (((int32_t)(int8_t)EF_U8(p + (uint32_t)o + 1u)) << 3) / (int32_t)EF_U8(rec + 3u);
+				EF_U16(L + 4u + (uint32_t)i * 4u) = (uint16_t)(q + 8);
+				e = (int32_t)(int8_t)EF_U8(p + (uint32_t)o);
+				EF_U16(L + 2u + ((uint32_t)(n8 + i)) * 4u) =
+					(uint16_t)(w70 + w74 + (e << sh));
+				e = (int32_t)(int8_t)EF_U8(p + (uint32_t)o + 1u);
+				EF_U16(L + 4u + ((uint32_t)(n8 + i)) * 4u) =
+					(uint16_t)(w64 + w6c + (e << sh));
+			}
+			{
+				int32_t x60 = (int32_t)(int16_t)EF_U16(L + 0x60u);
+				int32_t v;
+				s = EF_U8(0x0012b369u) & 31u;
+				v = x60 >> s;
+				if (v < 0) v = -v;
+				if (v > (int32_t)(int16_t)EF_U16(rec + 4u)) {
+					s = EF_U8(0x0012b369u) & 31u;
+					v = x60 >> s;
+					if (v < 0) v = -v;
+					if (v < (int32_t)(int16_t)EF_U16(rec + 6u))
+						guest_fn_c4b95_x(L);
+				}
+			}
+			rec = EF_U32(rec + 0xcu);
+		}
+	}
+	a = A16();
+	if (a < (int32_t)EF_U32(0x0015bdc0u) || a > (int32_t)EF_U32(0x0015bdc4u))
+		return;
+	b = B16();
+	if (b < (int32_t)EF_U32(0x0015bdc8u) || b > (int32_t)EF_U32(0x0015bdccu))
+		return;
+	d = (int32_t)EF_U32(0x0015bdb8u) - a;
+	if (d < 0) d = -d;
+	EF_U16(L + 0x54u) = (uint16_t)(d >> (EF_U8(0x0012b369u) & 31u));
+	d = (int32_t)EF_U32(0x0015bdbcu) - b;
+	if (d < 0) d = -d;
+	EF_U16(L + 0x56u) = (uint16_t)(d >> (EF_U8(0x0012b369u) & 31u));
+	n2 = B16();
+	n2 *= n2;
+	n1 = A16();
+	n1 *= n1;
+	e = (int32_t)EF_U32(0x00425ba0u) >> 16;
+	n1 += n2;
+	if (n1 > e)
+		return;
+	d = (n1 * 5) * 8;
+	d = d / e;
+	EF_U16(0x001f88ecu) = 2u;
+	if (d == 0)
+		d = 1;
+	if (d > 0x28)
+		d = 0x28;
+	EF_U8(0x001f88fau) = (uint8_t)(d + 0xa);
+#undef A16
+#undef B16
+}

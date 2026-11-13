@@ -3389,3 +3389,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005d1c4	draw_contact_labels_5d1c4			ebx,ecx,edx,esi,edi,ebp	0	contact letter labels
 0x0006bee8	update_player_target_6bee8			ebx,ecx,edx,esi,edi,ebp	0	player target slot state machine
 0x00073964	report_contact_73964	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	contact report / radio call
+0x00075f00	compute_view_marker_75f00			ebx,ecx,edx,esi,edi,ebp	0	Project player into plane, probe, scale footprint records, set marker bytes 0x1f88fa/0x1f88ec.

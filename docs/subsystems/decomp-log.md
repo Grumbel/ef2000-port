@@ -2554,3 +2554,15 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   ("unresolved external HI_") so their differentials ran vacuously. Macro fixed;
   re-verified with `functions_redirected=1`: ctl 400/400 each (calls 2473/2115/4588/1862)
   and isolated fuzz PASS 300 for all five. Always confirm functions_redirected=1.
+
+### 0x75f00 `compute_view_marker_75f00`
+
+Recovered (1065 bytes): projects the player position through 0xce328/0x15c0c4,
+probes the 8-bit plane around it (0xdec4c), fills the 17x17 scratch table from
+the footprint record (0xb3fb0), scales the record list points into a local
+table and hands it to 0xc4b95 when in range, and sets the proximity bytes
+0x1f88fa/0x1f88ec. Controlled differential with all five callees stubbed
+(ce328, 15c0c4 writing scripted A/B, dec4c, b3fb0, c4b95 with buffer contents
+logged): 400/400 agree (388 non-faulting; c4b95 reached 19 times, b3fb0 loop
+782 calls); both-fault idiv cases treated as equivalent; `functions_redirected`
+verified as 1. New wrapper: `guest_fn_dec4c`.
