@@ -3007,3 +3007,41 @@ void select_view_angles_91afc(uint32_t yaw, uint32_t pitch)
     }
     guest_fn_d86e0_x((uint16_t)yaw, id);
 }
+
+/* Original 0x39744 (303 bytes). Centre the 3D view on the screen: set the
+ * clip window around the screen centre, load the camera angles (A, B-0xc8
+ * shifted, 11-bit C/D) into the renderer state, sample one pixel at the
+ * centre via 0xc3f50, restore the full-screen clip window and return the
+ * sampled byte. */
+uint8_t centre_view_sample_39744(int16_t a, uint16_t d, int16_t b, uint16_t c)
+{
+    int32_t half_w, half_h, cx, cy;
+    uint8_t sample;
+    uint32_t v;
+
+    d = (uint16_t)(d & 0x7ffu);
+    c = (uint16_t)(c & 0x7ffu);
+    copy_constants_c469b();
+    half_w = (int32_t)EF_U32(0x0015b744u) / 2;
+    half_h = (int32_t)EF_U32(0x0015b748u) / 2;
+    cx = (int16_t)half_w;
+    cy = (int16_t)half_h;
+    guest_fn_c4105_x();
+    guest_fn_ce328_w((int32_t)(cx - 2), (int32_t)(cx + 2), (int32_t)(cy - 2), (int32_t)(cy + 2));
+    set_params_and_run_c4654(0u, 0u, 0u, 0u, 0u, 0u, 0xc000u);
+    EF_U32(0x000c4756u) = (uint32_t)(((uint32_t)d - 0x400u) << 16);
+    EF_U32(0x000c475cu) = (uint32_t)(((int32_t)b - 0xc8) << 16);
+    EF_U32(0x000c4762u) = (uint32_t)(((uint32_t)c - 0x400u) << 16);
+    v = EF_U32(0x000c4756u);
+    EF_U16(0x00159094u) = (uint16_t)((int32_t)v >> 16);
+    v = EF_U32(0x000c475cu);
+    EF_U16(0x00159098u) = (uint16_t)((int32_t)v >> 16);
+    v = EF_U32(0x000c4762u);
+    EF_U16(0x0015909cu) = (uint16_t)((int32_t)v >> 16);
+    guest_fn_9e0c4((int32_t)a, 0u, 0u, 0u);
+    guest_fn_c4167_x();
+    sample = (uint8_t)guest_fn_c3f50(cx, cy);
+    guest_fn_ce328_w(0, (int32_t)EF_U32(0x0015b744u) - 1, 0, (int32_t)EF_U32(0x0015b748u) - 1);
+    load_origin_and_run_c46bc();
+    return sample;
+}
