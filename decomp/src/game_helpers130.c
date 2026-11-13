@@ -2029,7 +2029,7 @@ void draw_progress_panel_98658(uint8_t highRes)
     if (highRes == 0u) {
         draw_glyph_string_eb008(0xfu, (uint32_t)(0x140 - (length * 4 + length)) >> 1, 0xa5u, text);
         filled = (int32_t)((uint32_t)EF_S32(0x0040c11cu) * 0xdau) / 100;
-        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
+        put_screen_rows_eb050(0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
         EF_U16(0x004208e6u) = 0xfu;
         EF_U16(0x004208e4u) = 7u;
         EF_U16(0x004208e8u) = 0xa0u;
@@ -2062,7 +2062,7 @@ void draw_progress_panel_98658(uint8_t highRes)
     } else {
         draw_glyph_string_eb008(0xfu, (uint32_t)(0x280 - (length * 4 + length)) >> 1, 0x16du, text);
         filled = (int32_t)((uint32_t)EF_S32(0x0040c11cu) * 0x1b6u) / 100;
-        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
+        put_screen_rows_eb050(0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
         EF_U16(0x004208eau) = 0x64u;
         EF_U16(0x004208e4u) = 7u;
         EF_U16(0x004208e6u) = 0x41u;
@@ -2104,9 +2104,9 @@ void draw_progress_panel_98658(uint8_t highRes)
     toggle_page_dc250();
     if (EF_S32(0x0040c11cu) == 100) {
         if (textX)
-            put_screen_rows_eb050(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
+            put_screen_rows_eb050(0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
         else
-            put_screen_rows_eb050(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
+            put_screen_rows_eb050(0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
         EF_U16(0x0040cd72u) = 0xffffu;
         EF_U16(0x0040cd74u) = 0xffffu;
     }

@@ -180,7 +180,7 @@ uint32_t compare_variable_a9640(uint32_t index, uint32_t op, int32_t value)
 void restore_saved_block_dd870(void)
 {
     if (EF_S16(0x0015ee94u) != -1)
-        put_screen_rows_eb050(0u, 0u, 0u, 0u, EF_U16(0x0015ee94u), EF_U16(0x0015ee96u), EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
+        put_screen_rows_eb050(EF_U16(0x0015ee94u), EF_U16(0x0015ee96u), EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
     EF_U16(0x0015ee94u) = 0xffffu;
 }
 

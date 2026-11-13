@@ -674,7 +674,7 @@ void redraw_entries_a6038(void)
     uint16_t i;
     uint16_t count;
     if (EF_U32(0x0041eeacu) != 0u && EF_U8(0x0041ef06u) != 0u)
-        put_screen_rows_eb050(0u, 0u, 0u, 0u, 0u, 0u, EF_U16(0x0015b744u), EF_U16(0x0015b748u), EF_U32(0x0041eeacu));
+        put_screen_rows_eb050(0u, 0u, EF_U16(0x0015b744u), EF_U16(0x0015b748u), EF_U32(0x0041eeacu));
     else
         tail_jump_c9ec4();
     count = EF_U16(0x0041eed8u);
@@ -1677,13 +1677,13 @@ void finish_resource_file_e3444(void)
 void restore_strip_98ac0(uint32_t a)
 {
     if (EF_U16(0x0040cd74u) != 0xffffu) {
-        put_screen_rows_eb050(0u, 0u, 0u, 0u, EF_U16(0x0040cd74u), EF_U16(0x0040cd72u), 0x23u, 0x1eu, EF_U32(0x0012dda4u));
+        put_screen_rows_eb050(EF_U16(0x0040cd74u), EF_U16(0x0040cd72u), 0x23u, 0x1eu, EF_U32(0x0012dda4u));
     } else if ((a & 0xffu) == 0u) {
-        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
-        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
+        get_screen_rows_eb1f0(0xfu, 0xa0u, 0x23u, 0x1eu, 0x0040c124u);
+        get_screen_rows_eb1f0(0xfu, 0xa0u, 0xfdu, 0x1eu, 0x00408590u);
     } else {
-        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
-        get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
+        get_screen_rows_eb1f0(0x41u, 0x168u, 0x23u, 0x1eu, 0x0040c124u);
+        get_screen_rows_eb1f0(0x41u, 0x168u, 0x1fcu, 0x1eu, 0x00408590u);
     }
     EF_U16(0x0040cd74u) = 0xffffu;
 }
@@ -1994,7 +1994,7 @@ void save_and_draw_strip_98b68(uint32_t x, uint32_t y)
         x = 0u;
     if ((int16_t)y < 0)
         y = 0u;
-    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, (uint16_t)x, (uint16_t)y, 0x23u, 0x1eu, EF_U32(0x0012dda4u));
+    get_screen_rows_eb1f0((uint16_t)x, (uint16_t)y, 0x23u, 0x1eu, EF_U32(0x0012dda4u));
     EF_U16(0x0040cd74u) = (uint16_t)x;
     EF_U16(0x0040cd72u) = (uint16_t)y;
     blit_transparent_cd957(0u, 0u, 0u, 0u, 0u, 0x1eu, 0x23u, (uint16_t)y, (uint16_t)x, 0x0040c958u);
@@ -4174,7 +4174,7 @@ void show_splash_c90e0(void)
     strcat_9ca57(b, 0x0018f01cu);
     if ((start_driver_c34cc(b) & 0xffffu) == 0u)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x0018f024u, b);
-    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, 0u, 0u, 0x280u, 0x190u, EF_U32(0x0041eeacu));
+    get_screen_rows_eb1f0(0u, 0u, 0x280u, 0x190u, EF_U32(0x0041eeacu));
     guest_fn_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
     guest_fn_c39ac();
 }

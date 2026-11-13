@@ -85,7 +85,7 @@ void save_and_draw_block_dd8dc(void)
         w = 0;
     if (h < 0)
         h = 0;
-    get_screen_rows_eb1f0(0u, 0u, 0u, 0u, (uint16_t)w, (uint16_t)h, EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
+    get_screen_rows_eb1f0((uint16_t)w, (uint16_t)h, EF_U16(0x0015ee88u), EF_U16(0x0015ee8au), EF_U32(0x0015ee90u));
     EF_U16(0x0015ee94u) = (uint16_t)w;
     EF_U16(0x0015ee96u) = (uint16_t)h;
     guest_fn_cde00_x((uint32_t)((int32_t)EF_S16(0x0015ee86u) + (int32_t)EF_S16(0x00425fc6u)),

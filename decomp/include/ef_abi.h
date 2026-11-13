@@ -4686,8 +4686,10 @@ void copy_rows_to_screen_eb0b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 
 
 /* small_wrappers5.c */
-void put_screen_rows_eb050(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
-void get_screen_rows_eb1f0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
+void put_screen_rows_eb050(uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
+#pragma aux put_screen_rows_eb050 parm caller [] modify [eax ebx ecx edx]
+void get_screen_rows_eb1f0(uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
+#pragma aux get_screen_rows_eb1f0 parm caller [] modify [eax ebx ecx edx]
 
 /* script_helpers1.c */
 void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count);

@@ -279,14 +279,26 @@ def link(objects, functions, globals_, mechanical_selected, image,
             preserved.discard(output_reg)
         regs = [reg for reg in register_codes if reg in preserved]
         body = record['addresses'][public.segment] + public.offset
+        # Caller-clean stack arguments ([ESP+4]..): the compiled body must
+        # see them at the same offsets, so re-push them after the saves. With
+        # nothing to save, a direct jump to the body is already correct.
+        stack_arg_count = len(re.findall(r'\[ESP\+\d+\]', signature['inputs'], re.I))
+        if stack_arg_count and not regs:
+            continue
         start = trampoline_cursor
         code = bytearray(0x50 + register_codes[reg] for reg in regs)
+        if stack_arg_count:
+            offset = 4 * len(regs) + 4 * stack_arg_count
+            for _ in range(stack_arg_count):
+                code.extend(b'\xff\x74\x24' + bytes([offset]))
         call_next = start + len(code) + 5
         displacement = body - call_next
         if not -(1 << 31) <= displacement < (1 << 31):
             signature_skip_reasons[address] = 'trampoline call target is out of range'
             continue
         code.extend(b'\xe8' + (displacement & 0xffffffff).to_bytes(4, 'little'))
+        if stack_arg_count:
+            code.extend(b'\x83\xc4' + bytes([4 * stack_arg_count]))
         code.extend(0x58 + register_codes[reg] for reg in reversed(regs))
         code.append(0xc3)
         trampoline_records.append((start, bytes(code), address))
