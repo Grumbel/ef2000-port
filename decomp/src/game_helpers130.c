@@ -2265,3 +2265,89 @@ void dump_record_b1f80(ef_addr32 rec, uint32_t handle)
     guest_fn_b1bb0(handle, 0x0018e004u);
     print_coordinate_record_b2a2c(rec + 0x3bu, handle);
 }
+
+/* Original 0xbd92c (666 bytes). Try to satisfy every entry (10-byte records at
+ * DESC+6, count at DESC+5) of a requirement list against OBJ: for each entry
+ * the pattern string (+4) is scanned up to 8 characters or a '%' for the first
+ * character whose available amount (OBJ+0x33 minus OBJ+0x37 table) covers the
+ * entry's amount (+3) and which 0xbd8c8 accepts; the choice is recorded in two
+ * scratch byte tables and charged to OBJ+0x37.  When an entry cannot be met
+ * the earlier charges are rolled back and 0 is returned; otherwise the claims
+ * are issued through 0xbe208 and 1 is returned.  The early return for an OBJ
+ * without +0x32 leaves the upper half of EDX in the result. */
+uint32_t reserve_requirements_bd92c(ef_addr32 obj, ef_addr32 desc, ef_addr32 owner, uint16_t cx)
+{
+    ef_addr32 tableA, tableB;
+    int16_t count, i, j;
+    uint16_t flag;
+    uint16_t claimed;
+
+    if (EF_U8(obj + 0x32u) == 0u)
+        return desc & 0xffff0000u;
+    count = (int16_t)EF_U8(desc + 5u);
+    tableA = guest_fn_cc6c0_x(EF_U8(desc + 5u), 0x0018ec30u);
+    tableB = guest_fn_cc6c0_x(EF_U8(desc + 5u), 0x0018ec50u);
+    fill_bytes_b3fb0(tableA, 0u, EF_U8(desc + 5u));
+    fill_bytes_b3fb0(tableB, 0u, EF_U8(desc + 5u));
+    for (i = 0; (int16_t)EF_U8(desc + 5u) > i; i++) {
+        ef_addr32 entry = EF_U32(desc + 6u) + (uint32_t)((int32_t)i * 10);
+
+        if (EF_U16(entry) == 0u)
+            continue;
+        flag = 1u;
+        for (j = 0; j < 8 && flag != 0u; j++) {
+            uint32_t ch = EF_U8(EF_U32(entry + 4u) + (uint32_t)(int32_t)j);
+            uint32_t have, used, need;
+
+            if (ch == 0x25u)
+                break;
+            have = EF_U8(EF_U32(obj + 0x33u) + ch);
+            used = EF_U8(EF_U32(obj + 0x37u) + ch);
+            need = EF_U8(entry + 3u);
+            if ((int32_t)(have - used) < (int32_t)need)
+                continue;
+            if (nth_match_exists_bd8c8((uint8_t)ch, (int16_t)need, EF_U8(desc), obj, owner) == 0u)
+                continue;
+            EF_U8(entry + 8u) = (uint8_t)ch;
+            EF_U8(tableA + (uint32_t)(int32_t)i) = (uint8_t)ch;
+            EF_U8(tableB + (uint32_t)(int32_t)i) = EF_U8(entry + 3u);
+            EF_U8(EF_U32(obj + 0x37u) + ch) = (uint8_t)(EF_U8(EF_U32(obj + 0x37u) + ch) + EF_U8(entry + 3u));
+            flag = 0u;
+            j++;
+            break;
+        }
+        if (flag != 0u) {
+            int16_t k;
+
+            for (k = 0; k < i; k++) {
+                if (EF_U16(EF_U32(desc + 6u) + (uint32_t)((int32_t)k * 10)) != 0u) {
+                    uint32_t slot = EF_U8(tableA + (uint32_t)(int32_t)k);
+
+                    EF_U8(EF_U32(obj + 0x37u) + slot) =
+                        (uint8_t)(EF_U8(EF_U32(obj + 0x37u) + slot) - EF_U8(tableB + (uint32_t)(int32_t)k));
+                }
+            }
+            if (tableA != 0u)
+                guest_fn_cc768(tableA);
+            if (tableB != 0u)
+                guest_fn_cc768(tableB);
+            return 0u;
+        }
+    }
+    claimed = 0u;
+    for (i = 0; i < (int16_t)EF_U8(desc + 5u); i++) {
+        ef_addr32 entry = EF_U32(desc + 6u) + (uint32_t)((int32_t)i * 10);
+
+        if (EF_U16(entry) != 0u) {
+            claim_idle_nodes_be208((uint32_t)(int32_t)EF_S16(obj + 9u), (uint32_t)(int32_t)(int16_t)cx,
+                                   (uint32_t)(int32_t)(int16_t)claimed, entry, owner);
+            claimed++;
+        }
+    }
+    (void)count;
+    if (tableA != 0u)
+        guest_fn_cc768(tableA);
+    if (tableB != 0u)
+        guest_fn_cc768(tableB);
+    return 1u;
+}

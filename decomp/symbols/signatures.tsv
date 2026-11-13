@@ -3334,3 +3334,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00098658	draw_progress_panel_98658	AL:uint8_t		ebx,ecx,edx,esi,edi	0	Original 0x98658 (1126 bytes); progress panel
 0x000acbe4	hit_test_pointer_acbe4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xacbe4 (980 bytes); pointer hit test
 0x000b1f80	dump_record_b1f80	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0xb1f80 (618 bytes); record dump
+0x000bd92c	reserve_requirements_bd92c	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,CX:uint16_t	EAX:uint32_t	esi,edi,ebp	0	Original 0xbd92c (666 bytes); requirement reservation

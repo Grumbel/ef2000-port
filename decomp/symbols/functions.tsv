@@ -2676,7 +2676,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bd7cc	157	shrink_counter_bd7cc	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000bd7cc.json	docs/compiler-abi.md; Try to shrink the counter byte at p+3 by one: the minimum depends on the type byte p+9 (types 1, 2, 10 need more than 2,; callers bd86c@bd8a7; guest pending
 0x000bd86c	92	record_has_valid_entry_bd86c	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd86c.json	docs/compiler-abi.md; True when a non-kind-2 record has a filled entry (scanned from the end) that passes the check.; callers bdbf8@bdc78,bdbf8@bdcc2,bdbf8@bdd11; guest pending
 0x000bd8c8	100	nth_match_exists_bd8c8	runtime_helpers13	compiles	game	confirmed	decomp/tests/0x000bd8c8.json	docs/compiler-abi.md; True when the list's index-th node matching the criteria exists.; callers bd92c@bda20; guest pending
-0x000bd92c	666			unknown	game	unverified		
+0x000bd92c	666	reserve_requirements_bd92c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000bd92c.json	Original 0xbd92c (666 bytes)
 0x000bdbc8	47	count_nonzero_entries	list_lookup	compiles	game	confirmed	decomp/tests/0x000bdbc8.json	docs/compiler-abi.md; Count the 10-byte entries (pointer +6, count byte +5) * whose first word is nonzero.; callers bd5f8@bd618,be59c@be5af,be59c@be605; guest pending
 0x000bdbf8	340			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x000bdd64	391			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
