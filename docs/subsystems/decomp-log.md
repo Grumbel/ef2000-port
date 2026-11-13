@@ -2521,3 +2521,10 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   (RAM 0x15bae0..0x15bb40 + call logs). Also re-blocked 0xb9aa4 (blocked x87/port
   callees, 6-stack-arg loop untestable), 0xbe59c (11 stack args, 9 callees) and
   0x8d11c (leaks ECX/EBX/EDX into blocked 0x913dc chain).
+
+- 0x5c518 `draw_tactical_marker_5c518` recovered (708 bytes, void; mode 3 selected-object
+  label + box + hold trigger, mode 4 cursor ticks). Isolated fuzz PASS 300 (only covers the
+  mode<3 early exit); callee-stubbed differential (16 callee stubs with scripted outputs,
+  random mode/object/projection state) agrees 400/400 incl. stub-call logs. New
+  wrappers: guest_fn_39cb4, guest_fn_5c8e0, guest_fn_86f7c_b (3 reg args),
+  guest_fn_48da0 / guest_fn_48bb0 (caller-cleanup stack args).

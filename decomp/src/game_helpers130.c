@@ -5452,3 +5452,92 @@ void build_clip_records_d7f0c(void)
 #undef W
 #undef S16W
 }
+
+/* 0x5c518: tactical label/marker for the selected or tracked object. */
+void draw_tactical_marker_5c518(void)
+{
+	uint8_t L[0x18];
+	uint32_t lp = (uint32_t)(uintptr_t)L;
+	ef_addr32 obj = 0;
+	uint8_t mode;
+	int32_t cl, k, t;
+#define LS(o) (*(int16_t *)(L + (o)))
+	guest_fn_cdf48((uint32_t)HI(0x001a6cf0u), (uint32_t)HI(0x001a6cf6u),
+	               (uint32_t)HI(0x001a6ceeu), (uint32_t)HI(0x001a6cf4u));
+	guest_fn_ce328_w(HI(0x001a6cf0u), HI(0x001a6cf6u), HI(0x001a6ceeu), HI(0x001a6cf4u));
+	mode = EF_U8(0x0012814cu);
+	if (mode < 3u)
+		return;
+	if (mode == 4u) {
+		int32_t r = guest_fn_86f7c_b(1, lp + 0xcu, 4);
+		LS(0x14) = (int16_t)r;
+		if ((int16_t)r < 0)
+			return;
+		guest_fn_5c9d4_x(lp + 0xcu, (uint32_t)(int32_t)(int16_t)r);
+		return;
+	}
+	if (mode != 3u)
+		return;
+	if ((int32_t)EF_U32(0x00197220u) > 0x2800)
+		return;
+	if ((int16_t)EF_U16(0x001a823eu) < 0)
+		return;
+	obj = guest_fn_7489c(HI(0x001a823cu));
+	if (obj == 0)
+		return;
+	guest_fn_39cb4(lp + 0xcu, lp + 0x14u);
+	if (guest_fn_5c8e0(lp + 0xcu) == 0)
+		return;
+	guest_fn_39a0c_x(lp + 0xcu, (uint32_t)(int32_t)LS(0x14));
+	if (guest_fn_5ca88_ret_x(obj, lp + 0x10u) == 0)
+		return;
+	guest_fn_5d520_x(LS(0x10), LS(0x12), obj);
+	if (EF_U32(obj + 0x1cu) != 0)
+		guest_fn_5dbc8_x(LS(0x10), LS(0x12));
+	guest_fn_a4342_va(lp, 0x00185facu, EF_U32(0x001971b0u));
+	{
+		int32_t half = ((int16_t)guest_fn_48da0(lp)) >> 1;
+		uint32_t shl;
+		cl = EF_U8(0x0012b369u) & 31;
+		shl = ((uint32_t)EF_U16(0x001a6ce2u) + 2u) << cl;
+		t = (int16_t)(shl + (uint32_t)(int32_t)LS(0x12));
+		guest_fn_48bb0(EF_U8(0x00128148u), (uint32_t)((1 - cl) & 0xff),
+		               (int16_t)((int32_t)LS(0x10) - half), t, lp);
+	}
+	if (EF_U8(0x00127da8u) != 0 && (EF_U8(obj + 0x26u) & 0x40u) != 0) {
+		int32_t X = LS(0x10), Y = LS(0x12);
+		uint32_t color = EF_U8(0x00128148u);
+		cl = EF_U8(0x0012b369u) & 31;
+		k = 0xa << cl;
+		guest_fn_c8ccc_x((uint32_t)(Y + k), (uint32_t)(X + k), (uint32_t)(Y - k),
+		                 (uint32_t)(X - k), color);
+		color = EF_U8(0x00128148u);
+		cl = EF_U8(0x0012b369u) & 31;
+		k = 0xa << cl;
+		guest_fn_c8ccc_x((uint32_t)(Y + k), (uint32_t)(X - k), (uint32_t)(Y - k),
+		                 (uint32_t)(X + k), color);
+	}
+	if (LS(0x14) >= 0x64)
+		return;
+	{
+		int32_t d = (int32_t)LS(0xc) - (int32_t)LS(0x10);
+		if (d < 0)
+			d = -d;
+		if ((d >> (EF_U8(0x0012b369u) & 31)) >= 5)
+			return;
+		d = (int32_t)LS(0xe) - (int32_t)LS(0x12);
+		if (d < 0)
+			d = -d;
+		if ((d >> (EF_U8(0x0012b369u) & 31)) >= 5)
+			return;
+	}
+	{
+		ef_addr32 rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
+		if (EF_U16(0x00197250u) == EF_U16(rec + 0x15u))
+			return;
+		if (EF_U8(0x001a6d1du) == 0)
+			return;
+		guest_fn_17754_w();
+	}
+#undef LS
+}
