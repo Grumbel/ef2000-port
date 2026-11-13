@@ -1,0 +1,70 @@
+{
+  "address": "0x000ea270",
+  "function_size": 378,
+  "cases": [
+    {
+      "name": "missing_file_prior_count_0",
+      "registers": {
+        "eax": 1966336
+      },
+      "memory": [
+        {
+          "address": "0x1e0100",
+          "hex": "00001e000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "c3"
+        },
+        {
+          "address": "0xb3b90",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9c9c0",
+          "hex": "ff0500021e00c3"
+        },
+        {
+          "address": "0xea240",
+          "hex": "ff0504021e00c3"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "0000000000000000"
+        }
+      ]
+    },
+    {
+      "name": "missing_file_prior_count_2",
+      "registers": {
+        "eax": 1966336
+      },
+      "memory": [
+        {
+          "address": "0x1e0100",
+          "hex": "00001e000000000000000000020000000000000000000000"
+        },
+        {
+          "address": "0x9d749",
+          "hex": "c3"
+        },
+        {
+          "address": "0xb3b90",
+          "hex": "31c0c3"
+        },
+        {
+          "address": "0x9c9c0",
+          "hex": "ff0500021e00c3"
+        },
+        {
+          "address": "0xea240",
+          "hex": "ff0504021e00c3"
+        },
+        {
+          "address": "0x1e0200",
+          "hex": "0000000000000000"
+        }
+      ]
+    }
+  ]
+}

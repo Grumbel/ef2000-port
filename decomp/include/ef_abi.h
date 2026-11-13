@@ -33,6 +33,7 @@ uint32_t size_localized_file_9cf74(ef_addr32 name, ef_addr32 frame);
 uint32_t load_localized_file_9cfa4(ef_addr32 name, ef_addr32 dest,
                                   ef_addr32 frame);
 void guest_fn_ea470(uint32_t mode); /* 0xea470: unresolved in main path */
+void clump_load(ef_addr32 descriptor); /* 0xea270 EAX */
 void guest_fn_ea270(ef_addr32 descriptor); /* 0xea270: clump loader */
 uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */
 

@@ -3451,3 +3451,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00040ec4	gc_performance_yes_40ec4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x40ec4 XOR AH,AH; store AH at 0x1a364c; RET. Callback entry; EAX upper/lower bytes retained.
 0x00040ebc	gc_start_new_campaign_40ebc			eax,ebx,ecx,edx,esi,edi,ebp	0	0x40ebc MOV byte [0x1a364c],1; RET; no register inputs or clobbers; GUI callback.
 0x00120746	initialize_x87_runtime_120746			eax,ebx,ecx,edx,esi,edi,ebp	0	Original early RET or PUSH/POP EAX EBX ECX EDX ES DS around initialization; ECX retained for caller 0x120485.
+0x000ea270	clump_load	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xea270..0xea3e9 saves six GPRs; callers 0x8b297/0x8b2a1 supply descriptors in EAX; 0x60-byte local frame.
