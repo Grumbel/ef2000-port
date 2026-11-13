@@ -1352,7 +1352,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00073734	234	set_unit_target_73734	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073734.json	docs/compiler-abi.md; Record that unit A now targets unit B (word +0x143 of A's record). When A is the player unit (word 0x1f71ca) the target'; callers 46454@4674d; guest pending
 0x00073820	260			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00073924	63	release_pending_73924	game_helpers29	compiles	game	confirmed	decomp/tests/0x00073924.json	docs/compiler-abi.md; Release a unit's current entry and clear its pending slot id if it matches.; callers 46454@46761; guest pending
-0x00073964	699			unknown	game	unverified		
+0x00073964	699	report_contact_73964	game_helpers130	compiles	game	confirmed	decomp/tests/0x00073964.json	Original 0x73964 (699 bytes)
 0x00073c38	228	hail_next_unit_73c38	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073c38.json	docs/compiler-abi.md; Round-robin hail: for the unit UNIT (AX) advance its cursor byte +0x142 (wrapping to 0 at the signed word 0x2119f4) and ; callers 6c8e0@6c913; guest pending
 0x00073d1c	52	clear_unit_flag_73d1c	game_helpers5	compiles	game	confirmed	decomp/tests/0x00073d1c.json	docs/compiler-abi.md; Clear a unit flag one time in five.; callers 6c8e0@6c920,72944@72c4d; guest pending
 0x00073d50	397	store_fixed_point_state_73d50	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00073d50.json	docs/compiler-abi.md; Convert the unit (AX, sign extended) record's floating point velocity/orientation fields to fixed point words using the ; callers 6d38c@6d68a,7222c@72386,72390@72499; guest pending

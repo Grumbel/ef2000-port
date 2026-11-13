@@ -2544,3 +2544,13 @@ Recovered from disassembly: debug overlay printing the selected object's header 
   +0x146/+0x150/+0x154 state machine, copies target fields to 0x1f7020../0x1f6fe0).
   Isolated fuzz PASS 300; callee-stubbed differential (7489c, 2e910, 6aeb4, 6a1d0;
   RAM dump of the player slot block and copy targets) agrees 400/400.
+
+- 0x73964 `report_contact_73964(int16 a, int16 b)` recovered (699 bytes, void; contact
+  record update / radio call via blocked 0x46254, 0x65030, 0x2b1f4). Callee-stubbed
+  differential (8 stubs) agrees 400/400 (both-fault idiv cases counted equivalent);
+  isolated fuzz PASS 300. New wrapper guest_fn_2bb64.
+- Correction: the previous five recoveries (0x5c518, 0x5df08, 0x5d1c4, 0x6bee8) were committed
+  without a `#define HI` in game_helpers130.c, which made the whole module fail to link
+  ("unresolved external HI_") so their differentials ran vacuously. Macro fixed;
+  re-verified with `functions_redirected=1`: ctl 400/400 each (calls 2473/2115/4588/1862)
+  and isolated fuzz PASS 300 for all five. Always confirm functions_redirected=1.

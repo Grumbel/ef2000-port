@@ -5453,6 +5453,8 @@ void build_clip_records_d7f0c(void)
 #undef S16W
 }
 
+#define HI(a) (((int32_t)EF_U32(a)) >> 16)
+
 /* 0x5c518: tactical label/marker for the selected or tracked object. */
 void draw_tactical_marker_5c518(void)
 {
@@ -5799,3 +5801,91 @@ copy:
 	EF_U32(0x001f6fe4u) = EF_U32(obj + 0x95u);
 #undef RECB
 }
+
+/* 0x73964: unit `a` is spotted by unit `b`; update the contact record or start the radio call. */
+void report_contact_73964(int16_t a, int16_t b)
+{
+	ef_addr32 obj, q;
+	uint16_t cx = (uint16_t)a;
+	int32_t di = (int16_t)b;
+#define RECB(o) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
+	obj = guest_fn_7489c((int16_t)a);
+	if (obj == 0)
+		return;
+	q = guest_fn_8ffe8((int16_t)b);
+	if (q == 0)
+		return;
+	if (cx == EF_U16(0x001f71cau)) {
+		uint32_t k = EF_U8(q + 0x3au);
+		ef_addr32 rec;
+		uint32_t t;
+		guest_fn_65030(2u, di, EF_U8(0x00123810u + k * 164u) == 0 ? 3u : 4u);
+		rec = RECB(obj);
+		t = EF_U8(rec + 0x1bu);
+		if (t == 0xbu) {
+			uint16_t dx = EF_U16(rec + 0x50u);
+			if (dx == cx) {
+				EF_U16(rec + 0xb9u) = EF_U16(q + 0x38u);
+				EF_U8(RECB(obj) + 0xbbu) = 1u;
+				return;
+			}
+			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
+			return;
+		} else {
+			int32_t u = (int16_t)guest_fn_2bb64(((int32_t)EF_U32(obj + 0x26u)) >> 16);
+			int16_t si;
+			int32_t d, r;
+			if (u == 0xff)
+				return;
+			si = (int16_t)EF_U16(EF_U32(0x0019bb58u) + (uint32_t)u * 0xcau + 0x50u);
+			d = 10000 / (int32_t)EF_U16(0x00127d92u);
+			r = (int32_t)(uint16_t)guest_fn_9c960() % (d + 1);
+			if (r != 0)
+				return;
+			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, si, 0x30u, (uint32_t)di, 0u, 0u);
+			return;
+		}
+	} else {
+		uint32_t ty = EF_U8(obj + 0x16cu);
+		if (ty == 1u || ty == 3u || ty == 2u || ty == 4u || ty == 6u) {
+			ef_addr32 rec = RECB(obj);
+			if (EF_U8(rec + 0x1bu) == 0xbu) {
+				uint16_t dx = EF_U16(rec + 0x50u);
+				if (dx != cx) {
+					guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
+					return;
+				}
+				if (EF_U8(rec + 0x1au) == 6u) {
+					int32_t e = ((int32_t)EF_U32(rec + 0xb7u)) >> 16;
+					if (e != 0xff && EF_U8(rec + 0xbbu) == 1u)
+						return;
+				}
+				EF_U16(RECB(obj) + 0xb9u) = EF_U16(q + 0x38u);
+				EF_U8(RECB(obj) + 0xbbu) = 1u;
+				guest_fn_2b1f4_x(((int32_t)EF_U32(obj + 0x26u)) >> 16, 6u);
+				return;
+			}
+		}
+		{
+			int32_t idx = ((int32_t)EF_U32(obj + 0x26u)) >> 16;
+			int32_t u;
+			int16_t bx;
+			int32_t d, r;
+			if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)idx * 0xcau + 0x1bu) == 0xbu)
+				return;
+			u = (int16_t)guest_fn_2bb64(idx);
+			if (u == 0xff)
+				return;
+			bx = (int16_t)EF_U16(EF_U32(0x0019bb58u) + (uint32_t)u * 0xcau + 0x50u);
+			d = 10000 / (int32_t)EF_U16(0x00127d92u);
+			r = (int32_t)(uint16_t)guest_fn_9c960() % (d + 1);
+			if (r != 0) {
+				if ((uint8_t)guest_fn_7574c(bx) != 0)
+					return;
+			}
+			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, bx, 0x30u, (uint32_t)di, 0u, 0u);
+		}
+	}
+#undef RECB
+}
+#undef HI
