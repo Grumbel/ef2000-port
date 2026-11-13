@@ -7,6 +7,8 @@
 
 /* Clipped screen operations and buffer setup. */
 
+#pragma aux draw_clipped_c92e4 parm routine [eax] [edx] [ebx] [ecx] modify [eax]
+
 /* 0xc3770, 121 bytes. Allocate the two work buffers at 0x146e40/0x146e44 (size 0x164600) if needed, complain when either failed, then zero both. */
 void init_work_buffers_c3770(void)
 {
@@ -47,7 +49,7 @@ void draw_clipped_c92e4(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t
         return;
     if (sy + (int32_t)(int16_t)h > (int32_t)EF_U32(0x0015b748u))
         return;
-    guest_fn_eb174_x(0u, 0u, 0u, 0u, x & 0xffffu, y & 0xffffu, w & 0xffffu, h & 0xffffu,
+    copy_rows_eb174(x, y, w, h, x & 0xffffu, y & 0xffffu, w & 0xffffu, h & 0xffffu,
                      s0 & 0xffffu, s1 & 0xffffu, s2 & 0xffffu, s3);
 }
 
