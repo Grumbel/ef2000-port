@@ -2260,3 +2260,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 actual GUI-resource evidence: eight-function recovered parser chain matches original for gui.par from DID.DAT and DID1ST.DAT, with no service stubs and prepared RAM-backed input. Reproducer tools/menu_resource_differential.py stores all proprietary artifacts in ignored local/. Archive I/O, fixups, startup and working main menu remain incomplete.
 
 2026-11-13 pointer-fixup continuation: recovered 0xaa4b8/0xaa4d4, passing eight synthetic comparisons and both real gui.par parse-plus-fixup comparisons. Remaining post-load passes and source-only startup/menu are incomplete.
+
+2026-11-13 scene-resolution continuation: recovered 0xaa350, six targeted synthetic-service comparisons pass, and two real-resource sequential parse/fixup/scene checks pass. Resolver helper replacements, names/resources and source-only startup/menu remain incomplete.
