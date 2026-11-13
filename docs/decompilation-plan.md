@@ -2285,3 +2285,13 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13  heap-growth  Recovered 0x10d80b control flow in heap_grow.c; OpenWatcom clean, 359-byte C body versus original 324. Fifteen isolated original-vs-C cases and four cases composed with C size/tail/insertion/release helpers PASS. DS/LSL/+1 is a documented ASM exception; DOS break provision and alternate growth remain external, native provider unbound, entry stays drafted. No game runs or source-only menu claim.
 
 2026-11-13 script-runner follow-up: completed review of unfinished 0x1093d8 attempt. OpenWatcom emits zero warnings/errors. Original ASM pushes/pops ECX but changes EBX/EDX; caller 0xe40cf consumes neither, so corrected their erroneous preserved-register contract. Replaced the invalid draft probe with five synthetic cases; callback records the first line byte instead of its stack address. Empty/comment-only pass; three selector cases fail because original selector stores the temporary line address in the caller table sentinel (0x1e0108), exposing different stack layout. Retained volatile cursor: removing it exceeds the 180000-instruction budget in copy_line; retain blocked state and normal hybrid exclusion. No golden replay or working-menu claim. Commands: tools/ef2000_wcc.py decomp/src/script_helpers1.c; tools/hybrid_link.py --image local/startup-nosound-02/payload.bin --hand-objects local/script-finish-objects --exclude-list /dev/null --only-address 0x1093d8 -o local/script-finish-final.patch; tools/func_differential.py 0x1093d8 --payload local/startup-nosound-02/payload.bin --patch local/script-finish-final.patch --spec decomp/tests/0x001093d8.json.
+
+2026-11-13 ASM control-flow inventory: schema 2 records direct/indirect call and
+jump edges, fallthrough, undecodable instructions and system-transition review
+items without promoting recovery states. Full export succeeds for 4,290 entries;
+heap growth 0x10d80b has five review edges and normalizer 0x10d94f has one.
+Seven focused tests pass (`python3 -m unittest tests.test_asm_inventory
+tests.test_asm_diff`). Reproducer: `python3 tools/asm_inventory.py --output
+local/asm-flow-inventory-20261113`. Exact body-range import, indirect-edge
+resolution and instruction equivalence remain pending; linear-window reports
+are not evidence of complete functions or source-only execution.

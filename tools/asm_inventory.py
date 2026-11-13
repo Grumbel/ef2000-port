@@ -51,6 +51,41 @@ def decode_window(image, address, size, *, objdump='objdump', runner=subprocess.
     return instructions
 
 
+def control_flow_report(instructions):
+    """Classify static edges without claiming that linear bytes are code.
+
+    A target inside a decoded instruction is a blocker, not a new entry.
+    Calls retain their fallthrough; unconditional jumps and returns do not.
+    Indirect destinations and interrupt/system transitions require review.
+    """
+    starts = {i['address'] for i in instructions}
+    edges = []
+    for insn in instructions:
+        site = insn['address']
+        mnemonic = insn['mnemonic']
+        next_address = site + len(bytes.fromhex(insn['bytes']))
+        call = mnemonic in ('call', 'lcall')
+        jump = mnemonic.startswith('j') or mnemonic.startswith('loop') or mnemonic == 'ljmp'
+        unconditional = mnemonic in ('jmp', 'ljmp')
+        terminal = mnemonic.startswith(('ret', 'iret')) or mnemonic in ('hlt', 'ud2')
+        transition = mnemonic in ('int', 'int3', 'into', 'syscall', 'sysenter', 'sysexit', 'sysret')
+        if call or jump:
+            target = insn.get('direct_target')
+            status = 'indirect-unresolved' if target is None else (
+                'decoded-instruction' if target in starts else 'outside-decoded-starts')
+            edges.append(dict(site=site, kind='call' if call else 'jump',
+                              target=target, status=status))
+        if transition or mnemonic in ('(bad)', '.byte'):
+            edges.append(dict(site=site, kind='review', target=None,
+                              status='system-transition' if transition else 'undecodable'))
+        if not unconditional and not terminal:
+            edges.append(dict(site=site, kind='fallthrough', target=next_address,
+                              status='decoded-instruction' if next_address in starts
+                              else 'outside-decoded-starts'))
+    return dict(edges=edges, review_edges=[e for e in edges
+                                          if e['status'] != 'decoded-instruction'])
+
+
 def export_inventory(image, rows, output, *, objdump='objdump', runner=subprocess.run):
     """Caller supplies a validated payload. Never change tracker recovery states."""
     payload = image.read_bytes()
@@ -87,7 +122,8 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
                       overlapping_entries=sorted(overlaps),
                       undecodable_addresses=[i['address'] for i in instructions
                                              if i['mnemonic'] in ('(bad)', '.byte')],
-                      instructions=instructions)
+                      instructions=instructions,
+                      control_flow=control_flow_report(instructions))
         (output / (stem + '.json')).write_text(json.dumps(record, indent=2) + '\n')
         listing = [f'; {address:#010x} {row["name"]}: unverified linear window ({size} bytes)']
         listing += [f'{i["address"]:08x}: {i["bytes"]:<30} {i["mnemonic"]} {i["operands"]}'.rstrip()
@@ -96,8 +132,10 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
         entries.append(dict(address=address, size=size, name=row['name'],
                             state=row['state'], kind=row['kind'], module=row['module'],
                             overlapping_entries=sorted(overlaps),
-                            instruction_count=len(instructions), file=stem + '.json'))
-    manifest = dict(schema=1, payload_sha256=hashlib.sha256(payload).hexdigest(),
+                            instruction_count=len(instructions),
+                            review_edge_count=len(record['control_flow']['review_edges']),
+                            file=stem + '.json'))
+    manifest = dict(schema=2, payload_sha256=hashlib.sha256(payload).hexdigest(),
                     decoder=version, boundary='unverified-linear-window',
                     overlap_scope='selected-tracker-entries',
                     selected_rows_sha256=hashlib.sha256(json.dumps(

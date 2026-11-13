@@ -43,3 +43,13 @@ Next automation steps are exact body-range import, code/data and indirect-edge
 classification, relocation-aware compiled instruction comparison, and dependency
 reports for menu/cockpit blockers. Keep unresolved edges and compiler/runtime
 ASM exceptions explicit rather than guessing C or treating them as complete.
+
+Schema 2 also records `control_flow.edges`, `control_flow.review_edges`, and
+per-entry `review_edge_count`. Calls and conditional branches retain a
+fallthrough edge; unconditional jumps, returns, `hlt` and `ud2` do not.
+Numeric targets resolve only to decoded instruction starts in the same window.
+Indirect transfers, targets outside those starts (including instruction
+interiors), window-exiting fallthrough, interrupt/system transitions and bad
+instructions remain explicit review items. External calls are review items,
+not automatically errors. This mnemonic-based report neither proves reachability
+nor resolves jump tables; its input still consists of unverified linear windows.

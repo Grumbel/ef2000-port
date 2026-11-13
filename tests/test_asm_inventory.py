@@ -37,6 +37,32 @@ class InventoryTests(unittest.TestCase):
             with self.assertRaises(FileExistsError):
                 asm_inventory.export_inventory(image, rows, root / 'a')
 
+    def test_control_flow_keeps_calls_and_conditional_fallthrough(self):
+        def insn(address, mnemonic, target=None):
+            result = dict(address=address, bytes='90', mnemonic=mnemonic, operands='')
+            if target is not None:
+                result['direct_target'] = target
+            return result
+        report = asm_inventory.control_flow_report([
+            insn(0, 'call', 20), insn(1, 'jne', 0), insn(2, 'jmp'),
+            insn(3, 'ret'), insn(4, 'int'), insn(5, '(bad)')])
+        edges = report['edges']
+        self.assertIn(dict(site=0, kind='fallthrough', target=1,
+                           status='decoded-instruction'), edges)
+        self.assertIn(dict(site=1, kind='fallthrough', target=2,
+                           status='decoded-instruction'), edges)
+        self.assertFalse(any(e['site'] in (2, 3) and e['kind'] == 'fallthrough'
+                             for e in edges))
+        self.assertEqual({e['status'] for e in report['review_edges']},
+                         {'outside-decoded-starts', 'indirect-unresolved',
+                          'system-transition', 'undecodable'})
+
+    def test_target_inside_instruction_is_not_resolved(self):
+        report = asm_inventory.control_flow_report([
+            dict(address=0, bytes='ebff', mnemonic='jmp', operands='1', direct_target=1)])
+        self.assertEqual(report['review_edges'][0]['target'], 1)
+        self.assertEqual(report['review_edges'][0]['status'], 'outside-decoded-starts')
+
     def test_reject_wrong_decoder_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
