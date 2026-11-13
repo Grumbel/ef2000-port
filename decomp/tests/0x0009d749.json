@@ -1,1 +1,240 @@
-{"address":"0x0009d749","function_size":31,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x0009d749",
+  "function_size": 31,
+  "cases": [
+    {
+      "name": "length_0_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "00a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_0_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "00a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_1_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6100a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_1_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6100a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_2_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616200a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_2_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616200a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_3_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "61626300a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_3_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "61626300a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_4_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6162636400a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_4_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6162636400a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_5_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616263646500a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_5_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616263646500a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_6_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "61626364656600a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_6_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "61626364656600a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_7_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6162636465666700a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_7_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "6162636465666700a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_8_delta_0",
+      "registers": {
+        "eax": 1966080,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616263646566676800a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "length_8_delta_32",
+      "registers": {
+        "eax": 1966112,
+        "edx": 1966080
+      },
+      "memory": [
+        {
+          "address": "0x1e0000",
+          "hex": "616263646566676800a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}
