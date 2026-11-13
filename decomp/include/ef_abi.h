@@ -980,7 +980,7 @@ void restore_state_a9900(void);
 uint32_t restore_state_a9990(void);
 void clear_latch_if_idle(void);
 void request_by_state(void);
-void clear_latch_and_notify(void);
+void clear_latch_and_notify(ef_addr32 name);
 void resolve_link_at_1(ef_addr32 record);
 void resolve_link_at_0(ef_addr32 record);
 ef_addr32 walk_chain_from_8(int16_t steps, ef_addr32 record);
@@ -7469,5 +7469,38 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux rotate_view_test_160122 parm routine []
 #pragma aux rotate_view_test_160156 parm routine []
 #pragma aux guest_fn_10d63b parm routine [] value [eax] modify [eax ebx ecx edx esi edi ebp]
+#endif
+
+/* Confirmed direct call sites in dispatcher 0xa9e70. */
+void menu_call_b3f48(void); /* 0xb3f48 */
+void menu_call_dc250(void); /* 0xdc250 */
+void menu_call_dcc10(void); /* 0xdcc10 */
+void menu_call_dcc54(void); /* 0xdcc54 */
+void menu_call_a9d48(void); /* 0xa9d48 */
+void menu_call_a9cd0(void); /* 0xa9cd0 */
+void menu_call_a992c(void); /* 0xa992c */
+void menu_call_28744(void); /* 0x28744 */
+void menu_call_a9990(void); /* 0xa9990 */
+void menu_call_b3f50(void); /* 0xb3f50 */
+void menu_call_a9900(void); /* 0xa9900 */
+void menu_op_a8bd4(ef_addr32 argument); /* 0xa8bd4 */
+void menu_op_a8a38(ef_addr32 argument); /* 0xa8a38 */
+void menu_op_a8958(ef_addr32 argument); /* 0xa8958 */
+void menu_op_a9130(ef_addr32 argument); /* 0xa9130 */
+void menu_op_a944c(void); /* 0xa944c */
+void menu_op_a9724(ef_addr32 argument); /* 0xa9724 */
+void menu_op_a9878(ef_addr32 argument); /* 0xa9878 */
+void menu_op_a9bd0(void); /* 0xa9bd0 */
+void menu_op_a9bec(ef_addr32 argument); /* 0xa9bec */
+void menu_op_a983c(ef_addr32 argument); /* 0xa983c */
+void menu_op_a905c(ef_addr32 argument); /* 0xa905c */
+void menu_op_a9bbc(void); /* 0xa9bbc */
+void menu_op_a99c0(ef_addr32 argument); /* 0xa99c0 */
+void menu_op_a9694(ef_addr32 argument); /* 0xa9694 */
+void menu_op_a9aa8(ef_addr32 argument); /* 0xa9aa8 */
+ef_addr32 menu_select_a9d0c(void); /* 0xa9d0c */
+void menu_seed_a45e4(uint32_t seed); /* 0xa45e4 */
+#ifdef __WATCOMC__
+#pragma aux menu_seed_a45e4 parm routine [] modify [eax]
 #endif
 #endif

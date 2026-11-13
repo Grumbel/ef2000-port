@@ -2238,3 +2238,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 populated resource validation: clump loader 0xea270 passes ten isolated synthetic-service comparisons, including both index-building loops and diagnostic dispatch. Marked compiles; real loading and pure-C main menu remain incomplete.
 
 2026-11-13 main-loop continuation: recovered 0xaaee8 main control loop; seven isolated synthetic-service differentials pass, including consumed environment argument and repeated GUI dispatch. GUI dispatcher 0xa9e70, real services and native startup boundaries remain unresolved; pure-C main menu is not achieved.
+
+2026-11-13 dispatcher continuation: hand-recovered 0xa9e70 passes 21 isolated synthetic-service cases, including every opcode and three stream transitions. Retain broad exclusion until mode/exit tails and real GUI integration are checked. Source-only main menu remains incomplete.
