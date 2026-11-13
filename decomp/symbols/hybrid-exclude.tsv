@@ -5,7 +5,7 @@ addr	reason
 0x00084b74	Mechanical body for this 5-byte JMP thunk is not ABI-equivalent; quick-fight bisector isolates it as sufficient for guest_exit at IP 0x222/tick 904. Keep original tail-jump bytes.
 0x000c4db4	Cockpit replay bisector: compiled replacement causes unmapped fetch at IP 0x15918c05/tick 3188. Original bytes avoid the fetch but cockpit counters, framebuffer and guest RAM still diverge; leave original pending ABI/behavior fix.
 0x000c36b4	Mechanical replacement loses the EAX/EDX/EBX/ECX plus two-stack-argument ABI; automatic M1 bisector identifies this entry alone as sufficient for the startup read fault. Keep original bytes pending manual recovery.
-0x000a9e70	Prior mechanical dispatcher caused invalid IP 0x4df015 (tick 650). Hand C now passes 21 isolated synthetic-service cases; mode/exit tails and full GUI integration remain unverified. Keep original in broad builds.
+0x000a9e70	Prior mechanical dispatcher caused invalid IP 0x4df015 (tick 650). Hand C now passes 27 isolated synthetic-service cases plus a combined main/dispatcher case; full GUI integration remains unverified. Keep original in broad builds.
 0x0015c0c4	Focused menu-accept bisector: the mechanically compiled replacement is sufficient for an invalid-write path at guest address 0x19655800. Keeping original bytes reaches the instruction limit without a crash; RAM/framebuffer equivalence remains unresolved.
 0x000002b0	The guest DOS bridge delegates intdos to the original X-32 dispatcher to preserve its INT 21h path and unwritten carry-word quirk; patching this replacement would recurse.
 0x0009c47a	The guest DOS bridge delegates int386x to the original X-32 interrupt thunk; patching this replacement would recurse and lose the original thunk behavior.
