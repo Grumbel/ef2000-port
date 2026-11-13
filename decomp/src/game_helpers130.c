@@ -1376,3 +1376,57 @@ void find_nearest_object_33b4(int16_t group)
     }
 #undef EF_GROUP_REC
 }
+
+/* 0x11e7c, 706 bytes. Draw button INDEX (29-byte records at 0x121fb4): unless its flag byte +0x0e bit 0 is set, look up the two text slots, enter scroll mode, blit the masked frame cell chosen by the record, clip the view to the screen and draw the label centred in the box (colour 0xe when the record's state byte is set, else 2 when the label flag +0x0d is set, else 1; the label is the shared string 0x12288c when 0x122888>>16 == 1, otherwise the pointer at +0x14), then leave scroll mode. */
+void draw_button_11e7c(int16_t index)
+{
+    uint32_t rec = (uint32_t)((int32_t)index * 29);
+    uint32_t state;
+    uint32_t cell;
+    ef_addr32 src;
+    ef_addr32 fmt;
+    int32_t width;
+    int32_t x;
+    int32_t y;
+    uint32_t colour;
+
+    if (EF_U8(0x00121fc2u + rec) & 1u)
+        return;
+    state = EF_U8(0x00121fb4u + rec);
+    src = get_text_slot_cd7f0((int16_t)EF_U8(0x00121ed5u + state * 29u));
+    if (src == 0u)
+        return;
+    {
+        uint32_t second = get_text_slot_cd7f0((int16_t)EF_U8(0x00121fb5u + rec));
+
+        if (second == 0u)
+            return;
+        enter_scroll_mode_c39f0(second);
+    }
+    cell = ((state + EF_U8(0x00121fb6u + rec)) & 0xffu) * 29u;
+    blit_masked_cd82c(0u, 0u, 0u, 0u,
+                      EF_U16(0x00121fbau + rec), EF_U16(0x00121fb8u + rec),
+                      EF_U16(0x00121edeu + cell), EF_U16(0x00121edcu + cell),
+                      EF_U16(0x00121edau + cell), EF_U16(0x00121ed8u + cell), src);
+    if ((EF_S32(0x00122888u) >> 16) == 1) {
+        fmt = 0x0012288cu;
+    } else {
+        fmt = EF_U32(0x00121fc8u + rec);
+        if (fmt == 0u) {
+            leave_scroll_mode_c39ac();
+            return;
+        }
+    }
+    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    width = formatted_text_width_48c34(1u, fmt);
+    y = (int16_t)((EF_S32(0x00121fbcu + rec) >> 17) + (EF_S32(0x00121fb8u + rec) >> 16) - 2);
+    x = (int16_t)((((EF_S32(0x00121fbau + rec) >> 16) - (int16_t)width) >> 1) + (EF_S32(0x00121fb6u + rec) >> 16));
+    if (state != 0u)
+        colour = 0x0eu;
+    else if (EF_U8(0x00121fc1u + rec) != 0u)
+        colour = 2u;
+    else
+        colour = 1u;
+    draw_formatted_text_mode_48bb0(colour, 1u, x, y, fmt);
+    leave_scroll_mode_c39ac();
+}

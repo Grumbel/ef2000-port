@@ -2394,3 +2394,7 @@ Recovered from disassembly: allocates the id/record tables (COLLECTION+0x78/+0x6
 ### 2026-11-13 find_nearest_object_33b4 (0x33b4)
 
 Recovered: picks a target object for group record AX (0xca-byte records at 0x19bb58), publishing 0x197061/0x19705f/0x197083; first unflagged member, then nearest to the reference block at +0xb5, then (type 2) nearest to its own target. Quirk kept: when the first scan runs out, the last looked-up object stays selected. Fuzz PASS 612 completed cases.
+
+### 2026-11-13 draw_button_11e7c (0x11e7c)
+
+Recovered: draws button AX (29-byte records at 0x121fb4) as a masked frame blit plus a centred label (colour 0xe/2/1 by state and label flag; label is the shared string 0x12288c or the record's pointer). Fuzz PASS 1000 completed cases.
