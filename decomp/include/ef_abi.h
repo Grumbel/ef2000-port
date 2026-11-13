@@ -3276,6 +3276,7 @@ void unpack_pair_2aa08(ef_addr32 out, ef_addr32 in);
 uint8_t record_close_and_active_2dc84(int16_t index);
 double scaled_pair_distance_37bc8(ef_addr32 out, int16_t index);
 double guest_fn_a4470(double value); /* 0xa4470 ST0 -> ST0 */
+double guest_fn_9d72c_x(double value); /* 0x9d72c ST0 truncate, ST0 -> ST0 */
 double guest_fn_6a760(int32_t a, int32_t b); /* 0x6a760 EAX/EDX -> ST0 */
 double guest_fn_b4230(int32_t value); /* 0xb4230 EAX -> ST0 */
 double guest_fn_80f4(ef_addr32 context, uint32_t index); /* 0x80f4 EAX/EDX -> ST0 */
@@ -4400,6 +4401,9 @@ uint32_t guest_fn_befb8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32
 void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx); /* 0xbc38 */
 ef_addr32 guest_fn_a78bc_x(ef_addr32 root, ef_addr32 name); /* 0xa78bc EAX/EDX -> EAX */
 void print_page_entries_ca5c(ef_addr32 fp); /* 0xca5c */
+void draw_marker_box_21e04(int16_t n); /* 0x21e04 */
+void guest_fn_2065c_x(int32_t a, int32_t b, int32_t c, int32_t d, uint32_t s0); /* 0x2065c EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
+void guest_fn_1ff0c_x(int32_t a, int32_t b, int32_t c); /* 0x1ff0c EAX/EDX/EBX */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);
@@ -7243,6 +7247,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 /* ST0-argument x87 helpers: Watcom would otherwise pass the double on the stack
  * (found by the cockpit bisect: 0xb41bc, 0xb427c). */
 #pragma aux guest_fn_a4470 parm [8087] value [8087] modify [eax]
+#pragma aux guest_fn_9d72c_x parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b45fa parm [8087] value [8087] modify [eax]
 /* Fixed-point matrix products take a in ESI, b in EBX, out in EDI and clobber
  * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */

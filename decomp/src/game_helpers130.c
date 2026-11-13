@@ -4317,3 +4317,57 @@ void print_page_entries_ca5c(ef_addr32 fp)
 		i++;
 	} while ((int16_t)i < (int16_t)EF_U16(0x001a53c0u));
 }
+
+#ifndef EF_F64
+#define EF_F64(a) (*(double *)ef_guest_memory_ptr((ef_addr32)(a)))
+#endif
+
+/* Original 0x21e04: draw the marker box and its two labels for entry n of
+ * the 10-byte table at 0x127a98. */
+void draw_marker_box_21e04(int16_t n)
+{
+	uint32_t b = (uint32_t)((int32_t)n * 10);
+	uint16_t w20 = EF_U16(0x00127a98u + b);
+	int16_t w28 = (int16_t)EF_U16(0x00127a9cu + b);
+	int16_t w2c, w1c, X1, d3v;
+	int32_t c, d, e, h, d3, top, bottom;
+	uint8_t t;
+
+	w2c = (int16_t)(int32_t)guest_fn_9d72c_x((double)EF_U8(0x001a363fu) * (EF_F64(0x001a30d0u) * EF_F64(0x00181bb6u)));
+	w1c = (int16_t)(int32_t)guest_fn_9d72c_x((double)EF_U8(0x001a3638u) * (EF_F64(0x001a30d0u) * EF_F64(0x00181bb6u)));
+	d = (int16_t)EF_U16(0x00127a9au + b);
+	c = (int16_t)EF_U16(0x00127a9eu + b);
+	if ((int8_t)EF_U8(0x00127aa0u + b) != -1) {
+		uint32_t r = guest_fn_cd7f0((int32_t)(int8_t)EF_U8(0x00127aa0u + b));
+
+		if (r == 0u)
+			return;
+		enter_scroll_mode_c39f0(r);
+	}
+	e = (int16_t)w20;
+	h = (int32_t)w28 >> 1;
+	top = d - (c >> 1);
+	bottom = d + (c >> 1);
+	fill_rect_ceccc(3u, e - h, top, e + h, bottom);
+	guest_fn_ce328_w(e - h, e + h, top, bottom);
+	guest_fn_cdf48((uint32_t)(e - h), (uint32_t)(e + h), (uint32_t)top, (uint32_t)bottom);
+	d3 = d - (c >> 3);
+	X1 = EF_S16(0x001237fau);
+	d3v = (int16_t)(d3 - X1);
+	draw_formatted_text_mode_48bb0(7u, 1u, (int32_t)(int16_t)((int32_t)w20 - 0x23 - (int32_t)EF_U16(0x001237fau)),
+	                               (int32_t)d3v, 0x00181ba8u);
+	t = (uint8_t)(int32_t)guest_fn_9d72c_x(EF_F64(0x001a3100u));
+	guest_fn_2065c_x((int32_t)w2c, (int32_t)t, (int32_t)(int16_t)((int32_t)w20 - 0x23), (int32_t)(int16_t)d3,
+	                 (uint32_t)EF_U8(0x00127aa1u + b));
+	X1 = EF_S16(0x001237fau);
+	d3v = (int16_t)(d3 - X1);
+	draw_formatted_text_mode_48bb0(7u, 1u, (int32_t)(int16_t)((int32_t)w20 + 0x23 - (int32_t)EF_U16(0x001237fau)),
+	                               (int32_t)d3v, 0x00181bb0u);
+	t = (uint8_t)(int32_t)guest_fn_9d72c_x(EF_F64(0x001a3100u));
+	guest_fn_2065c_x((int32_t)w1c, (int32_t)t, (int32_t)(int16_t)((int32_t)w20 + 0x23), (int32_t)(int16_t)d3,
+	                 (uint32_t)EF_U8(0x00127aa1u + b));
+	guest_fn_1ff0c_x((int32_t)EF_U8(0x00127aa1u + b), (int32_t)(int16_t)((int32_t)w20 - 0x28),
+	                 (int32_t)(int16_t)((c >> 2) + d + 10));
+	if (EF_U8(0x00127aa1u + b) != 0u)
+		label_box_5fc80((uint32_t)(int32_t)n);
+}

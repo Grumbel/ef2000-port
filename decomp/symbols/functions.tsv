@@ -354,7 +354,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002065c	1182			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x00020b10	2881			blocked	unclassified	unverified		Skipped as too difficult: dispatches through an indirect jump (interpreter-style handler with implicit registers).
 0x00021654	1967			blocked	unclassified	unverified		Skipped as too difficult: x87 floating-point code (fld/fmul/fcomp/fistp) that the differential harness cannot execute
-0x00021e04	616			unknown	unclassified	unverified		
+0x00021e04	616	draw_marker_box_21e04	game_helpers130	compiles	game	confirmed	decomp/tests/0x00021e04.json	Original 0x21e04 (616 bytes)
 0x00022e98	142	highlight_widget_22e98	game_helpers110	compiles	game	confirmed	decomp/tests/0x00022e98.json	docs/compiler-abi.md; Highlight widget record idx: when its slot byte is set, look the text slot up and enter scroll mode, then draw the recta; callers 1f960@1f968; guest pending
 0x00022f28	241	draw_indicator_22f28	tactical_marks1	compiles	game	confirmed	decomp/tests/0x00022f28.json	docs/compiler-abi.md; Draw the HUD indicator for slot idx (10-byte records at 0x127a96): if its text slot exists and its enable byte (0x1a81d8; callers none direct; guest pending
 0x000233c4	920			blocked	unclassified	unverified		Skipped as too difficult: uses carry-chain arithmetic (adc/sbb/rcl/rcr) that needs inline assembly to reproduce.
