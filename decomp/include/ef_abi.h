@@ -4337,6 +4337,7 @@ void draw_unit_info_78f3c(void);
 void draw_stat_row_275e0(int16_t x, int16_t y, uint32_t colour, int16_t row, uint16_t selected_row);
 void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled);
 int32_t collect_list_entries_c193c(ef_addr32 collection, ef_addr32 listHead, uint32_t keyA, uint32_t keyB);
+void find_nearest_object_33b4(int16_t group);
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

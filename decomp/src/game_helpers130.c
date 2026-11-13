@@ -1289,3 +1289,90 @@ int32_t collect_list_entries_c193c(ef_addr32 collection, ef_addr32 listHead, uin
     }
     return count;
 }
+
+/* 0x33b4, 689 bytes. For the group record GROUP (0xca bytes each at the table pointed to by 0x19bb58) pick a target object and publish it in 0x197061 (object), 0x19705f (id word) and 0x197083 (slot): first the first member whose object lacks flags 0x08/0x04 (the last looked-up object is kept even when the scan runs out); then, when the record has a reference block at +0xb5, the member object nearest to the reference point; finally, for type 2 records, the member whose own target (object +0x144) is nearest to it. Distance is the max of the three absolute axis deltas. */
+void find_nearest_object_33b4(int16_t group)
+{
+    int32_t best1 = -1;
+    int32_t best2 = -1;
+    ef_addr32 obj = 0u;
+    ef_addr32 rec;
+    ef_addr32 ref;
+    int32_t j = 0;
+    int32_t k;
+    uint32_t d;
+
+#define EF_GROUP_REC() (EF_U32(0x0019bb58u) + (uint32_t)((int32_t)group * 0xca))
+    while ((int16_t)j < (int16_t)EF_U8(EF_GROUP_REC() + 0x4fu)) {
+        rec = EF_GROUP_REC();
+        obj = lookup_filtered_indexed_object((int16_t)EF_U16(rec + 0x50u + (uint32_t)((int32_t)(int16_t)j * 2)));
+        if (obj != 0u && (EF_U8(obj + 0x24u) & 0x08u) == 0u && (EF_U8(obj + 0x24u) & 0x04u) == 0u)
+            break;
+        j++;
+    }
+    if (obj == 0u)
+        return;
+    rec = EF_GROUP_REC();
+    EF_U32(0x00197061u) = obj;
+    EF_U16(0x0019705fu) = EF_U16(rec + 0x50u + (uint32_t)((int32_t)(int16_t)j * 2));
+    ref = EF_U32(rec + 0xb5u);
+    EF_U16(0x00197083u) = (uint16_t)j;
+    if (ref != 0u) {
+        int32_t refA = (int32_t)(((uint32_t)(EF_S32(ref) >> 16) << 19) +
+                                 (((uint32_t)(EF_S32(ref + 0x18u) >> 16) << 8) + 0x40000u));
+        int32_t refB = (int32_t)((uint32_t)(-(EF_S32(ref + 0x1au) >> 16)) << 8);
+        int32_t refC = (int32_t)(((uint32_t)(int32_t)(int16_t)EF_U16(ref) << 19) +
+                                 (((uint32_t)(EF_S32(ref + 0x16u) >> 16) << 8) + 0x40000u));
+
+        k = 0;
+        while ((int16_t)k < (int16_t)EF_U8(EF_GROUP_REC() + 0x4fu)) {
+            rec = EF_GROUP_REC();
+            obj = lookup_filtered_indexed_object((int16_t)EF_U16(rec + 0x50u + (uint32_t)((int32_t)(int16_t)k * 2)));
+            if (obj != 0u && (EF_U8(obj + 0x24u) & 0x08u) == 0u && (EF_U8(obj + 0x24u) & 0x04u) == 0u) {
+                uint32_t dz = abs_a28f2((int32_t)(EF_U32(obj + 8u) - (uint32_t)refC));
+                uint32_t dy = abs_a28f2((int32_t)(EF_U32(obj + 4u) - (uint32_t)refB));
+                uint32_t dx = abs_a28f2((int32_t)(EF_U32(obj) - (uint32_t)refA));
+
+                d = (uint32_t)max3_signed((int32_t)dx, (int32_t)dy, (int32_t)dz);
+                if (d < (uint32_t)best1) {
+                    best1 = (int32_t)d;
+                    rec = EF_GROUP_REC();
+                    EF_U32(0x00197061u) = obj;
+                    EF_U16(0x0019705fu) = EF_U16(rec + 0x50u + (uint32_t)((int32_t)(int16_t)k * 2));
+                    EF_U16(0x00197083u) = (uint16_t)k;
+                }
+            }
+            k++;
+        }
+    }
+    if (EF_U8(EF_GROUP_REC() + 0x1au) != 2u)
+        return;
+    k = 0;
+    while ((int16_t)k < (int16_t)EF_U8(EF_GROUP_REC() + 0x4fu)) {
+        uint16_t id = EF_U16(EF_GROUP_REC() + 0x50u + (uint32_t)((int32_t)(int16_t)k * 2));
+
+        if (id != EF_U16(0x001f71cau)) {
+            obj = lookup_filtered_indexed_object((int16_t)id);
+            if (obj != 0u && (EF_U8(obj + 0x24u) & 0x08u) == 0u && (EF_U8(obj + 0x24u) & 0x04u) == 0u &&
+                EF_U16(obj + 0x146u) != 0xffu) {
+                ef_addr32 target = lookup_filtered_indexed_object((int16_t)(EF_S32(obj + 0x144u) >> 16));
+
+                if (target != 0u) {
+                    uint32_t dz = abs_a28f2((int32_t)(EF_U32(obj + 8u) - EF_U32(target + 8u)));
+                    uint32_t dy = abs_a28f2((int32_t)(EF_U32(obj + 4u) - EF_U32(target + 4u)));
+                    uint32_t dx = abs_a28f2((int32_t)(EF_U32(obj) - EF_U32(target)));
+
+                    d = (uint32_t)max3_signed((int32_t)dx, (int32_t)dy, (int32_t)dz);
+                    if (d < (uint32_t)best2) {
+                        best2 = (int32_t)d;
+                        EF_U32(0x00197061u) = obj;
+                        EF_U16(0x0019705fu) = id;
+                        EF_U16(0x00197083u) = (uint16_t)k;
+                    }
+                }
+            }
+        }
+        k++;
+    }
+#undef EF_GROUP_REC
+}

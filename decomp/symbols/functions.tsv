@@ -40,7 +40,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000020ec	3211			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x00002d78	117	schedule_allows_2d78	game_helpers13	compiles	game	confirmed	decomp/tests/0x00002d78.json	docs/compiler-abi.md; True when both owner bytes of the 62-byte record match and the time is in range.; callers 20ec@24d9,20ec@24fd,20ec@2521; guest pending
 0x00002e04	1456			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
-0x000033b4	689			unknown	game	unverified		
+0x000033b4	689	find_nearest_object_33b4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000033b4.json	Original 0x33b4 (689 bytes)
 0x00003668	1022			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00003aa8	61	map_code_3aa8	code_maps1	compiles	game	confirmed	decomp/tests/0x00003aa8.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 26).; callers 2e04@2edf,2e04@2f95,3d74@3d94; guest pending
 0x00003b1c	59	map_code_3b1c	code_maps1	compiles	game	confirmed	decomp/tests/0x00003b1c.json	docs/compiler-abi.md; Map a code to a constant via a jump table (codes outside the range give 26).; callers 3d74@3dcd; guest pending

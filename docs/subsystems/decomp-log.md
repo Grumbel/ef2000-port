@@ -2390,3 +2390,7 @@ Recovered the scene camera update (derive view angles from the navigation compon
 ### 2026-11-13 collect_list_entries_c193c (0xc193c)
 
 Recovered from disassembly: allocates the id/record tables (COLLECTION+0x78/+0x69), walks the node list and claims nodes matching the two keys, copying owner-block fields into 22-byte records; returns the count in EAX/EBX. Fuzz is weak (0 completed cases: random list pointers always fault the original), so the result is verified by disassembly only.
+
+### 2026-11-13 find_nearest_object_33b4 (0x33b4)
+
+Recovered: picks a target object for group record AX (0xca-byte records at 0x19bb58), publishing 0x197061/0x19705f/0x197083; first unflagged member, then nearest to the reference block at +0xb5, then (type 2) nearest to its own target. Quirk kept: when the first scan runs out, the last looked-up object stays selected. Fuzz PASS 612 completed cases.
