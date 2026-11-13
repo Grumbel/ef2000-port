@@ -4382,6 +4382,7 @@ uint16_t process_group_nodes_c0624(uint16_t value, uint8_t type, uint8_t group, 
 uint32_t guest_fn_fbad8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xfbad8 EAX/EDX/EBX/ECX + 1 stack, ret 4, result EAX */
 uint32_t guest_fn_bdd64_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xbdd64 EAX/EDX/EBX/ECX + 5 stack, ret 0x14, result EAX */
 void release_object_74584(int16_t id);
+void draw_tile_window_7ac74(int32_t mode, int32_t x, uint32_t unused_ebx, int32_t y, uint32_t s0); /* EAX, EDX, (EBX unused), ECX + 1 stack, ret 4 */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

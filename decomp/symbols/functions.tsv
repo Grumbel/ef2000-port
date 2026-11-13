@@ -1464,7 +1464,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007aa3c	132	pick_random_pair_7aa3c	game_helpers27	compiles	game	confirmed	decomp/tests/0x0007aa3c.json	docs/compiler-abi.md; Pick two random table values for the current stream slot.; callers 7ab00@7abc4; guest pending
 0x0007aac0	61	select_plane_source	plane_sources	compiles	game	confirmed	decomp/tests/0x0007aac0.json	docs/compiler-abi.md
 0x0007ab00	369			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
-0x0007ac74	405			unknown	game	unverified		
+0x0007ac74	405	draw_tile_window_7ac74	game_helpers130	compiles	game	confirmed	decomp/tests/0x0007ac74.json	Original 0x7ac74 (405 bytes)
 0x0007ae0c	123	map_value_7ae0c	game_helpers9	compiles	game	confirmed	decomp/tests/0x0007ae0c.json	docs/compiler-abi.md; Read the 16-bit value at wrapped (a, b) of the 0x190x0x190 two-plane map.; callers 7bb00@7bb2c; guest pending
 0x0007ae88	213	lookup_plane_cell_7ae88	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007ae88.json	docs/compiler-abi.md; Look up the cell of the plane map for the position (X, Z) (both in units of 2048; wrapped to 400 with the original off-b; callers 161d4@164a7,1df90@1e040,56084@56141; guest pending
 0x0007af60	221	lookup_plane_cell_7af60	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007af60.json	docs/compiler-abi.md; Like 0x7ae88 for the query in progress: returns 1 while the endpoint word 0x420908 is non-negative, otherwise looks up t; callers 1df90@1e096,82478@826a8,86f7c@8718e; guest pending

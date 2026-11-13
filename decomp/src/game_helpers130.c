@@ -3579,3 +3579,61 @@ void release_object_74584(int16_t id)
     }
     EF_U8(obj + 0x24u) = (uint8_t)(EF_U8(obj + 0x24u) | 4u);
 }
+
+/* Original 0x7ac74 (405 bytes). Walk a (0x12afd6)-square window of the
+ * 400x400 two-plane tile map starting at the cell below MODE's plane source
+ * (centre X/Y shifted down 11 bits, wrapped modulo 400) and draw every
+ * non-empty cell (combined 16-bit tile != 0xffff) with 0x9e0c4, passing the
+ * 12-bit-fraction cell position on each axis nudged by +/-0x1000 according to
+ * the cell's side of the two position globals. S0 is the draw argument
+ * (shifted into the high half of EBX). */
+void draw_tile_window_7ac74(int32_t mode, int32_t x, uint32_t unused_ebx, int32_t y, uint32_t s0)
+{
+    int32_t a, b, half, edi, ebp;
+    int16_t outer, inner, extent;
+    uint32_t arg = s0 << 16;
+
+    (void)unused_ebx;
+    (void)select_plane_source(mode);
+    half = (int32_t)EF_U32(0x0012afd4u) >> 0x11;
+    a = (0x18f - (y >> 11)) - half;
+    b = (x >> 11) - half;
+    if (a < 0) a += 0x190;
+    if (b < 0) b += 0x190;
+    a %= 0x190;
+    b %= 0x190;
+    outer = 0;
+    if ((int16_t)EF_U16(0x0012afd6u) <= 0)
+        return;
+    do {
+        edi = (a + (int32_t)outer) % 0x190;
+        inner = 0;
+        if ((int16_t)EF_U16(0x0012afd6u) > 0) {
+            ebp = (int32_t)((uint32_t)(((0x18f - edi) << 11) + 0x400) << 16);
+            do {
+                int32_t row = (b + (int32_t)inner) % 0x190;
+                uint32_t off = (uint32_t)(row * 0x190);
+                uint32_t hi = EF_U8(EF_U32(0x001f8eb4u) + off + (uint32_t)edi);
+                uint32_t lo = EF_U8(EF_U32(0x001f8eb8u) + off + (uint32_t)edi);
+                uint16_t tile = (uint16_t)((hi << 8) | lo);
+
+                if (tile != 0xffffu) {
+                    int32_t edx = (row << 11) + 0x400;
+                    int32_t ecx, ex;
+
+                    edx = (int32_t)((uint32_t)edx << 16);
+                    ecx = (int32_t)EF_U32(0x000c4756u) - edx;
+                    ex = (ecx >= 0 ? 1 : -1) * 0x1000;
+                    edx += ex;
+                    ecx = (int32_t)EF_U32(0x000c4762u) - ebp;
+                    ex = (ecx >= 0 ? 1 : -1) * 0x1000;
+                    ecx = ex + ebp;
+                    guest_fn_9e0c4((int32_t)(int16_t)tile, (uint32_t)edx, arg, (uint32_t)ecx);
+                }
+                extent = (int16_t)EF_U16(0x0012afd6u);
+                inner++;
+            } while (inner < extent);
+        }
+        outer++;
+    } while (outer < (int16_t)EF_U16(0x0012afd6u));
+}
