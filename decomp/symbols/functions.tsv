@@ -171,7 +171,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000c8e8	122	draw_page_entries_c8e8	screen_clip1	compiles	game	confirmed	decomp/tests/0x0000c8e8.json	docs/compiler-abi.md; For the current page (word at 0x121e98) call 0x11560 once for each of its entries, passing per-entry slots of the tables; callers bfcc@c27a,c868@c88f; guest pending
 0x0000c964	218	update_match_ratio_c964	float_helpers9	compiles	game	confirmed	decomp/tests/0x0000c964.json	docs/compiler-abi.md; Recompute the ratio of matching entries and store it as a float.; callers bfcc@c27f; guest pending
 0x0000ca40	25	gpwAlterSize	gui_callbacks_088	drafted	game	confirmed		Copy two sizing words; guest replay pending
-0x0000ca5c	573			unknown	game	unverified		
+0x0000ca5c	573	print_page_entries_ca5c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000ca5c.json	Original 0xca5c (573 bytes)
 0x0000cccc	1475	gpwRedrawRoute		named	game	unverified		
 0x0000d290	671			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0000d530	29	copy_runtime_input_state	runtime_small_ops	compiles	game	confirmed	decomp/tests/0x000d530.json	Three independent packed input fields; callers 418c4@418dd/45a54@45a79; guest pending

@@ -4399,6 +4399,7 @@ void scatter_probe_afbc(int16_t x, int16_t y, int16_t count, int16_t w, int16_t 
 uint32_t guest_fn_befb8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9); /* 0xbefb8 EAX/EDX/EBX/ECX + 10 stack */
 void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx); /* 0xbc38 */
 ef_addr32 guest_fn_a78bc_x(ef_addr32 root, ef_addr32 name); /* 0xa78bc EAX/EDX -> EAX */
+void print_page_entries_ca5c(ef_addr32 fp); /* 0xca5c */
 uint32_t loop_objects_c1034(int32_t di, uint32_t bp, ef_addr32 list, uint32_t arg4, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 void dump_lists_to_file_b3168(ef_addr32 name, ef_addr32 list, uint32_t e, ef_addr32 points,
                               uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4);

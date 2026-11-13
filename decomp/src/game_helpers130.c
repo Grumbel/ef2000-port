@@ -4261,3 +4261,59 @@ void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx)
 	                  (uint32_t)(int32_t)EF_S16(EF_U32(0x00197668u) + off + 0x39u));
 	guest_fn_a7588_x(child, (ef_addr32)(uintptr_t)buf);
 }
+
+/* Original 0xca5c: write the per-page entry listing to stream `fp`. */
+void print_page_entries_ca5c(ef_addr32 fp)
+{
+	uint16_t i = 0;
+	int32_t j;
+	int16_t cnt;
+
+	guest_fn_bc400(fp, 0x001809bcu);
+	EF_U16(0x00121e9au) = 0;
+	if ((int16_t)EF_U16(0x001a53c0u) <= 0)
+		return;
+	do {
+		j = 0;
+		while ((int16_t)j < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int16_t)i * 2u)) {
+			uint32_t pg = (uint32_t)(int32_t)(int16_t)i;
+			uint32_t j2 = (uint32_t)((int32_t)(int16_t)j * 2);
+			int16_t k = (int16_t)EF_U16(0x001a52b0u + pg * 16u + j2);
+
+			guest_fn_11560_x((int32_t)EF_S16(0x00197696u), (int32_t)EF_S16(0x001a5280u + pg * 2u),
+			                 (int32_t)k, 0x00197330u + j2, 0x00197300u + j2, 0x00197340u + j2,
+			                 0x00197360u + j2, 0x00197350u + j2);
+			guest_fn_bc400(fp, 0x001809d8u, (uint32_t)(int32_t)EF_S16(0x00197696u),
+			               (uint32_t)(int32_t)EF_S16(0x001a5280u + pg * 2u), (uint32_t)(int32_t)k);
+			if (EF_U8(0x00125839u) == 1u) {
+				cnt = (int16_t)EF_U16(0x00121e9au);
+				if (EF_U16(0x001a5290u + (uint32_t)((int32_t)cnt * 2)) != 0u) {
+					int32_t v = (int32_t)EF_S16(0x001a5290u + (uint32_t)((int32_t)cnt * 2));
+
+					guest_fn_bc400(fp, 0x00180a14u, (uint32_t)((v - 1) * 0x11 + 0x001a62f0));
+				} else {
+					guest_fn_bc400(fp, 0x001809fcu);
+				}
+			} else if (i == EF_U16(0x00197698u) && (int16_t)j == 0) {
+				guest_fn_bc400(fp, 0x00180a20u);
+			} else {
+				guest_fn_bc400(fp, 0x001809fcu);
+			}
+			guest_fn_bc400(fp, 0x00180a30u,
+			               EF_U32(0x00132dd0u + (uint32_t)((int32_t)EF_S16(0x00197310u + pg * 2u) * 4)));
+			guest_fn_bc400(fp, 0x00180a48u,
+			               EF_U32(0x00133338u + (uint32_t)((int32_t)EF_S16(0x00197320u + pg * 2u) * 4)));
+			guest_fn_bc400(fp, 0x00180a60u, (uint32_t)(int32_t)EF_S16(0x00197330u + j2));
+			guest_fn_bc400(fp, 0x00180a78u, (uint32_t)(int32_t)EF_S16(0x00197340u + j2));
+			guest_fn_bc400(fp, 0x00180a90u, (uint32_t)(int32_t)EF_S16(0x00197360u + j2));
+			if (EF_S16(0x00197350u + j2) == 1)
+				guest_fn_bc400(fp, 0x00180aa8u);
+			else
+				guest_fn_bc400(fp, 0x00180accu);
+			guest_fn_bc400(fp, 0x00180ae8u);
+			EF_U16(0x00121e9au) = (uint16_t)(EF_U16(0x00121e9au) + 1u);
+			j++;
+		}
+		i++;
+	} while ((int16_t)i < (int16_t)EF_U16(0x001a53c0u));
+}
