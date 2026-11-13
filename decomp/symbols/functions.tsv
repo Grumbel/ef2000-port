@@ -1924,7 +1924,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00094370	162	rebuild_angle_record_rev_94370	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00094370.json	docs/compiler-abi.md; Mirror of 0x942cc for the opposite direction: the angle starts at 0xfc00, and when the signed high word at 0x12db98 is b; callers 95e58@961af; guest pending
 0x00094484	109	update_camera_94484	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094484.json	docs/compiler-abi.md; ; callers 95e58@9619b; guest pending
 0x000944f4	135	latch_scene_camera_944f4	game_helpers72	compiles	game	confirmed	decomp/tests/0x000944f4.json	docs/compiler-abi.md; Latch the camera position and place the scene with the negated view angles.; callers 95e58@96bcb; guest pending
-0x0009457c	583			unknown	game	unverified		
+0x0009457c	583	update_scene_camera_9457c	game_helpers130	compiles	game	confirmed	decomp/tests/0x0009457c.json	Original 0x9457c (583 bytes)
 0x000947c4	108	look_at_unit_947c4	camera_helpers	compiles	game	confirmed	decomp/tests/0x000947c4.json	docs/compiler-abi.md; ; callers 95e58@9693f; guest pending
 0x00094830	78	look_from_player_94830	camera_helpers	compiles	game	confirmed	decomp/tests/0x00094830.json	docs/compiler-abi.md; ; callers 95e58@968fa; guest pending
 0x00094880	68	update_view_94880	game_helpers6	compiles	game	confirmed	decomp/tests/0x00094880.json	docs/compiler-abi.md; ; callers 95e58@96887,95e58@9689f; guest pending

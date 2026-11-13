@@ -1169,3 +1169,68 @@ void draw_stat_row_275e0(int16_t x, int16_t y, uint32_t colour, int16_t row, uin
     guest_sprintf_a4342(buf, 0x00182178u, EF_U32(0x0019b4a7u + base));
     guest_fn_dd370(0x37u, (uint32_t)(int32_t)(int16_t)(0x55u - text_width_dd2f4(buf)), 0xb3u, buf);
 }
+
+/* 0x9457c, 583 bytes. Update the scene camera for OBJECT: when OBJECT or ENABLED is zero only reset the pending flag (0x21449c = 1) and copy the mode byte 0x214486 to 0x12db9e; otherwise derive the view angles from the navigation component (0x92254), apply the zoom keys (0x2144aa bits 0x10/0x20 on 0x12dba0), scale the basis axes at 0x21440c/18/24 by the zoom, add the object position (>>8 and <<8 forms) to the camera, fall back to the remaining scene metric when the threshold check fails, and push the angles, scene pair and input triplet to the scene helpers. */
+void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled)
+{
+    uint16_t a;
+    uint16_t b;
+    int32_t zoom;
+    uint16_t negPitch;
+    uint16_t negYaw;
+
+    if (object == 0u || enabled == 0u) {
+        EF_U16(0x0021449cu) = 1u;
+        EF_U8(0x0012db9eu) = EF_U8(0x00214486u);
+        return;
+    }
+    init_bounds_d0b68(0x00214404u);
+    EF_U16(0x002143e4u) = 0u;
+    EF_U16(0x002143e6u) = 0u;
+    prepare_navigation_component(object, enabled);
+    a = EF_U16(0x002143e4u);
+    EF_U16(0x002144b0u) = 0u;
+    EF_U16(0x002144b6u) = a;
+    b = EF_U16(0x002143e6u);
+    EF_U16(0x002144b4u) = b;
+    negPitch = (uint16_t)(0u - b);
+    negYaw = (uint16_t)(0u - a);
+    EF_U16(0x002144b4u) = negPitch;
+    EF_U16(0x002144b6u) = negYaw;
+    update_scene_angle_first(0x00214404u, negPitch);
+    update_scene_angle_second(0x00214404u, EF_U16(0x002144b6u));
+    if (EF_U8(0x002144aau) & 0x10u) {
+        int16_t z = (int16_t)EF_U16(0x0012dba0u);
+
+        if (z > (int16_t)EF_U16(0x0021448au))
+            EF_U16(0x0012dba0u) = (uint16_t)(z - 1);
+    }
+    if (EF_U8(0x002144aau) & 0x20u)
+        EF_U16(0x0012dba0u) = (uint16_t)(EF_U16(0x0012dba0u) + 1u);
+    zoom = -(EF_S32(0x0012db9eu) >> 16);
+    EF_U32(0x0012dba8u) = (uint32_t)(EF_S32(0x0021440cu) * zoom);
+    EF_U32(0x0012dbacu) = (uint32_t)(EF_S32(0x00214418u) * zoom);
+    EF_U32(0x0012dbb0u) = (uint32_t)(EF_S32(0x00214424u) * zoom);
+    EF_U32(0x0021446cu) = EF_U32(object);
+    EF_U32(0x00214470u) = EF_U32(object + 4u);
+    EF_U32(0x00214474u) = EF_U32(object + 8u);
+    if (object == EF_U32(0x00214458u))
+        apply_rotated_offset_95bf4();
+    EF_U32(0x0021444cu) = (uint32_t)((EF_S32(0x0021446cu) >> 8) + (EF_S32(0x0012dba8u) >> 16));
+    EF_U32(0x00214448u) = (uint32_t)((EF_S32(0x00214470u) >> 8) + (EF_S32(0x0012dbacu) >> 16));
+    EF_U32(0x00214450u) = (uint32_t)((EF_S32(0x00214474u) >> 8) + (EF_S32(0x0012dbb0u) >> 16));
+    EF_U32(0x00214370u) = (EF_U32(0x0021446cu) << 8) + EF_U32(0x0012dba8u);
+    EF_U32(0x0021436cu) = (EF_U32(0x00214470u) << 8) + EF_U32(0x0012dbacu);
+    EF_U32(0x00214374u) = (EF_U32(0x00214474u) << 8) + EF_U32(0x0012dbb0u);
+    if (scene_metric_reaches_threshold((int32_t)EF_U32(0x0021444cu), (int32_t)EF_U32(0x00214448u)) == 0u) {
+        int32_t metric = scene_metric_remaining();
+
+        EF_U32(0x00214448u) = (uint32_t)metric;
+        EF_U32(0x0021436cu) = (uint32_t)metric << 16;
+    }
+    request_scene_pair((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b0u)));
+    set_scene_angles((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b4u)),
+                     (int16_t)(0u - EF_U16(0x002144b0u)));
+    set_scene_input_triplet((int32_t)EF_U32(0x00214370u), (int32_t)EF_U32(0x0021436cu),
+                            (int32_t)EF_U32(0x00214374u));
+}

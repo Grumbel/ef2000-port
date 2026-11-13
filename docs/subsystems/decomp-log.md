@@ -2382,3 +2382,7 @@ it calls the segment-limit helper `0x10d63b` as an external guest function
 - 0x78f3c `draw_unit_info_78f3c`: unit info panel text (fuzz PASS 1000).
 
 - 0x275e0 `draw_stat_row_275e0`: statistics table row draw (fuzz PASS 696).
+
+### 2026-11-13 update_scene_camera_9457c (0x9457c)
+
+Recovered the scene camera update (derive view angles from the navigation component, zoom keys, camera offset, scene metric fallback, angle/pair/input-triplet pushes). Fuzz reports only guest RAM 0x159064 differing (original 0x80, patched 0x6c): that word is the renderer's diagnostic saved ESP, written by a callee, so it reflects this function's stack frame depth (20 bytes difference), not behavior. All other RAM and registers matched in the completed cases.
