@@ -48,6 +48,71 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_indirect_register_memory_stack_aliases_and_jump_tables(self):
+        programs = [
+            'mov eax,0x200\ncall eax\nret',
+            'mov dword ptr [0x300400],0x200\ncall dword ptr [0x300400]\nret',
+            'push 0x200\ncall dword ptr [esp]\nadd esp,4\nret',
+            'mov dword ptr [esp-4],0x200\ncall dword ptr [esp-4]\nret',
+            'mov ebx,esp\nmov esp,0x200\ncall esp\nmov esp,ebx\nret',
+            'mov eax,0x200\njmp eax',
+            'mov dword ptr [0x300400],0x200\nmov dword ptr [0x300404],0x300\n'
+            'and eax,1\njmp dword ptr [eax*4+0x300400]',
+        ]
+        for index, program in enumerate(programs):
+            source = '.type root,@function\nroot: ' + program + '\n.size root, .-root\n' + '''
+.org 0x200
+.type first,@function
+first: inc edx
+ret
+.size first, .-first
+.org 0x300
+.type second,@function
+second: dec edx
+ret
+.size second, .-second'''
+            with self.subTest(index=index), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, _ = inventory(root, source)
+                out = root/'out'
+                generated = asm_c_program.generate(directory, out, image)
+                caller = next(e for e in generated['entries'] if e['address'] == 0x100)
+                self.assertTrue(caller['dynamic_transfer_sites'])
+                self.assertEqual(caller['state'], 'generated-unverified')
+                self.assertIn('direct-edges-only', generated['closure_scope'])
+                report = asm_c_differential.verify(out, root/'evidence', image, scenarios=16)
+                self.assertTrue(all(e['counts'] == {'pass': 16} for e in report['entries']), report)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_untranslated_indirect_target_stops_without_original_fallback(self):
+        source = '''.type root,@function
+root: mov eax,0x200
+call eax
+ret
+.size root, .-root
+.org 0x200
+.type unsupported,@function
+unsupported: cpuid
+ret
+.size unsupported, .-unsupported'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root/'out'
+            generated = asm_c_program.generate(directory, out, image)
+            self.assertEqual(next(e for e in generated['entries'] if e['address'] == 0x200)['state'], 'unsupported')
+            report = asm_c_differential.verify(out, root/'evidence', image, scenarios=2)
+            self.assertEqual(report['entries'][0]['counts'], {'mismatch': 2})
+            self.assertTrue(all('C status 2' in p['differences'][0] for p in report['entries'][0]['probes']))
+
+    def test_indirect_widths_and_far_transfers_still_fail_closed(self):
+        for mnemonic, operand in [('call', 'ax'), ('jmp', 'WORD PTR [eax]'),
+                                  ('call', 'FWORD PTR [eax]')]:
+            with self.subTest(mnemonic=mnemonic, operand=operand), self.assertRaises(ValueError):
+                asm_c_program.instruction_c(dict(address=0x100, bytes='ffff', mnemonic=mnemonic,
+                                                operands=operand), {0x100, 0x102})
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_changed_instruction_bytes_are_rejected_even_when_effects_match(self):
         # Replacing NOP with CLC after CLC leaves the same final registers,
         # flags and RAM. The static-code precondition still must be enforced.
@@ -165,7 +230,7 @@ ret
 .size middle, .-middle
 .org 0x300
 .type unsupported,@function
-unsupported: call eax
+unsupported: cpuid
 ret
 .size unsupported, .-unsupported
 .org 0x400
@@ -181,7 +246,7 @@ leaf: ret
             self.assertEqual(dependencies[0x200], {0x300})
             self.assertIn('untranslated direct dependencies', reasons[0x100])
             self.assertIn('untranslated direct dependencies', reasons[0x200])
-            self.assertIn('unresolved direct call', reasons[0x300])
+            self.assertIn('unsupported instruction', reasons[0x300])
             result = asm_c_program.generate(directory, root / 'out', image)
             self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
             self.assertEqual(sum(e['state'] == 'generated-unverified' for e in result['entries']), 1)

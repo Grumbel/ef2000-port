@@ -2494,3 +2494,44 @@ observed-leaves-{audit,apply,repeat}-20261113.tsv and
 observed-body-inventory-20261113. Commands: tools/ghidra_ef2000.py
 recover-observed-leaves [--apply] --output <report>; tools/ghidra_ef2000.py
 inventory --output local/ghidra/observed-body-inventory-20261113.
+
+
+**2026-11-13 — Checked indirect ASM dispatch and XLAT.**
+Added near 32-bit register/memory CALL and JMP to the explicit-state dispatcher.
+Targets are read before CALL pushes its return address, preserving CALL ESP,
+[ESP] and [ESP-4] aliasing. Dynamic targets must be translated instruction
+starts; unknown PCs return status 2 without an original-code fallback.
+Reports expose dynamic transfer sites and state that dependency closure covers
+only direct edges. Far/16-bit transfers remain unsupported. Added byte XLAT
+with wrapped EBX+AL addressing, partial AL write and unchanged flags.
+All 83 focused tests pass (Python 3.13.12/Unicorn 2.1.4), including synthetic
+indirect register/memory calls, stack aliases, tail jumps, jump tables and
+explicit failure for an untranslated CPUID target. Command: python3 -m unittest
+tests.test_asm_c_segments tests.test_asm_c_program tests.test_asm_to_c
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000.
+Repaired inventory selects 1,956 of 3,560 syntax-supported bodies, 242,587 body
+bytes, including 313 bodies with dynamic transfers. All 1,956 body objects and
+dispatcher compile with Watcom warnings treated as errors. Earlier unrepaired
+1,953-body comparison exposed 29 bodies with missing dynamic targets, leading
+to the reviewed boundary repairs above. Remaining target coverage and original
+fault/budget probes are not passes; no full coverage, native ABI or game
+integration claim. Artifacts: local/asm-c-observed-program-20261113 and
+local/asm-c-observed-full-tests-20261113.log.
+
+Final repaired-corpus comparison: 31,296 probes, 17,600 matches, 13,691
+original-fault/budget inconclusive outcomes and five failures across three
+bodies. 720 bodies pass all 16 prepared probes; 1,233 are inconclusive. The
+remaining failures are explicit unknown-PC stops: formatter entries 0xded86
+and 0xed133 each receive synthetic callback values 0x7f/0x80 (copyright text,
+not reviewed code); 0x11f7ef reaches unowned x87 FDIV at 0x11f7f9. No arithmetic,
+RAM or register mismatch appears in this run; these target-coverage failures
+still keep the CLI gate nonzero. The 26 other formerly failing bodies no longer
+fail after callback/XLAT recovery. Both callbacks have two matching and fourteen
+inconclusive probes each; XLAT leaf has fourteen matching and two inconclusive.
+Command: tools/asm_c_differential.py --translations
+local/asm-c-observed-program-20261113 --output local/asm-c-observed-diff-20261113
+--watcom /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4); final report exists, exit status 1 as expected.
+Reliable bulk translation remains active: x87 state/precision, runtime services,
+remaining integer patterns and boundaries, dynamic target coverage, and stronger
+application-level evidence remain unresolved.

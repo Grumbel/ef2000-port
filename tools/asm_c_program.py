@@ -2,12 +2,14 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Compose direct-call ASM translations without an original-code fallback.
+"""Compose checked ASM translations without an original-code fallback.
 
 Only bodies closed over translated direct dependencies are emitted. The shared
 PC dispatcher executes one guest instruction at a time on the same guest RAM
 and stack, so recursion, tail jumps and return addresses do not depend on host
-C stack layout or guessed ABI signatures. Indirect transfers remain unsupported.
+C stack layout or guessed ABI signatures. Indirect targets are checked against
+the translated PC registry at runtime; direct closure is not an indirect-target
+coverage proof.
 """
 
 import argparse
@@ -26,15 +28,32 @@ MODEL = 'flat-x86-program-explicit-state'
 
 
 def instruction_c(insn, starts):
-    if insn['mnemonic'] != 'call':
+    mnemonic = insn['mnemonic']
+    indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
+    if mnemonic != 'call' and not indirect:
         return asm_to_c.instruction_c(insn, starts)
-    target = insn.get('direct_target')
     next_pc = insn['address'] + len(bytes.fromhex(insn['bytes']))
-    if target not in starts or next_pc not in starts:
+    if mnemonic == 'call' and next_pc not in starts:
         raise asm_to_c.Unsupported('unresolved direct call or return continuation')
-    return ('ef_write(s, s->r[4] - 4u, 32, 0x%xu); '
-            'if (s->fault) return s->fault; s->r[4] -= 4u; '
-            's->pc = 0x%xu; break;' % (next_pc, target))
+    if indirect:
+        target = asm_to_c.operand(insn['operands'])
+        if target[0] not in ('reg', 'mem') or asm_to_c.width_of(target) != 32:
+            raise asm_to_c.Unsupported('unsupported indirect transfer operand')
+        # CALL [ESP-4], [ESP] and ESP must fetch their target before the
+        # return-PC push changes either ESP or the target's memory slot.
+        code = ['a = %s; if (s->fault) return s->fault;' % asm_to_c.read(target, 32)]
+        target_expression = 'a'
+    else:
+        target = insn['direct_target']
+        if target not in starts:
+            raise asm_to_c.Unsupported('unresolved direct call or return continuation')
+        code = []
+        target_expression = '0x%xu' % target
+    if mnemonic == 'call':
+        code += ['ef_write(s, s->r[4] - 4u, 32, 0x%xu);' % next_pc,
+                 'if (s->fault) return s->fault; s->r[4] -= 4u;']
+    code.append('s->pc = %s; break;' % target_expression)
+    return ' '.join(code)
 
 
 def analyse(records):
@@ -144,6 +163,9 @@ def generate(inventory, output, image):
             item.update(state='generated-unverified', file='ef_lift_%08x.c' % address,
                         source_sha256=hashlib.sha256(codes[address].encode()).hexdigest(),
                         dependencies=sorted(dependencies[address]),
+                        dynamic_transfer_sites=[i['address'] for i in record['instructions']
+                                                if i['mnemonic'] in ('call', 'jmp') and
+                                                'direct_target' not in i],
                         instruction_addresses=[i['address'] for i in record['instructions']],
                         body_bytes=sum(end-start for start, end in record['ranges']))
             (output / item['file']).write_text(codes[address])
@@ -156,6 +178,7 @@ def generate(inventory, output, image):
                   runtime_sha256=hashlib.sha256(asm_to_c.RUNTIME.encode()).hexdigest(),
                   dispatcher=dict(file='ef_lift_program.c', source_sha256=hashlib.sha256(program.encode()).hexdigest()),
                   syntactically_supported=len(codes), entries=report)
+    result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
 

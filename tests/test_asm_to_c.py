@@ -91,7 +91,7 @@ class TranslationTests(unittest.TestCase):
             'mul dl\nret', 'mul dx\nret', 'mul edx\nret',
             'ror eax, cl\nret', 'rcl ax, cl\nret', 'rcr al, cl\nret',
             'rol dword ptr [esi], 16\nret', 'ror byte ptr [esi], 8\nret',
-            'bswap eax\nret', 'xchg ah, al\nret', 'xchg ax, dx\nret',
+            'mov ebx,esi\nxlatb\nret', 'bswap eax\nret', 'xchg ah, al\nret', 'xchg ax, dx\nret',
             'xchg eax, [esi]\nret', 'xchg esi, [esi]\nret',
             'xchg [esi], esi\nret', 'xchg word ptr [esi], dx\nret',
         ]

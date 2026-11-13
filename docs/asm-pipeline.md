@@ -162,9 +162,13 @@ It checks the same byte/decoder provenance, then computes the greatest set of
 supported bodies closed over direct calls, jumps and fallthrough dependencies.
 Removing an unsupported callee removes all transitive callers, while supported
 recursive cycles remain eligible. Targets must be decoded instruction starts
-with unambiguous ownership. Indirect calls/jumps and unknown continuations are
-unsupported. The report distinguishes syntax support from the selected closed
-set and records each selected body's direct dependencies and instruction sites.
+with unambiguous ownership. Near 32-bit indirect calls/jumps read their register
+or memory target before any CALL stack push, then use the checked PC dispatcher.
+Unknown targets fail explicitly. Direct dependency closure does not establish
+indirect-target coverage; selected bodies record `dynamic_transfer_sites`, and
+`closure_scope` records that limitation. Far and 16-bit indirect transfers remain
+unsupported. The report distinguishes syntax support from the selected set and
+records each selected body's direct dependencies and instruction sites.
 
 CALL writes the original return PC onto the guest stack. The generated
 `ef_lift_run` dispatcher selects a body by guest PC and executes exactly one
@@ -300,3 +304,12 @@ no mismatches were masked, ignored or promoted. A complete 15-body failure
 closure passed before the full rerun. Indirect control flow, nonflat bindings,
 DOS/runtime services, x87 and native integration remain open; none of these
 results promotes the recovery tracker or establishes a working source-only game.
+
+2026-11-13 checked-indirect corpus after reviewed boundary recovery: 1,956
+selected bodies (242,587 body bytes), all Watcom warning-free. Of 31,296 probes,
+17,600 match, 13,691 are inconclusive and five fail at untranslated dynamic
+targets across three bodies (synthetic callbacks into copyright data and an
+unowned x87 island). The gate remains nonzero. 720 bodies pass all 16 probes.
+Artifacts: `local/asm-c-observed-program-20261113` and
+`local/asm-c-observed-diff-20261113`; 83 focused tests pass. Direct closure is
+not dynamic target coverage or a native game integration proof.

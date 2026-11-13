@@ -494,6 +494,12 @@ def instruction_c(insn, starts):
         if dst[0] not in ('reg', 'mem') or width_of(dst) not in (None, 8):
             raise Unsupported('unsupported SETcc destination')
         code.append(write(dst, '((%s) ? 1u : 0u)' % condition_c('j' + mnemonic[3:]), 8))
+    elif mnemonic == 'xlat':
+        source = operand(text)
+        if source[0] != 'mem' or source[1] != address_expression('ebx') or width_of(source) != 8:
+            raise Unsupported('unsupported XLAT addressing')
+        code += ['a = ef_read(s, (uint32_t)(s->r[3] + (s->r[0] & 255u)), 8);',
+                 'if (s->fault) return s->fault;', write(operand('al'), 'a', 8)]
     elif mnemonic == 'bswap':
         dst = operand(text)
         if dst[0] != 'reg' or width_of(dst) != 32:
