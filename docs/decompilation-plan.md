@@ -2258,3 +2258,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 memory-parser composition: self-contained C fill removes the final service stub from the eight-function RAM-backed parser fixture; four comparisons pass. This is synthetic input and prepared state, not actual menu resources or cold startup. Pure-C working main menu remains incomplete.
 
 2026-11-13 actual GUI-resource evidence: eight-function recovered parser chain matches original for gui.par from DID.DAT and DID1ST.DAT, with no service stubs and prepared RAM-backed input. Reproducer tools/menu_resource_differential.py stores all proprietary artifacts in ignored local/. Archive I/O, fixups, startup and working main menu remain incomplete.
+
+2026-11-13 pointer-fixup continuation: recovered 0xaa4b8/0xaa4d4, passing eight synthetic comparisons and both real gui.par parse-plus-fixup comparisons. Remaining post-load passes and source-only startup/menu are incomplete.
