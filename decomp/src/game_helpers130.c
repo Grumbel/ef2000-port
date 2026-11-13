@@ -588,3 +588,49 @@ ef_addr32 lookup_name_entry_eb520(ef_addr32 name, ef_addr32 context)
     return bsearch_entries_eb4dc((ef_addr32)(uintptr_t)&hash, EF_U32(context + 0x144u),
                                  EF_S32(context + 0x128u));
 }
+
+/* 0xb9c68, 426 bytes. Allocate COUNT (byte 0x1a55a0) 25-byte records, fill each from the parallel tables at 0x1a55a2/0x1a55d6/0x1a560a/0x1a5672 (and a time offset from add_time_offset_b54d0), mirror x/y into the 5-byte table at 0x1a4aa1, register the first record in the table entry, and return the records. */
+ef_addr32 build_object_records_b9c68(uint8_t mode, uint8_t slot, uint8_t flag)
+{
+    uint32_t count = EF_U8(0x001a55a0u);
+    ef_addr32 buf;
+    int16_t i;
+    uint32_t edx2;
+
+    buf = alloc_zeroed_cc6c0(0u, 0u, 0u, 0u, count * 25u, 0x0018eb3cu, 0x19u);
+    EF_U16(0x001a4b9cu) = (uint16_t)EF_U8(0x001a55a0u);
+    for (i = 0; i < (int16_t)EF_U8(0x001a55a0u); i++) {
+        ef_addr32 rec = buf + (uint32_t)((int32_t)i * 25);
+        uint16_t x = EF_U16(0x001a55a2u + (uint32_t)i * 2u);
+        uint16_t y = EF_U16(0x001a55d6u + (uint32_t)i * 2u);
+        uint32_t v0 = 0u, v4 = 0u, v8 = 0u;
+
+        EF_U32(rec) = x;
+        EF_U32(rec + 4u) = y;
+        EF_U16(0x001a4aa1u + (uint32_t)i * 5u) = x;
+        EF_U16(0x001a4aa3u + (uint32_t)i * 5u) = (uint16_t)(0x190u - y);
+        EF_U16(rec + 0xcu) = EF_U16(0x001a560au + (uint32_t)i * 4u);
+        EF_U16(rec + 0x16u) = EF_U16(0x001a56f4u);
+        if (slot == 3u) {
+            EF_U8(rec + 0x18u) = 0u;
+        } else if (mode == 1u || mode == 0u || mode == 0xbu) {
+            uint8_t t = EF_U8(0x001a5672u + (uint32_t)i);
+
+            EF_U8(rec + 0x18u) = (t == 8u || t == 3u) ? 0u : t;
+        } else {
+            EF_U8(rec + 0x18u) = EF_U8(0x001a5672u + (uint32_t)i);
+        }
+        add_time_offset_b54d0((ef_addr32)(uintptr_t)&v0, (ef_addr32)(uintptr_t)&v8,
+                              (ef_addr32)(uintptr_t)&v4,
+                              EF_S32(0x001a5718u + (uint32_t)flag * 2u) >> 16,
+                              (uint32_t)(EF_S32(EF_U32(0x001a550au) + 0x46u) >> 16));
+        EF_U16(rec + 0x10u) = (uint16_t)v0;
+        EF_U16(rec + 0x14u) = 0u;
+        EF_U16(rec + 0x12u) = (uint16_t)v8;
+        EF_U16(rec + 0xeu) = EF_U16(0x001a5712u + (uint32_t)flag * 2u);
+    }
+    edx2 = EF_U32(0x001a57c9u);
+    set_table_entry_b4e74((int16_t)(EF_S32(buf + 0xcu) >> 16), EF_U8(edx2 + 0xau), 1u, 0u,
+                          (uint32_t)(EF_S32(edx2 + 0xeu) >> 16), EF_U32(0x001a550au));
+    return buf;
+}

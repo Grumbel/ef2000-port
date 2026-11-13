@@ -2593,7 +2593,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b914c	1623			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000b97a4	768			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
 0x000b9aa4	450			blocked	game	unverified		Skipped as too difficult: callees with unrecovered conventions/signatures; function depends on them
-0x000b9c68	426			unknown	game	unverified		
+0x000b9c68	426	build_object_records_b9c68	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b9c68.json	Original 0xb9c68 (426 bytes)
 0x000b9e9c	164	class_selector_code_b9e9c	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000b9e9c.json	docs/compiler-abi.md; Map a (class, selector) pair to a code: the class byte comes from the record at [obj+0x51] through 0xba0e4 (4 when absen; callers 9820@9bf9; guest pending
 0x000ba0e4	43	map_code_ba0e4	code_maps1	compiles	game	confirmed	decomp/tests/0x000ba0e4.json	docs/compiler-abi.md; Map a code (1-based) to a constant via a jump table (codes outside the range give 0).; callers b4ee0@b4f03,b9e9c@b9eb0,bb7c0@bb7dc; guest pending
 0x000ba13c	359			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
