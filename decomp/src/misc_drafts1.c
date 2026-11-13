@@ -16747,39 +16747,6 @@ void load_saved_state_a99c0(uint32_t number)
 	EF_U8(0x001371edu) = 2u;
 }
 
-/* 0xaad7c, 238 bytes. Load the named saved state EAX: the name is cut at its first '.' (in place), formatted with 0x18d7e8 into a lookup buffer and the data file name is built from the default path (0xa7b70), the optional 0xa7b80 prefix and the name (formats 0x18d7cc and 0x18d7dc). The lookup name is opened with 0xa7900, falling back to the data file name (0x9ccb8, error format 0x18d930). The file is read (0xaa5c4) and closed (0x9ce84), the follow-up steps 0xaa3dc, 0xaa4d4 and 0xaa350 run, dword 0x419200 is copied to 0x4191f8 and byte 0x18d544 to 0x419160. Returns 1. */
-uint32_t load_named_state_aad7c(ef_addr32 name)
-{
-	char data[0xb4];
-	char look[0x60];
-	uint32_t i = 0u, h;
-
-	while (EF_U8(name + i) != 0x2eu && EF_U8(name + i) != 0u)
-		i++;
-	EF_U8(name + i) = 0u;
-	guest_sprintf_a4342((ef_addr32)(uintptr_t)look, 0x0018d7e8u, name);
-	if (call_9c858_18d57c() != 0u) {
-		uint32_t r80 = call_9c858_18d57c();
-		uint32_t r70 = guest_fn_a7b70_x();
-		guest_sprintf_a4342((ef_addr32)(uintptr_t)data, 0x0018d7ccu, r70, r80, name);
-	} else {
-		guest_sprintf_a4342((ef_addr32)(uintptr_t)data, 0x0018d7dcu, guest_fn_a7b70_x(), name);
-	}
-	h = guest_fn_a7900((ef_addr32)(uintptr_t)look);
-	if (h == 0xffffffffu) {
-		h = open_resource_9ccb8((uint32_t)(uintptr_t)data);
-		if (h == 0xffffffffu)
-			guest_callptr2_x(EF_U32(0x00132a74u), 0x0018d930u, (uint32_t)(uintptr_t)data);
-	}
-	guest_fn_aa5c4_x(h);
-	guest_fn_9ce84(h);
-	guest_fn_aa3dc_x();
-	guest_fn_aa4d4_x();
-	guest_fn_aa350_x();
-	EF_U32(0x004191f8u) = EF_U32(0x00419200u);
-	EF_U8(0x00419160u) = EF_U8(0x0018d544u);
-	return 1u;
-}
 
 /* 0xf2660, 264 bytes. Load the palette pair for the page named EAX. Builds the file name (default path 0x9c980 plus the separator 0x1918c4 when the path is not empty plus the name), and if the file exists (hook 0x132ab4) reads it into 0x464060 with the load hook 0x132ab8, otherwise 0x464063..0x464065 are set to 0xff; bytes 0x464060..0x464062 are cleared in any case. Then the name is split (0xe7fc0) and rebuilt (0xe80d0) with the extension 0x1918d8 after the second default path (separator 0x1918d0), and when that file exists it is loaded into 0x433f34 and dword 0x433f30 is set to 1. */
 void load_page_palette_f2660(ef_addr32 name)

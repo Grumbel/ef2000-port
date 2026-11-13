@@ -46,6 +46,7 @@ decomp/src/load_planes1.c
 decomp/src/localized_file_handlers.c
 decomp/src/script_helpers1.c
 decomp/src/misc_drafts1.c
+decomp/src/menu_state_load.c
 decomp/src/ail_irq_init.c
 decomp/src/runtime_libc.c
 decomp/src/runtime_helpers32.c

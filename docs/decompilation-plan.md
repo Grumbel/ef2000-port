@@ -2242,3 +2242,5 @@ Current user direction prioritizes matching generated assembly over game runs, s
 2026-11-13 dispatcher continuation: hand-recovered 0xa9e70 passes 21 isolated synthetic-service cases, including every opcode and three stream transitions. Retain broad exclusion until mode/exit tails and real GUI integration are checked. Source-only main menu remains incomplete.
 
 2026-11-13 composed menu-control validation: dispatcher now passes 27 synthetic-service cases including mode/exit tails; combined recovered main loop plus dispatcher passes one original-vs-C comparison. Real menu services and source-only startup remain incomplete.
+
+2026-11-13 GUI state-loader continuation: corrected 0xaad7c frame layout and isolated source module; six synthetic-service differentials pass. Actual GUI parser integration and source-only startup remain incomplete.

@@ -4425,7 +4425,9 @@ void init_angle_tables_3bd50(void); /* 0x3bd50 */
 void draw_compass_strip_3bf44(int16_t col, int16_t dy, int16_t ang); /* 0x3bf44 */
 void pair_word_dc5a9(int32_t x, int32_t y, ef_addr32 dst); /* 0xdc5a9 stack-only, ret 0xc */
 void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in); /* 0x84b8 */
+#ifdef __WATCOMC__
 #pragma aux assign_object_sub_entry_84b8 parm [eax] [esi]
+#endif
 void scatter_probe_afbc(int16_t x, int16_t y, int16_t count, int16_t w, int16_t s); /* 0xafbc */
 uint32_t guest_fn_befb8_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9); /* 0xbefb8 EAX/EDX/EBX/ECX + 10 stack */
 void fill_record_dialog_bc38(ef_addr32 name, uint8_t idx); /* 0xbc38 */
@@ -4698,9 +4700,13 @@ void copy_rows_to_screen_eb0b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u
 
 /* small_wrappers5.c */
 void put_screen_rows_eb050(uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
+#ifdef __WATCOMC__
 #pragma aux put_screen_rows_eb050 parm caller [] modify [eax ebx ecx edx]
+#endif
 void get_screen_rows_eb1f0(uint32_t x, uint32_t y, uint32_t width, uint32_t rows, ef_addr32 buf);
+#ifdef __WATCOMC__
 #pragma aux get_screen_rows_eb1f0 parm caller [] modify [eax ebx ecx edx]
+#endif
 
 /* script_helpers1.c */
 void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count);

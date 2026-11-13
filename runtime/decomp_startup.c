@@ -240,7 +240,7 @@ void guest_fn_117b0c(uint32_t port, uint32_t value)
     keyboard_ack_pending = 1;
 }
 
-uint32_t guest_fn_9c430(uint32_t port)
+uint8_t guest_fn_9c430(uint32_t port)
 {
     if (!probing || !main_probe_active ||
         (port != 0x64u && port != 0x60u))
@@ -685,7 +685,7 @@ uint32_t guest_fn_d66c2_x(void)
     return 0;
 }
 
-uint32_t guest_fn_e94ec(ef_addr32 path, uint32_t flags)
+uint8_t guest_fn_e94ec(ef_addr32 path, uint32_t flags)
 {
     if (!probing || !main_probe_active ||
         path != EF_U32(0x0012b36cu) || flags != 0u ||
