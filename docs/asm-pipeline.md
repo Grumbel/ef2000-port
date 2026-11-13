@@ -249,3 +249,54 @@ with otherwise identical outputs. The guarded 1,178-body corpus reproduces
 object warning-free. Artifacts: `local/asm-c-guard-program-20261113` and
 `local/asm-c-guard-diff-20261113`. Self-modifying code remains unsupported and
 is now detected, not silently executed using an obsolete translation.
+
+State ABI 1 adds all six visible segment selectors. The original side binds a
+zero-base GDT (code 8, data 16 and 24), and C uses the same selector profile;
+null data selector aliases 0..3 are included. Each probe now checks selectors
+alongside GPRs, EFLAGS, PC and RAM. Unknown selector bindings return status 7;
+this is not a general nonflat GDT implementation. Generated reports carry the
+state ABI and incompatible older outputs must be regenerated before rerunning.
+
+Supported segment operations include MOV to/from selectors, 32-bit segment
+PUSH/POP and LES/LDS/LFS/LGS/LSS with 16- or 32-bit offsets. The PUSH policy is
+measured against Unicorn (full dword writes), including prefilled stack slots.
+Far-pointer fields are read before a destination register changes their address.
+Flat segment overrides preserve the bound address interpretation; nonflat
+segments and full architectural protection/exception emulation remain outside
+the model.
+
+MOVS/STOS/LODS/CMPS/SCAS support byte, word and dword elements, both DF directions,
+REP and the comparison repeat conditions. Copies execute element by element,
+preserving overlap effects. Each repeated element consumes one budget step;
+a comparison mismatch advances immediately, while a continuing repeat performs
+the oracle's final zero-count check. Step-by-step resumption tests verify this
+budget behavior, including zero counts, flags and all RAM.
+
+The byte guard exposed intentional operand patching in the original decompressor.
+Verified immediate suffixes are now read from guest RAM as data for MOV register-
+immediate (B0..BF), register ALU groups 80/81/83, and register shift/rotate groups
+C0/C1. The encoded opcode, operation group, destination register, width and prefix
+must match the decoded instruction; signed 83 immediates are explicitly extended.
+The guard continues checking every non-parameterized byte. This preserves fixed
+instruction semantics while allowing its data parameter to change; it is not a
+runtime decoder or original-code execution fallback. Modified opcodes, register
+bits, addressing and all unsupported patch forms still fail status 6. Tests cover
+8/16/32-bit MOV patches, wide/signed-byte/word arithmetic patches, shift-count
+patches and rejection of destination-register opcode changes.
+
+2026-11-13 selector/string corpus: 2,942 syntax-supported bodies; direct closure
+selects 1,358 (139,340 body bytes), including 585 with cross-body dependencies.
+All body objects and the dispatcher compile warning-free with OpenWatcom v2.
+The 21,728 isolated probes produce 13,912 matches, 7,816 original-fault/budget
+inconclusive outcomes, no worker failures and zero mismatches. 572 bodies pass
+all probes (214 with cross-body dependencies); 786 remain inconclusive. All
+79 focused tests pass. Artifacts: `local/asm-c-segstr-final-program-20261113` and
+`local/asm-c-segstr-final-diff-20261113`.
+
+The initial run correctly stopped on 15 bodies: twelve callers of a decompressor
+that patches immediate parameters, and three helpers using null selector aliases
+1..3. These were fixed in generic encoding/selector rules, with dedicated tests;
+no mismatches were masked, ignored or promoted. A complete 15-body failure
+closure passed before the full rerun. Indirect control flow, nonflat bindings,
+DOS/runtime services, x87 and native integration remain open; none of these
+results promotes the recovery tracker or establishes a working source-only game.

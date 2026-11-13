@@ -74,16 +74,17 @@ def analyse(records):
 def dispatcher(records):
     prototypes = ['unsigned ef_lift_%08x(ef_lift_state *, uint32_t);' % r['address']
                   for r in records]
-    locations = sorted((i['address'], r['address'], bytes.fromhex(i['bytes']))
+    locations = sorted((i['address'], r['address'], bytes.fromhex(i['bytes']),
+                        asm_to_c.mutable_immediate(i))
                        for r in records for i in r['instructions'])
     if not locations:
         raise ValueError('no closed translated instructions')
     entries, original = [], bytearray()
-    for pc, address, encoded in locations:
+    for pc, address, encoded, immediate in locations:
         if not 1 <= len(encoded) <= 15:
             raise ValueError('invalid x86 instruction length')
         entries.append('    {0x%xu, ef_lift_%08x, %du, %du},' %
-                       (pc, address, len(original), len(encoded)))
+                       (pc, address, len(original), immediate[0] if immediate else len(encoded)))
         original.extend(encoded)
     original_lines = ['    ' + ','.join('0x%02x' % byte for byte in original[i:i+16]) + ','
                       for i in range(0, len(original), 16)]
@@ -150,6 +151,7 @@ def generate(inventory, output, image):
     program = dispatcher([r for r in records if r['address'] in closed])
     (output / 'ef_lift_program.c').write_text(program)
     result = dict(schema=1, model=MODEL, payload_sha256=manifest['payload_sha256'],
+                  state_abi=asm_to_c.STATE_ABI,
                   inventory_sha256=hashlib.sha256((inventory / 'manifest.json').read_bytes()).hexdigest(),
                   runtime_sha256=hashlib.sha256(asm_to_c.RUNTIME.encode()).hexdigest(),
                   dispatcher=dict(file='ef_lift_program.c', source_sha256=hashlib.sha256(program.encode()).hexdigest()),

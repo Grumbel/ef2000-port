@@ -21,10 +21,7 @@ except ImportError:
     unicorn = None
 
 
-class State(ctypes.Structure):
-    _fields_ = [('r', ctypes.c_uint32 * 8), ('flags', ctypes.c_uint32),
-                ('pc', ctypes.c_uint32), ('fault', ctypes.c_uint32),
-                ('memory', ctypes.POINTER(ctypes.c_uint8)), ('memory_size', ctypes.c_uint32)]
+State = asm_c_differential.State
 
 
 def assemble(root, source):
@@ -47,7 +44,7 @@ class TranslationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
-                           'mov eax, fs:[4]\nret', 'push ax\nret', 'pop [eax]\nret',
+                           'in eax,dx\nret', 'push ax\nret', 'pop [eax]\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
                     _, record = assemble(root, source)

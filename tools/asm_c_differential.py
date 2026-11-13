@@ -19,6 +19,7 @@ import multiprocessing
 from pathlib import Path
 import random
 import resource
+import struct
 import subprocess
 
 try:
@@ -30,7 +31,22 @@ except ImportError:
 class State(ctypes.Structure):
     _fields_ = [('r', ctypes.c_uint32 * 8), ('flags', ctypes.c_uint32),
                 ('pc', ctypes.c_uint32), ('fault', ctypes.c_uint32),
-                ('memory', ctypes.POINTER(ctypes.c_uint8)), ('memory_size', ctypes.c_uint32)]
+                ('memory', ctypes.POINTER(ctypes.c_uint8)), ('memory_size', ctypes.c_uint32),
+                ('segment', ctypes.c_uint32 * 6)]
+
+
+def bind_flat_segments(cpu):
+    """Bind the zero-base selector profile shared by the original and C model."""
+    from unicorn import x86_const
+    table = 0x10000000
+    cpu.mem_map(table, 0x1000)
+    cpu.mem_write(table, bytes(8) + struct.pack('<QQQ', 0x00cf9a000000ffff,
+                                              0x00cf92000000ffff, 0x00cf92000000ffff))
+    cpu.reg_write(x86_const.UC_X86_REG_GDTR, (0, table, 31, 0))
+    selectors = [16, 8, 16, 16, 16, 16]
+    for name, value in zip(asm_to_c.SEGMENTS, selectors):
+        cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
+    return selectors
 
 
 def probes(count, seed):
@@ -62,6 +78,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu = Uc(UC_ARCH_X86, UC_MODE_32)
     cpu.mem_map(0, memory_size)
     cpu.mem_write(0, bytes(memory))
+    selectors = bind_flat_segments(cpu)
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
@@ -76,6 +93,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
+    state.segment[:] = selectors
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -89,6 +107,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     expected = [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
                 for n in asm_to_c.REGS]
     for name, actual, original in zip(asm_to_c.REGS, state.r, expected):
+        if actual != original:
+            differences.append('%s: C=0x%x x86=0x%x' % (name, actual, original))
+    for name, actual in zip(asm_to_c.SEGMENTS, state.segment):
+        original = cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + name.upper()))
         if actual != original:
             differences.append('%s: C=0x%x x86=0x%x' % (name, actual, original))
     if state.pc != sentinel:
@@ -171,6 +193,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     manifest_path = directory / 'report.json'
     manifest_bytes = manifest_path.read_bytes()
     manifest = json.loads(manifest_bytes)
+    if manifest.get('state_abi') != asm_to_c.STATE_ABI:
+        raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
     if (manifest.get('model') not in ('flat-x86-explicit-state', 'flat-x86-program-explicit-state') or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
@@ -243,6 +267,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
                   process_isolation='fork-per-entry-with-phase-reporting',
+                  state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report

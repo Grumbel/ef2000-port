@@ -2438,3 +2438,40 @@ local/asm-c-guard-program-20261113 --output local/asm-c-guard-diff-20261113 --wa
 (Python 3.13.12/Unicorn 2.1.4 for oracle tests). No tracker/native promotion.
 Segment/string state, indirect transfers, runtime bindings, x87 and body-boundary
 cases still prevent reliable full coverage.
+
+2026-11-13 selector/string state and instruction data parameters: State ABI 1
+adds ES/CS/SS/DS/FS/GS and pins a zero-base GDT profile (null data aliases 0..3,
+code 8, data 16/24). The verifier checks every visible selector and rejects
+incompatible generated state ABIs. Supported MOV/PUSH/POP selector operations,
+LES/LDS/LFS/LGS/LSS, segment overrides, CLD/STD and byte/word/dword
+MOVS/STOS/LODS/CMPS/SCAS including REP/repeat conditions preserve guest state.
+REP element and terminal-check budget/resumption match measured Unicorn steps;
+copy overlap is preserved element by element. Unknown bindings return status 7.
+The first guarded corpus reported 15 mismatching bodies. Twelve callers reached
+intentional decompressor operand patches at 0xcf7f8/0xcf806/0xcf82b; three helpers
+used null selector alias 1. Added generic, encoding-proven mutable immediate
+suffixes for MOV register-immediate, register ALU 80/81/83 (with signed-byte
+extension), and register shift/rotate C0/C1. Generated C reads those parameters
+from guest RAM while operation/register/prefix bytes remain guarded; arbitrary
+opcode/addressing changes still fail status 6. No function-address exception,
+original-code fallback or ignored mismatch. Complete 15-body failure closure
+passes; full rerun is clean. All 79 focused tests pass, including selector state,
+stack slot widths, far-pointer aliases, DF/count/overlap/repeat exits, exact
+step budgets, mutable data fields and unchanged opcode guard regressions.
+Full Ghidra 12.1.4 corpus: 2,942 syntax-supported, 1,358 selected closed bodies
+(139,340 body bytes), 585 with cross-body dependencies; 1,584 syntax-supported
+remain excluded. All 1,358 Watcom v2 -we body objects plus dispatcher compile
+warning-free. 21,728 isolated probes: 13,912 matches, 7,816 original-fault/budget
+inconclusive, zero worker failures and zero mismatches. 572 bodies pass all
+probes, including 214 with cross-body dependencies; 786 remain inconclusive.
+Commands: python3 -m unittest tests.test_asm_c_segments tests.test_asm_c_program
+tests.test_asm_to_c tests.test_asm_inventory tests.test_asm_diff
+tests.test_ghidra_ef2000; tools/asm_c_program.py --inventory
+local/asm-body-inventory-20261113 --output local/asm-c-segstr-final-program-20261113;
+tools/asm_c_differential.py --translations local/asm-c-segstr-final-program-20261113
+--output local/asm-c-segstr-final-diff-20261113 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386
+(Python 3.13.12/Unicorn 2.1.4). Failed iterations remain under ignored local/.
+No tracker promotion or native/source-only game claim. Checked indirect calls/
+jumps, nonflat selector bindings, runtime services, x87, remaining body boundaries
+and stronger application-level evidence remain before full reliable coverage.
