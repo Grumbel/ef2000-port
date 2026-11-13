@@ -231,7 +231,7 @@ def export_all(args):
     output = (args.output or workspace / 'full-export').resolve()
     output.mkdir(parents=True, exist_ok=True)
     files = ['report.json', 'functions.tsv', 'calls.tsv', 'candidate-entries.tsv',
-             'orphan-ranges.tsv', 'orphan-instructions.asm']
+             'orphan-ranges.tsv', 'orphan-instructions.asm', 'body-ranges.json']
     if getattr(args, 'custom_storage_fallback', False) and getattr(args, 'overwrite', False):
         # Run BOTH passes in an empty directory. Reusing the old export tree
         # can resurrect stale custom-storage C, making a "complete" corpus

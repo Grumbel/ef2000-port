@@ -53,3 +53,31 @@ interiors), window-exiting fallthrough, interrupt/system transitions and bad
 instructions remain explicit review items. External calls are review items,
 not automatically errors. This mnemonic-based report neither proves reachability
 nor resolves jump tables; its input still consists of unverified linear windows.
+
+Ghidra inventory/export now also writes `body-ranges.json`, containing half-open
+function ranges and Ghidra instruction locations/lengths, with a SHA-256 of the
+actual initialized program memory. Export to a separate directory to preserve
+an existing pseudo-C index:
+
+```sh
+python3 tools/ghidra_ef2000.py inventory --output local/ghidra/body-inventory
+python3 tools/asm_inventory.py --address 0x10d80b \
+  --body-ranges local/ghidra/body-inventory/body-ranges.json \
+  --output local/asm-body-heap-growth
+```
+
+Schema 3 preserves these ranges without decoding the gaps. It checks payload
+provenance, span ordering and bounds, entry containment, and instruction byte
+continuity separately in every span. A missing body is an error, never a fallback
+to a tracker-sized window. The manifest binds the body export by its digest.
+`ghidra_instruction_layout_matches` compares every decoded instruction start and
+length against Ghidra, exposing embedded data or disagreeing decoders; absent
+layout metadata produces `null`, not agreement. These are exact exports of
+Ghidra's current ownership hypotheses, not proof that those hypotheses are
+complete or correct.
+
+2026-11-13 full check (Ghidra 12.1.4): 4,277 bodies, including 40 with multiple
+ranges; no body overlaps; instruction layouts agree for 4,275. Entries 0xfa3d4
+and 0x11f6d8 disagree and need review. Thirteen additional tracker entries have
+no Ghidra body and are already blocked. The selected full-body export and the
+explicit missing-entry tracker are under ignored `local/`; none are promoted.

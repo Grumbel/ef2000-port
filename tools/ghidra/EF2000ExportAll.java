@@ -7,6 +7,8 @@ import ghidra.app.decompiler.DecompileOptions;
 import ghidra.app.decompiler.DecompileResults;
 import ghidra.app.script.GhidraScript;
 import ghidra.program.model.address.Address;
+import ghidra.program.model.address.AddressRangeIterator;
+import ghidra.program.model.address.AddressRange;
 import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.FunctionIterator;
 import ghidra.program.model.listing.Instruction;
@@ -22,6 +24,8 @@ import ghidra.program.model.symbol.SourceType;
 import ghidra.program.model.symbol.Reference;
 import ghidra.program.model.lang.PrototypeModel;
 
+import java.security.MessageDigest;
+import java.util.HexFormat;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -182,6 +186,13 @@ public class EF2000ExportAll extends GhidraScript {
         long functionBytes = 0;
         int written = 0, reused = 0, failed = 0, limited = 0, assemblyFallbacks = 0;
         int fastcallWritten = 0, watcomWritten = 0, storageWritten = 0;
+        byte[] image = new byte[(int) IMAGE_END];
+        if (currentProgram.getMemory().getBytes(toAddr(0), image) != image.length) {
+            throw new IllegalStateException("incomplete initialized image");
+        }
+        String imageDigest = HexFormat.of().formatHex(
+            MessageDigest.getInstance("SHA-256").digest(image));
+        List<String> bodyEntries = new ArrayList<>();
         List<String> index = new ArrayList<>();
         index.add("entry\tname\tbody_bytes\tstatus\tfile\terror");
         try {
@@ -189,6 +200,27 @@ public class EF2000ExportAll extends GhidraScript {
                 monitor.checkCancelled();
                 long offset = function.getEntryPoint().getOffset();
                 functionBytes += function.getBody().getNumAddresses();
+                List<String> spans = new ArrayList<>();
+                AddressRangeIterator ranges = function.getBody().getAddressRanges();
+                while (ranges.hasNext()) {
+                    AddressRange range = ranges.next();
+                    if (!inImage(range.getMinAddress()) || !inImage(range.getMaxAddress())) {
+                        throw new IllegalStateException("function body outside image");
+                    }
+                    spans.add(String.format("[%d,%d]", range.getMinAddress().getOffset(),
+                        range.getMaxAddress().getOffset() + 1));
+                }
+                List<String> instructionSpans = new ArrayList<>();
+                InstructionIterator bodyInstructions = currentProgram.getListing().getInstructions(
+                    function.getBody(), true);
+                while (bodyInstructions.hasNext()) {
+                    Instruction instruction = bodyInstructions.next();
+                    instructionSpans.add(String.format("[%d,%d]",
+                        instruction.getAddress().getOffset(), instruction.getLength()));
+                }
+                bodyEntries.add(String.format(
+                    "{\"address\":%d,\"ranges\":[%s],\"instruction_spans\":[%s]}",
+                    offset, String.join(",", spans), String.join(",", instructionSpans)));
                 String fileName = String.format("functions/%04x/0x%08x.c", offset >>> 16, offset);
                 Path file = output.resolve(fileName);
                 String status = "inventory", error = "", relative = "";
@@ -289,6 +321,10 @@ public class EF2000ExportAll extends GhidraScript {
             if (decompiler != null) decompiler.dispose();
             if (alternativeDecompiler != null) alternativeDecompiler.dispose();
         }
+        Files.writeString(output.resolve("body-ranges.json"),
+            "{\"schema\":1,\"payload_sha256\":\"" + imageDigest +
+            "\",\"boundary\":\"ghidra-body-ranges\",\"entries\":[" +
+            String.join(",", bodyEntries) + "]}\n", StandardCharsets.UTF_8);
         Files.writeString(output.resolve("functions.tsv"), String.join("\n", index) + "\n",
                           StandardCharsets.UTF_8);
         Files.writeString(output.resolve("calls.tsv"), String.join("\n", calls) + "\n",

@@ -2295,3 +2295,17 @@ tests.test_asm_diff`). Reproducer: `python3 tools/asm_inventory.py --output
 local/asm-flow-inventory-20261113`. Exact body-range import, indirect-edge
 resolution and instruction equivalence remain pending; linear-window reports
 are not evidence of complete functions or source-only execution.
+
+2026-11-13 ASM body-range import: Ghidra exports actual half-open body spans and
+instruction locations/lengths bound to initialized-memory SHA-256. Inventory
+schema 3 validates provenance and decodes each span separately; missing bodies
+fail closed. Ghidra 12.1.4 full inventory: 4,277 bodies (40 multi-span), no
+ownership overlaps, 4,275 matching decoder layouts; 0xfa3d4/0x11f6d8 disagree.
+Thirteen tracker-only entries remain blocked and have no imported body.
+Commands: `python3 -m unittest tests.test_asm_inventory tests.test_asm_diff
+tests.test_ghidra_ef2000` (56 pass); `python3 tools/ghidra_ef2000.py inventory
+--output local/ghidra/body-layout-20261113`; `python3 tools/asm_inventory.py
+--tracker local/ghidra/body-tracker-20261113.tsv --body-ranges
+local/ghidra/body-layout-20261113/body-ranges.json --output
+local/asm-body-inventory-20261113` (4,277 exported). Translation, ABI and semantic
+equivalence remain separate gates; reliable bulk C translation is not yet achieved.

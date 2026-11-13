@@ -1,6 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
+import hashlib
 import json
 from pathlib import Path
 import subprocess
@@ -62,6 +63,75 @@ class InventoryTests(unittest.TestCase):
             dict(address=0, bytes='ebff', mnemonic='jmp', operands='1', direct_target=1)])
         self.assertEqual(report['review_edges'][0]['target'], 1)
         self.assertEqual(report['review_edges'][0]['status'], 'outside-decoded-starts')
+
+    def write_bodies(self, root, image, entries):
+        path = root / 'bodies.json'
+        path.write_text(json.dumps(dict(schema=1, boundary='ghidra-body-ranges',
+            payload_sha256=hashlib.sha256(image.read_bytes()).hexdigest(), entries=entries)))
+        return path
+
+    def test_detached_ranges_exclude_gap_and_keep_cross_span_edge(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root / 'payload.bin'
+            image.write_bytes(bytes.fromhex('eb02ffffc3'))
+            rows = [dict(addr='0x0', size='3', name='fixture', state='drafted',
+                         kind='game', module='fixture')]
+            bodies = self.write_bodies(root, image,
+                                      [dict(address=0, ranges=[[0, 2], [4, 5]],
+                                            instruction_spans=[[0, 2], [4, 1]])])
+            result = asm_inventory.export_inventory(image, rows, root / 'out', body_ranges=bodies)
+            record = json.loads((root / 'out/00000000.json').read_text())
+            self.assertEqual([i['address'] for i in record['instructions']], [0, 4])
+            self.assertEqual(record['ranges'], [[0, 2], [4, 5]])
+            self.assertTrue(record['ghidra_instruction_layout_matches'])
+            self.assertEqual(record['control_flow']['review_edges'], [])
+            self.assertEqual(result['boundary'], 'ghidra-body-ranges')
+            self.assertEqual(result['body_ranges_sha256'], hashlib.sha256(bodies.read_bytes()).hexdigest())
+
+    def test_data_in_body_is_not_promoted_to_instruction_agreement(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, rows = self.fixture(root)
+            bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, 7]],
+                instruction_spans=[[0, 5], [6, 1]])])
+            manifest = asm_inventory.export_inventory(image, rows[:1], root / 'out',
+                                                      body_ranges=bodies)
+            self.assertFalse(manifest['entries'][0]['ghidra_instruction_layout_matches'])
+
+    def test_invalid_body_provenance_ranges_and_missing_entry_fail_closed(self):
+        cases = [
+            [dict(address=0, ranges=[[0, 8]])],
+            [dict(address=0, ranges=[[0, 2], [1, 3]])],
+            [dict(address=0, ranges=[[1, 2]])],
+            [dict(address=0, ranges=[[0, 1]]), dict(address=0, ranges=[[0, 2]])],
+            [dict(address=1, ranges=[[1, 2]])],
+        ]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, rows = self.fixture(root)
+            for entries in cases:
+                with self.subTest(entries=entries):
+                    bodies = self.write_bodies(root, image, entries)
+                    with self.assertRaises(ValueError):
+                        asm_inventory.export_inventory(image, rows[:1], root / 'out', body_ranges=bodies)
+                    self.assertFalse((root / 'out').exists())
+            bodies = self.write_bodies(root, image, [])
+            image.write_bytes(b'changed')
+            with self.assertRaisesRegex(ValueError, 'provenance'):
+                asm_inventory.export_inventory(image, rows[:1], root / 'out', body_ranges=bodies)
+
+    def test_body_ending_inside_instruction_is_rejected(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, rows = self.fixture(root)
+            bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, 2]])])
+            def runner(argv, **kwargs):
+                text = 'fake decoder' if '--version' in argv else '0: e8 01 00 00 00 call 6'
+                return subprocess.CompletedProcess(argv, 0, text, '')
+            with self.assertRaisesRegex(ValueError, 'byte/continuity mismatch'):
+                asm_inventory.export_inventory(image, rows[:1], root / 'out',
+                                               body_ranges=bodies, runner=runner)
 
     def test_reject_wrong_decoder_bytes(self):
         with tempfile.TemporaryDirectory() as temporary:

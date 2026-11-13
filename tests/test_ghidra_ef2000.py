@@ -179,6 +179,7 @@ class GhidraWorkflowTests(unittest.TestCase):
             (output / 'candidate-entries.tsv').write_text('entry\treason\n')
             (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
             (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+            (output / 'body-ranges.json').write_text('{}\n')
             (output / 'report.json').write_text(json.dumps({
                 'initialized_image_bytes': ghidra.IMAGE_SIZE,
                 'discovered_functions': 42, 'decompilations_written': 0,
@@ -219,6 +220,7 @@ class GhidraWorkflowTests(unittest.TestCase):
             (output / 'candidate-entries.tsv').write_text('entry\treason\n')
             (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
             (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+            (output / 'body-ranges.json').write_text('{}\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.export_all(args)
@@ -271,6 +273,7 @@ class GhidraWorkflowTests(unittest.TestCase):
             (staged / 'candidate-entries.tsv').write_text('entry\treason\n')
             (staged / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
             (staged / 'orphan-instructions.asm').write_text('; no orphan bytes\n')
+            (staged / 'body-ranges.json').write_text('{}\n')
             (staged / 'report.json').write_text(json.dumps({
                 'initialized_image_bytes': ghidra.IMAGE_SIZE,
                 'discovered_functions': 2, 'decompilations_written': 1,
@@ -308,6 +311,7 @@ class GhidraWorkflowTests(unittest.TestCase):
             (output / 'candidate-entries.tsv').write_text('entry\treason\n')
             (output / 'orphan-ranges.tsv').write_text('start\tend_exclusive\n')
             (output / 'orphan-instructions.asm').write_text('; nothing unassigned\n')
+            (output / 'body-ranges.json').write_text('{}\n')
 
         with patch.object(ghidra.subprocess, 'run', side_effect=fake_ghidra):
             ghidra.export_all(args)
