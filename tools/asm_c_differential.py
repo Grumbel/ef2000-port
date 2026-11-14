@@ -23,9 +23,10 @@ import struct
 import subprocess
 
 try:
-    from . import asm_to_c
+    from . import asm_to_c, asm_softfloat
 except ImportError:
     import asm_to_c
+    import asm_softfloat
 
 
 class State(ctypes.Structure):
@@ -245,7 +246,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program):
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None):
+           watcom=None, softfloat_build=None):
     payload = image.read_bytes()
     manifest_path = directory / 'report.json'
     manifest_bytes = manifest_path.read_bytes()
@@ -267,9 +268,21 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         if entry.get('source_sha256') != hashlib.sha256((directory / entry['file']).read_bytes()).hexdigest():
             raise ValueError('translation source digest mismatch')
     sources = [directory / e['file'] for e in artifacts]
+    needs_narrow = any(asm_to_c.asm_x87.NARROW_DEFINE in source.read_text() for source in sources)
+    expected_backends = [asm_to_c.asm_x87.NARROW_BACKEND] if needs_narrow else []
+    if manifest.get('required_backends', []) != expected_backends:
+        raise ValueError('translation backend declaration mismatch')
+    if needs_narrow:
+        if softfloat_build is None:
+            raise ValueError('narrowing translations require --softfloat-build')
+        if manifest.get('backend_source_sha256') != asm_softfloat.digest(asm_to_c.ROOT / 'tools/asm_x87_narrow.c'):
+            raise ValueError('narrowing adapter source digest mismatch; regenerate translations')
+        asm_softfloat.validated_build(softfloat_build, watcom=bool(watcom))
     if not generated:
         raise ValueError('no generated C sources to test')
     output.mkdir(parents=True, exist_ok=False)
+    backend = (asm_softfloat.build_narrow(softfloat_build, output / 'narrow-backend',
+                                        compiler=compiler, watcom=watcom) if needs_narrow else None)
     watcom_results = {}
     if watcom:
         objects = output / 'objects'
@@ -293,6 +306,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                               for source in sources))
     command = [compiler, '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra',
                '-Werror', '-Wno-unused-function', '-I', str(directory), str(unit), '-o', str(library)]
+    if backend:
+        command += [str(output / 'narrow-backend/narrow.so'), '-Wl,-z,defs']
     result = subprocess.run(command, capture_output=True, text=True)
     (output / 'compile.log').write_text(result.stdout + result.stderr)
     result.check_returncode()
@@ -326,6 +341,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
+                  narrow_backend=backend,
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
@@ -338,6 +354,7 @@ def main(argv=None):
     parser.add_argument('--workspace', type=Path, default=asm_to_c.ROOT / 'local/ghidra')
     parser.add_argument('--compiler', default='cc')
     parser.add_argument('--watcom', help='also require warning-free OpenWatcom compilation')
+    parser.add_argument('--softfloat-build', type=Path, help='validated SoftFloat build for narrowing stores')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
     args = parser.parse_args(argv)
@@ -347,7 +364,8 @@ def main(argv=None):
             raise ValueError('translation and differential artifacts must stay under ignored local/')
         workspace = asm_to_c.asm_inventory.ghidra_ef2000.validated_workspace(args.workspace)
         report = verify(directory, output, workspace / 'payload.bin', compiler=args.compiler,
-                        scenarios=args.scenarios, budget=args.budget, watcom=args.watcom)
+                        scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
+                        softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         return 1 if counts['mismatch'] else 0

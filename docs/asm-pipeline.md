@@ -542,3 +542,39 @@ are checked. This adapter does not yet implement FST/FSTP memory effects,
 exception masks, suppressed stores or pop timing. Store instruction integration
 and independent validation of those effects remain required; existing corpus
 coverage and its nonzero gate are unchanged.
+
+Generated FST/FSTP DWORD/QWORD now uses the pinned narrowing adapter. IE/OE/UE
+that are unmasked suppress the memory write and pop; precision can commit both
+and then leave a pending exception. Exact subnormals also raise unmasked UE.
+Earlier sticky flags are retained; suppressed OE/UE do not add PE or C1.
+Empty-stack invalid uses the indefinite value when masked. Full RAM bounds
+and pending delivery checks precede conversion/stack effects.
+
+Only bodies that need narrowing enable the optional header section. It is
+outside the base header guard so a later body can enable it in the combined
+translation unit. Manifests declare `required_backends` and bind the adapter
+source digest. The differential runner requires `--softfloat-build` for those
+bodies, validates the pinned profile and objects before output/compilation,
+builds a recorded adapter, and links with unresolved symbols rejected. Missing,
+undeclared or stale backend dependencies fail explicitly. No original fallback.
+
+458,752 generated-store hardware comparisons cover all 64 exception masks,
+four rounding modes, every TOP, empty/nonempty sources, both widths/pop forms
+and signed special/boundary values. Compare RAM, retained raw physical registers,
+status/tags, flags, opcode and relocated context under UBSan. Bounds, pending
+state and isolated hardware fault-priority tests also pass. Forty addressing
+variants compile warning-free with Watcom. The conversion and dependency checks
+remain separate tests, and full-game/exception-delivery evidence is still needed.
+
+The completed 2,107-body corpus run has 33,712 probes: 18,530 matches,
+15,068 inconclusive and 114 mismatches. All preceding 2,096 per-body outcomes
+are unchanged. The eleven added bodies contribute 30 matches, 99 inconclusive
+and 47 mismatches across four bodies. These remain failures in the report;
+no comparison fields are masked. Original helper 0x120a52 independently matches
+C on hardware for the disputed status, opcode and eight-byte target spans in
+all fourteen completed probes, including masked empty-stack indefinite stores.
+This private original-byte probe runs in host long mode (ES ignored, host return
+width differs), so it establishes those disputed fields only, not guest ABI
+equivalence. Evidence: local/asm-x87-original-store-probe-20261114/evidence.json;
+bulk report: local/asm-c-x87-store-diff-20261114/report.json. The gate remains
+nonzero; oracle repair and full game integration remain required.

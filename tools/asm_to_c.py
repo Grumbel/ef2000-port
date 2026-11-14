@@ -263,6 +263,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
                           asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + '\n#endif\n')
+RUNTIME += asm_x87.NARROW_RUNTIME
 
 
 class Unsupported(ValueError):
@@ -510,10 +511,14 @@ def instruction_c(insn, starts):
     stack_operation = asm_x87.stack_operation(mnemonic, text)
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
-    if integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
+    narrow_store = mnemonic in ('fst', 'fstp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
+    if narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
-            if integer_load:
+            if narrow_store:
+                encoding, group = (0xd9 if width_of(op) == 32 else 0xdd), (3 if mnemonic == 'fstp' else 2)
+                helper = 'ef_x87_store_real(s, b, %d, %d)' % (width_of(op), mnemonic == 'fstp')
+            elif integer_load:
                 encoding, group = (0xdb if width_of(op) == 32 else 0xdf), (5 if width_of(op) == 64 else 0)
                 helper = 'ef_x87_load_integer(s, b, %d)' % width_of(op)
             elif real_load:
@@ -814,7 +819,8 @@ def translate(record, *, starts=None, renderer=instruction_c):
     declarations = 'uint32_t ' + ', '.join(variables) + ';' if variables else ''
     if re.search(r'\bproduct\b', '\n'.join(cases)):
         declarations += '\n    uint64_t product;'
-    return '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
+    prefix = asm_x87.NARROW_DEFINE if any('ef_x87_store_real(' in case for case in cases) else ''
+    return prefix + '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
 #include "ef_lift_state.h"
 unsigned ef_lift_%08x(ef_lift_state *s, uint32_t fuel) {
     %s
@@ -885,8 +891,16 @@ def generate(inventory, output, image):
                   inventory_sha256=hashlib.sha256((inventory / 'manifest.json').read_bytes()).hexdigest(),
                   model='flat-x86-explicit-state',
                   runtime_sha256=hashlib.sha256(RUNTIME.encode()).hexdigest(), entries=report)
+    bind_backends(result, [(output / e['file']).read_text() for e in report if e['state'] == 'generated-unverified'])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
+
+
+def bind_backends(report, codes):
+    required = any(asm_x87.NARROW_DEFINE in code for code in codes)
+    report['required_backends'] = [asm_x87.NARROW_BACKEND] if required else []
+    if required:
+        report['backend_source_sha256'] = hashlib.sha256((ROOT / 'tools/asm_x87_narrow.c').read_bytes()).hexdigest()
 
 
 def main(argv=None):

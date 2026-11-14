@@ -179,6 +179,7 @@ def generate(inventory, output, image):
                   dispatcher=dict(file='ef_lift_program.c', source_sha256=hashlib.sha256(program.encode()).hexdigest()),
                   syntactically_supported=len(codes), entries=report)
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
+    asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
 

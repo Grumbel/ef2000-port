@@ -10,6 +10,9 @@ No original instructions are executed by these helpers.
 
 import re
 
+NARROW_BACKEND = 'softfloat-3e-8086-narrow-v1'
+NARROW_DEFINE = '#define EF_LIFT_SOFTFLOAT_NARROW 1\n'
+
 
 def stack_operation(mnemonic, text):
     unary = {'fld1': 0, 'fldz': 1, 'fchs': 3, 'fabs': 4, 'fincstp': 9, 'fdecstp': 10}
@@ -264,4 +267,45 @@ static unsigned ef_x87_load_integer(ef_lift_state *s, uint32_t address, unsigned
     ef_x87_put(s, destination, value); ef_x87_top(s, destination);
     return 0;
 }
+'''
+
+# Outside the base header guard: a later body in the combined translation unit
+# may be the first to enable this optional dependency.
+NARROW_RUNTIME = r'''
+#if defined(EF_LIFT_SOFTFLOAT_NARROW) && !defined(EF_LIFT_NARROW_RUNTIME)
+#define EF_LIFT_NARROW_RUNTIME
+unsigned ef_x87_narrow(const uint32_t *, unsigned, unsigned, uint32_t *);
+static unsigned ef_x87_store_real(ef_lift_state *s, uint32_t address, unsigned width, unsigned pop) {
+    uint32_t indefinite[3] = {0, 0xc0000000u, 0xffffu}, out[2], flags, tiny, unmasked;
+    unsigned top = ef_x87_index(s, 0);
+    const uint32_t *value = s->x87[top];
+    if (width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
+        s->fault = 3; return 3;
+    }
+    if (ef_x87_empty(s, top)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+        value = indefinite;
+    }
+    flags = ef_x87_narrow(value, width, (s->x87_control >> 10) & 3u, out);
+    if (flags & 0x10000u) return 9;
+    tiny = width == 32 ? !(out[0] & 0x7f800000u) && (out[0] & 0x7fffffu) :
+           !(out[1] & 0x7ff00000u) && ((out[1] & 0xfffffu) | out[0]);
+    /* Unmasked underflow includes exact subnormal results. */
+    if (!(s->x87_control & 0x10u) && tiny) flags |= 0x10u;
+    unmasked = flags & ~s->x87_control & 0x3fu;
+    if (unmasked & 0x19u) {
+        /* IE/OE/UE suppress store/pop and do not add PE or rounded-up C1. */
+        s->x87_status = (s->x87_status & ~0x200u) | (flags & 0x1fu) | 0x8080u;
+        return 0;
+    }
+    s->x87_status = (s->x87_status & ~0x200u) | flags;
+    if (unmasked) s->x87_status |= 0x8080u;
+    ef_write(s, address, 32, out[0]);
+    if (width == 64) ef_write(s, address + 4u, 32, out[1]);
+    if (pop) { s->x87_tag |= 3u << (top * 2); ef_x87_top(s, top + 1u); }
+    return 0;
+}
+#endif
 '''

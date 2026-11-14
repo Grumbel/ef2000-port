@@ -2951,3 +2951,60 @@ masked; therefore masked conversion flags alone are insufficient to decide
 store effects. The native probes are under local/asm-x87-narrow-probe-20261114
 (state.c/state.so), currently binary32 exploratory cases only. These observations
 are implementation input, not a completed instruction conformance test.
+
+
+**2026-11-14 — Generated narrowing stores and explicit backend binding.**
+Integrated FST/FSTP DWORD/QWORD with the pinned conversion adapter. Model all
+mask-dependent effects: unmasked IE/OE/UE suppress writes/pop and new PE/C1;
+unmasked PE may commit, then defer delivery. Exact subnormals also signal
+unmasked UE. Preserve old sticky flags, raw source payloads and tags; empty
+source uses masked indefinite or deferred unmasked invalid. Bounds and pending
+checks precede effects. Update encoded instruction/data environment separately.
+Optional header section supports late inclusion in the combined translation
+unit. Both generators declare required backend and adapter-source hash. The
+verifier requires --softfloat-build, validates source/profile/header/library/
+Watcom objects before creating output, builds a recorded adapter, and rejects
+unresolved symbols. Missing/stale/undeclared dependencies fail explicitly.
+458,752 generated-body hardware comparisons pass under UBSan: all 64 masks,
+four RC modes, all TOPs, empty/nonempty sources, signed boundary/special values,
+both widths and pop forms. Compare RAM/canaries, every retained physical FP
+value, status/tags, flags, opcode and relocated context. Additional isolated
+fault probes cover invalid data, overflow, underflow/precision, empty stack and
+pending #MF; bounds/pending checks verify no partial C state/RAM mutation.
+Backend declaration/source tampering fails before compilation/output. Forty
+address variants and the adapter compile warning-free with Watcom.
+All 106 ASM/Ghidra/dependency tests pass with optional dependencies enabled
+(169 s). Regeneration: 3,640 syntax-supported, 2,107 selected bodies, 272,045
+bytes (+11 selected, +1,883 bytes). All body objects and dispatcher compile with
+Watcom; the full corpus comparison is a separate gate. No tracker promotion or
+full game/native ABI claim; remaining arithmetic, delivery and oracle accuracy
+stay active.
+Commands: ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3
+-m unittest tests.test_asm_x87_store tests.test_asm_x87_narrow tests.test_asm_softfloat
+tests.test_asm_x87_integer_load tests.test_asm_x87_load tests.test_asm_x87_memory
+tests.test_asm_x87_stack tests.test_asm_c_x87 tests.test_asm_c_segments
+tests.test_asm_c_program tests.test_asm_to_c tests.test_asm_inventory
+tests.test_asm_diff tests.test_ghidra_ef2000;
+tools/asm_c_program.py --inventory local/asm-observed-body-inventory-20261113
+--output local/asm-c-x87-store-program-20261114. Evidence:
+local/asm-c-x87-store-full-tests-20261114.log,
+local/asm-x87-store-final-tests-20261114.log,
+local/asm-x87-store-watcom-20261114/compile.log. Full suite Python 3.13.12/
+Unicorn 2.1.4; native-only tests also Python 3.13.17. Watcom -bt=dos -3r -za99
+-w1 -we. Original assets remain unchanged and all generated material stays local/.
+
+Completed corpus comparison: 33,712 probes, 18,530 matching, 15,068 inconclusive,
+114 mismatching. All prior 2,096 per-body outcomes are unchanged. Eleven added
+bodies contribute 30 matches, 99 inconclusive and 47 mismatches across four
+bodies (0x2b634, 0x3519c, 0xea884, 0x120a52). No differences are waived.
+Actual original helper 0x120a52 independently agrees with C on hardware for
+status/opcode and eight-byte target spans in all fourteen disputed completed
+probes, including masked empty-stack indefinite stores. The host-long-mode
+probe ignores ES and uses host return width: this confirms those fields only,
+not full guest context or ABI equivalence. Its evidence binds original payload,
+body, bulk report and probe library hashes. Evidence:
+local/asm-x87-original-store-probe-20261114/evidence.json and
+local/asm-c-x87-store-diff-20261114/report.json. Run with --softfloat-build
+local/asm-softfloat-verified-build-20261113 and --watcom as above. Corpus gate
+exits nonzero; oracle accuracy, checked-target failures, arithmetic and game
+integration remain active. No tracker promotion.
