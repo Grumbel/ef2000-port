@@ -210,6 +210,8 @@
           objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
           objects/ef2000-unicorn-cpp --self-test-zero-return | grep -q 'zero-return stop detected'
           objects/ef2000-unicorn-cpp --self-test-zero-return --timing realtime | grep -q 'zero-return stop detected'
+          objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail | grep -q 'zero-return stop detected'
+          objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail --timing realtime | grep -q 'zero-return stop detected'
           objects/ef2000-unicorn-x87-smoke | grep -q '5/5 FLD/FSTP qword memory round-trips passed'
           objects/ef2000-dos-clock-test | grep -q 'deterministic PIT calendar conversion passed'
           objects/ef2000-efpatch-test

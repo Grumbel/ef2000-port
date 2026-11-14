@@ -1326,6 +1326,11 @@ public:
               "install instruction-state trace hook");
     }
 
+    void enable_block_tail_trace() {
+        check(uc_hook_add(cpu_, &block_tail_hook_, UC_HOOK_BLOCK,
+                          (void*)on_block_tail, this, 1, 0), "install block-tail hook");
+    }
+
     void enable_guest_hashes(const std::vector<std::pair<uint32_t, uint32_t>>& ranges) {
         guest_hash_ranges_ = ranges;
     }
@@ -1547,6 +1552,14 @@ public:
                             << std::dec << count << std::hex;
                     first_hit = false;
                 }
+                if (block_tail_count_) {
+                    message << " block_tail=";
+                    const uint64_t begin = block_tail_count_ > block_tail_.size() ?
+                                           block_tail_count_ - block_tail_.size() : 0;
+                    for (uint64_t i = begin; i < block_tail_count_; ++i)
+                        message << (i == begin ? "0x" : ",0x")
+                                << block_tail_[i % block_tail_.size()];
+                }
                 throw std::runtime_error(message.str());
             }
             if (pending_copy_) finish_fast_copy();
@@ -1759,6 +1772,9 @@ public:
 private:
     std::string invalid_memory_;
     uc_hook slice_hook_{};
+    uc_hook block_tail_hook_{};
+    std::array<uint32_t, 64> block_tail_{};
+    uint64_t block_tail_count_{};
     uc_hook archive_lookup_hook_{};
     std::set<std::pair<std::string, std::string>> archive_lookups_seen_;
     std::chrono::steady_clock::time_point slice_deadline_{};
@@ -2738,6 +2754,11 @@ private:
             }
         }
     }
+    static void on_block_tail(uc_engine*, uint64_t address, uint32_t, void* user) {
+        auto* machine = static_cast<Machine*>(user);
+        machine->block_tail_[machine->block_tail_count_++ % machine->block_tail_.size()] =
+            static_cast<uint32_t>(address);
+    }
     static void on_block_state(uc_engine*, uint64_t address, uint32_t size, void* user) {
         auto* machine = static_cast<Machine*>(user);
         if (machine->trace_block_count_ >= machine->trace_block_limit_) return;
@@ -3362,6 +3383,7 @@ void usage(const char* program) {
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--trace-patch-entry ADDR] (repeatable, trace guest code addresses)\n"
               << "       [--trace-block-state FILE] [--trace-block-start ADDR] [--trace-block-limit N] (CSV basic-block registers/segments/stack)\n"
+              << "       [--trace-block-tail] (last 64 basic-block addresses on a zero-address stop)\n"
               << "       [--trace-instruction-state FILE --trace-instruction-start ADDR] [--trace-instruction-limit N]\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
@@ -3409,7 +3431,7 @@ int main(int argc, char** argv) {
         bool self_test_archive_lookup = false, self_test_patch_hits = false;
         bool self_test_zero_return = false;
         bool trace_interrupts = false, trace_archive_lookups = false;
-        bool trace_entry_state = false;
+        bool trace_entry_state = false, trace_block_tail = false;
         std::vector<MouseEvent> mouse_events;
         std::vector<TimedKeyEvent> key_events;
         std::vector<JoystickEvent> joystick_events;
@@ -3448,6 +3470,8 @@ int main(int argc, char** argv) {
                 if (end != value.size() || address >= IMAGE_SIZE)
                     throw std::runtime_error("--trace-patch-entry expects a guest address");
                 trace_patch_entries.push_back(uint32_t(address));
+            } else if (!std::strcmp(argv[i], "--trace-block-tail")) {
+                trace_block_tail = true;
             } else if (!std::strcmp(argv[i], "--trace-block-state") && i + 1 < argc) {
                 trace_block_state = argv[++i];
             } else if (!std::strcmp(argv[i], "--trace-block-start") && i + 1 < argc) {
@@ -3913,7 +3937,13 @@ int main(int argc, char** argv) {
                 // xor eax,eax; push eax; ret: bad control transfer to the
                 // emulation end address must fail rather than spend fuel.
                 constexpr uint8_t code[] = {0x31, 0xc0, 0x50, 0xc3};
-                std::copy(std::begin(code), std::end(code), image.begin() + ENTRY);
+                std::vector<uint8_t> chain;
+                if (trace_block_tail) {
+                    for (unsigned i = 0; i < 80; ++i)
+                        chain.insert(chain.end(), {0xeb, 0x01, 0xcc}); // jmp over int3
+                }
+                chain.insert(chain.end(), std::begin(code), std::end(code));
+                std::copy(chain.begin(), chain.end(), image.begin() + ENTRY);
             } else if (self_test_patch_hits) {
                 std::copy(std::begin(patch_hits_guest), std::end(patch_hits_guest), image.begin() + ENTRY);
                 put32(image, ENTRY + 1, 0x200 - (ENTRY + 5));
@@ -3929,6 +3959,7 @@ int main(int argc, char** argv) {
             if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
             if (self_test_patch_hits) machine.enable_patch_hit_trace({0x200, ENTRY});
             machine.enable_guest_hashes(guest_hash_ranges);
+            if (trace_block_tail) machine.enable_block_tail_trace();
             if (self_test_zero_return) {
                 const bool realtime_zero = timing == ExecutionTiming::Realtime;
                 const std::string expected = std::string(realtime_zero ? "real-time" :
@@ -3939,6 +3970,17 @@ int main(int argc, char** argv) {
                                 realtime_zero, realtime_zero ? 0.1 : 0, performance);
                 } catch (const std::runtime_error& error) {
                     if (std::string(error.what()).find(expected) != 0) throw;
+                    if (trace_block_tail) {
+                        std::ostringstream tail;
+                        tail << " block_tail=" << std::hex;
+                        for (unsigned i = 17; i <= 80; ++i)
+                            tail << (i == 17 ? "0x" : ",0x") << ENTRY + 3 * i;
+                        const std::string diagnostic = error.what();
+                        if (diagnostic.size() < tail.str().size() ||
+                            diagnostic.compare(diagnostic.size() - tail.str().size(),
+                                               tail.str().size(), tail.str()) != 0)
+                            throw std::runtime_error("zero-return block history order/size mismatch");
+                    }
                     std::cout << "zero-return stop detected (" <<
                         (realtime_zero ? "real-time" : "instruction-counted") << ")\n";
                     return 0;
@@ -4055,6 +4097,7 @@ int main(int argc, char** argv) {
             machine.trace_patch_entry_state(trace_entry_state);
         }
         machine.enable_guest_hashes(guest_hash_ranges);
+        if (trace_block_tail) machine.enable_block_tail_trace();
         if (!capture_targets.empty())
             machine.set_capture_memory_ranges(std::move(capture_memory_ranges));
         if (!capture_targets.empty())

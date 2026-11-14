@@ -4082,3 +4082,29 @@ local/hybrid-null-stop-{selftest-build,ctest}-20261114.log.
 The first diagnostic launch did not start because the redirected output
 directory was absent; after creating it, the actual replay completed with the
 reported failure and snapshot. No game assets changed.
+
+### 2026-11-14 — bounded basic-block history identifies loading corruption
+
+Add opt-in --trace-block-tail: keep only the last 64 basic-block addresses
+and append them to an unexpected zero-address stop. This avoids an unbounded
+instruction log while retaining the code immediately before a corrupt return.
+Synthetic 80-block jump chains verify ring wrap, chronological order and exact
+capacity in instruction-counted and real-time modes. Four zero-stop CTests and
+19 Python replay tests pass. Default execution installs no history hook.
+
+The same two-Return hybrid replay now identifies build_ramp_table_e7ea4 as the
+last returning body, repeatedly calling original truncate_9d72c and __CHP.
+The captured register/RAM snapshot is byte-identical with and without tracing
+(SHA-256 0ce2e0456cb8502c780d4d743365398f36ef7f9f36dc9d101fc7c06041594679).
+Both stop at tick 3221 with the same corrupted stack, confirming that the
+recorder did not change the guest state in this case. Snapshot decoding was
+validated against the reconstructed, SHA-bound patched input image.
+
+The actual caller pushes an eight-byte double each iteration, but original
+0x9d72c consumes/returns ST0 and performs plain RET. The canonical declaration
+missing an x87 pragma and its EAX:double signature are incorrect (the alternate
+guest_fn_9d72c_x alias already has an x87 pragma). Next correct that ABI, keep
+the unverified ceil/floor replacement excluded, and replay the full image.
+Evidence: local/hybrid-block-tail-20261114/{run,annotated}.log, its validated
+stopped-ram.bin, and local/hybrid-block-tail-{build,ctest,parser-tests}-20261114.log.
+Proprietary state and diagnostic code dumps remain ignored.

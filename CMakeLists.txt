@@ -390,6 +390,13 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --self-test-zero-return --timing realtime)
   set_tests_properties(unicorn-cpp-zero-return unicorn-cpp-zero-return-realtime PROPERTIES
                        PASS_REGULAR_EXPRESSION "zero-return stop detected")
+  add_test(NAME unicorn-cpp-zero-return-history COMMAND ef2000-unicorn-cpp
+           --self-test-zero-return --trace-block-tail)
+  add_test(NAME unicorn-cpp-zero-return-history-realtime COMMAND ef2000-unicorn-cpp
+           --self-test-zero-return --trace-block-tail --timing realtime)
+  set_tests_properties(unicorn-cpp-zero-return-history
+                       unicorn-cpp-zero-return-history-realtime PROPERTIES
+                       PASS_REGULAR_EXPRESSION "zero-return stop detected")
   add_test(NAME unicorn-cpp-patch-hits COMMAND ef2000-unicorn-cpp --self-test-patch-hits)
   set_tests_properties(unicorn-cpp-patch-hits PROPERTIES
                        PASS_REGULAR_EXPRESSION "patch_hit: addr=0x200 count=2")
