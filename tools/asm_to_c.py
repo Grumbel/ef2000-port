@@ -263,7 +263,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
                           asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + '\n#endif\n')
-RUNTIME += asm_x87.NARROW_RUNTIME
+RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME
 
 
 class Unsupported(ValueError):
@@ -509,6 +509,10 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
+    try:
+        binary_operation = asm_x87.binary_register(insn)
+    except ValueError as error:
+        raise Unsupported(str(error)) from error
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
     narrow_store = mnemonic in ('fst', 'fstp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
@@ -535,6 +539,12 @@ def instruction_c(insn, starts):
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif binary_operation is not None:
+        operation, left, right, destination, pop, opcode = binary_operation
+        code += ['a = ef_x87_register_binary(s, %d, %d, %d, %d, %d); if (a) return a;' %
+                 (operation, left, right, destination, pop),
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
+                 (insn['address'], opcode)]
     elif stack_operation is not None:
         operation, argument = stack_operation
         encoded = bytes.fromhex(insn['bytes'])
@@ -820,6 +830,8 @@ def translate(record, *, starts=None, renderer=instruction_c):
     if re.search(r'\bproduct\b', '\n'.join(cases)):
         declarations += '\n    uint64_t product;'
     prefix = asm_x87.NARROW_DEFINE if any('ef_x87_store_real(' in case for case in cases) else ''
+    if any('ef_x87_register_binary(' in case for case in cases):
+        prefix += asm_x87.BINARY_DEFINE
     return prefix + '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
 #include "ef_lift_state.h"
 unsigned ef_lift_%08x(ef_lift_state *s, uint32_t fuel) {
@@ -897,10 +909,14 @@ def generate(inventory, output, image):
 
 
 def bind_backends(report, codes):
+    codes = list(codes)
     required = any(asm_x87.NARROW_DEFINE in code for code in codes)
     report['required_backends'] = [asm_x87.NARROW_BACKEND] if required else []
     if required:
         report['backend_source_sha256'] = hashlib.sha256((ROOT / 'tools/asm_x87_narrow.c').read_bytes()).hexdigest()
+    if any(asm_x87.BINARY_DEFINE in code for code in codes):
+        report['required_backends'].append(asm_x87.BINARY_BACKEND)
+        report['binary_backend_source_sha256'] = hashlib.sha256((ROOT / 'tools/asm_x87_binary.c').read_bytes()).hexdigest()
 
 
 def main(argv=None):

@@ -597,3 +597,55 @@ load normalization. Run `ASM_SOFTFLOAT_BUILD=local/asm-softfloat python3 -m unit
 tests.test_asm_x87_binary`. This is masked arithmetic only: guest instruction
 rendering, stack effects, unmasked exception effects/delivery and corpus coverage
 remain unchanged and unproven by these tests.
+
+Generated register FADD/FMUL/FSUB/FSUBR/FDIV/FDIVR now uses the arithmetic
+adapter, including ST(i) destinations and pop forms. Encoding and decoded
+mnemonic/operand spelling must agree. Optional arithmetic code uses a separate
+header guard and backend declaration/source digest; the verifier validates and
+links both arithmetic and narrowing dependencies when required. Missing/stale/
+undeclared arithmetic dependencies fail before output/compilation.
+
+The control-aware adapter suppresses the destination for unmasked IE/DE/ZE.
+Unmasked OE/UE instead compute the precision-rounded normal result with exponent
+wrapped by 24,576; PE can commit the result and pop. Rebased finite operands
+retain sticky contributions without host floating-point arithmetic. Exact tiny
+results can signal unmasked UE, but rounding to the minimum normal avoids UE.
+Earlier sticky flags are preserved; masked stack underflow writes indefinite
+and can pop, while unmasked stack invalid suppresses both. Pending exceptions
+still stop explicitly at the next waiting instruction (status 8); no #MF
+delivery is claimed. Reserved precision control remains unsupported.
+
+5,512,656 raw adapter/hardware comparisons cover masked arithmetic plus all
+exception-mask combinations. A separate 1,880,064 generated-body comparison
+covers all 144 register encodings, all masks/defined PC/RC, rotated TOP, empty
+operands, seeded sticky flags and signed special/range/rounding cases. Compare
+all physical raw registers (including popped contents), status/tags, opcode,
+flags and relocated environment under UBSan; RAM remains unchanged. Pending
+state is checked for no partial mutation. All 144 forms compile warning-free
+with Watcom. Tests: `tests.test_asm_x87_binary` and
+`tests.test_asm_x87_arithmetic`, with `ASM_SOFTFLOAT_BUILD` set. Memory arithmetic,
+the unowned FDIV target at 0x11f7f9, exception delivery and game integration
+remain separate work.
+
+Native pointer checks require an uninterrupted measurement on this AMD host.
+A hardware-only 10-million-sample probe reproduced four pointer changes, all
+across measured thread context switches, and none in 9,999,854 uninterrupted
+samples. This is consistent with the AMD pointer-restore limitation described
+in [Linux's FPU restore code](https://raw.githubusercontent.com/torvalds/linux/master/arch/x86/kernel/fpu/core.c).
+The generated-body test checks per-thread context-switch counters around the
+native call and rejects interrupted measurements before inspecting any output
+or running C. It retries the same input (bounded), records the rejected count,
+and still compares every field. The final 1,880,064-case run rejected 61 such
+measurements; it binds adapter/dependency/runtime/generated/test source hashes.
+No comparison fields or corpus differences are waived.
+
+All 109 regression tests pass; strengthened context checks pass in a separate
+final focused run. The completed 2,117-body corpus has 33,872 probes: 18,530
+matches, 15,097 inconclusive and 245 mismatches across 21 bodies. All preceding
+2,107 per-body outcomes remain unchanged. The ten new bodies add 29 inconclusive
+and 131 mismatches, with differences confined to x87 status/opcode (including
+invalid versus divide-by-zero status for 0/0). The gate remains nonzero.
+Artifacts: local/asm-x87-register-arithmetic-full-tests-20261114.log,
+local/asm-x87-register-arithmetic-tests-20261114.log,
+local/asm-x87-binary-unmasked-probe-20261114/context-switch-evidence.json and
+local/asm-c-x87-register-arithmetic-diff-20261114/report.json.

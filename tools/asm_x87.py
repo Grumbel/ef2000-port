@@ -12,6 +12,38 @@ import re
 
 NARROW_BACKEND = 'softfloat-3e-8086-narrow-v1'
 NARROW_DEFINE = '#define EF_LIFT_SOFTFLOAT_NARROW 1\n'
+BINARY_BACKEND = 'softfloat-3e-8086-binary-v1'
+BINARY_DEFINE = '#define EF_LIFT_SOFTFLOAT_BINARY 1\n'
+
+
+def binary_register(insn):
+    """Decode register arithmetic, checking the independently decoded spelling."""
+    mnemonic = insn['mnemonic']
+    names = ('fadd', 'fmul', 'fsub', 'fsubr', 'fdiv', 'fdivr')
+    if mnemonic.rstrip('p') not in names:
+        return None
+    encoded = bytes.fromhex(insn['bytes'])
+    if len(encoded) != 2 or encoded[0] not in (0xd8, 0xdc, 0xde) or encoded[1] < 0xc0:
+        raise ValueError('unsupported x87 arithmetic encoding')
+    group, index = (encoded[1] >> 3) & 7, encoded[1] & 7
+    if group not in (0, 1, 4, 5, 6, 7):
+        raise ValueError('unsupported x87 arithmetic group')
+    operation = {0: 0, 1: 2, 4: 1, 5: 1, 6: 3, 7: 3}[group]
+    destination = 0 if encoded[0] == 0xd8 else index
+    left, right = (0, index) if group in (0, 1, 4, 6) else (index, 0)
+    reverse = group in (5, 7) if encoded[0] == 0xd8 else group in (4, 6)
+    expected = {0: 'fadd', 1: 'fmul', 4: 'fsub', 5: 'fsub', 6: 'fdiv', 7: 'fdiv'}[group]
+    expected += 'r' if reverse else ''
+    expected += 'p' if encoded[0] == 0xde else ''
+    registers = []
+    for operand in insn['operands'].lower().replace(' ', '').split(','):
+        match = re.fullmatch(r'st(?:\(([0-7])\))?', operand)
+        if not match:
+            raise ValueError('unsupported x87 arithmetic operands')
+        registers.append(int(match[1] or 0))
+    if mnemonic != expected or registers != ([0, index] if encoded[0] == 0xd8 else [index, 0]):
+        raise ValueError('x87 arithmetic encoding/spelling mismatch')
+    return operation, left, right, destination, int(encoded[0] == 0xde), ((encoded[0] & 7) << 8) | encoded[1]
 
 
 def stack_operation(mnemonic, text):
@@ -304,6 +336,33 @@ static unsigned ef_x87_store_real(ef_lift_state *s, uint32_t address, unsigned w
     if (unmasked) s->x87_status |= 0x8080u;
     ef_write(s, address, 32, out[0]);
     if (width == 64) ef_write(s, address + 4u, 32, out[1]);
+    if (pop) { s->x87_tag |= 3u << (top * 2); ef_x87_top(s, top + 1u); }
+    return 0;
+}
+#endif
+'''
+
+BINARY_RUNTIME = r'''
+#if defined(EF_LIFT_SOFTFLOAT_BINARY) && !defined(EF_LIFT_BINARY_RUNTIME)
+#define EF_LIFT_BINARY_RUNTIME
+unsigned ef_x87_binary_control(const uint32_t *, const uint32_t *, unsigned, unsigned, uint32_t *);
+static unsigned ef_x87_register_binary(ef_lift_state *s, unsigned operation,
+                                      unsigned left, unsigned right, unsigned destination, unsigned pop) {
+    uint32_t value[3] = {0, 0xc0000000u, 0xffffu}, flags;
+    unsigned top = ef_x87_index(s, 0);
+    if (s->x87_status & 0x80u) return 8;
+    left = ef_x87_index(s, left); right = ef_x87_index(s, right);
+    destination = ef_x87_index(s, destination);
+    if (ef_x87_empty(s, left) || ef_x87_empty(s, right)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+    } else {
+        flags = ef_x87_binary_control(s->x87[left], s->x87[right], operation, s->x87_control, value);
+        if (flags & 0x10000u) return 9;
+        s->x87_status = (s->x87_status & ~0x200u) | (flags & 0x23fu);
+        if (flags & ~s->x87_control & 0x3fu) s->x87_status |= 0x8080u;
+        if (flags & 0x20000u) return 0;
+    }
+    ef_x87_put(s, destination, value);
     if (pop) { s->x87_tag |= 3u << (top * 2); ef_x87_top(s, top + 1u); }
     return 0;
 }

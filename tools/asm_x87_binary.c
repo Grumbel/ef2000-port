@@ -1,7 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
 /* SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception */
 
-/* Masked raw arithmetic only. No guest stack, memory or exception delivery. */
+/* Raw arithmetic and exception-mask effects. No guest stack/memory/delivery. */
 #include <stdint.h>
 #include "platform.h"
 #include "softfloat.h"
@@ -72,4 +72,75 @@ unsigned ef_x87_binary(const uint32_t left[3], const uint32_t right[3],
     out[1] = (uint32_t)(result.signif >> 32);
     out[2] = result.signExp;
     return exceptions;
+}
+
+/* Return bit 17 when a pre-computation exception suppresses the destination.
+   In that case out is untouched. Unmasked range exceptions instead return a
+   rounded, exponent-wrapped result, as required for register arithmetic. */
+unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
+                               unsigned operation, unsigned control, uint32_t out[3])
+{
+    uint32_t result[3], scaled[2][3], rounded[3];
+    uint64_t significand;
+    int exponent[2], shift, result_exponent, common;
+    unsigned flags, scaled_flags, precision = (control >> 8) & 3u;
+    unsigned rounding = (control >> 10) & 3u, i;
+    const uint32_t *raw;
+    flags = ef_x87_binary(left, right, operation, precision, rounding, result);
+    if (flags & 0x10000u) return flags;
+    if ((flags & ~control & 1u)) return 0x20001u;
+    if ((flags & ~control & 4u)) return 0x20004u;
+    if ((flags & ~control & 2u)) return 0x20002u;
+    /* Range adjustment applies only to finite nonzero results of finite
+       operands. NaNs/invalid/divide-by-zero have already taken priority. */
+    if (!(flags & 5u) && (control & 0x18u) != 0x18u &&
+        (left[2] & 0x7fffu) != 0x7fffu && (right[2] & 0x7fffu) != 0x7fffu) {
+        for (i = 0; i < 2; ++i) {
+            raw = i ? right : left;
+            significand = ((uint64_t)raw[1] << 32) | raw[0];
+            exponent[i] = (int)(raw[2] & 0x7fffu);
+            if (!exponent[i]) exponent[i] = 1;
+            if (significand) {
+                while (!(significand & ((uint64_t)1 << 63))) {
+                    significand <<= 1; --exponent[i];
+                }
+            }
+            scaled[i][0] = (uint32_t)significand;
+            scaled[i][1] = (uint32_t)(significand >> 32);
+            scaled[i][2] = raw[2] & 0x8000u;
+        }
+        if (operation < 2) {
+            common = exponent[0] > exponent[1] ? exponent[0] : exponent[1];
+            shift = 0x3fff - common;
+        } else shift = 0;
+        for (i = 0; i < 2; ++i) {
+            if (!(scaled[i][0] | scaled[i][1])) continue;
+            if (operation >= 2) scaled[i][2] |= 0x3fffu;
+            else if (exponent[i] + shift > 0) scaled[i][2] |= (unsigned)(exponent[i] + shift);
+            else {
+                /* An operand this far below the other operand contributes
+                   only a sticky bit. Preserve its nonzero sign/direction. */
+                scaled[i][0] = 1; scaled[i][1] = 0;
+            }
+        }
+        scaled_flags = ef_x87_binary(scaled[0], scaled[1], operation, precision, rounding, rounded);
+        if (rounded[0] | rounded[1]) {
+            result_exponent = (int)(rounded[2] & 0x7fffu);
+            if (operation < 2) common = -shift;
+            else if (operation == 2) common = exponent[0] + exponent[1] - 0x7ffe;
+            else common = exponent[0] - exponent[1];
+            result_exponent += common;
+            if (!(control & 8u) && (flags & 8u)) {
+                rounded[2] = (rounded[2] & 0x8000u) | (unsigned)(result_exponent - 24576);
+                flags = (flags & 2u) | (scaled_flags & 0x220u) | 8u;
+                for (i = 0; i < 3; ++i) result[i] = rounded[i];
+            } else if (!(control & 0x10u) && result_exponent <= 0) {
+                rounded[2] = (rounded[2] & 0x8000u) | (unsigned)(result_exponent + 24576);
+                flags = (flags & 2u) | (scaled_flags & 0x220u) | 0x10u;
+                for (i = 0; i < 3; ++i) result[i] = rounded[i];
+            }
+        }
+    }
+    for (i = 0; i < 3; ++i) out[i] = result[i];
+    return flags;
 }

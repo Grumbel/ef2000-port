@@ -3036,3 +3036,64 @@ This adapter proves masked raw arithmetic only; unmasked architectural effects,
 stack/rendering integration, pending exception delivery, full corpus and game
 integration still require work. Existing selected-body count and nonzero gate
 are unchanged. No tracker promotion; all dependency/generated artifacts local/.
+
+**2026-11-14 — Register arithmetic, exception masks and exponent wrapping.**
+Integrated FADD/FMUL/FSUB/FSUBR/FDIV/FDIVR register forms and pop variants.
+Check opcode/operand spelling before rendering; preserve raw popped payloads,
+all other registers/tags and prior sticky flags. Model masked/unmasked stack
+invalid, early IE/DE/ZE suppression, and late OE/UE/PE results/pop. New controlled
+adapter rebases finite inputs, preserving tiny sticky contributions, to obtain
+precision-rounded exponent-wrapped OE/UE results (24,576 bias). Exact subnormal
+results can raise unmasked UE; a rounded minimum-normal result avoids it.
+Retain explicit pending-delivery status 8; reserved PC remains unsupported.
+Both generators bind a separate arithmetic backend/source hash; verifier
+validates dependencies before creating output, builds recorded adapters and
+links both backends with unresolved symbols rejected. No original fallback.
+5,512,656 raw hardware cases pass across all exception masks, PC/RC and
+special/range/rounding inputs. Another 1,880,064 generated-body hardware cases
+pass under UBSan: all 144 encoded register variants, every mask/defined PC/RC,
+rotated TOP, empty operands and seeded sticky flags; compare all physical raw
+registers, tags/status, opcode, flags and relocated context, including retained
+popped payloads. Pending-state checks show no mutation; RAM unchanged. All 144
+forms compile warning-free with Watcom. Regeneration selects 2,117 bodies,
+273,524 bytes (+10 bodies, +1,479 bytes); syntax support 3,665. All 2,117 body
+objects and dispatcher compile with Watcom -we. Full regression/corpus gates
+are recorded separately when complete. The unowned 0x11f7f9 FDIV target still
+needs boundary review; memory arithmetic also remains unsupported. No tracker promotion or game/ABI
+claim. Evidence:
+local/asm-x87-binary-control-tests-20261114.log,
+local/asm-x87-binary-control-evidence-20261114.json,
+local/asm-x87-register-arithmetic-tests-20261114.log,
+local/asm-x87-register-arithmetic-evidence-20261114.json,
+local/asm-x87-register-arithmetic-watcom-20261114/compile.log,
+local/asm-c-x87-register-arithmetic-program-20261114/report.json.
+
+Final regression: 109 tests pass without skips (250 s, Python 3.13.12/Unicorn
+2.1.4); final strengthened arithmetic context checks also pass (62 s, Python
+3.13.17). Native-only stress isolated a host observation problem: four pointer
+changes in ten million samples, all with measured thread context switches;
+9,999,854 uninterrupted samples preserve pointers. Consistent with the AMD
+pointer restore limitation documented in Linux arch/x86/kernel/fpu/core.c.
+The generated-body test now brackets each native call with per-thread context
+switch counts and rejects interrupted measurements before examining results
+or running C; bounded retries repeat the exact input. Final run rejects 61
+interrupted samples and compares all fields for 1,880,064 accepted cases. No
+diff-based retry or field masking. Evidence binds current adapter, dependency,
+runtime, generated and test sources. Host-only evidence:
+local/asm-x87-binary-unmasked-probe-20261114/context-switch-evidence.json.
+Full comparison: 33,872 probes, 18,530 matches, 15,097 inconclusive and 245
+mismatches across 21 bodies; 751 bodies pass all probes and 1,345 are
+inconclusive. All prior 2,107 per-body outcomes unchanged. Ten new bodies
+contribute 29 inconclusive and 131 mismatches, confined to x87 status/opcode
+(including 0/0 invalid versus divide-by-zero). All discrepancies remain failures;
+gate exits 1. Report: local/asm-c-x87-register-arithmetic-diff-20261114/report.json.
+Commands: ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3
+-m unittest tests.test_asm_x87_arithmetic tests.test_asm_x87_binary plus the
+preceding 106-test list; tools/asm_c_differential.py --translations
+local/asm-c-x87-register-arithmetic-program-20261114 --output
+local/asm-c-x87-register-arithmetic-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386>.
+Logs: local/asm-x87-register-arithmetic-full-tests-20261114.log and
+local/asm-x87-register-arithmetic-tests-20261114.log. Oracle accuracy, reviewed
+dynamic target ownership, remaining x87 operations and game integration remain
+active. No tracker promotion and no full equivalence claim.

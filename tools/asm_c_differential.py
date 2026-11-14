@@ -269,7 +269,10 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
             raise ValueError('translation source digest mismatch')
     sources = [directory / e['file'] for e in artifacts]
     needs_narrow = any(asm_to_c.asm_x87.NARROW_DEFINE in source.read_text() for source in sources)
+    needs_binary = any(asm_to_c.asm_x87.BINARY_DEFINE in source.read_text() for source in sources)
     expected_backends = [asm_to_c.asm_x87.NARROW_BACKEND] if needs_narrow else []
+    if needs_binary:
+        expected_backends.append(asm_to_c.asm_x87.BINARY_BACKEND)
     if manifest.get('required_backends', []) != expected_backends:
         raise ValueError('translation backend declaration mismatch')
     if needs_narrow:
@@ -278,11 +281,19 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         if manifest.get('backend_source_sha256') != asm_softfloat.digest(asm_to_c.ROOT / 'tools/asm_x87_narrow.c'):
             raise ValueError('narrowing adapter source digest mismatch; regenerate translations')
         asm_softfloat.validated_build(softfloat_build, watcom=bool(watcom))
+    if needs_binary:
+        if softfloat_build is None:
+            raise ValueError('arithmetic translations require --softfloat-build')
+        if manifest.get('binary_backend_source_sha256') != asm_softfloat.digest(asm_to_c.ROOT / 'tools/asm_x87_binary.c'):
+            raise ValueError('arithmetic adapter source digest mismatch; regenerate translations')
+        asm_softfloat.validated_build(softfloat_build, watcom=bool(watcom))
     if not generated:
         raise ValueError('no generated C sources to test')
     output.mkdir(parents=True, exist_ok=False)
     backend = (asm_softfloat.build_narrow(softfloat_build, output / 'narrow-backend',
                                         compiler=compiler, watcom=watcom) if needs_narrow else None)
+    binary_backend = (asm_softfloat.build_binary(softfloat_build, output / 'binary-backend',
+                                               compiler=compiler, watcom=watcom) if needs_binary else None)
     watcom_results = {}
     if watcom:
         objects = output / 'objects'
@@ -308,6 +319,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                '-Werror', '-Wno-unused-function', '-I', str(directory), str(unit), '-o', str(library)]
     if backend:
         command += [str(output / 'narrow-backend/narrow.so'), '-Wl,-z,defs']
+    if binary_backend:
+        command += [str(output / 'binary-backend/binary.so'), '-Wl,-z,defs']
     result = subprocess.run(command, capture_output=True, text=True)
     (output / 'compile.log').write_text(result.stdout + result.stderr)
     result.check_returncode()
@@ -342,6 +355,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
                   narrow_backend=backend,
+                  binary_backend=binary_backend,
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
@@ -354,7 +368,7 @@ def main(argv=None):
     parser.add_argument('--workspace', type=Path, default=asm_to_c.ROOT / 'local/ghidra')
     parser.add_argument('--compiler', default='cc')
     parser.add_argument('--watcom', help='also require warning-free OpenWatcom compilation')
-    parser.add_argument('--softfloat-build', type=Path, help='validated SoftFloat build for narrowing stores')
+    parser.add_argument('--softfloat-build', type=Path, help='validated SoftFloat build for narrowing stores and arithmetic')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
     args = parser.parse_args(argv)

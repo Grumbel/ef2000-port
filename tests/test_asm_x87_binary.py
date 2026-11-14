@@ -32,6 +32,9 @@ class BinaryTests(unittest.TestCase):
             convert.argtypes = [pointer, pointer, ctypes.c_uint, ctypes.c_uint,
                                 ctypes.c_uint, pointer]
             convert.restype = ctypes.c_uint
+            controlled = library.ef_x87_binary_control
+            controlled.argtypes = [pointer, pointer, ctypes.c_uint, ctypes.c_uint, pointer]
+            controlled.restype = ctypes.c_uint
             globals_ = [ctypes.c_uint8.in_dll(library, name) for name in
                         ('softfloat_roundingMode', 'softfloat_exceptionFlags',
                          'softfloat_detectTininess', 'extF80_roundingPrecision')]
@@ -65,20 +68,28 @@ PROBE(divide, ".byte 0xd8,0xf1")
             captured = (ctypes.c_uint8 * 108)()
             cases = 0
 
-            def check(a, b, operation, precision, rounding):
+            def check(a, b, operation, precision, rounding, masks=None):
                 nonlocal cases
                 for raw, value in ((left, a), (right, b)):
                     raw[:] = [value[0] & 0xffffffff, value[0] >> 32, value[1]]
-                struct.pack_into('<H', state, 0, 0x7f | precision << 8 | rounding << 10)
+                control = 0x40 | (63 if masks is None else masks) | precision << 8 | rounding << 10
+                struct.pack_into('<H', state, 0, control)
                 struct.pack_into('<H', state, 4, 0x4500)
                 struct.pack_into('<H', state, 8, 0xfff0)
                 struct.pack_into('<QH', state, 28, *a)
                 struct.pack_into('<QH', state, 38, *b)
                 operations[operation](initial, captured)
-                flags = convert(left, right, operation, precision, rounding, result)
+                result[:] = [123, 456, 789]
+                flags = (convert(left, right, operation, precision, rounding, result) if masks is None else
+                         controlled(left, right, operation, control, result))
                 expected = struct.unpack_from('<QH', bytes(captured), 28)
-                actual = (result[0] | result[1] << 32, result[2])
-                context = (a, b, operation, precision, rounding)
+                if flags & 0x20000:
+                    self.assertEqual(list(result), [123, 456, 789])
+                    actual = a
+                    flags &= ~0x20000
+                else:
+                    actual = (result[0] | result[1] << 32, result[2])
+                context = (a, b, operation, precision, rounding, masks)
                 self.assertEqual(actual, expected, context)
                 self.assertEqual(flags, struct.unpack_from('<H', bytes(captured), 4)[0] & 0x23f,
                                  context)
@@ -119,6 +130,17 @@ PROBE(divide, ".byte 0xd8,0xf1")
                         for precision in (0, 2, 3):
                             for rounding in range(4):
                                 check(a, b, operation, precision, rounding)
+                control_pairs = [(a, b) for a in values for b in values]
+                control_pairs += [((0xffffffffffffffff, 0x7ffe), (0x8000000000000000, 0x4000)),
+                                  ((0x8000000000000000, 1), (0x8000000000000000, 0x3ffe)),
+                                  ((0x7fffffffffffffff, 0), (0x8000000000000001, 0x3fff)),
+                                  ((0xffffffffffffffff, 0x7ffe), (1, 0))]
+                for a, b in control_pairs:
+                    for masks in range(64):
+                        for operation in range(4):
+                            for precision in (0, 2, 3):
+                                for rounding in range(4):
+                                    check(a, b, operation, precision, rounding, masks)
                 # Sweep the extended exponent range through every precision
                 # and rounding mode, crossing tiny and overflow boundaries.
                 for exponent in range(1, 0x7fff):
@@ -138,7 +160,7 @@ PROBE(divide, ".byte 0xd8,0xf1")
                     Path(os.environ['ASM_BINARY_EVIDENCE']).write_text(json.dumps(dict(
                         cases=cases, adapter=report['source_sha256'],
                         dependency=report['dependency_library_sha256'],
-                        scope='Masked raw arithmetic only; no guest effects or unmasked delivery.'),
+                        scope='Raw arithmetic with all exception masks; no guest effects or delivery.'),
                         indent=2) + '\n')
             finally:
                 for value, old in zip(globals_, previous):
