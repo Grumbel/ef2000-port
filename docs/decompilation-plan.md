@@ -3895,3 +3895,22 @@ concrete Blocked: note for blocked entries. Do not promote these bodies to make
 the build pass. Python unittest discovery restricted to test_decomp_batch_09*_payload.py
 passes all eight asset-free inventory tests; eight original-byte suites skip
 without EF2000_PAYLOAD. Runtime repair and complete Nix validation remain pending.
+
+### 2026-11-14 — enforce hybrid ABI exclusions
+
+Hybrid repair found that hybrid_link recorded unsupported signatures in
+unwrapped_abi, but retained them in eligible_entries: both entry jumps and
+external references still selected the unwrapped C body. Remove skipped entries
+from resolution and redirects, and include the reason in exclusions. Synthetic
+two-module tests check missing signatures, callee-clean stack arguments, multiple
+return registers and unsupported preserved registers: the callee entry remains
+original and a supported compiled caller's relocated CALL targets that original
+entry. 22 hybrid/app/OMF tests pass (one compiler-dependent skip).
+
+A pinned full-object relink drops 200 unsupported redirects (2800 to 2600),
+with 342/382 modules retained. This is an ABI correctness fix, not a working-game
+claim: the bounded private-Xvfb replay still faults at 0x10d901 in heap growth.
+The Nix package now builds after the inventory-test fix; its native64 launcher
+reproduces the same fault. Startup bisection continues separately.
+Evidence: local/hybrid-abi-filter-tests-20261114.log,
+local/hybrid-abi-filter-fix-20261114/ and local/hybrid-launch-repair-02-20261114/.

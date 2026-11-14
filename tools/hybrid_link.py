@@ -305,6 +305,13 @@ def link(objects, functions, globals_, mechanical_selected, image,
         trampoline_targets[address] = start
         trampoline_cursor += len(code)
 
+    # Unsupported signatures must remain original for both entry redirects
+    # and external calls from other compiled modules. Merely reporting these
+    # skips still linked them directly to bodies with incompatible ABIs.
+    for address, reason in signature_skip_reasons.items():
+        del eligible_entries[address]
+        excluded.append((address, reason))
+
     arena_end = trampoline_cursor
     if arena_end >= STACK_TOP:
         raise OMFError('linked arena overlaps the guest stack region')
