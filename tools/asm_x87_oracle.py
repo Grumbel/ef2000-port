@@ -10,6 +10,7 @@ Unknown forms, pending delivery and unrecognized hardware context fail closed.
 
 from collections import Counter
 import ctypes
+from functools import lru_cache
 import hashlib
 import json
 from pathlib import Path
@@ -33,7 +34,7 @@ MEMORY = {(0xd9, 0): (4, False, False), (0xd9, 2): (4, True, False),
           (0xdb, 5): (10, False, False), (0xdb, 7): (10, True, False),
           (0xdf, 0): (2, False, False), (0xdf, 5): (8, False, False)}
 MEMORY.update({(opcode, group): (width, False, False)
-               for opcode, width in ((0xd8, 4), (0xdc, 8)) for group in (0, 1, 4, 5, 6, 7)})
+               for opcode, width in ((0xd8, 4), (0xdc, 8)) for group in range(8)})
 
 
 class Unavailable(ValueError):
@@ -42,10 +43,11 @@ class Unavailable(ValueError):
 
 def register_opcodes():
     result = {(0xd9, value) for value in (0xe0, 0xe1, 0xe8, 0xee, 0xf6, 0xf7)}
-    result |= {(0xdb, 0xe2), (0xdb, 0xe3), (0xdf, 0xe0)}
+    result |= {(0xdb, 0xe2), (0xdb, 0xe3), (0xdf, 0xe0), (0xd9, 0xe4), (0xde, 0xd9), (0xda, 0xe9)}
     for index in range(8):
         result |= {(0xd9, 0xc0+index), (0xd9, 0xc8+index),
-                   (0xdd, 0xc0+index), (0xdd, 0xd0+index), (0xdd, 0xd8+index)}
+                   (0xdd, 0xc0+index), (0xdd, 0xd0+index), (0xdd, 0xd8+index),
+                   (0xd8, 0xd0+index), (0xd8, 0xd8+index), (0xdd, 0xe0+index), (0xdd, 0xe8+index)}
         for opcode in (0xd8, 0xdc, 0xde):
             for group in (0, 1, 4, 5, 6, 7):
                 result.add((opcode, 0xc0+group*8+index))
@@ -143,6 +145,7 @@ def build(output, *, compiler='cc'):
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(), command=command,
                   machine=platform.machine(), system=platform.system(),
                   host_selectors=dict(cs=native.host_cs, ds=native.host_ds),
+                  comparison_profile=native.comparison_profile,
                   limits='Known x87 ISA only; flat zero-base operands relocated; pending #MF delivery unsupported.')
     (output/'report.json').write_text(json.dumps(report, indent=2)+'\n')
     return native, report
@@ -180,6 +183,43 @@ def pack(values):
     return state
 
 
+def detect_comparison_profile(execute):
+    """Measure two CPU traits once, never fit a profile to a guest probe result."""
+    profile, evidence = 0, []
+    for bit, control, initial_cc, expected_cc, left in (
+            (1, 0x37e, 0, 0x4500, [1, 0xc0000000, 0x7fff]),
+            (2, 0x37d, 0x4000, 0x100, [1, 0, 0])):
+        values = {field: 0 for field in FIELDS}
+        values.update(x87_control=control, x87_status=initial_cc, x87_tag=0xfff2,
+                      x87=[left, [0, 0x80000000, 0x3fff]]+[[0, 0, 0] for _ in range(6)])
+        observed = execute(values)
+        codes = observed['x87_status'] & 0x4500
+        if codes == expected_cc:
+            profile |= bit
+        elif codes != initial_cc:
+            raise Unavailable('unsupported unmasked comparison condition-code profile')
+        evidence.append(dict(control=control, initial_cc=initial_cc, computed_cc=expected_cc,
+                             observed_status=observed['x87_status']))
+    return dict(flags=profile, invalid_updates_cc=bool(profile & 1),
+                denormal_updates_cc=bool(profile & 2), measurements=evidence)
+
+
+@lru_cache(maxsize=1)
+def unicorn_comparison_profile():
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
+    def probe(values):
+        cpu = Uc(UC_ARCH_X86, UC_MODE_32)
+        cpu.mem_map(0x1000, 0x1000)
+        cpu.mem_write(0x1000, b'\xd8\xd1')
+        restore(cpu, values)
+        try:
+            cpu.emu_start(0x1000, 0x1002, count=1)
+        except UcError:
+            pass
+        return snapshot(cpu)
+    return detect_comparison_profile(probe)
+
+
 class Native:
     def __init__(self, library):
         self.library = ctypes.CDLL(str(library.resolve()))
@@ -188,6 +228,7 @@ class Native:
         self.run.restype = ctypes.c_uint64
         self.host_cs = self.library.ef_x87_host_cs()
         self.host_ds = self.library.ef_x87_host_ds()
+        self.comparison_profile = detect_comparison_profile(lambda values: self.execute(0xd8d1, values, b'', 0)[0])
 
     def execute(self, operation, values, data, eax):
         opcode, modrm = operation >> 8, operation & 255

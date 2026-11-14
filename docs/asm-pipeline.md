@@ -368,8 +368,9 @@ State ABI 2 adds eight physical x87 registers as three explicit 32-bit words
 (significand low/high and sign/exponent), plus control/status/tag words and
 instruction/data pointers, selectors and opcode. TOP remains in the status
 word. No host `double`, `long double`, or packed native 80-bit struct determines
-the state layout. ABI 1 manifests are rejected before compilation; regenerate
-old translation artifacts. The verifier initializes the oracle and C from the
+the state layout. Current ABI 3 retains those fields and adds an immutable
+comparison CPU-profile word (described below). ABI 1/2 manifests are rejected
+before compilation; regenerate old artifacts. The verifier initializes the oracle and C from the
 same captured x87 state and compares every raw register, including empty-slot
 payloads, and all eight environment fields. Current full-corpus probes begin
 with an empty x87 stack and control word 0x37f; separate seeded tests cover
@@ -836,3 +837,57 @@ mismatch. The gate still exits 1. No tracker or game-verification promotion.
 Evidence: local/asm-wait-tests-20261114.log, local/asm-wait-regression-20261114.log,
 local/asm-wait-body-inventory-20261114/manifest.json and
 local/asm-c-wait-diff-20261114/report.json.
+
+FCOM/FCOMP/FCOMPP, FUCOM/FUCOMP/FUCOMPP and FTST now use an exact integer
+raw-80 comparison, with DWORD/QWORD memory forms and zero/one/two pops as
+encoded. Signed zeros compare equal; finite, denormal/pseudo-denormal,
+infinity, NaN and unsupported encodings retain their exception priority.
+FUCOM permits quiet NaNs without IE; FCOM treats every NaN as invalid. Pops
+are suppressed on unmasked invalid/denormal. Masked invalid/stack faults set
+unordered and perform the requested pops; masked DE proceeds with comparison.
+Physical payloads are never quieted or overwritten.
+All other status bits, sticky flags, integer flags/registers and memory remain
+observable. Full bounds and pending checks precede memory effects.
+
+Unmasked comparison condition codes require an explicit CPU profile. The
+[Intel reference](https://cdrdv2-public.intel.com/671110/325383-sdm-vol-2abcd.pdf)
+describes conditional status updates, while this host updates comparison codes
+even when an unmasked invalid/denormal suppresses pops. ABI 3 adds
+`x87_compare_profile`: bit 0 updates C0/C2/C3 on unmasked IE, bit 1 on unmasked
+DE; clear bits preserve those codes. Both references measure these two traits
+with fixed independent inputs before corpus execution. Measurements and the
+chosen flags are recorded; they do not depend on any guest probe result. This
+host and Unicorn both select 3. The verifier initializes the C configuration
+from that fixed profile and detects configuration mutation. No status field
+is masked, and no per-probe result is used to choose a profile. Unsupported
+profile bits fail explicitly. Profile 0 remains a defined preserving policy.
+
+2,356,224 generated-body/native comparisons pass under UBSan across all 39
+forms, masks, defined PC/RC, rotated TOP, prior condition/sticky flags, empty
+operands and signed special/denormal/negative-ordering cases. All physical raw
+values, tags/status/control, opcode, flags, memory and relocated context are
+checked. Explicit preserving/updating policies and invalid configuration are
+tested separately. All 39 forms compile warning-free with Watcom. Full 125-test
+regression passes without skips, followed by the strengthened two-test matrix.
+Regeneration reaches 3,994 syntax-supported and 2,249 selected bodies, 299,929
+bytes (+69 bodies/+16,732 bytes); full corpus evidence remains separate.
+Evidence: local/asm-x87-compare-full-tests-20261114.log,
+local/asm-x87-compare-final-tests-20261114.log,
+local/asm-x87-compare-final-evidence-20261114.json and
+local/asm-x87-compare-watcom-20261114/compile.log. No function is promoted to
+game-verified by these instruction tests.
+
+Completed ABI 3 hardware-oracle corpus: 35,984 probes, 20,201 matches, 15,779
+inconclusive and four existing mismatches. Added 69 bodies contribute 761
+matches and 343 inconclusive, with every preceding probe state unchanged.
+813 bodies pass all probes, 1,434 are inconclusive and two mismatch at the
+untranslated callback targets 0x7f/0x80 (0xded86/0xed133). All 2,249 body objects
+and dispatcher compile warning-free with Watcom. The gate still exits 1.
+Native coverage is 17,269 operations in 57 forms, with five interrupted native
+measurements rejected before results/C execution; seven unknown register forms
+remain inconclusive. Final comparison matrix rejects 73 interrupted samples.
+The recorded profile is fixed at 3 with its two independent measurements;
+current native-oracle source and translation manifest digests are verified.
+Evidence: local/asm-c-x87-compare-diff-20261114/report.json. Captured inputs,
+remaining instructions/services, target coverage and game integration remain
+required; reliable bulk translation is still active.

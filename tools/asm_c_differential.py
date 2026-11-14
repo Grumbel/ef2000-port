@@ -38,7 +38,8 @@ class State(ctypes.Structure):
                 ('x87_control', ctypes.c_uint32), ('x87_status', ctypes.c_uint32),
                 ('x87_tag', ctypes.c_uint32), ('x87_ip', ctypes.c_uint32),
                 ('x87_cs', ctypes.c_uint32), ('x87_dp', ctypes.c_uint32),
-                ('x87_ds', ctypes.c_uint32), ('x87_opcode', ctypes.c_uint32)]
+                ('x87_ds', ctypes.c_uint32), ('x87_opcode', ctypes.c_uint32),
+                ('x87_compare_profile', ctypes.c_uint32)]
 
 
 X87_FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',
@@ -150,6 +151,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                   native_memory, memory_size)
     state.segment[:] = selectors
     set_x87(state, initial_fpu)
+    profile = (native_x87.comparison_profile if native_x87 is not None else
+               asm_x87_oracle.unicorn_comparison_profile())['flags']
+    state.x87_compare_profile = profile
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -162,6 +166,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if phase:
         phase('comparison')
     differences = []
+    if state.x87_compare_profile != profile:
+        differences.append('C comparison CPU profile changed')
     expected = [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
                 for n in asm_to_c.REGS]
     for name, actual, original in zip(asm_to_c.REGS, state.r, expected):
@@ -338,6 +344,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     (output / 'compile.log').write_text(result.stdout + result.stderr)
     result.check_returncode()
     loaded = ctypes.CDLL(str(library.resolve()))
+    comparison_profile = (native_x87.comparison_profile if native_x87 is not None else
+                          asm_x87_oracle.unicorn_comparison_profile())
     entries = []
     progress = output / 'progress.jsonl'
     for entry in manifest['entries']:
@@ -368,6 +376,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
                   original_x87_oracle=native_report or dict(model='unicorn'),
+                  comparison_profile=comparison_profile,
                   narrow_backend=backend,
                   binary_backend=binary_backend,
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')

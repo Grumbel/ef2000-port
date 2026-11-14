@@ -33,7 +33,7 @@ class DecodeTests(unittest.TestCase):
             else:
                 result = oracle.decode(bytes.fromhex(encoded), registers)
                 self.assertEqual((result['address'], result['segment']), (address, segment), encoded)
-        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9fe', 'd81424', 'd9', ''):
+        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9fe', 'df1424', 'd9', ''):
             with self.assertRaises(oracle.Unavailable, msg=encoded):
                 oracle.decode(bytes.fromhex(encoded), registers)
 
@@ -128,6 +128,7 @@ class OracleTests(unittest.TestCase):
             mutations += [('raw FP%d' % index, lambda state, index=index: state.x87[index].__setitem__(0, state.x87[index][0]^1))
                           for index in range(8)]
             mutations += [('eax', lambda state: state.r.__setitem__(0, state.r[0]^1)),
+                          ('comparison profile', lambda state: setattr(state, 'x87_compare_profile', state.x87_compare_profile^1)),
                           ('flags', lambda state: setattr(state, 'flags', state.flags^1)),
                           ('return PC', lambda state: setattr(state, 'pc', state.pc^1)),
                           ('RAM', lambda state: state.memory.__setitem__(0x300200, state.memory[0x300200]^1))]

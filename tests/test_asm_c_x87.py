@@ -30,9 +30,10 @@ class X87StateTests(unittest.TestCase):
             root = Path(temporary)
             image = root / 'image.bin'
             image.write_bytes(b'')
-            (root / 'report.json').write_text(json.dumps(dict(state_abi=1)))
-            with self.assertRaisesRegex(ValueError, 'incompatible translation state ABI'):
-                diff.verify(root, root / 'evidence', image, compiler='must-not-be-invoked')
+            for abi in (1, 2):
+                (root / 'report.json').write_text(json.dumps(dict(state_abi=abi)))
+                with self.assertRaisesRegex(ValueError, 'incompatible translation state ABI'):
+                    diff.verify(root, root / 'evidence', image, compiler='must-not-be-invoked')
             self.assertFalse((root / 'evidence').exists())
 
     def test_snapshot_preserves_physical_registers_and_environment(self):

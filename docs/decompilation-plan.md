@@ -3343,3 +3343,69 @@ local/asm-wait-body-inventory-20261114/manifest.json (including copied raw body
 evidence), local/asm-c-wait-diff-20261114/report.json. Full remaining target,
 x87/trap/runtime-service coverage, captured inputs and game integration stay
 active. Original assets unchanged; all exports and generated source stay local/.
+
+**2026-11-14 — Exact x87 comparisons and explicit unmasked condition-code profile.**
+FCOMP is first unsupported in 213 bodies. Added all 39 canonical register,
+memory, quiet-NaN, pop and FTST forms. Integer raw-80 ordering normalizes only
+local significands/exponents, handles signed zero/infinity and detects NaN/
+unsupported encodings without host floating-point arithmetic. Preserve physical
+payloads and other tags; masked IE/stack invalid produces unordered and requested
+pops, unmasked IE/DE suppresses pops. Prior sticky flags, SF and unaffected
+status/flags remain visible. Memory forms widen exactly with existing helper,
+carry narrow DE, and apply bounds/pending checks before effects.
+Native probes exposed a CPU-specific observable: this host computes condition
+codes on unmasked IE/DE even while suppressing pops. Do not hide those fields
+or silently impose a host behavior. State ABI 3 appends x87_compare_profile:
+bit 0/1 selects computed versus preserved C0/C2/C3 on unmasked IE/DE. Two fixed
+independent probes measure the reference profile once before guest execution;
+record measurements and chosen flags. Native and Unicorn select 3 here. C
+configuration is initialized to that fixed profile and checked for mutation;
+no guest result fitting or field masking. Policy 0 preserves codes; all four
+policies are tested and unknown bits rejected. ABI 1/2 artifacts fail before
+compilation; regeneration required. No old state layout is silently reused.
+2,356,224 final generated-body/native cases pass under UBSan: all 39 forms,
+all masks/defined PC/RC, rotated TOP, old condition/sticky bits, empty operands,
+signed zeros/NaNs/infinities, unsupported encodings, denormals/pseudo-denormals
+and negative-versus-negative ordering. Check all raw physical values, tags/
+status/control, opcode, flags, memory/source spans and relocated metadata.
+125 regression tests pass without skips (403 s); final strengthened two-test
+comparison suite passes (106 s), including preserving/updating policies and
+invalid-profile rejection. Old ABI rejection and CPU-config corruption tests
+pass. All 39 forms compile warning-free with Watcom -we. Regeneration: 3,994
+syntax-supported, 2,249 selected bodies, 299,929 bytes (+69/+16,732). Full corpus
+outcomes are separate evidence. No tracker promotion or game-equivalence claim.
+Commands: python3 -m unittest tests.test_asm_x87_compare plus preceding complete
+123-test module list, with ASM_SOFTFLOAT_BUILD and ASM_MEMORY_ARITHMETIC_WATCOM
+enabled (actual total 125 tests); final python3 -m unittest
+tests.test_asm_x87_compare with ASM_COMPARE_EVIDENCE; tools/asm_c_program.py
+--inventory local/asm-wait-body-inventory-20261114 --output
+local/asm-c-x87-compare-program-20261114. Python 3.13.12/Unicorn 2.1.4. Evidence:
+local/asm-x87-compare-full-tests-20261114.log,
+local/asm-x87-compare-final-tests-20261114.log,
+local/asm-x87-compare-final-evidence-20261114.json,
+local/asm-x87-compare-watcom-20261114/compile.log and
+local/asm-c-x87-compare-program-20261114/report.json. Native profile measurement
+is original-oracle-only and shares no comparison implementation with C.
+
+Final ABI 3 hardware-oracle run: 35,984 probes, 20,201 matching, 15,779
+inconclusive and four existing target mismatches. Added 69 bodies contribute
+761 matches, 343 inconclusive and no mismatches. All old probe states unchanged:
+19,440 pass -> pass, 15,436 inconclusive -> inconclusive, four mismatch ->
+mismatch. 813 bodies pass all probes; 1,434 are inconclusive and two mismatch
+(0xded86/0xed133 targets 0x7f/0x80). CLI exits 1. All 2,249 body objects and
+dispatcher compile warning-free with Watcom -we. Native reference executes
+17,269 operations in 57 forms and rejects five interrupted measurements before
+result inspection/C execution; seven unknown register forms remain inconclusive.
+Final 2,356,224-case matrix rejects 73 interrupted samples and binds current
+test/runtime/native sources. Profile 3 and its two independent measurements
+are present in the final report; current original-oracle source and translation
+manifest digests independently checked. No field masking, guest-result fitting,
+state downgrade or tracker promotion.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-compare-program-20261114 --output
+local/asm-c-x87-compare-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-x87-compare-diff-20261114/report.json. Remaining integer
+stores, other ISA/services/traps, reviewed dynamic targets, captured callers
+and full-game integration remain active. No full game/ABI equivalence claim.

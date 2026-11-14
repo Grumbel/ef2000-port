@@ -16,6 +16,29 @@ BINARY_BACKEND = 'softfloat-3e-8086-binary-v1'
 BINARY_DEFINE = '#define EF_LIFT_SOFTFLOAT_BINARY 1\n'
 
 
+def comparison_register(insn):
+    mnemonic, text = insn['mnemonic'], insn['operands'].strip().lower()
+    if mnemonic not in ('fcom', 'fcomp', 'fucom', 'fucomp', 'fcompp', 'fucompp', 'ftst'):
+        return None
+    encoded = bytes.fromhex(insn['bytes'])
+    special = {'fcompp': (b'\xde\xd9', 1, 0, 2), 'fucompp': (b'\xda\xe9', 1, 1, 2),
+               'ftst': (b'\xd9\xe4', 8, 0, 0)}
+    if mnemonic in special:
+        expected, index, quiet, pop = special[mnemonic]
+        if encoded != expected or text:
+            raise ValueError('unsupported x87 comparison encoding/spelling')
+    else:
+        match = re.fullmatch(r'st(?:\(([0-7])\))?', text)
+        if not match:
+            raise ValueError('unsupported x87 comparison register')
+        index = int(match[1] or 0)
+        quiet, pop = int(mnemonic.startswith('fu')), int(mnemonic.endswith('p'))
+        expected = bytes((0xdd if quiet else 0xd8, (0xe0 if quiet else 0xd0)+pop*8+index))
+        if encoded != expected:
+            raise ValueError('x87 comparison encoding/spelling mismatch')
+    return index, quiet, pop, ((encoded[0] & 7) << 8) | encoded[1]
+
+
 def binary_register(insn):
     """Decode register arithmetic, checking the independently decoded spelling."""
     mnemonic = insn['mnemonic']
@@ -402,4 +425,71 @@ static unsigned ef_x87_memory_binary(ef_lift_state *s, uint32_t address, unsigne
     return 0;
 }
 #endif
+'''
+
+COMPARE_RUNTIME = r'''
+static unsigned ef_x87_nan(const uint32_t *v) {
+    return (v[2] & 0x7fffu) == 0x7fffu && ((v[1] & 0x7fffffffu) || v[0]);
+}
+static int ef_x87_order(const uint32_t *a, const uint32_t *b) {
+    uint64_t left = ((uint64_t)a[1] << 32) | a[0], right = ((uint64_t)b[1] << 32) | b[0];
+    int ae = (int)(a[2] & 0x7fffu), be = (int)(b[2] & 0x7fffu), order;
+    unsigned negative = a[2] & 0x8000u;
+    if (!left && !right && !ae && !be) return 0;
+    if ((a[2] ^ b[2]) & 0x8000u) return negative ? -1 : 1;
+    if (!ae) ae = 1;
+    if (!be) be = 1;
+    if (!left) ae = -32768;
+    else while (!(left & ((uint64_t)1 << 63))) { left <<= 1; --ae; }
+    if (!right) be = -32768;
+    else while (!(right & ((uint64_t)1 << 63))) { right <<= 1; --be; }
+    order = ae < be || (ae == be && left < right) ? -1 :
+            ae > be || (ae == be && left > right) ? 1 : 0;
+    return negative ? -order : order;
+}
+static unsigned ef_x87_compare_values(ef_lift_state *s, const uint32_t *a, const uint32_t *b,
+                                      unsigned empty, unsigned quiet, unsigned pop, unsigned denormal) {
+    unsigned nan_a, nan_b, unsupported, flags = 0, codes, unmasked, i, top = ef_x87_index(s, 0);
+    int order;
+    if (s->x87_compare_profile & ~3u) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    nan_a = ef_x87_nan(a); nan_b = ef_x87_nan(b);
+    unsupported = ((a[2] & 0x7fffu) && !(a[1] & 0x80000000u)) ||
+                  ((b[2] & 0x7fffu) && !(b[1] & 0x80000000u));
+    if (empty) flags = 0x41u;
+    else if (unsupported || (nan_a && (!quiet || !(a[1] & 0x40000000u))) ||
+                           (nan_b && (!quiet || !(b[1] & 0x40000000u)))) flags = 1;
+    if (empty || unsupported || nan_a || nan_b) codes = 0x4500u;
+    else {
+        if (denormal || (!(a[2] & 0x7fffu) && (a[0] || a[1])) ||
+                        (!(b[2] & 0x7fffu) && (b[0] || b[1]))) flags = 2;
+        order = ef_x87_order(a, b);
+        codes = order < 0 ? 0x100u : order == 0 ? 0x4000u : 0;
+    }
+    s->x87_status = (s->x87_status & ~0x200u) | flags;
+    unmasked = flags & ~s->x87_control & 3u;
+    if (!unmasked || (s->x87_compare_profile & (unmasked & 1u ? 1u : 2u)))
+        s->x87_status = (s->x87_status & ~0x4500u) | codes;
+    if (unmasked) { s->x87_status |= 0x8080u; return 0; }
+    for (i = 0; i < pop; ++i) s->x87_tag |= 3u << (((top+i) & 7u)*2);
+    if (pop) ef_x87_top(s, top+pop);
+    return 0;
+}
+static unsigned ef_x87_compare_register(ef_lift_state *s, unsigned index, unsigned quiet, unsigned pop) {
+    uint32_t zero[3] = {0, 0, 0};
+    unsigned top = ef_x87_index(s, 0), other = ef_x87_index(s, index);
+    return ef_x87_compare_values(s, s->x87[top], index == 8 ? zero : s->x87[other],
+        ef_x87_empty(s, top) || (index != 8 && ef_x87_empty(s, other)), quiet, pop, 0);
+}
+static unsigned ef_x87_compare_memory(ef_lift_state *s, uint32_t address, unsigned width, unsigned pop) {
+    uint32_t value[3], low, high = 0;
+    unsigned top = ef_x87_index(s, 0), flags;
+    if (width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width/8u || address > s->memory_size-width/8u) { s->fault = 3; return 3; }
+    low = ef_read(s, address, 32);
+    if (width == 64) high = ef_read(s, address+4u, 32);
+    flags = ef_x87_real_bits(low, high, width, value);
+    return ef_x87_compare_values(s, s->x87[top], value, ef_x87_empty(s, top), 0, pop, (flags & 2u) != 0);
+}
 '''

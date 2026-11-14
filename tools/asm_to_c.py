@@ -25,7 +25,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
 SEGMENTS = ('es', 'cs', 'ss', 'ds', 'fs', 'gs')
-STATE_ABI = 2
+STATE_ABI = 3
 REG = {name: (index, 32, 0) for index, name in enumerate(REGS)}
 for index, name in enumerate(('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')):
     REG[name] = (index, 16, 0)
@@ -60,6 +60,8 @@ typedef struct {
     uint32_t x87[8][3]; /* Physical registers: significand low/high, sign/exponent. */
     uint32_t x87_control, x87_status, x87_tag;
     uint32_t x87_ip, x87_cs, x87_dp, x87_ds, x87_opcode;
+    /* Bit 0/1: update comparison CCs on unmasked invalid/denormal. */
+    uint32_t x87_compare_profile;
 } ef_lift_state;
 static unsigned ef_segments_valid(ef_lift_state *s) {
     unsigned i;
@@ -262,7 +264,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 #endif
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
-                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + '\n#endif\n')
+                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
 RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME
 
 
@@ -509,18 +511,23 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
+    memory_compare = mnemonic in ('fcom', 'fcomp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     memory_binary = mnemonic in ('fadd', 'fmul', 'fsub', 'fsubr', 'fdiv', 'fdivr') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     try:
         binary_operation = None if memory_binary else asm_x87.binary_register(insn)
+        comparison = None if memory_compare else asm_x87.comparison_register(insn)
     except ValueError as error:
         raise Unsupported(str(error)) from error
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
     narrow_store = mnemonic in ('fst', 'fstp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
-    if memory_binary or narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
+    if memory_compare or memory_binary or narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
-            if memory_binary:
+            if memory_compare:
+                encoding, group = (0xd8 if width_of(op) == 32 else 0xdc), (3 if mnemonic == 'fcomp' else 2)
+                helper = 'ef_x87_compare_memory(s, b, %d, %d)' % (width_of(op), mnemonic == 'fcomp')
+            elif memory_binary:
                 encoding = 0xd8 if width_of(op) == 32 else 0xdc
                 group, operation, reverse = {'fadd': (0, 0, 0), 'fmul': (1, 2, 0),
                     'fsub': (4, 1, 0), 'fsubr': (5, 1, 1), 'fdiv': (6, 3, 0), 'fdivr': (7, 3, 1)}[mnemonic]
@@ -545,6 +552,11 @@ def instruction_c(insn, starts):
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif comparison is not None:
+        index, quiet, pop, opcode = comparison
+        code += ['a = ef_x87_compare_register(s, %d, %d, %d); if (a) return a;' % (index, quiet, pop),
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
+                 (insn['address'], opcode)]
     elif binary_operation is not None:
         operation, left, right, destination, pop, opcode = binary_operation
         code += ['a = ef_x87_register_binary(s, %d, %d, %d, %d, %d); if (a) return a;' %
