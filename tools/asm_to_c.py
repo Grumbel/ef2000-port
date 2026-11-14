@@ -100,6 +100,31 @@ static void ef_write(ef_lift_state *s, uint32_t address, unsigned width, uint32_
     }
     for (i = 0; i < bytes; ++i) s->memory[address+i] = (uint8_t)(value >> (8*i));
 }
+/* Match the flat integer oracle's save/restore order, including partial
+ * effects on a memory fault. ESP commits only after the instruction completes.
+ * Exception delivery itself remains outside this explicit-state model. */
+static unsigned ef_stack_all(ef_lift_state *s, unsigned pop) {
+    uint32_t stack = s->r[4], address, value;
+    unsigned slot, byte, index;
+    for (slot = 0; slot < 8; ++slot) {
+        index = 7u-slot;
+        if (pop && index == 4) continue; /* Discard the saved ESP slot, without reading it. */
+        address = (pop ? stack : stack-32u) + slot*4u;
+        if (pop) {
+            value = ef_read(s, address, 32);
+            if (s->fault) return s->fault;
+            s->r[index] = value;
+        } else {
+            value = s->r[index];
+            for (byte = 0; byte < 4; ++byte) {
+                ef_write(s, address+byte, 8, value >> (8u*byte));
+                if (s->fault) return s->fault;
+            }
+        }
+    }
+    s->r[4] = pop ? stack+32u : stack-32u;
+    return 0;
+}
 static void ef_szp(ef_lift_state *s, uint32_t result, unsigned width) {
     uint32_t byte = result & 255u, parity;
     byte ^= byte >> 4; byte &= 15u;
@@ -701,6 +726,10 @@ def instruction_c(insn, starts):
     elif mnemonic == 'leave' and not text:
         code += ['a = ef_read(s, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
+    elif mnemonic in ('pusha', 'popa'):
+        if text or insn['bytes'] != ('60' if mnemonic == 'pusha' else '61'):
+            raise Unsupported('unsupported PUSHA/POPA encoding/spelling')
+        code.append('a = ef_stack_all(s, %d); if (a) return a;' % (mnemonic == 'popa'))
     elif mnemonic in ('push', 'pop'):
         op = operand(text)
         if op[0] == 'seg' and mnemonic == 'push':

@@ -1065,3 +1065,72 @@ and supplementary wrapper script/library digests checked independently. Stack
 operations, interrupt/services, remaining x87 operations, audited flow gaps,
 reviewed dynamic targets, captured callers and full-game integration remain;
 reliable bulk translation remains active.
+
+Unprefixed 32-bit PUSHA/POPA (60/61) now preserve the full register save order,
+original saved ESP, POPA's unread/discarded ESP slot, flags and FP state. ESP
+commits only after completion. Partial effects follow the current flat Unicorn
+integer oracle: PUSHA writes ascending frame addresses (including partial bytes
+before the RAM boundary); POPA can restore earlier registers before a later read
+fault. These are emulator-state observations, not native exception-delivery
+proof. Existing original-fault probes remain inconclusive. Other widths/prefixes
+and mismatched spellings fail explicitly.
+
+1,272 generated-code/Unicorn 2.1.4 comparisons pass under UBSan: 1,122 complete,
+150 faulting, randomized GPRs/RAM/flags, unaligned stacks, both RAM edges and
+wrapping addresses. Compare full RAM/register/flags/PC and untouched remaining
+state; memory-read hooks confirm POPA does not read the saved ESP slot. Both
+forms compile warning-free with Watcom -we. Evidence:
+local/asm-stack-all-tests-20261114.log and
+local/asm-stack-all-evidence-20261114.json.
+
+Regeneration reaches 4,134 syntax-supported and 2,499 dependency-closed bodies,
+402,520 bytes (+3/+374): 0xc46bc, 0xc5c24, 0xc5cd3. The 2,496 preceding body
+sources remain byte-identical. The earlier optimistic 119-body PUSHA estimate
+was a first-blocker upper bound: later interrupts now block six of those roots,
+0xc4167 still depends on 0xc409c, and 0xfa02c exposes apparent post-INT3 gaps.
+Read-only Ghidra audits find one six-byte undefined internal hole with no
+references and no normal flow-gap candidate for 0xfa02c. Both missing next-PCs
+follow INT3 (0xfa0b2/0xfa167); do not recover adjacent bytes as ordinary
+fallthrough without a trap contract. No project/tracker/boundary changes.
+Evidence: local/asm-stack-all-closure-evidence-20261114.json,
+local/asm-stack-all-fa02c-holes-20261114.tsv,
+local/asm-stack-all-flow-gaps-20261114.tsv and generated program report.
+
+Affected inventory/translation/program/segment/x87-state/WAIT/stack regression
+passes: 51 tests without skips (132.424 s), Python 3.13.12/Unicorn 2.1.4. Numeric
+x87 algorithms/backends are unchanged; their preceding matrix evidence remains
+separate. Exact command/environment:
+local/asm-stack-all-regression-command-20261114.json; output:
+local/asm-stack-all-regression-20261114.log.
+
+Static interrupt frontier now covers 56 first-blocked bodies: 99 INT 21h,
+18 INT 31h, three INT 10h, three INT 2Fh and 16 INT 6 instructions. Counts are
+instructions within those bodies, not service-ID proofs. Keep DOS/DPMI/BIOS
+services separate from deliberate trap semantics; no blanket INT translation or
+service stubs were added. Evidence:
+local/asm-stack-all-interrupt-frontier-20261114.json.
+
+Next stack frontier: 0xc409c (dependency of newly unblocked PUSHA body 0xc4167)
+uses 16-bit memory PUSH/POP at 0xc40c7/0xc40f6. Those scalar forms remain
+unsupported; do not infer that all PUSH/POP variants were completed here.
+
+Completed hardware-oracle corpus: 39,984 probes, 22,152 matches, 17,828
+inconclusive and four unchanged callback-target mismatches. All three new
+bodies pass all 16 probes (48 new matches). Every preceding outcome is unchanged:
+22,104 pass -> pass, 17,828 inconclusive -> inconclusive, four mismatch ->
+mismatch. 887 bodies pass all probes, 1,610 are inconclusive and two mismatch
+(0xded86/0xed133 targets 0x7f/0x80). CLI exits 1; the full gate remains failing.
+All 2,499 bodies and dispatcher compile warning-free with Watcom -we. Native
+x87 reference coverage remains 117,161 operations/68 forms; seven interrupted
+native samples rejected before result inspection/C execution. No relaxed fields,
+original-fault promotion, game-verification claims or tracker changes.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-stack-all-program-20261114 --output
+local/asm-c-stack-all-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-stack-all-diff-20261114/report.json and
+local/asm-stack-all-corpus-summary-20261114.json. Current native-tool/translation-
+manifest digests independently checked. Scalar memory stack forms, services/traps,
+remaining ISA, audited boundaries, reviewed targets, captured callers and game
+integration remain required; reliable bulk translation remains active.
