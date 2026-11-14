@@ -210,10 +210,42 @@ static unsigned ef_x87_memory80(ef_lift_state *s, uint32_t address, unsigned loa
 '''
 
 REAL_LOAD_RUNTIME = r'''
-static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned width) {
-    uint32_t low, high = 0, exponent, maximum, bias, sign, flags = 0, value[3];
+/* Exact widening preserves a signaling payload for arithmetic. FLD separately
+   quiets sNaN and applies its own mask-dependent push behavior. */
+static unsigned ef_x87_real_bits(uint32_t low, uint32_t high, unsigned width, uint32_t value[3]) {
+    uint32_t exponent, maximum, bias, sign, flags = 0;
     uint64_t fraction, implicit, significand;
-    unsigned fraction_bits, shift, destination = (ef_x87_index(s, 0) + 7u) & 7u;
+    unsigned fraction_bits, shift;
+    if (width == 32) {
+        fraction_bits = 23; maximum = 255; bias = 16256;
+        sign = (low >> 16) & 0x8000u; exponent = (low >> 23) & 255u;
+        fraction = low & 0x7fffffu;
+    } else {
+        fraction_bits = 52; maximum = 2047; bias = 15360;
+        sign = (high >> 16) & 0x8000u; exponent = (high >> 20) & 2047u;
+        fraction = ((uint64_t)(high & 0xfffffu) << 32) | low;
+    }
+    implicit = (uint64_t)1 << fraction_bits;
+    shift = 63u - fraction_bits;
+    if (exponent == maximum) {
+        if (fraction && !(fraction & (implicit >> 1))) flags = 1;
+        significand = ((uint64_t)1 << 63) | (fraction << shift);
+        exponent = 0x7fffu;
+    } else if (exponent) {
+        significand = (implicit | fraction) << shift;
+        exponent += bias;
+    } else if (fraction) {
+        flags = 2; exponent = bias + 1u;
+        while (!(fraction & implicit)) { fraction <<= 1; --exponent; }
+        significand = fraction << shift;
+    } else significand = 0;
+    value[0] = (uint32_t)significand; value[1] = (uint32_t)(significand >> 32);
+    value[2] = sign | exponent;
+    return flags;
+}
+static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned width) {
+    uint32_t low, high = 0, flags, value[3];
+    unsigned destination = (ef_x87_index(s, 0) + 7u) & 7u;
     if (width != 32 && width != 64) return 9;
     if (s->x87_status & 0x80u) return 8;
     if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
@@ -226,30 +258,8 @@ static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned wi
         s->x87_status &= ~0x200u;
         low = ef_read(s, address, 32);
         if (width == 64) high = ef_read(s, address + 4u, 32);
-        if (width == 32) {
-            fraction_bits = 23; maximum = 255; bias = 16256;
-            sign = (low >> 16) & 0x8000u; exponent = (low >> 23) & 255u;
-            fraction = low & 0x7fffffu;
-        } else {
-            fraction_bits = 52; maximum = 2047; bias = 15360;
-            sign = (high >> 16) & 0x8000u; exponent = (high >> 20) & 2047u;
-            fraction = ((uint64_t)(high & 0xfffffu) << 32) | low;
-        }
-        implicit = (uint64_t)1 << fraction_bits;
-        shift = 63u - fraction_bits;
-        if (exponent == maximum) {
-            if (fraction && !(fraction & (implicit >> 1))) flags = 1;
-            significand = ((uint64_t)1 << 63) | (fraction << shift);
-            if (fraction) significand |= (uint64_t)1 << 62;
-            exponent = 0x7fffu;
-        } else if (exponent) {
-            significand = (implicit | fraction) << shift;
-            exponent += bias;
-        } else if (fraction) {
-            flags = 2; exponent = bias + 1u;
-            while (!(fraction & implicit)) { fraction <<= 1; --exponent; }
-            significand = fraction << shift;
-        } else significand = 0;
+        flags = ef_x87_real_bits(low, high, width, value);
+        if (flags & 1u) value[1] |= 0x40000000u;
         s->x87_status |= flags;
         if (flags & ~s->x87_control) {
             s->x87_status |= 0x8080u;
@@ -257,8 +267,6 @@ static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned wi
                exact normalized result and defers delivery until a wait. */
             if (flags & 1u) return 0;
         }
-        value[0] = (uint32_t)significand; value[1] = (uint32_t)(significand >> 32);
-        value[2] = sign | exponent;
     }
     ef_x87_put(s, destination, value); ef_x87_top(s, destination);
     return 0;
@@ -346,6 +354,7 @@ BINARY_RUNTIME = r'''
 #if defined(EF_LIFT_SOFTFLOAT_BINARY) && !defined(EF_LIFT_BINARY_RUNTIME)
 #define EF_LIFT_BINARY_RUNTIME
 unsigned ef_x87_binary_control(const uint32_t *, const uint32_t *, unsigned, unsigned, uint32_t *);
+unsigned ef_x87_binary_operand(const uint32_t *, const uint32_t *, unsigned, unsigned, unsigned, uint32_t *);
 static unsigned ef_x87_register_binary(ef_lift_state *s, unsigned operation,
                                       unsigned left, unsigned right, unsigned destination, unsigned pop) {
     uint32_t value[3] = {0, 0xc0000000u, 0xffffu}, flags;
@@ -364,6 +373,32 @@ static unsigned ef_x87_register_binary(ef_lift_state *s, unsigned operation,
     }
     ef_x87_put(s, destination, value);
     if (pop) { s->x87_tag |= 3u << (top * 2); ef_x87_top(s, top + 1u); }
+    return 0;
+}
+static unsigned ef_x87_memory_binary(ef_lift_state *s, uint32_t address, unsigned width,
+                                    unsigned operation, unsigned reverse) {
+    uint32_t value[3] = {0, 0xc0000000u, 0xffffu}, operand[3], flags, low, high = 0;
+    unsigned top = ef_x87_index(s, 0), denormal;
+    if (width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
+        s->fault = 3; return 3;
+    }
+    if (ef_x87_empty(s, top)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+    } else {
+        low = ef_read(s, address, 32);
+        if (width == 64) high = ef_read(s, address+4u, 32);
+        denormal = (ef_x87_real_bits(low, high, width, operand) & 2u) != 0;
+        flags = ef_x87_binary_operand(reverse ? operand : s->x87[top],
+                                      reverse ? s->x87[top] : operand,
+                                      operation, s->x87_control, denormal, value);
+        if (flags & 0x10000u) return 9;
+        s->x87_status = (s->x87_status & ~0x200u) | (flags & 0x23fu);
+        if (flags & ~s->x87_control & 0x3fu) s->x87_status |= 0x8080u;
+        if (flags & 0x20000u) return 0;
+    }
+    ef_x87_put(s, top, value);
     return 0;
 }
 #endif

@@ -3227,3 +3227,73 @@ local/asm-softfloat-verified-build-20261113 --watcom <wcc386>
 --x87-oracle hardware (Python 3.13.12/Unicorn 2.1.4, Linux x86-64).
 No tracker promotion or full native ABI/game claim. Target coverage, unsupported
 x87/trap/runtime services, captured inputs and game integration remain active.
+
+**2026-11-14 — Exact real-memory arithmetic with operand exception priority.**
+Added all twelve D8/DC real-memory add/multiply/subtract/divide/reverse forms.
+Reuse exact IEEE widening with FLD; preserve signaling NaNs for arithmetic,
+then let the validated adapter determine priority. Explicitly carry DE for
+normalized narrow subnormals into controlled arithmetic; invalid/NaN or ZE
+suppresses DE, while unmasked DE suppresses the arithmetic destination before
+late range/precision effects. Existing register API delegates with no external
+DE. Preserve original bounds/pending ordering, empty-stack invalid behavior,
+sticky flags, raw nondestination payloads and tags; no source writes or pop.
+Independent native oracle adds these memory forms and validates measured host
+CS/DS before relocating metadata. No arithmetic helper is shared with it.
+847,872 generated-body/native cases pass under UBSan across all forms, masks,
+defined precision/rounding, rotated TOP, empty sources and signed special/
+denormal/range/rounding operands. Compare all raw physical payloads, tags/status/
+control, opcode, flags/GPRs, source/canaries and relocated context. Null-memory
+fork probes confirm #PF before new stack invalid, pending #MF before #PF;
+bounds/pending C checks verify no partial state/RAM mutation. Another 120
+composed addressing/segment cases pass and compile with Watcom -we, including
+ModRM/SIB/absolute and SS/ES/FS/GS=24. Refactored FLD and native-oracle focused
+regressions pass (nine tests, 15 s). Regeneration: 3,803 syntax-supported,
+2,178 selected bodies, 282,897 bytes (+62 bodies, +9,383 bytes). Full suites and
+corpus outcomes are separate evidence. No tracker promotion/game equivalence.
+Commands: ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3
+-m unittest tests.test_asm_x87_memory_arithmetic; set
+ASM_MEMORY_ARITHMETIC_WATCOM=<wcc386> for all 120 addressing-object checks.
+tools/asm_c_program.py --inventory local/asm-x87-dispatch-body-inventory-20261114
+--output local/asm-c-x87-memory-arithmetic-program-20261114. Evidence:
+local/asm-x87-memory-arithmetic-tests-20261114.log,
+local/asm-x87-memory-arithmetic-evidence-20261114.json,
+local/asm-x87-memory-addressing-tests-20261114.log,
+local/asm-c-x87-memory-arithmetic-program-20261114/report.json.
+
+Full regression: 118 tests pass without skips (296 s), including all previous
+raw arithmetic/register/store/real-load hardware suites, Ghidra/inventory,
+segments, dependency integrity and oracle checks. The strengthened memory suite
+then passes again (two tests, 41 s), adding denormal operands combined with
+overflow/underflow so the final matrix reaches 847,872 cases. All 2,178 body
+objects and dispatcher compile warning-free with Watcom -we. Evidence:
+local/asm-x87-memory-arithmetic-full-tests-20261114.log and
+local/asm-x87-memory-arithmetic-final-tests-20261114.log. Full test command is
+the preceding 116-test list plus tests.test_asm_x87_memory_arithmetic, with
+ASM_SOFTFLOAT_BUILD and ASM_MEMORY_ARITHMETIC_WATCOM enabled; Python 3.13.12/
+Unicorn 2.1.4. Final matrix artifact binds current adapter/runtime/test/native
+source digests. Independent layout inspection also identifies the two excluded
+bodies (0xfa3d4, 0x11f6d8): decoder disagreements concern FWAIT-prefixed grouping,
+not yet normalized or accepted. Division closure remains blocked; resolve this
+in its own recovery/decoder change. No scope or comparison field is waived.
+
+Completed hardware-oracle corpus: 34,848 probes, 19,408 matches, 15,436
+inconclusive and four existing mismatches across 0xded86/0xed133 (targets 0x7f/
+0x80). Added 62 bodies contribute 638 matches and 354 inconclusive, no new
+mismatches. Every preceding probe's pass/inconclusive/mismatch state remains
+unchanged: 18,770/15,082/four. 779 bodies pass all probes, 1,397 remain
+inconclusive and two mismatch. CLI exits 1. Native reference executes 8,731
+operations in 39 forms; seven unsupported register observations remain
+inconclusive. No missing observation is called a pass. Current arithmetic
+adapter and native-oracle source digests verified in final report; final memory
+matrix also binds current adapter/runtime/test/native source digests. It rejects
+39 interrupted measurements before any result inspection or C execution.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-memory-arithmetic-program-20261114 --output
+local/asm-c-x87-memory-arithmetic-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386>
+--x87-oracle hardware (Python 3.13.12/Unicorn 2.1.4). Evidence:
+local/asm-c-x87-memory-arithmetic-diff-20261114/report.json. No tracker promotion;
+decoder grouping, target coverage, remaining x87/trap/runtime services, captured
+inputs and full-game integration remain active. Assets unchanged; all generated
+code, original exports and dependency artifacts remain ignored under local/.

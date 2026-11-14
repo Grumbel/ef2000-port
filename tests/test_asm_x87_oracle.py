@@ -33,7 +33,7 @@ class DecodeTests(unittest.TestCase):
             else:
                 result = oracle.decode(bytes.fromhex(encoded), registers)
                 self.assertEqual((result['address'], result['segment']), (address, segment), encoded)
-        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9fe', 'd80424', 'd9', ''):
+        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9fe', 'd81424', 'd9', ''):
             with self.assertRaises(oracle.Unavailable, msg=encoded):
                 oracle.decode(bytes.fromhex(encoded), registers)
 

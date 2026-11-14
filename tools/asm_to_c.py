@@ -509,17 +509,23 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
+    memory_binary = mnemonic in ('fadd', 'fmul', 'fsub', 'fsubr', 'fdiv', 'fdivr') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     try:
-        binary_operation = asm_x87.binary_register(insn)
+        binary_operation = None if memory_binary else asm_x87.binary_register(insn)
     except ValueError as error:
         raise Unsupported(str(error)) from error
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
     narrow_store = mnemonic in ('fst', 'fstp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
-    if narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
+    if memory_binary or narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
-            if narrow_store:
+            if memory_binary:
+                encoding = 0xd8 if width_of(op) == 32 else 0xdc
+                group, operation, reverse = {'fadd': (0, 0, 0), 'fmul': (1, 2, 0),
+                    'fsub': (4, 1, 0), 'fsubr': (5, 1, 1), 'fdiv': (6, 3, 0), 'fdivr': (7, 3, 1)}[mnemonic]
+                helper = 'ef_x87_memory_binary(s, b, %d, %d, %d)' % (width_of(op), operation, reverse)
+            elif narrow_store:
                 encoding, group = (0xd9 if width_of(op) == 32 else 0xdd), (3 if mnemonic == 'fstp' else 2)
                 helper = 'ef_x87_store_real(s, b, %d, %d)' % (width_of(op), mnemonic == 'fstp')
             elif integer_load:
@@ -830,7 +836,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
     if re.search(r'\bproduct\b', '\n'.join(cases)):
         declarations += '\n    uint64_t product;'
     prefix = asm_x87.NARROW_DEFINE if any('ef_x87_store_real(' in case for case in cases) else ''
-    if any('ef_x87_register_binary(' in case for case in cases):
+    if any('ef_x87_register_binary(' in case or 'ef_x87_memory_binary(' in case for case in cases):
         prefix += asm_x87.BINARY_DEFINE
     return prefix + '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
 #include "ef_lift_state.h"

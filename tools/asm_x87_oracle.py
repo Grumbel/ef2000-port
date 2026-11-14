@@ -32,6 +32,8 @@ MEMORY = {(0xd9, 0): (4, False, False), (0xd9, 2): (4, True, False),
           (0xdd, 7): (2, True, True), (0xdb, 0): (4, False, False),
           (0xdb, 5): (10, False, False), (0xdb, 7): (10, True, False),
           (0xdf, 0): (2, False, False), (0xdf, 5): (8, False, False)}
+MEMORY.update({(opcode, group): (width, False, False)
+               for opcode, width in ((0xd8, 4), (0xdc, 8)) for group in (0, 1, 4, 5, 6, 7)})
 
 
 class Unavailable(ValueError):
@@ -104,6 +106,8 @@ def source():
     operations = sorted({(a << 8) | b for a, b in REGISTER} |
                         {(a << 8) | (b << 3) | 6 for a, b in MEMORY})
     text = [r'''#include <stdint.h>
+unsigned ef_x87_host_cs(void) { uint16_t value; __asm__ volatile("mov %%cs,%0" : "=r"(value)); return value; }
+unsigned ef_x87_host_ds(void) { uint16_t value; __asm__ volatile("mov %%ds,%0" : "=r"(value)); return value; }
 typedef uintptr_t (*operation_fn)(const void *,void *,void *,uint32_t *);
 #define OP(NAME,A,B) \
 static uintptr_t NAME(const void *input,void *out,void *data,uint32_t *eax) { \
@@ -133,13 +137,15 @@ def build(output, *, compiler='cc'):
     result = subprocess.run(command, capture_output=True, text=True)
     (output/'compile.log').write_text(result.stdout+result.stderr)
     result.check_returncode()
+    native = Native(library)
     report = dict(model='unicorn-with-native-x87-v1', source_sha256=hashlib.sha256(unit.read_bytes()).hexdigest(),
                   tool_sha256=hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(), command=command,
                   machine=platform.machine(), system=platform.system(),
+                  host_selectors=dict(cs=native.host_cs, ds=native.host_ds),
                   limits='Known x87 ISA only; flat zero-base operands relocated; pending #MF delivery unsupported.')
     (output/'report.json').write_text(json.dumps(report, indent=2)+'\n')
-    return Native(library), report
+    return native, report
 
 
 def snapshot(cpu):
@@ -180,6 +186,8 @@ class Native:
         self.run = self.library.ef_x87_original
         self.run.argtypes = [ctypes.c_uint]+[ctypes.c_void_p]*3+[ctypes.POINTER(ctypes.c_uint32)]
         self.run.restype = ctypes.c_uint64
+        self.host_cs = self.library.ef_x87_host_cs()
+        self.host_ds = self.library.ef_x87_host_ds()
 
     def execute(self, operation, values, data, eax):
         opcode, modrm = operation >> 8, operation & 255
@@ -268,7 +276,7 @@ class Binding:
         else:
             if result['x87_ip'] == 0xdecaf001 and result['x87_cs'] == 0x1234:
                 result.update(x87_ip=values['x87_ip'], x87_cs=values['x87_cs'])
-            elif result['x87_ip'] == native_pc:
+            elif result['x87_ip'] == native_pc and result['x87_cs'] == self.native.host_cs:
                 result.update(x87_ip=address, x87_cs=cpu.reg_read(x.UC_X86_REG_CS))
                 if 'address' in op:
                     expected = ((op['operation'] >> 8) & 7) << 8 | (op['operation'] & 255)
@@ -279,7 +287,7 @@ class Binding:
                 raise Unavailable('unexpected native instruction pointer')
             if result['x87_dp'] == 0xdecaf002 and result['x87_ds'] == 0x5678:
                 result.update(x87_dp=values['x87_dp'], x87_ds=values['x87_ds'])
-            elif 'address' in op and result['x87_dp'] == native_dp:
+            elif 'address' in op and result['x87_dp'] == native_dp and result['x87_ds'] == self.native.host_ds:
                 result.update(x87_dp=op['address'], x87_ds=cpu.reg_read(getattr(x, 'UC_X86_REG_'+op['segment'])))
             else:
                 raise Unavailable('unexpected native data pointer')

@@ -156,6 +156,13 @@ PROBE(divide, ".byte 0xd8,0xf1")
                                      0x10000)
                     self.assertEqual(list(result), [123, 456, 789])
                     self.assertEqual([v.value for v in globals_], sentinels)
+                operand = library.ef_x87_binary_operand
+                operand.argtypes = [pointer, pointer, ctypes.c_uint, ctypes.c_uint, ctypes.c_uint, pointer]
+                operand.restype = ctypes.c_uint
+                result[:] = [123, 456, 789]
+                self.assertEqual(operand(left, right, 0, 0x37f, 2, result), 0x10000)
+                self.assertEqual(list(result), [123, 456, 789])
+                self.assertEqual([v.value for v in globals_], sentinels)
                 if os.environ.get('ASM_BINARY_EVIDENCE'):
                     Path(os.environ['ASM_BINARY_EVIDENCE']).write_text(json.dumps(dict(
                         cases=cases, adapter=report['source_sha256'],

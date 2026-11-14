@@ -77,8 +77,8 @@ unsigned ef_x87_binary(const uint32_t left[3], const uint32_t right[3],
 /* Return bit 17 when a pre-computation exception suppresses the destination.
    In that case out is untouched. Unmasked range exceptions instead return a
    rounded, exponent-wrapped result, as required for register arithmetic. */
-unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
-                               unsigned operation, unsigned control, uint32_t out[3])
+unsigned ef_x87_binary_operand(const uint32_t left[3], const uint32_t right[3],
+                               unsigned operation, unsigned control, unsigned denormal, uint32_t out[3])
 {
     uint32_t result[3], scaled[2][3], rounded[3];
     uint64_t significand;
@@ -86,8 +86,14 @@ unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
     unsigned flags, scaled_flags, precision = (control >> 8) & 3u;
     unsigned rounding = (control >> 10) & 3u, i;
     const uint32_t *raw;
+    if (denormal > 1) return 0x10000u;
     flags = ef_x87_binary(left, right, operation, precision, rounding, result);
     if (flags & 0x10000u) return flags;
+    /* Narrow subnormal operands are normalized by exact widening, but still
+       signal DE unless invalid/NaN or divide-by-zero takes priority. */
+    if (denormal && !(flags & 5u) &&
+        !((result[2] & 0x7fffu) == 0x7fffu &&
+          (result[0] || result[1] != 0x80000000u))) flags |= 2u;
     if ((flags & ~control & 1u)) return 0x20001u;
     if ((flags & ~control & 4u)) return 0x20004u;
     if ((flags & ~control & 2u)) return 0x20002u;
@@ -143,4 +149,10 @@ unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
     }
     for (i = 0; i < 3; ++i) out[i] = result[i];
     return flags;
+}
+
+unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
+                               unsigned operation, unsigned control, uint32_t out[3])
+{
+    return ef_x87_binary_operand(left, right, operation, control, 0, out);
 }

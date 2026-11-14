@@ -757,3 +757,49 @@ translation manifest and current oracle source. Evidence:
 local/asm-c-x87-hardware-oracle-diff-20261114/report.json and original-x87/
 report.json. This is independent x87 evidence within a flat Unicorn integer/
 memory oracle, not full guest ABI/game equivalence or completed bulk coverage.
+
+Generated FADD/FMUL/FSUB/FSUBR/FDIV/FDIVR now accepts DWORD/QWORD memory
+operands (D8/DC), using the same validated arithmetic backend as register forms.
+Exact IEEE widening is shared with FLD, but arithmetic preserves signaling NaN
+payloads until the operation chooses exception priority. Normalizing a narrow
+subnormal must retain its operand-DE indication. The controlled adapter accepts
+that indication, suppressing it for invalid/NaN or divide-by-zero, and applies
+early unmasked-DE suppression before result rounding/wrapping. Existing register
+API is retained with no extra DE input. Masked stack underflow yields indefinite;
+unmasked invalid suppresses the result. Pending checks and complete bounds
+checks precede effects; memory arithmetic never pushes/pops or writes its source.
+
+847,872 generated-body comparisons with independent native instructions pass
+under UBSan: all twelve forms, every exception mask, all defined PC/RC, rotated
+TOP, empty/nonempty sources, signed special/denormal/range/rounding cases and
+prior sticky flags. Compare all physical raw values/tags/status/control, flags,
+registers, unchanged source/canaries and relocated instruction/data metadata.
+Bounds/pending checks show no partial mutation; isolated null-operand probes
+confirm memory faults precede new stack invalid and pending #MF precedes memory
+faults. Another 120 composed cases cover ModRM/SIB, absolute and segment-override
+addressing, including SS/ES/FS/GS=24; all compile warning-free with Watcom.
+
+The independent native oracle allowlist includes the twelve memory operations.
+It now records current host CS/DS and validates native selectors before pointer
+relocation, retaining every guest selector comparison. Regeneration selects
+2,178 bodies, 282,897 bytes (+62 bodies, +9,383 bytes); syntax support reaches
+3,803. Full regression and corpus evidence remain separate gates. The complete
+division dispatch still requires trap and callee-boundary support.
+
+Final validation: 118 full regression tests pass without skips (296 s), then
+the strengthened two-test memory suite passes (41 s), including combined
+denormal-operand/range cases. Its 847,872 accepted hardware comparisons reject
+39 interrupted native measurements before inspecting results or running C.
+The corpus selects 2,178 bodies; all body objects and dispatcher compile
+warning-free with Watcom. The complete 34,848-probe hardware-oracle run yields
+19,408 matches, 15,436 inconclusive and four existing target mismatches. Added
+bodies contribute 638 matches and 354 inconclusive probes; every prior probe's
+state is unchanged. 779 bodies pass all probes, 1,397 are inconclusive and two
+mismatch (0xded86/0xed133, targets 0x7f/0x80). CLI remains nonzero.
+Native coverage is 8,731 operations in 39 forms; seven unsupported register
+observations remain explicitly inconclusive. Source/adapter/oracle digests are
+verified against the current code. Evidence:
+local/asm-x87-memory-arithmetic-full-tests-20261114.log,
+local/asm-x87-memory-arithmetic-final-tests-20261114.log and
+local/asm-c-x87-memory-arithmetic-diff-20261114/report.json. No game integration,
+captured-caller or universal-equivalence claim; bulk translation remains active.
