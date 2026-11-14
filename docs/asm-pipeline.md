@@ -891,3 +891,42 @@ current native-oracle source and translation manifest digests are verified.
 Evidence: local/asm-c-x87-compare-diff-20261114/report.json. Captured inputs,
 remaining instructions/services, target coverage and game integration remain
 required; reliable bulk translation is still active.
+
+FIST/FISTP now store signed 16/32-bit integers; FISTP also stores 64-bit
+integers. The conversion uses integer operations on raw extended precision,
+with all four rounding modes and no host floating-point dependency. PC does
+not affect conversion. Masked invalid/empty inputs store integer indefinite;
+unmasked invalid suppresses the store and pop. An unmasked precision exception
+still stores the rounded value and performs the requested pop. Extended
+subnormals raise precision when inexact, without a denormal exception. Invalid
+conversion takes priority over precision. C1 records magnitude increment;
+physical source payloads remain unchanged even after a pop. Pending delivery
+and complete bounds checks precede effects. FISTTP remains unsupported.
+
+307,200 generated-body/native cases pass under UBSan across all five forms,
+all masks/defined PC/RC, rotating TOP, empty/nonempty operands, both signs,
+halfway/range boundaries, NaNs, infinities, denormals/pseudo-denormals and
+unsupported raw encodings. Tests compare raw physical payloads, status/tags,
+control, opcode, relocated context, memory canaries and integer state, and
+check pending-before-bounds and wrapping/out-of-bounds addresses. All five
+forms compile warning-free with Watcom -we. Evidence:
+local/asm-x87-integer-store-tests-20261114.log and
+local/asm-x87-integer-store-evidence-20261114.json.
+
+Regeneration raises syntax support from 3,994 to 4,128 bodies. Direct closure
+still selects the same 2,249 bodies/299,929 bytes: every selected source and
+the dispatcher are byte-identical to the comparison-stage output. These
+newly supported bodies still depend on untranslated callees. This is no new
+full-corpus differential result; the previous four callback-target mismatches
+remain unresolved. Evidence:
+local/asm-x87-integer-store-closure-evidence-20261114.json and
+local/asm-c-x87-integer-store-program-20261114/report.json. FRNDINT at 0x9d73d
+blocks helper 0x9d72c and 45 immediate callers. Interrupt/service boundaries,
+other x87 operations and audited flow gaps also remain; no tracker promotion.
+
+The complete 19-module ASM inventory/translation/closure/segment/x87 regression
+command passes: 77 tests, no skips, 423.983 s, Python 3.13.12/Unicorn 2.1.4,
+with the validated SoftFloat build and both Watcom options enabled. Command
+arguments/environment: local/asm-x87-integer-store-full-command-20261114.json;
+output: local/asm-x87-integer-store-full-tests-20261114.log. The focused matrix
+rejects 36 interrupted native measurements before result inspection/C execution.

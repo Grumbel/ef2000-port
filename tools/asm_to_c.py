@@ -264,7 +264,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 #endif
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
-                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
+                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
 RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME
 
 
@@ -520,8 +520,9 @@ def instruction_c(insn, starts):
         raise Unsupported(str(error)) from error
     real_load = mnemonic == 'fld' and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     integer_load = mnemonic == 'fild' and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
+    integer_store = mnemonic in ('fist', 'fistp') and text.strip().lower().startswith(('word ptr ', 'dword ptr ', 'qword ptr '))
     narrow_store = mnemonic in ('fst', 'fstp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
-    if memory_compare or memory_binary or narrow_store or integer_load or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
+    if memory_compare or memory_binary or narrow_store or integer_load or integer_store or real_load or (mnemonic in ('fld', 'fstp') and text.strip().lower().startswith('tbyte ptr ')):
         op = operand(text)
         try:
             if memory_compare:
@@ -538,6 +539,12 @@ def instruction_c(insn, starts):
             elif integer_load:
                 encoding, group = (0xdb if width_of(op) == 32 else 0xdf), (5 if width_of(op) == 64 else 0)
                 helper = 'ef_x87_load_integer(s, b, %d)' % width_of(op)
+            elif integer_store:
+                if width_of(op) == 64 and mnemonic != 'fistp':
+                    raise ValueError('unsupported 64-bit FIST encoding')
+                encoding = 0xdb if width_of(op) == 32 else 0xdf
+                group = 7 if width_of(op) == 64 else (3 if mnemonic == 'fistp' else 2)
+                helper = 'ef_x87_store_integer(s, b, %d, %d)' % (width_of(op), mnemonic == 'fistp')
             elif real_load:
                 encoding, group = (0xd9 if width_of(op) == 32 else 0xdd), 0
                 helper = 'ef_x87_load_real(s, b, %d)' % width_of(op)

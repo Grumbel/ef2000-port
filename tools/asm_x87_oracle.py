@@ -33,6 +33,8 @@ MEMORY = {(0xd9, 0): (4, False, False), (0xd9, 2): (4, True, False),
           (0xdd, 7): (2, True, True), (0xdb, 0): (4, False, False),
           (0xdb, 5): (10, False, False), (0xdb, 7): (10, True, False),
           (0xdf, 0): (2, False, False), (0xdf, 5): (8, False, False)}
+MEMORY.update({(0xdf, 2): (2, True, False), (0xdf, 3): (2, True, False),
+               (0xdb, 2): (4, True, False), (0xdb, 3): (4, True, False), (0xdf, 7): (8, True, False)})
 MEMORY.update({(opcode, group): (width, False, False)
                for opcode, width in ((0xd8, 4), (0xdc, 8)) for group in range(8)})
 

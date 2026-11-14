@@ -3409,3 +3409,44 @@ local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardw
 Evidence: local/asm-c-x87-compare-diff-20261114/report.json. Remaining integer
 stores, other ISA/services/traps, reviewed dynamic targets, captured callers
 and full-game integration remain active. No full game/ABI equivalence claim.
+
+**2026-11-14 — Exact x87 integer stores; closure remains blocked.**
+Add five FIST/FISTP memory encodings: 16/32-bit nonpop/pop and 64-bit pop.
+Raw extended-to-integer conversion uses unsigned integer operations, handles
+all rounding modes and signed range boundaries without signed overflow or
+shift UB, and ignores PC. Preserve raw source payloads after pops. Masked
+invalid/empty values store integer indefinite; unmasked invalid suppresses
+store/pop, whereas unmasked precision commits both. Extended denormals do
+not raise DE during integer conversion. Invalid suppresses precision and C1;
+valid inexact conversions set PE and magnitude-increment C1. Full memory
+bounds and pending delivery checks precede effects; FISTTP stays unsupported.
+Independent fixed-opcode native oracle gains only these five allowlisted
+forms. 307,200 generated/native cases pass under UBSan with all masks, defined
+PC/RC, rotated TOP, empty operands, both signs, halfway/range cases and raw
+special/unsupported encodings. Compare physical registers, tags/status/control,
+opcode, relocated context, store canaries and integer state. Test pending-before-
+bounds and rejected wrap/short spans. All five forms compile with Watcom -we,
+zero warnings. Command: ASM_INTEGER_STORE_WCC=<wcc386>
+ASM_INTEGER_STORE_EVIDENCE=local/asm-x87-integer-store-evidence-20261114.json
+python3 -m unittest tests.test_asm_x87_integer_store.
+
+Regenerate with tools/asm_c_program.py --workspace
+local/ghidra-x87-dispatch-20261114 --inventory
+local/asm-wait-body-inventory-20261114 --output
+local/asm-c-x87-integer-store-program-20261114. Syntax support grows 3,994 ->
+4,128 (+134), but direct closure remains 2,249 bodies/299,929 bytes. All
+selected sources and dispatcher are byte-identical to the preceding program.
+No full-corpus rerun or new probe total claimed; previous four callback-target
+mismatches remain unresolved. The next high-fanout instruction is FRNDINT in
+0x9d72c (45 immediate callers); interrupts/services and audited boundary gaps
+also remain. Evidence: local/asm-x87-integer-store-tests-20261114.log,
+local/asm-x87-integer-store-evidence-20261114.json,
+local/asm-x87-integer-store-closure-evidence-20261114.json and generated report.
+No function is promoted to game-verified.
+
+The complete 19-module ASM inventory/translation/closure/segment/x87 regression
+command passes: 77 tests, no skips, 423.983 s, Python 3.13.12/Unicorn 2.1.4,
+with the validated SoftFloat build and both Watcom options enabled. Command
+arguments/environment: local/asm-x87-integer-store-full-command-20261114.json;
+output: local/asm-x87-integer-store-full-tests-20261114.log. The focused matrix
+rejects 36 interrupted native measurements before result inspection/C execution.

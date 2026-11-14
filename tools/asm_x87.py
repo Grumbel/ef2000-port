@@ -296,6 +296,66 @@ static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned wi
 }
 '''
 
+INTEGER_STORE_RUNTIME = r'''
+/* Convert raw extended precision without host floating point or signed overflow.
+ * Integer stores ignore PC and do not raise DE, including extended denormals. */
+static unsigned ef_x87_integer_bits(const uint32_t *value, unsigned width,
+                                    unsigned rounding, uint64_t *out) {
+    uint64_t sig = (uint64_t)value[0] | (uint64_t)value[1] << 32;
+    uint64_t magnitude, remainder = 0, half, limit;
+    unsigned negative = (value[2] >> 15) & 1u, increment = 0;
+    unsigned exponent = value[2] & 0x7fffu;
+    int power, shift;
+    limit = (uint64_t)1 << (width - 1u);
+    *out = limit; /* Masked invalid conversion: integer indefinite. */
+    if (exponent == 0x7fffu || (exponent && !(sig >> 63))) return 1;
+    if (!negative) --limit;
+    power = (int)(exponent ? exponent : 1u) - 16383;
+    if (power >= 63) {
+        shift = power - 63;
+        if (shift >= 64 || sig > (limit >> shift)) return 1;
+        magnitude = sig << shift;
+    } else {
+        shift = 63 - power;
+        magnitude = shift >= 64 ? 0 : sig >> shift;
+        remainder = shift >= 64 ? sig : sig & (((uint64_t)1 << shift) - 1u);
+        if (remainder) {
+            if (rounding == 0 && shift <= 64) {
+                half = (uint64_t)1 << (shift - 1);
+                increment = remainder > half || (remainder == half && (magnitude & 1u));
+            } else if (rounding == 1) increment = negative;
+            else if (rounding == 2) increment = !negative;
+        }
+        magnitude += increment;
+        if (magnitude > limit) return 1;
+    }
+    *out = negative ? (uint64_t)0 - magnitude : magnitude;
+    return (remainder ? 0x20u : 0u) | (increment ? 0x200u : 0u);
+}
+static unsigned ef_x87_store_integer(ef_lift_state *s, uint32_t address, unsigned width, unsigned pop) {
+    uint64_t out;
+    unsigned flags, top = ef_x87_index(s, 0);
+    if (width != 16 && width != 32 && width != 64) return 9;
+    if (s->x87_status & 0x80u) return 8;
+    if (s->memory_size < width / 8u || address > s->memory_size - width / 8u) {
+        s->fault = 3; return 3;
+    }
+    if (ef_x87_empty(s, top)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+        flags = 1; out = (uint64_t)1 << (width - 1u);
+    } else flags = ef_x87_integer_bits(s->x87[top], width, (s->x87_control >> 10) & 3u, &out);
+    s->x87_status = (s->x87_status & ~0x200u) | flags;
+    if (flags & ~s->x87_control & 0x3fu) {
+        s->x87_status |= 0x8080u;
+        if (flags & 1u) return 0;
+    }
+    ef_write(s, address, width == 64 ? 32 : width, (uint32_t)out);
+    if (width == 64) ef_write(s, address + 4u, 32, (uint32_t)(out >> 32));
+    if (pop) { s->x87_tag |= 3u << (top * 2u); ef_x87_top(s, top + 1u); }
+    return 0;
+}
+'''
+
 INTEGER_LOAD_RUNTIME = r'''
 static unsigned ef_x87_load_integer(ef_lift_state *s, uint32_t address, unsigned width) {
     uint32_t value[3], exponent, negative;
