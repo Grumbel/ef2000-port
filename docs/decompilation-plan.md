@@ -3297,3 +3297,49 @@ local/asm-c-x87-memory-arithmetic-diff-20261114/report.json. No tracker promotio
 decoder grouping, target coverage, remaining x87/trap/runtime services, captured
 inputs and full-game integration remain active. Assets unchanged; all generated
 code, original exports and dependency artifacts remain ignored under local/.
+
+**2026-11-14 — Separate WAIT execution and strict normalized layout provenance.**
+Resolved both remaining decoder disagreements through architectural WAIT
+normalization, not changed Ghidra body extents or waived layout checks. Intel's
+FSTCW/FNSTCW reference documents separate WAIT and nonwaiting execution.
+Normalize leading WAIT chains only when standalone or grouped with an x87
+operation; retain every physical PC and byte and re-decode the residual opcode.
+Raw Ghidra spans remain available beside normalized spans. Schema 4 copies and
+hash-binds the raw body-range evidence, and translation rechecks its payload/
+document digest, normalization profile, raw/normalized spans and agreement flag.
+Reject false agreement, missing spans, bogus merged non-x87 spans and tampered
+evidence. Legacy schema 3 remains accepted only with independent decode
+agreement; fused old inventories require regeneration.
+All 4,279 recovered bodies now agree. 0xfa3d4's repeated WAIT/FNSTCW grouping
+and 0x11f6d8's WAIT/FLDCW grouping are explained without changing ownership,
+ranges or payload. WAIT advances one byte/one fuel unit and otherwise preserves
+state; pending delivery returns 8 before the following store. Separate residual
+FNSTCW entry remains nonwaiting even with pending state. Tests cover full-state
+native comparison, separate entry/fuel, no partial mutation, native #MF-before-
+store and negative normalization/provenance cases. No #MF delivery implemented.
+Fourteen focused WAIT/inventory tests and 104 regression tests pass without
+skips (0.7 s / 128 s; Python 3.13.12/Unicorn 2.1.4). All 2,180 body objects and
+dispatcher compile with Watcom -bt=dos -3r -za99 -w1 -we. Syntax support 3,806;
+selected 2,180 / 283,197 bytes (+two bodies/+300 bytes). New 0x11f6d8 and
+0x120800 each match all 16 probes. 0xfa3d4 remains untranslated at FCOMP.
+Every preceding body source byte-identical and every preceding probe outcome
+unchanged. Full 34,880-probe hardware-oracle corpus: 19,440 matches, 15,436
+inconclusive, four remaining target mismatches across 0xded86/0xed133. 781
+all-pass bodies, 1,397 inconclusive and two mismatching; CLI still exits 1.
+No tracker promotion, handwritten-signature or game-equivalence claim.
+Commands: python3 -m unittest tests.test_asm_wait tests.test_asm_inventory
+tests.test_asm_to_c tests.test_asm_c_program tests.test_asm_c_x87
+tests.test_asm_c_segments tests.test_asm_x87_oracle tests.test_asm_diff
+tests.test_ghidra_ef2000; export inventory from
+local/ghidra-x87-dispatch-20261114/body-inventory/body-ranges.json to
+local/asm-wait-body-inventory-20261114; tools/asm_c_program.py --inventory
+local/asm-wait-body-inventory-20261114 --output local/asm-c-wait-program-20261114;
+tools/asm_c_differential.py --workspace local/ghidra-x87-dispatch-20261114
+--translations local/asm-c-wait-program-20261114 --output
+local/asm-c-wait-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-wait-tests-20261114.log, local/asm-wait-regression-20261114.log,
+local/asm-wait-body-inventory-20261114/manifest.json (including copied raw body
+evidence), local/asm-c-wait-diff-20261114/report.json. Full remaining target,
+x87/trap/runtime-service coverage, captured inputs and game integration stay
+active. Original assets unchanged; all exports and generated source stay local/.

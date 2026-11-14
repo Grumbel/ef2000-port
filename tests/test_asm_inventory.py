@@ -8,10 +8,67 @@ import subprocess
 import tempfile
 import unittest
 
-from tools import asm_inventory
+from tools import asm_inventory, asm_to_c
 
 
 class InventoryTests(unittest.TestCase):
+    def test_wait_grouping_preserves_raw_evidence_and_instruction_starts(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root/'payload.bin'
+            image.write_bytes(bytes.fromhex('9b9bd97c24109bd96c2410c3'))
+            rows = [dict(addr='0x0', size='12', name='wait_fixture', state='unknown', kind='asm', module='')]
+            expected = [[0, 1], [1, 1], [2, 4], [6, 1], [7, 4], [11, 1]]
+            for index, raw in enumerate(([[0, 1], [1, 5], [6, 1], [7, 4], [11, 1]],
+                                         [[0, 6], [6, 5], [11, 1]], expected)):
+                bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, 12]], instruction_spans=raw)])
+                output = root/str(index)
+                manifest = asm_inventory.export_inventory(image, rows, output, body_ranges=bodies)
+                _, records = asm_to_c.read_inventory(output, image)
+                record = records[0]
+                self.assertEqual(manifest['schema'], 4)
+                self.assertEqual(manifest['instruction_normalization'], asm_inventory.NORMALIZATION)
+                self.assertEqual(record['ghidra_instruction_spans'], raw)
+                self.assertEqual(record['normalized_ghidra_instruction_spans'], expected)
+                self.assertTrue(record['ghidra_instruction_layout_matches'])
+                self.assertEqual([i['mnemonic'] for i in record['instructions']],
+                                 ['fwait', 'fwait', 'fnstcw', 'fwait', 'fldcw', 'ret'])
+                self.assertEqual(bytes.fromhex(''.join(i['bytes'] for i in record['instructions'])), image.read_bytes())
+                self.assertEqual((output/'ghidra-body-ranges.json').read_bytes(), bodies.read_bytes())
+                modified = dict(record, normalized_ghidra_instruction_spans=[[0, 12]])
+                (output/'00000000.json').write_text(json.dumps(modified))
+                with self.assertRaisesRegex(ValueError, 'normalized Ghidra'):
+                    asm_to_c.read_inventory(output, image)
+                (output/'00000000.json').write_text(json.dumps(record))
+                evidence = output/'ghidra-body-ranges.json'
+                evidence.write_text(evidence.read_text()+' ')
+                with self.assertRaisesRegex(ValueError, 'normalized inventory provenance'):
+                    asm_to_c.read_inventory(output, image)
+
+    def test_wait_normalization_does_not_fill_gaps_or_merge_other_instructions(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for index, (encoded, layout) in enumerate((
+                    ('9b90c3', [[0, 2], [2, 1]]),
+                    ('9b9bd97c2410c3', [[0, 1], [2, 4], [6, 1]]),
+                    ('9bd97c24109bc3', [[0, 6], [6, 1]]))):
+                image = root/'payload.bin'
+                image.write_bytes(bytes.fromhex(encoded))
+                rows = [dict(addr='0x0', size=str(len(image.read_bytes())), name='fixture',
+                             state='unknown', kind='asm', module='')]
+                bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, len(image.read_bytes())]],
+                                                            instruction_spans=layout)])
+                output = root/str(index)
+                manifest = asm_inventory.export_inventory(image, rows, output, body_ranges=bodies)
+                self.assertFalse(manifest['entries'][0]['ghidra_instruction_layout_matches'])
+                record = json.loads((output/'00000000.json').read_text())
+                with self.assertRaises(asm_to_c.Unsupported):
+                    asm_to_c.translate(record)
+                record['ghidra_instruction_layout_matches'] = True
+                (output/'00000000.json').write_text(json.dumps(record))
+                with self.assertRaisesRegex(ValueError, 'normalized Ghidra'):
+                    asm_to_c.read_inventory(output, image)
+
     def fixture(self, root):
         image = root / 'payload.bin'
         image.write_bytes(bytes.fromhex('e80100000090c3'))

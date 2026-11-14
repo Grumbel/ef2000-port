@@ -559,6 +559,10 @@ def instruction_c(insn, starts):
         code += ['a = ef_x87_stack(s, %d, %d); if (a) return a;' % (operation, argument),
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], ((encoded[0] & 7) << 8) | encoded[1])]
+    elif mnemonic in ('fwait', 'wait') and not text:
+        if insn['bytes'] != '9b':
+            raise Unsupported('unsupported WAIT encoding')
+        code.append('if (s->x87_status & 0x80u) return 8;')
     elif mnemonic == 'fninit' and not text:
         # FNINIT marks registers empty but preserves their physical contents.
         code += ['s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;',
@@ -859,9 +863,15 @@ def read_inventory(inventory, image):
     """Validate payload bytes and independently decode every input record."""
     payload = image.read_bytes()
     manifest = json.loads((inventory / 'manifest.json').read_text())
-    if (manifest.get('schema') != 3 or manifest.get('boundary') != 'ghidra-body-ranges' or
+    if (manifest.get('schema') not in (3, asm_inventory.SCHEMA) or manifest.get('boundary') != 'ghidra-body-ranges' or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
         raise ValueError('invalid inventory provenance')
+    bodies = None
+    if manifest['schema'] == asm_inventory.SCHEMA:
+        bodies, digest = asm_inventory.load_body_ranges(inventory / 'ghidra-body-ranges.json', payload)
+        if (digest != manifest.get('body_ranges_sha256') or
+                manifest.get('instruction_normalization') != asm_inventory.NORMALIZATION):
+            raise ValueError('invalid normalized inventory provenance')
     records = []
     seen = set()
     for entry in manifest['entries']:
@@ -878,6 +888,17 @@ def read_inventory(inventory, image):
         decoded = []
         for start, end in record['ranges']:
             decoded.extend(asm_inventory.decode_window(image, start, end-start))
+        if bodies is not None:
+            body = bodies.get(record['address'])
+            layout = body.get('instruction_spans') if body else None
+            normalized = asm_inventory.normalized_layout(layout, payload)
+            matches = ([[i['address'], len(bytes.fromhex(i['bytes']))] for i in decoded] == normalized
+                       if layout is not None else None)
+            if (body is None or record['ranges'] != body['ranges'] or
+                    record.get('ghidra_instruction_spans') != layout or
+                    record.get('normalized_ghidra_instruction_spans') != normalized or
+                    record.get('ghidra_instruction_layout_matches') != matches):
+                raise ValueError('normalized Ghidra instruction layout mismatch')
         if (decoded != record['instructions'] or record['address'] != entry['address'] or
                 record['address'] in seen):
             raise ValueError('instruction decode mismatch')

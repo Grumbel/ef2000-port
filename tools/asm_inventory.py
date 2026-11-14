@@ -23,6 +23,37 @@ except ImportError:
 
 LINE = re.compile(r'^\s*([0-9a-f]+):\s*((?:[0-9a-f]{2}\s+)+)\s*(.*?)\s*$')
 DIRECT = re.compile(r'^(?:0x)?([0-9a-f]+)(?:\s|$)')
+SCHEMA = 4
+NORMALIZATION = 'x87-wait-opcode-split-v1'
+
+
+def wait_prefix_count(encoded):
+    """Only normalize leading WAITs, optionally grouped with an x87 operation.
+
+    9B is an independently executed instruction, not an x87 opcode modifier.
+    Do not turn a bogus merged WAIT/non-x87 span into layout agreement.
+    """
+    count = 0
+    while count < len(encoded) and encoded[count] == 0x9b:
+        count += 1
+    if not count or count == len(encoded):
+        return count
+    cursor = count
+    while cursor < len(encoded) and encoded[cursor] in (0x26, 0x2e, 0x36, 0x3e, 0x64, 0x65, 0x66, 0x67):
+        cursor += 1
+    return count if cursor < len(encoded) and 0xd8 <= encoded[cursor] <= 0xdf else 0
+
+
+def normalized_layout(layout, payload):
+    if layout is None:
+        return None
+    result = []
+    for site, length in layout:
+        count = wait_prefix_count(payload[site:site+length])
+        result.extend([site+i, 1] for i in range(count))
+        if count != length:
+            result.append([site+count, length-count])
+    return result
 
 
 def decode_window(image, address, size, *, objdump='objdump', runner=subprocess.run):
@@ -47,7 +78,20 @@ def decode_window(image, address, size, *, objdump='objdump', runner=subprocess.
             target = DIRECT.match(operands)
             if target:
                 instruction['direct_target'] = int(target[1], 16)
-        instructions.append(instruction)
+        count = wait_prefix_count(encoded)
+        if count:
+            if (offset < address or offset+len(encoded) > address+size or
+                    image.read_bytes()[offset:offset+len(encoded)] != encoded):
+                raise ValueError(f'disassembly byte/continuity mismatch at {offset:#x}')
+            instructions.extend(dict(address=offset+i, bytes='9b', mnemonic='fwait', operands='')
+                                for i in range(count))
+            if count < len(encoded):
+                # Re-decode the residual instruction; don't infer no-wait
+                # mnemonics from objdump's fused spelling (e.g. FSTCW).
+                instructions.extend(decode_window(image, offset+count, len(encoded)-count,
+                                                  objdump=objdump, runner=runner))
+        else:
+            instructions.append(instruction)
     return instructions
 
 
@@ -143,6 +187,9 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
         prepared.append((address, ranges, row))
     # Refuse overwrite: stale files must not silently become part of a new run.
     output.mkdir(parents=True, exist_ok=False)
+    if body_ranges:
+        # Carry the hashed raw Ghidra evidence with the normalized inventory.
+        (output / 'ghidra-body-ranges.json').write_bytes(body_ranges.read_bytes())
     version = runner([objdump, '--version'], check=True, capture_output=True,
                      text=True).stdout.splitlines()[0]
     entries = []
@@ -166,10 +213,13 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
                     if other != address and any(a < d and c < b
                         for a, b in ranges for c, d in spans)]
         layout = bodies[address].get('instruction_spans') if body_ranges else None
+        normalized = normalized_layout(layout, payload)
         decoded_layout = [[i['address'], len(bytes.fromhex(i['bytes']))] for i in instructions]
-        layout_matches = decoded_layout == layout if layout is not None else None
+        layout_matches = decoded_layout == normalized if layout is not None else None
         record = dict(address=address, size=size, name=row['name'],
                       ghidra_instruction_layout_matches=layout_matches,
+                      ghidra_instruction_spans=layout,
+                      normalized_ghidra_instruction_spans=normalized,
                       ghidra_instruction_bytes=(sum(length for _, length in layout)
                                                 if layout is not None else None),
                       boundary=boundary, ranges=ranges,
@@ -190,7 +240,8 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
                             review_edge_count=len(record['control_flow']['review_edges']),
                             ghidra_instruction_layout_matches=layout_matches,
                             file=stem + '.json'))
-    manifest = dict(schema=3, payload_sha256=hashlib.sha256(payload).hexdigest(),
+    manifest = dict(schema=SCHEMA, payload_sha256=hashlib.sha256(payload).hexdigest(),
+                    instruction_normalization=NORMALIZATION,
                     decoder=version, boundary=boundary, body_ranges_sha256=body_digest,
                     overlap_scope='selected-tracker-entries',
                     selected_rows_sha256=hashlib.sha256(json.dumps(

@@ -803,3 +803,36 @@ local/asm-x87-memory-arithmetic-full-tests-20261114.log,
 local/asm-x87-memory-arithmetic-final-tests-20261114.log and
 local/asm-c-x87-memory-arithmetic-diff-20261114/report.json. No game integration,
 captured-caller or universal-equivalence claim; bulk translation remains active.
+
+Inventory schema 4 normalizes leading WAIT bytes into independently executed
+instructions. This follows the FSTCW/FNSTCW description in the
+[Intel instruction reference](https://cdrdv2-public.intel.com/782156/325383-sdm-vol-2abcd.pdf).
+Each WAIT retains its physical PC/byte and consumes fuel; the residual operation
+is independently re-decoded, not renamed by guessing from a waiting mnemonic.
+Only WAIT chains optionally grouped with an x87 operation are normalized.
+Unrelated merged instructions, missing Ghidra spans and other boundary drift
+remain blockers. Raw Ghidra spans and normalized spans are both recorded; a
+copied raw body-range document is hash-bound and revalidated before translation.
+Stored layout flags cannot override that evidence. Schema 3 inputs still require
+fresh decoding agreement; old fused-WAIT inventories must be regenerated.
+
+Both former layout exclusions now agree: 0xfa3d4 contains repeated WAIT plus
+FNSTCW grouping, and 0x11f6d8 contains WAIT plus FLDCW. No body range, ownership
+or payload byte changes. All 4,279 bodies agree with independent decoding.
+WAIT stops explicitly at pending delivery status 8 without touching RAM or
+metadata; it does not deliver #MF. Tests confirm separate fuel accounting,
+pending-before-store behavior and direct entry into the residual nonwaiting
+FNSTCW with pending state. A native child traps before its following store;
+controls/raw state and untouched memory are checked with the independent oracle.
+
+104 focused tests pass without skips (128 s). All 2,180 body objects and
+dispatcher compile warning-free with Watcom. New generated bodies 0x11f6d8 and
+0x120800 each match all 16 probes; 0xfa3d4 still stops at unsupported FCOMP.
+Syntax support is 3,806; selected bytes 283,197 (+300). All preceding 2,178
+body sources remain byte-identical and probe outcomes unchanged. The completed
+34,880-probe run has 19,440 matches, 15,436 inconclusive and four existing
+target failures; 781 bodies pass all probes, 1,397 are inconclusive and two
+mismatch. The gate still exits 1. No tracker or game-verification promotion.
+Evidence: local/asm-wait-tests-20261114.log, local/asm-wait-regression-20261114.log,
+local/asm-wait-body-inventory-20261114/manifest.json and
+local/asm-c-wait-diff-20261114/report.json.
