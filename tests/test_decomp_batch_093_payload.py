@@ -31,7 +31,10 @@ class Inventory093(unittest.TestCase):
             with self.subTest(address=hex(address)):
                 self.assertEqual(int(rows[address]["size"]), size)
                 self.assertEqual(rows[address]["module"], module)
-                self.assertEqual(rows[address]["state"], "drafted")
+                self.assertIn(rows[address]["state"],
+                              ("drafted", "blocked", "compiles", "spliced", "verified"))
+                if rows[address]["state"] == "blocked":
+                    self.assertTrue(rows[address]["notes"].startswith("Blocked:"))
                 self.assertEqual(rows[address]["kind"], "game")
 
 

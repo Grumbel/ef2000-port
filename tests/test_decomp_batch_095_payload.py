@@ -35,7 +35,10 @@ class Inventory095(unittest.TestCase):
                 module = ("gui_options_labels_095" if address in (0xF4347, 0xF44B6)
                           else "gui_script_pipeline_095")
                 self.assertEqual(row["module"], module)
-                self.assertEqual(row["state"], "drafted")
+                self.assertIn(row["state"],
+                              ("drafted", "blocked", "compiles", "spliced", "verified"))
+                if row["state"] == "blocked":
+                    self.assertTrue(row["notes"].startswith("Blocked:"))
                 self.assertEqual(row["sig_status"], signature_status)
 
 

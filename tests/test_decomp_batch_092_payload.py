@@ -36,7 +36,10 @@ class Inventory092(unittest.TestCase):
                 self.assertEqual(row["name"], name)
                 self.assertEqual(int(row["size"]), size)
                 self.assertEqual(row["module"], module)
-                self.assertEqual(row["state"], "drafted")
+                self.assertIn(row["state"],
+                              ("drafted", "blocked", "compiles", "spliced", "verified"))
+                if row["state"] == "blocked":
+                    self.assertTrue(row["notes"].startswith("Blocked:"))
                 self.assertEqual(row["kind"], "game")
                 self.assertEqual(row["sig_status"], "unverified")
 

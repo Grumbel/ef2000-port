@@ -3884,3 +3884,14 @@ local/capture-legacy-pinned-20261114.log and
 local/capture-x87-game-evidence-20261114.json. Proprietary snapshots remain ignored
 under local/. This supplies richer input evidence, not completed capture replay,
 ABI validation or full-game verification.
+
+### 2026-11-14 — unblock hybrid packaging inventory checks
+
+The requested ef2000-hybrid Nix run fails before launch: 57 inventory subtests
+for batches 090–097 require the historical drafted state, although the tracker
+correctly demoted host-adapter bodies to blocked. Keep sizes, names, modules,
+kinds and signature assertions; permit tracked progress states and require a
+concrete Blocked: note for blocked entries. Do not promote these bodies to make
+the build pass. Python unittest discovery restricted to test_decomp_batch_09*_payload.py
+passes all eight asset-free inventory tests; eight original-byte suites skip
+without EF2000_PAYLOAD. Runtime repair and complete Nix validation remain pending.

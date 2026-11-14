@@ -52,7 +52,10 @@ class BatchInventory090(unittest.TestCase):
                 self.assertEqual(row["size"], str(size))
                 self.assertEqual(row["name"], name)
                 self.assertEqual(row["module"], "environment_values_090" if address <= 0xDA580 else "environment_world_090")
-                self.assertEqual(row["state"], "drafted")
+                self.assertIn(row["state"],
+                              ("drafted", "blocked", "compiles", "spliced", "verified"))
+                if row["state"] == "blocked":
+                    self.assertTrue(row["notes"].startswith("Blocked:"))
                 self.assertEqual(row["kind"], "game")
 
 
