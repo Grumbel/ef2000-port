@@ -4263,4 +4263,8 @@ NIXPKGS_ALLOW_UNFREE=1 nix build -L --impure .#ef2000-hybrid currently fails
 one of 506 Python checks (67 skips): the FLD hardware-oracle test observes
 native FIP zero rather than the instruction address. A direct isolated rerun
 passes; investigate the oracle/host-state interaction before changing any
-expectation. The package and playable cockpit remain unverified.
+expectation. Include the existing (width, bits, control word, TOP, tags) vector
+in the native-FIP assertion message so a future failure identifies its input.
+The unchanged check passes directly with python3 -m unittest
+ tests.test_asm_x87_load.RealLoadTests.test_widening_modes_masks_stack_faults_and_all_exponents
+(7.75 seconds). The package and playable cockpit remain unverified.

@@ -124,7 +124,7 @@ uintptr_t native%d(const void *initial, void *out, void *data) {
                         self.assertEqual((row[0] | (row[1] << 32), row[2]),
                             struct.unpack_from('<QH', observed, 28+((physical-expected_top)&7)*10), context)
                     if full:
-                        self.assertEqual(struct.unpack_from('<I', observed, 12)[0], pc & 0xffffffff)
+                        self.assertEqual(struct.unpack_from('<I', observed, 12)[0], pc & 0xffffffff, context)
                         self.assertEqual(struct.unpack_from('<I', observed, 20)[0], ctypes.addressof(data) & 0xffffffff)
                         self.assertEqual((state.x87_ip, state.x87_cs, state.x87_dp, state.x87_ds),
                                          (0x100, 8, 0x500, 16), context)
