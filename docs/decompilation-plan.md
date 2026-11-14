@@ -3844,3 +3844,43 @@ manifest and support object digests independently checked. This is prepared-
 state boundary proof, not native ABI/captured-game/replay verification. The new
 tracker row remains unknown/asm/unverified. Services/traps, other ISA, reviewed
 dynamic targets, captured callers and full-game integration remain active.
+
+**2026-11-14 — Capture the context needed for real ASM-to-C inputs.**
+Bulk prepared-state verification remains 2,528 selected bodies with 22,308
+matching, 18,136 inconclusive and four uncovered callback-header failures.
+Existing EFCAP001 snapshots omit x87 and CS/FS/GS, so they cannot safely seed
+that model. Add opt-in --capture-x87/EFCAP002 while retaining default EFCAP001
+output and legacy decoding. Capture all physical raw-80 slots (empty payloads
+included), eight environment fields, every selector, producer version, GDTR/LDTR,
+selected raw descriptors and bounded addressable table windows. Missing table
+entries/windows are explicit; table memory is not a hidden-cache snapshot.
+Serialize explicit little-endian fields, validate sizes/widths/descriptor-table
+consistency, preserve source-image binding and refuse overwrites. The old ABI
+oracle rejects EFCAP002 rather than silently dropping context. Captured replay
+into the ASM model still needs segment/profile restoration; do not claim it done.
+
+Synthetic native tests verify physical FP0..FP7 versus logical ST0 at TOP=5,
+retain nonzero empty payloads, preserve accessed descriptor bits and distinguish
+cached selectors from table entries made unavailable by a reduced limit.
+Cross-language fixture checks the Python decoder and malformed context rejection.
+Capture format assertions now run in Release builds as explicit checks.
+Warning-free build: cmake --build local/codex-build --target
+ ef2000-call-capture-test ef2000-call-capture-unicorn-test ef2000-unicorn-cpp -j2.
+14 Python tests pass without skips (0.344 s): tests.test_call_capture and
+tests.test_func_differential with EF_CAPTURE_UNICORN_TEST pointing to the built
+fixture and Python 3.13.12/Unicorn 2.1.4. Six native CTests pass (0.32 s): the two
+capture tests plus patch-hits, guest-hash, BDA and clock runner regressions.
+
+Real original-run capture at 0x604 under private Xvfb, guest DOS/VGA clocks,
+sound off and a disposable drive overlay: EFCAP002 records 64 MiB RAM, selectors
+CS=0x2f and DS/ES/SS=7, and 48/256-byte GDT/LDT windows. A separate default-v1
+run produces identical 13 registers and byte-identical RAM, and both terminate
+at the same five-million-instruction state (55 interrupts, 20 ticks, IP=0xfef56,
+AX=0xf62f). No original assets modified. The first candidate executable was a
+previous modified local fixture; SHA checking rejected it before capture. The
+actual runs use the pinned original ../EF2000/c/EF2000/_EF2000.EXE.
+Evidence: local/capture-x87-{commit-tests,commit-ctest,pinned}-20261114.log,
+local/capture-legacy-pinned-20261114.log and
+local/capture-x87-game-evidence-20261114.json. Proprietary snapshots remain ignored
+under local/. This supplies richer input evidence, not completed capture replay,
+ABI validation or full-game verification.

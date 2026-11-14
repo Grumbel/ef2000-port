@@ -19,6 +19,7 @@
 #include "wav_capture.hpp"
 #include "efpatch.hpp"
 #include "call_capture.hpp"
+#include "call_capture_unicorn.hpp"
 #include <unicorn/unicorn.h>
 #include <unicorn/x86.h>
 #ifdef _WIN32
@@ -1334,11 +1335,12 @@ public:
 
     void enable_call_capture(const std::vector<std::pair<uint32_t, unsigned>>& targets,
                              const fs::path& directory,
-                             const std::array<uint8_t, 32>& original_sha) {
+                             const std::array<uint8_t, 32>& original_sha, bool x87 = false) {
         if (targets.empty()) return;
         fs::create_directories(directory);
         capture_dir_ = directory;
         capture_source_sha_ = original_sha;
+        capture_x87_ = x87;
         for (const auto& [address, limit] : targets) {
             if (address >= image_size_ || !limit || limit > 4 ||
                 capture_remaining_.count(address))
@@ -1788,6 +1790,7 @@ private:
     std::filesystem::path capture_dir_;
     std::array<uint8_t, 32> capture_source_sha_{};
     std::string capture_error_;
+    bool capture_x87_{};
     std::string status_ = "instruction_limit";
     std::string detail_;
     bool trace_interrupts_{};
@@ -2765,6 +2768,7 @@ private:
         capture.registers = {regs.ax, regs.bx, regs.cx, regs.dx, regs.si,
                              regs.di, regs.bp, regs.sp, regs.ip, regs.flags,
                              regs.ds, regs.es, regs.ss};
+        if (capture_x87_) ef2000::capture_x87_context(cpu_, capture);
         std::ostringstream name;
         name << "0x" << std::hex << std::setw(7) << std::setfill('0') << address
              << '-' << std::dec << std::setw(4) << std::setfill('0') << index
@@ -3340,6 +3344,7 @@ void usage(const char* program) {
               << "       [--hash-guest ADDR:LENGTH] (final guest SHA-256, repeatable; max 16 MiB)\n"
               << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
               << "       [--capture-memory ADDR:LENGTH] (repeatable selected-memory sidecars at captured calls)\n"
+              << "       [--capture-x87] (EFCAP002 raw x87, all selectors and descriptor-table context)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
               << "       --cd-dir DIR provides DOS disc files only; it does not enable music\n"
               << "       --overlay-dir writes only to a separate copy-on-write DOS drive\n"
@@ -3385,6 +3390,7 @@ int main(int argc, char** argv) {
         std::vector<std::pair<uint32_t, unsigned>> capture_targets;
         std::vector<std::pair<uint32_t, uint32_t>> capture_memory_ranges;
         fs::path capture_dir;
+        bool capture_x87 = false;
         fs::path trace_block_state;
         uint32_t trace_block_start{};
         uint64_t trace_block_limit = 250000;
@@ -3476,6 +3482,8 @@ int main(int argc, char** argv) {
                 capture_targets.emplace_back(static_cast<uint32_t>(address), count);
             } else if (!std::strcmp(argv[i], "--capture-dir") && i + 1 < argc) {
                 capture_dir = argv[++i];
+            } else if (!std::strcmp(argv[i], "--capture-x87")) {
+                capture_x87 = true;
             } else if (!std::strcmp(argv[i], "--capture-memory") && i + 1 < argc) {
                 const std::string value = argv[++i];
                 const size_t colon = value.find(':');
@@ -3731,6 +3739,8 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--overlay-skin-dir requires --windowed or --fullscreen");
         if (capture_targets.empty() != capture_dir.empty())
             throw std::runtime_error("--capture-calls and --capture-dir must be specified together");
+        if (capture_x87 && capture_targets.empty())
+            throw std::runtime_error("--capture-x87 requires --capture-calls and --capture-dir");
         unsigned captures = 0;
         std::set<uint32_t> captured_addresses;
         for (const auto& [address, count] : capture_targets) {
@@ -3877,7 +3887,7 @@ int main(int argc, char** argv) {
             Machine machine(image, {}, {}, {}, ef2000::SoundMode::Off, false,
                             {}, {}, std::move(joystick_events), controls);
             if (!capture_targets.empty())
-                machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
+                machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image), capture_x87);
             if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
             if (self_test_patch_hits) machine.enable_patch_hit_trace({0x200, ENTRY});
             machine.enable_guest_hashes(guest_hash_ranges);
@@ -3994,7 +4004,7 @@ int main(int argc, char** argv) {
         if (!capture_targets.empty())
             machine.set_capture_memory_ranges(std::move(capture_memory_ranges));
         if (!capture_targets.empty())
-            machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image));
+            machine.enable_call_capture(capture_targets, capture_dir, sha256_bytes(image), capture_x87);
         if (trace_archive_lookups) machine.enable_archive_lookup_trace();
         return machine.run(limit, window, timer_interval, framebuffer, wav_directory,
                            realtime, wall_seconds, performance);

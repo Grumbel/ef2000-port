@@ -313,6 +313,8 @@ def scenarios_from_capture(captured, patch_writes):
     Never copy the replacement's whole initialized image over live guest
     RAM: that would wipe original game data and BSS modifications.
     """
+    if captured.x87 is not None:
+        raise ValueError('EFCAP002 requires x87 and segment-context restoration; this ABI oracle does not support it')
     regs = captured.registers
     if any(regs[name] != 7 for name in ('ds', 'es', 'ss')):
         raise ValueError('captured function requires non-flat DS/ES/SS selector handling')

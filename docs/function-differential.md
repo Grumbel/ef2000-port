@@ -168,3 +168,20 @@ arena writes until a cross-backend range/mapping audit and a guard-region
 test establish a defensible reservation. In particular, the Unicorn table
 map currently begins just above 64 MiB, and the native64 checkpoint copies
 exactly 64 MiB of guest RAM: simply enlarging one constant is unsafe.
+
+For ASM-to-C input preparation, `--capture-x87` opts into `EFCAP002`; default
+captures remain `EFCAP001`. It adds FS/GS/CS, all eight physical raw-80 payloads
+(including empty slots), CW/SW/tag/IP/CS/DP/DS/opcode, the producer's Unicorn
+version, GDTR/LDTR registers, selected raw descriptor entries and bounded GDT/LDT
+windows. A missing descriptor/table window is explicit. Table memory does not
+prove the CPU's hidden segment-cache contents: the native test deliberately
+changes the table limit after loading selectors to exercise that distinction.
+
+EFCAP002 has a 120-byte common header (16 registers), a 244-byte fixed context,
+then GDT/LDT windows (at most 64 KiB each), then the original guest RAM. Counts,
+field widths, table sizes, selected descriptors and total length are checked.
+It uses the same source-image binding and no-overwrite rule as EFCAP001.
+The Python reader accepts both formats; the existing native-ABI differential
+runner explicitly rejects EFCAP002 until x87/segment restoration is implemented.
+It never substitutes empty FP state or discards the extra context. These are
+input snapshots, not portable emulator save games or game-equivalence proof.
