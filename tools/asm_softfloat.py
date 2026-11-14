@@ -140,25 +140,35 @@ def validated_build(directory, *, watcom=False):
 
 
 def build_narrow(directory, output, *, compiler='cc', watcom=None):
+    return build_adapter(directory, output, 'narrow', compiler=compiler, watcom=watcom)
+
+
+def build_binary(directory, output, *, compiler='cc', watcom=None):
+    return build_adapter(directory, output, 'binary', compiler=compiler, watcom=watcom)
+
+
+def build_adapter(directory, output, name, *, compiler='cc', watcom=None):
+    if name not in ('narrow', 'binary'):
+        raise ValueError('unknown SoftFloat adapter')
     report = validated_build(directory, watcom=bool(watcom))
     if output.exists():
         raise ValueError('use a fresh SoftFloat adapter build directory')
     output.mkdir(parents=True)
-    source = ROOT / 'tools/asm_x87_narrow.c'
+    source = ROOT / ('tools/asm_x87_%s.c' % name)
     includes = [directory, directory / 'SoftFloat-3e/source/include']
-    library = output / 'narrow.so'
+    library = output / (name + '.so')
     command = [compiler, '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra', '-Werror']
     command += ['-I' + str(p) for p in includes]
     command += [str(source), str(directory / 'softfloat.so'), '-Wl,-z,defs', '-o', str(library)]
     result = subprocess.run(command, capture_output=True, text=True)
     (output / 'host.log').write_text(result.stdout + result.stderr)
     result.check_returncode()
-    evidence = dict(schema=1, model='x87-narrow-softfloat-3e-8086',
+    evidence = dict(schema=1, model='x87-%s-softfloat-3e-8086' % name,
                     dependency_report_sha256=digest(directory / 'report.json'),
                     dependency_library_sha256=report['library_sha256'],
                     source_sha256=digest(source), library_sha256=digest(library), host_command=command)
     if watcom:
-        obj = output / 'narrow.obj'
+        obj = output / (name + '.obj')
         command = [watcom, '-q', '-bt=dos', '-3r', '-za99', '-w1', '-we']
         command += ['-i=' + str(p) for p in includes] + ['-fo=' + str(obj), str(source)]
         result = subprocess.run(command, capture_output=True, text=True)
@@ -174,6 +184,7 @@ def main():
     inputs = parser.add_mutually_exclusive_group(required=True)
     inputs.add_argument('--archive', type=Path)
     inputs.add_argument('--narrow-from', type=Path, help='build adapter from a validated dependency build')
+    inputs.add_argument('--binary-from', type=Path, help='build masked arithmetic adapter')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--compiler', default='cc')
     parser.add_argument('--watcom')
@@ -182,7 +193,10 @@ def main():
         output = args.output.resolve()
         if not output.is_relative_to(ROOT / 'local'):
             raise ValueError('SoftFloat artifacts must stay under ignored local/')
-        if args.narrow_from:
+        if args.binary_from:
+            build_binary(args.binary_from.resolve(), output, compiler=args.compiler, watcom=args.watcom)
+            print('Built SoftFloat arithmetic adapter; output: %s' % output)
+        elif args.narrow_from:
             build_narrow(args.narrow_from.resolve(), output, compiler=args.compiler, watcom=args.watcom)
             print('Built SoftFloat narrowing adapter; output: %s' % output)
         else:

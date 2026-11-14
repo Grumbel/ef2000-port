@@ -52,11 +52,12 @@ class SoftFloatBuildTests(unittest.TestCase):
                     elif change == 'binding':
                         current['headers']['platform.h'] = current['platform_sha256']
                     (root/'report.json').write_text(json.dumps(current))
-                    with patch.object(asm_softfloat.subprocess, 'run') as compile_:
-                        with self.assertRaises(ValueError):
-                            asm_softfloat.build_narrow(root, root/'out', watcom='wcc' if change == 'watcom' else None)
-                        compile_.assert_not_called()
-                    self.assertFalse((root/'out').exists())
+                    for builder in (asm_softfloat.build_narrow, asm_softfloat.build_binary):
+                        with patch.object(asm_softfloat.subprocess, 'run') as compile_:
+                            with self.assertRaises(ValueError):
+                                builder(root, root/'out', watcom='wcc' if change == 'watcom' else None)
+                            compile_.assert_not_called()
+                        self.assertFalse((root/'out').exists())
 
     def test_bad_digest_creates_no_build(self):
         with tempfile.TemporaryDirectory() as temporary:

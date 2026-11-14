@@ -578,3 +578,22 @@ width differs), so it establishes those disputed fields only, not guest ABI
 equivalence. Evidence: local/asm-x87-original-store-probe-20261114/evidence.json;
 bulk report: local/asm-c-x87-store-diff-20261114/report.json. The gate remains
 nonzero; oracle repair and full game integration remain required.
+
+`tools/asm_x87_binary.c` now supplies a separate masked raw-80 arithmetic
+adapter for add/subtract/multiply/divide. Build it with
+`tools/asm_softfloat.py --binary-from local/asm-softfloat --output local/asm-binary`
+(optionally `--watcom /path/to/wcc386`). It shares narrowing's validated pinned
+dependency builder and records source/library/object hashes. The API accepts
+architectural PC (0/2/3) and RC (0..3), rejects reserved PC, and returns raw
+extended result plus x87 exception flags and C1. It canonicalizes pseudo-denormal
+inputs, rejects unsupported encodings with indefinite, handles denormal-operand
+priority, and restores all four SoftFloat settings. Calls must be serialized.
+
+1,064,400 independent native x87 comparisons pass for results and flags/C1:
+all supported PC/RC combinations, signed special/unsupported operands, different
+NaN payloads, cancellation, precision boundaries, seeded random inputs and an
+extended-exponent sweep. Inputs are restored as raw x87 state, avoiding prior
+load normalization. Run `ASM_SOFTFLOAT_BUILD=local/asm-softfloat python3 -m unittest
+tests.test_asm_x87_binary`. This is masked arithmetic only: guest instruction
+rendering, stack effects, unmasked exception effects/delivery and corpus coverage
+remain unchanged and unproven by these tests.

@@ -3008,3 +3008,31 @@ local/asm-c-x87-store-diff-20261114/report.json. Run with --softfloat-build
 local/asm-softfloat-verified-build-20261113 and --watcom as above. Corpus gate
 exits nonzero; oracle accuracy, checked-target failures, arithmetic and game
 integration remain active. No tracker promotion.
+
+**2026-11-14 — Independently validated masked extended arithmetic adapter.**
+Added generic asm_x87_binary.c for raw add/subtract/multiply/divide, returning
+extended bits and x87 flags/C1 at every defined precision/rounding setting.
+Normalize pseudo-denormals, handle unsupported encodings and denormal-operand
+priority, and preserve SoftFloat mode/flags/tininess/precision settings. Invalid
+API controls leave output/settings unchanged. Shared validated adapter builder
+now supports --binary-from and records dependency/source/library/Watcom hashes.
+1,064,400 hardware cases agree on raw results and flags/C1; cover signed
+zeros/infinities, multiple signaling/quiet NaN payloads, unsupported encodings,
+subnormals/pseudo-denormals, cancellation/rounding boundaries, seeded random
+canonical/arbitrary inputs and all extended exponents with PC 0/2/3 and RC 0..3.
+Hardware inputs use FRSTOR, so denormal/unsupported raw operands are not silently
+normalized by a preceding load. Native evidence exposed DE suppression by
+invalid/NaN or divide-by-zero; adapter now models it. Watcom build warning-free.
+Nine focused arithmetic/narrowing/dependency/store tests pass with no skips.
+Commands: ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3
+-m unittest tests.test_asm_x87_binary tests.test_asm_x87_narrow
+tests.test_asm_softfloat tests.test_asm_x87_store (Python 3.13.12/Unicorn 2.1.4);
+tools/asm_softfloat.py --binary-from local/asm-softfloat-verified-build-20261113
+--output local/asm-x87-binary-build-20261114 --watcom <wcc386>.
+Evidence: local/asm-x87-binary-regression-20261114.log,
+local/asm-x87-binary-evidence-20261114.json,
+local/asm-x87-binary-build-20261114/report.json and watcom.log.
+This adapter proves masked raw arithmetic only; unmasked architectural effects,
+stack/rendering integration, pending exception delivery, full corpus and game
+integration still require work. Existing selected-body count and nonzero gate
+are unchanged. No tracker promotion; all dependency/generated artifacts local/.
