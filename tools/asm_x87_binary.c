@@ -156,3 +156,58 @@ unsigned ef_x87_binary_control(const uint32_t left[3], const uint32_t right[3],
 {
     return ef_x87_binary_operand(left, right, operation, control, 0, out);
 }
+
+/* Square root has no range exception: even the smallest extended subnormal
+   has a normal square root. IE/DE precede computation; PE commits its result. */
+unsigned ef_x87_sqrt_control(const uint32_t raw[3], unsigned control, uint32_t out[3])
+{
+    static const uint_fast8_t modes[4] = {0, 2, 3, 1};
+    static const uint_fast8_t precisions[4] = {32, 0, 64, 80};
+    extFloat80_t operand, result, truncated;
+    uint_fast8_t old_mode, old_flags, old_tininess, old_precision, flags;
+    unsigned exceptions = 0, precision = (control >> 8) & 3u;
+    if (precision == 1) return 0x10000u;
+    if ((raw[2] & 0x7fffu) && !(raw[1] & 0x80000000u)) {
+        if (!(control & 1u)) return 0x20001u;
+        out[0] = 0; out[1] = 0xc0000000u; out[2] = 0xffffu;
+        return 1;
+    }
+    operand.signif = ((uint64_t)raw[1] << 32) | raw[0];
+    operand.signExp = (uint16_t)raw[2];
+    if (!(raw[2] & 0x7fffu) && operand.signif) {
+        exceptions = 2;
+        if (raw[1] & 0x80000000u) ++operand.signExp;
+    }
+    old_mode = softfloat_roundingMode;
+    old_flags = softfloat_exceptionFlags;
+    old_tininess = softfloat_detectTininess;
+    old_precision = extF80_roundingPrecision;
+    softfloat_roundingMode = modes[(control >> 10) & 3u];
+    softfloat_exceptionFlags = 0;
+    softfloat_detectTininess = softfloat_tininess_afterRounding;
+    extF80_roundingPrecision = precisions[precision];
+    extF80M_sqrt(&operand, &result);
+    flags = softfloat_exceptionFlags;
+    softfloat_roundingMode = softfloat_round_minMag;
+    softfloat_exceptionFlags = 0;
+    extF80M_sqrt(&operand, &truncated);
+    softfloat_roundingMode = old_mode;
+    softfloat_exceptionFlags = old_flags;
+    softfloat_detectTininess = old_tininess;
+    extF80_roundingPrecision = old_precision;
+    if (flags & ~(softfloat_flag_invalid | softfloat_flag_inexact)) return 0x10000u;
+    /* Invalid and NaN take priority over a denormal input, including -tiny. */
+    if ((flags & softfloat_flag_invalid) ||
+        ((result.signExp & 0x7fffu) == 0x7fffu &&
+         result.signif != ((uint64_t)1 << 63))) exceptions = 0;
+    exceptions |= ((flags & 16u) >> 4) | ((flags & 1u) << 5);
+    if (exceptions & ~control & 1u) return 0x20001u;
+    if (exceptions & ~control & 2u) return 0x20002u;
+    if ((flags & softfloat_flag_inexact) &&
+        ((result.signExp & 0x7fffu) > (truncated.signExp & 0x7fffu) ||
+         ((result.signExp & 0x7fffu) == (truncated.signExp & 0x7fffu) &&
+          result.signif > truncated.signif))) exceptions |= 0x200u;
+    out[0] = (uint32_t)result.signif; out[1] = (uint32_t)(result.signif >> 32);
+    out[2] = result.signExp;
+    return exceptions;
+}

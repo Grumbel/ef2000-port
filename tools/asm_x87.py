@@ -502,6 +502,23 @@ BINARY_RUNTIME = r'''
 #define EF_LIFT_BINARY_RUNTIME
 unsigned ef_x87_binary_control(const uint32_t *, const uint32_t *, unsigned, unsigned, uint32_t *);
 unsigned ef_x87_binary_operand(const uint32_t *, const uint32_t *, unsigned, unsigned, unsigned, uint32_t *);
+unsigned ef_x87_sqrt_control(const uint32_t *, unsigned, uint32_t *);
+static unsigned ef_x87_sqrt(ef_lift_state *s) {
+    uint32_t value[3] = {0, 0xc0000000u, 0xffffu}, flags;
+    unsigned top = ef_x87_index(s, 0);
+    if (s->x87_status & 0x80u) return 8;
+    if (ef_x87_empty(s, top)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+    } else {
+        flags = ef_x87_sqrt_control(s->x87[top], s->x87_control, value);
+        if (flags & 0x10000u) return 9;
+        s->x87_status = (s->x87_status & ~0x200u) | (flags & 0x23fu);
+        if (flags & ~s->x87_control & 0x3fu) s->x87_status |= 0x8080u;
+        if (flags & 0x20000u) return 0;
+    }
+    ef_x87_put(s, top, value);
+    return 0;
+}
 static unsigned ef_x87_register_binary(ef_lift_state *s, unsigned operation,
                                       unsigned left, unsigned right, unsigned destination, unsigned pop) {
     uint32_t value[3] = {0, 0xc0000000u, 0xffffu}, flags;

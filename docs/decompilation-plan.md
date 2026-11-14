@@ -3514,3 +3514,87 @@ local/asm-x87-round-closure-evidence-20261114.json. Current native source and
 translation-manifest digests checked independently. Remaining instructions,
 services/traps, audited boundaries, reviewed dynamic targets, captured inputs
 and game integration remain required; reliable bulk translation is active.
+
+**2026-11-14 — Exact raw-80 square root and 124 additional closed bodies.**
+Dependency-only impact analysis selects FSQRT: one directly blocked body, 124
+optimistic closure additions versus 119 for PUSHA/102 for INT. Estimates do not
+assume that later instructions in a blocked body are supported. Implement D9 FA
+using extF80M_sqrt from the validated, pinned SoftFloat build, with explicit
+raw payloads, PC/RC, exception priority and mask effects. Preserve binary adapter
+interfaces; extend only its hash-bound source and the original oracle's fixed
+FSQRT allowlist. Save/restore rounding, precision, flags and tininess settings.
+Reject reserved PC. Handle NaN quieting, unsupported/empty indefinite, signed
+zero, infinities and DE; invalid suppresses DE, unmasked IE/DE suppresses writes,
+unmasked PE commits. C1 records magnitude increment; other status, TOP, raw
+physical values and DP context remain observable. Square root cannot produce
+an extended range exception for a finite positive input; unexpected backend
+range flags fail explicitly. No host-FP or original-code fallback.
+
+634,368 generated/native cases pass with generated-code UBSan: 236,544 all-mask/
+PC/RC, both-sign, rotated TOP, empty/raw-special cases; 393,216 all-exponent/
+PC/RC cases; 4,608 exact-square and squared-rounding-midpoint neighbors. Compare
+all raw values, tags/control/status/opcode, relocated context, GPRs/flags,
+complete RAM and configuration; assert every SoftFloat global is restored after
+each operation. Pending delivery, fuel, reserved PC and encoding rejection pass.
+A preceding integer-only body tests late backend enabling in one TU. Adapter
+and generated bodies compile warning-free with Watcom -we. Final two-test suite
+passes in 30.082 s, rejecting 53 interrupted native samples before inspecting
+results/C execution. Command: ASM_SOFTFLOAT_BUILD=<validated-build>
+ASM_SQRT_WCC=<wcc386>
+ASM_SQRT_EVIDENCE=local/asm-x87-sqrt-final-evidence-20261114.json
+python3 -m unittest tests.test_asm_x87_sqrt.
+
+Regeneration with tools/asm_c_program.py --workspace
+local/ghidra-x87-dispatch-20261114 --inventory
+local/asm-wait-body-inventory-20261114 --output
+local/asm-c-x87-sqrt-program-20261114 yields 4,130 syntax-supported and 2,496
+closed bodies/402,146 bytes (+124/+59,892), including 0xa4472 and its dependency
+chains. All preceding 2,372 body sources are byte-identical. These remain
+unverified at game level; full corpus results are a separate gate.
+Evidence: local/asm-next-blocker-impact-20261114.json,
+local/asm-x87-sqrt-final-tests-20261114.log,
+local/asm-x87-sqrt-final-evidence-20261114.json,
+local/asm-x87-sqrt-closure-evidence-20261114.json and generated report.
+
+Full 21-module ASM regression: 81 tests pass without skips (493.593 s),
+Python 3.13.12/Unicorn 2.1.4, validated SoftFloat and all four Watcom test
+options enabled. Exact arguments/environment:
+local/asm-x87-sqrt-full-command-20261114.json; output:
+local/asm-x87-sqrt-full-tests-20261114.log.
+
+Generic 0xa4472 probes (16) remain inconclusive: empty initial FP stack causes
+original memory faults in its error path before FSQRT. Add a separate valid-ST0
+experiment with the existing compare(initial_x87=...) API and full dispatcher,
+without altering tools or corpus states. All 768 prepared cases match: all TOP/
+PC/RC, zeros including -0, positive exact/irrational roots, true/pseudo-denormal
+and largest finite input. Each original executes exactly one FSQRT. Compare
+complete GPR/FP state, environment and 4 MiB RAM; no field masking or outcome
+reclassification. This is additional prepared-input evidence, not captured
+caller/game integration proof. Command: PYTHONPATH=<repo>:<Unicorn-site-packages>
+<Python-3.13.12> local/check-sqrt-wrapper-20261114.py. Evidence:
+local/asm-x87-sqrt-wrapper-20261114.log and
+local/asm-x87-sqrt-wrapper-evidence-20261114.json; script/library hashes recorded.
+
+Completed hardware-oracle corpus: 39,936 probes, 22,104 matches, 17,828
+inconclusive and four unchanged callback-target mismatches. Added 124 bodies
+contribute 1,047 matches and 937 inconclusive, no new mismatches. Every old
+probe state is unchanged: 21,057 pass -> pass, 16,891 inconclusive ->
+inconclusive, four mismatch -> mismatch. 884 bodies pass all probes, 1,610
+are inconclusive and two mismatch (0xded86/0xed133 targets 0x7f/0x80). CLI exits
+1; the full gate still fails. All 2,496 bodies and dispatcher compile warning-
+free with Watcom -we. Native reference executes 117,161 operations in 68 forms,
+including 453 FSQRT operations through callers; 18 interrupted samples rejected
+before inspecting results or C execution. Generic wrapper probes remain 16
+inconclusive; the separate 768 valid-ST0 wrapper cases pass and bind the same
+compiled library. No masked fields, outcome reclassification or tracker promotion.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-sqrt-program-20261114 --output
+local/asm-c-x87-sqrt-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-x87-sqrt-diff-20261114/report.json and
+local/asm-x87-sqrt-corpus-summary-20261114.json. Native tool, translation manifest
+and supplementary wrapper script/library digests checked independently. Stack
+operations, interrupt/services, remaining x87 operations, audited flow gaps,
+reviewed dynamic targets, captured callers and full-game integration remain;
+reliable bulk translation remains active.

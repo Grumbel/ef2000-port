@@ -559,6 +559,11 @@ def instruction_c(insn, starts):
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif mnemonic == 'fsqrt':
+        if text or insn['bytes'] != 'd9fa':
+            raise Unsupported('unsupported FSQRT encoding/spelling')
+        code += ['a = ef_x87_sqrt(s); if (a) return a;',
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x1fau;' % insn['address']]
     elif mnemonic == 'frndint':
         if text or insn['bytes'] != 'd9fc':
             raise Unsupported('unsupported FRNDINT encoding/spelling')
@@ -864,7 +869,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
     if re.search(r'\bproduct\b', '\n'.join(cases)):
         declarations += '\n    uint64_t product;'
     prefix = asm_x87.NARROW_DEFINE if any('ef_x87_store_real(' in case for case in cases) else ''
-    if any('ef_x87_register_binary(' in case or 'ef_x87_memory_binary(' in case for case in cases):
+    if any('ef_x87_register_binary(' in case or 'ef_x87_memory_binary(' in case or 'ef_x87_sqrt(' in case for case in cases):
         prefix += asm_x87.BINARY_DEFINE
     return prefix + '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
 #include "ef_lift_state.h"
