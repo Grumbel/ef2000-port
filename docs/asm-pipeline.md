@@ -514,3 +514,31 @@ all 2,096 per-body outcomes unchanged: 18,500 matches, 14,969 inconclusive and
 67 existing mismatches. The host library is byte-identical to the preceding
 run because FILD does not yet enter selected bodies. All 98 tests pass. FILD's
 hardware coverage is separate from bulk/game coverage; the gate stays nonzero.
+
+The narrowing conversion adapter is built separately from the instruction
+renderer:
+
+```sh
+python3 tools/asm_softfloat.py --narrow-from local/asm-softfloat \
+  --output local/asm-narrow --watcom /path/to/wcc386
+ASM_SOFTFLOAT_BUILD=local/asm-softfloat python3 -m unittest \
+  tests.test_asm_softfloat tests.test_asm_x87_narrow
+```
+
+`tools/asm_x87_narrow.c` consumes three raw extended words and returns binary32/
+binary64 bits plus conversion flags and C1. It shares the dependency's platform
+header/ABI, handles unsupported encodings and pseudo-denormals, and computes C1
+from a second conversion toward zero. Rounding mode, exception flags and
+tininess settings are restored. The pinned non-TLS library requires serialized
+calls; the existing verifier isolates entries by process. The builder validates
+source/header/platform/library digests and Watcom object bindings before making
+an adapter output, then records adapter source/object/library hashes. All
+third-party material stays under ignored local/.
+
+277,984 masked-conversion cases match hardware values, flags and C1, including
+all extended exponents in four rounding directions and boundary/special payloads
+across precision controls. Invalid arguments and library-context restoration
+are checked. This adapter does not yet implement FST/FSTP memory effects,
+exception masks, suppressed stores or pop timing. Store instruction integration
+and independent validation of those effects remain required; existing corpus
+coverage and its nonzero gate are unchanged.

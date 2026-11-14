@@ -2908,3 +2908,46 @@ local/asm-c-x87-integer-load-program-20261113 --output
 local/asm-c-x87-integer-load-diff-20261113 --watcom
 /nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386.
 Final report exists. Full reliable bulk translation remains active.
+
+
+**2026-11-14 — Pinned narrowing conversion adapter prerequisite.**
+Added tools/asm_x87_narrow.c around SoftFloat 3e's 8086 extended-to-real
+conversions, with explicit raw-word/bit-result ABI. Include the same platform
+header as the dependency; no native floating type or guest memory side effect.
+Detect unsupported extended encodings (IE/indefinite), normalize pseudo-
+denormals, retain NaN signs/payloads, map flags and derive C1 via a second
+conversion toward zero. Restore all changed library settings; require serialized
+calls for the non-TLS dependency. No original-code fallback or game code.
+Added asm_softfloat.py --narrow-from, requiring fresh ignored output and a
+validated 237-source profile, source/header/platform/library hashes, safe paths,
+unique bindings and (when requested) Watcom object hashes. Record adapter source,
+commands, dependency report/library and resulting artifacts. Source/header/path/
+profile/duplicate/missing-Watcom corruption fails before compilation/output.
+Host and Watcom -w1 -we compile the adapter without diagnostics.
+277,984 hardware masked-conversion comparisons pass: all 32,768 extended
+exponents in four rounding modes for both widths, plus signed boundary/special
+significands across all standard PC/RC settings. Compare output bits, exception
+flags and C1; context restoration and invalid arguments are checked. Six
+SoftFloat/adapter tests pass with all opt-in dependencies enabled; existing
+3,072 arithmetic hardware cases are rerun too. This is a conversion prerequisite,
+not completed FST/FSTP or unmasked-store/pop semantics. No translation/runtime
+code or selected corpus changed; existing bulk gate remains nonzero.
+Commands: tools/asm_softfloat.py --narrow-from
+local/asm-softfloat-verified-build-20261113 --output
+local/asm-x87-narrow-build-20261114 --watcom
+/nix/store/rs0hwdf6mhndmsyhc9z5gbgsa43ps8vg-open-watcom-v2-0-unstable-2026-04-11/bin/wcc386;
+ASM_SOFTFLOAT_BUILD=local/asm-softfloat-verified-build-20261113 python3 -m unittest
+tests.test_asm_softfloat tests.test_asm_x87_narrow. Evidence:
+local/asm-x87-narrow-final-tests-20261114.log,
+local/asm-x87-narrow-evidence-20261114.json and
+local/asm-x87-narrow-build-20261114/report.json (Python 3.13.12/Unicorn 2.1.4).
+Store-mask commit/pop behavior, remaining arithmetic/runtime and oracle accuracy
+stay active; no tracker promotion or full-bulk claim.
+
+Next store integration must retain experimentally observed commit distinctions:
+unmasked IE/OE/UE suppress the memory write/pop; unmasked PE can still write and
+pop. Unmasked UE also traps an exact subnormal result that raises no UE when
+masked; therefore masked conversion flags alone are insufficient to decide
+store effects. The native probes are under local/asm-x87-narrow-probe-20261114
+(state.c/state.so), currently binary32 exploratory cases only. These observations
+are implementation input, not a completed instruction conformance test.

@@ -21,6 +21,43 @@ from tests.test_asm_to_c import assemble, unicorn
 
 
 class SoftFloatBuildTests(unittest.TestCase):
+    def test_dependency_validation_rejects_profile_paths_and_corruption_before_build(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            sources = []
+            for index in range(237):
+                source = root / ('source_%d.c' % index)
+                source.write_text('/* synthetic dependency inventory */')
+                sources.append(dict(source=source.name, source_sha256=asm_softfloat.digest(source)))
+            for name in ('platform.h', 'softfloat.so', 'types.h'):
+                (root / name).write_bytes(b'synthetic validation fixture')
+            report = dict(schema=1, archive_sha256=asm_softfloat.ARCHIVE_SHA256,
+                          specialization='8086', fast_int64=False, inline_level=0, round_odd=True,
+                          platform_sha256=asm_softfloat.digest(root/'platform.h'),
+                          library_sha256=asm_softfloat.digest(root/'softfloat.so'),
+                          headers={'types.h': asm_softfloat.digest(root/'types.h')}, sources=sources)
+            (root/'report.json').write_text(json.dumps(report))
+            self.assertEqual(asm_softfloat.validated_build(root), report)
+            for change in ('header', 'path', 'profile', 'duplicate', 'binding', 'watcom'):
+                with self.subTest(change=change):
+                    current = json.loads(json.dumps(report))
+                    if change == 'header':
+                        current['headers']['types.h'] = '0'*64
+                    elif change == 'path':
+                        current['headers']['../outside'] = '0'*64
+                    elif change == 'profile':
+                        current['specialization'] = 'ARM-VFPv2'
+                    elif change == 'duplicate':
+                        current['sources'][-1] = current['sources'][0]
+                    elif change == 'binding':
+                        current['headers']['platform.h'] = current['platform_sha256']
+                    (root/'report.json').write_text(json.dumps(current))
+                    with patch.object(asm_softfloat.subprocess, 'run') as compile_:
+                        with self.assertRaises(ValueError):
+                            asm_softfloat.build_narrow(root, root/'out', watcom='wcc' if change == 'watcom' else None)
+                        compile_.assert_not_called()
+                    self.assertFalse((root/'out').exists())
+
     def test_bad_digest_creates_no_build(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
