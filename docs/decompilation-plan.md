@@ -4108,3 +4108,33 @@ the unverified ceil/floor replacement excluded, and replay the full image.
 Evidence: local/hybrid-block-tail-20261114/{run,annotated}.log, its validated
 stopped-ram.bin, and local/hybrid-block-tail-{build,ctest,parser-tests}-20261114.log.
 Proprietary state and diagnostic code dumps remain ignored.
+
+### 2026-11-14 — correct canonical x87 truncation call ABI
+
+Declare truncate_9d72c with Watcom parm/value [8087] and preserved GPRs;
+correct its original signature from EAX:double to ST0 input/output. Disassembly
+at 0x9d72c saves/restores the x87 control word around FRNDINT and uses plain RET.
+Both e7ea4@e7f24 and f80@14eb pass ST0 and pop the result themselves. The
+alternate alias already had an x87 pragma; canonical callers did not. Keep
+the ceil/floor C implementation explicitly excluded pending raw x87 precision
+and exception checks. Recompile both canonical-caller modules with zero warnings.
+Correct the ramp builder's preservation record: EDX is scratch, not saved.
+
+Replace its dummy spec with seven real cases: full/interior/single-interval
+ramps, equal/reversed endpoints, and invalid bounds. Isolated original-vs-C
+comparisons pass all seven, comparing 256 ramp bytes for each valid case,
+return value, preserved registers and stack cleanup. Synthetic A5 guards detect
+out-of-range writes. The old call ABI faults on the full-range negative control
+(invalid return fetch at 0xe898000a), so these cases detect the regression.
+Commands: tools/hybrid_link.py --only-address 0xe7ea4 with the recompiled
+objects; tools/func_differential.py 0xe7ea4 --payload
+local/ghidra-stack-return-20261114/payload.bin --patch
+local/hybrid-truncate-abi-fix-20261114/only-ramp.efpatch --spec
+decomp/tests/0x000e7ea4.json. Evidence: local/hybrid-truncate-abi-fix-20261114/
+{diff-ramp,diff-ramp-old-control,compile-misc,compile-float,tests}.log.
+
+Full 2593-redirect replay no longer returns to zero from the ramp builder. It
+now exposes a later invalid callback fetch at 0xfab33ce9, tick 3221, through
+release_ref_108ffa and guest_callptr_eax_ret_x. Cockpit-entry canaries remain
+unreached. Investigate the callback declaration/definition clobber contract
+next; no M2 completion or full raw-x87 equivalence claim.

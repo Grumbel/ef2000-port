@@ -7362,6 +7362,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 /* ST0-argument x87 helpers: Watcom would otherwise pass the double on the stack
  * (found by the cockpit bisect: 0xb41bc, 0xb427c). */
 #pragma aux guest_fn_a4470 parm [8087] value [8087] modify [eax]
+#pragma aux truncate_9d72c parm [8087] value [8087] modify exact []
 #pragma aux guest_fn_9d72c_x parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b45fa parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b45ac parm [8087] value [8087] modify [eax]
