@@ -4051,3 +4051,34 @@ reach the cockpit: at 1.5B instructions IP=0, AX=1, and the four flight-entry
 canaries (0x58d24/0x7a428/0x7eea0/0x810d0) have zero hits. No M2 or full-game
 equivalence claim. Evidence: local/hybrid-path-cockpit-20261114.log and its
 inspected framebuffer. Next investigate this loading control-flow divergence.
+
+### 2026-11-14 — reject false instruction-limit passes at EIP zero
+
+The simulation-loading stall exposed an oracle bug: uc_emu_start uses end=0.
+After a guest return/jump reaches zero, Unicorn returns UC_ERR_OK without
+running further instructions, but the runner repeatedly charges whole slices
+and reports instruction_limit. Detect this unexpected end-address stop in both
+instruction-counted and real-time modes before delivering further timer ticks.
+Report a bisectable guest-execution error with SP, stack words, tick/IRQ counters
+and replacement hits. A requested --capture-calls 0 now records that first stop
+through the existing snapshot writer. Do not treat budget exhaustion as progress
+when guest execution has stopped. Synthetic zero-return self-tests require this
+error in both timing modes; existing clock, retrace, BDA, patch-hit and hash
+regressions remain passing (eight native CTests in the selected group).
+All 19 replay tests pass, including a parser regression checking that this
+failure keeps canary counts. Commands: xvfb-run -a ctest --test-dir
+local/codex-build --output-on-failure -R
+'unicorn-cpp-(zero-return|patch-hits|guest-hash|bda|clock|retrace)';
+python3 -m unittest tests.test_replay_suite -v.
+
+Actual two-Return replay with the corrected path-call image now stops at the
+first zero transfer: ticks=3221, IRQ0=3154, SP=0x3ffe6e4, AX=1; top stack words
+are 0x93,0,0x92,0,0x91,0,0x90,0. A complete guest-RAM snapshot is retained under
+local/hybrid-null-stop-20261114/calls/. This supersedes the earlier misleading
+1.5B-instruction stop at tick 6000. Next locate the preceding control transfer;
+the current stack already looks overwritten, so a short block-history diagnostic
+may be needed. Evidence: local/hybrid-null-stop-20261114/run.log and
+local/hybrid-null-stop-{selftest-build,ctest}-20261114.log.
+The first diagnostic launch did not start because the redirected output
+directory was absent; after creating it, the actual replay completed with the
+reported failure and snapshot. No game assets changed.

@@ -385,6 +385,11 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
            --joystick-event 0:0:0:0 --joystick-axes=0,1 --trace-joystick)
   set_tests_properties(unicorn-cpp-gameport PROPERTIES
                        PASS_REGULAR_EXPRESSION "gameport: axes=2 reads=1 writes=1")
+  add_test(NAME unicorn-cpp-zero-return COMMAND ef2000-unicorn-cpp --self-test-zero-return)
+  add_test(NAME unicorn-cpp-zero-return-realtime COMMAND ef2000-unicorn-cpp
+           --self-test-zero-return --timing realtime)
+  set_tests_properties(unicorn-cpp-zero-return unicorn-cpp-zero-return-realtime PROPERTIES
+                       PASS_REGULAR_EXPRESSION "zero-return stop detected")
   add_test(NAME unicorn-cpp-patch-hits COMMAND ef2000-unicorn-cpp --self-test-patch-hits)
   set_tests_properties(unicorn-cpp-patch-hits PROPERTIES
                        PASS_REGULAR_EXPRESSION "patch_hit: addr=0x200 count=2")

@@ -1522,6 +1522,33 @@ public:
                 }
                 completed += amount;
             }
+            // Zero is Unicorn's end address, not executable EF2000 code.
+            // A bad guest return/jump can otherwise produce UC_ERR_OK on
+            // every subsequent slice and consume the budget without running.
+            if (status_ == "instruction_limit" && ip_at_cpu() == 0) {
+                if (capture_remaining_.count(0)) capture_call(0);
+                const auto regs = read_regs();
+                std::ostringstream message;
+                message << (realtime ? "real-time" : "instruction-counted")
+                        << " guest execution: unexpected zero-address stop ip=0x0 sp=0x"
+                        << std::hex << regs.sp << std::dec << " ticks=" << ticks_
+                        << " irqs=" << irq0_ << " ax=0x" << std::hex << regs.ax;
+                std::array<uint32_t, 8> words{};
+                if (uc_mem_read(cpu_, regs.sp, words.data(), sizeof(words)) == UC_ERR_OK) {
+                    message << " stack=";
+                    for (size_t i = 0; i < words.size(); ++i)
+                        message << (i ? ",0x" : "0x") << words[i];
+                }
+                message << " patch_hits=";
+                bool first_hit = true;
+                for (const auto& [address, count] : patch_hit_counts_) {
+                    if (!count) continue;
+                    message << (first_hit ? "0x" : ",0x") << address << ':'
+                            << std::dec << count << std::hex;
+                    first_hit = false;
+                }
+                throw std::runtime_error(message.str());
+            }
             if (pending_copy_) finish_fast_copy();
             if (performance_.profile)
                 perf_stats_.guest_time += std::chrono::steady_clock::now() - guest_started;
@@ -3343,6 +3370,7 @@ void usage(const char* program) {
               << "       Patched runs report patch_hit entry counts (zero means unexercised)\n"
               << "       [--hash-guest ADDR:LENGTH] (final guest SHA-256, repeatable; max 16 MiB)\n"
               << "       [--capture-calls ADDR[:N] --capture-dir DIR] (up to 4 guest-RAM call snapshots)\n"
+              << "       Capture address 0 records an unexpected emulation stop at zero.\n"
               << "       [--capture-memory ADDR:LENGTH] (repeatable selected-memory sidecars at captured calls)\n"
               << "       [--capture-x87] (EFCAP002 raw x87, all selectors and descriptor-table context)\n"
               << "       --cd-cue FILE enables MSCDEX Red Book music from read-only CUE/BIN\n"
@@ -3379,6 +3407,7 @@ int main(int argc, char** argv) {
         bool self_test = false, self_test_bda = false, self_test_clock = false;
         bool self_test_retrace = false, self_test_fast_copy = false;
         bool self_test_archive_lookup = false, self_test_patch_hits = false;
+        bool self_test_zero_return = false;
         bool trace_interrupts = false, trace_archive_lookups = false;
         bool trace_entry_state = false;
         std::vector<MouseEvent> mouse_events;
@@ -3639,6 +3668,8 @@ int main(int argc, char** argv) {
                 self_test_fast_copy = true;
             } else if (!std::strcmp(argv[i], "--self-test-archive-lookup")) {
                 self_test_archive_lookup = true;
+            } else if (!std::strcmp(argv[i], "--self-test-zero-return")) {
+                self_test_zero_return = true;
             } else if (!std::strcmp(argv[i], "--self-test-patch-hits")) {
                 self_test_patch_hits = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
@@ -3717,7 +3748,7 @@ int main(int argc, char** argv) {
         // was requested explicitly.
         const bool any_self_test = self_test || self_test_bda || self_test_clock ||
             self_test_retrace || self_test_fast_copy || self_test_archive_lookup ||
-            self_test_patch_hits;
+            self_test_patch_hits || self_test_zero_return;
         if (!explicit_window && !headless && !any_self_test && wall_seconds <= 0 &&
             !(explicit_limit && limit) && framebuffer.empty() && !path.empty())
             window.enabled = true;
@@ -3751,10 +3782,12 @@ int main(int argc, char** argv) {
         if (captures > 4)
             throw std::runtime_error("--capture-calls supports at most four snapshots per run");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
-            self_test_fast_copy || self_test_archive_lookup || self_test_patch_hits) {
+            self_test_fast_copy || self_test_archive_lookup || self_test_patch_hits ||
+            self_test_zero_return) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) +
-                int(self_test_archive_lookup) + int(self_test_patch_hits) != 1)
+                int(self_test_archive_lookup) + int(self_test_patch_hits) +
+                int(self_test_zero_return) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!patch_paths.empty()) throw std::runtime_error("self-test does not accept patches");
@@ -3876,6 +3909,11 @@ int main(int argc, char** argv) {
                 image[0xeb520] = 0xc3; // test routine returns without touching registers
                 constexpr char pathname[] = "test.bbm";
                 std::copy(std::begin(pathname), std::end(pathname), image.begin() + 0x2000);
+            } else if (self_test_zero_return) {
+                // xor eax,eax; push eax; ret: bad control transfer to the
+                // emulation end address must fail rather than spend fuel.
+                constexpr uint8_t code[] = {0x31, 0xc0, 0x50, 0xc3};
+                std::copy(std::begin(code), std::end(code), image.begin() + ENTRY);
             } else if (self_test_patch_hits) {
                 std::copy(std::begin(patch_hits_guest), std::end(patch_hits_guest), image.begin() + ENTRY);
                 put32(image, ENTRY + 1, 0x200 - (ENTRY + 5));
@@ -3891,6 +3929,22 @@ int main(int argc, char** argv) {
             if (self_test_archive_lookup) machine.enable_archive_lookup_trace();
             if (self_test_patch_hits) machine.enable_patch_hit_trace({0x200, ENTRY});
             machine.enable_guest_hashes(guest_hash_ranges);
+            if (self_test_zero_return) {
+                const bool realtime_zero = timing == ExecutionTiming::Realtime;
+                const std::string expected = std::string(realtime_zero ? "real-time" :
+                    "instruction-counted") +
+                    " guest execution: unexpected zero-address stop ip=0x0 ";
+                try {
+                    machine.run(realtime_zero ? 0 : 10000, window, 250000, "", "",
+                                realtime_zero, realtime_zero ? 0.1 : 0, performance);
+                } catch (const std::runtime_error& error) {
+                    if (std::string(error.what()).find(expected) != 0) throw;
+                    std::cout << "zero-return stop detected (" <<
+                        (realtime_zero ? "real-time" : "instruction-counted") << ")\n";
+                    return 0;
+                }
+                throw std::runtime_error("zero-return self-test consumed its budget without failing");
+            }
             const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
             performance.clock_loop_benchmark = self_test_clock;
             return machine.run(realtime_test ? 0 : 10000, window, 250000, "", "",

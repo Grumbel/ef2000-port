@@ -159,6 +159,18 @@ class ManifestTests(unittest.TestCase):
                          'Invalid memory write (UC_ERR_WRITE_UNMAPPED)')
         self.assertIsNone(replay_suite.parse_guest_fault('runner crashed before guest'))
 
+    def test_zero_address_stop_is_a_bisectable_guest_failure(self):
+        stderr = ('ef2000-unicorn-cpp: instruction-counted guest execution: '
+                  'unexpected zero-address stop ip=0x0 sp=0x3fff000 '
+                  'ticks=9 irqs=3 ax=0x1 stack=0x1234,0x0 patch_hits=0x20:5')
+        result = replay_suite.parse_guest_fault(stderr, {0x20})
+        self.assertEqual(result['status']['status'],
+                         'guest_fault:unexpected zero-address stop')
+        self.assertEqual(result['status']['ip'], 0)
+        self.assertEqual(result['status']['ticks'], 9)
+        self.assertEqual(result['status']['irq0'], 3)
+        self.assertEqual(result['patch_hits'], {'0x20': 5})
+
 
 class SyntheticReplayTests(unittest.TestCase):
     def setUp(self):
