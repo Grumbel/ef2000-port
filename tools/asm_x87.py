@@ -296,6 +296,70 @@ static unsigned ef_x87_load_real(ef_lift_state *s, uint32_t address, unsigned wi
 }
 '''
 
+ROUND_RUNTIME = r'''
+static unsigned ef_x87_round_integer(ef_lift_state *s) {
+    uint32_t value[3] = {0, 0xc0000000u, 0xffffu};
+    uint64_t sig, magnitude, remainder, half;
+    unsigned top = ef_x87_index(s, 0), exponent, negative, rounding, flags = 0, increment = 0;
+    int power, shift;
+    if (s->x87_status & 0x80u) return 8;
+    if (ef_x87_empty(s, top)) {
+        if (!ef_x87_stack_fault(s, 0)) return 0;
+    } else {
+        value[0] = s->x87[top][0]; value[1] = s->x87[top][1]; value[2] = s->x87[top][2];
+        sig = (uint64_t)value[0] | (uint64_t)value[1] << 32;
+        exponent = value[2] & 0x7fffu; negative = value[2] & 0x8000u;
+        s->x87_status &= ~0x200u;
+        if (exponent && !(sig >> 63)) {
+            flags = 1; value[0] = 0; value[1] = 0xc0000000u; value[2] = 0xffffu;
+        } else if (exponent == 0x7fffu) {
+            /* Infinities and quiet NaNs pass through. Quiet a signaling NaN
+             * only if invalid is masked; otherwise leave the source intact. */
+            if ((sig & 0x7fffffffffffffffu) && !(value[1] & 0x40000000u)) {
+                flags = 1; value[1] |= 0x40000000u;
+            }
+        } else if (sig) {
+            if (!exponent) flags = 2;
+            if (!(flags & ~s->x87_control)) {
+                power = (int)(exponent ? exponent : 1u) - 16383;
+                /* At exponent 63 and above every raw-80 value is integral.
+                 * FRNDINT ignores precision control and has no integer range limit. */
+                if (power < 63) {
+                    shift = 63 - power;
+                    magnitude = shift >= 64 ? 0 : sig >> shift;
+                    remainder = shift >= 64 ? sig : sig & (((uint64_t)1 << shift) - 1u);
+                    rounding = (s->x87_control >> 10) & 3u;
+                    if (remainder) {
+                        flags |= 0x20u;
+                        if (rounding == 0 && shift <= 64) {
+                            half = (uint64_t)1 << (shift - 1);
+                            increment = remainder > half || (remainder == half && (magnitude & 1u));
+                        } else if (rounding == 1) increment = negative != 0;
+                        else if (rounding == 2) increment = negative == 0;
+                    }
+                    magnitude += increment;
+                    if (increment) flags |= 0x200u;
+                    exponent = 0;
+                    if (magnitude) {
+                        exponent = 16446u;
+                        while (!(magnitude >> 63)) { magnitude <<= 1; --exponent; }
+                    }
+                    value[0] = (uint32_t)magnitude; value[1] = (uint32_t)(magnitude >> 32);
+                    value[2] = exponent | negative;
+                }
+            }
+        }
+        s->x87_status |= flags;
+        if (flags & ~s->x87_control & 0x3fu) {
+            s->x87_status |= 0x8080u;
+            if (flags & ~s->x87_control & 3u) return 0;
+        }
+    }
+    ef_x87_put(s, top, value);
+    return 0;
+}
+'''
+
 INTEGER_STORE_RUNTIME = r'''
 /* Convert raw extended precision without host floating point or signed overflow.
  * Integer stores ignore PC and do not raise DE, including extended denormals. */

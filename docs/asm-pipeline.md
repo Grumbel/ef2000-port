@@ -930,3 +930,61 @@ with the validated SoftFloat build and both Watcom options enabled. Command
 arguments/environment: local/asm-x87-integer-store-full-command-20261114.json;
 output: local/asm-x87-integer-store-full-tests-20261114.log. The focused matrix
 rejects 36 interrupted native measurements before result inspection/C execution.
+
+FRNDINT now rounds raw extended precision to an integral extended value with
+integer operations, independently of host FP and without a signed-integer range
+limit. It ignores PC, preserves signed zero/infinities/quiet NaNs, quiets masked
+signaling NaNs and produces indefinite for masked unsupported/empty inputs.
+Unmasked IE/DE suppresses the destination write; unmasked PE commits the rounded
+result. Nonzero exponent-zero operands, including pseudo-denormals, raise DE
+before precision. C1 tracks magnitude increment; other condition/sticky bits,
+TOP, other physical payloads and the data-pointer environment remain observable.
+Pending delivery fails explicitly. Only the exact unprefixed D9 FC spelling is
+enabled; the independent native oracle allowlists that one register form.
+
+498,688 generated-body/native cases pass under UBSan: 236,544 cases cover all
+masks/defined PC/RC, both signs, rotated TOP, empty operands, old condition/sticky
+bits, ties, range boundaries and special/unsupported raw encodings; 262,144 more
+cover every exponent with both signs and all rounding modes. Check all physical
+values/tags/status/control, opcode, relocated environment, integer registers,
+flags, complete RAM and CPU configuration. Pending delivery, zero fuel and
+mismatched spelling/bytes are checked separately. Watcom compiles the form
+warning-free with -we. Evidence: local/asm-x87-round-final-tests-20261114.log,
+local/asm-x87-round-evidence-20261114.json. The matrix rejects 19 interrupted
+native samples before result inspection/C execution.
+
+Regeneration reaches 4,129 syntax-supported and 2,372 dependency-closed bodies,
+342,254 bytes. FRNDINT helper 0x9d72c and its dependency chains add 123 bodies/
+42,325 bytes beyond the integer-store stage. These are generated-unverified;
+full corpus outcomes remain a separate gate. Evidence:
+local/asm-c-x87-round-program-20261114/report.json. No game-verification claim.
+
+The 20-module regression command passes 79 tests without skips (450.155 s),
+Python 3.13.12/Unicorn 2.1.4, validated SoftFloat and all three Watcom test
+options enabled. Exact command arguments/environment:
+local/asm-x87-round-full-command-20261114.json; output:
+local/asm-x87-round-full-tests-20261114.log.
+
+Completed hardware-oracle corpus: 37,952 probes, 21,057 matches, 16,891
+inconclusive and four existing callback-target mismatches. Added 123 bodies
+contribute 856 matches and 1,112 inconclusive, with no new mismatches. All old
+probe states are unchanged: 20,201 pass -> pass, 15,779 inconclusive ->
+inconclusive, four mismatch -> mismatch. 845 bodies pass all probes, 1,525
+are inconclusive and two mismatch (0xded86/0xed133 targets 0x7f/0x80). CLI exits
+1; the full gate remains failing. Helper 0x9d72c passes all 16 probes. All 2,372
+body objects and dispatcher compile warning-free with Watcom -we. The native
+reference executes 95,870 operations in 65 forms, rejecting eight interrupted
+measurements before inspecting results/C execution. No field masking, failure
+reclassification or tracker promotion. The 2,249 preceding body sources remain
+byte-identical; newly closed bodies contain 156 FISTP instructions.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-round-program-20261114 --output
+local/asm-c-x87-round-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-x87-round-diff-20261114/report.json,
+local/asm-x87-round-corpus-summary-20261114.json and
+local/asm-x87-round-closure-evidence-20261114.json. Current native source and
+translation-manifest digests checked independently. Remaining instructions,
+services/traps, audited boundaries, reviewed dynamic targets, captured inputs
+and game integration remain required; reliable bulk translation is active.

@@ -3450,3 +3450,67 @@ with the validated SoftFloat build and both Watcom options enabled. Command
 arguments/environment: local/asm-x87-integer-store-full-command-20261114.json;
 output: local/asm-x87-integer-store-full-tests-20261114.log. The focused matrix
 rejects 36 interrupted native measurements before result inspection/C execution.
+
+**2026-11-14 — FRNDINT and 123 additional closed bodies.**
+Implement the exact D9 FC FRNDINT form using unsigned integer operations on raw
+extended precision. PC has no effect; even values beyond signed-integer range
+retain integral payloads. Handle all RC, signed zeros, infinities, NaN quieting,
+unsupported encodings, masked empty-stack indefinite and exception priority.
+Nonzero exponent-zero operands include DE; unmasked IE/DE suppresses the write,
+while unmasked PE commits. C1 records magnitude increment; preserve other
+condition/sticky flags, TOP, data-pointer context and other physical registers.
+Unknown encodings/prefixes/spelling and pending delivery fail explicitly. Native
+oracle gains only the independent fixed-opcode FRNDINT form, no shared rounding
+implementation. 498,688 generated/native cases pass under UBSan: 236,544 all-mask/
+PC/RC, rotated TOP, both signs, empty/special/boundary/tie cases plus 262,144
+all-exponent/both-sign/all-RC cases. Compare full raw stack/environment, complete
+RAM, GPRs/flags and configuration; test pending, fuel and malformed encoding.
+Watcom -we compiles without warnings. Final two-test suite passes in 22.205 s;
+19 interrupted native samples rejected before results or C execution. An initial
+run matched all native cases then failed an incorrect expected zero-fuel return
+code in the test (expected 5; existing documented execution result is 1); the
+corrected assertion and full matrix pass without changing runtime fuel behavior.
+Command: ASM_ROUND_WCC=<wcc386>
+ASM_ROUND_EVIDENCE=local/asm-x87-round-evidence-20261114.json
+python3 -m unittest tests.test_asm_x87_round.
+
+Regeneration: tools/asm_c_program.py --workspace
+local/ghidra-x87-dispatch-20261114 --inventory
+local/asm-wait-body-inventory-20261114 --output
+local/asm-c-x87-round-program-20261114. Syntax support 4,129; direct closure
+2,372 bodies/342,254 bytes (+123/+42,325 from integer-store stage). Helper
+0x9d72c and its callers no longer stop at FRNDINT; FIST/P bodies from the last
+step now join closure through it. Generated state only; no tracker promotion.
+Full-corpus differential and game integration remain separate evidence gates.
+Evidence: local/asm-x87-round-final-tests-20261114.log,
+local/asm-x87-round-evidence-20261114.json and generated report.
+
+The 20-module regression command passes 79 tests without skips (450.155 s),
+Python 3.13.12/Unicorn 2.1.4, validated SoftFloat and all three Watcom test
+options enabled. Exact command arguments/environment:
+local/asm-x87-round-full-command-20261114.json; output:
+local/asm-x87-round-full-tests-20261114.log.
+
+Completed hardware-oracle corpus: 37,952 probes, 21,057 matches, 16,891
+inconclusive and four existing callback-target mismatches. Added 123 bodies
+contribute 856 matches and 1,112 inconclusive, with no new mismatches. All old
+probe states are unchanged: 20,201 pass -> pass, 15,779 inconclusive ->
+inconclusive, four mismatch -> mismatch. 845 bodies pass all probes, 1,525
+are inconclusive and two mismatch (0xded86/0xed133 targets 0x7f/0x80). CLI exits
+1; the full gate remains failing. Helper 0x9d72c passes all 16 probes. All 2,372
+body objects and dispatcher compile warning-free with Watcom -we. The native
+reference executes 95,870 operations in 65 forms, rejecting eight interrupted
+measurements before inspecting results/C execution. No field masking, failure
+reclassification or tracker promotion. The 2,249 preceding body sources remain
+byte-identical; newly closed bodies contain 156 FISTP instructions.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-round-program-20261114 --output
+local/asm-c-x87-round-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-x87-round-diff-20261114/report.json,
+local/asm-x87-round-corpus-summary-20261114.json and
+local/asm-x87-round-closure-evidence-20261114.json. Current native source and
+translation-manifest digests checked independently. Remaining instructions,
+services/traps, audited boundaries, reviewed dynamic targets, captured inputs
+and game integration remain required; reliable bulk translation is active.

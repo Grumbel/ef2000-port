@@ -264,7 +264,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 #endif
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
-                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
+                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.ROUND_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
 RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME
 
 
@@ -559,6 +559,11 @@ def instruction_c(insn, starts):
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif mnemonic == 'frndint':
+        if text or insn['bytes'] != 'd9fc':
+            raise Unsupported('unsupported FRNDINT encoding/spelling')
+        code += ['a = ef_x87_round_integer(s); if (a) return a;',
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x1fcu;' % insn['address']]
     elif comparison is not None:
         index, quiet, pop, opcode = comparison
         code += ['a = ef_x87_compare_register(s, %d, %d, %d); if (a) return a;' % (index, quiet, pop),
