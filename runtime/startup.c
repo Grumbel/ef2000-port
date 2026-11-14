@@ -115,6 +115,14 @@ static u32 divide_frame, divide_active, divide_virtual_if;
 
 static uptr guest(u32 offset) { return (u32)(GUEST_BASE + offset); }
 
+static int guest_io_address(u32 offset) {
+    if (offset >= 0x86 && offset < 0x195fb0) return 1;
+#ifdef EF_RESERVED_ARENA_START
+    if (offset >= RESERVED_ARENA_START && offset < RESERVED_ARENA_END) return 1;
+#endif
+    return 0;
+}
+
 static int guest_range(u32 offset, u32 length) {
     if (offset > 0x260 && offset < IMAGE_SIZE && length <= IMAGE_SIZE - offset) return 1;
     uptr address = guest(offset);
@@ -582,7 +590,7 @@ static void guest_fault(u32 signal, struct context *r) {
             return;
         }
     }
-    if (protection_fault && ((r->ip >= 0x86 && r->ip < 0x195fb0) ||
+    if (protection_fault && (guest_io_address(r->ip) ||
                             (r->ip >= IMAGE_SIZE + 0x100 && r->ip < IMAGE_SIZE + 0x110))) {
         u8 opcode = *(u8 *)guest(r->ip);
         if (opcode == 0xfa || opcode == 0xfb) {
@@ -675,7 +683,7 @@ static void guest_fault(u32 signal, struct context *r) {
             return;
         }
     }
-    if (protection_fault && r->ip >= 0x86 && r->ip < 0x195fb0 &&
+    if (protection_fault && guest_io_address(r->ip) &&
         (*(u8 *)guest(r->ip) == 0xec || *(u8 *)guest(r->ip) == 0xee) &&
         (r->dx & 0xffff) == 0x201) {
         u32 mask = *(u32 *)(uptr)INPUT_BASE == INPUT_MAGIC ?

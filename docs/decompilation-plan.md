@@ -3946,3 +3946,21 @@ Evidence: local/hybrid-archive-corrected-20261114/{diff-flat,diff-check,diff-old
 The full hybrid now passes the data-set check but still has a configuration
 callback fault, separately bisected to scanf integer conversion at 0x108ddb.
 No menu/cockpit completion claim yet.
+
+### 2026-11-14 — native port I/O from the hybrid arena
+
+The native backend faults at relocated guest_inp_x (0x302fdff, IN AL,DX with
+DX=0x64), although Unicorn passes that point: native I/O address guards accept
+only original code. Extend existing port and CLI/STI handling to the explicitly
+reserved arena. Keep the supported devices/opcodes unchanged. A synthetic guest
+regression copies a helper into the arena, checks port 0x61 write/read, keyboard
+status, disconnected gameport, CLI/STI and a zero DOS exit. The same helper in
+mapped RAM outside that arena must fault. Native test passes without game data.
+The actual native run now reaches video mode 0x13, then reproduces the later
+Unicorn GUI fault; that failure is separately bisected to 0xc3364.
+
+Read diagnostic transcripts with UTF-8 replacement for raw DOS console bytes,
+so a German error message cannot prevent report.json from being written.
+Evidence: local/hybrid-native-port-fix-20261114/; validation:
+xvfb-run -a python3 -m unittest tests.test_native_hybrid_io -v and the two
+asset-free tests in tests.test_startup_runtime.TranscriptTests.

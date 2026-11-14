@@ -450,7 +450,7 @@ def main():
                              'Sound hardware is absent; audio is disabled in a local configuration copy by default.'),
                             'VGA/VBE implements the observed indexed banked modes, not the complete hardware API.'],
         }
-        report.update(analyze_calls((output / 'calls.log').read_text()))
+        report.update(analyze_calls((output / 'calls.log').read_text(encoding='utf-8', errors='replace')))
         report['real_mode_backend'] = args.real_mode
         report['real_mode_execution'] = real_mode_requests
         report['segment_limit_diagnostic'] = args.check_segment_limit
