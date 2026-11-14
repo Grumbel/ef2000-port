@@ -4196,3 +4196,35 @@ timer failure and reaches cockpit initialization 0x58d24 once. It then faults
 at tick 3923 in string_copy.obj:copy_string_9d749+9, reading invalid source
 0x26c22fef. Remaining cockpit canaries are unreached; investigate that source
 pointer/caller next. No full cockpit usability or M2 completion claim.
+
+### 2026-11-14 — preserve the directory cache while reading it
+
+The tick-3923 string-copy fault comes through load_directory_list_7a66c and
+pool_append_7a51c. A local exception snapshot confirms cached mode
+([0x12afc8]=1), a corrupted filename buffer, and duplicated/truncated names
+in the pool. Original disassembly branches over buffer_write_word at 7a684
+and over pool_append at 7a6da when reading the cache. The recovered C called
+both unconditionally, advancing and rewriting the input stream while reading
+it. Restore the two else-block boundaries; preserve the original unchecked
+filename copy and all observable data formats.
+
+Replace the dummy test with three synthetic cached-list cases: empty, two
+filenames, and three filenames in section two with a nonzero starting slot.
+Compare guest RAM, preserved GPRs and stack cleanup. All three fail against
+the old C (even the empty case incorrectly advances the cursor by four bytes
+instead of two); all three pass after the fix. Command:
+PYTHONPATH=<unicorn-site-packages> python3 tools/func_differential.py 0x7a66c
+--payload local/ghidra-stack-return-20261114/payload.bin --patch
+local/hybrid-directory-cache-fix-20261114/only-directory.efpatch --spec
+decomp/tests/0x0007a66c.json --flat-segments. Flat descriptors are needed by
+the original strlen callee's ES load. Evidence: local/hybrid-directory-cache-fix-20261114/
+{diff-old-flat,diff-fixed,tests}.log. The affected module compiles warning-free.
+Temporary exception instrumentation was removed and the normal runner rebuilt.
+All 34 focused Python tests pass. The 2595-redirect replay through 1B
+instructions reaches its budget normally at tick 4000, after the former
+3923 fault; 0x58d24 is hit once and remaining cockpit canaries are unreached.
+Evidence: billion.log and billion-frame.ppm in the same local directory.
+Two 1.5B attempts ended with SIGTERM and no guest result, so they provide no
+pass/fail evidence. A new full run reports process status periodically in a
+private Xvfb display to separate process lifetime from guest behavior. Full
+cockpit usability and M2 remain unproven.

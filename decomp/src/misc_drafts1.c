@@ -11729,9 +11729,10 @@ void load_directory_list_7a66c(ef_addr32 path)
     ef_addr32 src = 0x0019e5f0u;
     if (EF_U32(0x0012afc8u) != 0u)
         count = buffer_read_word();
-    else
+    else {
         count = (int16_t)list_directory_names_32de8(path, 0x00187bc4u);
-    buffer_write_word((int16_t)count);
+        buffer_write_word((int16_t)count);
+    }
     sec = EF_U32(0x001f8ea4u);
     {
         int32_t rec = (int32_t)(int16_t)EF_U16(sec) * 3;
@@ -11741,9 +11742,10 @@ void load_directory_list_7a66c(ef_addr32 path)
         uint32_t slot;
         if (EF_U32(0x0012afc8u) != 0u)
             copy_string_9d749(namep, pool_take_7a54c());
-        else
+        else {
             guest_fn_df26f_x(src, 0x00187bccu, namep);
-        pool_append_7a51c(namep);
+            pool_append_7a51c(namep);
+        }
         copy_string_9d749(EF_U32(0x001f8e98u) * 0x11u + EF_U32(0x001f8e9cu), namep);
         slot = EF_U32(0x001f8e98u);
         EF_U16(slot * 0x11u + EF_U32(0x001f8e9cu) + 0xfu) = 1u;

@@ -1,1 +1,139 @@
-{"address":"0x0007a66c","function_size":204,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x7a66c",
+  "function_size": 204,
+  "max_instructions": 50000,
+  "cases": [
+    {
+      "name": "empty",
+      "registers": {
+        "eax": "0x530000"
+      },
+      "memory": [
+        {
+          "address": "0x12afc8",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x1f8e90",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8ea4",
+          "hex": "00005100"
+        },
+        {
+          "address": "0x1f8e9c",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x1f8e98",
+          "hex": "00000000"
+        },
+        {
+          "address": "0x500000",
+          "hex": "00000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x510000",
+          "hex": "00000000070000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "two_names",
+      "registers": {
+        "eax": "0x530000"
+      },
+      "memory": [
+        {
+          "address": "0x12afc8",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x1f8e90",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8ea4",
+          "hex": "00005100"
+        },
+        {
+          "address": "0x1f8e9c",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x1f8e98",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x500000",
+          "hex": "0200414c5048412e44415400424554412e444154000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x510000",
+          "hex": "00000000070000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "section_two",
+      "registers": {
+        "eax": "0x530000"
+      },
+      "memory": [
+        {
+          "address": "0x12afc8",
+          "hex": "01000000"
+        },
+        {
+          "address": "0x1f8e90",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8e94",
+          "hex": "00005000"
+        },
+        {
+          "address": "0x1f8ea4",
+          "hex": "00005100"
+        },
+        {
+          "address": "0x1f8e9c",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x1f8e98",
+          "hex": "03000000"
+        },
+        {
+          "address": "0x500000",
+          "hex": "030041004c4f4e474e414d452e4558540043000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x510000",
+          "hex": "02000000000000000000000000000000070000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}
