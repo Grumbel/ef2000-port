@@ -3156,3 +3156,74 @@ local/asm-softfloat-verified-build-20261113 --watcom <wcc386>, Python 3.13.12/
 Unicorn 2.1.4. Evidence: local/asm-c-x87-dispatch-diff-20261114/report.json,
 whose manifest digest is independently checked. Original assets remain intact;
 all original/generated exports and Ghidra projects stay ignored under local/.
+
+**2026-11-14 — Independent x87 oracle work rationale.**
+Current strict corpus has 244 mismatching probes across 20 bodies; 240 include
+x87 opcode differences and 137 include status differences. Independent native
+ISA matrices and original-helper probes already establish several Unicorn
+defects, including missing status/opcode, 0/0 priority and empty-stack stores.
+A separate opt-in native x87 coprocessor is warranted for the corpus, rather
+than weakening comparisons or special-casing a single function. Preserve the
+default unmodified Unicorn mode and every compared state/RAM field. New oracle
+must execute only a fixed generic ISA allowlist, use no translator/SoftFloat
+helpers, reject unknown forms and pending delivery, record provenance/coverage,
+and qualify memory/context relocation and host interruption handling.
+
+**2026-11-14 — Opt-in native x87 coprocessor for original execution.**
+Added independent asm_x87_oracle.py and --x87-oracle hardware; default Unicorn
+behavior stays unchanged. Fixed generic ISA allowlist covers currently generated
+x87 register/stack/arithmetic, real/integer memory transfers and control forms.
+No translator/runtime helpers, SoftFloat or arbitrary guest bytes in the native
+executor. Raw FSAVE physical state and all metadata enter/leave a saved/restored
+host x87 context. Independent ModRM/SIB decoding, full operand reads/private
+buffers, pointer/selector/FOP relocation and AX preservation join the native
+operation to the flat Unicorn integer/memory oracle. Unsupported/prefixed forms
+and pending delivery are inconclusive; FWAIT without pending status is a no-op.
+Reject interrupted native measurements using thread context-switch counters
+before output inspection/C execution; bounded identical-input retries only,
+never crash/diff retries. Native operand-size/opcode checks precede execution.
+Record native source/tool/library/command provenance and per-probe operation/
+interruption evidence. Keep every state/RAM comparison and original-fault/fuel
+policy. No full hardware guest ABI, protected descriptor or #MF delivery claim.
+Six new tests pass: 3,156 ModRM/SIB/default/override-address checks against
+independent Unicorn accesses; native controls/raw-memory integration; corruption
+of all eight physical payloads, all x87 fields and RAM/GPR/flags/PC detected;
+unsupported forms/delivery/fuel explicitly inconclusive; mode/report provenance
+checked. Focused regression passes 99 tests without skips (127 s), retaining all
+old Unicorn mismatch expectations. Previously failing 20-body focused rerun:
+240 x87 mismatch probes now match all fields; four target-coverage failures
+remain, with original inconclusive outcomes retained. Full corpus is separate.
+Commands: python3 -m unittest tests.test_asm_x87_oracle tests.test_asm_c_x87
+tests.test_asm_c_segments tests.test_asm_c_program tests.test_asm_to_c
+tests.test_asm_inventory tests.test_asm_diff tests.test_ghidra_ef2000;
+ASM differential command as before plus --x87-oracle hardware. Python 3.13.12/
+Unicorn 2.1.4. Evidence: local/asm-x87-oracle-tests-20261114.log,
+local/asm-x87-oracle-regression-20261114.log,
+local/asm-x87-oracle-focused-evidence-20261114.json. C translator and generated
+bodies unchanged; native execution is restricted to the original oracle.
+
+Full hardware-mode corpus completes: 33,856 probes, 18,770 matches, 15,082
+inconclusive and four mismatches across two bodies. Transition audit against
+the unmodified Unicorn run: 18,530 pass -> pass, 15,082 inconclusive ->
+inconclusive, 240 mismatch -> pass, four mismatch -> mismatch; no completed
+probe downgraded. 758 all-pass bodies, 1,356 inconclusive, two mismatching.
+Remaining failures are 0xded86/0xed133 reaching unowned callback values 0x7f/
+0x80, still C status 2 after original completion. CLI exits 1. The separate
+default-Unicorn report retains 244 mismatches; no report/field is rewritten.
+Native coverage: 1,584 operations, 22 forms, 309 probes; zero interrupted
+samples. Eight previously inconclusive probes stop at unsupported native forms
+(three register, five memory); unsupported observations remain explicit gaps.
+All 2,116 C body objects and dispatcher compile warning-free with Watcom -we;
+host original/coprocessor and portable C/SoftFloat execution remain separate.
+Current oracle source digest and unchanged translation manifest verified against
+the final reports. Evidence:
+local/asm-c-x87-hardware-oracle-diff-20261114/report.json,
+local/asm-c-x87-hardware-oracle-diff-20261114/original-x87/report.json.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-dispatch-program-20261114 --output
+local/asm-c-x87-hardware-oracle-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386>
+--x87-oracle hardware (Python 3.13.12/Unicorn 2.1.4, Linux x86-64).
+No tracker promotion or full native ABI/game claim. Target coverage, unsupported
+x87/trap/runtime services, captured inputs and game integration remain active.

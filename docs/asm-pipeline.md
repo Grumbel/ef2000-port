@@ -689,3 +689,71 @@ with Watcom. Eighty focused regression tests and tracker checks pass.
 Evidence: local/asm-x87-dispatch-regression-20261114.log and
 local/asm-c-x87-dispatch-diff-20261114/report.json. The complete division
 dispatch remains unsupported until its trap/closure requirements are modeled.
+
+The independent original-execution mode is opt-in:
+
+```sh
+python3 tools/asm_c_differential.py --translations local/asm-c-program \
+  --output local/asm-c-hardware-evidence --softfloat-build local/asm-softfloat \
+  --watcom /path/to/wcc386 --x87-oracle hardware
+```
+
+Default `--x87-oracle unicorn` preserves the earlier oracle and its known
+disagreements. Hardware mode runs integer instructions in Unicorn and executes
+known x87 instructions through a separate Linux x86-64 native coprocessor.
+`asm_x87_oracle.py` imports no translator/runtime arithmetic and links no
+SoftFloat. It emits a fixed generic ISA allowlist, never guest-provided machine
+code. Each operation saves/restores the host x87 state, imports/exports all raw
+physical registers (including empty payloads), tags/status/control and metadata,
+and relocates memory operands to bounded private buffers. A separate ModRM/SIB
+decoder computes wrapped guest addresses and default/override selectors.
+Metadata sentinels identify unchanged pointers; actual native operation/data
+addresses are relocated back to guest IP/DP/selectors and original FOP. Native
+memory FOP is validated before relocating its address-mode bits. FNSTSW AX
+preserves high EAX; nonwaiting control instructions retain their native effects.
+
+The fixed set covers current generated stack/register arithmetic, 32/64/80-bit
+loads/stores, integer loads and control operations. Unknown forms/prefixes and
+pending #MF delivery make original execution explicitly inconclusive. FWAIT
+without pending delivery advances without changing state. Thread context-switch
+counters reject interrupted native measurements before result inspection or C
+execution; identical inputs are retried with a bound. No crash retry or diff
+waiver. Guest memory mapping and integer/segment behavior remain Unicorn's
+flat-profile semantics, not a full native guest ABI or exception-delivery model.
+Reports identify the oracle mode and bind generated native source, tool, library
+and compile command; per-probe opcode coverage and interrupted-sample counts
+make partial/unsupported observations visible. All compared fields remain on.
+
+Six new tests pass, including 3,156 address checks against independent Unicorn
+accesses, control/raw-memory integration, deliberate corruption of every x87
+environment field and every physical payload, plus RAM/GPR/flags/PC corruption.
+Unsupported forms, pending delivery and original budget exhaustion do not run
+C or produce passes. The 99-test focused regression also passes without skips;
+old Unicorn-mode mismatch expectations remain unchanged. In a separate focused
+rerun of the prior 20 mismatching bodies, hardware observation turns 240 x87
+disagreements into full-state matches and retains four untranslated-target
+mismatches. This focused result alone is not a full-corpus claim.
+Evidence: local/asm-x87-oracle-tests-20261114.log,
+local/asm-x87-oracle-regression-20261114.log,
+local/asm-x87-oracle-focused-evidence-20261114.json. Translation source and the
+portable C runtime are unchanged; the native coprocessor exists only in the
+independent original oracle.
+
+The full 2,116-body hardware-mode run completes with 33,856 probes: 18,770
+matching, 15,082 inconclusive and four mismatching. All 18,530 former matches
+remain matches; all 15,082 former inconclusive states remain inconclusive;
+240 former mismatches match, and four remain failures. No completed probe is
+downgraded. Eighteen x87-failing bodies are resolved under hardware observation;
+758 bodies pass all probes, 1,356 are inconclusive and two mismatch. Remaining
+failures are formatter entries 0xded86/0xed133 calling untranslated 0x7f/0x80.
+The CLI still exits 1. The default Unicorn-mode report retains 244 mismatches.
+
+The coprocessor records 1,584 native operations in 22 forms across 309 probes,
+with zero interrupted native samples in this run. Eight already-inconclusive
+probes stop at unsupported native forms (three register, five memory); these
+remain coverage gaps. All C body objects and dispatcher compile warning-free
+with Watcom; the native oracle itself is host-only. Reports bind the unchanged
+translation manifest and current oracle source. Evidence:
+local/asm-c-x87-hardware-oracle-diff-20261114/report.json and original-x87/
+report.json. This is independent x87 evidence within a flat Unicorn integer/
+memory oracle, not full guest ABI/game equivalence or completed bulk coverage.

@@ -23,10 +23,11 @@ import struct
 import subprocess
 
 try:
-    from . import asm_to_c, asm_softfloat
+    from . import asm_to_c, asm_softfloat, asm_x87_oracle
 except ImportError:
     import asm_to_c
     import asm_softfloat
+    import asm_x87_oracle
 
 
 class State(ctypes.Structure):
@@ -109,7 +110,7 @@ def probes(count, seed):
 
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
-            initial_x87=None):
+            initial_x87=None, native_x87=None):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
     from unicorn import x86_const
 
@@ -126,6 +127,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu.mem_write(0, bytes(memory))
     selectors = bind_flat_segments(cpu)
     initial_fpu = bind_x87(cpu, initial_x87)
+    binding = native_x87.bind(cpu) if native_x87 is not None else None
+    def outcome(**fields):
+        if binding is not None:
+            fields['original_x87'] = binding.evidence()
+        return fields
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
@@ -133,10 +139,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         phase('original')
     try:
         cpu.emu_start(address, sentinel, count=budget)
+    except asm_x87_oracle.Unavailable as error:
+        return outcome(state='inconclusive', reason='original native x87 unavailable: '+str(error))
     except UcError as error:
-        return dict(state='inconclusive', reason='original fault: ' + str(error))
+        return outcome(state='inconclusive', reason='original fault: ' + str(error))
     if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
-        return dict(state='inconclusive', reason='original instruction budget exhausted')
+        return outcome(state='inconclusive', reason='original instruction budget exhausted')
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
@@ -149,7 +157,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if status:
         reason = ('pending x87 exception delivery unsupported' if status == 8 else
                   'budget/pc/memory/divide')
-        return dict(state='mismatch', differences=[
+        return outcome(state='mismatch', differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
     if phase:
         phase('comparison')
@@ -180,10 +188,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if memory != original_ram:
         first = next(i for i, (a, b) in enumerate(zip(memory, original_ram)) if a != b)
         differences.append('RAM first mismatch at 0x%x' % first)
-    return dict(state='mismatch' if differences else 'pass', differences=differences)
+    return outcome(state='mismatch' if differences else 'pass', differences=differences)
 
 
-def isolated_probes(function, payload, address, scenarios, budget, program):
+def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -199,7 +207,8 @@ def isolated_probes(function, payload, address, scenarios, budget, program):
             for index, (registers, flags) in enumerate(probes(scenarios, address)):
                 sender.send(('phase', index, 'setup'))
                 result = compare(function, payload, address, registers, flags, budget=budget,
-                                 program=program, phase=lambda stage: sender.send(('phase', index, stage)))
+                                 program=program, native_x87=native_x87,
+                                 phase=lambda stage: sender.send(('phase', index, stage)))
                 sender.send(('result', index, result))
         except Exception as error:
             sender.send(('error', -1, repr(error)))
@@ -246,7 +255,9 @@ def isolated_probes(function, payload, address, scenarios, budget, program):
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None, softfloat_build=None):
+           watcom=None, softfloat_build=None, x87_oracle='unicorn'):
+    if x87_oracle not in ('unicorn', 'hardware'):
+        raise ValueError('unknown x87 oracle')
     payload = image.read_bytes()
     manifest_path = directory / 'report.json'
     manifest_bytes = manifest_path.read_bytes()
@@ -290,6 +301,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if not generated:
         raise ValueError('no generated C sources to test')
     output.mkdir(parents=True, exist_ok=False)
+    native_x87, native_report = (asm_x87_oracle.build(output/'original-x87', compiler=compiler)
+                                 if x87_oracle == 'hardware' else (None, None))
     backend = (asm_softfloat.build_narrow(softfloat_build, output / 'narrow-backend',
                                         compiler=compiler, watcom=watcom) if needs_narrow else None)
     binary_backend = (asm_softfloat.build_binary(softfloat_build, output / 'binary-backend',
@@ -334,7 +347,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
-        results = isolated_probes(function, payload, address, scenarios, budget, program)
+        results = isolated_probes(function, payload, address, scenarios, budget, program, native_x87=native_x87)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
@@ -354,6 +367,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
+                  original_x87_oracle=native_report or dict(model='unicorn'),
                   narrow_backend=backend,
                   binary_backend=binary_backend,
                   limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
@@ -369,6 +383,8 @@ def main(argv=None):
     parser.add_argument('--compiler', default='cc')
     parser.add_argument('--watcom', help='also require warning-free OpenWatcom compilation')
     parser.add_argument('--softfloat-build', type=Path, help='validated SoftFloat build for narrowing stores and arithmetic')
+    parser.add_argument('--x87-oracle', choices=('unicorn', 'hardware'), default='unicorn',
+                        help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
     args = parser.parse_args(argv)
@@ -379,7 +395,8 @@ def main(argv=None):
         workspace = asm_to_c.asm_inventory.ghidra_ef2000.validated_workspace(args.workspace)
         report = verify(directory, output, workspace / 'payload.bin', compiler=args.compiler,
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
-                        softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None)
+                        softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
+                        x87_oracle=args.x87_oracle)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         return 1 if counts['mismatch'] else 0
