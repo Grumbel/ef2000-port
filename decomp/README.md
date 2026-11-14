@@ -337,7 +337,15 @@ original executable through the native64 harness until the source is complete.
 The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually
+Current launcher check (2026-11-14): the full hand-written hybrid profile
+retains 2,593 C redirects across 342/382 linked modules and reaches the main
+menu in native64 (15 seconds, no faults) and Unicorn (500M instructions).
+The framebuffers were inspected. Entering Quick Fight still fails on Return
+at tick 2118; gameplay and the combined hand-written/mechanical milestones
+remain incomplete. These checks do not establish full-game equivalence.
+See the latest entries in [the progress log](../docs/decompilation-plan.md).
+
+Historical Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually
 confirmed additional entry points (4,290 tracked); 3,216 marked `compiles`,
 251 `drafted`, 11 `spliced`, 7 `blocked`, 9 `compiles-bad`, and 20 `verified`.
 The verified OpenWatcom OMF replacements are

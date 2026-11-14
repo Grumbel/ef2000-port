@@ -3985,3 +3985,32 @@ differences instead; its candidate set is not a culprit or exclusion list.
 A 300M-instruction abnormal-stop bisect is running instead.
 Evidence: local/hybrid-bisect-startup-20261114/bisect-{03,04,05}/report.json,
 local/hybrid-gui-fix-20261114/ and local/hybrid-native-port-fix-20261114/.
+
+### 2026-11-14 — restore the hand-written hybrid main menu
+
+The 300M-instruction startup bisector isolates pattern loader 0xe4010 as
+sufficient for a jump into pathname bytes at 0x9cfd8; exclude and demote it.
+The next bisector isolates bitstream refill 0xfa332 as sufficient for an
+invalid write through 0xffffffff. Disassembly shows register outputs ESI/EDX
+and carry, not the C draft's pointer inputs. Correct its signature and those
+of its coupled decode fragments 0xfa1d4/0xfa200: the latter return their
+symbols in ECX/EBX while updating AL/ESI/EDX. Their pointer-state C drafts
+are not valid guest-entry replacements. Mark the three compiles-bad and
+preserve this fragment cluster pending register/flag adapters.
+
+The full hand-written profile retains 2593 C redirects, 12965 entry bytes,
+a 576198-byte arena and 342/382 linked modules. A 500M-instruction Unicorn
+run reaches the main menu without a guest fault (2000 ticks, 1937 IRQ0s,
+198 lowercase replacement hits). Native64 also reaches the same visible
+menu and stops normally at its 15-second diagnostic limit, with no faults.
+Both framebuffers were inspected. Evidence: local/hybrid-bitstream-cluster-fix-20261114/
+and local/hybrid-native-menu-fix-20261114/. This is the hand-written launcher
+profile, not proof of the combined mechanical milestone or full-game equivalence.
+
+Quick Fight remains broken: Return at tick 2100 stops at 0x17f7ca/tick 2118
+with unsupported port OUT c88d. Its bounded replay is recorded in
+local/hybrid-quickfight-fix-20261114.log. The follow-up bisect-09 was stopped
+at the owner's request to finish and commit; it has no established culprit.
+Do not claim the launcher is fully usable or M2 complete. The preceding Nix
+build (708ac765) passes its checks but reproduces the pre-pattern-fix fault;
+the final source revision has not yet been rebuilt through Nix.
