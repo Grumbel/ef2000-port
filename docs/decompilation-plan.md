@@ -3786,3 +3786,61 @@ local/asm-scalar-stack-shards-corpus-summary-20261114.json. Current native-tool,
 translation-manifest and all support-source/object digests independently checked.
 Remaining services/traps, reviewed targets, captured callers and game integration
 keep reliable bulk translation active.
+
+**2026-11-14 — Recover the observed RET-only dispatch target.**
+The scalar-stack run's two added failures in 0xc6b80 stop at 0xc5e65. Review
+independent disassembly and the table at 0x15b270: slot zero points to the
+single-byte RET, immediately after INT3 at 0xc5e64. Extend the existing reviewed-
+leaf recovery with only [0xc5e65,0xc5e66). Guard pinned payload/language, indexed
+JMP at 0xc6cdf owned by 0xc6b80, EAX/table-literal operands, slot-zero pointer,
+preceding one-byte INT3, no conflicting owner/data, and exact RET extent. No
+padding or header data is promoted; the trap remains outside compiled coverage.
+
+Copy the disposable project to local/ghidra-stack-return-20261114. Run
+recover-observed-leaves in report mode (proposed 0 -> 1 byte), apply, then report
+again (1 -> 1 already_recovered), using the private headless wrapper. Other
+three reviewed leaves remain unchanged. Fresh inventory has exactly 4,280
+functions: all 4,279 previous raw ranges/instruction spans are identical; only
+the singleton RET body is added. Add a tracker row as unknown/asm/unverified,
+without native ABI or game-verification claims. Export normalized ASM for all
+4,280 owned bodies; 13 tracker-only entries remain excluded as before.
+
+47 tooling tests pass (0.270 s), including rejection of a fresh old three-leaf
+report that omits the new target. Regeneration yields 4,143 syntax-supported,
+2,528 selected bodies/410,780 bytes. All 2,527 preceding entries/body sources
+and runtime are identical; one RET entry is added. Full Watcom/native-oracle
+corpus is a separate pending gate. Commands: tools/ghidra_ef2000.py
+recover-observed-leaves --workspace local/ghidra-stack-return-20261114
+--analyze-headless local/ghidra-headless-private-20261114 [--apply] --output
+<fresh-report>; inventory to local/asm-dispatch-return-ghidra-20261114;
+tools/asm_c_program.py --workspace local/ghidra-stack-return-20261114
+--inventory local/asm-dispatch-return-body-inventory-20261114 --output
+local/asm-c-dispatch-return-program-20261114.
+Evidence: local/asm-dispatch-return-{audit,apply,idempotent}-20261114.tsv,
+local/asm-dispatch-return-final-tool-tests-20261114.log,
+local/asm-dispatch-return-inventory-evidence-20261114.json and
+local/asm-dispatch-return-program-evidence-20261114.json. Recovery/audit state
+is not a function-verification promotion.
+
+Final recovered-target hardware-oracle corpus: 40,448 probes, 22,308 matches,
+18,136 inconclusive and four original callback-target mismatches. The new RET
+leaf passes all 16 probes. Both previous 0xc6b80 target failures now match full
+state/RAM; its 14 original-fault probes remain inconclusive. All other preceding
+outcomes are unchanged: 22,290 pass -> pass, 18,136 inconclusive -> inconclusive,
+two mismatch -> pass, four mismatch -> mismatch. 894 bodies pass every probe,
+1,632 are inconclusive and two mismatch (0xded86/0xed133 targets 0x7f/0x80).
+CLI exits 1; the full gate remains failing. All 2,528 bodies, dispatcher and 63
+table units compile warning-free with Watcom -we. Native x87 reference coverage
+is 117,161 operations/68 forms; 15 interrupted samples rejected before inspecting
+results/C execution. No failures were downgraded or fields masked.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-stack-return-20261114 --translations
+local/asm-c-dispatch-return-program-20261114 --output
+local/asm-c-dispatch-return-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-dispatch-return-diff-20261114/report.json and
+local/asm-dispatch-return-corpus-summary-20261114.json. Native-tool, translation-
+manifest and support object digests independently checked. This is prepared-
+state boundary proof, not native ABI/captured-game/replay verification. The new
+tracker row remains unknown/asm/unverified. Services/traps, other ISA, reviewed
+dynamic targets, captured callers and full-game integration remain active.

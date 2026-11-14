@@ -173,11 +173,19 @@ class GhidraWorkflowTests(unittest.TestCase):
                 'entry\tend_exclusive\tname\tbody_bytes_before\tbody_bytes_after\tresult\n'
                 '0x000a432f\t0x000a4342\tfirst\t0\t19\tproposed\n'
                 '0x000e300f\t0x000e3022\tsecond\t0\t19\tproposed\n'
-                '0x000c64d0\t0x000c64ea\tthird\t20\t26\tproposed\n')
+                '0x000c64d0\t0x000c64ea\tthird\t20\t26\tproposed\n'
+                '0x000c5e65\t0x000c5e66\tfourth\t0\t1\tproposed\n')
         with patch.object(ghidra.subprocess, 'run', side_effect=run):
-            self.assertEqual(len(ghidra.recover_observed_leaves(args)), 3)
+            self.assertEqual(len(ghidra.recover_observed_leaves(args)), 4)
         with patch.object(ghidra.subprocess, 'run'):
             with self.assertRaisesRegex(ValueError, 'fresh observed-leaf report'):
+                ghidra.recover_observed_leaves(args)
+        def old_report(command, check):
+            run(command, check)
+            path = self.workspace / 'observed-leaves.tsv'
+            path.write_text('\n'.join(path.read_text().splitlines()[:-1])+'\n')
+        with patch.object(ghidra.subprocess, 'run', side_effect=old_report):
+            with self.assertRaisesRegex(ValueError, 'invalid observed-leaf report'):
                 ghidra.recover_observed_leaves(args)
 
     def test_division_dispatch_requires_all_cases_and_fresh_payload_bound_evidence(self):

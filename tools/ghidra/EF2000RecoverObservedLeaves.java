@@ -10,6 +10,7 @@ import ghidra.program.model.listing.Function;
 import ghidra.program.model.listing.Instruction;
 import ghidra.program.model.listing.Data;
 import ghidra.program.model.scalar.Scalar;
+import ghidra.program.model.lang.Register;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.security.MessageDigest;
@@ -21,16 +22,19 @@ import java.util.Set;
 /** Reviewed branch-free leaves exposed by checked indirect dispatch. No byte recipes. */
 public class EF2000RecoverObservedLeaves extends GhidraScript {
     private static final int IMAGE_SIZE = 0x195fb0;
-    // entry, exclusive end, corroborating MOV ECX literal, previous body bytes.
+    // entry, exclusive end, corroborating instruction, previous body bytes.
     // Both callbacks follow RET and precede independent caller prologues.
     // XLAT's missing flow annotation had cut the third body before its store/RET.
+    // The fourth is the RET-only target of a reviewed indexed dispatch table.
     private static final long[][] RECIPES = {
         {0xa432f, 0xa4342, 0xa4352, 0},
         {0xe300f, 0xe3022, 0xe3026, 0},
         {0xc64d0, 0xc64ea, 0, 20},
+        {0xc5e65, 0xc5e66, 0xc6cdf, 0},
     };
     private static final String[] NAMES = {
-        "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0"
+        "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
+        "dispatch_return_c5e65"
     };
 
     @Override
@@ -60,7 +64,35 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                 if (before != recipe[3] && before != end-entry) {
                     throw new IllegalStateException("unexpected previous body at " + toAddr(entry));
                 }
-                if (literal != 0) {
+                if (entry == 0xc5e65) {
+                    Instruction jump = getInstructionAt(toAddr(literal));
+                    Function caller = getFunctionContaining(toAddr(literal));
+                    boolean table = false, base = false;
+                    if (jump != null && jump.getMnemonicString().equals("JMP")) {
+                        for (Object object : jump.getOpObjects(0)) {
+                            if (object instanceof Scalar && ((Scalar)object).getUnsignedValue() == 0x15b270) table = true;
+                            if (object instanceof Address && ((Address)object).getOffset() == 0x15b270) table = true;
+                            if (object instanceof Register && ((Register)object).getName().equals("EAX")) base = true;
+                        }
+                    }
+                    if (!table || !base || caller == null || caller.getEntryPoint().getOffset() != 0xc6b80 ||
+                            Integer.toUnsignedLong(currentProgram.getMemory().getInt(toAddr(0x15b270))) != entry) {
+                        throw new IllegalStateException("missing observed dispatch-table corroboration");
+                    }
+                    Address trapAddress = toAddr(entry-1);
+                    if (getInstructionAt(trapAddress) == null) {
+                        if (currentProgram.getListing().getDefinedDataContaining(trapAddress) != null ||
+                                getInstructionContaining(trapAddress) != null ||
+                                !new DisassembleCommand(trapAddress, new AddressSet(trapAddress, trapAddress), false)
+                                    .applyTo(currentProgram, monitor)) {
+                            throw new IllegalStateException("cannot audit preceding trap boundary");
+                        }
+                    }
+                    Instruction trap = getInstructionAt(trapAddress);
+                    if (trap == null || !trap.getMnemonicString().equals("INT3") || trap.getLength() != 1) {
+                        throw new IllegalStateException("unexpected preceding trap boundary");
+                    }
+                } else if (literal != 0) {
                     Instruction reference = getInstructionAt(toAddr(literal));
                     boolean matches = false;
                     if (reference != null && reference.getMnemonicString().equals("MOV") &&
@@ -130,6 +162,6 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         var output = Paths.get(args[0]);
         Files.createDirectories(output.getParent());
         Files.writeString(output, String.join("\n", rows) + "\n");
-        println("EF2000: audited three observed leaf boundaries; " + args[1]);
+        println("EF2000: audited " + RECIPES.length + " observed leaf boundaries; " + args[1]);
     }
 }

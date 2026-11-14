@@ -361,7 +361,7 @@ def recover_calls(args):
 
 
 def recover_observed_leaves(args):
-    """Audit or apply three reviewed leaf boundaries exposed by indirect execution."""
+    """Audit or apply reviewed leaf boundaries exposed by indirect execution."""
     workspace = validated_workspace(args.workspace)
     output = (args.output or workspace / 'observed-leaves.tsv').resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -375,8 +375,8 @@ def recover_observed_leaves(args):
         raise ValueError('Ghidra returned without a fresh observed-leaf report')
     with output.open(newline='') as stream:
         rows = list(csv.DictReader(stream, delimiter='\t'))
-    if ({row['entry'] for row in rows} != {'0x000a432f', '0x000e300f', '0x000c64d0'} or
-            len(rows) != 3 or any(row['result'] not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
+    if ({row['entry'] for row in rows} != {'0x000a432f', '0x000e300f', '0x000c64d0', '0x000c5e65'} or
+            len(rows) != 4 or any(row['result'] not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
         raise ValueError('invalid observed-leaf report')
     print(f'Ghidra observed leaves: {len(rows)} reviewed boundaries; output: {output}')
     return rows

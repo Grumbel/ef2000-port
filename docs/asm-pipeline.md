@@ -1233,3 +1233,41 @@ local/asm-scalar-stack-shards-corpus-summary-20261114.json. Current native-tool,
 translation-manifest and all support-source/object digests independently checked.
 Remaining services/traps, reviewed targets, captured callers and game integration
 keep reliable bulk translation active.
+
+The new 0xc6b80 failures expose a legitimate missing dispatch target, 0xc5e65:
+table 0x15b270 slot zero points to a one-byte RET after INT3. Guarded Ghidra
+recovery now recognizes that singleton body, corroborating indexed JMP/EAX/table
+operands at 0xc6cdf in 0xc6b80 and rejecting owner/data/control-flow conflicts.
+Report/apply/idempotent checks succeed on a disposable project copy. The trap
+itself is not compiled. All previous 4,279 raw bodies/spans are unchanged; the
+new inventory adds exactly one function, with no tracker promotion beyond
+unknown/asm/unverified. 47 tooling tests pass, including missing-target report
+rejection. Regeneration adds one RET entry: 4,143 syntax-supported, 2,528 selected,
+410,780 bytes; every preceding body source and runtime is identical. Full corpus
+outcomes remain separate evidence. Artifacts:
+local/asm-dispatch-return-inventory-evidence-20261114.json,
+local/asm-dispatch-return-program-evidence-20261114.json and
+local/asm-dispatch-return-{audit,apply,idempotent}-20261114.tsv.
+
+Final recovered-target hardware-oracle corpus: 40,448 probes, 22,308 matches,
+18,136 inconclusive and four original callback-target mismatches. The new RET
+leaf passes all 16 probes. Both previous 0xc6b80 target failures now match full
+state/RAM; its 14 original-fault probes remain inconclusive. All other preceding
+outcomes are unchanged: 22,290 pass -> pass, 18,136 inconclusive -> inconclusive,
+two mismatch -> pass, four mismatch -> mismatch. 894 bodies pass every probe,
+1,632 are inconclusive and two mismatch (0xded86/0xed133 targets 0x7f/0x80).
+CLI exits 1; the full gate remains failing. All 2,528 bodies, dispatcher and 63
+table units compile warning-free with Watcom -we. Native x87 reference coverage
+is 117,161 operations/68 forms; 15 interrupted samples rejected before inspecting
+results/C execution. No failures were downgraded or fields masked.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-stack-return-20261114 --translations
+local/asm-c-dispatch-return-program-20261114 --output
+local/asm-c-dispatch-return-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-dispatch-return-diff-20261114/report.json and
+local/asm-dispatch-return-corpus-summary-20261114.json. Native-tool, translation-
+manifest and support object digests independently checked. This is prepared-
+state boundary proof, not native ABI/captured-game/replay verification. The new
+tracker row remains unknown/asm/unverified. Services/traps, other ISA, reviewed
+dynamic targets, captured callers and full-game integration remain active.
