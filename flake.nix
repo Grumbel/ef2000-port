@@ -212,6 +212,10 @@
           objects/ef2000-unicorn-cpp --self-test-zero-return --timing realtime | grep -q 'zero-return stop detected'
           objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail | grep -q 'zero-return stop detected'
           objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail --timing realtime | grep -q 'zero-return stop detected'
+          for fault_timing in instruction realtime; do
+            objects/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" | grep -q 'memory-fault stop detected'
+            objects/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" --trace-block-tail | grep -q 'memory-fault stop detected'
+          done
           objects/ef2000-unicorn-x87-smoke | grep -q '5/5 FLD/FSTP qword memory round-trips passed'
           objects/ef2000-dos-clock-test | grep -q 'deterministic PIT calendar conversion passed'
           objects/ef2000-efpatch-test

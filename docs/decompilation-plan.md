@@ -4228,3 +4228,39 @@ Two 1.5B attempts ended with SIGTERM and no guest result, so they provide no
 pass/fail evidence. A new full run reports process status periodically in a
 private Xvfb display to separate process lifetime from guest behavior. Full
 cockpit usability and M2 remain unproven.
+
+### 2026-11-14 — retain block history for memory faults
+
+Extend --trace-block-tail to ordinary Unicorn execution errors in both timing
+modes, retaining the opt-in/default-off behavior and the same 64-entry ring.
+Factor history formatting out of the zero-address path. Add asset-free invalid
+read self-tests with and without tracing in both modes. An 80-block chain
+checks exact capacity and chronological wrap; untraced failures contain no
+history. Private-Xvfb CTest command:
+ctest --test-dir local/codex-build --output-on-failure
+-R 'unicorn-cpp-(memory-fault|zero-return)' (8 pass). The 19 replay-parser tests
+also pass. Wire the new checks into the Nix package check phase.
+
+The post-directory-fix replay now has an authoritative later failure at tick
+5074, executing stack memory after a bad transfer. The ordinary full-history
+probe was too slow to finish before SIGTERM. A temporary diagnostic build
+installed the recorder at tick 4900; its final failure record exactly matches
+the untraced record before the appended 64 addresses. Those addresses show a
+long march through stack data and do not yet identify the initial transfer.
+The temporary activation change was removed and the normal source rebuilt.
+Evidence: local/hybrid-directory-cache-fix-20261114/{monitored,tail,
+fault-tail-tests-private,fault-tail-replay-tests}.log.
+
+A full Nix Watcom rebuild exposed one stale incremental module, misc_helpers2,
+from the earlier scroll-clobber change. Normalized OMF comparison shows every
+other module identical. Use the complete fresh 382-object set from
+/nix/store/w1gssyp2zvnbxdlxmzfcfbsc7w94v3sv-ef2000-decomp-watcom-0.1.0-dev.1730+g46659df/lib/ef2000/decomp-objects
+for subsequent integration probes. Its 2595-redirect replay still fails at
+tick 5074 in stack memory, so that artifact correction does not resolve M2.
+Fresh evidence: local/hybrid-fresh-objects-20261114/monitored.log.
+
+NIXPKGS_ALLOW_UNFREE=1 nix build -L --impure .#ef2000-hybrid currently fails
+one of 506 Python checks (67 skips): the FLD hardware-oracle test observes
+native FIP zero rather than the instruction address. A direct isolated rerun
+passes; investigate the oracle/host-state interaction before changing any
+expectation. The package and playable cockpit remain unverified.

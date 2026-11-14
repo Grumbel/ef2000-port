@@ -1464,7 +1464,7 @@ public:
                             message << "0x" << std::hex << patch_hit_sequence_[i] << std::dec;
                         }
                     }
-                    throw std::runtime_error(message.str());
+                    throw std::runtime_error(message.str() + block_tail_diagnostic());
                 }
             } else {
                 constexpr uint64_t quantum = 1000;
@@ -1523,7 +1523,7 @@ public:
                             message << "0x" << std::hex << patch_hit_sequence_[i] << std::dec;
                         }
                     }
-                    throw std::runtime_error(message.str());
+                    throw std::runtime_error(message.str() + block_tail_diagnostic());
                 }
                 completed += amount;
             }
@@ -1552,15 +1552,7 @@ public:
                             << std::dec << count << std::hex;
                     first_hit = false;
                 }
-                if (block_tail_count_) {
-                    message << " block_tail=";
-                    const uint64_t begin = block_tail_count_ > block_tail_.size() ?
-                                           block_tail_count_ - block_tail_.size() : 0;
-                    for (uint64_t i = begin; i < block_tail_count_; ++i)
-                        message << (i == begin ? "0x" : ",0x")
-                                << block_tail_[i % block_tail_.size()];
-                }
-                throw std::runtime_error(message.str());
+                throw std::runtime_error(message.str() + block_tail_diagnostic());
             }
             if (pending_copy_) finish_fast_copy();
             if (performance_.profile)
@@ -2614,6 +2606,17 @@ private:
         reg(UC_X86_REG_EIP, TABLE_BASE + 0x200);
         reg(UC_X86_REG_EFLAGS, 0x202);
     }
+    std::string block_tail_diagnostic() const {
+        if (!block_tail_count_) return {};
+        std::ostringstream out;
+        out << " block_tail=" << std::hex;
+        const uint64_t begin = block_tail_count_ > block_tail_.size() ?
+                               block_tail_count_ - block_tail_.size() : 0;
+        for (uint64_t i = begin; i < block_tail_count_; ++i)
+            out << (i == begin ? "0x" : ",0x")
+                << block_tail_[i % block_tail_.size()];
+        return out.str();
+    }
     void fail(std::string message) {
         status_ = "unsupported_interface";
         detail_ = std::move(message);
@@ -3383,7 +3386,7 @@ void usage(const char* program) {
               << "       [--trace-interrupts] (stderr DOS/X-32 call transcript)\n"
               << "       [--trace-patch-entry ADDR] (repeatable, trace guest code addresses)\n"
               << "       [--trace-block-state FILE] [--trace-block-start ADDR] [--trace-block-limit N] (CSV basic-block registers/segments/stack)\n"
-              << "       [--trace-block-tail] (last 64 basic-block addresses on a zero-address stop)\n"
+              << "       [--trace-block-tail] (last 64 basic-block addresses on an execution failure)\n"
               << "       [--trace-instruction-state FILE --trace-instruction-start ADDR] [--trace-instruction-limit N]\n"
               << "       [--trace-archive-lookups] (unique DID pathname requests on stderr)\n"
               << "       [--framebuffer picture.ppm] (capture actual guest VGA/VBE mode)\n"
@@ -3429,7 +3432,7 @@ int main(int argc, char** argv) {
         bool self_test = false, self_test_bda = false, self_test_clock = false;
         bool self_test_retrace = false, self_test_fast_copy = false;
         bool self_test_archive_lookup = false, self_test_patch_hits = false;
-        bool self_test_zero_return = false;
+        bool self_test_zero_return = false, self_test_memory_fault = false;
         bool trace_interrupts = false, trace_archive_lookups = false;
         bool trace_entry_state = false, trace_block_tail = false;
         std::vector<MouseEvent> mouse_events;
@@ -3694,6 +3697,8 @@ int main(int argc, char** argv) {
                 self_test_archive_lookup = true;
             } else if (!std::strcmp(argv[i], "--self-test-zero-return")) {
                 self_test_zero_return = true;
+            } else if (!std::strcmp(argv[i], "--self-test-memory-fault")) {
+                self_test_memory_fault = true;
             } else if (!std::strcmp(argv[i], "--self-test-patch-hits")) {
                 self_test_patch_hits = true;
             } else if (!std::strcmp(argv[i], "--framebuffer") && i + 1 < argc) {
@@ -3772,7 +3777,7 @@ int main(int argc, char** argv) {
         // was requested explicitly.
         const bool any_self_test = self_test || self_test_bda || self_test_clock ||
             self_test_retrace || self_test_fast_copy || self_test_archive_lookup ||
-            self_test_patch_hits || self_test_zero_return;
+            self_test_patch_hits || self_test_zero_return || self_test_memory_fault;
         if (!explicit_window && !headless && !any_self_test && wall_seconds <= 0 &&
             !(explicit_limit && limit) && framebuffer.empty() && !path.empty())
             window.enabled = true;
@@ -3807,11 +3812,11 @@ int main(int argc, char** argv) {
             throw std::runtime_error("--capture-calls supports at most four snapshots per run");
         if (self_test || self_test_bda || self_test_clock || self_test_retrace ||
             self_test_fast_copy || self_test_archive_lookup || self_test_patch_hits ||
-            self_test_zero_return) {
+            self_test_zero_return || self_test_memory_fault) {
             if (int(self_test) + int(self_test_bda) + int(self_test_clock) +
                 int(self_test_retrace) + int(self_test_fast_copy) +
                 int(self_test_archive_lookup) + int(self_test_patch_hits) +
-                int(self_test_zero_return) != 1)
+                int(self_test_zero_return) + int(self_test_memory_fault) != 1)
                 throw std::runtime_error("choose one --self-test mode");
             if (!path.empty()) throw std::runtime_error("self-test does not take an executable");
             if (!patch_paths.empty()) throw std::runtime_error("self-test does not accept patches");
@@ -3933,7 +3938,7 @@ int main(int argc, char** argv) {
                 image[0xeb520] = 0xc3; // test routine returns without touching registers
                 constexpr char pathname[] = "test.bbm";
                 std::copy(std::begin(pathname), std::end(pathname), image.begin() + 0x2000);
-            } else if (self_test_zero_return) {
+            } else if (self_test_zero_return || self_test_memory_fault) {
                 // xor eax,eax; push eax; ret: bad control transfer to the
                 // emulation end address must fail rather than spend fuel.
                 constexpr uint8_t code[] = {0x31, 0xc0, 0x50, 0xc3};
@@ -3942,7 +3947,12 @@ int main(int argc, char** argv) {
                     for (unsigned i = 0; i < 80; ++i)
                         chain.insert(chain.end(), {0xeb, 0x01, 0xcc}); // jmp over int3
                 }
-                chain.insert(chain.end(), std::begin(code), std::end(code));
+                if (self_test_memory_fault) {
+                    // mov eax,0x70000000; mov eax,[eax]: unmapped read.
+                    chain.insert(chain.end(), {0xb8, 0, 0, 0, 0x70, 0x8b, 0});
+                } else {
+                    chain.insert(chain.end(), std::begin(code), std::end(code));
+                }
                 std::copy(chain.begin(), chain.end(), image.begin() + ENTRY);
             } else if (self_test_patch_hits) {
                 std::copy(std::begin(patch_hits_guest), std::end(patch_hits_guest), image.begin() + ENTRY);
@@ -3960,11 +3970,13 @@ int main(int argc, char** argv) {
             if (self_test_patch_hits) machine.enable_patch_hit_trace({0x200, ENTRY});
             machine.enable_guest_hashes(guest_hash_ranges);
             if (trace_block_tail) machine.enable_block_tail_trace();
-            if (self_test_zero_return) {
+            if (self_test_zero_return || self_test_memory_fault) {
                 const bool realtime_zero = timing == ExecutionTiming::Realtime;
                 const std::string expected = std::string(realtime_zero ? "real-time" :
                     "instruction-counted") +
-                    " guest execution: unexpected zero-address stop ip=0x0 ";
+                    (self_test_memory_fault ?
+                        " guest execution: Invalid memory read (UC_ERR_READ_UNMAPPED) " :
+                        " guest execution: unexpected zero-address stop ip=0x0 ");
                 try {
                     machine.run(realtime_zero ? 0 : 10000, window, 250000, "", "",
                                 realtime_zero, realtime_zero ? 0.1 : 0, performance);
@@ -3979,13 +3991,16 @@ int main(int argc, char** argv) {
                         if (diagnostic.size() < tail.str().size() ||
                             diagnostic.compare(diagnostic.size() - tail.str().size(),
                                                tail.str().size(), tail.str()) != 0)
-                            throw std::runtime_error("zero-return block history order/size mismatch");
+                            throw std::runtime_error("execution-failure block history order/size mismatch");
                     }
-                    std::cout << "zero-return stop detected (" <<
+                    if (!trace_block_tail && std::string(error.what()).find(" block_tail=") != std::string::npos)
+                        throw std::runtime_error("block history present without tracing");
+                    std::cout << (self_test_memory_fault ? "memory-fault stop detected (" :
+                                 "zero-return stop detected (") <<
                         (realtime_zero ? "real-time" : "instruction-counted") << ")\n";
                     return 0;
                 }
-                throw std::runtime_error("zero-return self-test consumed its budget without failing");
+                throw std::runtime_error("execution-failure self-test consumed its budget without failing");
             }
             const bool realtime_test = self_test_clock || self_test_retrace || self_test_fast_copy;
             performance.clock_loop_benchmark = self_test_clock;

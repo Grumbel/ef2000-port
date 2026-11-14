@@ -397,6 +397,19 @@ if(UNICORN_INCLUDE_DIR AND UNICORN_LIBRARY AND (WIN32 OR OpenSSL_FOUND))
   set_tests_properties(unicorn-cpp-zero-return-history
                        unicorn-cpp-zero-return-history-realtime PROPERTIES
                        PASS_REGULAR_EXPRESSION "zero-return stop detected")
+  foreach(memory_fault_mode IN ITEMS counted realtime)
+    set(memory_fault_args --self-test-memory-fault)
+    if(memory_fault_mode STREQUAL "realtime")
+      list(APPEND memory_fault_args --timing realtime)
+    endif()
+    add_test(NAME unicorn-cpp-memory-fault-${memory_fault_mode}
+             COMMAND ef2000-unicorn-cpp ${memory_fault_args})
+    add_test(NAME unicorn-cpp-memory-fault-history-${memory_fault_mode}
+             COMMAND ef2000-unicorn-cpp ${memory_fault_args} --trace-block-tail)
+    set_tests_properties(unicorn-cpp-memory-fault-${memory_fault_mode}
+                         unicorn-cpp-memory-fault-history-${memory_fault_mode} PROPERTIES
+                         PASS_REGULAR_EXPRESSION "memory-fault stop detected")
+  endforeach()
   add_test(NAME unicorn-cpp-patch-hits COMMAND ef2000-unicorn-cpp --self-test-patch-hits)
   set_tests_properties(unicorn-cpp-patch-hits PROPERTIES
                        PASS_REGULAR_EXPRESSION "patch_hit: addr=0x200 count=2")
