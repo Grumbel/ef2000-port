@@ -3914,3 +3914,14 @@ The Nix package now builds after the inventory-test fix; its native64 launcher
 reproduces the same fault. Startup bisection continues separately.
 Evidence: local/hybrid-abi-filter-tests-20261114.log,
 local/hybrid-abi-filter-fix-20261114/ and local/hybrid-launch-repair-02-20261114/.
+
+### 2026-11-14 — index ABI aliases during hybrid linking
+
+Pre-index ABI alias spellings once rather than rescanning and normalizing every
+alias for every relocation. Full 382-object linking drops from roughly 15–20 s
+to under one second. The complete patch is byte-identical before/after indexing
+(SHA-256 19900f34dee7f35151f54eb0107673a5421d1ff02e2651ca9f33784b94c8f866),
+using the same startup exclusions and pinned image. Hybrid alias/exclusion tests
+pass. This makes the launcher and successive startup bisections practical;
+no generated-code or behavior change is intended. Evidence stays under
+local/hybrid-interrupt-fix-20261114/{current,indexed}.efpatch.

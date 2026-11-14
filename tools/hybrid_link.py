@@ -147,6 +147,10 @@ def link(objects, functions, globals_, mechanical_selected, image,
         if row['name']:
             for spelling in symbol_spellings(row['name']):
                 function_by_name.setdefault(spelling, []).append(row)
+    alias_by_spelling = {}
+    for name, address in abi_aliases.items():
+        for spelling in symbol_spellings(name):
+            alias_by_spelling.setdefault(spelling, set()).add(address)
     global_by_name = {}
     for row in globals_:
         for spelling in symbol_spellings(row['name']):
@@ -332,8 +336,7 @@ def link(objects, functions, globals_, mechanical_selected, image,
         if guest_entry is not None and guest_entry in function_by_addr:
             return guest_entry
         aliases = {address for spelling in symbol_spellings(symbol)
-                   for name, address in abi_aliases.items()
-                   if spelling in symbol_spellings(name)}
+                   for address in alias_by_spelling.get(spelling, ())}
         if len(aliases) == 1:
             return next(iter(aliases))
         matches = {int(row['addr'], 16)
