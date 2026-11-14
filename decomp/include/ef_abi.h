@@ -7186,6 +7186,13 @@ void guest_tactcom_sequence_entry_boundary_3010e(ef_addr32 stream);
 void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
                                                 uint32_t capacity, uint32_t site);
 
+/* Callback helper clobbers must be visible to separately compiled callers.
+ * Their indirect-call shim uses ECX to hold the callback address. */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_callptr_eax_ret_x parm [eax] [edx] modify [eax ecx edx]
+#pragma aux guest_callptr_eax_x parm [eax] [edx] modify [eax ecx edx]
+#endif
+
 /* Original callers clean the stack (plain `ret`); keep Watcom register
  * arguments in EAX/EDX/EBX/ECX but let the caller pop the rest. Found by the
  * static ret-immediate check (tools/abi_check.py). */

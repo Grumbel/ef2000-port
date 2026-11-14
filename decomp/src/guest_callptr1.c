@@ -64,13 +64,11 @@ static uint32_t call_register_eax(uint32_t fn, uint32_t arg);
     "mov eax,edx" \
     "call ecx"
 
-#pragma aux guest_callptr_eax_ret_x parm [eax] [edx] modify [eax ecx edx]
 uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t arg)
 {
     return call_register_eax(fn, arg);
 }
 
-#pragma aux guest_callptr_eax_x parm [eax] [edx] modify [eax ecx edx]
 void guest_callptr_eax_x(ef_addr32 fn, uint32_t arg)
 {
     (void)call_register_eax(fn, arg);

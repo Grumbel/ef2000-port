@@ -4138,3 +4138,25 @@ now exposes a later invalid callback fetch at 0xfab33ce9, tick 3221, through
 release_ref_108ffa and guest_callptr_eax_ret_x. Cockpit-entry canaries remain
 unreached. Investigate the callback declaration/definition clobber contract
 next; no M2 completion or full raw-x87 equivalence claim.
+
+### 2026-11-14 — expose EAX callback-helper clobbers to callers
+
+Move the public Watcom pragmas for guest_callptr_eax_ret_x and
+guest_callptr_eax_x from guest_callptr1.c to ef_abi.h. Both shims put the
+callback address in ECX; separately compiled callers previously assumed ECX
+survived. An asset-free three-register caller kept its third argument in ECX
+across the helper and returned 12306 instead of 41. The same fixture, compiled
+with the shared declaration and executed with the actual helper object, returns
+41 with balanced stack. The old object fails this test as a negative control.
+
+Validation command: EF2000_WCC386=<pinned-wcc386> PYTHONPATH=<unicorn-site-packages>
+python3 -m unittest tests.test_callback_abi tests.test_ef2000_wcc
+ tests.test_hybrid_link tests.test_func_differential tests.test_replay_suite
+(34 pass, no skips). Recompile all seven affected modules with
+ tools/ef2000_wcc.py; zero warnings. Link the broad profile with
+ tools/hybrid_link.py: 2593 replacements retained. Runtime evidence resides in
+local/hybrid-callback-abi-fix-20261114/. Full replay passes the former
+scanner callback fault at tick 3221 and stops later at tick 3839, IP 0x110e23,
+with unsupported_interface (detail: unsupported real-mode BIOS INT 13).
+Cockpit canaries remain unreached. Investigate that stop next; this does not
+complete M2 or establish a usable flight session.
