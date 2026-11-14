@@ -100,6 +100,16 @@ static void ef_write(ef_lift_state *s, uint32_t address, unsigned width, uint32_
     }
     for (i = 0; i < bytes; ++i) s->memory[address+i] = (uint8_t)(value >> (8*i));
 }
+static unsigned ef_stack_store(ef_lift_state *s, uint32_t address, unsigned width, uint32_t value) {
+    unsigned byte;
+    if (width != 16 && width != 32) return 9;
+    /* Preserve the flat oracle's partial writes, without committing ESP. */
+    for (byte = 0; byte < width/8u; ++byte) {
+        ef_write(s, address+byte, 8, value >> (8u*byte));
+        if (s->fault) return s->fault;
+    }
+    return 0;
+}
 /* Match the flat integer oracle's save/restore order, including partial
  * effects on a memory fault. ESP commits only after the instruction completes.
  * Exception delivery itself remains outside this explicit-state model. */
@@ -344,6 +354,63 @@ def operand(text):
 
 def width_of(op):
     return op[2] if op[0] in ('reg', 'mem', 'seg') else None
+
+
+def scalar_stack_width(insn, op):
+    """Check scalar PUSH/POP width/form; 32-bit address parsing stays mandatory."""
+    encoded = bytes.fromhex(insn['bytes'])
+    offset, word, segment = 0, False, False
+    while offset < len(encoded):
+        byte = encoded[offset]
+        if byte == 0x66 and not word:
+            word = True
+        elif byte in (0x26, 0x2e, 0x36, 0x3e, 0x64, 0x65) and not segment:
+            segment = True
+        else:
+            break
+        offset += 1
+    width = 16 if word else 32
+    pop = insn['mnemonic'] == 'pop'
+    if (offset >= len(encoded) or
+            (op[0] != 'imm' and width_of(op) != width) or
+            (insn['mnemonic'] == 'pushw' and (not word or op[0] != 'imm'))):
+        raise Unsupported('scalar stack width/encoding mismatch')
+    opcode = encoded[offset]
+    if op[0] == 'imm' and not pop:
+        if insn['mnemonic'] != ('pushw' if word else 'push') or opcode not in (0x68, 0x6a):
+            raise Unsupported('unsupported stack immediate encoding')
+        count = 1 if opcode == 0x6a else width//8
+        if len(encoded) != offset+1+count:
+            raise Unsupported('unsupported stack immediate length')
+        immediate = int.from_bytes(encoded[offset+1:], 'little', signed=opcode == 0x6a)
+        if (immediate ^ op[1]) & ((1 << width)-1):
+            raise Unsupported('stack immediate encoding/spelling mismatch')
+    elif op[0] == 'reg' and opcode in range(0x58 if pop else 0x50, 0x60 if pop else 0x58):
+        if len(encoded) != offset+1 or (opcode & 7) != op[1]:
+            raise Unsupported('stack register encoding/spelling mismatch')
+    elif op[0] in ('mem', 'reg') and opcode == (0x8f if pop else 0xff):
+        if len(encoded) < offset+2:
+            raise Unsupported('missing stack ModRM')
+        modrm = encoded[offset+1]
+        mode, base = modrm >> 6, modrm & 7
+        if ((modrm >> 3) & 7) != (0 if pop else 6) or (mode == 3) != (op[0] == 'reg'):
+            raise Unsupported('unsupported stack ModRM')
+        end = offset+2
+        if mode == 3:
+            if base != op[1]:
+                raise Unsupported('stack register encoding/spelling mismatch')
+        else:
+            if base == 4:
+                if len(encoded) <= end:
+                    raise Unsupported('missing stack SIB')
+                base = encoded[end] & 7
+                end += 1
+            end += 4 if mode == 2 or (mode == 0 and base == 5) else 1 if mode == 1 else 0
+        if len(encoded) != end:
+            raise Unsupported('unsupported stack address encoding')
+    else:
+        raise Unsupported('unsupported scalar stack encoding')
+    return width
 
 
 def read(op, width):
@@ -730,7 +797,7 @@ def instruction_c(insn, starts):
         if text or insn['bytes'] != ('60' if mnemonic == 'pusha' else '61'):
             raise Unsupported('unsupported PUSHA/POPA encoding/spelling')
         code.append('a = ef_stack_all(s, %d); if (a) return a;' % (mnemonic == 'popa'))
-    elif mnemonic in ('push', 'pop'):
+    elif mnemonic in ('push', 'pushw', 'pop'):
         op = operand(text)
         if op[0] == 'seg' and mnemonic == 'push':
             code += ['ef_write(s, s->r[4] - 4u, 32, %s);' % read(op, 16),
@@ -739,13 +806,23 @@ def instruction_c(insn, starts):
             code += ['a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',
                      'ef_load_segment(s, %d, a);' % op[1],
                      'if (s->fault) return s->fault; s->r[4] += 4u;']
-        elif mnemonic == 'push' and (width_of(op) == 32 or op[0] == 'imm'):
-            code += ['a = %s; if (s->fault) return s->fault;' % read(op, 32),
-                     'ef_write(s, s->r[4] - 4u, 32, a);',
-                     'if (s->fault) return s->fault; s->r[4] -= 4u;']
-        elif mnemonic == 'pop' and op[0] == 'reg' and width_of(op) == 32:
-            code += ['a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',
-                     's->r[4] += 4u;', write(op, 'a', 32)]
+        elif mnemonic in ('push', 'pushw') and op[0] in ('reg', 'mem', 'imm'):
+            width = scalar_stack_width(insn, op)
+            code += ['a = %s; if (s->fault) return s->fault;' % read(op, width),
+                     'b = ef_stack_store(s, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
+                     's->r[4] -= %du;' % (width//8)]
+        elif mnemonic == 'pop' and op[0] in ('reg', 'mem'):
+            width = scalar_stack_width(insn, op)
+            code += ['a = ef_read(s, s->r[4], %d); if (s->fault) return s->fault;' % width]
+            if op[0] == 'mem':
+                # Evaluate the destination using post-increment ESP, but keep
+                # architectural ESP intact until every destination byte stores.
+                destination = op[1].replace('s->r[4]', '(s->r[4] + %du)' % (width//8))
+                code += ['b = %s;' % destination,
+                         'result = ef_stack_store(s, b, %d, a); if (result) return result;' % width,
+                         's->r[4] += %du;' % (width//8)]
+            else:
+                code += ['s->r[4] += %du;' % (width//8), write(op, 'a', width)]
         else:
             raise Unsupported('unsupported stack operand')
     elif mnemonic in ('shl', 'sal', 'shr', 'sar', 'rol', 'ror', 'rcl', 'rcr'):

@@ -1134,3 +1134,102 @@ local/asm-stack-all-corpus-summary-20261114.json. Current native-tool/translatio
 manifest digests independently checked. Scalar memory stack forms, services/traps,
 remaining ISA, audited boundaries, reviewed targets, captured callers and game
 integration remain required; reliable bulk translation remains active.
+
+Scalar PUSH/POP now support 16/32-bit registers and memory plus encoded
+16/32-bit immediate PUSH (including GNU's PUSHW spelling). Decode operand-size,
+register/ModRM form, SIB/displacement lengths and signed immediate bytes before
+rendering; other prefixes/address sizes and mismatches fail explicitly.
+Memory PUSH reads its source using original ESP. Memory POP reads the old stack
+value, evaluates its destination using incremented ESP, and commits ESP only
+when the destination store completes. POP SP preserves the upper half of the
+post-increment ESP, including 64 KiB carry. Sources overlapping destinations
+are read before writing. Checked byte stores preserve flat Unicorn partial
+writes on a fault, including ordinary 32-bit PUSH; flags/FP state stay unchanged.
+This remains the flat integer-oracle profile, not native exception delivery.
+
+12,649 generated-code/Unicorn 2.1.4 cases pass under UBSan across 91 forms:
+10,040 complete, 2,609 faulting. Cover every GPR and SP/ESP alias, word/dword
+memory, SIB, FS, absolute and ESP-relative operands, overlapping source/destination,
+16-bit signed immediates/alternate encodings, RAM edges, unaligned accesses,
+32-bit wrap and 64 KiB carries. Compare all RAM/GPRs/flags/PC and untouched
+remaining state; reject width, prefix, group/register and immediate mismatches.
+All forms compile warning-free with Watcom -we. Evidence:
+local/asm-scalar-stack-tests-20261114.log and
+local/asm-scalar-stack-evidence-20261114.json.
+
+Regeneration reaches 4,142 syntax-supported and 2,527 dependency-closed bodies,
+410,779 bytes (+28/+8,259). No first-blocker 'unsupported stack operand' remains;
+0xc409c joins closure. 2,024 preceding body sources change because scalar PUSH
+now uses byte-store checks; do not claim source identity. Full corpus state
+comparison remains the separate gate. Evidence:
+local/asm-scalar-stack-closure-evidence-20261114.json and
+local/asm-c-scalar-stack-program-20261114/report.json. No tracker promotion.
+
+The 2,527-body monolithic registry hit Watcom E1145 in its constant initializer
+before comparisons began. Registry layout pc-shards-v1 now puts at most 2,048
+sorted PC entries and their guarded bytes into each separate C table unit. The
+main dispatcher first selects a table, then performs the same exact-PC lookup
+and byte guard. Missing targets, opcode mismatch, stop PC and shared instruction
+fuel semantics stay explicit. No selected body was removed. There are 63 table
+units for 128,988 locations. Body sources and runtime are identical to the failed
+monolithic scalar-stack generation.
+
+The manifest binds the generated registry header and every table source in
+'dispatcher_support', with a validated layout and shard size. Verification checks
+the exact support inventory and all source/header hashes before compilation;
+Watcom compiles table units separately, and the report binds their object hashes.
+Legacy monolithic manifests remain readable. Tests use two-entry tables to cross
+boundaries during calls/returns/resume and check before/between/after missing PCs,
+byte changes, omitted/duplicated/malformed support, invalid sizes and header/table
+corruption. No output directory is created for rejected artifact metadata.
+Evidence: local/asm-scalar-stack-shards-generation-evidence-20261114.json,
+local/asm-scalar-stack-shards-final-boundary-20261114.log and
+local/asm-c-scalar-stack-shards-program-20261114/report.json. The initial two
+regression failures were obsolete rejection assertions for PUSH AX and memory
+POP; they now exercise still-unsupported PUSHF/POPF instead. Scalar semantics
+were not changed to satisfy those assertions.
+
+Final affected eight-module regression passes 53 tests without skips
+(150.562 s), plus the final boundary/configuration test with invalid-size cases.
+Command modules/environment: local/asm-scalar-stack-regression-command-20261114.json;
+final output: local/asm-scalar-stack-shards-regression-20261114.log. Numeric x87
+algorithms/backends are unchanged; their instruction matrices remain separate
+prior evidence. Current full-corpus execution still requires its own result.
+
+Independent cross-artifact comparison also confirms all 128,988 PC/function/
+offset/guard-length entries and all 410,779 guarded code bytes are unchanged
+between the failed monolithic output and the partitioned registry (offsets
+rebased per table). Every table descriptor matches its first PC, count and
+symbols. This checks the complete registry beyond sampled execution coverage.
+Evidence: local/check-registry-partition-20261114.py and
+local/asm-scalar-stack-registry-equivalence-20261114.json, binding both manifests
+and the checking script. Original bytes remain only in ignored local artifacts.
+
+Completed partitioned hardware-oracle corpus: 40,432 probes, 22,290 matches,
+18,136 inconclusive and six mismatches. Added 28 bodies contribute 138 matches,
+308 inconclusive and two uncovered-target failures in 0xc6b80. All preceding
+outcomes are unchanged: 22,152 pass -> pass, 17,828 inconclusive -> inconclusive,
+four mismatch -> mismatch. 893 bodies pass all probes, 1,631 are inconclusive
+and three mismatch. 0xc409c passes all 16 probes. Native x87 coverage remains
+117,161 operations/68 forms; five interrupted samples rejected before inspecting
+results/C execution. All 2,527 body objects, dispatcher and 63 table modules
+compile warning-free with Watcom -we; all table object digests are bound.
+
+The two new failures stop at 0xc5e65 after original completion. Current inventory
+has no owner there; independent disassembly shows a one-byte RET, and dispatch
+table 0x15b270 points to it from the indexed jump at 0xc6cdf. This is a concrete
+observed code target, unlike the four previous copyright-header targets 0x7f/0x80.
+Keep both failures, do not downgrade them or infer target coverage from direct
+closure. Recover/audit this legitimate leaf boundary as its own change before
+claiming that the expanded program passes. The full gate exits 1. No masked
+fields, original-fault promotion or game-verification claims.
+Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-scalar-stack-shards-program-20261114 --output
+local/asm-c-scalar-stack-shards-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386> --x87-oracle hardware.
+Evidence: local/asm-c-scalar-stack-shards-diff-20261114/report.json and
+local/asm-scalar-stack-shards-corpus-summary-20261114.json. Current native-tool,
+translation-manifest and all support-source/object digests independently checked.
+Remaining services/traps, reviewed targets, captured callers and game integration
+keep reliable bulk translation active.

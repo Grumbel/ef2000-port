@@ -280,11 +280,25 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('runtime_sha256') != hashlib.sha256(runtime.read_bytes()).hexdigest():
         raise ValueError('translation runtime digest mismatch')
     generated = [e for e in manifest['entries'] if e['state'] == 'generated-unverified']
-    artifacts = generated + ([manifest['dispatcher']] if program else [])
+    support = manifest.get('dispatcher_support', [])
+    if program and manifest.get('dispatcher_layout') == 'pc-shards-v1':
+        size = manifest.get('dispatcher_shard_entries')
+        if type(size) is not int or not 1 <= size <= 2048:
+            raise ValueError('invalid dispatcher shard size')
+        count = sum(len(e.get('instruction_addresses', [])) for e in generated)
+        names = ['ef_lift_registry.h'] + ['ef_lift_registry_%04d.c' % n
+                                          for n in range((count+size-1)//size)]
+        if (not count or not isinstance(support, list) or
+                any(not isinstance(e, dict) or not isinstance(e.get('file'), str) for e in support) or
+                sorted(e['file'] for e in support) != sorted(names)):
+            raise ValueError('invalid dispatcher support inventory')
+    elif support or manifest.get('dispatcher_layout'):
+        raise ValueError('unsupported dispatcher layout')
+    artifacts = generated + ([manifest['dispatcher']] + support if program else [])
     for entry in artifacts:
         if entry.get('source_sha256') != hashlib.sha256((directory / entry['file']).read_bytes()).hexdigest():
             raise ValueError('translation source digest mismatch')
-    sources = [directory / e['file'] for e in artifacts]
+    sources = [directory / e['file'] for e in artifacts if e['file'].endswith('.c')]
     needs_narrow = any(asm_to_c.asm_x87.NARROW_DEFINE in source.read_text() for source in sources)
     needs_binary = any(asm_to_c.asm_x87.BINARY_DEFINE in source.read_text() for source in sources)
     expected_backends = [asm_to_c.asm_x87.NARROW_BACKEND] if needs_narrow else []
@@ -371,6 +385,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
                   host_translation_unit_sha256=hashlib.sha256(unit.read_bytes()).hexdigest(),
                   dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
+                  dispatcher_support_sha256={e['file']: e['source_sha256'] for e in support},
+                  dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
+                                                     for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries,
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',

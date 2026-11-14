@@ -45,7 +45,7 @@ class TranslationTests(unittest.TestCase):
             root = Path(temporary)
             for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
                            'addr16 loop 1f\n1: ret',
-                           'in eax,dx\nret', 'push ax\nret', 'pop [eax]\nret',
+                           'in eax,dx\nret', 'pushf\nret', 'popf\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
                     _, record = assemble(root, source)

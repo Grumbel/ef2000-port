@@ -277,7 +277,7 @@ ret
             root = Path(temporary)
             image, directory, records = inventory(root, source)
             out = root / 'out'
-            asm_c_program.generate(directory, out, image)
+            manifest = asm_c_program.generate(directory, out, image, shard_entries=2)
             asm_c_differential.verify(out, root / 'evidence', image, scenarios=1)
             function = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run
             function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
@@ -296,8 +296,37 @@ ret
             self.assertEqual(function(ctypes.byref(state), 2, 0xf00), 0)
             self.assertEqual(state.pc, 0xf00)
             self.assertEqual(state.r[4], 0x804)
-            state.pc = 0x700
-            self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 2)
+            for pc in (0xff, 0x106, 0x202, 0x700):
+                state.pc = pc
+                self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 2)
+            state.pc = 0x200
+            memory[0x200] ^= 1
+            self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 6)
+            memory[0x200] ^= 1
+            for index, artifact in enumerate(manifest['dispatcher_support']):
+                path = out/artifact['file']
+                saved = path.read_bytes()
+                path.write_bytes(saved+b'/* modified registry */')
+                evidence = root/('tampered-support-%d'%index)
+                with self.assertRaisesRegex(ValueError, 'source digest mismatch'):
+                    asm_c_differential.verify(out, evidence, image, scenarios=1)
+                self.assertFalse(evidence.exists())
+                path.write_bytes(saved)
+            manifest_path = out/'report.json'
+            saved = manifest_path.read_bytes()
+            for support in (manifest['dispatcher_support'][:-1], [None],
+                            manifest['dispatcher_support']*2):
+                bad = dict(manifest, dispatcher_support=support)
+                manifest_path.write_text(json.dumps(bad))
+                with self.assertRaisesRegex(ValueError, 'support inventory'):
+                    asm_c_differential.verify(out, root/'bad-support', image, scenarios=1)
+                self.assertFalse((root/'bad-support').exists())
+            for size in (0, 2049, True):
+                manifest_path.write_text(json.dumps(dict(manifest, dispatcher_shard_entries=size)))
+                with self.assertRaisesRegex(ValueError, 'shard size'):
+                    asm_c_differential.verify(out, root/'bad-shard-size', image, scenarios=1)
+                self.assertFalse((root/'bad-shard-size').exists())
+            manifest_path.write_bytes(saved)
             with (out / 'ef_lift_program.c').open('a') as stream:
                 stream.write('/* modified dispatcher */')
             with self.assertRaisesRegex(ValueError, 'source digest mismatch'):

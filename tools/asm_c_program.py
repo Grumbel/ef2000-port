@@ -90,7 +90,10 @@ def analyse(records):
     return codes, dependencies, closed, reasons
 
 
-def dispatcher(records):
+def dispatcher(records, *, shard_entries=2048):
+    """Keep each Watcom unit below its constant-initializer limits."""
+    if type(shard_entries) is not int or not 1 <= shard_entries <= 2048:
+        raise ValueError('registry shard size must be between 1 and 2048')
     prototypes = ['unsigned ef_lift_%08x(ef_lift_state *, uint32_t);' % r['address']
                   for r in records]
     locations = sorted((i['address'], r['address'], bytes.fromhex(i['bytes']),
@@ -98,59 +101,86 @@ def dispatcher(records):
                        for r in records for i in r['instructions'])
     if not locations:
         raise ValueError('no closed translated instructions')
-    entries, original = [], bytearray()
-    for pc, address, encoded, immediate in locations:
-        if not 1 <= len(encoded) <= 15:
-            raise ValueError('invalid x86 instruction length')
-        entries.append('    {0x%xu, ef_lift_%08x, %du, %du},' %
-                       (pc, address, len(original), immediate[0] if immediate else len(encoded)))
-        original.extend(encoded)
-    original_lines = ['    ' + ','.join('0x%02x' % byte for byte in original[i:i+16]) + ','
-                      for i in range(0, len(original), 16)]
-    return '''/* Generated ASM-derived program dispatcher. NEVER COMMIT. */
+    header = '''/* Generated ASM-derived registry declarations. NEVER COMMIT. */
+#ifndef EF_LIFT_REGISTRY_H
+#define EF_LIFT_REGISTRY_H
 #include "ef_lift_state.h"
-%s
 typedef unsigned (*ef_lift_step_function)(ef_lift_state *, uint32_t);
 typedef struct {
     uint32_t pc; ef_lift_step_function step;
     uint32_t code_offset; uint8_t length;
 } ef_lift_location;
-static const ef_lift_location ef_locations[] = {
-%s
-};
-static const uint8_t ef_original_code[] = {
+'''+ '\n'.join(prototypes)+'\n'
+    files, chunks = {}, []
+    for number, start in enumerate(range(0, len(locations), shard_entries)):
+        entries, original = [], bytearray()
+        group = locations[start:start+shard_entries]
+        for pc, address, encoded, immediate in group:
+            if not 1 <= len(encoded) <= 15:
+                raise ValueError('invalid x86 instruction length')
+            entries.append('    {0x%xu, ef_lift_%08x, %du, %du},' %
+                           (pc, address, len(original), immediate[0] if immediate else len(encoded)))
+            original.extend(encoded)
+        name, code = 'ef_locations_%04d'%number, 'ef_code_%04d'%number
+        header += 'extern const ef_lift_location %s[%d];\n' % (name,len(group))
+        header += 'extern const uint8_t %s[%d];\n' % (code,len(original))
+        byte_lines = ['    '+','.join('0x%02x'%b for b in original[i:i+16])+','
+                      for i in range(0,len(original),16)]
+        files['ef_lift_registry_%04d.c'%number] = (
+            '/* Generated ASM-derived PC/byte table. NEVER COMMIT. */\n'
+            '#include "ef_lift_registry.h"\nconst ef_lift_location %s[] = {\n%s\n};\n'
+            'const uint8_t %s[] = {\n%s\n};\n' % (name,'\n'.join(entries),code,'\n'.join(byte_lines)))
+        chunks.append('    {0x%xu, %du, %s, %s},' % (group[0][0],len(group),name,code))
+    files['ef_lift_registry.h'] = header+'#endif\n'
+    files['ef_lift_program.c'] = '''/* Generated ASM-derived program dispatcher. NEVER COMMIT. */
+#include "ef_lift_registry.h"
+typedef struct {
+    uint32_t first_pc, count;
+    const ef_lift_location *locations;
+    const uint8_t *code;
+} ef_lift_chunk;
+static const ef_lift_chunk ef_chunks[] = {
 %s
 };
 unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
     unsigned status;
     uint32_t low, high, middle, byte_index, code_byte;
+    const ef_lift_chunk *chunk;
+    const ef_lift_location *location;
     if (s->fault) return s->fault;
     while (fuel--) {
         if (s->pc == stop_pc) return 0;
-        low = 0; high = sizeof(ef_locations) / sizeof(ef_locations[0]);
+        low = 0; high = sizeof(ef_chunks) / sizeof(ef_chunks[0]);
         while (low < high) {
             middle = low + (high-low)/2;
-            if (ef_locations[middle].pc < s->pc) low = middle + 1;
+            if (ef_chunks[middle].first_pc <= s->pc) low = middle + 1;
             else high = middle;
         }
-        if (low == sizeof(ef_locations) / sizeof(ef_locations[0]) ||
-            ef_locations[low].pc != s->pc) return 2;
-        for (byte_index = 0; byte_index < ef_locations[low].length; ++byte_index) {
+        if (!low) return 2;
+        chunk = &ef_chunks[low-1];
+        low = 0; high = chunk->count;
+        while (low < high) {
+            middle = low + (high-low)/2;
+            if (chunk->locations[middle].pc < s->pc) low = middle + 1;
+            else high = middle;
+        }
+        if (low == chunk->count || chunk->locations[low].pc != s->pc) return 2;
+        location = &chunk->locations[low];
+        for (byte_index = 0; byte_index < location->length; ++byte_index) {
             code_byte = ef_read(s, s->pc + byte_index, 8);
             if (s->fault) return s->fault;
-            if (code_byte != ef_original_code[ef_locations[low].code_offset + byte_index]) return 6;
+            if (code_byte != chunk->code[location->code_offset + byte_index]) return 6;
         }
-        status = ef_locations[low].step(s, 1);
-        /* 0: RET executed; 1: one ordinary instruction completed. Both
-           consume exactly one unit of the shared guest instruction budget. */
+        status = location->step(s, 1);
+        /* RET and ordinary completion each consume exactly one shared unit. */
         if (status != 0 && status != 1) return status;
     }
     return s->pc == stop_pc ? 0 : 1;
 }
-''' % ('\n'.join(prototypes), '\n'.join(entries), '\n'.join(original_lines))
+''' % '\n'.join(chunks)
+    return files
 
-
-def generate(inventory, output, image):
+def generate(inventory, output, image, *, shard_entries=2048):
     manifest, records = asm_to_c.read_inventory(inventory, image)
     codes, dependencies, closed, reasons = analyse(records)
     output.mkdir(parents=True, exist_ok=False)
@@ -170,14 +200,20 @@ def generate(inventory, output, image):
                         body_bytes=sum(end-start for start, end in record['ranges']))
             (output / item['file']).write_text(codes[address])
         report.append(item)
-    program = dispatcher([r for r in records if r['address'] in closed])
-    (output / 'ef_lift_program.c').write_text(program)
+    files = dispatcher([r for r in records if r['address'] in closed], shard_entries=shard_entries)
+    for name, code in files.items():
+        (output / name).write_text(code)
+    program = files['ef_lift_program.c']
     result = dict(schema=1, model=MODEL, payload_sha256=manifest['payload_sha256'],
                   state_abi=asm_to_c.STATE_ABI,
                   inventory_sha256=hashlib.sha256((inventory / 'manifest.json').read_bytes()).hexdigest(),
                   runtime_sha256=hashlib.sha256(asm_to_c.RUNTIME.encode()).hexdigest(),
                   dispatcher=dict(file='ef_lift_program.c', source_sha256=hashlib.sha256(program.encode()).hexdigest()),
                   syntactically_supported=len(codes), entries=report)
+    result['dispatcher_layout'] = 'pc-shards-v1'
+    result['dispatcher_shard_entries'] = shard_entries
+    result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())
+                                    for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
     asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
