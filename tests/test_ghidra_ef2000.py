@@ -180,6 +180,32 @@ class GhidraWorkflowTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'fresh observed-leaf report'):
                 ghidra.recover_observed_leaves(args)
 
+    def test_division_dispatch_requires_all_cases_and_fresh_payload_bound_evidence(self):
+        (self.workspace / 'projects').mkdir(parents=True)
+        (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')
+        (self.workspace / 'payload.bin').write_bytes(self.image)
+        (self.workspace / 'manifest.json').write_text(json.dumps(self.manifest))
+        args = argparse.Namespace(workspace=self.workspace, analyze_headless=self.launcher,
+                                  output=None, apply=False)
+        def run(command, check):
+            self.assertIn('EF2000RecoverDivideDispatch.java', command)
+            self.assertEqual(command[-2:], ['report', hashlib.sha256(self.image).hexdigest()])
+            (self.workspace / 'divide-dispatch.tsv').write_text(
+                'entry\tcase_index\tbody_bytes_after\tresult\n' + ''.join(
+                    f'0x0011f7ef\t{i}\t1068\tproposed\n' for i in range(64)))
+        with patch.object(ghidra.subprocess, 'run', side_effect=run):
+            self.assertEqual(len(ghidra.recover_divide_dispatch(args)), 64)
+        with patch.object(ghidra.subprocess, 'run'):
+            with self.assertRaisesRegex(ValueError, 'fresh division-dispatch report'):
+                ghidra.recover_divide_dispatch(args)
+        def incomplete(command, check):
+            run(command, check)
+            path = self.workspace / 'divide-dispatch.tsv'
+            path.write_text('\n'.join(path.read_text().splitlines()[:-1])+'\n')
+        with patch.object(ghidra.subprocess, 'run', side_effect=incomplete):
+            with self.assertRaisesRegex(ValueError, 'invalid division-dispatch report'):
+                ghidra.recover_divide_dispatch(args)
+
     def test_inventory_produces_full_program_index_and_calls(self):
         (self.workspace / 'projects').mkdir(parents=True)
         (self.workspace / 'projects/EF2000.gpr').write_bytes(b'project')

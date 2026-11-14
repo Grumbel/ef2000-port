@@ -649,3 +649,43 @@ Artifacts: local/asm-x87-register-arithmetic-full-tests-20261114.log,
 local/asm-x87-register-arithmetic-tests-20261114.log,
 local/asm-x87-binary-unmasked-probe-20261114/context-switch-evidence.json and
 local/asm-c-x87-register-arithmetic-diff-20261114/report.json.
+
+The division dispatch at 0x11f7ef now has a complete reviewed boundary through
+0x11fc1a (1,068 bytes, 376 instructions). The former ten-byte body ended at its
+indirect jump. All 64 ordered entries in the table at 0x195eb0 name contiguous
+case starts; the cases contain 48 RET exits, 16 INT 6 exits and 42 calls to
+0x11f6d8. The next helper starts at 0x11fc1b. Recovery checks image/body/table
+hashes, prior extent, every instruction/case boundary, permitted flow, sole
+callee, stack cleanup and code/data ownership before updating the body and
+computed-jump references in one transaction. Report mode rolls back; apply and
+repeat runs on a disposable project confirm recovery and idempotence. Wrong
+provenance produces no output or mutation. No original bytes are embedded.
+
+Run `tools/ghidra_ef2000.py recover-divide-dispatch --workspace local/<copy>`
+with `--analyze-headless /path/to/analyzeHeadless`; add `--apply` only after
+reviewing the proposal. All artifacts stay local/. Both callers inspected at
+0x1189a6/0x1189df set EAX=15 and continue consuming x87 results. The old draft
+returns a target address, so its tracker state is now compiles-bad and signature
+unverified. Its stale test extent/index are corrected and explicitly remain an
+uncaptured-x87 input template, not equivalence evidence. Decompiler pseudo-C
+still warns about the table; independently decoded instructions and table/flow
+checks establish this recovery.
+
+Fresh Ghidra and independent decoding agree on all 376 root instructions.
+Program generation now correctly rejects the complete root because INT is
+unsupported; callee closure/memory arithmetic remain further work. Selection
+is 2,116 bodies, 273,514 bytes, with every remaining body source byte-identical
+to the preceding run. This removes an incomplete translation candidate; it
+does not establish successful execution of the division dispatch. The strict
+corpus gate and full-game validation remain required.
+
+The completed repaired-corpus run has 33,856 probes: 18,530 matching, 15,082
+inconclusive and 244 mismatching across 20 bodies. All remaining per-probe
+records are identical to the preceding 2,117-body run. The removed incomplete
+prefix contributed one mismatch and fifteen inconclusive probes; none becomes
+a match. There are still 751 all-pass bodies and 1,345 inconclusive bodies;
+the gate exits 1. All 2,116 body objects and dispatcher compile warning-free
+with Watcom. Eighty focused regression tests and tracker checks pass.
+Evidence: local/asm-x87-dispatch-regression-20261114.log and
+local/asm-c-x87-dispatch-diff-20261114/report.json. The complete division
+dispatch remains unsupported until its trap/closure requirements are modeled.

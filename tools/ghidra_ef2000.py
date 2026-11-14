@@ -382,6 +382,29 @@ def recover_observed_leaves(args):
     return rows
 
 
+def recover_divide_dispatch(args):
+    """Recover all 64 reviewed division cases, including original trap exits."""
+    workspace = validated_workspace(args.workspace)
+    output = (args.output or workspace / 'divide-dispatch.tsv').resolve()
+    output.parent.mkdir(parents=True, exist_ok=True)
+    previous = output.stat().st_mtime_ns if output.exists() else -1
+    digest = hashlib.sha256((workspace / IMAGE_NAME).read_bytes()).hexdigest()
+    command = project_args(workspace, headless_path(args.analyze_headless)) + [
+        '-process', IMAGE_NAME, '-noanalysis', '-postScript',
+        'EF2000RecoverDivideDispatch.java', str(output), 'apply' if args.apply else 'report', digest]
+    subprocess.run(command, check=True)
+    if not output.is_file() or output.stat().st_mtime_ns <= previous:
+        raise ValueError('Ghidra returned without a fresh division-dispatch report')
+    with output.open(newline='') as stream:
+        rows = list(csv.DictReader(stream, delimiter='\t'))
+    if (len(rows) != 64 or {row.get('case_index') for row in rows} != {str(i) for i in range(64)} or
+            any(row.get('entry') != '0x0011f7ef' or row.get('body_bytes_after') != '1068' or
+                row.get('result') not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
+        raise ValueError('invalid division-dispatch report')
+    print(f'Ghidra division dispatch: all 64 reviewed cases; output: {output}')
+    return rows
+
+
 def repair_boundaries(args):
     """Audit or explicitly repair known instruction overlaps blocking a function body."""
     workspace = validated_workspace(args.workspace)
@@ -696,7 +719,7 @@ def main(argv=None):
     default_workspace = Path(os.environ.get('EF2000_GHIDRA_WORKSPACE',
                                             str(ROOT / 'local/ghidra'))).expanduser()
     for name in ('import', 'decompile', 'copy-callers', 'inventory', 'export-all',
-                 'recover-orphans', 'recover-calls', 'recover-observed-leaves', 'repair-boundaries', 'audit-flow-gaps',
+                 'recover-orphans', 'recover-calls', 'recover-observed-leaves', 'recover-divide-dispatch', 'repair-boundaries', 'audit-flow-gaps',
                  'audit-body-holes', 'function-facts', 'subsystem-map',
                  'callback-tables', 'name-callbacks', 'rebuild',
                  'apply-symbols', 'export-symbols'):
@@ -747,6 +770,9 @@ def main(argv=None):
     observed = subparsers.choices['recover-observed-leaves']
     observed.add_argument('--output', type=Path)
     observed.add_argument('--apply', action='store_true', help='apply reviewed leaf boundaries; default rolls back')
+    division = subparsers.choices['recover-divide-dispatch']
+    division.add_argument('--output', type=Path)
+    division.add_argument('--apply', action='store_true', help='recover complete reviewed 64-case division body; default rolls back')
     boundaries = subparsers.choices['repair-boundaries']
     boundaries.add_argument('--output', type=Path,
                             help='TSV audit (default: workspace/boundary-repairs.tsv)')
@@ -809,6 +835,7 @@ def main(argv=None):
          'inventory': export_all, 'export-all': export_all,
          'recover-orphans': recover_orphans, 'recover-calls': recover_calls,
          'recover-observed-leaves': recover_observed_leaves,
+         'recover-divide-dispatch': recover_divide_dispatch,
          'repair-boundaries': repair_boundaries,
          'audit-flow-gaps': audit_flow_gaps,
          'audit-body-holes': audit_body_holes,

@@ -1,1 +1,1 @@
-{"address":"0x0011f7ef","function_size":10,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{"address":"0x0011f7ef","function_size":1068,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x0000000f"},"memory":[]}],"notes":"Draft input template only: raw x87 caller state is not captured. Existing C returns a table target instead of executing division; compiles-bad, no equivalence claim."}

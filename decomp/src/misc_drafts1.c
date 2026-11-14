@@ -21657,7 +21657,9 @@ uint32_t dispatch_relative_c5f08(uint32_t *esi)
 	return EF_U32(0x15b270u + (uint32_t)op);
 }
 
-/* 0x11f7ef, 10 bytes. Implicit-register fragment (EAX = index): reserve 0x20 bytes of stack and return the address of the handler in the dword table at 0x195eb0 (the original jumps through it). */
+/* Known incorrect draft at 0x11f7ef: the recovered 1068-byte body executes
+ * all 64 division/trap cases; returning a table target does not implement it.
+ * Tracker state: compiles-bad. See docs/asm-pipeline.md. */
 uint32_t jump_target_11f7ef(uint32_t index)
 {
 	return EF_U32(0x195eb0u + index * 4u);

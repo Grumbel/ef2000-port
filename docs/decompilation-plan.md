@@ -3097,3 +3097,62 @@ Logs: local/asm-x87-register-arithmetic-full-tests-20261114.log and
 local/asm-x87-register-arithmetic-tests-20261114.log. Oracle accuracy, reviewed
 dynamic target ownership, remaining x87 operations and game integration remain
 active. No tracker promotion and no full equivalence claim.
+
+**2026-11-14 — Complete division-dispatch boundary and invalid draft withdrawal.**
+Reviewed missing target 0x11f7f9 from the computed jump at 0x11f7f2. It belongs
+to the complete 64-way division dispatch 0x11f7ef..0x11fc1a, not a separate
+ordinary leaf. Full table/linear decoding establishes 1,068 bytes and 376
+instructions: prefix plus 64 contiguous cases, 48 RET/16 INT 6 exits and 42
+calls to 0x11f6d8; next helper starts at 0x11fc1b. New reviewed Ghidra recovery
+checks exact image/body/table provenance, prior body, ownership/data conflicts,
+case boundaries, permitted flow, sole callee and stack cleanup. Adds all 64
+computed-jump references and the complete body atomically. No original bytes
+or pseudo-C committed. Read-only flow-gap/body-hole audits preceded recovery;
+the ten-byte prefix alone had no internal holes for those audits to expose.
+Proposal rollback, apply (10 -> 1068), repeat (already recovered), and wrong
+provenance/no-output guard run on a disposable project. Regenerated 4,279-body
+inventory: 4,277 instruction-layout agreements, including all 376 root
+instructions. Pseudo-C still warns about the table and remains nonauthoritative.
+Both caller sites 0x1189a6/0x1189df set EAX=15 and continue using x87 results.
+Existing C only returns a table target: mark compiles-bad, withdraw confirmed
+signature, correct extent and invalid test index, and label the test template
+as missing raw x87 caller input. No function is promoted to verified.
+Complete root now correctly fails generation at unsupported INT; helper closure
+and memory arithmetic also need work. Syntax support 3,664; selected 2,116,
+273,514 bytes. All remaining body sources byte-identical to preceding corpus.
+This is a recovery correction, not proof that the previously failing dispatch
+now executes correctly. Full corpus evidence is recorded separately below.
+Commands: tools/ghidra_ef2000.py audit-flow-gaps / audit-body-holes 0x11f7ef;
+recover-divide-dispatch --workspace local/ghidra-x87-dispatch-20261114 (report,
+--apply, repeat); inventory --output <workspace>/body-inventory; asm_inventory
+export from those ranges; tools/asm_c_program.py --inventory
+local/asm-x87-dispatch-body-inventory-20261114 --output
+local/asm-c-x87-dispatch-program-20261114. Ghidra 12.1.4/OpenJDK 21.0.12.1,
+private XDG settings/cache under /tmp; base project and assets unchanged.
+Evidence: local/asm-x87-dispatch-{flow-gaps,body-holes,proposal,apply,repeat,
+bad-provenance,inventory,decompile}-20261114 logs/TSVs;
+local/ghidra-x87-dispatch-20261114/body-inventory/body-ranges.json;
+local/asm-x87-dispatch-body-inventory-20261114/0011f7ef.json.
+
+Focused regression: 80 Ghidra/inventory/program/renderer tests pass without
+skips (109 s); tracker check passes for 4,292 rows. Command: python3 -m unittest
+tests.test_ghidra_ef2000 tests.test_asm_inventory tests.test_asm_c_program
+tests.test_asm_to_c (Python 3.13.12 with Unicorn 2.1.4); python3
+tools/decomp_status.py check. Log: local/asm-x87-dispatch-regression-20261114.log.
+All 2,116 remaining body objects and rebuilt dispatcher compile warning-free
+with Watcom -bt=dos -3r -za99 -w1 -we.
+
+Completed repaired-corpus comparison: 33,856 probes, 18,530 matching, 15,082
+inconclusive and 244 mismatching across 20 bodies. All remaining per-probe
+records are identical to the preceding 2,117-body run (not just totals).
+Removed prefix had one mismatch and fifteen inconclusive probes; none is
+reclassified as a pass. 751 bodies pass all probes; 1,345 remain inconclusive.
+CLI exits 1 and complete-dispatch translation remains unsupported. No narrowed
+equivalence claim. Command: tools/asm_c_differential.py --workspace
+local/ghidra-x87-dispatch-20261114 --translations
+local/asm-c-x87-dispatch-program-20261114 --output
+local/asm-c-x87-dispatch-diff-20261114 --softfloat-build
+local/asm-softfloat-verified-build-20261113 --watcom <wcc386>, Python 3.13.12/
+Unicorn 2.1.4. Evidence: local/asm-c-x87-dispatch-diff-20261114/report.json,
+whose manifest digest is independently checked. Original assets remain intact;
+all original/generated exports and Ghidra projects stay ignored under local/.
