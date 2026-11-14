@@ -3263,7 +3263,7 @@ void draw_glyph_f25b0(uint8_t value, uint32_t x, uint32_t row, uint32_t glyph);
 void step_animation_f36a4(void);
 uint32_t count_matching_entries_fba6c(uint32_t a, uint32_t b, ef_addr32 listp);
 uint32_t guest_fn_fc6c8(void); /* 0xfc6c8 -> EAX */
-void guest_fn_fc39c(uint32_t a, uint32_t b, uint32_t width, uint32_t height); /* 0xfc39c EAX/EDX/EBX/ECX */
+void guest_fn_fc39c(uint32_t count, uint32_t step); /* 0xfc39c two stack arguments */
 void guest_fn_c3ae8(void); /* 0xc3ae8 */
 void guest_fn_fef26(void); /* 0xfef26 */
 void guest_fn_d663c(ef_addr32 table); /* 0xd663c EAX */
@@ -3748,7 +3748,7 @@ void accumulate_ticks_53c10(void);
 void reset_motion_limits_70698(void);
 void start_page_7feb0(void);
 void leave_scroll_mode_c39ac(void);
-void enter_scroll_mode_c39f0(uint32_t value);
+void enter_scroll_mode_c39f0(uint32_t value, uint32_t width, uint32_t height);
 void guest_fn_53350_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, float s1, uint32_t s2); /* 0x53350 stack */
 void guest_fn_6e8d8_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6e8d8 stack */
 void guest_fn_6eaf4_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6eaf4 stack */
@@ -3759,7 +3759,7 @@ void accumulate_ticks_53c10(void);
 void reset_motion_limits_70698(void);
 void start_page_7feb0(void);
 void leave_scroll_mode_c39ac(void);
-void enter_scroll_mode_c39f0(uint32_t value);
+void enter_scroll_mode_c39f0(uint32_t value, uint32_t width, uint32_t height);
 void guest_fn_53350_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, float s1, uint32_t s2); /* 0x53350 stack */
 void guest_fn_6e8d8_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6e8d8 stack */
 void guest_fn_6eaf4_w(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double v); /* 0x6eaf4 stack */
@@ -4488,7 +4488,7 @@ void guest_fn_b5800(uint32_t a, uint32_t b, uint32_t c); /* 0xb5800 EAX/EDX/EBX 
 void guest_fn_b570c(uint32_t a, uint32_t b, uint32_t c); /* 0xb570c EAX/EDX/EBX */
 void guest_fn_b4e74(int16_t a, uint8_t d, uint8_t b, uint16_t c, uint32_t s0, uint32_t s1); /* 0xb4e74 AX/DL/BL/CX + 2 stack */
 void render_table_entry_63d5c(uint32_t ax);
-void guest_fn_c39f0(uint32_t a); /* 0xc39f0 EAX */
+void guest_fn_c39f0(uint32_t value, uint32_t width, uint32_t height); /* 0xc39f0 EAX/EDX/EBX */
 void guest_fn_dc21c_s(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xdc21c 4 stack, callee cleanup */
 void guest_fn_dc334_s(uint32_t a, uint32_t b); /* 0xdc334 2 stack, callee cleanup */
 void guest_fn_d86e0_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xd86e0 EAX/EDX/EBX/ECX */
@@ -5764,7 +5764,7 @@ void send_guarded_message_103e0c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 uint32_t checksum_bytes_10dc1d(uint32_t p, uint32_t count);
 void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count);
 
-void build_row_table_fc39c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t step);
+void build_row_table_fc39c(uint32_t count, uint32_t step);
 uint32_t handler_address_117dd8(uint32_t index);
 
 uint32_t project_relative_point_c89cc(uint32_t src, uint32_t out, uint32_t dst);
@@ -7347,7 +7347,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux cos_scaled_f8298 modify exact []
 #pragma aux divide_by_scaled_word_f8314 modify exact []
 #pragma aux fill_record_f8da8 modify exact []
-#pragma aux build_row_table_fc39c modify exact []
+#pragma aux build_row_table_fc39c parm routine [] modify exact [eax ecx]
+#pragma aux guest_fn_fc39c parm routine [] modify exact [eax ecx]
 #pragma aux project_vertices_fc8cc modify exact []
 #pragma aux set_and_check_video_mode_fe710 modify exact []
 #pragma aux modf_10d9c6 modify exact []

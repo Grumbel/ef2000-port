@@ -35,7 +35,7 @@ void highlight_widget_22e98(int16_t idx)
 
         if (r == 0)
             return;
-        enter_scroll_mode_c39f0(r);
+        enter_scroll_mode_c39f0(r, 0x100u, 0xc0u);
     }
     x = EF_S16(rec);
     y = EF_S16(rec + 2u);

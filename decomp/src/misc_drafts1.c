@@ -7012,9 +7012,10 @@ void draw_label_entries_150d4(void)
         int16_t bh = (int16_t)EF_U16(ent + 8u);
         uint32_t text = ent + 0xau;
         int32_t width, x, y;
-        if (get_text_slot_cd7f0((int16_t)EF_U8(ent + 1u)) == 0u)
+        uint32_t resource = get_text_slot_cd7f0((int16_t)EF_U8(ent + 1u));
+        if (resource == 0u)
             continue;
-        enter_scroll_mode_c39f0(text);
+        enter_scroll_mode_c39f0(resource, 0x100u, 0xc0u);
         width = (int16_t)formatted_text_width_48c34(1u, text);
         y = (int16_t)(by + (bh >> 1) - 2);
         x = (int16_t)(bx + (((int32_t)bw - width) >> 1));
@@ -8351,16 +8352,16 @@ void swap_buffers_ded60(uint32_t a, uint32_t b, uint32_t count)
     }
 }
 
-/* 0xfc39c, 48 bytes. Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x164600 and STEP in 0x1631f4, then append two more dwords equal to (COUNT-1)*STEP after the table. ORIGINAL BUG: a count of 0 makes the LOOP run 2^32 times; not modelled. */
-void build_row_table_fc39c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t step)
+/* 0xfc39c, 48 bytes. Stack (ret 8): fill the row-offset table at 0x163200 with COUNT dwords 0, STEP, 2*STEP, ...; store COUNT*STEP in 0x164600 and STEP in 0x1631f4, then append two more dwords equal to (COUNT-1)*STEP after the table. ORIGINAL BUG: a count of 0 makes the LOOP run 2^32 times. */
+void build_row_table_fc39c(uint32_t count, uint32_t step)
 {
     uint32_t v = 0u, i, p = 0x00163200u;
-    (void)u0; (void)u1; (void)u2; (void)u3;
-    for (i = 0; i < count; i++) {
+    i = count;
+    do {
         EF_U32(p) = v;
         p += 4u;
         v += step;
-    }
+    } while (--i != 0u);
     EF_U32(0x00164600u) = v;
     EF_U32(0x001631f4u) = step;
     v -= step;
@@ -9668,7 +9669,7 @@ void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x)
     uint32_t e3;
     if (img == 0u)
         return;
-    enter_scroll_mode_c39f0(img);
+    enter_scroll_mode_c39f0(img, 0x100u, 0xc0u);
     guest_fn_cdf48(0u, 0xffu, 0u, 0xbfu);
     latch_values_ce328(0u, 0xffu, 0u, 0xbfu);
     hi_c4 = (int32_t)EF_U32(0x00125ac4u) >> 16;
@@ -9677,7 +9678,7 @@ void draw_framed_panel_38be8(uint32_t id, uint32_t y, uint32_t x)
     guest_fn_cf7c4_x(0x00125a24u, (uint32_t)(hi_c6 - hi_c8), (uint32_t)(hi_c4 - hi_c8), 0u);
     t = guest_fn_cd7f0((int16_t)id);
     if (t != 0u) {
-        enter_scroll_mode_c39f0(t);
+        enter_scroll_mode_c39f0(t, 0x100u, 0xc0u);
         b = EF_U16(0x00125acau);
         e1 = (EF_U16(0x00125ac6u) - b) & 0xffffu;
         e2 = (EF_U16(0x00125ac8u) - b) & 0xffffu;

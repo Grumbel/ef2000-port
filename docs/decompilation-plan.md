@@ -4160,3 +4160,39 @@ scanner callback fault at tick 3221 and stops later at tick 3839, IP 0x110e23,
 with unsupported_interface (detail: unsupported real-mode BIOS INT 13).
 Cockpit canaries remain unreached. Investigate that stop next; this does not
 complete M2 or establish a usable flight session.
+
+### 2026-11-14 — correct scroll dimensions and row-table call ABI
+
+The next stop was a general-protection exception (vector 13 decimal), not an
+unimplemented disk BIOS call. Exception-entry RAM shows the original row-table
+builder at 0xfc39c running with zero COUNT/STEP, wrapping LOOP and overwriting
+the saved AIL data selector. Its caller at c39f0 consumes WIDTH in EDX and HEIGHT
+in EBX, then pushes them for the callee. Recovered callers passed only EAX.
+An unpatched control reaches all four cockpit canaries through 1.5B instructions.
+
+Correct c39f0's canonical and alias declarations and all nine recovered call
+sites to pass 256x192, as their original callers do. draw_label_entries_150d4
+also now passes the loaded resource returned by cd7f0, retaining the label
+pointer separately for text drawing. Correct both scroll helpers' row-table
+calls to COUNT/STEP on the stack; remove the two old bisect exclusions after
+four isolated cases each pass. Correct the row builder's own declaration and
+body to two stack parameters, and preserve the original zero-count LOOP wrap.
+Its ECX is scratch; the leaving-scroll wrapper also clobbers ECX/EDX/EBX.
+Five direct-body row-table cases pass, including a wrapping step and zero step.
+The ordinary linker still excludes that stack callee pending a stack-aware
+trampoline; the direct test uses its compiled ABI without a saving wrapper.
+
+Commands: tools/func_differential.py {0xc39ac,0xc39f0,0xfc39c} --payload
+local/ghidra-stack-return-20261114/payload.bin --spec decomp/tests/<addr>.json
+--patch <isolated patch>; local/hybrid-scroll-abi-fix-20261114/test-row-body.py
+constructs the direct row-body patch from the linked arena. Four affected
+modules compile warning-free (remove two unused local declarations exposed
+when rebuilding game_helpers130). The 34 focused Python tests pass with
+OpenWatcom and Unicorn enabled. Evidence: local/hybrid-scroll-abi-fix-20261114/
+{diff-enter-v3,diff-leave-v3,diff-row,tests}.log. Temporary runtime write-watch
+and exception snapshot instrumentation has been removed from source and the
+normal runner rebuilt. Full 2595-redirect replay passes the former tick-3839
+timer failure and reaches cockpit initialization 0x58d24 once. It then faults
+at tick 3923 in string_copy.obj:copy_string_9d749+9, reading invalid source
+0x26c22fef. Remaining cockpit canaries are unreached; investigate that source
+pointer/caller next. No full cockpit usability or M2 completion claim.

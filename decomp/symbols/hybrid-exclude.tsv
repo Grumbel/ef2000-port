@@ -40,7 +40,6 @@ addr	reason
 0x000da8c4	Single-redirect culprit for cockpit replay (bisect m2-bisect-024); cause unreviewed; keep original.
 0x000da5cc	Single-redirect culprit for cockpit replay (bisect m2-bisect-025); cause unreviewed; keep original.
 0x000da360	Single-redirect culprit for cockpit replay (bisect m2-bisect-026); cause unreviewed; keep original.
-0x000c39f0	Single-redirect culprit for cockpit replay (bisect m2-bisect-027); cause unreviewed; keep original.
 0x000db28c	Single-redirect culprit for cockpit replay (bisect m2-bisect-028); cause unreviewed; keep original.
 0x000da224	Single-redirect culprit for cockpit replay (bisect m2-bisect-029); cause unreviewed; keep original.
 0x000daa5c	Single-redirect culprit for cockpit replay (bisect m2-bisect-030); cause unreviewed; keep original.
@@ -49,7 +48,6 @@ addr	reason
 0x000db8bc	Single-redirect culprit for cockpit replay (bisect m2-bisect-032); cause unreviewed; keep original.
 0x000dab40	Single-redirect culprit for cockpit replay (bisect m2-bisect-033); cause unreviewed; keep original.
 0x000d2110	Single-redirect culprit for cockpit replay (bisect m2-bisect-034); cause unreviewed; keep original.
-0x000c39ac	Single-redirect culprit for cockpit replay (bisect m2-bisect-035); cause unreviewed; keep original.
 0x00090a70	Single-redirect culprit for cockpit replay (bisect m2-bisect-036); cause unreviewed; keep original.
 0x00080d40	Single-redirect culprit for cockpit replay (bisect m2-bisect-037); cause unreviewed; keep original.
 0x0007aac0	Single-redirect culprit for cockpit replay (bisect m2-bisect-038); cause unreviewed; keep original.

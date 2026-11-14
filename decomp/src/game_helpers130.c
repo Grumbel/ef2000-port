@@ -500,7 +500,7 @@ void draw_framed_box_14d58(int16_t index)
     slot = get_text_slot_cd7f0((int16_t)EF_U8(rec + 1u));
     if (slot == 0u)
         return;
-    enter_scroll_mode_c39f0(slot);
+    enter_scroll_mode_c39f0(slot, 0x100u, 0xc0u);
     colours = 0x0012285au + (uint32_t)EF_U8(rec) * 3u;
     y = (int16_t)EF_U16(rec + 4u);
     fill_rect_ceccc(EF_U8(colours), x + 1, y + 1, x + w - 2, y + h - 2);
@@ -1401,7 +1401,7 @@ void draw_button_11e7c(int16_t index)
 
         if (second == 0u)
             return;
-        enter_scroll_mode_c39f0(second);
+        enter_scroll_mode_c39f0(second, 0x100u, 0xc0u);
     }
     cell = ((state + EF_U8(0x00121fb6u + rec)) & 0xffu) * 29u;
     blit_masked_cd82c(0u, 0u, 0u, 0u,
@@ -1459,7 +1459,7 @@ void draw_text_box_1f994(int16_t index, ef_addr32 fallbackBitmap)
         if (slot == 0u)
             return;
         dst = slot;
-        enter_scroll_mode_c39f0(slot);
+        enter_scroll_mode_c39f0(slot, 0x100u, 0xc0u);
     }
     dst += (uint32_t)(((int32_t)top << 8) + (int32_t)left);
     y1 = (int32_t)yc - ((int16_t)heightWord >> 1);
@@ -3134,7 +3134,7 @@ void draw_outline_segments_3d7b0(uint8_t a, uint8_t d, uint16_t b)
     for (i = 0; i < 9; i++) {
         uint32_t rec = EF_U32(0x001972e0u) + (uint32_t)a * 0x22u;
         uint32_t p = EF_U32(rec + 0x1au) + (uint32_t)d * 0x2au + (uint32_t)((int32_t)i * 4);
-        int32_t t8, t12, x0, y0, e4, e10, c0, cl;
+        int32_t t8, t12, x0, y0, e10, c0, cl;
         uint32_t p6;
 
         t8 = (int32_t)(EF_U32(rec + 8u) << 11);
@@ -4342,7 +4342,7 @@ void draw_marker_box_21e04(int16_t n)
 
 		if (r == 0u)
 			return;
-		enter_scroll_mode_c39f0(r);
+		enter_scroll_mode_c39f0(r, 0x100u, 0xc0u);
 	}
 	e = (int16_t)w20;
 	h = (int32_t)w28 >> 1;
@@ -4378,7 +4378,7 @@ void fire_object_slot_2a1fc(int16_t id, uint8_t slot, uint32_t arg)
 	int32_t m[9];
 	int32_t pos[3];
 	ef_addr32 mp = (ef_addr32)(uintptr_t)m;
-	ef_addr32 obj, ent, row, p;
+	ef_addr32 obj, ent, row;
 	int32_t cx, di, bx, k;
 	int16_t n;
 	int32_t lim;
@@ -6269,7 +6269,7 @@ void render_table_entry_63d5c(uint32_t ax)
 		uint32_t r = guest_fn_cd7f0((int32_t)(int8_t)EF_U8(t + 8u));
 		if (r == 0u)
 			return;
-		guest_fn_c39f0(r);
+		guest_fn_c39f0(r, 0x100u, 0xc0u);
 	}
 	guest_fn_ceccc(3u, (uint32_t)(x - hz), (uint32_t)(y - hw), (uint32_t)(x + hz), (uint32_t)(y + hw));
 	guest_fn_ce328_w((uint32_t)(x - hz), (uint32_t)(x + hz), (uint32_t)(y - hw), (uint32_t)(y + hw));
