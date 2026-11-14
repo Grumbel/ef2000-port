@@ -3074,7 +3074,6 @@ uint8_t guest_fn_56ffc(void); /* 0x56ffc -> AL */
 void guest_fn_e2988(uint32_t ticks); /* 0xe2988 EAX */
 void guest_fn_581b0(void); /* 0x581b0 */
 void guest_fn_58094(void); /* 0x58094 */
-void guest_fn_9c980_sfx(ef_addr32 buffer, ef_addr32 suffix); /* 0x9c980 EAX/EDX */
 void guest_fn_e1e6c_3(uint32_t a, uint32_t b, uint32_t c); /* 0xe1e6c EAX/EDX/EBX */
 uint8_t guest_fn_7e670(void); /* 0x7e670 -> AL */
 

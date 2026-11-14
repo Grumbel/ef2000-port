@@ -4014,3 +4014,40 @@ at the owner's request to finish and commit; it has no established culprit.
 Do not claim the launcher is fully usable or M2 complete. The preceding Nix
 build (708ac765) passes its checks but reproduces the pre-pattern-fix fault;
 the final source revision has not yet been rebuilt through Nix.
+
+### 2026-11-14 — repair default-path call arity and Quick Fight setup
+
+Four callers used guest_fn_9c980_sfx(buffer, suffix), although original 0x9c980
+reads only EAX and preserves EDX. The generated one-register ABI pragma spills
+the extra argument to the stack; the original callee does not remove it.
+The old 0x7c4fc object contains PUSH suffix followed by CALL with no cleanup.
+Replace all four uses with build_default_path_9c980(buffer) and remove the
+misleading alias declaration. Keep explicit suffix concatenation; add the
+missing strcat of 0x18a86c in load_effect_list_8bad4, matching 0x8bae9/0x8baeb.
+Original callers at 0x80058 and 0x81230 likewise concatenate their suffix after
+the path call. Correct 0x7c4fc's preservation record: EDX is scratch, not saved;
+callers 4aa0@4aee and 4cf4@4d38 discard it. Three affected modules compile with
+zero warnings. Sound-bank/effect-list paths are assembly-audited, not dynamically
+verified here.
+
+Full hand-written relink retains all 2593 redirects across 342/382 modules.
+Private-Xvfb replay with Return at ticks 2100/2102 now reaches Quick Fight setup
+and runs to 700M instructions without a guest fault: 2800 ticks, 2735 IRQ0s,
+214 lowercase replacement hits. Repeated after the preservation correction,
+with the same stop state/counters; framebuffer inspected. This corrects the
+previous bad jump at 0x17f7ca without disabling further C replacements.
+The obsolete pre-fix bisect-10 was stopped after the concrete call-site repair;
+its partial reductions are not an established culprit list.
+
+25 compiler-wrapper/hybrid/app/OMF tests pass without skips. Evidence:
+local/hybrid-path-arity-fix-20261114/{compile45,compile46,compile-misc,
+compile45-corrected-abi,tests,run,run-corrected-abi}.log.
+The committed e11001c3 Nix build passes 504 Python tests (66 expected skips)
+and reaches the native menu with no faults at its 15-second limit; the new
+path-call correction has not yet been rebuilt through Nix.
+
+A longer two-Return run reaches the simulation-loading screen but does not
+reach the cockpit: at 1.5B instructions IP=0, AX=1, and the four flight-entry
+canaries (0x58d24/0x7a428/0x7eea0/0x810d0) have zero hits. No M2 or full-game
+equivalence claim. Evidence: local/hybrid-path-cockpit-20261114.log and its
+inspected framebuffer. Next investigate this loading control-flow divergence.

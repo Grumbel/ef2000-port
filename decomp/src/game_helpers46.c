@@ -46,7 +46,7 @@ void init_sound_bank_80058(void)
     if (EF_U32(0x0012b074u) != 0)
         return;
     init_arena_e29a0();
-    guest_fn_9c980_sfx(buf, 0x001887e4u);
+    build_default_path_9c980(buf);
     guest_fn_9ca57(buf, 0x001887e4u);
     guest_fn_9ca57(buf, 0x001887f0u);
     switch (guest_fn_e94ec(buf, 0) & 0xffu) {
@@ -77,7 +77,7 @@ void init_sound_bank_81230(void)
     if (EF_U32(0x0012b108u) != 0)
         return;
     init_arena_e29a0();
-    guest_fn_9c980_sfx(buf, 0x00188934u);
+    build_default_path_9c980(buf);
     guest_fn_9ca57(buf, 0x00188934u);
     guest_fn_9ca57(buf, 0x00188940u);
     switch (guest_fn_e94ec(buf, 0) & 0xffu) {

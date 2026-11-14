@@ -340,9 +340,10 @@ The original-code runtime remains the validation oracle. See
 Current launcher check (2026-11-14): the full hand-written hybrid profile
 retains 2,593 C redirects across 342/382 linked modules and reaches the main
 menu in native64 (15 seconds, no faults) and Unicorn (500M instructions).
-The framebuffers were inspected. Entering Quick Fight still fails on Return
-at tick 2118; gameplay and the combined hand-written/mechanical milestones
-remain incomplete. These checks do not establish full-game equivalence.
+The framebuffers were inspected. After repairing a path-call arity mismatch,
+Return also enters Quick Fight setup in the 700M-instruction replay. The longer
+run stalls on simulation loading with no cockpit-entry canary hits; gameplay
+and the combined hand-written/mechanical milestones remain incomplete. These checks do not establish full-game equivalence.
 See the latest entries in [the progress log](../docs/decompilation-plan.md).
 
 Historical Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually

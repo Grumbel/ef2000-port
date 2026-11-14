@@ -388,7 +388,8 @@ void load_effect_list_8bad4(uint32_t first, uint32_t second)
     uint8_t buf[0x78];
     ef_addr32 b = (uint32_t)(uintptr_t)buf;
     ef_addr32 rec;
-    guest_fn_9c980_sfx(b, 0x0018a86cu);
+    build_default_path_9c980(b);
+    guest_fn_9ca57(b, 0x0018a86cu);
     guest_fn_9ca57(b, first);
     guest_fn_9ca57(b, second);
     rec = select_validated_ui_record(b);

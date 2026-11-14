@@ -105,7 +105,7 @@ void set_session_text_7c4fc(ef_addr32 name, uint32_t target)
     uint32_t length;
     ef_addr32 copy = 0x001301bau;
 
-    guest_fn_9c980_sfx(buf, 0x00187ce4u);
+    build_default_path_9c980(buf);
     guest_fn_9ca57(buf, 0x00187ce4u);
     guest_fn_9ca57(buf, name);
     copy_string_9d749(0x001971b4u, buf);
