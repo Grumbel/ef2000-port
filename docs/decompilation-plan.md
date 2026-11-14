@@ -3964,3 +3964,24 @@ so a German error message cannot prevent report.json from being written.
 Evidence: local/hybrid-native-port-fix-20261114/; validation:
 xvfb-run -a python3 -m unittest tests.test_native_hybrid_io -v and the two
 asset-free tests in tests.test_startup_runtime.TranscriptTests.
+
+### 2026-11-14 — preserve unsafe startup and callback fragments
+
+Keep five entries original in the broad hybrid: 0x222 is code-inspected by
+X-32 GETDS validation; redirecting it fails immediately. Entry 0x235 feeds
+comparison flags into already-excluded tail 0x23b; its C wrapper cannot supply
+that interface. Fragment 0x9c4b2 restores registers/segments and transfers into
+an interrupt stub; the draft only returns the stub address. Preserving it plus
+the ABI exclusions removes the heap fault and exposes archive lookup.
+
+After correcting archive prefix matching, startup bisection isolates 0x108ddb
+as sufficient for an invalid callback fetch during configuration parsing, then
+0xc3364 as sufficient for stack corruption during GUI asset loading. Demote
+these two and 0x9c4b2 to compiles-bad and record exclusions with evidence.
+The image retains 2597 compiled redirects across 342/382 modules and reaches
+the 640x400 DID splash; a later stop remains, so neither M1 nor M2 is complete.
+The 200M-instruction bisect-06 did not reach that later stop and reduced timing
+differences instead; its candidate set is not a culprit or exclusion list.
+A 300M-instruction abnormal-stop bisect is running instead.
+Evidence: local/hybrid-bisect-startup-20261114/bisect-{03,04,05}/report.json,
+local/hybrid-gui-fix-20261114/ and local/hybrid-native-port-fix-20261114/.
