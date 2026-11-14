@@ -3925,3 +3925,24 @@ using the same startup exclusions and pinned image. Hybrid alias/exclusion tests
 pass. This makes the launcher and successive startup bisections practical;
 no generated-code or behavior change is intended. Evidence stays under
 local/hybrid-interrupt-fix-20261114/{current,indexed}.efpatch.
+
+### 2026-11-14 — correct archive prefix matching
+
+Startup bisection isolates 0xeb520 as sufficient for a false missing-dataset
+exit. Its prefix loop used break-on-mismatch; original 0xeb5d6/0xeb5d8 continues
+on mismatch and stops on a match. Correct the branch. Four original captured
+COLTAB calls plus two input variants replacing only the pathname with CHECK.CD
+match return values and preserved registers under the flat-segment ABI oracle.
+The old compiled draft fails the CHECK.CD variant: original EAX=0x4e0e04, C=0.
+This checks ABI outputs, not all RAM (compared_ram_bytes=0). Capture/patch data
+remain local. The module compiles with two existing unrelated unused-variable
+warnings (e4 and p); no new warning.
+
+Captured-call replay decoded arena patches a second time without the 64 MiB
+address limit already used when applying them, rejecting valid hybrid patches.
+Use the same limit for both decodes. 14 capture/differential tests pass with
+Unicorn (one optional C++ fixture skip); real captured hybrid replay now runs.
+Evidence: local/hybrid-archive-corrected-20261114/{diff-flat,diff-check,diff-old-check}.log.
+The full hybrid now passes the data-set check but still has a configuration
+callback fault, separately bisected to scanf integer conversion at 0x108ddb.
+No menu/cockpit completion claim yet.

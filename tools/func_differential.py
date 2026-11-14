@@ -357,7 +357,7 @@ def main():
                 raise ValueError('captured-call instruction budget must be positive')
             patch_writes = []
             for path in args.patch:
-                patch_writes.extend(decode_patch(path.read_bytes(), original))
+                patch_writes.extend(decode_patch(path.read_bytes(), original, 0x4000000))
             cases = []
             for path in args.captured:
                 captured = load_capture(path, original, address)

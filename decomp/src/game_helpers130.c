@@ -560,7 +560,7 @@ ef_addr32 lookup_name_entry_eb520(ef_addr32 name, ef_addr32 context)
             break;
         entry = EF_U32(EF_U32(context + 0x134u) + index * 4u);
         if (compare_strings_e5c03(keyAddr, EF_U32(EF_U32(context + 0x134u) + index * 4u),
-                                  guest_fn_b1b8b(entry)) != 0)
+                                  guest_fn_b1b8b(entry)) == 0)
             break;
     }
     if ((int32_t)index < EF_S32(context + 0x12cu)) {
