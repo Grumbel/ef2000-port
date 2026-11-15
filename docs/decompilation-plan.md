@@ -4601,3 +4601,27 @@ then faults at tick 5214: fetch 0x180c7e5a, ESP 0x3ffeca0. Flight usability
 remains incomplete. Original-transfer evidence:
 local/trig-call-abi-20261115/transfer-trace.log. Corrected integration log:
 local/runtime-helper-frames-20261115/extended-checkpoint.log.
+
+
+### 2026-11-15: keep the self-modifying rotation entry original
+
+[x] The next full-profile block tail ends at c4755 before fetch 0x180c7e5a.
+Original c4755 starts SUB EAX,imm32; camera-origin writes target its immediate
+at c4756, plus the following EBX/ECX immediates c475c/c4762. A five-byte JMP
+redirect occupies the same bytes, so normal origin updates corrupt its
+relative displacement. The draft C interface additionally uses an output
+pointer instead of returning coordinates through ESI/EDI/EBP. Demote only
+this proven unsafe entry to compiles-bad/unverified and explicitly exclude
+it until self-modifying operands and the multi-register ABI are represented.
+
+The linked patch now has no write overlapping c4755..c4765; all other 2594
+redirects remain enabled. Full replay passes the former invalid fetch,
+then stops at address zero later in tick 5214. Captures at c4755, its caller
+continuation 160171 and c473c show intact original SUB instructions with
+all three origin immediates patched to zero, and successful coordinate
+return to the original wrapper. These captures prove the retained path runs;
+they do not prove flight usability. Evidence:
+local/rotation-smc-20261115/{extended-checkpoint,transfer-trace}.log and
+transfer-trace-error-captures/. The later tail ends at compiled 0x302fb43
+after original record_word_16010e returns. All 42 focused tests pass;
+python3 tools/decomp_status.py check reports tracker ok (4293 functions).
