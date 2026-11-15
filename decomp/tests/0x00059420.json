@@ -5,20 +5,92 @@
   "cases": [
     {
       "name": "double_scaled_mode",
-      "registers": {"eax": "0xfffffffd", "edx": 4, "ebx": "0x11223344"},
+      "registers": {
+        "eax": "0xfffffffd",
+        "edx": 4,
+        "ebx": "0x11223344"
+      },
       "memory": [
-        {"address": "0x0012b369", "hex": "01"},
-        {"address": "0x001a6cfa", "hex": "fcff0700"},
-        {"address": "0x00128148", "hex": "31"}
+        {
+          "address": "0x0012b369",
+          "hex": "01"
+        },
+        {
+          "address": "0x001a6cfa",
+          "hex": "fcff0700"
+        },
+        {
+          "address": "0x00128148",
+          "hex": "31"
+        },
+        {
+          "address": "0x48bb0",
+          "hex": "8b442404a3000053008b442408a3040053008b44240ca3080053008b442410a30c0053008b442414a310005300c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
       ]
     },
     {
       "name": "single_scaled_mode",
-      "registers": {"eax": "0xfffffffd", "edx": 4, "ebx": "0x8899"},
+      "registers": {
+        "eax": "0xfffffffd",
+        "edx": 4,
+        "ebx": "0x8899"
+      },
       "memory": [
-        {"address": "0x0012b369", "hex": "07"},
-        {"address": "0x001a6cfa", "hex": "fcff0700"},
-        {"address": "0x00128148", "hex": "31"}
+        {
+          "address": "0x0012b369",
+          "hex": "07"
+        },
+        {
+          "address": "0x001a6cfa",
+          "hex": "fcff0700"
+        },
+        {
+          "address": "0x00128148",
+          "hex": "31"
+        },
+        {
+          "address": "0x48bb0",
+          "hex": "8b442404a3000053008b442408a3040053008b44240ca3080053008b442410a30c0053008b442414a310005300c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "wrapped_doubled_coordinates",
+      "registers": {
+        "eax": "0x7fff",
+        "edx": "0x8000",
+        "ebx": "0x520000"
+      },
+      "memory": [
+        {
+          "address": "0x12b369",
+          "hex": "01"
+        },
+        {
+          "address": "0x1a6cfa",
+          "hex": "ffff0200"
+        },
+        {
+          "address": "0x128148",
+          "hex": "e1"
+        },
+        {
+          "address": "0x48bb0",
+          "hex": "8b442404a3000053008b442408a3040053008b44240ca3080053008b442410a30c0053008b442414a310005300c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
       ]
     }
   ]

@@ -4711,3 +4711,43 @@ fault with identical registers, stack words, IRQ count and canary counts.
 This establishes parity at this later failure, not flight usability. The
 original loop is only a diagnostic control, not a committed exclusion.
 Logs: local/renderer-handler-abi-20261115/{extended-checkpoint,original-control}.log.
+
+
+### 2026-11-15: use the tactical text sink's five-stack-argument ABI
+
+[x] The formatter fault's block tail identifies draw_tactical_coordinates
+calling original 48bb0, then E3022/ED133 with format pointer ffffffbf. Its
+nonvariadic sink alias lacked EF_CDECL, so WCC passed four arguments in
+registers and only AUX on the stack. Original 59477 pushes all five arguments
+and cleans twenty bytes; original 48c32 is a plain RET. Mark the sink
+EF_CDECL, correct 48bb0 cleanup from twenty to zero, and correct 59420's
+preserved registers to ECX/ESI/EDI/EBP (EAX/EDX/EBX are scratch).
+Recompile record_transitions and its game_helpers63/game_helpers130/
+misc_drafts1 callers, all warning-free, using object-specific ABI headers.
+
+Expand 59420's isolated test with a five-stack-argument sink and a wrapped
+coordinate case. Old C faults returning through AUX; all three fixed cases
+pass RAM/GPR/ESP comparisons. Correcting 48bb0's cleanup also removes its
+previous automatic stack-aware gate. Do not silently enable that replacement:
+eight new differential cases show literal text passes in all four mode
+variants, but numeric text fails in all four. Original "n=123" becomes
+"n=1702266776" (initial EDI 0x65768798): hybrid_link's register-saving
+trampoline forwards only the five fixed arguments, not the unknown variadic
+suffix. Explicitly retain the original entry and mark the replacement
+compiles-bad until its variadic forwarding is represented. No claim that the
+C body itself is the source of that trampoline mismatch.
+
+Commands: tools/func_differential.py <59420|48bb0> --payload <payload>
+ --patch <isolated patch> --spec decomp/tests/0x000<address>.json
+ --flat-segments. Evidence: local/tactical-text-abi-20261115/{old-59420,
+fixed-59420,fixed-48bb0,tests}.log. All 44 focused tests pass; tracker validates.
+The record-transitions host test passes when compiled directly with assertions
+enabled. Its existing Release CMake target fails on unused assert-only
+variables/parameters under NDEBUG; do not report that target as passed.
+
+With 48bb0 retained original, the full 2594-redirect replay passes the invalid
+format-pointer read, but reports unsupported port OUT 0000 at IP 0x32/tick
+5235. This is another unresolved failure, not flight usability. The temporary
+2595-redirect diagnostic with C text enabled also ends with the port failure
+and is not a valid text replacement pass. Authoritative retained-original
+integration log: local/tactical-text-abi-20261115/original-text.log.

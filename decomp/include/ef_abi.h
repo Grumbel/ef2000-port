@@ -318,7 +318,7 @@ void read_tactical_indicator_callback(void); /* indirect 0x15bab8 */
 #endif
 
 /* Runtime record and tactical display operations, separate original sinks. */
-void draw_tactical_coordinate_marker(uint8_t mark, uint32_t mode,
+void EF_CDECL draw_tactical_coordinate_marker(uint8_t mark, uint32_t mode,
                                      int32_t x, int32_t y, uint32_t aux); /* 0x48bb0 */
 int32_t draw_tactical_item_metric(ef_addr32 item); /* 0x594a4 EAX */
 void draw_tactical_coordinates(int16_t x, int16_t y, uint32_t aux); /* 0x59420 AX/DX/EBX */
