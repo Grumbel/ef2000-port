@@ -337,13 +337,23 @@ original executable through the native64 harness until the source is complete.
 The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Current launcher check (2026-11-14): the full hand-written hybrid profile
-retains 2,593 C redirects across 342/382 linked modules and reaches the main
-menu in native64 (15 seconds, no faults) and Unicorn (500M instructions).
-The framebuffers were inspected. After repairing a path-call arity mismatch,
-Return also enters Quick Fight setup in the 700M-instruction replay. The longer
-run stalls on simulation loading with no cockpit-entry canary hits; gameplay
-and the combined hand-written/mechanical milestones remain incomplete. These checks do not establish full-game equivalence.
+Current hand-written hybrid check (2026-11-16, source e367efaf): 2,597 C
+redirects across 342/382 linked modules, with a 575,854-byte arena. Real SDL
+input on private Xvfb accepts Quick Fight and reaches flight; the 100-second
+native64 run ends at its time limit with no guest faults. The full Unicorn
+profile also reaches flight and exhausts a 4-billion-instruction budget
+without a guest fault (16,000 ticks, 15,933 IRQ0 deliveries). Its flight
+canaries at `0x7eea0` and `0x810d0` each fire once. The shorter 1.5-billion
+replay ends during mission loading, so it is insufficient for this profile.
+
+Terrain and HUD are visible, but the cockpit and sky are missing and HUD/text
+rendering remains distorted. Rendering bisection continues; a usable flight
+session, matching replay state, and the combined hand-written/mechanical
+milestones remain incomplete. These checks do not establish full-game
+equivalence. The tracked source inventory contains 4,293 functions: 3,368
+`compiles`, 30 `verified`, 11 `spliced`, 866 `blocked`, and 9 `compiles-bad`,
+plus nine entries in other states. These inventory counts do not measure
+which functions the hybrid actually executes.
 See the latest entries in [the progress log](../docs/decompilation-plan.md).
 
 Historical Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually

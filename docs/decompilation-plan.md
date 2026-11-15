@@ -5068,3 +5068,26 @@ captured frame has terrain and HUD but missing cockpit/sky and distorted
 HUD/text; flight fidelity is not established. See this directory's
 game.log and output/{report.json,calls.log,framebuffer.png}. The complete
 2597-redirect C++ cockpit replay is also running as an independent check.
+
+### 2026-11-16 — full hybrid flight checkpoint after input repairs
+
+At e367efaf, the full 2597-redirect, 342/382-module profile now reaches flight
+in both native64 and Unicorn. The native real-input test is recorded above.
+The C++ 1.5-billion-instruction replay ends on the mission-loading splash
+(640x400, 15% progress), not at a guest fault. Extending the same run setup
+to 4 billion instructions reaches 320x200 flight, ending at instruction_limit
+with 42485 interrupts, 16000 ticks, 15933 IRQ0 deliveries and IP 0x110de6.
+Flight-entry canaries 0x7eea0/0x810d0 each hit once; scaled draw entry 0xc565e
+hits 38974 times. Terrain/HUD are visible; cockpit, sky and HUD/text fidelity
+remain incorrect. These observations do not establish matching state or
+M3 convergence. Updated decomp/README.md's stale 2026-11-14 launcher status.
+
+Evidence: local/weapon-refresh-20261116/{current.json,cockpit-long.log,
+cockpit-long.ppm,cockpit-checkpoint.log,cockpit-checkpoint.ppm}. Command:
+private-Xvfb replay-long.sh in that directory, using the same four Return
+events, guest DOS/VGA clocks and complete patch as replay.sh, with only
+the instruction budget and artifact names changed. The third bounded
+black-mask bisection batch completed with 284 candidates; the fourth resumes
+the union of its persistent exclusions and newly excluded addresses.
+Its 285-redirect initial trial reproduces the 320x200 rendering mismatch.
+The separate e367efaf Nix package build remains in progress.
