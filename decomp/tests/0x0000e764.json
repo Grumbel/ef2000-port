@@ -1,1 +1,55 @@
-{"address":"0x0000e764","function_size":15,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0xe764",
+  "function_size": 15,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "allocate_0",
+      "registers": {
+        "eax": 0
+      },
+      "memory": [
+        {
+          "address": "0xcc6c0",
+          "hex": "8b442404a3000053008b442408a304005300b800005200c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "allocate_14",
+      "registers": {
+        "eax": 14
+      },
+      "memory": [
+        {
+          "address": "0xcc6c0",
+          "hex": "8b442404a3000053008b442408a304005300b800005200c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "allocate_132",
+      "registers": {
+        "eax": 132
+      },
+      "memory": [
+        {
+          "address": "0xcc6c0",
+          "hex": "8b442404a3000053008b442408a304005300b800005200c3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}

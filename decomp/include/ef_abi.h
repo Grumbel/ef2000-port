@@ -3402,7 +3402,7 @@ uint16_t guest_fn_cc22c(uint32_t a, uint32_t b, uint32_t c); /* 0xcc22c EAX/EDX/
 double guest_fn_dc1e9(double a, double b); /* 0xdc1e9 ST1/ST0 -> ST0 */
 
 /* leaf_helpers1.c */
-void log_alloc_e764(uint32_t a);
+ef_addr32 log_alloc_e764(uint32_t a);
 uint32_t constant_44_35218(void);
 void store_word_39300(void);
 double scale_float_52eb0(float value);
@@ -3502,7 +3502,6 @@ uint32_t guest_tail_fc354(uint32_t a); /* 0xfc354 EAX */
 uint32_t guest_tail_fc795(uint32_t a); /* 0xfc795 EAX */
 uint32_t guest_tail_fe541(uint32_t a); /* 0xfe541 EAX */
 void guest_tail_dc2c0(void); /* 0xdc2c0 */
-void guest_fn_cc6c0_pair(uint32_t a, ef_addr32 format); /* 0xcc6c0 cdecl */
 uint16_t guest_fn_9ddfc_w(void); /* 0x9ddfc -> AX */
 void guest_fn_56c90_m(uint32_t a, uint32_t mode); /* 0x56c90 EAX/EDX */
 uint32_t guest_fn_7a194_r(void); /* 0x7a194 -> EAX */

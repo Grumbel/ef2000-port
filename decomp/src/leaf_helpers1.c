@@ -9,10 +9,11 @@
 
 #define EF_F64(a) (*(double *)ef_guest_memory_ptr((ef_addr32)(a)))
 
-/* 0xe764, 15 bytes. Format a string through the allocator log helper. */
-void log_alloc_e764(uint32_t a)
+/* 0xe764, 15 bytes. Allocate a zeroed block, using cfg_read as its failure
+ * diagnostic. The allocator takes two caller-cleaned stack arguments. */
+ef_addr32 log_alloc_e764(uint32_t a)
 {
-    guest_fn_cc6c0_pair(a, 0x00180bfcu);
+    return guest_fn_cc6c0_x(a, 0x00180bfcu);
 }
 
 /* 0x35218, 8 bytes. Constant 0x44. */

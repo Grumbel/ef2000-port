@@ -4396,3 +4396,37 @@ is not claimed resolved by the direct-probe guard. Logs remain in
 local/nix-hybrid-20261115-current{,-retry}.log and
 local/nix-x87-memory-20261115/probe-compare.log. No translator assertion is
 waived and no known numerical divergence is accepted.
+
+### 2026-11-15: restore the parser allocation callback ABI
+
+[x] Repair 0xe764, the allocation hook selected at [0x121ebc] while loading
+header lists. Original pushes size and the cfg_read failure diagnostic as two
+cdecl arguments to 0xcc6c0, cleans eight bytes, and returns the allocated
+pointer in EAX. The C draft called a register-argument alias and declared no
+return. Use the existing explicit cdecl two-argument alias, return ef_addr32,
+remove the unused incorrect alias, and correct the confirmed signature.
+
+An earlier-start execution guard catches the first invalid transfer at
+0x3f86d5a immediately after the default IRQ trampoline 0x4000100. A write watch
+then catches the first corruption at 0xe301a (formatter output), tick 5074:
+compiled ABI-trampoline bytes are interpreted as a failure format and copied
+through the stack buffer into 0x4000100. The allocator's original failure path
+at 0xcc702 formats the bogus stack argument; this is downstream of the wrong
+0xe764 call convention, not a VGA/IRQ emulation issue. Diagnostic source and
+runners are local only; runtime source and normal runner are restored. Evidence:
+local/first-invalid-transfer-20261115/{probe,watch}.log and watch-captures/.
+
+Three synthetic allocator adapters record the two stack arguments and return
+a distinct pointer for sizes 0,14,132. Old C fails all three, fixed C passes
+all three with preserved registers and stack cleanup. Module compiles with
+zero warnings; 36 focused Python checks pass. The full 2595-redirect replay
+passes the previous failure and grows the guest heap further, then reaches a
+separate tick-5095 GP at original LES [EBP+8] (0x9c231), currently reported as
+unsupported BIOS interrupt 13. This later far-pointer/call ABI remains to
+investigate. Evidence: local/allocator-callback-20261115/{old,fixed,tests,replay}.log.
+
+The prior committed profile's complete Nix build passes 511 tests (68 skips),
+and the exact requested nix run launcher reaches the menu without faults
+under private Xvfb. Its fresh Nix object patch is byte-identical to the
+verified whole-button fix. Logs: local/nix-hybrid-20261115-final.log and
+local/native-final-20261115.log. Full gameplay remains incomplete.
