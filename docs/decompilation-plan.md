@@ -4430,3 +4430,37 @@ and the exact requested nix run launcher reaches the menu without faults
 under private Xvfb. Its fresh Nix object patch is byte-identical to the
 verified whole-button fix. Logs: local/nix-hybrid-20261115-final.log and
 local/native-final-20261115.log. Full gameplay remains incomplete.
+
+### 2026-11-15: honor explicit cdecl declarations in ABI generation
+
+[x] Correct the release-call ABI reaching the next loading failure. Interrupt
+trace at tick 5095 shows 0x9c231 LES [EBP+8] receiving offset=0x2f,
+selector=0xd5 and length=0x19002f. The caller is compiled finish_request_6b8:
+its OMF passes the intended first argument in EAX, only selector/length on
+the stack, and expects callee cleanup. The public guest_fn_9c23d declaration
+already says EF_CDECL, but generated confirmed pragmas overwrite it using
+incorrect EAX-only metadata for the shared-tail entry.
+
+Do not generate a register pragma over an explicit EF_CDECL/__cdecl
+annotation. Correct original 0x9c23d's signature to three caller-cleaned stack
+arguments; it sets AX=0x601 and jumps to the same stack prologue as 0x9c220.
+Its already-excluded C placeholder remains excluded. The only currently
+emitted pragma conflicting with an explicit EF_CDECL is guest_fn_9c23d.
+A synthetic compiler-wrapper fixture verifies both stack annotations survive
+while ordinary register inference still works.
+
+Three original-versus-C finish_request cases cover active aligned and
+unaligned slots and an already-released slot. The old caller faults fetching
+0x32435465; the corrected caller passes all three, including observed stack
+arguments, free-list/count updates, preserved registers and cleanup. Watcom
+compiles warning-free and 37 focused Python tests pass. The full unchanged
+2595-redirect profile passes the LES fault and reaches a separate tick-5116
+GP at original POP FS (0x31a). Evidence: local/x32-release-abi-20261115/
+{old,fixed,tests,replay}.log and x32_pool.asm.
+
+The allocator-fix pressed-button regression, with the same 0x101688 tracepoint
+configuration as its original baseline, is byte-identical to the original.
+An earlier diagnostic without that tracepoint ran unexpectedly long and was
+explicitly terminated (exit 143), not counted as a guest pass/failure. Host
+ptrace inspection was denied by the kernel. Artifacts remain under
+local/allocator-callback-20261115/pressed{,-traced}*.

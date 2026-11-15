@@ -1988,7 +1988,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00115984	tail_jump_115984	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00115984 (5 bytes); tail jump. Forward to 0xfa9a0.; callers 105024@105068,105070@10511c; docs/compiler-abi.md
 0x0011d24e	tail_jump_11d24e	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011d24e (5 bytes); tail jump. Forward to 0x120485.; callers 10dc7f@10dcef; docs/compiler-abi.md
 0x000c9ec4	tail_jump_c9ec4	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c9ec4 (5 bytes); tail jump. Forward to 0xdc2c0.; callers a6038@a606f,ac5f8@ac610; docs/compiler-abi.md
-0x0009c23d	tail_jump_9c23d	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009c23d (6 bytes); tail jump. Forward to 0x9c224.; callers 6b8@6eb; docs/compiler-abi.md
+0x0009c23d	tail_jump_9c23d	[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	12	Original 0x0009c23d (6 bytes); caller-cleaned offset, selector, length on stack. MOV AX,0x601 then JMP 0x9c224 shares the 0x9c220 stack frame and RET. EAX status result; callers 6b8@6eb. Keep original tail entry under existing exclusion.
 0x000a37c4	send_byte_request_8_a37c4	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a37c4 (31 bytes); Send a one-byte request with code 8.; callers a3824@a389d; docs/compiler-abi.md
 0x000a37e4	send_byte_request_9_a37e4	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a37e4 (31 bytes); Send a one-byte request with code 9.; callers a3824@a38bd; docs/compiler-abi.md
 0x000a3804	send_byte_request_10_a3804	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a3804 (31 bytes); Send a one-byte request with code 10.; callers a3824@a3883; docs/compiler-abi.md

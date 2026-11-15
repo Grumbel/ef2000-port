@@ -6,11 +6,31 @@
 from pathlib import Path
 import tempfile
 import unittest
+from unittest import mock
 
 from tools import ef2000_wcc
 
 
 class WatcomWrapperTests(unittest.TestCase):
+    def test_explicit_cdecl_is_not_overridden_by_register_metadata(self):
+        with tempfile.TemporaryDirectory() as temp:
+            root = Path(temp)
+            (root / 'decomp/symbols').mkdir(parents=True)
+            (root / 'decomp/include').mkdir()
+            (root / 'decomp/include/ef_abi.h').write_text(
+                'uint32_t EF_CDECL guest_stack(uint32_t a); /* 0x100 */\n'
+                'uint32_t __cdecl guest_stack_literal(uint32_t a); /* 0x100 */\n'
+                'uint32_t guest_register(uint32_t a); /* 0x100 */\n')
+            (root / 'decomp/symbols/signatures.tsv').write_text(
+                'addr\tname\tinputs\toutputs\tpreserved\tstack_bytes\n'
+                '0x100\tguest_register\tEAX:uint32_t\tEAX:uint32_t\t'
+                'ebx,ecx,edx,esi,edi,ebp\t0\n')
+            with mock.patch.object(ef2000_wcc, 'ROOT', root):
+                pragmas = ef2000_wcc.confirmed_abi_pragmas()
+            self.assertIn('#pragma aux guest_register parm [eax]', pragmas)
+            self.assertNotIn('#pragma aux guest_stack ', pragmas)
+            self.assertNotIn('#pragma aux guest_stack_literal ', pragmas)
+
     def test_compiles_fixture_with_pinned_flags(self):
         with tempfile.TemporaryDirectory() as temp:
             output = Path(temp) / 'smoke.obj'

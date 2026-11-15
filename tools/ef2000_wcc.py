@@ -84,6 +84,10 @@ def confirmed_abi_pragmas():
             if not preserved <= set(GPRS):
                 continue
             for name in sorted(names):
+                # An explicit stack-call declaration is stronger evidence than
+                # inferred register inputs (especially for shared tail entries).
+                if re.search(r'\b(?:EF_CDECL|__cdecl)\b', declarations[name]):
+                    continue
                 value = None
                 output_reg = None
                 if outputs and declarations[name] != 'void':
