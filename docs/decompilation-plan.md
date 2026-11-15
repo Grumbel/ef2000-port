@@ -4268,3 +4268,38 @@ in the native-FIP assertion message so a future failure identifies its input.
 The unchanged check passes directly with python3 -m unittest
  tests.test_asm_x87_load.RealLoadTests.test_widening_modes_masks_stack_faults_and_all_exponents
 (7.75 seconds). The package and playable cockpit remain unverified.
+
+### 2026-11-15 — supply the active-widget fill's missing bottom edge
+
+Correct draw_active_marker_e5088 to pass all five arguments to c91c8, including
+(uint16_t)(y + height) from words 0x41eef8 and 0x41ef00. The original pushes
+that bottom edge at e50d0 and c91c8 returns with RET 4; the four-argument alias
+pushed nothing, corrupting the caller's stack on the solid-background path.
+Remove that alias and use the existing canonical five-argument declaration.
+The rectangle renderer itself remains original under its existing exclusion.
+
+The old isolated C faults at invalid fetch 0x65768798 on filled_region. The
+corrected body passes five cases: no active widget, no background flag,
+a 24x12 fill, an out-of-bounds fill, and a synthetic custom-draw callback.
+The fill compares all 288 affected pixels plus the refresh marker; stack
+cleanup and preserved GPRs match. Command: tools/func_differential.py 0xe5088
+--payload local/ghidra-stack-return-20261114/payload.bin --patch
+local/active-marker-height-20261115/fixed.efpatch --spec
+decomp/tests/0x000e5088.json --flat-segments. Module compiles warning-free;
+34 focused Python tests pass. Full 2595-redirect loading still reaches the
+separate tick-5074 stack-execution fault. Evidence: local/active-marker-height-20261115/
+{diff-old,diff-fixed,tests,monitored}.log.
+
+The reported main-menu highlight defect is reproduced by pressing at guest
+(160,110), in the gray region below the first label: only the part through row
+102 changes, while original rows 103..115 change too. This cutoff is exactly
+the 64-KiB VGA bank boundary at a 640-byte pitch. The active-widget argument
+fix does not repair it (pressed framebuffers identical before/after); inspect
+the banked update path separately. Images/logs stay in local/menu-highlight-20261115/.
+
+The complete 27-test x87 tranche passes in the failed derivation's exact
+Nix environment (10 expected skips). A fresh NIXPKGS_ALLOW_UNFREE=1 nix build
+-L --impure .#ef2000-hybrid then completes: 506 Python checks pass (67 skips)
+and local/nix-hybrid-20261115-3c8c220d links the built launcher. Strict native
+FIP assertions remain unchanged. One earlier full-suite native-FIP failure
+remains an observed intermittent check; no x87 expectation was relaxed.

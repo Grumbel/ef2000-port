@@ -3655,7 +3655,6 @@ uint8_t guest_fn_106d34_w(uint32_t a, uint32_t b); /* 0x106d34 EAX/EDX -> AL */
 uint32_t guest_fn_106bfc_w(uint32_t a); /* 0x106bfc EAX -> EAX */
 void guest_fn_107060_w(uint32_t a); /* 0x107060 EAX */
 void guest_fn_e4c9c_w(ef_addr32 unit); /* 0xe4c9c EAX */
-void guest_fn_c91c8_w(uint32_t color, uint32_t x, uint32_t y, uint32_t x2); /* 0xc91c8 EAX/EDX/EBX/ECX */
 
 /* leaf_helpers6.c */
 void load_settings_39254(void);

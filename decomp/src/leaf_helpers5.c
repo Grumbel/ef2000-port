@@ -138,8 +138,9 @@ void draw_active_marker_e5088(void)
     if (EF_U32(unit + 0x95u) != 0) {
         guest_fn_e4c9c_w(unit);
     } else if (EF_U8(unit + 0xc4u) & 1) {
-        guest_fn_c91c8_w(EF_U8(unit + 0xc2u), EF_U16(0x0041eef6u), EF_U16(0x0041eef8u),
-                         (uint16_t)(EF_U16(0x0041eef6u) + EF_U16(0x0041eefau)));
+        fill_rect_clipped_c91c8(EF_U8(unit + 0xc2u), EF_U16(0x0041eef6u), EF_U16(0x0041eef8u),
+                               (uint16_t)(EF_U16(0x0041eef6u) + EF_U16(0x0041eefau)),
+                               (uint16_t)(EF_U16(0x0041eef8u) + EF_U16(0x0041ef00u)));
     }
     EF_U16(EF_U32(0x0041eea0u) + 0xdau) = 1;
 }
