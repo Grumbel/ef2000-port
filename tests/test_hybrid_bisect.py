@@ -13,6 +13,22 @@ from tools import hybrid_bisect
 
 
 class FrameDifferenceTest(unittest.TestCase):
+    def test_render_failure_does_not_match_a_different_video_mode(self):
+        with tempfile.TemporaryDirectory() as directory:
+            frame = Path(directory) / 'frame.ppm'
+            result = {'status': {'status': 'instruction_limit'}}
+            frame.write_bytes(b'P6\n2 1\n255\n' + bytes(6))
+            target = hybrid_bisect.frame_failure_signature(result, result, frame)
+            frame.write_bytes(b'P6\n2 1\n255\n' + bytes([255]) * 6)
+            self.assertEqual(target, hybrid_bisect.frame_failure_signature(
+                result, result, frame))
+            frame.write_bytes(b'P6\n4 2\n255\n' + bytes(24))
+            self.assertNotEqual(target, hybrid_bisect.frame_failure_signature(
+                result, result, frame))
+            frame.unlink()
+            self.assertNotEqual(target, hybrid_bisect.frame_failure_signature(
+                result, result, frame))
+
     def test_baseline_and_trial_link_keep_variadic_entry_contract(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

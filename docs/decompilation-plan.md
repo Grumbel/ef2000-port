@@ -4887,3 +4887,25 @@ pass with Unicorn enabled (`python3 -m unittest tests.test_hybrid_bisect
 local/status-cdecl-20261115/current.efpatch (SHA-256 c7135c66708013cd4fdc2084e84d96f66326a8cff4d3365565f8d3fa91be1760).
 Rendering bisection is running under private Xvfb in
 local/render-bisect-20261115; no rendering fix or completed bisection is claimed.
+
+### 2026-11-15 — Distinguish cockpit blanking from loading-screen stalls
+
+Rendering trials now include framebuffer geometry in the frame-failure
+signature. A 640x400 loading stall is no longer interchangeable with the
+320x200 cockpit failure; regression coverage also rejects missing frames.
+All eight linker/bisector tests pass with Unicorn enabled. Original and full
+hybrid 1.5B replays reproduce their earlier raw frames exactly. The full
+hybrid differs in 90.2812% of pixels, with 95.7297% black pixels versus
+9.14375% in original. Diagnostic complementary redirects restore visible
+terrain/cockpit but change palette, so raw pixel difference alone cannot
+isolate this blanking defect. The superseded broad bisections were stopped
+intentionally; they do not establish a culprit. A black-pixel-mask bisection
+is running under private Xvfb in local/render-black-mask-bisect-20261115;
+its ignored wrapper retains unmodified frames as frame.raw.ppm. No subset
+is promoted as the production profile.
+
+Nix output local/nix-hybrid-current-20261115 resolves to the completed
+39198eaa launcher build. Its runtime build log records 522 tests passing
+(75 skipped), followed by installation/fixup. The outer build process exited
+143 after producing the output; the installed launcher is being independently
+smoke-tested. This is not a verified native cockpit playthrough.

@@ -111,6 +111,21 @@ def crash_class(result, baseline):
     return (status['status'], fault['type'] if fault is not None else None)
 
 
+def frame_failure_signature(result, baseline, frame):
+    """Keep different video modes from becoming the same rendering failure."""
+    abnormal_stop = crash_class(result, baseline)
+    if abnormal_stop is not None:
+        return abnormal_stop
+    try:
+        header = frame.read_bytes().split(None, 4)
+        if header[0] != b'P6' or header[3] != b'255':
+            raise ValueError('unsupported framebuffer header')
+        geometry = (int(header[1]), int(header[2]))
+    except (OSError, IndexError, ValueError):
+        geometry = None
+    return ('frame-mismatch', geometry)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', type=Path, default=ROOT / 'local/initial-image/payload.bin')
@@ -316,7 +331,8 @@ def main(argv=None):
             if match_mode[0] == 'frame':
                 if result is None or trial_log[-1]['passed']:
                     return None
-                return crash_class(result, baseline) or ('frame-mismatch',)
+                return frame_failure_signature(
+                    result, baseline, output / f'trial-{run_number:02d}' / 'frame.ppm')
             if match_mode[0] == 'crash':
                 return crash_class(result, baseline)
             return failure_signature(result)
