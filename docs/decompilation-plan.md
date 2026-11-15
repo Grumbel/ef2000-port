@@ -4540,3 +4540,34 @@ at the same tick (0xbff70800). The prior line-30 parser error is passed,
 but flight usability remains unverified. Do not treat the parser adapter
 passes as proof that loading or the cockpit works. Logs:
 local/{component-prefix-count,six-field-label}-20261115/extended-checkpoint.log.
+
+
+### 2026-11-15: call original trigonometric leaves through ST0
+
+[x] The full-profile block tail locates the tick-5207 invalid return immediately
+after the sixth trigonometric call in unit_rotation_matrix_7215c. Compiled
+callers pushed an eight-byte argument for cos_b45a2/sin_b45ac, but original
+b45a2/b45ac consume and replace ST0 and return without popping arguments.
+Six calls left 48 bytes on the stack. Original b45b6 saves EAX/EBP and touches
+no other GPR; both leaves preserve all GPR. Correct their public pragmas and
+signature rows to ST0 input/output, zero stack arguments, all GPR preserved.
+Keep both existing replacement exclusions: this repairs callers to original
+entries, not the C replacements' unverified trigonometric equivalence.
+
+Recompile misc_drafts1 (the only other source using these canonical names):
+zero warnings. Its rotation-matrix caller now directly CALLs each leaf with
+ST0 live, without the old SUB ESP,8 / FSTP [ESP] sequence. The asset-free
+trig_contract_fixture invokes both public declarations with synthetic
+FCOS/FSIN;RET callees and verifies outputs, guards, return value and ESP for
+0, -0.75 and 2.25. The old header faults on all three angles; the corrected
+contract passes. All 38 focused tests pass using EF2000_WCC386 and Unicorn:
+python3 -m unittest tests.test_callback_abi tests.test_ef2000_wcc
+ tests.test_hybrid_link tests.test_func_differential tests.test_replay_suite
+ tests.test_hybrid_bisect. Evidence under local/trig-call-abi-20261115/.
+
+The full 2595-redirect replay passes that invalid return but still fails in
+the same tick at another control transfer: execution reaches heap data
+0xcc50c3 and faults reading 0xe5610000. This is a new diagnostic point, not
+a successful flight replay. The previous block-tail evidence is in
+local/six-field-label-20261115/exp-entry-capture.log; corrected integration
+result: local/trig-call-abi-20261115/extended-checkpoint.log.

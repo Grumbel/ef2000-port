@@ -3780,6 +3780,11 @@ double int_distance_2d_f83d0(int32_t x1, int32_t x2, int32_t y1, int32_t y2);
 /* float_helpers8.c */
 double cos_b45a2(double angle);
 double sin_b45ac(double angle);
+#if defined(__WATCOMC__)
+/* Original trig entries consume and replace ST0, with no stack arguments. */
+#pragma aux cos_b45a2 parm [8087] value [8087] modify exact []
+#pragma aux sin_b45ac parm [8087] value [8087] modify exact []
+#endif
 uint8_t point_in_oriented_box_7d20(ef_addr32 point, ef_addr32 box);
 ef_addr32 mark_entry_at_point_82b8(int32_t x, int32_t y);
 
