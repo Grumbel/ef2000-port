@@ -4874,3 +4874,16 @@ an original-entry hit count of zero. Logs and frames:
 local/status-cdecl-20261115/{extended-checkpoint,cockpit-checkpoint}.{log,ppm,png}.
 Next work remains rendering/control-flow convergence and the current Nix
 launcher, not declaring the bulk translation goal complete.
+
+### 2026-11-15 — Keep rendering bisection on the current variadic ABI
+
+The bisector's two linker calls omitted `variadic_names`, silently omitting
+native variadic entries and rebuilding their old argument-frame failure into
+rendering trials. Both initial selection and each trial now parse the selected
+ABI header and pass its variadic declarations to the linker. A synthetic
+command-level regression verifies both calls; all seven linker/bisector tests
+pass with Unicorn enabled (`python3 -m unittest tests.test_hybrid_bisect
+ tests.test_hybrid_link`). The first real cockpit trial is byte-identical to
+local/status-cdecl-20261115/current.efpatch (SHA-256 c7135c66708013cd4fdc2084e84d96f66326a8cff4d3365565f8d3fa91be1760).
+Rendering bisection is running under private Xvfb in
+local/render-bisect-20261115; no rendering fix or completed bisection is claimed.

@@ -178,6 +178,7 @@ def main(argv=None):
         signatures = hybrid_link.read_tsv(ROOT / 'decomp/symbols/signatures.tsv')
         source = args.image.read_bytes()
         aliases = hybrid_link.load_abi_aliases(args.abi_header)
+        variadic_names = hybrid_link.load_variadic_names(args.abi_header)
         persistent_excludes = hybrid_link.load_exclusions(args.exclude_list, len(source))
         for item in args.exclude_address:
             address_text, separator, reason = item.partition(':')
@@ -189,7 +190,8 @@ def main(argv=None):
         initial_blob, _ = hybrid_link.link(objects, functions, globals_, selected,
                                            source, aliases,
                                            explicit_excludes=persistent_excludes,
-                                           signatures=signatures)
+                                           signatures=signatures,
+                                           variadic_names=variadic_names)
         initial_writes = decode_patch(initial_blob, source, hybrid_link.GUEST_SIZE)
         initial_addresses = {address for address, _ in initial_writes
                              if address < len(source)}
@@ -257,7 +259,8 @@ def main(argv=None):
                     stream.write(f'0x{address:08x}\ttemporary hybrid bisector demotion\n')
             blob, report = hybrid_link.link(
                 objects, functions, globals_, selected, source, aliases,
-                explicit_excludes=excluded_map, signatures=signatures)
+                explicit_excludes=excluded_map, signatures=signatures,
+                variadic_names=variadic_names)
             patch_path.write_bytes(blob)
             writes = decode_patch(blob, source, hybrid_link.GUEST_SIZE)
             addresses = {address for address, _ in writes if address < len(source)}
