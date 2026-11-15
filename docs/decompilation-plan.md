@@ -4485,3 +4485,27 @@ parse_component_record_f314 -> read_record_ed80 -> read_parser_enum_19_names,
 not the corrected point-list function. Investigate that component's earlier
 line consumption next. Evidence: local/point-list-order-20261115/replay.log
 and error-captures/; all assets/snapshots remain local.
+
+### 2026-11-15: consume all twenty component-prefix records
+
+[x] Correct parse_component_record_f314's family-zero prefix loop. Original
+f3db initializes the cursor to REC, increments it at f3e0, and writes offsets
++0x55..+0x68, consuming twenty parse_enum_eea0 records. C started at REC+1,
+consuming only nineteen and leaving the following position/waypoint lines
+out of sync. Restore the initial cursor; other families retain their skip.
+
+The focused fixture also exposes incorrect EDX preservation metadata.
+Original f314 saves EBX/ECX/ESI/EDI, uses DL as parent kind and leaves EDX as
+a scratch point offset; f5f9 does not restore it. Correct the signature and
+recompile both the body and its runtime_helpers27 caller. With that proven
+ABI, old family zero fails RAM at REC+0x55 while families one/two pass; all
+three fixed adapters pass with original RAM/GPR/stack comparison (49 observed
+original blocks). Both modules compile warning-free; 37 focused tests pass.
+Evidence: local/component-prefix-count-20261115/{old-correct-abi,abi-fixed,tests}.log.
+
+Full-profile loading attempts with this change were externally terminated
+(exit 143) without guest results, including a process-monitored run. They do
+not prove success or failure. A shorter 1.3B-instruction checkpoint is running
+to obtain bounded evidence beyond the previous 1.279B-instruction parser stop.
+The full 2595-redirect profile remains enabled. Checkpoint artifacts stay in
+local/component-prefix-count-20261115/.

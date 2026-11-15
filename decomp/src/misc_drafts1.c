@@ -15739,7 +15739,7 @@ uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent)
 	EF_U8(rec + 2u) = (uint8_t)parse_enum_ec3c();
 	EF_U8(rec + 3u) = (uint8_t)read_parser_enum_10_names();
 	if (EF_U16(0x00197abau) == 0u) {
-		for (p = rec + 1u; p != rec + 0x14u; ) {
+		for (p = rec; p != rec + 0x14u; ) {
 			p++;
 			EF_U8(p + 0x54u) = (uint8_t)parse_enum_eea0();
 		}
