@@ -14,6 +14,7 @@ import unittest
 
 from tools import asm_to_c, asm_x87, asm_c_differential as diff
 from tests.test_asm_to_c import assemble
+from tests.native_x87 import call_without_context_switch
 
 
 @unittest.skipUnless(platform.machine() == 'x86_64' and
@@ -107,7 +108,7 @@ class X87StackTests(unittest.TestCase):
                             for index, (significand, exponent) in enumerate(values):
                                 state.x87[index][:] = [significand & 0xffffffff, significand >> 32, exponent]
                             saved = bytes(state)
-                            function(native, output)
+                            call_without_context_switch(function, native, output)
                             self.assertEqual(run(ctypes.byref(state), operation, argument), 0)
                             observed = bytes(output)
                             expected_status, expected_tags = struct.unpack_from('<H', observed, 4)[0], \

@@ -18,6 +18,7 @@ import tempfile
 import unittest
 
 from tools import asm_to_c, asm_softfloat, asm_c_differential as diff
+from tests.native_x87 import call_without_context_switch
 from tests.test_asm_to_c import assemble
 from tests.test_asm_c_program import inventory
 
@@ -97,7 +98,8 @@ uintptr_t op%d(const void *initial,void *out,void *data) {
                                         current=list(values);current[top]=(sig,exp)
                                         for logical in range(8):struct.pack_into('<QH',initial,28+logical*10,*current[(top+logical)&7])
                                         data[:]=b'\xa5'*8;memory[0x500:0x508]=b'\xa5'*8
-                                        pc=native((ctypes.c_uint8*108).from_buffer(initial),captured,data)
+                                        pc=call_without_context_switch(native,
+                                            (ctypes.c_uint8*108).from_buffer(initial),captured,data)
                                         state=diff.State.from_buffer_copy(baseline)
                                         state.x87_control,state.x87_status,state.x87_tag=control,status,tags
                                         state.x87[top][:]=[sig&0xffffffff,sig>>32,exp]

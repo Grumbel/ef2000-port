@@ -4371,3 +4371,28 @@ prove that an uninterrupted result (including zero) is returned unchanged,
 only measured switches cause another observation, and repeated interruption
 fails closed. Seven helper/load/memory tests pass in the failed derivation's
 exact Nix environment (12.870 seconds); fixed-tests.log records the result.
+
+### 2026-11-15: guard the remaining direct native x87 probes
+
+A same-source Nix retry passes the native comparison test but fails the raw
+stack probe on FXCH ST(0): retained FDP/FDS are zero instead of 0x234567/16.
+That probe still executed hardware without measuring interruption. Apply the
+same bounded observation guard to direct stack, integer-load and narrowing-
+store probes. Arithmetic and the native oracle already measure context
+switches. Preserve all expected state and assertion strictness. Intentionally
+faulting child-process calls remain direct.
+
+Validation in the exact Nix environment: helper/stack/integer/store tranche
+runs seven tests in 18.728 seconds (two optional store skips); rerun those two
+store tests with ASM_SOFTFLOAT_BUILD pointing at the existing verified local
+build and both pass in 11.488 seconds. Evidence: local/nix-x87-memory-20261115/
+{remaining-fixed-tests,store-fixed-tests}.log.
+
+The preceding full build also observed zero retained FDP/FDS in the native
+comparison oracle despite its existing switch guard. Its diagnostic isolated
+run passes all 2,356,224 cases unchanged in 116.401 seconds, and that comparison
+passes in the full retry. This remaining intermittent hardware-oracle symptom
+is not claimed resolved by the direct-probe guard. Logs remain in
+local/nix-hybrid-20261115-current{,-retry}.log and
+local/nix-x87-memory-20261115/probe-compare.log. No translator assertion is
+waived and no known numerical divergence is accepted.
