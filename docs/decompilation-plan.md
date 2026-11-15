@@ -4513,3 +4513,30 @@ previous failure, not a completed cockpit replay or native flight usability.
 Evidence: local/component-prefix-count-20261115/short-checkpoint.log.
 The full 2595-redirect profile remains enabled. Checkpoint artifacts stay in
 local/component-prefix-count-20261115/.
+
+
+### 2026-11-15: skip six-field record labels and preserve caller registers
+
+[x] Restore read_parser_six_field_record's initial read_parser_token call
+(original ee5f). Without it the label becomes the first coordinate and the
+last field remains unread. Original ee5c saves EDX and its tokenizer/number
+parser dependencies preserve the other non-result GPR; correct the signature
+accordingly. The old body also demonstrably clobbered EBX and ECX. Rebuild
+parser_records and both callers, misc_drafts1 and runtime_helpers27.
+
+Expand decomp/tests/0x000ee5c.json with signed bounds, low-word truncation,
+quoted labels and the existing numeric-label/missing-final-field case.
+Using original parsing dependencies, old C fails all four cases; fixed C
+passes all four RAM/GPR/stack comparisons. All three modules compile with
+zero warnings; 37 focused Python tests pass. Commands: tools/func_differential.py
+0xee5c --payload <payload> --patch <isolated patch> --spec
+ decomp/tests/0x000ee5c.json --flat-segments; unittest modules callback_abi,
+ef2000_wcc, hybrid_link, func_differential, replay_suite and hybrid_bisect.
+Evidence: local/six-field-label-20261115/{old,fixed,tests}.log.
+
+The 1.4B-instruction replay with all 2595 redirects fails later at tick 5207
+with an invalid fetch (0xbff20800); the preceding full-profile build fails
+at the same tick (0xbff70800). The prior line-30 parser error is passed,
+but flight usability remains unverified. Do not treat the parser adapter
+passes as proof that loading or the cockpit works. Logs:
+local/{component-prefix-count,six-field-label}-20261115/extended-checkpoint.log.

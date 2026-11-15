@@ -1,12 +1,99 @@
 {
-  "address": "0x0000ee5c",
+  "address": "0xee5c",
   "function_size": 65,
-  "max_instructions": 180000,
+  "max_instructions": 20000,
   "cases": [
-    {"name": "six_unsigned_and_signed_fields", "registers": {"eax": "0x002a0000"}, "memory": [
-      {"address": "0x00121ea8", "hex": "0000"},
-      {"address": "0x001976b0", "hex": "3132202d3420362037202d3820363535333500"},
-      {"address": "0x002a0000", "hex": "000000000000000000000000000000000000"}
-    ]}
+    {
+      "name": "signed_fields",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x1976b0",
+          "hex": "504f534954494f4e20313030202d3230302033303020342035203600"
+        },
+        {
+          "address": "0x121ea8",
+          "hex": "0000"
+        },
+        {
+          "address": "0x197abe",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "word_truncation",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x1976b0",
+          "hex": "2009504f53452032313437343833363437202d323134373438333634382030202d31203332373638202d333237363900"
+        },
+        {
+          "address": "0x121ea8",
+          "hex": "0000"
+        },
+        {
+          "address": "0x197abe",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "quoted_label",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x1976b0",
+          "hex": "22504f5345204c4142454c2220372038203920313020313120313200"
+        },
+        {
+          "address": "0x121ea8",
+          "hex": "0000"
+        },
+        {
+          "address": "0x197abe",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "numeric_label_missing_final_field",
+      "registers": {
+        "eax": "0x002a0000"
+      },
+      "memory": [
+        {
+          "address": "0x00121ea8",
+          "hex": "0000"
+        },
+        {
+          "address": "0x001976b0",
+          "hex": "3132202d3420362037202d3820363535333500"
+        },
+        {
+          "address": "0x002a0000",
+          "hex": "000000000000000000000000000000000000"
+        }
+      ]
+    }
   ]
 }

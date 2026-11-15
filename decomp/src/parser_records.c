@@ -147,10 +147,11 @@ uint32_t read_parser_enum(void)
     return 0;
 }
 
-/* 0xee5c: three guest decimal conversions followed by three integer
+/* 0xee5c: skip the record label, then three guest decimal conversions and three integer
  * conversions, with word truncation at +0x0c/+0x0e/+0x10. */
 uint32_t read_parser_six_field_record(ef_addr32 destination)
 {
+    read_parser_token();
     write32(destination, read_parser_decimal());
     write32(destination + 4u, read_parser_decimal());
     write32(destination + 8u, read_parser_decimal());
