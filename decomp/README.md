@@ -337,20 +337,24 @@ original executable through the native64 harness until the source is complete.
 The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Current hand-written hybrid check (2026-11-16, source e367efaf): 2,597 C
-redirects across 342/382 linked modules, with a 575,854-byte arena. Real SDL
-input on private Xvfb accepts Quick Fight and reaches flight; the 100-second
-native64 run ends at its time limit with no guest faults. The full Unicorn
-profile also reaches flight and exhausts a 4-billion-instruction budget
-without a guest fault (16,000 ticks, 15,933 IRQ0 deliveries). Its flight
-canaries at `0x7eea0` and `0x810d0` each fire once. The shorter 1.5-billion
-replay ends during mission loading, so it is insufficient for this profile.
+Current hand-written hybrid check (2026-11-16): 2,597 C redirects across
+342/382 linked modules. The 38f929b0 full Unicorn profile reaches flight and
+exhausts four billion instructions without a guest fault (16,000 ticks,
+15,933 IRQ0 deliveries). Cockpit, sky, terrain and HUD are now visible.
+The pressed main-menu button frame matches the original across all 640×400
+pixels after 550 million instructions. The shorter 1.5-billion replay ends
+during mission loading and is insufficient for this profile.
 
-Terrain and HUD are visible, but the cockpit and sky are missing and HUD/text
-rendering remains distorted. Rendering bisection continues; a usable flight
-session, matching replay state, and the combined hand-written/mechanical
-milestones remain incomplete. These checks do not establish full-game
-equivalence. The tracked source inventory contains 4,293 functions: 3,368
+A fresh Nix hybrid build at 38f929b0 passes 526 tests (75 skips), but native
+camera input exposes a separate shadowed-text alias calling-convention fault.
+The current EF_CDECL correction passes five pending-message differential
+cases and the private native camera test renders an external aircraft without
+that fault. Xvfb sends Alt with the scripted F4/F1 keys; plain function keys
+remain to be checked. The external view's terrain differs visibly from the
+original, so rendering equivalence and a usable flight session remain
+unproven. The combined hand-written/mechanical milestones also remain
+incomplete. These checks do not establish full-game equivalence.
+The tracked source inventory contains 4,293 functions: 3,368
 `compiles`, 30 `verified`, 11 `spliced`, 866 `blocked`, and 9 `compiles-bad`,
 plus nine entries in other states. These inventory counts do not measure
 which functions the hybrid actually executes.

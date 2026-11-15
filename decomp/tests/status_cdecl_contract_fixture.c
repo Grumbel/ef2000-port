@@ -9,5 +9,6 @@ uint32_t status_cdecl_contract_fixture(void)
     format_ui_status_float(0x5000, 0x6000, 1.25);
     format_ui_status_value(0x5000, 0x6000, 33);
     guest_fn_a4342_plain(0x5000, 0x6000);
+    guest_fn_48c90(15, 310, 5, 0x6000);
     return draw_tactical_mode_item(1, 0x6000);
 }

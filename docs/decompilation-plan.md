@@ -5203,3 +5203,62 @@ strnlen_far_ed542 offset-1 fault in this run; it does not establish pixel
 or gameplay equivalence. See local/integer-text-20261116/{native.sh,game.log}
 and output/{report.json,framebuffer.png}. All generated data used the drive
 overlay and input was confined to a private Xvfb display.
+
+
+### 2026-11-16 — Pass shadowed text arguments on the caller stack
+
+The fresh 38f929b0 Nix hybrid build succeeds: 526 tests, 75 skips, 359.151
+seconds. Its private native SDL run reaches MISS3 flight, but an external
+view input exposes a null format pointer in original 0xed133 (fault ed1b6).
+The identical unpatched-original input run completes 100 seconds without a
+fault. Xvfb's key mapping sends Alt make/break around the requested F4/F1;
+these results cover those actual combinations, not plain function keys.
+
+Temporary ignored diagnostic traps at ed133 confirm EDX=0 and identify the
+call through original 48c90. The guest_fn_48c90 declaration said cdecl in a
+comment but lacked EF_CDECL, so compiled callers supplied four GPR arguments
+to an original stack-argument entry. Add EF_CDECL and correct the public
+signature's stack cleanup from 16 to 0 (RET at 48d58). Original callers
+912fb and 3b78 push the four fixed arguments; 912b8 explicitly removes 16.
+The original variadic renderer remains original; no unknown suffix is copied.
+Rebuild all five direct-caller modules: misc_drafts1, small_wrappers4,
+small_wrappers7, state_reset1 and game_helpers43.
+
+Five authored 912b8 cases log the width argument and all four drawing stack
+arguments, covering positive/expired/negative message counts, count wrap and
+signed-width truncation. The one-redirect old patch passes only the two skip
+cases; the repaired one passes all five, including RAM, ESP and preserved
+registers. The existing separately compiled status fixture now also executes
+this alias and checks caller cleanup. All 53 focused tests pass; all five
+Watcom modules compile with zero warnings/errors; tracker check 4293.
+Evidence: local/shadow-text-cdecl-20261116/{old.log,old.json,fixed.json,
+tests.log,compile-*.log}. Commands: ef2000_wcc.py for those five modules;
+func_differential.py 0x912b8 with explicit spec and --flat-segments; the eight
+focused unittest modules; decomp_status.py check.
+
+The full 38f929b0 replay also completes four billion instructions without a
+fault (16000 ticks, 15933 IRQ0 deliveries), with cockpit and sky restored.
+The latest pressed-button frame matches the original across all 640x400
+pixels after 550 million instructions. See local/integer-text-20261116/
+{cockpit-long.log,cockpit-long.png,pressed.log,pressed.ppm,verification-summary.json}.
+The successful package is local/hybrid-integer-text-20261116; full build logs
+are local/hybrid-integer-text-build-02-20261116/{build.log,runtime.log,exit-status}.
+The first Nix client ended externally 143 mid-suite; its saved log is not a
+failed-test verdict. Ordinary detached children did not survive tool cleanup;
+the successful retry ran in a private tmux session with a durable exit status.
+
+The repaired full-profile private native run completes its 100-second limit,
+launcher exit 0, with no guest fault after the actual Alt+F4/Alt+F1 input.
+Its captures show an external aircraft. Both the original and hybrid remain
+in external view after the scripted F1 combination; this is not proof of a
+return to the cockpit. The hybrid external view has a visible terrain
+mismatch (much of its background is gray where the original shows terrain),
+which remains to be isolated. See local/shadow-text-cdecl-20261116/
+{native.sh,driver.log,game.log,external-window.png,returned-window.png} and
+output/report.json. Original controls: local/native-original-camera-20261116/.
+Diagnostic-only traps, never committed: local/native-camera-null-format-20261116/
+and local/native-camera-null-caller-20261116/. The first packaged screenshot
+helper hung after the fault destroyed its window; only that private test
+session was terminated. Subsequent captures use a five-second timeout.
+The fresh package built above predates this alias fix; rebuilding the latest
+package and plain-function-key checks remain pending.

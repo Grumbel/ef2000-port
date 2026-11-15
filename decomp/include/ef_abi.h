@@ -2807,7 +2807,7 @@ void guest_fn_275a4(void); /* 0x275a4 */
 uint32_t guest_fn_27fec(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x27fec EAX/EDX/EBX/ECX */
 void EF_CDECL guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 cdecl */
 uint32_t guest_fn_a7900(ef_addr32 name); /* 0xa7900 cdecl */
-void guest_fn_48c90(uint32_t row, uint32_t col, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl */
+void EF_CDECL guest_fn_48c90(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl, caller cleanup */
 
 /* runtime_helpers19.c */
 uint32_t dos_call_350b_880(void);

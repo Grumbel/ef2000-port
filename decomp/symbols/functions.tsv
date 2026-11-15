@@ -1881,7 +1881,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00091238	33	begin_mode_35	misc_state	compiles	game	confirmed	decomp/tests/0x00091238.json	docs/compiler-abi.md; byte 0x12db9e=0x35, word 0x21449c=1, 0xd0b68(0x12dbec); callers 92c28@92ceb,92c28@92daf; guest pending
 0x0009125c	60	scene_lookup_named_word	scene_state	compiles	game	confirmed	decomp/tests/0x0009125c.json	docs/compiler-abi.md
 0x00091298	29	scene_metric_remaining	scene_state	compiles	game	confirmed	decomp/tests/0x00091298.json	docs/compiler-abi.md
-0x000912b8	79	draw_pending_message_912b8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000912b8.json	docs/compiler-abi.md; While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row ; callers 3dd30@3e344; guest pending
+0x000912b8	79	draw_pending_message_912b8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000912b8.json	docs/compiler-abi.md; While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row ; callers 3dd30@3e344; 5 authored differential cases pass with stack-argument logging; 48c90 alias corrected to caller-cleaned cdecl; full replay equivalence pending
 0x000913dc	1298			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x000918f0	30	scene_metric_reaches_threshold	scene_state	compiles	game	confirmed	decomp/tests/0x000918f0.json	docs/compiler-abi.md
 0x00091910	73	set_scene_input_triplet	scene_state	compiles	game	confirmed	decomp/tests/0x00091910.json	docs/compiler-abi.md

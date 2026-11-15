@@ -40,6 +40,7 @@ class CallbackAbiTests(unittest.TestCase):
                 ('format_ui_status_float', (0x5000, 0x6000, 0, 0x3ff40000)),
                 ('format_ui_status_value', (0x5000, 0x6000, 33)),
                 ('guest_fn_a4342_plain', (0x5000, 0x6000)),
+                ('guest_fn_48c90', (15, 310, 5, 0x6000)),
                 ('draw_tactical_mode_item', (1, 0x6000)),
             ]
             targets = {name: 0x3000 + index * 0x100
@@ -59,7 +60,7 @@ class CallbackAbiTests(unittest.TestCase):
                     stub.extend(b'\xa3' + struct.pack('<I', 0x9000 + index * 0x20 + word * 4))
                 stub.extend(b'\xb8\x34\x12\x00\x00\xc3')
                 cpu.mem_write(targets[name], bytes(stub))
-            cpu.mem_write(0x9000, b'\xa5' * 0xa0)
+            cpu.mem_write(0x9000, b'\xa5' * (len(cases) * 0x20))
             cpu.mem_write(0x10000, struct.pack('<I', 0x8000))
             cpu.reg_write(x86.UC_X86_REG_ESP, 0x10000)
             cpu.emu_start(0x1000 + entry.offset, 0x8000, count=1000)
