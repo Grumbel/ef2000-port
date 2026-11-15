@@ -5,7 +5,11 @@
  * the original game (an older compiler) inlined: 64-bit shifts, multiply and
  * divide, and the truncating float-to-integer rounding step. They are
  * register-convention routines (A = EDX:EAX, B = ECX:EBX, count in EBX) that
- * preserve every register except the result registers (the aux pragmas below declare everything modified so that the compiler emits no prologue; the asm saves what it uses).
+ * preserve every register except the result registers. The private aux
+ * pragmas declare all GPR modified to suppress compiler-generated saves:
+ * every assembly body owns its stack and executes its own RET. The bodies
+ * save the registers required by the compiler helper/callback ABI; the
+ * private declarations do not define the recovered callers' public ABI.
  *
  * The bodies are hand-written assembly; they are not recovered game code. */
 
@@ -51,23 +55,23 @@ void *memcpy(void *dest, const void *src, unsigned count);
 #pragma aux __U8D "*" parm [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux __I8D "*" parm [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux __CHP "*" parm [] modify [eax ebx ecx edx esi edi ebp]
-#pragma aux if_dsqrt "IF@DSQRT" parm [] modify []
-#pragma aux if_dsin "IF@DSIN" parm [] modify []
-#pragma aux if_dcos "IF@DCOS" parm [] modify []
-#pragma aux if_dlog "IF@DLOG" parm [] modify []
-#pragma aux if_dtan "IF@DTAN" parm [] modify []
-#pragma aux if_datan "IF@DATAN" parm [] modify []
-#pragma aux if_dfmod "IF@DFMOD" parm [] modify []
-#pragma aux thunk_guest_fatal_arg "guest_fatal_arg_" parm [] modify []
-#pragma aux thunk_guest_fatal_arg3 "guest_fatal_arg3_" parm [] modify []
-#pragma aux thunk_guest_report_parser_enum_error "guest_report_parser_enum_error_" parm [] modify []
-#pragma aux thunk_guest_parser_line_overflow "guest_parser_line_overflow_" parm [] modify []
-#pragma aux thunk_report_buffer_capacity_exceeded "report_buffer_capacity_exceeded_" parm [] modify []
-#pragma aux thunk_guest_callptr4s2_x "guest_callptr4s2_x_" parm [] modify []
-#pragma aux if_datan2 "IF@DATAN2" parm [] modify []
-#pragma aux ceil "*" parm [] modify []
-#pragma aux floor "*" parm [] modify []
-#pragma aux trunc "*" parm [] modify []
+#pragma aux if_dsqrt "IF@DSQRT" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_dsin "IF@DSIN" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_dcos "IF@DCOS" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_dlog "IF@DLOG" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_dtan "IF@DTAN" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_datan "IF@DATAN" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_dfmod "IF@DFMOD" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_guest_fatal_arg "guest_fatal_arg_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_guest_fatal_arg3 "guest_fatal_arg3_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_guest_report_parser_enum_error "guest_report_parser_enum_error_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_guest_parser_line_overflow "guest_parser_line_overflow_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_report_buffer_capacity_exceeded "report_buffer_capacity_exceeded_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux thunk_guest_callptr4s2_x "guest_callptr4s2_x_" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux if_datan2 "IF@DATAN2" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux ceil "*" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux floor "*" parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux trunc "*" parm [] modify [eax ebx ecx edx esi edi ebp]
 
 /* EDX:EAX <<= EBX (counts of 64 or more give 0). */
 void __U8LS(void)

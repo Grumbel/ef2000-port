@@ -4571,3 +4571,33 @@ the same tick at another control transfer: execution reaches heap data
 a successful flight replay. The previous block-tail evidence is in
 local/six-field-label-20261115/exp-entry-capture.log; corrected integration
 result: local/trig-call-abi-20261115/extended-checkpoint.log.
+
+
+### 2026-11-15: suppress compiler frames around assembly-owned helper stacks
+
+[x] The next block tail ends in IF@DSQRT, then heap data at 0xcc50bf.
+Disassembly of watcom_rt_helpers shows PUSH EBX/ECX/EDX/ESI/EDI before FSQRT;
+the handwritten RET executes before the generated POPs and jumps to saved
+EDI. Seventeen recently added private pragmas incorrectly said MODIFY [].
+Like the existing integer helpers, declare all GPR modified to suppress
+compiler saves around these assembly-owned stacks. Each body still preserves
+its required registers explicitly. This private implementation declaration
+does not weaken recovered callers' public contracts.
+
+Add asset-free tests for all 17 affected helpers: eight ST0 math operations,
+ceil/floor/trunc with three inputs each, five cdecl diagnostic thunks and the
+four-register/two-stack callback thunk. Check return addresses, exact stack
+cleanup, arguments, preserved GPR, returned math values, x87 control word and
+empty tags after consuming the result. The old object faults in all 23
+subcases; the corrected object passes. All 42 focused tests pass:
+EF2000_WCC386=<wcc386> PYTHONPATH=<Unicorn> python3 -m unittest
+ tests.test_watcom_rt_helpers tests.test_callback_abi tests.test_ef2000_wcc
+ tests.test_hybrid_link tests.test_func_differential tests.test_replay_suite
+ tests.test_hybrid_bisect. The runtime module compiles warning-free.
+Evidence: local/runtime-helper-frames-20261115/{old-tests,tests}.log.
+
+The full 2595-redirect replay passes the tick-5207 invalid helper return,
+then faults at tick 5214: fetch 0x180c7e5a, ESP 0x3ffeca0. Flight usability
+remains incomplete. Original-transfer evidence:
+local/trig-call-abi-20261115/transfer-trace.log. Corrected integration log:
+local/runtime-helper-frames-20261115/extended-checkpoint.log.
