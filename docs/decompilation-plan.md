@@ -5122,3 +5122,44 @@ Commands: Nix Python -m unittest tests.test_asm_x87_oracle
 tests.test_asm_x87_compare with ASM_COMPARE_EVIDENCE set, plus the selected
 signal regression. No recovered game code or comparison expectations changed.
 The package build must be retried with this observation fix.
+
+### 2026-11-16 — preserve the view-volume entry's registers and carry
+
+Corrected 0xc473c: AX is the margin; ESI/EDI/EBP carry x/y/z. The old C ABI
+used EDX/EBX/ECX instead. Original callers 0x15be2e/0x160147/0x16017b also use
+CF from the final SHR, not just the EAX return. Watcom rejects EBP as an
+ordinary C parameter, so this entry now has a small register/flag adapter;
+it forwards the four stack arguments to the existing 0xceb40 guest entry
+and returns directly after SHR. The C point-in-view-volume implementation
+is unchanged. The GCC value-only model remains available for host probes.
+Corrected the signature's preserved set to ESI/EDI/EBP; EBX/ECX/EDX are scratch.
+
+Six authored differential cases record all four stack arguments and compare
+CF, EAX, preserved registers, RAM and ESP. Old C fails all six; the actual
+one-redirect adapter patch passes all six, including even/odd and high-bit
+results. Watcom has zero warnings/errors; disassembly confirms no compiler
+frame or flag-changing epilogue; all 53 focused tests pass; tracker check 4293.
+Early failed-compilation artifacts with zero redirects are not validation.
+Evidence: local/view-volume-20261116/{view-adapter.json,view-adapter.efpatch,
+misc.asm,tests.log} and local/view-volume-old-20261116.efpatch.
+
+The ten-redirect diagnostic profile now restores the cockpit and sky. Its
+320x200 black mask matches all 64000 original pixels, previously 52.9281%
+different. Raw colors are not claimed identical. It ends at instruction_limit,
+6000 ticks, 5952 IRQ0 deliveries. See diagnostic-correct.{json,log,ppm,png} in
+that directory. The first diagnostic mistakenly replaced the default exclusion
+list and enabled unsafe entries; its early unsupported-interface result is
+inconclusive. The corrected run retains the union of persistent exclusions
+and trial03 exclusions. The sixth bounded bisection ended externally 143
+before saving its final report; trial03 had reproduced the symptom with ten
+redirects and its incremental exclusions were retained for this control.
+
+The full native input run reaches flight but exposes a separate fault at
+compiled 0x03044cf4 in strnlen_far_ed542, passed offset 1 from the formatter.
+Full-profile rendering/usability remains pending; see game.log and output/
+report.json. Commands: ef2000_wcc.py for misc_drafts1; func_differential.py
+0xc473c with explicit spec and --flat-segments; the same eight focused
+unittest modules; private-Xvfb diagnostic-correct.sh and native.sh.
+The preceding fbebfbaa Nix hybrid build now completes successfully after the
+signal observation fix, at local/hybrid-signal-guard-20261116. It predates
+this view-volume correction.
