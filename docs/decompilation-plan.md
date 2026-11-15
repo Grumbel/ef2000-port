@@ -4347,3 +4347,27 @@ from the actual helper and a callback clobbering EBX/ECX/EDX/ESI/EDI; the focuse
 all-clobbers{,-diff}.log, all-clobbers.ppm and tests.log. The separate cockpit
 loading fault persists after the intermediate narrower clobber correction;
 full launcher/gameplay validation remains pending.
+
+### 2026-11-15: reject interrupted native x87 observations
+
+The launcher rebuild at 312a1cfd runs 508 Python tests but fails the native
+extended-memory test: saved FIP is zero instead of the instruction address.
+This is the same class of intermittent observation as the earlier FLD failure.
+A local diagnostic records an involuntary context switch with the zero FIP.
+A disposable probe then pins itself and a busy child to one CPU and inserts
+sched_yield between the native x87 instruction and FNSAVE: it reproduces FIP=0
+with the involuntary-switch count changing from 34 to 35 inside the measured
+native-call interval. Evidence remains in local/nix-x87-memory-20261115/
+{probe,probe-immediate,probe-yield}.log. Do not infer a translator mismatch from
+this interrupted hardware observation.
+
+Add a test helper that samples thread voluntary/involuntary context-switch
+counters immediately around the native call. Discard only samples with a
+measured switch, at most four attempts; repeated interruption raises an error.
+Use it for the two native load/memory tests that have exhibited the failure.
+All existing pointer, opcode, numeric, exception and guest-state assertions
+remain strict. No generated-code failure is retried. Three synthetic tests
+prove that an uninterrupted result (including zero) is returned unchanged,
+only measured switches cause another observation, and repeated interruption
+fails closed. Seven helper/load/memory tests pass in the failed derivation's
+exact Nix environment (12.870 seconds); fixed-tests.log records the result.

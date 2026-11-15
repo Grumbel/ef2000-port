@@ -17,6 +17,7 @@ import unittest
 
 from tools import asm_to_c, asm_x87, asm_c_differential as diff
 from tests.test_asm_to_c import assemble
+from tests.native_x87 import call_without_context_switch
 
 
 @unittest.skipUnless(platform.machine() == 'x86_64' and
@@ -92,7 +93,7 @@ uintptr_t op%d(const void *initial, void *out, void *data) {
                                         operand_tags = (tags & ~(3 << (top*2))) | (payload_class << (top*2))
                                     struct.pack_into('<H', initial, 8, operand_tags)
                                 data = (ctypes.c_uint8 * 10).from_buffer_copy(struct.pack('<QH', *payload))
-                                instruction = native(saved, output, data)
+                                instruction = call_without_context_switch(native, saved, output, data)
                                 observed = bytes(output)
                                 memory[0x500:0x50a] = struct.pack('<QH', *payload)
                                 state = diff.State((ctypes.c_uint32 * 8)(), 0xad7, 0x100, 0, ram, len(memory))
@@ -115,7 +116,7 @@ uintptr_t op%d(const void *initial, void *out, void *data) {
                                 self.assertEqual(bytes(memory[0x500:0x50a]), bytes(data), context)
                                 self.assertEqual(memory[0x4ff], 0x5a)
                                 self.assertEqual(memory[0x50a], 0x5a)
-                                self.assertEqual(struct.unpack_from('<I', observed, 12)[0], instruction & 0xffffffff)
+                                self.assertEqual(struct.unpack_from('<I', observed, 12)[0], instruction & 0xffffffff, context)
                                 self.assertEqual(struct.unpack_from('<I', observed, 20)[0], ctypes.addressof(data) & 0xffffffff)
                                 self.assertEqual((state.x87_ip, state.x87_cs, state.x87_dp, state.x87_ds),
                                                  (0x100, 8, 0x500, 16), context)

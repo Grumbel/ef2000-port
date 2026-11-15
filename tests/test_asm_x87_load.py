@@ -14,6 +14,7 @@ import unittest
 
 from tools import asm_to_c, asm_x87, asm_c_differential as diff
 from tests.test_asm_to_c import assemble
+from tests.native_x87 import call_without_context_switch
 
 
 @unittest.skipUnless(platform.machine() == 'x86_64' and
@@ -108,7 +109,8 @@ uintptr_t native%d(const void *initial, void *out, void *data) {
                     encoded = bits.to_bytes(width//8, 'little')
                     data[:width//8] = encoded
                     memory[0x500:0x500+width//8] = encoded
-                    pc = native((ctypes.c_uint8 * 108).from_buffer(initial), output, data)
+                    pc = call_without_context_switch(native,
+                        (ctypes.c_uint8 * 108).from_buffer(initial), output, data)
                     state = diff.State.from_buffer_copy(saved_template)
                     state.x87_control, state.x87_status, state.x87_tag = control, status, tags
                     context = (width, hex(bits), hex(control), top, hex(tags))
