@@ -38,9 +38,9 @@ void refresh_weapon_state_8cb60(void)
     if (unit == 0)
         return;
     if (EF_U8(0x001f6f4fu) != 0)
-        guest_fn_8cae8_w();
+        guest_fn_8cae8_w(unit);
     else
-        guest_fn_8ca24_w(EF_S32(unit + 0x26u) >> 16);
+        guest_fn_8ca24_w(unit, EF_S32(unit + 0x26u) >> 16);
     if (EF_U8(0x00127da8u) != 0)
         EF_U8(0x001f6f4fu) = 0;
     EF_U8(unit + 0x1d7u) = first_nonignored_activity_slot((int16_t)(EF_S32(unit + 0x14u) >> 16));

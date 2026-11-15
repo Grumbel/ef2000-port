@@ -3696,8 +3696,8 @@ void init_scene_angles_94000(void);
 void count_ground_kill_9a8b4(ef_addr32 record, uint32_t kind);
 void count_air_kill_9a998(ef_addr32 record);
 void guest_fn_17754_w(void); /* 0x17754 */
-void guest_fn_8cae8_w(void); /* 0x8cae8 */
-void guest_fn_8ca24_w(int32_t a); /* 0x8ca24 EDX */
+void guest_fn_8cae8_w(ef_addr32 unit); /* 0x8cae8 EAX */
+void guest_fn_8ca24_w(ef_addr32 unit, int32_t index); /* 0x8ca24 EAX/EDX */
 void guest_fn_86720_w(void); /* 0x86720 */
 void guest_fn_d9ba0_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xd9ba0 EAX/EDX/EBX/ECX/stack */
 ef_addr32 guest_fn_c1b8c_w(int32_t a, ef_addr32 b); /* 0xc1b8c EAX/EDX -> EAX */

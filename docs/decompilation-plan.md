@@ -5035,3 +5035,36 @@ game.log and output/{calls.log,report.json}. This is not a full replay pass,
 so the function remains compiles. The second cockpit-mask bisection batch
 also completed: unresolved,487 remaining candidates; its durable report is
 local/cockpit-mask-bisect-02-20261115/report.json.
+
+### 2026-11-16 — pass the unit to both weapon refresh paths
+
+Corrected refresh_weapon_state_8cb60's calls to 0x8ca24 and 0x8cae8: both
+require the unit pointer in EAX; 0x8ca24 also takes the signed loadout index
+in EDX. The prior aliases omitted the pointer, so mission acceptance reached
+init_weapon_slots_8ca24 with REC=0 and faulted at compiled 0x03045a29.
+Original calls 0x8cb83/0x8cb90 and the callees' prologues confirm the inputs;
+0x8d3c7 independently forwards unit EAX and loadout EDX to 0x8ca24.
+
+Replaced the empty refresh probe with three authored differential cases:
+loadout refresh, saved-slot refresh, and missing player. Synthetic callees
+record both unit pointers and the signed index, while the rest of the
+original refresh body exercises its stores. Previous C passes only the
+missing-player case; corrected C passes all three, including RAM, stack and
+preserved registers. Both alias declarations and their calls are corrected.
+The entry remains compiles until full replay fidelity is established.
+
+Watcom compiles game_helpers53 with zero warnings/errors; all 53 focused
+unittests pass and decomp_status.py check reports 4293 entries. Commands:
+ef2000_wcc.py for game_helpers53; func_differential.py 0x8cb60 with the explicit
+spec and --flat-segments; the same eight focused unittest modules used for
+the preceding tokenizer correction. Evidence: ignored
+local/weapon-refresh-20261116/{refresh.efpatch,tests.log} and
+local/weapon-refresh-old-20261116.efpatch.
+
+The real SDL-input run on a private Xvfb display now accepts the mission,
+enters flight and completes its100-second test at time_limit: launcher
+exit0, guest return27, faults[], startup_checkpoint_verified=true. The
+captured frame has terrain and HUD but missing cockpit/sky and distorted
+HUD/text; flight fidelity is not established. See this directory's
+game.log and output/{report.json,calls.log,framebuffer.png}. The complete
+2597-redirect C++ cockpit replay is also running as an independent check.
