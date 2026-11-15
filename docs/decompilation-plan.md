@@ -4977,3 +4977,34 @@ local/native-packaged-fixed-20261115{.log,/report.json,/calls.log}.
 The separate fresh-object C++ menu observation ended externally with143 and
 no log; it is inconclusive, not a replay failure or pass. The black-mask
 bisection of the prior profile remains live as an independent diagnostic.
+
+### 2026-11-15 — preserve the keyboard handler's live data selector
+
+Corrected store_selector_fe610: hybrid Watcom now reads DS through
+guest_seg_x(3), as the original MOV AX,DS does, instead of writing zero to
+0xfe624. That word is the immediate loaded by the IRQ1 handler at 0xfe622.
+Real SDL Return input exposed a native general-protection fault at 0xfe639
+with DS=0; flat-memory menu replays had not exercised this protection check.
+The nonzero protected-mode differential fails the previous C (expected 0x10,
+actual 0) and passes the replacement, including EAX, preserved registers,
+stack and observed RAM writes. The authored surrounding instruction canaries
+also detect widened writes. The entry remains compiles: full replay fidelity
+is still pending.
+
+Evidence: local/keyboard-selector-20261115/{selector.efpatch,game.log,
+output/report.json,output/calls.log}. A private Xvfb SDL run receives two
+Return make/break pairs at guest port 0x60, ends at its 40-second time limit,
+launcher exit 0, guest return 27, faults[], startup_checkpoint_verified=true.
+This proves removal of the first-key crash, not interactive flight readiness.
+Watcom compilation has zero warnings/errors; all 53 focused tests pass;
+decomp_status.py check reports 4293 entries. Commands: ef2000_wcc.py for
+misc_drafts1; func_differential.py 0xfe610 with the explicit spec and
+--flat-segments; unittest modules test_watcom_rt_helpers, test_callback_abi,
+test_ef2000_wcc, test_hybrid_link, test_func_differential, test_replay_suite,
+test_hybrid_bisect and test_decomp_app.
+
+The bounded cockpit black-mask bisection completed with outcome unresolved,
+649 exclusions and 1947 remaining candidates (not a minimal culprit set).
+Its report is local/cockpit-mask-bisect-01-20261115/report.json. The next
+batch can resume those exclusions; it must continue distinguishing the
+640x400 loading stall from the 320x200 cockpit rendering mismatch.

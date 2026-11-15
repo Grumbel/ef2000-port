@@ -1,1 +1,19 @@
-{"address":"0x000fe610","function_size":15,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0x000fe610",
+  "function_size": 15,
+  "max_instructions": 1000,
+  "cases": [
+    {
+      "name": "store_live_data_selector_with_instruction_guards",
+      "registers": {
+        "eax": "0xdeadbeef"
+      },
+      "memory": [
+        {
+          "address": "0xfe620",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}
