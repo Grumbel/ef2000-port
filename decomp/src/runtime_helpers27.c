@@ -123,12 +123,13 @@ uint32_t read_record_header_f604(ef_addr32 record)
 /* 0xfb10, 187 bytes. Read a list of 25-byte points and clamp the inner ones into 12..387. */
 uint32_t read_point_list_fb10(ef_addr32 list)
 {
-    int32_t count = (int16_t)guest_fn_e95c();
+    int32_t count;
     int32_t i = 0;
     uint32_t offset = 0;
 
     read_parser_line();
     read_parser_token();
+    count = (int16_t)guest_fn_e95c();
     EF_U16(list) = (uint16_t)count;
     EF_U32(list + 2u) = guest_allocate_parser_text((uint32_t)(count * 25), 0);
     if (EF_U32(list + 2u) == 0)

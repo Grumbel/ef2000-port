@@ -1,1 +1,139 @@
-{"address":"0x0000fb10","function_size":187,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000"},"memory":[]}]}
+{
+  "address": "0xfb10",
+  "function_size": 187,
+  "max_instructions": 10000,
+  "cases": [
+    {
+      "name": "new_line_count_0",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x530000",
+          "hex": "000000000000000000000000a5a5a5a5"
+        },
+        {
+          "address": "0xe810",
+          "hex": "c7050000530001000000b841000000c3"
+        },
+        {
+          "address": "0xe89c",
+          "hex": "ff050000530031c0c3"
+        },
+        {
+          "address": "0xe95c",
+          "hex": "8b0500005300a30c00530083f802740331c0c3a104005300c3"
+        },
+        {
+          "address": "0x121ebc",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a308005300b800005400c3"
+        },
+        {
+          "address": "0xed80",
+          "hex": "c70000100000c74004fbffffffb801000000c3"
+        }
+      ]
+    },
+    {
+      "name": "new_line_count_1",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x530000",
+          "hex": "000000000100000000000000a5a5a5a5"
+        },
+        {
+          "address": "0xe810",
+          "hex": "c7050000530001000000b841000000c3"
+        },
+        {
+          "address": "0xe89c",
+          "hex": "ff050000530031c0c3"
+        },
+        {
+          "address": "0xe95c",
+          "hex": "8b0500005300a30c00530083f802740331c0c3a104005300c3"
+        },
+        {
+          "address": "0x121ebc",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a308005300b800005400c3"
+        },
+        {
+          "address": "0xed80",
+          "hex": "c70000100000c74004fbffffffb801000000c3"
+        }
+      ]
+    },
+    {
+      "name": "new_line_count_3",
+      "registers": {
+        "eax": "0x510000"
+      },
+      "memory": [
+        {
+          "address": "0x510000",
+          "hex": "a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x530000",
+          "hex": "000000000300000000000000a5a5a5a5"
+        },
+        {
+          "address": "0xe810",
+          "hex": "c7050000530001000000b841000000c3"
+        },
+        {
+          "address": "0xe89c",
+          "hex": "ff050000530031c0c3"
+        },
+        {
+          "address": "0xe95c",
+          "hex": "8b0500005300a30c00530083f802740331c0c3a104005300c3"
+        },
+        {
+          "address": "0x121ebc",
+          "hex": "00005200"
+        },
+        {
+          "address": "0x520000",
+          "hex": "a308005300b800005400c3"
+        },
+        {
+          "address": "0xed80",
+          "hex": "c70000100000c74004fbffffffb801000000c3"
+        }
+      ]
+    }
+  ]
+}

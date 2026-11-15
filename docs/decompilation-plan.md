@@ -4464,3 +4464,24 @@ An earlier diagnostic without that tracepoint ran unexpectedly long and was
 explicitly terminated (exit 143), not counted as a guest pass/failure. Host
 ptrace inspection was denied by the kernel. Artifacts remain under
 local/allocator-callback-20261115/pressed{,-traced}*.
+
+### 2026-11-15: retain point-list parser call order
+
+[x] Move the count read in read_point_list_fb10 after read_parser_line and
+read_parser_token. Original fb18/fb1d/fb22 perform those three calls in that
+order; the C initializer called the integer parser on the previous line.
+Three isolated adapters record call phase and allocation size for counts
+0,1,3 and populate coordinates so only the middle point is clamped. Old C
+fails all three, fixed C passes all three with ABI/RAM comparison (17 observed
+original blocks). The module compiles warning-free; 37 focused Python tests
+pass. Use isolated-fixed.efpatch for these stubbed-callee tests: the full
+patch calls compiled parser bodies and intentionally bypasses original-entry
+stubs. Evidence: local/point-list-order-20261115/{old,isolated-fixed,tests}.log.
+
+The full 2595-redirect profile still reports the same mission-file line-30
+waypoint error. A capture before enter_handler_eb448 teardown shows the actual
+message and parser line "WP_ROUTE 2 0 1", cursor 14. Its caller chain is
+parse_component_record_f314 -> read_record_ed80 -> read_parser_enum_19_names,
+not the corrected point-list function. Investigate that component's earlier
+line consumption next. Evidence: local/point-list-order-20261115/replay.log
+and error-captures/; all assets/snapshots remain local.
