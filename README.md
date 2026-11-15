@@ -113,6 +113,8 @@ In particular:
 
 | Reference | Why it matters |
 | --- | --- |
+| [TFX Enhanced](https://github.com/Buyukcaglar/tfx-enh) | Modernized version of TFX, EF2000's prequel. |
+| [F-22: Air Dominance Fighter](https://store.steampowered.com/app/3146140/F22_Air_Dominance_Fighter/) | Modernized version of EF2000's sequel. |
 | [tfx3view / tfxdat](https://github.com/Grumbel/tfx3view) | Existing DID archive extraction and 3D geometry viewer; distinct from the menu/mission scripts. |
 | [EFUTIL discussion](https://simhq.net/forum/ubbthreads.php/topics/3835020/re-ef2000-reloaded), [ReViVe](https://www.combatsim.com/memb123/archive/htm/htm_arc2/evolute.htm), [Strategic Commander](https://simhq.net/forum/ubbthreads.php/topics/3458818/3) | Legacy campaign aircraft-swapping, restoration and scenario editing tools. **EFUTIL is not a mission extractor.** |
 | [EF2000 Reloaded](https://simhq.net/forum/ubbthreads.php/topics/3830314/all/EF2000_Reloaded) and [3Dfx installation notes](https://www.tales-from-darkenedroom.com/post/ef2000-updated-part-3-ef2000-reloaded-dosbox) | Specialized DOSBox Voodoo emulation for DOS **GFX+**; the statically linked graphics library prevents straightforward Glide-wrapper interception. |
