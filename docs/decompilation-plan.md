@@ -5163,3 +5163,43 @@ unittest modules; private-Xvfb diagnostic-correct.sh and native.sh.
 The preceding fbebfbaa Nix hybrid build now completes successfully after the
 signal observation fix, at local/hybrid-signal-guard-20261116. It predates
 this view-volume correction.
+
+
+### 2026-11-16 — Restore the integer conversion terminator
+
+The 0x10e46f reverse digit buffer omitted the initial zero byte stored by
+original 0x10e480. Copying the reversed digits therefore read below the
+buffer until incidental stack data contained zero, corrupting formatter
+output. Seed digits[0] with zero and start the count at one. The signed
+0x10e4b8 wrapper now negates an unsigned magnitude, preserving original
+32-bit NEG behavior for INT32_MIN without C signed overflow. Disassembly
+and both formatter call sites confirm ECX/ESI/EDI/EBP preserved, with EBX
+and EDX scratch; correct the signature rows accordingly.
+
+Seven cases per entry cover zero, decimal, unsigned maximum, binary,
+hexadecimal, negative and minimum signed inputs. Their stack is backed by
+nonzero payload data at 0x180000 to expose the missing terminator rather
+than hiding it in freshly zeroed scratch RAM. Both old entries fail all
+seven RAM comparisons; the actual two-redirect repaired patch passes all
+14, including destination guards, return pointer, preserved GPRs and ESP.
+Watcom reports zero warnings/errors. All 53 focused tests pass and the
+tracker check covers 4293 functions. Entries remain compiles until complete
+replay equivalence is established. Evidence: local/integer-text-20261116/
+{old-poison.log,old-signed.log,old.json,fixed.json,tests.log,compile.log}.
+Commands: ef2000_wcc.py for runtime_libc; func_differential.py 0x10e46f and
+0x10e4b8 with explicit specs and --flat-segments; the eight focused unittest
+modules listed in the previous checkpoint; decomp_status.py check.
+
+The preceding fbebfbaa Nix runtime build is independently confirmed to have
+passed 526 tests (75 skips) in 365.436 seconds. Its successful hybrid package
+predates the view-volume and integer conversion fixes; see
+local/hybrid-signal-guard-20261116-runtime.log. A fresh package build and
+interactive verification remain necessary.
+
+The full 2597-redirect native SDL input run now reaches MISS3 flight and
+finishes its 100-second limit without a guest fault (launcher exit 0).
+Its frame shows the cockpit, HUD, terrain and sky. This clears the previous
+strnlen_far_ed542 offset-1 fault in this run; it does not establish pixel
+or gameplay equivalence. See local/integer-text-20261116/{native.sh,game.log}
+and output/{report.json,framebuffer.png}. All generated data used the drive
+overlay and input was confined to a private Xvfb display.

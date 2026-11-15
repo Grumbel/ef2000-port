@@ -18,9 +18,11 @@ void call_11d258_default(void)
 ef_addr32 unsigned_to_text(uint32_t value, ef_addr32 destination, uint32_t radix)
 {
     uint8_t digits[0x28];
-    uint32_t count = 0;
+    uint32_t count = 1;
     uint8_t c;
     ef_addr32 out = destination;
+    /* Original 0x10e480 seeds the reverse buffer with the terminator. */
+    digits[0] = 0;
     do {
         digits[count++] = EF_U8(0x0010e44au + value % radix);
         value /= radix;
@@ -37,12 +39,13 @@ ef_addr32 unsigned_to_text(uint32_t value, ef_addr32 destination, uint32_t radix
 ef_addr32 signed_to_text(int32_t value, ef_addr32 destination, uint32_t radix)
 {
     ef_addr32 out = destination;
+    uint32_t magnitude = (uint32_t)value;
     if (radix == 10 && value < 0) {
-        value = -value;
+        magnitude = 0u - magnitude;
         EF_U8(out) = 0x2d;
         ++out;
     }
-    unsigned_to_text((uint32_t)value, out, radix);
+    unsigned_to_text(magnitude, out, radix);
     return destination;
 }
 

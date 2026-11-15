@@ -1,1 +1,107 @@
-{"address":"0x0010e4b8","function_size":27,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000","ebx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x10e4b8",
+  "function_size": 27,
+  "max_instructions": 10000,
+  "cases": [
+    {
+      "name": "zero",
+      "registers": {
+        "eax": "0x0",
+        "edx": "0x540010",
+        "ebx": "0xa"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "decimal",
+      "registers": {
+        "eax": "0x75bcd15",
+        "edx": "0x540010",
+        "ebx": "0xa"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "maximum",
+      "registers": {
+        "eax": "0xffffffff",
+        "edx": "0x540010",
+        "ebx": "0xa"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "binary",
+      "registers": {
+        "eax": "0x80000001",
+        "edx": "0x540010",
+        "ebx": "0x2"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "hexadecimal",
+      "registers": {
+        "eax": "0xabcdef12",
+        "edx": "0x540010",
+        "ebx": "0x10"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "negative",
+      "registers": {
+        "eax": "0xffffffd6",
+        "edx": "0x540010",
+        "ebx": "0xa"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "minimum",
+      "registers": {
+        "eax": "0x80000000",
+        "edx": "0x540010",
+        "ebx": "0xa"
+      },
+      "memory": [
+        {
+          "address": "0x540000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ],
+  "stack_top": "0x180000",
+  "description": "Use nonzero payload-backed scratch at stack_top to expose an omitted reverse-buffer terminator; destination guards must remain unchanged."
+}
