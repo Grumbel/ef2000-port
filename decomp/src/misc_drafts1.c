@@ -21617,8 +21617,8 @@ void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out)
 	                 ((uint32_t)(EF_U16(b + 8u) ^ 0x8000u) << 16) | EF_U16(a + 8u), out);
 }
 
-/* 0xc425a, 17 bytes. At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (word count at 0x146e50) down to its base; for each entry, take its word as an index into the byte table at 0x148e58 and call the handler in the dword table at 0xc3f88 selected by that byte. ESI (the index) is passed implicitly to the handler. */
-void run_handler_stack_c425a(void)
+/* 0xc425a, 17 bytes. At the entry (the loop at 0xc4281 follows). Implicit-register fragment: walk the word stack at 0x147e56 from the top (word count at 0x146e50) down to its base; for each entry, take its word as an index into the byte table at 0x148e58 and call the handler in the dword table at 0xc3f88 selected by that byte. Handlers receive ESI=index and EBX=table offset; other GPR are scratch through the callback. EBX returns the stack base. */
+uint32_t run_handler_stack_c425a(void)
 {
 	uint32_t p = 0x147e56u + 2u * EF_U16(0x146e50u);
 
@@ -21629,8 +21629,9 @@ void run_handler_stack_c425a(void)
 		p -= 2u;
 		idx = EF_U16(p);
 		kind = EF_U8(idx + 0x148e58u);
-		guest_callptr0_x(EF_U32(kind + 0xc3f88u));
+		guest_callptr_ebxesi_x(EF_U32(kind + 0xc3f88u), kind, idx);
 	}
+	return p;
 }
 
 /* 0xfe610, 15 bytes. Store the current data selector in word 0xfe624

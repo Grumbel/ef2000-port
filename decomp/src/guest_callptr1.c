@@ -32,6 +32,18 @@ uint32_t guest_callptr_stack1_ret_x(ef_addr32 fn, uint32_t arg)
     return call_callee_stack1(fn, arg);
 }
 
+static void call_register_ebxesi(uint32_t fn, uint32_t kind, uint32_t index);
+#pragma aux call_register_ebxesi parm [eax] [edx] [ebx] \
+    modify [eax ebx ecx edx esi edi ebp] = \
+    "mov esi,ebx" \
+    "mov ebx,edx" \
+    "call eax"
+
+void guest_callptr_ebxesi_x(ef_addr32 fn, uint32_t kind, uint32_t index)
+{
+    call_register_ebxesi(fn, kind, index);
+}
+
 static void call_cdecl_stack2(uint32_t fn, uint32_t arg0, uint32_t arg1);
 #pragma aux call_cdecl_stack2 parm [eax] [edx] [ebx] modify [eax ecx edx] = \
     "push ebx" \

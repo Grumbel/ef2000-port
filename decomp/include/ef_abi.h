@@ -4271,8 +4271,10 @@ void register_stack_ranges_d6df0(void);
 int32_t angle_of_fitted_pair_dc8d8(int32_t x, int32_t y);
 void guest_callptr1_x(ef_addr32 fn, ef_addr32 arg); /* indirect cdecl call with one stack argument */
 uint32_t guest_callptr_stack1_ret_x(ef_addr32 fn, uint32_t arg); /* one callee-cleaned stack argument, EAX result */
+void guest_callptr_ebxesi_x(ef_addr32 fn, uint32_t kind, uint32_t index);
 #if defined(__WATCOMC__)
 #pragma aux guest_callptr_stack1_ret_x parm [eax] [edx] value [eax] modify [eax ebx ecx edx esi edi]
+#pragma aux guest_callptr_ebxesi_x parm [eax] [edx] [ebx] modify [eax ebx ecx edx esi edi ebp]
 #endif
 
 /* game_helpers121.c */
@@ -6853,7 +6855,7 @@ double ratio_combo_sum_11bf28(uint32_t a, uint32_t d, uint32_t b, double p, doub
 void int_to_extended_eff6e(int32_t value, uint32_t out);
 int32_t extended_to_int_efeff(uint32_t rec);
 void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out);
-void run_handler_stack_c425a(void);
+uint32_t run_handler_stack_c425a(void);
 uint32_t store_selector_fe610(void);
 uint32_t dispatch_word_c5e56(uint32_t *esi);
 uint32_t dispatch_relative_c5f08(uint32_t *esi);
@@ -6863,7 +6865,7 @@ uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry);
 void int_to_extended_eff6e(int32_t value, uint32_t out); /* 0xeff6e */
 int32_t extended_to_int_efeff(uint32_t rec); /* 0xefeff */
 void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out); /* 0xef942 */
-void run_handler_stack_c425a(void); /* 0xc425a */
+uint32_t run_handler_stack_c425a(void); /* 0xc425a */
 uint32_t store_selector_fe610(void); /* 0xfe610 */
 uint32_t dispatch_word_c5e56(uint32_t *esi); /* 0xc5e56 */
 uint32_t dispatch_relative_c5f08(uint32_t *esi); /* 0xc5f08 */
@@ -6875,7 +6877,7 @@ uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry); /* 0x1084c
 void int_to_extended_eff6e(int32_t value, uint32_t out); /* 0xeff6e */
 int32_t extended_to_int_efeff(uint32_t rec); /* 0xefeff */
 void combine_records_negated_ef942(uint32_t a, uint32_t b, uint32_t out); /* 0xef942 */
-void run_handler_stack_c425a(void); /* 0xc425a */
+uint32_t run_handler_stack_c425a(void); /* 0xc425a */
 uint32_t poll_device_ready_a42c4(void); /* 0xa42c4 */
 
 uint32_t install_timer_vector_235(uint32_t value);

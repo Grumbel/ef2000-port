@@ -4678,3 +4678,36 @@ All three modules for the current renderer investigation were recompiled
 sequentially before linking, so its integration result does not rely on the
 racing builds. This fixes publication ownership; it is not a claim that
 other translated bodies or cached objects are ABI-correct.
+
+
+### 2026-11-15: pass renderer handler indices in ESI
+
+[x] The "emm: bad getadr (0)" capture's live caller stack identifies
+run_handler_stack_c425a -> guest_callptr0_x -> original c5551 -> b3f58.
+Original c4270 loads the handler index into ESI, c4273 loads its byte-selected
+dispatch offset into EBX, and c427a calls the selected handler. C loaded the
+index only into a local and called through a zero-argument helper, exposing
+stale ESI to the handler. Add a distinct public EBX/ESI callback helper with
+all seven GPR scratch. Pass both values explicitly. Original c4281/c4289
+returns EBX=147e56; correct the loop's public signature to return that value
+and stop claiming callback-clobbered GPR are preserved. Recompile the helper,
+misc_drafts1 and its renderer_sort_queue caller sequentially, zero warnings.
+
+The four isolated original-versus-C cases cover empty, single, reverse-order
+and repeated entries; handlers log EBX/ESI and clobber all seven GPR. Fixed
+C passes RAM/EBX/ESP comparisons in all four. Old empty case fails EBX;
+old single case faults. Keep tracker state compiles: these tests do not
+verify arbitrary renderer handlers or claim static coverage of the shared
+tail. Command: tools/func_differential.py 0xc425a --payload <payload>
+ --patch <isolated patch> --spec decomp/tests/0x000c425a.json --flat-segments.
+All 44 focused tests pass after the independent compile-wrapper race fix;
+tracker validates (4293 functions). Evidence:
+local/renderer-handler-abi-20261115/{old,fixed,tests-with-race-fix}.log.
+
+The full 2594-redirect replay now follows the actual handler path and faults
+inside formatting at ed1b6 reading ffffffbf, tick 5235. A diagnostic control
+restoring only c425a's original entry (2593 redirects) reaches the exact same
+fault with identical registers, stack words, IRQ count and canary counts.
+This establishes parity at this later failure, not flight usability. The
+original loop is only a diagnostic control, not a committed exclusion.
+Logs: local/renderer-handler-abi-20261115/{extended-checkpoint,original-control}.log.
