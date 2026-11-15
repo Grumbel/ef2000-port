@@ -4658,3 +4658,23 @@ during fatal teardown, as in the earlier parser failure; it is secondary.
 Do not call this a flight pass. Integration log and full error snapshot:
 local/script-callback-abi-20261115/extended-checkpoint.log and
 extended-checkpoint-error-captures/0x00eb448-0000.efcap.
+
+
+### 2026-11-15: isolate generated ABI headers per object
+
+[x] Parallel wrapper calls shared destination.parent/ef_confirmed_abi.h.
+Each write_text truncates that file while another WCC process may read it;
+a concurrent compile emitted only 8213 included lines versus 12388 when
+recompiled sequentially. Give every destination object its own .abi.h file.
+No callers outside the wrapper require the former shared filename.
+
+The deterministic asset-free regression synchronizes two fake compiler jobs
+after both headers are published, then checks each compiler's header against
+its job. The old wrapper fails (first reads second's pragmas); object-specific
+headers pass. All 44 focused tests pass, including the real OpenWatcom/Unicorn
+callback and runtime-helper tests. Evidence:
+local/renderer-handler-abi-20261115/{old-header-race,tests-with-race-fix}.log.
+All three modules for the current renderer investigation were recompiled
+sequentially before linking, so its integration result does not rely on the
+racing builds. This fixes publication ownership; it is not a claim that
+other translated bodies or cached objects are ABI-correct.

@@ -144,7 +144,9 @@ def compile_module(source, *, compiler='wcc386', output=None, execute=subprocess
     if destination.suffix != '.obj':
         raise ValueError('output must have a .obj extension')
     destination.parent.mkdir(parents=True, exist_ok=True)
-    abi_header = destination.parent / 'ef_confirmed_abi.h'
+    # Another module may compile into this directory while WCC is reading it.
+    # Give each object its own header instead of truncating a shared file.
+    abi_header = destination.with_suffix('.abi.h')
     abi_header.write_text(confirmed_abi_pragmas())
     command = [compiler, *FLAGS, '-i=' + str(root / 'decomp/include'),
                '-fi=' + str(abi_header), '-fo=' + str(destination), str(source)]

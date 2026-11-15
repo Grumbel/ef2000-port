@@ -4,7 +4,9 @@
 """Asset-free contract tests for the OpenWatcom compile wrapper."""
 
 from pathlib import Path
+from concurrent.futures import ThreadPoolExecutor
 import tempfile
+import threading
 import unittest
 from unittest import mock
 
@@ -12,6 +14,27 @@ from tools import ef2000_wcc
 
 
 class WatcomWrapperTests(unittest.TestCase):
+    def test_concurrent_objects_keep_their_own_abi_headers(self):
+        with tempfile.TemporaryDirectory() as temp:
+            ready = threading.Barrier(2)
+            job = threading.local()
+            def fake_compiler(argv, check):
+                header = Path(next(arg[4:] for arg in argv if arg.startswith('-fi=')))
+                output = Path(next(arg[4:] for arg in argv if arg.startswith('-fo=')))
+                ready.wait(timeout=5)  # Both headers exist before either is read.
+                self.assertEqual(header.read_text(), job.pragmas)
+                output.write_bytes(b'fictional OMF fixture')
+            def compile_one(name):
+                job.pragmas = '#pragma aux ' + name + ' parm [eax]\n'
+                return ef2000_wcc.compile_module(
+                    ef2000_wcc.ROOT / 'decomp/tests/fixture.c',
+                    output=Path(temp) / (name + '.obj'), execute=fake_compiler)
+            with mock.patch.object(ef2000_wcc, 'confirmed_abi_pragmas',
+                                   side_effect=lambda: job.pragmas):
+                with ThreadPoolExecutor(max_workers=2) as workers:
+                    results = list(workers.map(compile_one, ('first', 'second')))
+            self.assertEqual({p.name for p in results}, {'first.obj', 'second.obj'})
+
     def test_explicit_cdecl_is_not_overridden_by_register_metadata(self):
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
