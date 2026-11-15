@@ -111,6 +111,14 @@ def align(value, boundary):
     return (value + boundary - 1) // boundary * boundary
 
 
+def load_variadic_names(path):
+    """Find explicit C variadic declarations, including multiline prototypes."""
+    declarations = re.sub(r'/\*.*?\*/|//[^\n]*', '', path.read_text(), flags=re.S)
+    return set(re.findall(
+        r'(?m)^[ \t]*[A-Za-z_][\w \t*]*?\s+([A-Za-z_]\w*)\s*'
+        r'\([^;{}]*\.\.\.[^;{}]*\)\s*;', declarations))
+
+
 def load_objects(hand_dirs, mechanical_dir, report_path):
     """Return (objects, selected-address->kind), excluding non-ok drafts."""
     selected = {}
@@ -138,7 +146,7 @@ def load_objects(hand_dirs, mechanical_dir, report_path):
 
 def link(objects, functions, globals_, mechanical_selected, image,
          abi_aliases, arena_base=DEFAULT_ARENA, explicit_excludes=None,
-         signatures=None):
+         signatures=None, variadic_names=()):
     explicit_excludes = explicit_excludes or {}
     function_by_addr = {int(row['addr'], 16): row for row in functions}
     signature_by_addr = {int(row['addr'], 16): row for row in signatures or []}
@@ -254,6 +262,7 @@ def link(objects, functions, globals_, mechanical_selected, image,
     # and the declared return register pass through unchanged.
     trampoline_targets = {}
     trampoline_records = []
+    variadic_direct = []
     trampoline_cursor = code_arena_end
     register_codes = {'eax': 0, 'ecx': 1, 'edx': 2, 'ebx': 3,
                       'ebp': 5, 'esi': 6, 'edi': 7}
@@ -274,6 +283,20 @@ def link(objects, functions, globals_, mechanical_selected, image,
         outputs = [item.strip() for item in signature['outputs'].split(',') if item.strip()]
         if len(outputs) > 1:
             signature_skip_reasons[address] = 'multiple return registers need a custom trampoline'
+            continue
+        if signature.get('name', function_by_addr[address]['name']) in variadic_names:
+            # A finite argument-copy wrapper cannot forward the unknown suffix.
+            # Handwritten C variadic definitions use Watcom's caller-cleaned
+            # stack ABI and preserve non-result GPR themselves. Enter them by
+            # a direct jump, retaining the caller's complete argument frame.
+            inputs = [part.strip() for part in signature['inputs'].split(',') if part.strip()]
+            stack_only = all(re.fullmatch(r'\[ESP\+\d+\]:.+', part, re.I)
+                             for part in inputs)
+            result_ok = not outputs or outputs[0].split(':', 1)[0].lower() in ('eax', 'ax', 'al', 'st0')
+            if record['origin'] != 'hand' or not stack_only or 'eax' in preserved or not result_ok:
+                signature_skip_reasons[address] = 'variadic entry requires the native C stack/result ABI'
+                continue
+            variadic_direct.append(address)
             continue
         if outputs:
             output_reg = outputs[0].split(':', 1)[0].lower()
@@ -504,6 +527,7 @@ def link(objects, functions, globals_, mechanical_selected, image,
         'compiled_code_bytes': code_arena_end - arena_base,
         'abi_trampolines': len(trampoline_records),
         'abi_trampoline_bytes': sum(len(code) for _, code, _ in trampoline_records),
+        'variadic_direct_entries': [f'0x{address:08x}' for address in variadic_direct],
         'object_modules': len(modules),
         'linked_modules': len(active_modules),
         'functions_redirected': redirect_count,
@@ -583,7 +607,8 @@ def main(argv=None):
         blob, report = link(objects, read_tsv(args.functions), read_tsv(args.globals),
                             selected, source,
                             load_abi_aliases(args.abi_header), args.arena_base,
-                            explicit_excludes, read_tsv(args.signatures))
+                            explicit_excludes, read_tsv(args.signatures),
+                            load_variadic_names(args.abi_header))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         with args.output.open('xb') as stream:
             stream.write(blob)

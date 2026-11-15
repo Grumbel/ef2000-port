@@ -4751,3 +4751,43 @@ format-pointer read, but reports unsupported port OUT 0000 at IP 0x32/tick
 2595-redirect diagnostic with C text enabled also ends with the port failure
 and is not a valid text replacement pass. Authoritative retained-original
 integration log: local/tactical-text-abi-20261115/original-text.log.
+
+
+### 2026-11-15: retain complete argument frames at native C variadic entries
+
+[x] Fix the generic linker's variadic stack loss. Its register-saving wrapper
+re-pushes only the fixed signature arguments, so a variadic C body reads saved
+GPR where the unknown suffix belongs (48bb0's 123 became EDI=65768798).
+Discover explicit variadic declarations in the ABI header, ignoring comments.
+For handwritten native C variadic definitions with stack-only inputs, caller
+cleanup, native EAX/ST0 results and no EAX-preservation requirement, enter the
+body directly so its own C ABI preserves non-result registers and the caller's
+entire argument frame remains in place. Unsupported shapes stay original;
+fixed-argument entries retain their existing wrappers. Report direct entries.
+
+Asset-free Unicorn regression exercises a synthetic C-ABI callee with zero,
+one, three and six variable words, checking sums, all preserved GPR, return
+address, ESP and unchanged caller argument bytes. Additional negative cases
+reject register-input, EAX-preserving and nonnative-result variadic contracts;
+prototype parsing distinguishes comments containing ellipses. All 46 focused
+tests pass with OpenWatcom and Unicorn. Command: python3 -m unittest
+ tests.test_watcom_rt_helpers tests.test_callback_abi tests.test_ef2000_wcc
+ tests.test_hybrid_link tests.test_func_differential tests.test_replay_suite
+ tests.test_hybrid_bisect.
+
+Re-enable 48bb0 only after nine original-versus-C RAM/GPR/ESP cases pass:
+literal/numeric text in four mode variants, plus mixed signed integer/hex/
+string-pointer arguments. With the old wrapper numeric cases mismatch and
+the mixed case faults; direct entry passes all nine. The floating-format
+probe faults in the original oracle, so remains inconclusive under ignored
+local/variadic-tail-20261115/double-probe.json. Do not count it as a pass or
+as a replacement-specific defect. Keep tracker state compiles, not verified.
+Differential command: tools/func_differential.py 0x48bb0 --payload <payload>
+ --patch <isolated patch> --spec decomp/tests/0x00048bb0.json --flat-segments.
+Evidence: local/variadic-tail-20261115/{old-differential,differential,tests}.log.
+
+Full link: 2595 redirects, 342/382 modules, 575548 arena bytes; report lists
+48bb0 as the only direct variadic entry. The replay still reports unsupported
+port OUT 0000 at tick 5235. Flight usability remains incomplete; no completion
+claim follows from the function tests. Integration:
+local/variadic-tail-20261115/extended-checkpoint.log.

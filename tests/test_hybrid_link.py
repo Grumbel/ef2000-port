@@ -16,6 +16,12 @@ from tools.omf_splice import Fixup, Module, Public, Segment
 
 
 class AbiAliasTests(unittest.TestCase):
+    def test_variadic_declarations_are_distinct_from_fixed_stack_aliases(self):
+        with tempfile.TemporaryDirectory() as directory:
+            header = Path(directory) / 'abi.h'
+            header.write_text('int EF_CDECL variadic(int count,\n ...);\n'
+                              'void fixed(int count /* ... */);\n')
+            self.assertEqual(hybrid_link.load_variadic_names(header), {'variadic'})
     def test_only_leading_address_annotation_is_an_entry_alias(self):
         with tempfile.TemporaryDirectory() as directory:
             header = Path(directory) / 'abi.h'
@@ -36,6 +42,57 @@ class AbiAliasTests(unittest.TestCase):
 
 
 class SignatureExclusionTests(unittest.TestCase):
+    def test_variadic_entry_keeps_the_complete_caller_argument_frame(self):
+        try:
+            import unicorn as uc
+            from unicorn import x86_const as x86
+        except ImportError:
+            self.skipTest('requires Unicorn')
+        # Synthetic cdecl body: preserve ECX/EDX, then sum COUNT stack words.
+        code = bytes.fromhex('51528b4c240c8d54241031c085c97407030283c204e2f95a59c3')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'variadic.obj'
+            path.write_bytes(b'fixture')
+            module = Module(segments=[None, Segment('text', 'CODE', len(code), 1, True)],
+                            publics=[Public('variadic_', 1, 0)])
+            module.segments[1].data[:] = code
+            functions = [dict(addr='0x20', size='8', name='variadic',
+                              state='compiles', sig_status='confirmed')]
+            signatures = [dict(addr='0x20', name='variadic', inputs='[ESP+4]:uint32_t',
+                               outputs='EAX:uint32_t', preserved='ebx,ecx,edx,esi,edi,ebp',
+                               stack_bytes='0')]
+            source = bytes(128)
+            with patch.object(hybrid_link, 'read_module', return_value=module), \
+                    patch.object(hybrid_link, 'IMAGE_SHA256', hashlib.sha256(source).hexdigest()):
+                blob, report = hybrid_link.link(
+                    [(path, 'hand')], functions, [], {}, source, {},
+                    signatures=signatures, variadic_names={'variadic'})
+            self.assertEqual(report['abi_trampolines'], 0)
+            self.assertEqual(report['variadic_direct_entries'], ['0x00000020'])
+            for values in ((), (17,), (11, 22, 33), (1, 2, 3, 4, 5, 6)):
+                with self.subTest(values=values):
+                    cpu = uc.Uc(uc.UC_ARCH_X86, uc.UC_MODE_32)
+                    cpu.mem_map(0, hybrid_link.GUEST_SIZE)
+                    cpu.mem_write(0, source)
+                    for address, data in efpatch.decode(blob, source, hybrid_link.GUEST_SIZE):
+                        cpu.mem_write(address, data)
+                    stack, sentinel = 0x3fff000, 0x3ffe000
+                    args = (sentinel, len(values), *values)
+                    frame = struct.pack('<' + 'I' * len(args), *args)
+                    cpu.mem_write(stack, frame)
+                    cpu.reg_write(x86.UC_X86_REG_ESP, stack)
+                    saved = {reg: 0x12345678 + index for index, reg in enumerate(
+                        ('EBX', 'ECX', 'EDX', 'ESI', 'EDI', 'EBP'))}
+                    for reg, value in saved.items():
+                        cpu.reg_write(getattr(x86, 'UC_X86_REG_' + reg), value)
+                    cpu.emu_start(0x20, sentinel, count=1000)
+                    self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EIP), sentinel)
+                    self.assertEqual(cpu.reg_read(x86.UC_X86_REG_ESP), stack + 4)
+                    self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EAX), sum(values))
+                    self.assertEqual(cpu.mem_read(stack, len(frame)), frame)
+                    for reg, value in saved.items():
+                        self.assertEqual(cpu.reg_read(getattr(x86, 'UC_X86_REG_' + reg)), value)
+
     def test_unsupported_abi_keeps_entry_and_external_calls_original(self):
         # A supported compiled caller calls an unsupported callee in another
         # object. Check both the original entry bytes and the relocated CALL;
@@ -45,6 +102,9 @@ class SignatureExclusionTests(unittest.TestCase):
             ({'stack_bytes': '4'}, 'stack arguments'),
             ({'outputs': 'EAX:uint32_t,EDX:uint32_t'}, 'multiple return registers'),
             ({'preserved': 'ds'}, 'unsupported preserved-register set'),
+            ({'inputs': 'EAX:uint32_t'}, 'native C stack/result ABI'),
+            ({'preserved': 'eax'}, 'native C stack/result ABI'),
+            ({'outputs': 'EDX:uint32_t'}, 'native C stack/result ABI'),
         )
         for overrides, reason in cases:
             with self.subTest(reason=reason), tempfile.TemporaryDirectory() as directory:
@@ -71,7 +131,7 @@ class SignatureExclusionTests(unittest.TestCase):
                         patch.object(hybrid_link, 'IMAGE_SHA256', hashlib.sha256(bytes(128)).hexdigest()):
                     blob, report = hybrid_link.link(
                         [(path, 'hand') for path in paths], functions, [], {}, bytes(128), {},
-                        signatures=signatures)
+                        signatures=signatures, variadic_names={'callee'})
                 writes = dict(efpatch.decode(blob, bytes(128), hybrid_link.GUEST_SIZE))
                 self.assertNotIn(0x20, writes)
                 self.assertIn(0x40, writes)
