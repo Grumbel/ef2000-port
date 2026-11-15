@@ -306,11 +306,11 @@ void draw_tactical_item_mode(ef_addr32 item); /* 0x59484 EAX */
 void refresh_tactical_indicator(void); /* 0x5331c */
 
 /* Original guest sinks for status formatting and tactical drawing. */
-void format_ui_status_pair(ef_addr32 destination, ef_addr32 format,
+void EF_CDECL format_ui_status_pair(ef_addr32 destination, ef_addr32 format,
                            uint32_t first, uint32_t second); /* 0xa4342 */
-void format_ui_status_float(ef_addr32 destination, ef_addr32 format,
+void EF_CDECL format_ui_status_float(ef_addr32 destination, ef_addr32 format,
                             double value); /* 0xa4342 */
-int32_t draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
+int32_t EF_CDECL draw_tactical_mode_item(uint32_t mode, ef_addr32 item); /* 0x48c34 */
 void read_tactical_indicator_callback(void); /* indirect 0x15bab8 */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 /* call dword ptr ds:[0x15bab8]; an out-of-line thunk would need a prologue that corrupts the tail jump. */
@@ -730,7 +730,7 @@ void write_status_byte_15bdd0(ef_addr32 destination); /* 0x82bf0 EAX */
 uint8_t set_pending_mode_two(void); /* 0x845a4 -> AL */
 void load_halfword_1fcaec(void); /* 0x81794 */
 void release_block_12afc4(void); /* 0x7a434 */
-void format_ui_status_value(ef_addr32 destination, ef_addr32 format, uint32_t value); /* 0xa4342 */
+void EF_CDECL format_ui_status_value(ef_addr32 destination, ef_addr32 format, uint32_t value); /* 0xa4342 */
 uint32_t guest_query_status_value(ef_addr32 destination); /* 0x810ec EAX -> EAX */
 void guest_release_block(ef_addr32 block); /* 0xc3f80 EAX */
 
@@ -2805,7 +2805,7 @@ void check_data_file_283c8(void);
 void draw_debug_counters_404bc(void);
 void guest_fn_275a4(void); /* 0x275a4 */
 uint32_t guest_fn_27fec(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x27fec EAX/EDX/EBX/ECX */
-void guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 cdecl */
+void EF_CDECL guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 cdecl */
 uint32_t guest_fn_a7900(ef_addr32 name); /* 0xa7900 cdecl */
 void guest_fn_48c90(uint32_t row, uint32_t col, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl */
 

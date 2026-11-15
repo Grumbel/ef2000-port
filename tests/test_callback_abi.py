@@ -25,6 +25,52 @@ COMPILER = os.environ.get('EF2000_WCC386') or shutil.which('wcc386')
 
 @unittest.skipUnless(COMPILER and uc, 'requires OpenWatcom and Unicorn')
 class CallbackAbiTests(unittest.TestCase):
+    def test_status_sinks_use_caller_cleaned_stack_arguments(self):
+        with tempfile.TemporaryDirectory() as directory:
+            output = Path(directory) / 'status.obj'
+            ef2000_wcc.compile_module(
+                ef2000_wcc.ROOT / 'decomp/tests/status_cdecl_contract_fixture.c',
+                compiler=COMPILER, output=output)
+            caller = read_module(output.read_bytes())
+            entry = next(p for p in caller.publics
+                         if p.symbol.rstrip('_') == 'status_cdecl_contract_fixture')
+            code = bytearray(caller.segments[entry.segment].data)
+            cases = [
+                ('format_ui_status_pair', (0x5000, 0x6000, 11, 22)),
+                ('format_ui_status_float', (0x5000, 0x6000, 0, 0x3ff40000)),
+                ('format_ui_status_value', (0x5000, 0x6000, 33)),
+                ('guest_fn_a4342_plain', (0x5000, 0x6000)),
+                ('draw_tactical_mode_item', (1, 0x6000)),
+            ]
+            targets = {name: 0x3000 + index * 0x100
+                       for index, (name, args) in enumerate(cases)}
+            self.assertEqual(len(caller.fixups), len(cases))
+            for fixup in caller.fixups:
+                name = caller.externs[fixup.target_index].strip('_')
+                struct.pack_into('<i', code, fixup.offset,
+                                 targets[name] - (0x1000 + fixup.offset + 4))
+            cpu = uc.Uc(uc.UC_ARCH_X86, uc.UC_MODE_32)
+            cpu.mem_map(0x1000, 0x10000)
+            cpu.mem_write(0x1000, bytes(code))
+            for index, (name, args) in enumerate(cases):
+                stub = bytearray()
+                for word in range(len(args)):
+                    stub.extend(b'\x8b\x44\x24' + bytes([4 + word * 4]))
+                    stub.extend(b'\xa3' + struct.pack('<I', 0x9000 + index * 0x20 + word * 4))
+                stub.extend(b'\xb8\x34\x12\x00\x00\xc3')
+                cpu.mem_write(targets[name], bytes(stub))
+            cpu.mem_write(0x9000, b'\xa5' * 0xa0)
+            cpu.mem_write(0x10000, struct.pack('<I', 0x8000))
+            cpu.reg_write(x86.UC_X86_REG_ESP, 0x10000)
+            cpu.emu_start(0x1000 + entry.offset, 0x8000, count=1000)
+            self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EIP), 0x8000)
+            self.assertEqual(cpu.reg_read(x86.UC_X86_REG_ESP), 0x10004)
+            self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EAX), 0x1234)
+            for index, (name, args) in enumerate(cases):
+                actual = cpu.mem_read(0x9000 + index * 0x20, 0x20)
+                expected = struct.pack('<' + 'I' * len(args), *args)
+                self.assertEqual(actual, expected + b'\xa5' * (0x20 - len(expected)), name)
+
     def test_public_trig_calls_use_x87_without_stack_arguments(self):
         with tempfile.TemporaryDirectory() as directory:
             output = Path(directory) / 'trig.obj'

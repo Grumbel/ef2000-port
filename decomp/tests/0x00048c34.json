@@ -1,1 +1,215 @@
-{"address":"0x00048c34","function_size":91,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0x48c34",
+  "function_size": 91,
+  "max_instructions": 30000,
+  "cases": [
+    {
+      "name": "literal_mode_0",
+      "registers": {},
+      "stack_args": [
+        0,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "integer_mode_0",
+      "registers": {},
+      "stack_args": [
+        0,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "256400"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "7b000000"
+        }
+      ]
+    },
+    {
+      "name": "literal_mode_1",
+      "registers": {},
+      "stack_args": [
+        1,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "integer_mode_1",
+      "registers": {},
+      "stack_args": [
+        1,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "256400"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "7b000000"
+        }
+      ]
+    },
+    {
+      "name": "literal_mode_2",
+      "registers": {},
+      "stack_args": [
+        2,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "integer_mode_2",
+      "registers": {},
+      "stack_args": [
+        2,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "256400"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "7b000000"
+        }
+      ]
+    },
+    {
+      "name": "literal_mode_258",
+      "registers": {},
+      "stack_args": [
+        258,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "integer_mode_258",
+      "registers": {},
+      "stack_args": [
+        258,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x521000",
+          "hex": "256400"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x159a0",
+          "hex": "6089c6bf00005300acaa84c075fa61b80d000000c3"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "7b000000"
+        }
+      ]
+    }
+  ]
+}

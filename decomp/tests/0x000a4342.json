@@ -1,1 +1,85 @@
-{"address":"0x000a4342","function_size":48,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0xa4342",
+  "function_size": 48,
+  "max_instructions": 30000,
+  "cases": [
+    {
+      "name": "literal",
+      "registers": {},
+      "stack_args": [
+        5373952,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x521000",
+          "hex": "48454c4c4f00"
+        },
+        {
+          "address": "0x522000",
+          "hex": "4f4b00"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00000000"
+        }
+      ]
+    },
+    {
+      "name": "signed",
+      "registers": {},
+      "stack_args": [
+        5373952,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x521000",
+          "hex": "6e3d256400"
+        },
+        {
+          "address": "0x522000",
+          "hex": "4f4b00"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "f9ffffff"
+        }
+      ]
+    },
+    {
+      "name": "mixed",
+      "registers": {},
+      "stack_args": [
+        5373952,
+        5378048
+      ],
+      "memory": [
+        {
+          "address": "0x520000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x521000",
+          "hex": "25732f25782f257500"
+        },
+        {
+          "address": "0x522000",
+          "hex": "4f4b00"
+        },
+        {
+          "address": "0x3fff00c",
+          "hex": "00205200edfe00007b000000"
+        }
+      ]
+    }
+  ]
+}

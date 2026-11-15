@@ -4827,3 +4827,50 @@ passes the low-memory port stop but reaches another fetch fault at
 unresolved; do not infer that the cockpit or native flight is usable.
 Authoritative current patch/log:
 local/odometer-call-abi-20261115/abi-complete.{efpatch,log}.
+
+
+### 2026-11-15: restore caller-cleaned status and text-width sinks
+
+[x] The post-odometer fetch fault ends after original 48c34 scans a buffer
+full of instruction bytes through strlen, then returns through overwritten
+code-looking words. The tactical metric sink alias still used register
+arguments although original 594a4 pushes mode/item and original 48c8e is a
+plain RET. Mark draw_tactical_mode_item EF_CDECL. Correct the same missing
+contract on the four adjacent sprintf aliases (pair, double, value and no
+varargs). Original a4371 is also a plain RET. Correct 48c34/a4342 cleanup
+metadata from 8 to 0; their native C variadic bodies now use the verified
+full-frame direct-entry path. Correct 594a4 preservation to all non-result
+GPR: its EDX save plus the width callee's other preservation.
+
+Recompile all six affected caller modules and both native C variadic callee
+modules using private ABI headers; all eight compile warning-free. An
+asset-free separate caller tests all five public alias shapes, including the
+double's two stack words, exact caller cleanup and width return value. The
+old header causes an invalid fetch; the corrected header passes. All 47
+focused tests pass without skips. Three metric-wrapper differential cases
+check signed-half/full width and arguments (old C fails all three), eight
+real-formatter width cases cover mode variants and integer/literal formats,
+and three real-formatter sprintf cases cover literals and signed/mixed
+string/hex/unsigned arguments. All fourteen pass original RAM/GPR/ESP and
+return-value comparison. Commands: tools/func_differential.py
+<594a4|48c34|a4342> --payload <payload> --patch <isolated patch>
+ --spec decomp/tests/0x000<address>.json --flat-segments; focused unittest
+modules watcom_rt_helpers, callback_abi, ef2000_wcc, hybrid_link,
+func_differential, replay_suite and hybrid_bisect. Tracker validates.
+Evidence: local/status-cdecl-20261115/{old-contract,contract,old-594a4,
+fixed-*,tests}.log. Earlier arity audit lists 63 possible declarations under
+local/odometer-call-abi-20261115/remaining-arity-audit.tsv; they are candidates,
+not confirmed defects or authorization to remove arguments blindly.
+
+Full profile now has 2597 redirects, 342/382 modules, 575584 arena bytes and
+three native variadic entries (48bb0, 48c34, a4342). Both 1.4B and 1.5B
+instruction replays complete normally at their instruction limits, reaching
+ticks 5600 and 6000 without the prior stack/port faults. The 1.5B frame still
+differs substantially from original control: HUD renders over mostly black
+terrain/cockpit areas and labels differ. This is not faithful rendering or
+verified native flight usability. Original-entry canaries alone do not count
+compiled direct calls, so do not infer absence of an entire subsystem from
+an original-entry hit count of zero. Logs and frames:
+local/status-cdecl-20261115/{extended-checkpoint,cockpit-checkpoint}.{log,ppm,png}.
+Next work remains rendering/control-flow convergence and the current Nix
+launcher, not declaring the bulk translation goal complete.
