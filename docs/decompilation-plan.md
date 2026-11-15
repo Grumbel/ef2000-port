@@ -4505,7 +4505,11 @@ Evidence: local/component-prefix-count-20261115/{old-correct-abi,abi-fixed,tests
 
 Full-profile loading attempts with this change were externally terminated
 (exit 143) without guest results, including a process-monitored run. They do
-not prove success or failure. A shorter 1.3B-instruction checkpoint is running
-to obtain bounded evidence beyond the previous 1.279B-instruction parser stop.
+not prove success or failure. The shorter 1.3B-instruction checkpoint subsequently completed normally
+(status=instruction_limit, tick 5200, 57.17 seconds), passing the previous
+1.279B-instruction parser stop. Traced entries 0x58d24, 0x7eea0 and 0x810d0
+each ran once; 0x7a428 had not run. This establishes progress beyond the
+previous failure, not a completed cockpit replay or native flight usability.
+Evidence: local/component-prefix-count-20261115/short-checkpoint.log.
 The full 2595-redirect profile remains enabled. Checkpoint artifacts stay in
 local/component-prefix-count-20261115/.
