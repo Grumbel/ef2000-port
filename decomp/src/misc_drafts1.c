@@ -4566,7 +4566,8 @@ static void start_script_record(int32_t n, uint32_t extra)
         EF_U16(0x0041718cu) = (uint16_t)(EF_U16(0x0041718cu) + EF_U16(pos + 4u));
         EF_U32(0x001600b8u) = EF_U8(rec + 0x1cu);
     }
-    guest_callptr1_x(EF_U32(0x00132b14u), (uint32_t)(int32_t)(int16_t)EF_U16(rec));
+    EF_U32(0x001600c0u) = guest_callptr_stack1_ret_x(
+        EF_U32(0x00132b14u), (uint32_t)(int32_t)(int16_t)EF_U16(rec));
     guest_fn_160255_x();
 }
 

@@ -4625,3 +4625,36 @@ local/rotation-smc-20261115/{extended-checkpoint,transfer-trace}.log and
 transfer-trace-error-captures/. The later tail ends at compiled 0x302fb43
 after original record_word_16010e returns. All 42 focused tests pass;
 python3 tools/decomp_status.py check reports tracker ok (4293 functions).
+
+
+### 2026-11-15: preserve script callback cleanup and return values
+
+[x] The zero-address block tail ends at guest_callptr1_x after the original
+record_word_16010e returns. Original script starters 9fb00@9fbe8 and
+a060c@a06eb push one argument, call [132b14] without caller cleanup, and
+store EAX at 1600c0 before calling 160255. C used the cdecl helper (double
+cleanup after RET 4) and discarded the result. Add a distinct one-stack-arg,
+callee-cleaned, EAX-returning callback helper; publish its six-GPR scratch
+contract. Correct the shared script-start body to store the return value.
+The original cdecl helper retains its caller-cleanup contract.
+
+The asset-free separately compiled caller test checks a live value across
+six-register callback clobbers, the argument, return value and exact ESP.
+Both script entry fixtures cover zero, relative and negative indices, the
+relative-position flag, extra-word wrapping, callback arguments/results and
+all original RAM/GPR/ESP comparisons. Old C faults in the first case of each;
+fixed C passes all six. Both affected modules compile warning-free; all 43
+focused tests pass, including tests.test_watcom_rt_helpers and
+ tests.test_callback_abi plus ef2000_wcc, hybrid_link, func_differential,
+replay_suite and hybrid_bisect. Differential command: tools/func_differential.py
+<9fb00|a060c> --payload <payload> --patch <isolated patch> --spec
+ decomp/tests/0x000<address>.json --flat-segments.
+Evidence: local/script-callback-abi-20261115/{old-*,fixed-*,tests}.log.
+
+The full 2594-redirect replay passes the previous tick-5214 zero stop and
+reaches tick 5273, where enter_handler_eb448 captures the primary error
+"emm: bad getadr (0)". The later GP at 0x31a / BIOS-13 diagnostic occurs
+during fatal teardown, as in the earlier parser failure; it is secondary.
+Do not call this a flight pass. Integration log and full error snapshot:
+local/script-callback-abi-20261115/extended-checkpoint.log and
+extended-checkpoint-error-captures/0x00eb448-0000.efcap.

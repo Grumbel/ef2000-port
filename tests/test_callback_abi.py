@@ -74,6 +74,16 @@ class CallbackAbiTests(unittest.TestCase):
                             b'\xbe\xff\xff\xff\xff'  # ESI
                             b'\xbf\xff\xff\xff\xff\xc3', 17)  # EDI; ret
 
+    def test_callee_cleaned_stack_callback_result_and_live_value(self):
+        self.check_callback('callback_stack1_contract_fixture',
+                            'guest_callptr_stack1_ret_x',
+                            b'\x8b\x44\x24\x04\x40'  # EAX = argument + 1
+                            b'\xbb\xff\xff\xff\xff'
+                            b'\xb9\xff\xff\xff\xff'
+                            b'\xba\xff\xff\xff\xff'
+                            b'\xbe\xff\xff\xff\xff'
+                            b'\xbf\xff\xff\xff\xff\xc2\x04\x00', 59)
+
     def check_callback(self, fixture, helper_name, callback, expected):
         with tempfile.TemporaryDirectory() as directory:
             objects = []
