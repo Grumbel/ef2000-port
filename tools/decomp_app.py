@@ -32,10 +32,12 @@ def build_patch(executable, object_dir, output):
     signatures = hybrid_link.read_tsv(ROOT / 'decomp/symbols/signatures.tsv')
     exclusions = hybrid_link.load_exclusions(
         ROOT / 'decomp/symbols/hybrid-exclude.tsv', len(image))
+    abi_header = ROOT / 'decomp/include/ef_abi.h'
     blob, report = hybrid_link.link(
         objects, functions, globals_, {}, image,
-        hybrid_link.load_abi_aliases(ROOT / 'decomp/include/ef_abi.h'),
-        explicit_excludes=exclusions, signatures=signatures)
+        hybrid_link.load_abi_aliases(abi_header),
+        explicit_excludes=exclusions, signatures=signatures,
+        variadic_names=hybrid_link.load_variadic_names(abi_header))
     output.write_bytes(blob)
     print('ef2000-hybrid: %d recovered C functions, %d redirect bytes, '
           '%d arena bytes; %d/%d modules linked' % (

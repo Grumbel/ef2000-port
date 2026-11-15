@@ -4909,3 +4909,26 @@ Nix output local/nix-hybrid-current-20261115 resolves to the completed
 (75 skipped), followed by installation/fixup. The outer build process exited
 143 after producing the output; the installed launcher is being independently
 smoke-tested. This is not a verified native cockpit playthrough.
+
+### 2026-11-15 — Preserve variadic frames in the native hybrid launcher
+
+The completed Nix launcher build exited ff before the menu: the console
+reported `Unable to open file '\.par'`. Fresh and cumulative object sets
+both failed under its patch builder. `decomp_app.build_patch` omitted the
+new variadic declarations, generating three obsolete fixed-argument frames
+(99 extra arena bytes) and losing resource-format arguments. It now loads
+variadic names from the same ABI header used for aliases. Its fresh-object
+patch is byte-identical to the CLI linker patch (2597 redirects, 575600 arena
+bytes). Add a builder regression using an independently selected ABI header;
+all 12 launcher/linker/bisector tests pass with Unicorn enabled:
+`python3 -m unittest tests.test_decomp_app tests.test_hybrid_bisect
+ tests.test_hybrid_link`.
+
+With the corrected builder, the freshly built native runtime and complete
+Nix object set reach video mode 100 (menu), finish the 20-second time limit
+and return zero under private Xvfb. The old builder failed with the same
+runtime/objects. Evidence: local/native-current-20261115.log,
+local/native-cumulative-control-20261115.log, and
+local/native-variadic-fixed-20261115{.log,/report.json,/calls.log}.
+The packaged command still needs rebuilding with this fix; native flight
+usability and cockpit rendering remain unverified.
