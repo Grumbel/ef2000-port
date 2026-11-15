@@ -4317,3 +4317,33 @@ that the oracle counts pixels and detects a 1% defect below the default limit.
 Validation: python3 -m unittest tests.test_hybrid_bisect tests.test_replay_suite
 (20 passing tests). Asset-backed bisection runs on private Xvfb; artifacts
 remain in local/menu-highlight-bisect-20261115/.
+
+### 2026-11-15: restore the whole pressed main-menu button region
+
+[x] Isolate the missing button highlight rows and repair the callback ABI.
+Private-Xvfb pixel bisection reduces the defect to 0x101688 alone (20 trials,
+local/menu-highlight-bisect-20261115/report.json). Translating only this entry
+reproduces the exact missing rows; demoting only this entry in the full hybrid
+produces a byte-identical original pressed-button PPM at 550M instructions.
+
+The function is a scanline draw/advance loop, not a hardware delay. Its original
+stack slot protects the count from callback clobbers. A captured original call
+has count 15, draw callback 0xd5a90 and advance callback 0x101040. The draw body
+clobbers EAX/EBX/ECX/EDX/ESI/EDI. guest_callptr0_x declared its narrower clobbers
+only in the implementation, so the old caller kept the count in EDX; merely
+exposing those clobbers moves the count into EBX and still fails. Declare the
+full renderer clobber set in both the public helper contract and its inline
+call primitive. The compiler now protects the count across the draw calls.
+
+The complete 2595-redirect hybrid, including the corrected C loop, produces a
+byte-identical original pressed-button PPM (all 640x400 pixels), restoring the
+entire region below the label. The 64-KiB cutoff was the symptom, not evidence
+that the VGA bank emulation needed changing. No replacement is disabled.
+All three affected modules compile without warnings. Six synthetic row counts
+(0,1,2,3,12,13), with draw-register-clobbering callbacks and counter RAM, match
+original ABI/RAM. A separately compiled asset-free caller protects a live value
+from the actual helper and a callback clobbering EBX/ECX/EDX/ESI/EDI; the focused
+36-test Python tranche passes. Evidence: local/scanline-callback-20261115/,
+all-clobbers{,-diff}.log, all-clobbers.ppm and tests.log. The separate cockpit
+loading fault persists after the intermediate narrower clobber correction;
+full launcher/gameplay validation remains pending.

@@ -10,7 +10,7 @@ static void call_cdecl_stack1(uint32_t fn, uint32_t arg);
     "add esp,4"
 
 static void call_register0(uint32_t fn);
-#pragma aux call_register0 parm [eax] modify [eax ecx edx] = \
+#pragma aux call_register0 parm [eax] modify [eax ebx ecx edx esi edi] = \
     "call eax"
 
 /* Preserve the original cdecl callback contract: one stack argument and
@@ -52,7 +52,6 @@ void guest_callptr3_x(ef_addr32 fn, uint32_t arg0, uint32_t arg1,
     call_cdecl_stack3(fn, arg0, arg1, arg2);
 }
 
-#pragma aux guest_callptr0_x parm [eax] modify [eax ecx edx]
 void guest_callptr0_x(ef_addr32 fn)
 {
     call_register0(fn);

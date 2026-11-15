@@ -440,7 +440,10 @@ void enable_state_widget_362c4(void)
     guest_fn_a7318_2_x(widget, labels[idx]);
 }
 
-/* 0x101688, 85 bytes. Run a short hardware delay loop: n pulses of the two callbacks at 0x486da4/0x486da0, one for the low bit and two per remaining half step. */
+/* 0x101688, 85 bytes. Run n pairs of scanline draw/advance callbacks at
+ * 0x486da4/0x486da0, one for the low bit and two per remaining half step.
+ * Draw callbacks overwrite EAX/EBX/ECX/EDX/ESI/EDI; keep the count on the
+ * stack across calls, as in the original. */
 void pulse_delay_101688(int32_t n)
 {
     if (n & 1) {
