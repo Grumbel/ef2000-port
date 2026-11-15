@@ -4932,3 +4932,48 @@ local/native-cumulative-control-20261115.log, and
 local/native-variadic-fixed-20261115{.log,/report.json,/calls.log}.
 The packaged command still needs rebuilding with this fix; native flight
 usability and cockpit rendering remain unverified.
+
+### 2026-11-15 — Continue scaled renderer entries into drawing
+
+Original c552e/c565e are 35-byte scaling entries that continue into shared
+rendering bodies c5551/c5681; the C drafts returned after scaling, and even
+returned immediately for scale +/-1. Restore those draw calls with ESI=index
+using the existing register callback adapter. Reconstruct the scaling step
+locally so it does not call the excluded AL/ESI division/multiplication
+fragments using their incorrect ordinary-C declarations. Preserve signed
+division, byte negation (-128 stays -128), atomic three-coordinate updates,
+and draw suppression on any signed multiplication overflow. Correct both
+signature inputs from EAX to ESI and remove the false preserved-register
+claim through the full draw callback. Queue table slots 20/24 and immediate
+dispatch 16018a@16024f confirm the ESI input.
+
+Eight independent differential cases per entry cover +/-1, signed division,
+multiplication, -128 and overflow in each coordinate. Authored sinks log ESI,
+count draw calls and clobber all seven GPR including EBP. The old bodies pass
+only 3/8 (overflow cases) per entry; corrected bodies pass 16/16 RAM/ESP and
+contract checks. Original helper arithmetic executes in the oracle; no game
+bytes are stored in the fixtures. WCC reports zero warnings/errors; all 53
+focused tests pass with WCC and Unicorn enabled, tracker check passes.
+
+The full profile retains 2597 redirects, 342/382 modules, 575816 arena bytes.
+Its 1.5B replay reaches instruction_limit/tick6000 without crashing; c565e
+receives 2821 original-entry hits. Terrain is now visible: black-pixel fraction
+falls from 95.7297% to 46.1031%. Cockpit panels remain absent and HUD differs;
+this is not complete rendering fidelity or verified flight usability. Both
+functions remain compiles. The 550M pressed-menu replay remains byte-identical
+to the original whole-button highlight. Evidence and objects:
+local/renderer-scale-tail-20261115/{old-552e,old-565e,fixed-c552e,fixed-c565e,
+compile,tests,cockpit-checkpoint,button}.log and corresponding ignored frames.
+Commands: ef2000_wcc.py for misc_drafts1, func_differential.py for both entries
+with explicit specs and --flat-segments, and the seven previous focused
+unittest modules plus tests.test_decomp_app.
+
+The exact packaged `NIXPKGS_ALLOW_UNFREE=1 nix run --impure .#ef2000-hybrid --
+../EF2000/c/EF2000/` prefix at a899f96a now passes a private-Xvfb headless
+20-second menu smoke: time_limit, launcher exit0, guest return27, faults[],
+startup_checkpoint_verified=true. Its complete Nix build includes the launcher
+variadic fix, predating this renderer fix. Evidence:
+local/native-packaged-fixed-20261115{.log,/report.json,/calls.log}.
+The separate fresh-object C++ menu observation ended externally with143 and
+no log; it is inconclusive, not a replay failure or pass. The black-mask
+bisection of the prior profile remains live as an independent diagnostic.

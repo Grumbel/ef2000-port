@@ -7401,8 +7401,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux build_rotation_matrix_fcd20 parm [ebx] [esi] [edi] modify exact [eax ebx ecx edi edx esi]
 #pragma aux draw_patterned_line_10d188 parm [esi] modify exact [eax esi]
 #pragma aux fetch_scaled_value_c54ef parm [edi] modify exact [eax ecx edx esi edi]
-#pragma aux scale_entry_c552e parm [esi] modify exact [eax]
-#pragma aux scale_entry_c565e parm [esi] modify exact [eax]
+#pragma aux scale_entry_c552e parm [esi] modify exact [eax ebx ecx edx esi edi ebp]
+#pragma aux scale_entry_c565e parm [esi] modify exact [eax ebx ecx edx esi edi ebp]
 #endif
 
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)

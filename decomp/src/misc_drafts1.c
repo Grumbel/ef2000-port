@@ -21740,30 +21740,49 @@ uint32_t swap_word_c5372(uint32_t *ebx)
 	return 0u;
 }
 
-/* 0xc552e, 35 bytes. Implicit-register fragment (ESI = index): scale the table entries at INDEX by the signed byte at 0x149e58 + INDEX; 1 and -1 do nothing, positive values divide, negative ones multiply by the negated value (nothing further happens when the negation overflows). */
-void scale_entry_c552e(uint32_t index)
+/* Shared scaling step for the two renderer entries below. A failed signed
+ * multiply leaves all three coordinates unchanged and suppresses drawing.
+ * Negation is byte-sized: scale -128 therefore multiplies by -128. */
+static uint32_t scale_renderer_coordinates(uint32_t index)
 {
-	int8_t s = (int8_t)EF_U8(0x149e58u + index);
+    int32_t scale = (int8_t)EF_U8(0x149e58u + index);
+    uint32_t off = index * 4u;
 
-	if (s == 1 || s == -1)
-		return;
-	if (s > 0)
-		divide_table_entries_c5409((uint32_t)s, index);
-	else
-		multiply_table_entries_c5441((uint8_t)-s, index);
+    if (scale == 1 || scale == -1)
+        return 1u;
+    if (scale >= 0) {
+        /* Zero is not special-cased: the original divides by zero too. */
+        EF_S32(0x150e58u + off) /= scale;
+        EF_S32(0x152e58u + off) /= scale;
+        EF_S32(0x154e58u + off) /= scale;
+    } else {
+        int64_t multiplier = (int8_t)(uint8_t)-scale;
+        int64_t a = (int64_t)EF_S32(0x150e58u + off) * multiplier;
+        int64_t b = (int64_t)EF_S32(0x152e58u + off) * multiplier;
+        int64_t c = (int64_t)EF_S32(0x154e58u + off) * multiplier;
+
+        if (a != (int32_t)a || b != (int32_t)b || c != (int32_t)c)
+            return 0u;
+        EF_S32(0x150e58u + off) = (int32_t)a;
+        EF_S32(0x152e58u + off) = (int32_t)b;
+        EF_S32(0x154e58u + off) = (int32_t)c;
+    }
+    return 1u;
 }
 
-/* 0xc565e, 35 bytes. Implicit-register fragment (ESI = index): identical to 0xc552e, the second copy of the scaling step. */
+/* 0xc552e, 35-byte entry plus shared draw body at c5551. ESI is the
+ * table index; every successful scaling path continues into drawing. */
+void scale_entry_c552e(uint32_t index)
+{
+    if (scale_renderer_coordinates(index))
+        guest_callptr_ebxesi_x(0xc5551u, 0x20u, index);
+}
+
+/* 0xc565e, 35-byte entry plus shared draw body at c5681. */
 void scale_entry_c565e(uint32_t index)
 {
-	int8_t s = (int8_t)EF_U8(0x149e58u + index);
-
-	if (s == 1 || s == -1)
-		return;
-	if (s > 0)
-		divide_table_entries_c5409((uint32_t)s, index);
-	else
-		multiply_table_entries_c5441((uint8_t)-s, index);
+    if (scale_renderer_coordinates(index))
+        guest_callptr_ebxesi_x(0xc5681u, 0x24u, index);
 }
 
 /* 0xc4e3b, 39 bytes. Implicit-register fragment (ESI = record, EBX is an out value): byte-swap the word at ESI+0x10, shift it left by two, store it and use it as the handler index; byte-swap the word at ESI+0x20 in place, add it to the pointer (EBX = ESI+0x20+word) and return the address of the handler, the dword at 0xc4e62 plus the index. */
