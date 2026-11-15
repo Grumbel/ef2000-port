@@ -4303,3 +4303,17 @@ Nix environment (10 expected skips). A fresh NIXPKGS_ALLOW_UNFREE=1 nix build
 and local/nix-hybrid-20261115-3c8c220d links the built launcher. Strict native
 FIP assertions remain unchanged. One earlier full-suite native-FIP failure
 remains an observed intermittent check; no x87 expectation was relaxed.
+
+### 2026-11-15: bisect small framebuffer defects
+
+Add --frame-diff-limit to hybrid_bisect (default 0.2, range 0..1), allowing
+--match frame --frame-diff-limit 0 to isolate the pressed main-menu button's
+missing rows. Exact failure matching also includes the stopped instruction
+pointer, which changes with unrelated demotions; frame matching isolates the
+visual symptom independently. Record the selected threshold in report.json
+and print four decimal percentage places so small mismatches stay visible.
+A synthetic 100-pixel frame with three changed channels in one pixel verifies
+that the oracle counts pixels and detects a 1% defect below the default limit.
+Validation: python3 -m unittest tests.test_hybrid_bisect tests.test_replay_suite
+(20 passing tests). Asset-backed bisection runs on private Xvfb; artifacts
+remain in local/menu-highlight-bisect-20261115/.

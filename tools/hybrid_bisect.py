@@ -139,6 +139,9 @@ def main(argv=None):
     parser.add_argument('--globals', type=Path, default=ROOT / 'decomp/symbols/globals.tsv')
     parser.add_argument('--abi-header', type=Path, default=hybrid_link.ABI_HEADER)
     parser.add_argument('--max-rounds', type=int, default=16)
+    parser.add_argument('--frame-diff-limit', type=float, default=FRAME_DIFF_LIMIT,
+                        help='maximum fraction of differing pixels for --match frame '
+                             '(default: 0.2; use 0 for small drawing defects)')
     parser.add_argument('--match', choices=('crash', 'exact', 'frame'), default='crash',
                         help='how a trial reproduces the failure: same abnormal stop '
                              'class (default, ignores benign RAM/counter differences) '
@@ -150,6 +153,8 @@ def main(argv=None):
     try:
         if args.timeout <= 0 or args.max_rounds <= 0:
             raise ValueError('timeout and max-rounds must be positive')
+        if not 0 <= args.frame_diff_limit <= 1:
+            raise ValueError('frame-diff-limit must be between 0 and 1')
         for path, label in ((args.image, 'payload'), (args.executable, 'executable'),
                             (args.runner, 'runner'), (args.manifest, 'manifest')):
             if not path.is_file():
@@ -272,8 +277,8 @@ def main(argv=None):
                     difference = frame_difference(
                         output / 'baseline' / 'frame.ppm',
                         output / f'trial-{run_number:02d}' / 'frame.ppm')
-                    if difference > FRAME_DIFF_LIMIT:
-                        failures.append(f'framebuffer differs in {difference:.0%} of pixels')
+                    if difference > args.frame_diff_limit:
+                        failures.append(f'framebuffer differs in {difference:.4%} of pixels')
                 missing_hits = [address for address in must_hit
                                 if result['patch_hits'].get(f'0x{address:x}', 0) == 0]
                 failures.extend(f'canary 0x{address:x} was not hit'
@@ -354,6 +359,7 @@ def main(argv=None):
         if outcome == 'unresolved' and len(current) < 2:
             outcome = 'minimal-set'
         result = {'schema': 'ef2000-hybrid-bisect-v1', 'case': args.case,
+                  'frame_diff_limit': args.frame_diff_limit,
                   'baseline': baseline, 'outcome': outcome,
                   'target_failure_signature': list(target_signature),
                   'trace_addresses': [f'0x{x:08x}' for x in trace_addresses],
