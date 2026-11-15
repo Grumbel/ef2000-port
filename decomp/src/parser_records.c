@@ -73,7 +73,9 @@ void initialize_parser_records(void)
 
 /* 0xe89c: skip spaces/tabs, read a quoted or comma/whitespace-delimited
  * token, then write NUL and the low-16-bit input cursor. Only 80 source
- * bytes fit; a truncated token deliberately leaves the cursor mid-token. */
+ * bytes fit; a truncated token deliberately leaves the cursor mid-token.
+ * All non-EAX general registers are preserved, including the caller's ECX
+ * output pointer during mission configuration loading. */
 uint32_t read_parser_token(void)
 {
     uint16_t cursor = read16(parser_cursor);

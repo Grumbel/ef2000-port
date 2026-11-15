@@ -5008,3 +5008,30 @@ The bounded cockpit black-mask bisection completed with outcome unresolved,
 Its report is local/cockpit-mask-bisect-01-20261115/report.json. The next
 batch can resume those exclusions; it must continue distinguishing the
 640x400 loading stall from the 320x200 cockpit rendering mismatch.
+
+### 2026-11-15 — preserve the tokenizer caller's output pointer
+
+Corrected read_parser_token (0xe89c) to preserve all six non-EAX GPRs.
+The original saves EBX/EDX/ESI and never changes ECX/EDI/EBP. Its previous
+contract omitted the latter three, allowing compiled token length to leak
+through ECX. Original caller 0x105a4 keeps its fourth output pointer in ECX
+across the token reader and four integer reads; native mission acceptance
+faulted writing through ECX=12 at0x1061a. Existing callers0xe95c/0xe980 also
+confirm the reader's no-argument EAX return contract.
+
+With the previous object and previous contract, all three differential cases
+fail ECX preservation (11,5,0 instead of the input value). Recompiling with
+the corrected contract passes all three, RAM and stack included. Watcom has
+zero warnings/errors; all53 focused tests pass; tracker check4293 entries.
+Commands: ef2000_wcc.py for parser_records; func_differential.py0xe89c with
+explicit spec and --flat-segments; the same eight focused unittest modules
+as the keyboard-selector entry above. Evidence: ignored
+local/parser-token-preserve-20261116/{old-token.efpatch,token.efpatch,tests.log}.
+
+The private-Xvfb real-input acceptance run now loads MISS3.MIS and enters
+flight mode0x13, passing the former0x1061a fault. It then faults separately
+at compiled address0x03045a29; flight remains unusable. See that directory's
+game.log and output/{calls.log,report.json}. This is not a full replay pass,
+so the function remains compiles. The second cockpit-mask bisection batch
+also completed: unresolved,487 remaining candidates; its durable report is
+local/cockpit-mask-bisect-02-20261115/report.json.
