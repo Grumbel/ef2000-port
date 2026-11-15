@@ -109,7 +109,9 @@ def source():
     """Emit only a fixed allowlist of generic ISA operations, never guest bytes."""
     operations = sorted({(a << 8) | b for a, b in REGISTER} |
                         {(a << 8) | (b << 3) | 6 for a, b in MEMORY})
-    text = [r'''#include <stdint.h>
+    text = [r'''#define _POSIX_C_SOURCE 200809L
+#include <stdint.h>
+#include <signal.h>
 unsigned ef_x87_host_cs(void) { uint16_t value; __asm__ volatile("mov %%cs,%0" : "=r"(value)); return value; }
 unsigned ef_x87_host_ds(void) { uint16_t value; __asm__ volatile("mov %%ds,%0" : "=r"(value)); return value; }
 typedef uintptr_t (*operation_fn)(const void *,void *,void *,uint32_t *);
@@ -123,10 +125,20 @@ static uintptr_t NAME(const void *input,void *out,void *data,uint32_t *eax) { \
  *eax=ax; return pc; }
 ''']
     text += ['OP(op_%04x,"0x%x","0x%x")' % (op, op >> 8, op & 255) for op in operations]
-    text += ['uintptr_t ef_x87_original(unsigned op,const void *in,void *out,void *data,uint32_t *ax) {',
+    text += ['static uintptr_t ef_x87_dispatch(unsigned op,const void *in,void *out,void *data,uint32_t *ax) {',
              'switch(op) {']
     text += ['case 0x%x: return op_%04x(in,out,data,ax);' % (op, op) for op in operations]
-    text += ['default: return 0;', '}', '}']
+    text += ['default: return 0;', '}', '}', r'''
+uintptr_t ef_x87_original(unsigned op,const void *in,void *out,void *data,uint32_t *ax) {
+ sigset_t blocked, previous; uintptr_t pc;
+ /* Signal return can lose AMD x87 pointers without a counted context switch.
+  * Defer delivery until the instruction and its saved observation are complete.
+  * Context switches remain covered by the caller's measured retry guard. */
+ if (sigfillset(&blocked) || sigprocmask(SIG_BLOCK,&blocked,&previous)) return 0;
+ pc=ef_x87_dispatch(op,in,out,data,ax);
+ if (sigprocmask(SIG_SETMASK,&previous,0)) return 0;
+ return pc;
+}''']
     return '\n'.join(text)+'\n'
 
 

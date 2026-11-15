@@ -5091,3 +5091,34 @@ black-mask bisection batch completed with 284 candidates; the fourth resumes
 the union of its persistent exclusions and newly excluded addresses.
 Its 285-redirect initial trial reproduces the 320x200 rendering mismatch.
 The separate e367efaf Nix package build remains in progress.
+
+### 2026-11-16 — defer signals during native x87 observations
+
+The e367efaf Nix package build failed its sole failing test in the native x87
+comparison matrix: retained data pointer/selector were zero instead of the
+synthetic 0xdecaf002/0x5678. All 525 tests completed, with 75 optional skips;
+the package was not produced. The existing measured context-switch guard
+cannot detect signal delivery and return without a context switch.
+
+An authored host probe raises SIGUSR1 between FRSTOR and FCOM, then saves
+the observation. On this host, 100/100 calls without measured switches lose
+the retained data pointer/selector; 100/100 calls with signal delivery deferred
+retain them. This establishes an unguarded host observation failure mode
+consistent with the package failure; the failed sample's signal was not
+recorded. The oracle now blocks signals immediately before dispatch and
+restores the caller's mask after saving the result and restoring host x87
+state. The context-switch guard and all numerical/metadata assertions remain.
+
+A deterministic regression raises a real signal during dispatch and checks
+that it is delivered afterward, including an unsupported-operation return.
+It also checks restoration of a nonempty signal mask. Removing signal
+protection makes the regression fail. Nine oracle/comparison tests pass in
+the exact Nix Python environment, including all 2,356,224 comparison cases;
+the strengthened nonempty-mask regression passes separately. Evidence:
+local/x87-signal-probe-20261116/{probe.c,signal-evidence.json,
+unprotected-test.log,tests.log,compare-evidence.json} and
+local/hybrid-weapon-refresh-20261116-{build,runtime}.log.
+Commands: Nix Python -m unittest tests.test_asm_x87_oracle
+tests.test_asm_x87_compare with ASM_COMPARE_EVIDENCE set, plus the selected
+signal regression. No recovered game code or comparison expectations changed.
+The package build must be retried with this observation fix.

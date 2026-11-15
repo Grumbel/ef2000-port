@@ -8,10 +8,12 @@ import json
 import platform
 from pathlib import Path
 import shutil
+import signal
 import struct
 import subprocess
 import tempfile
 import unittest
+from unittest import mock
 
 from tools import asm_x87_oracle as oracle, asm_c_differential as diff, asm_to_c
 from tests.test_asm_to_c import assemble, unicorn
@@ -51,6 +53,41 @@ class OracleTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.temporary.cleanup()
+
+    def test_native_observation_defers_signals_and_restores_mask(self):
+        # Inject a real asynchronous signal inside dispatch. It must arrive
+        # after dispatch returns, including the unsupported-operation path.
+        source = oracle.source().replace(
+            'static uintptr_t ef_x87_dispatch(',
+            'static volatile sig_atomic_t ef_test_seen;\n'
+            'static void ef_test_handler(int n) { (void)n; ++ef_test_seen; }\n'
+            'unsigned ef_test_signal_count(void) { return ef_test_seen; }\n'
+            'static uintptr_t ef_x87_dispatch(').replace(
+            'switch(op) {',
+            'signal(SIGUSR1,ef_test_handler); ef_test_seen=0;\n'
+            'raise(SIGUSR1); if (ef_test_seen) return 0;\n'
+            'switch(op) {')
+        previous_handler = signal.getsignal(signal.SIGUSR1)
+        previous_mask = signal.pthread_sigmask(signal.SIG_BLOCK, [])
+        expected_mask = (previous_mask | {signal.SIGUSR2}) - {signal.SIGUSR1}
+        try:
+            signal.pthread_sigmask(signal.SIG_SETMASK, expected_mask)
+            with mock.patch.object(oracle, 'source', return_value=source):
+                native, _ = oracle.build(self.root/'signal-observation')
+            values = dict(x87_control=0x37f, x87_status=0, x87_tag=0,
+                          x87_opcode=0x321,
+                          x87=[[0, 0x80000000, 0x3fff] for _ in range(8)])
+            result, _, _, _, _, _ = native.execute(0xd8d1, values, b'', 0)
+            self.assertEqual((result['x87_dp'], result['x87_ds']),
+                             (0xdecaf002, 0x5678))
+            self.assertEqual(native.library.ef_test_signal_count(), 1)
+            self.assertEqual(signal.pthread_sigmask(signal.SIG_BLOCK, []), expected_mask)
+            self.assertEqual(native.run(0, None, None, None, None), 0)
+            self.assertEqual(native.library.ef_test_signal_count(), 1)
+            self.assertEqual(signal.pthread_sigmask(signal.SIG_BLOCK, []), expected_mask)
+        finally:
+            signal.signal(signal.SIGUSR1, previous_handler)
+            signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
 
     def compiled(self, root, source):
         image, record = assemble(root, source)
