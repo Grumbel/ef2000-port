@@ -1,1 +1,93 @@
-{"address":"0x0005e1b0","function_size":106,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000","ebx":"0x00001000","ecx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x5e1b0",
+  "function_size": 106,
+  "max_instructions": 10000,
+  "cases": [
+    {
+      "name": "normal",
+      "registers": {
+        "eax": "0xfffffffd",
+        "edx": "0x4",
+        "ebx": "0x520000",
+        "ecx": "0x521000"
+      },
+      "memory": [
+        {
+          "address": "0x12b369",
+          "hex": "00"
+        },
+        {
+          "address": "0x1a6cfa",
+          "hex": "fcff0700"
+        },
+        {
+          "address": "0x128148",
+          "hex": "31"
+        },
+        {
+          "address": "0x520000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x48bb0",
+          "hex": "8b442404a3000053008b442408a3040053008b44240ca3080053008b442410a30c0053008b442414a310005300c3"
+        },
+        {
+          "address": "0x48d5c",
+          "hex": "8b442404a320005300b809000000c3"
+        },
+        {
+          "address": "0x5e21c",
+          "hex": "a324005300891528005300891d2c005300b8ffffffffbbffffffffbaffffffffc3"
+        }
+      ]
+    },
+    {
+      "name": "doubled",
+      "registers": {
+        "eax": "0x7fff",
+        "edx": "0xffff8000",
+        "ebx": "0x520000",
+        "ecx": "0x521000"
+      },
+      "memory": [
+        {
+          "address": "0x12b369",
+          "hex": "01"
+        },
+        {
+          "address": "0x1a6cfa",
+          "hex": "fcff0700"
+        },
+        {
+          "address": "0x128148",
+          "hex": "31"
+        },
+        {
+          "address": "0x520000",
+          "hex": "4c4142454c00"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        },
+        {
+          "address": "0x48bb0",
+          "hex": "8b442404a3000053008b442408a3040053008b44240ca3080053008b442410a30c0053008b442414a310005300c3"
+        },
+        {
+          "address": "0x48d5c",
+          "hex": "8b442404a320005300b809000000c3"
+        },
+        {
+          "address": "0x5e21c",
+          "hex": "a324005300891528005300891d2c005300b8ffffffffbbffffffffbaffffffffc3"
+        }
+      ]
+    }
+  ]
+}

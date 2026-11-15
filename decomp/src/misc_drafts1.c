@@ -2008,7 +2008,7 @@ void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c)
     draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (uint8_t)(1u - EF_U8(0x0012b369u)), px, py, fmt);
     w = formatted_width_48d5c(fmt);
     a += (int32_t)w + 1;
-    guest_fn_5e21c_x((int16_t)a, (int16_t)b, (uint32_t)c, 0u);
+    guest_fn_5e21c_x((int16_t)a, (int16_t)b, (uint32_t)c);
 }
 
 /* 0x3bcc0, 101 bytes. Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B and A (doubled in video mode 3), then draw a box of colour C at (A, B) (ret 4). */
@@ -13477,7 +13477,7 @@ void show_scaled_value_5c2d8(void)
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f8cu, (double)f);
     else
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f94u, (double)f);
-    guest_fn_5e21c_x((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf, 0u);
+    guest_fn_5e21c_x((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf);
 }
 
 /* 0x5fc80, 168 bytes. Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double 0x1a3078 * 0x186072 with format 0x18604c at (x - w/2 + 5, y - h/2 + 2) and the dword 0x197238 with format 0x186064 at (x + w/2 - 0x1e, same y), both in colour 0xf mode 1, then run 0x5b288 with value 0xf, word x, zero. */

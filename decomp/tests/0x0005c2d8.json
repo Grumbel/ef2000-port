@@ -1,1 +1,121 @@
-{"address":"0x0005c2d8","function_size":123,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0x5c2d8",
+  "function_size": 123,
+  "max_instructions": 10000,
+  "cases": [
+    {
+      "name": "positive",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x1a2ef0",
+          "hex": "000000000000f43f"
+        },
+        {
+          "address": "0x185f9a",
+          "hex": "0000000000000040"
+        },
+        {
+          "address": "0x185fa2",
+          "hex": "0000000000001040"
+        },
+        {
+          "address": "0x1a6d1b",
+          "hex": "02"
+        },
+        {
+          "address": "0x12818e",
+          "hex": "0180"
+        },
+        {
+          "address": "0xa4342",
+          "hex": "608b442428a3000053008b44242ca3040053008b442430a3080053008b442424c7003132330061b803000000c3"
+        },
+        {
+          "address": "0x5e21c",
+          "hex": "a30c0053008915100053008b03a314005300b8ffffffffbbffffffffbaffffffffc3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "negative",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x1a2ef0",
+          "hex": "000000000000f4bf"
+        },
+        {
+          "address": "0x185f9a",
+          "hex": "0000000000000040"
+        },
+        {
+          "address": "0x185fa2",
+          "hex": "0000000000001040"
+        },
+        {
+          "address": "0x1a6d1b",
+          "hex": "00"
+        },
+        {
+          "address": "0x128170",
+          "hex": "3700"
+        },
+        {
+          "address": "0xa4342",
+          "hex": "608b442428a3000053008b44242ca3040053008b442430a3080053008b442424c7003132330061b803000000c3"
+        },
+        {
+          "address": "0x5e21c",
+          "hex": "a30c0053008915100053008b03a314005300b8ffffffffbbffffffffbaffffffffc3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "zero",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x1a2ef0",
+          "hex": "0000000000000000"
+        },
+        {
+          "address": "0x185f9a",
+          "hex": "0000000000000040"
+        },
+        {
+          "address": "0x185fa2",
+          "hex": "0000000000001040"
+        },
+        {
+          "address": "0x1a6d1b",
+          "hex": "ff"
+        },
+        {
+          "address": "0x129061",
+          "hex": "ff7f"
+        },
+        {
+          "address": "0xa4342",
+          "hex": "608b442428a3000053008b44242ca3040053008b442430a3080053008b442424c7003132330061b803000000c3"
+        },
+        {
+          "address": "0x5e21c",
+          "hex": "a30c0053008915100053008b03a314005300b8ffffffffbbffffffffbaffffffffc3"
+        },
+        {
+          "address": "0x530000",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}

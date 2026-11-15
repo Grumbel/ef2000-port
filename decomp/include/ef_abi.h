@@ -5192,7 +5192,7 @@ void save_and_draw_strip_98b68(uint32_t x, uint32_t y);
 void finish_log_d1bec(void);
 void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c);
 void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint32_t mode);
-void guest_fn_5e21c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x5e21c EAX/EDX/EBX/ECX */
+void guest_fn_5e21c_x(uint32_t a, uint32_t b, uint32_t c); /* 0x5e21c EAX/EDX/EBX, no stack arguments */
 void guest_fn_c8ccc_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xc8ccc 5 stack, callee cleanup */
 
 void round_double_to_int64_10e28a(ef_addr32 p);

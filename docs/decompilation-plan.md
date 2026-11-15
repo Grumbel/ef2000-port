@@ -4791,3 +4791,39 @@ Full link: 2595 redirects, 342/382 modules, 575548 arena bytes; report lists
 port OUT 0000 at tick 5235. Flight usability remains incomplete; no completion
 claim follows from the function tests. Integration:
 local/variadic-tail-20261115/extended-checkpoint.log.
+
+
+### 2026-11-15: remove ghost stack arguments from odometer calls
+
+[x] A late block-state trace from original 59420 reaches show_scaled_value's
+compiled epilogue, then returns to 0x2c and executes banner text (OUTSB at
+0x31 explains the port-0 report). The 5e21c alias declared four parameters
+although its confirmed ABI consumes only EAX/EDX/EBX. WCC therefore pushed
+the fourth dummy zero and assumed the callee would remove it; original
+5e4c0 is a plain RET. Both show_scaled_value_5c2d8 and draw_cell_text_5e1b0
+passed that unsupported fourth argument. Correct the declaration and both
+calls. The rebuilt callers no longer PUSH zero before CALLing 5e21c.
+
+Also correct 5e1b0's preservation row: its original prologue saves only
+ESI/EDI/EBP; EAX/EDX/EBX are scratch through the odometer and ECX is used
+for shift/mode setup. Recompile misc_drafts1 with that complete ABI, zero
+warnings. Three scaled-value cases exercise positive/negative/zero values,
+float-rounded formatter arguments, sign-extended ids and the three-register
+odometer call using authored callee stubs. Two cell-text cases exercise
+normal/doubled coordinates, the text-width result and final odometer
+arguments. Fixed C passes all five RAM/GPR/ESP comparisons; old C faults
+in the first case of each function. All 46 focused tests pass; tracker
+validates (4293 functions). Differential commands:
+ tools/func_differential.py <5c2d8|5e1b0> --payload <payload>
+ --patch <isolated patch> --spec decomp/tests/0x000<address>.json
+ --flat-segments. Evidence: local/odometer-call-abi-20261115/{old-*,fixed-*,tests}.log.
+
+The successful diagnostic trace and low-memory snapshot are under
+local/variadic-tail-20261115/coordinate-state-*. Earlier body-entry probes
+hit the trace limit during mission setup or rejected an arena snapshot;
+they are not full replay passes. The complete 2595-redirect integration
+passes the low-memory port stop but reaches another fetch fault at
+0x42a3e857/tick 5235 with instruction-looking words on the stack. This is
+unresolved; do not infer that the cockpit or native flight is usable.
+Authoritative current patch/log:
+local/odometer-call-abi-20261115/abi-complete.{efpatch,log}.
