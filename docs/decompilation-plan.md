@@ -5336,3 +5336,23 @@ while full terrain fidelity remains unresolved. Commands:
 func_differential.py 0xd8528 --spec decomp/tests/0x000d8528.json
 --flat-segments with the isolated corners.efpatch; decomp_status.py check.
 Evidence: local/terrain-matrix-probes-20261116/{corners.json,corners.log}.
+
+### 2026-11-16 — Restore the shared textured span fallback
+
+Original d3c50 branches at d3c62, d3c85, d3c8d and d3c9b enter
+textured renderer body d3cb2; the C translation incorrectly returned.
+Call original entry d3cb0 on those paths, which supplies the saved EBP
+expected by its body. Declare renderer scratch-register clobbers and
+correct d3c50 preservation to EBP only. Keep the neighboring renderer
+original while its shared boundaries remain unresolved.
+
+Seven authored cases exercise empty/short/wide spans, both depth limits,
+and the separate d3900 dispatch (stubbed to record that call). The original
+textured body runs and writes pixels in the fallback cases. The old patch
+passes 2/7; the repaired isolated one-redirect patch passes 7/7 RAM and
+GPR/ESP comparisons. Full 2598-entry replay is running, so retain compiles
+status and do not yet claim terrain fidelity. Commands: ef2000_wcc.py
+on game_helpers64.c; hybrid_link.py --only-address 0xd3c50;
+func_differential.py 0xd3c50 --spec decomp/tests/0x000d3c50.json
+--flat-segments; decomp_status.py check; git diff --check.
+Evidence: local/textured-tail-20261116/{before,after}.log and span.json.

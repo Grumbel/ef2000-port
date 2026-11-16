@@ -30,7 +30,7 @@ void request_status_for_a32e8(uint16_t key)
     }
 }
 
-/* 0xd3c50, 84 bytes. Redraw when the tracked span is large enough and the two edge values differ by more than 0x800. */
+/* 0xd3c50, 84 bytes. Select the wide-span renderer or its shared textured tail. */
 void redraw_wide_span_d3c50(void)
 {
     int32_t a;
@@ -38,16 +38,22 @@ void redraw_wide_span_d3c50(void)
     int32_t d;
 
     if ((int16_t)(EF_U16(0x00485fd2u) - EF_U16(0x00485feau)) < 0x10)
-        return;
+        goto textured;
     a = EF_S32(0x00485ffcu) >> 8;
     b = EF_S32(0x00485fe4u) >> 8;
     EF_S32(0x0015b8f4u) = a;
     EF_S32(0x0015b8f8u) = b;
     if (a >= 0x20000 || b >= 0x20000)
-        return;
+        goto textured;
     d = a - b;
     if (d < 0)
         d = -d;
-    if (d > 0x800)
+    if (d > 0x800) {
         guest_fn_d3900_w();
+        return;
+    }
+textured:
+    /* Original branches enter d3cb2 after d3c50's PUSH EBP.
+     * Calling d3cb0 supplies the same saved EBP for that shared body. */
+    guest_fn_d3cb0_w();
 }
