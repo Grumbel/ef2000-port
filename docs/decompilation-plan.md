@@ -6421,3 +6421,36 @@ resolution claim. Evidence: local/script-dispatch-review-20261116/{original.asm,
 caller-one.asm,caller-two.asm,misc_drafts1.obj,misc_drafts1.lst,full.json}.
 Commands: ef2000_wcc.py on misc_drafts1.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Page-yaw-biased record startup (0x9fc00)
+
+Recover `start_biased_page_record_9fc00` (467 original bytes) in
+`decomp/src/page_positioned_record.c`. Call sites9e86c,9f1f4 and9f220 pass
+signed AX/DX record/point words and retain ESI/EBX interpreter state; EAX
+and EDX results are ignored. Original saves EBX/ECX/ESI/EDI, leaves EBP
+untouched and uses plain RET. Both script-pair and repeated-start paths
+were reviewed against the original assembly.
+
+Preserve29/6-byte record/point strides, signed rotation index, point-Y store
+before setup callback, wrapping offsets and interleaved overlapping dword
+reads. Shift coordinates left16 before view160156(margin,Z,Y,X,out).
+Apply page yaw bias to the default rotation, publish identifier/repeat/
+value/world globals in original order, test repeat before publishing its
+rotation pointer, preload optional angles before stores and reread repeat
+between Y/Z stores. Lookup uses the callee-cleaned stack identifier, then
+publish1600c0 and call160255. Always invoke the final world callback,
+including the rejecting view path with potentially uninitialized output.
+Do not add bounds, rejection cleanup or coordinate normalization.
+
+Remove obsolete9fc00 unreviewed-mechanical exclusion after body/caller
+review; keep view-test arithmetic exclusions. Watcom compiles warning-free.
+Wdis confirms saved registers, signed indices, SHL16 inputs and stack push
+order, bias, ordered globals/angles, repeat reread, lookup argument, final
+hook and plain RET. Full static link:2625 redirects,357/397 modules,
+590980 arena bytes. Tracker and diff checks pass; inventory3395 compiles,
+839 blocked. Static evidence only; no execution/UI/replay runs or crash
+resolution claim. Evidence: local/page-biased-record-20261116/{original.asm,
+caller-one.asm,caller-two.asm,page_positioned_record.obj,
+page_positioned_record.lst,full.json}. Commands: ef2000_wcc.py on
+page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
+git diff --check.

@@ -3483,3 +3483,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00160329	append_rotated_script_entry_160329			esi,edi,ebp	0	160329..1603f0 saves ESI/EDI/EBP; no register inputs, global1600a8..c0; sole caller a0a1d ignores scratch results; plain RET; docs/compiler-abi.md
 0x0009da80	load_page_name_table_9da80			ebx,ecx,edx,esi,edi,ebp	0	9da80..9dbec gate then load_string_table9d990 before six saves; sole caller9d924 ignores EAX; plain RET; docs/compiler-abi.md
 0x0009f940	dispatch_offset_page_record_9f940	EAX:uint32_t,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	9f940..9fafd saves EBX/ECX/ESI/EDI, EBP untouched; sole caller9e847 signed AX/DX script words; EAX/EDX scratch, plain RET; docs/compiler-abi.md
+0x0009fc00	start_biased_page_record_9fc00	EAX:uint32_t,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	9fc00..9fdd2 saves EBX/ECX/ESI/EDI, EBP untouched; signed AX/DX at9e86c/9f1f4/9f220; EAX/EDX scratch, plain RET; docs/compiler-abi.md

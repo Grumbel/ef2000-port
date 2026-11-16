@@ -7589,4 +7589,5 @@ void guest_fn_16018a_x(void); /* original global-input dispatcher */
 #ifdef __WATCOMC__
 #pragma aux guest_fn_16018a_x parm caller [] modify [eax ebx ecx edx]
 #endif
+void start_biased_page_record_9fc00(uint32_t record_index, uint32_t point_index);
 #endif
