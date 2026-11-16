@@ -7329,3 +7329,30 @@ local/record-tree-free-20261116/{record_tree_free.obj,record_tree_free.lst,
 full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild; full RAM/stack
 equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover UI reset initialization
+
+Recover reset_ui_state_ac0e0 (139 original bytes) in ui_state_reset.c;
+runtime_helpers33 had no definition. ASM and both caller sites 84c96/84cac
+establish no inputs, EAX scratch, six other registers preserved, plain RET.
+No caller ABI changes required. Inspect nested e17f8/ac16c register saves:
+the original zero EDX/DL values survive these calls.
+
+Preserve conditional engine reset, display initialization, 100000-byte pool
+initialization, clock latch, record loading, style bitmap copy, glyph rebuild
+and state clear order. Centre the cursor using signed division by two
+truncated toward zero, subtract one, then narrow to a word, separately for
+width and height. Set the reset flag before ac16c, retain both final byte
+clears afterward even though ac16c also clears them. Name seven state fields
+without guessing meanings for unknown flags. Remove the generic probe
+tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py ui_state_reset.c (zero warnings); wdis (call order,
+style copy, signed-half arithmetic, word stores, final flags, EDX save and
+plain RET); hybrid_link.py pinned payload/full objects (2652 redirects,
+600120 arena bytes,382/422 modules,1621 exclusions); decomp_status.py check
+(4293 functions); git diff --check. Evidence:
+local/ui-state-reset-20261116/{ui_state_reset.obj,ui_state_reset.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.

@@ -434,3 +434,10 @@ addr	size	type	name	evidence	notes
 0x0041eedc	2	uint16_t	g_selected_named_entry	aca4d stores lookup result	reloaded unsigned for 25-byte table indexing
 0x0041eed4	2	uint16_t	g_selected_entry_field21	aca78 stores table word at +21	meaning not established
 0x0041eec8	2	uint16_t	g_selected_entry_field23	aca7f stores table word at +23	meaning not established
+0x0041eea8	4	ef_addr32	g_ui_style_bitmap_source	ac10d reads before style bitmap store	reset copies into 1378dd
+0x0041eeac	4	uint32_t	g_ui_reset_state	ac123 clears after glyph rebuild	meaning otherwise unestablished
+0x0013725e	2	int16_t	g_ui_cursor_x	ac133 writes signed width/2 minus one	word-narrowed cursor coordinate
+0x00137260	2	int16_t	g_ui_cursor_y	ac148 writes signed height/2 minus one	word-narrowed cursor coordinate
+0x0041f2e7	1	uint8_t	g_ui_reset_flag	ac152 sets before ac16c	meaning otherwise unestablished
+0x0041f833	1	uint8_t	g_ui_state_flag_41f833	ac15d clears after ac16c	also cleared by ac16c
+0x0041f2e6	1	uint8_t	g_ui_state_flag_41f2e6	ac163 clears after ac16c	also cleared by ac16c
