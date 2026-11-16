@@ -8367,3 +8367,20 @@ PC and RAM. Validation: tests.test_asm_c_program and tests.test_asm_capture
 in the matching Nix Python/Unicorn environment; tracker check;
 git diff --check. No gameplay or UI runs. Reliable bulk translation remains
 open, including compound stack, string and descriptor-reload operations.
+
+### 2026-11-17 — Translate descriptor-backed LEAVE frame restoration
+
+LEAVE now reads the saved frame pointer through cached SS, rather than the
+legacy flat helper. ESP and EBP commit only after the saved-frame read
+succeeds. This enables the existing 32-bit LEAVE translation in descriptor
+profile 1 without changing the accepted instruction/operand forms.
+ENTER remains rejected in descriptor mode pending allocation-limit handling;
+PUSHA/POPA, strings, far loads and descriptor reloads also remain unwired.
+
+Synthetic captured-state comparisons cover LEAVE after a conventional
+PUSH EBP / MOV EBP,ESP prologue, with and without local stack allocation.
+Explicit saved-frame reads at the expand-down boundary and across the RAM
+extent reject without changing registers, flags or RAM. Validation:
+tests.test_asm_capture and tests.test_asm_c_program in the matching Nix
+Python/Unicorn environment; tracker check; git diff --check. No gameplay
+or UI runs; the reliable bulk translation goal remains open.

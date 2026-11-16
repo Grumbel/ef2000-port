@@ -843,7 +843,7 @@ def instruction_c(insn, starts):
                  's->r[4] -= 4u; s->r[5] = s->r[4];',
                  's->r[4] -= %du;' % arguments[0][1]]
     elif mnemonic == 'leave' and not text:
-        code += ['a = ef_read(s, s->r[5], 32); if (s->fault) return s->fault;',
+        code += ['a = ef_read_segment(s, 2, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
     elif mnemonic in ('pusha', 'popa'):
         if text or insn['bytes'] != ('60' if mnemonic == 'pusha' else '61'):
@@ -1023,7 +1023,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'pusha', 'popa', 'enter', 'leave',
+    unwired = {'pusha', 'popa', 'enter',
                'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
                'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
     for i in instructions:

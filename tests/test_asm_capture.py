@@ -60,6 +60,8 @@ class AsmCaptureTests(unittest.TestCase):
             'push dword ptr ds:[0x2000]\npop dword ptr ss:[esp+4]\nret',
             'push esp\npop esp\nret',
             'push eax\npop dword ptr ds:[0x2000]\nret',
+            'push ebp\nmov ebp,esp\nsub esp,16\nleave\nret',
+            'push ebp\nmov ebp,esp\nleave\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -102,7 +104,7 @@ class AsmCaptureTests(unittest.TestCase):
                         self.assertIn('C status 7', result['differences'][0])
                     else:
                         self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 7, 10, 14):
+                    if number in (0, 7, 10, 14, 15, 16):
                         # Test the generated access path, not only the helper:
                         # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
@@ -121,6 +123,14 @@ class AsmCaptureTests(unittest.TestCase):
                             state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
                         if number == 10:
                             state.segment_cache[2].limit = regs['esp'] - 4
+                        if number in (15, 16):
+                            # Isolate LEAVE with a failing saved-frame read.
+                            state.pc = next(i['address'] for i in record['instructions']
+                                            if i['mnemonic'] == 'leave')
+                            if number == 15:
+                                state.r[5] = 0x100  # Expand-down lower boundary.
+                            else:
+                                state.r[5] = len(ram)-2  # RAM extent crossing.
                         if number == 14:
                             # Isolate POP: source SS succeeds, destination DS fails.
                             state.pc = record['instructions'][1]['address']
@@ -129,8 +139,9 @@ class AsmCaptureTests(unittest.TestCase):
                             state.pc = record['instructions'][2]['address']
                             state.r[3], state.r[0] = 0x2000, 0x12340000
                         before = (list(state.r), state.flags, bytes(ram))
-                        self.assertEqual(function(ctypes.byref(state), 100), 7)
-                        self.assertEqual(state.fault, 7)
+                        expected_fault = 3 if number == 16 else 7
+                        self.assertEqual(function(ctypes.byref(state), 100), expected_fault)
+                        self.assertEqual(state.fault, expected_fault)
                         self.assertEqual((list(state.r), state.flags, bytes(ram)), before)
 
     @unittest.skipUnless(shutil.which('cc') and shutil.which('objdump'), 'requires C compiler and objdump')
