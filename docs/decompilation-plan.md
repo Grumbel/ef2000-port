@@ -5370,3 +5370,18 @@ establishes restoration of the large missing-ground region, not exact
 framebuffer equivalence or full flight fidelity. The current Nix package
 build and native flight verification remain pending. Evidence:
 local/textured-tail-20261116/{replay.sh,replay.log,replay.ppm,comparison.json}.
+
+### 2026-11-16 — Verify the packaged terrain fix and camera round trip
+
+The 3ce674d0 ef2000-hybrid Nix build completes with exit 0; native package
+unittest discovery runs 527 tests in 392.646 seconds. A private Xvfb test
+of that built launcher reaches flight, shows the external aircraft over
+continuous terrain with raw F4, and restores cockpit/HUD with raw F1.
+Port 0x60 confirms unmodified make/break codes 3e/be/3b/bb. At the configured
+100-second limit the launcher exits 0, report status time_limit/returncode 27,
+faults empty, startup_checkpoint_verified true. Original assets stay read-only;
+all generated data use isolated output/overlay directories. This verifies this
+flight/camera sequence, not broader playability or exact rendering fidelity.
+Evidence: local/hybrid-textured-tail-build-20261116/{build.log,exit-status};
+local/native-textured-tail-20261116/{run.sh,verification-summary.json,
+external-window.png,returned-window.png,output/report.json}.

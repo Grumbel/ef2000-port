@@ -345,16 +345,16 @@ The pressed main-menu button frame matches the original across all 640×400
 pixels after 550 million instructions. The shorter 1.5-billion replay ends
 during mission loading and is insufficient for this profile.
 
-A fresh Nix hybrid build at 38f929b0 passes 526 tests (75 skips), but native
-camera input exposes a separate shadowed-text alias calling-convention fault.
-The current EF_CDECL correction passes five pending-message differential
-cases and the private native camera test renders an external aircraft without
-that fault. A subsequent 100-second test of the rebuilt 3e374775 package
-uses raw XTest keycodes: unmodified F4 shows the external aircraft and F1
-returns to the cockpit, with no guest fault. The external view's terrain differs visibly from the
-original, so rendering equivalence and a usable flight session remain
-unproven. The combined hand-written/mechanical milestones also remain
-incomplete. These checks do not establish full-game equivalence.
+The rebuilt 3ce674d0 Nix package passes its build and 527 Python tests.
+A private 100-second native test reaches flight, unmodified F4 shows the
+external aircraft over terrain, and F1 returns to the cockpit/HUD. The
+launcher exits 0 at its configured time limit with no guest faults and a
+verified startup checkpoint. The shared textured-span fallback repair removes
+the large missing-ground region. With all 2,598 entries enabled, the same
+four-billion-instruction external-view replay reduces terrain-mask disagreement
+from 56.37% to 2.61%. Exact rendering equivalence, broader flight usability,
+and combined hand-written/mechanical milestones remain unproven. These checks
+do not establish full-game equivalence.
 The tracked source inventory contains 4,293 functions: 3,368
 `compiles`, 30 `verified`, 11 `spliced`, 866 `blocked`, and 9 `compiles-bad`,
 plus nine entries in other states. These inventory counts do not measure
