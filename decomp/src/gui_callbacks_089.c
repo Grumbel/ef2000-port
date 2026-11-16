@@ -25,31 +25,6 @@ void gui_kots_init_4b54(ef_addr32 widget)
         guest(0xac7a8u, 0x17f79cu, 0u);
 }
 
-/* 0x4b1a4, 75 bytes: reject when network is active or signed fuel below
- * minimum, otherwise close the dialog and jump to the next screen. */
-void gui_campaign_warning_ok_4b1a4(void)
-{
-    uint32_t fuel;
-    if (EF_U8(0x126576u) != 0u) {
-        guest(0x4f388u, 0x132202u, 0x132223u);
-        return;
-    }
-    fuel = guest(0x50770u, 0u, 0u);
-    if ((int16_t)fuel < EF_S16(0x1357b0u)) {
-        guest(0x4f388u, 0x1321b7u, 0x1321d8u);
-    } else {
-        guest(0xa4c84u, 0u, 0u);
-        guest(0xac7a8u, 0x1849bcu, 0u);
-    }
-}
-
-/* 0x50638, 15 bytes: one call followed by a different terminal jump. */
-void gui_draw_fuel_bar_50638(void)
-{
-    guest(0xac9e8u, 0u, 0u);
-    guest(0xa4db0u, 0x184ec4u, 0u);
-}
-
 /* 0x5089c, 0x508fc and 0x5095c: three distinct 96-byte callback bodies.
  * The widget's two ASCII digits encode a 1-based selection. This is not
  * atoi: second digit is read only if first digit is exactly '1'. */

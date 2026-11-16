@@ -48,8 +48,9 @@ uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */
  * entries. Host C interfaces do not assert native guest splice ABIs. */
 uint32_t gui_guest_call_089(uint32_t entry, uint32_t eax, uint32_t edx);
 void gui_kots_init_4b54(ef_addr32 widget);
+/* Recovered frontend_warning.c entries use confirmed guest ABIs. */
 void gui_campaign_warning_ok_4b1a4(void);
-void gui_draw_fuel_bar_50638(void);
+ef_addr32 gui_draw_fuel_bar_50638(void);
 void gui_type2_click_5089c(ef_addr32 widget);
 void gui_type3_click_508fc(ef_addr32 widget);
 void gui_type4_click_5095c(ef_addr32 widget);

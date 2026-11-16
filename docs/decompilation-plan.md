@@ -8100,3 +8100,32 @@ decomp_status.py check (4293 functions); git diff --check. Evidence:
 local/assignment-actions-20261116/{assignment_actions.obj,assignment_actions.lst,gui_callbacks_089.obj,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16 — warning acceptance and fuel-bar callbacks
+
+Recover 4b1a4/50638 (75/15 original bytes) in frontend_warning.c,
+replacing host-hook gui_callbacks_089 drafts. Keep original registry names
+cgWarningOkClick/mpDrawFuelBar in tracker evidence. ASM and callback
+entries establish no inputs, six preserved registers, plain RET. Warning
+uses EAX scratch; fuel-bar returns the EAX pointer from a4db0. Correct its
+C declaration from void to ef_addr32; no existing guest C callers.
+
+Preserve network gate, two distinct EAX/EDX binding pairs, signed AX versus
+fresh signed word threshold after max_difference_50770, then widget refresh
+before fixed pending-name scheduling. Fuel-bar resets view first then
+returns apply_a4b80_a4db0(184ec4). Inspect ac9e8/a4db0 original entries to
+confirm no hidden input and pointer return. Wdis emits the original
+15-byte CALL/MOV/JMP sequence for this body, with relocated call targets.
+Reuse documented network/threshold globals. Add confirmed signatures,
+move two tracker entries blocked -> compiles and remove stale mechanical
+exclusions. Retain legacy host-model tests without executing them; these
+are not guest-equivalence evidence for the recovered implementations.
+
+Commands: ef2000_wcc.py frontend_warning.c and gui_callbacks_089.c (zero
+warnings); wdis (signed word comparison, argument pairs, call order,
+EDX preservation and pointer tail return); hybrid_link.py pinned
+payload/full objects (2692 redirects,605384 arena bytes,410/450 modules,
+1581 exclusions); decomp_status.py check (4293 functions); git diff --check.
+Evidence: local/frontend-warning-20261116/{frontend_warning.obj,frontend_warning.lst,gui_callbacks_089.obj,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
