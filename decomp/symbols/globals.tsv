@@ -279,3 +279,4 @@ addr	size	type	name	evidence	notes
 0x0042089c	4	ef_addr32	g_render_left_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
 0x0042085c	4	ef_addr32	g_render_upper_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
 0x0042081c	4	ef_addr32	g_render_lower_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0015b91c	4	ef_addr32	g_texture_blend_table	original d5a90 setup and pixel bodies	page base refreshed before width rejection; indexed by texture byte times256 plus existing framebuffer byte

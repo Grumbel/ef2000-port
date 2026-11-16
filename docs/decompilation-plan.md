@@ -5737,3 +5737,23 @@ tools/ef2000_wcc.py decomp/src/render_bounds.c; wdis object inspection;
 tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
 Artifacts: local/texture-span-decomp-20261116/bounds/{render_bounds.obj,
 render_bounds.lst,render_bounds.abi.h} and bounds-full.json beside it.
+
+### 2026-11-16 — Recover the framebuffer-blended texture span
+
+Recover d5a90 and its computed-return/shared pixel tails through d5c83 in
+texture_spans.c. The table base at 15b91c is refreshed before width rejection;
+lookup indices combine the FS texel as the high byte and the current frame
+pixel as the low byte. Retain signed multiply/shift bits, packed ADD/ADC
+stepping, remainder-first eight-pixel groups, inclusive end and counter writes.
+Preserve the original width-one bug: the second endpoint receives the first
+blended color without a second texture/frame/table lookup. Original callbacks
+through 101688 and d2a7c require only EBP preservation and no register inputs.
+
+Watcom compiles warning-free; generated listing confirms FS/background/table
+read order, per-pixel table reloads and the one-lookup/two-store endpoint path.
+Static full link succeeds with 2606 redirects, 345/385 modules, 579932 arena
+bytes. Keep compiles/static-review-only status. No execution/UI/replay runs
+are started. Evidence: local/texture-span-decomp-20261116/blended/
+{texture_spans.obj,texture_spans.lst,texture_spans.abi.h} and blended-full.json.
+Commands: ef2000_wcc.py on texture_spans.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check. Inventory: 3376 compiles, 858 blocked.

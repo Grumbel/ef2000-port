@@ -3464,3 +3464,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000d4370	draw_masked_transparent_span_d4370			ebp	0	Original saves EBP; mask at 158f24 applies to full packed U before each FS:[BX] read. No register inputs/results.
 0x000d2a7c	build_atlas_textured_object_d2a7c	ESI:ef_addr32,ECX:uint32_t	ESI:ef_addr32	eax,ebx,edx,edi,ebp	0	Original pushes EAX/EBX/EDX/EDI/EBP; advances ESI by two per vertex; ECX scratch. d23d8 preserves the advanced ESI. Installed at159184 by c448b.
 0x000d2130	classify_render_bounds_d2130	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original saves every non-EAX GPR. Plane callbacks receive EAX=context/EDX=x/EBX=y/ECX=z and return AL. Called by d23d8 and d299c; no EAX result consumed.
+0x000d5a90	draw_blended_texture_span_d5a90			ebp	0	Original saves EBP only; globals and FS inputs. Computed RET enters unrolled blend body; width-one tail duplicates the first blended color. Called through 101688 draw callback and d2a7c span slot.

@@ -377,3 +377,87 @@ void draw_masked_transparent_span_d4370(void)
 {
     draw_transparent_affine_span(1u);
 }
+
+
+static uint8_t texture_blended_pixel(ef_addr32 destination, uint32_t index)
+{
+    uint32_t texel = texture_byte_fs(index);
+    uint32_t background = EF_U8(destination);
+    ef_addr32 table = EF_U32(0x0015b91cu);
+
+    return EF_U8(table + (texel << 8) + background);
+}
+
+/* 0xd5a90, 271 owned bytes. The computed RET enters 26-byte pixel bodies
+ * d5b60..d5c2f and joins the shared tail through d5c83. Preserve EBP. */
+void draw_blended_texture_span_d5a90(void)
+{
+    int32_t left;
+    int32_t width;
+    ef_addr32 destination;
+    uint32_t start_u;
+    uint32_t start_v;
+    uint32_t index;
+    uint32_t step_u;
+    uint32_t step_v;
+    uint32_t fraction_v;
+    uint32_t packed_step;
+    uint32_t fraction_step_u;
+    uint32_t fraction_step_v;
+    uint32_t count;
+    int32_t reciprocal;
+
+    EF_U32(0x0015b91cu) = 0x00433f34u + EF_U32(0x00160000u) * 0x4004u;
+    left = EF_S16(0x00485feau);
+    width = (int32_t)EF_S16(0x00485fd2u) - left;
+    if (width <= 0)
+        return;
+    destination = EF_U32(0x0015b754u) +
+        EF_U32(0x00163200u + (uint32_t)(int32_t)EF_S16(0x00485feeu) * 4u) +
+        (uint32_t)left;
+    start_u = EF_U32(0x00485ff0u);
+    start_v = EF_U32(0x00485ff4u);
+    index = ((start_u >> 16) & 255u) | ((start_v >> 8) & 0xff00u);
+    if (width == 1) {
+        uint8_t color = texture_blended_pixel(destination, index);
+
+        EF_U8(destination) = color;
+        /* ORIGINAL BUG: d5c6c loads endpoint coordinates but d5c80 writes
+         * the same AL without another texture/framebuffer/table lookup. */
+        EF_U8(destination + 1u) = color;
+        return;
+    }
+
+    reciprocal = EF_S32(0x00159b7cu + (uint32_t)width * 4u);
+    EF_U32(0x0015b920u) = (uint32_t)width >> 3;
+    step_u = texture_step(EF_U32(0x00485fd8u) - start_u, reciprocal);
+    step_v = texture_step(EF_U32(0x00485fdcu) - start_v, reciprocal);
+    fraction_step_u = step_u << 16;
+    fraction_step_v = step_v << 16;
+    fraction_v = (start_v << 16) | (start_v >> 16);
+    packed_step = (start_u << 16) | (step_u >> 16);
+    packed_step = (packed_step & 0xffff00ffu) | ((step_v >> 8) & 0xff00u);
+
+    /* The computed RET enters the last remainder+1 bodies first, then the
+     * full eight-body loop. Preserve its counter writes and inclusive end. */
+    count = ((uint32_t)width & 7u) + 1u;
+    do {
+        do {
+            uint8_t pixel = texture_blended_pixel(destination, index);
+            uint64_t sum = (uint64_t)fraction_v + fraction_step_v;
+            uint32_t high;
+            uint32_t low;
+
+            fraction_v = (uint32_t)sum;
+            high = ((index >> 8) + ((packed_step >> 8) & 255u) +
+                    (uint32_t)(sum >> 32)) & 255u;
+            sum = (uint64_t)packed_step + fraction_step_u;
+            packed_step = (uint32_t)sum;
+            low = (index + (packed_step & 255u) + (uint32_t)(sum >> 32)) & 255u;
+            index = (high << 8) | low;
+            EF_U8(destination++) = pixel;
+        } while (--count != 0u);
+        EF_U32(0x0015b920u) = EF_U32(0x0015b920u) - 1u;
+        count = 8u;
+    } while ((int32_t)EF_U32(0x0015b920u) >= 0);
+}
