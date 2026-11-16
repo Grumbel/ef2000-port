@@ -7591,4 +7591,5 @@ void guest_fn_16018a_x(void); /* original global-input dispatcher */
 void start_biased_page_record_9fc00(uint32_t record_index, uint32_t point_index);
 uint8_t render_page_9e0c4(uint32_t page_id, uint32_t x, uint32_t y, uint32_t z);
 void pump_device_events_a410c(void);
+uint8_t initialize_comms_a3c18(void);
 #endif

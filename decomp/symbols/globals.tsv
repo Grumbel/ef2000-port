@@ -370,3 +370,14 @@ addr	size	type	name	evidence	notes
 0x0013583c	1	uint8_t	g_device_event_scan_enabled	original a410c shared-tail ASM	post-loop scan flag
 0x00136b84	4	ef_addr32	g_device_event_ids	original a410c shared-tail ASM	live byte-index list pointer
 0x00136b88	4	ef_addr32	g_device_event_count_pointer	original a410c shared-tail ASM	live pointer to byte list length
+0x0013578c	1	uint8_t	g_comms_initialized	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x0013578d	1	uint8_t	g_comms_initialize_gate	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x0013578e	1	uint8_t	g_comms_initialize_status	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x00135790	4	ef_addr32	g_comms_status_message	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x00135794	4	ef_addr32	g_comms_output_buffer	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x001357d4	2	uint16_t	g_comms_initial_counter	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x001357d6	2	uint16_t	g_comms_initial_clock_dx	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x00136dd4	4	uint32_t	g_comms_initial_tick	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x0013581c	1	uint8_t	g_comms_initial_clock_dl	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x0013581d	1	uint8_t	g_comms_initialize_flag_1	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x0013581e	1	uint8_t	g_comms_initialize_flag_2	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md

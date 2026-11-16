@@ -10323,3 +10323,38 @@ alternate.asm,tail.asm,caller.asm,device_event_pump.obj,
 device_event_pump.lst,full.json}. Commands: ef2000_wcc.py on
 device_event_pump.c and ui_state_helpers.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Communications initialization (0xa3c18)
+
+Recover `initialize_comms_a3c18` in decomp/src/comms_initialize.c from the
+390-byte original. No inputs, AL status, all six non-EAX GPRs preserved,
+plain RET. Call sites 346b3/34743 and 34bf1 consume AL; inspect both caller
+bodies. The old indirect-call blocker can be narrowed: e1570 installs
+ed090/e0984/e11fc or e1568 at 136ba0. Inspect those original initializers;
+they take no arguments and return status in AL. Keep the indirect dispatch
+and its full scratch-register contract rather than binding a driver in C.
+
+Preserve the pre-initialization fatal callback's caller-cleaned stack
+argument, name check, table setup, optional decoded-key early exit, status
+publication, and the exceptional status22 continuation. Preserve the live
+status reloads, mode read before the count reset, optional entry formatting,
+output-buffer byte clear, message-table lookup and ordered reset stores.
+The timer call is not merely an EAX scalar call: original EBX retains the
+output pointer's high word, its low word is zero, and EAX/ECX/EDX/ESI/EDI
+are zero on entry. A narrow inline adapter recreates those inputs, stores
+returned EAX at136dd4 first, then captures EBX/EDX as a two-word union.
+Keep the returned DX store, clear_tables call, status reload, BX store and
+DL store in their original order; do not assume these callback outputs are
+zero even though the usual fe560 timer preserves them. Name eleven globals.
+No existing C source calls the newly confirmed entry alias.
+
+Watcom compilation: zero warnings/errors. Wdis confirms preservation,
+plain returns, both status paths, indirect initializer, clock inputs and
+output capture. Full static link:2628 redirects,360/400 modules,592196
+arena bytes. Tracker:3398 compiles,836 blocked of4293. Tracker and diff
+checks pass. Static review only: no execution, gameplay or differential
+proof and no claim that reported crashes are fixed. Evidence:
+local/comms-initialize-20261116/{original.asm,caller1.asm,caller2.asm,
+comms_initialize.obj,comms_initialize.lst,full.json}. Commands:
+ef2000_wcc.py on comms_initialize.c; wdis; hybrid_link.py with pinned payload
+and full-objects; decomp_status.py check; git diff --check.
