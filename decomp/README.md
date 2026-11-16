@@ -349,8 +349,9 @@ A fresh Nix hybrid build at 38f929b0 passes 526 tests (75 skips), but native
 camera input exposes a separate shadowed-text alias calling-convention fault.
 The current EF_CDECL correction passes five pending-message differential
 cases and the private native camera test renders an external aircraft without
-that fault. Xvfb sends Alt with the scripted F4/F1 keys; plain function keys
-remain to be checked. The external view's terrain differs visibly from the
+that fault. A subsequent 100-second test of the rebuilt 3e374775 package
+uses raw XTest keycodes: unmodified F4 shows the external aircraft and F1
+returns to the cockpit, with no guest fault. The external view's terrain differs visibly from the
 original, so rendering equivalence and a usable flight session remain
 unproven. The combined hand-written/mechanical milestones also remain
 incomplete. These checks do not establish full-game equivalence.

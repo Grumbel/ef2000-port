@@ -5284,3 +5284,20 @@ unproven; the paired four-billion-instruction captures show about 88% terrain
 pixels in the original versus 33% in the hybrid. Evidence lives under
 local/external-view-replay-20261116/ and
 local/external-terrain-bisect-02-20261116/.
+
+### 2026-11-16 — Verify packaged flight camera controls with raw keys
+
+The 3e374775 packaged native hybrid completes the 100-second private-Xvfb
+camera run: launcher exit 0, guest time_limit/return 27, zero faults and
+startup_checkpoint_verified=true. The xdotool F4/F1 injection still adds Alt
+despite the private xmodmap change, so repeat using direct XTest keycodes
+70/67. This repeat also completes successfully; port 0x60 records exactly
+3e/be and 3b/bb after the two Return presses, without Alt's 38/b8. Inspected
+screenshots show F4's external aircraft and F1's restored cockpit. The
+external terrain remains visibly incorrect; this proves camera controls and
+fault-free execution for this sequence, not rendering equivalence or full
+playability. No game data was modified; generated files use isolated output
+directories. Evidence: local/native-raw-camera-20261116/{run.sh,raw-key.py,
+driver.log,game.log,verification-summary.json,external-window.png,
+returned-window.png}; output/report.json and exit-status. The earlier
+xdotool run is local/native-packaged-shadow-text-20261116/.
