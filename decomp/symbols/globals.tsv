@@ -409,3 +409,11 @@ addr	size	type	name	evidence	notes
 0x0018d5ac	45	char[45]	g_parser_scalar_kind_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
 0x0018d5dc	38	char[38]	g_parser_record_missing_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
 0x0018d604	45	char[45]	g_parser_record_kind_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
+0x001371fb	1	uint8_t	g_parser_state_1371fb	a9bfc original ASM	Reset to zero; wider meaning unestablished
+0x00419214	4	uint32_t	g_parser_state_419214	a9bfc original ASM	Reset to zero; wider meaning unestablished
+0x001371ed	1	uint8_t	g_parser_state_1371ed	a9bfc original ASM	Reset to zero; wider meaning unestablished
+0x001371ff	1	uint8_t	g_parser_state_1371ff	a9bfc original ASM	Reset to zero; wider meaning unestablished
+0x00137200	1	uint8_t	g_parser_state_137200	a9bfc original ASM	Separate byte reset, not a wider clear
+0x00137201	1	uint8_t	g_parser_state_137201	a9bfc original ASM	Separate byte reset, not a wider clear
+0x00417250	40	ef_addr32[10]	g_parser_option_buffers	a9bfc original ASM	Ten pointers installed in nonsequential order; overlaps menu animation option0
+0x004194c6	150	char[10][15]	g_parser_option_storage	a9bfc original ASM	Ten consecutive option buffers; contents left unchanged

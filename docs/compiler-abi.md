@@ -10837,3 +10837,30 @@ full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild. Generated stack layouts
 differ; full RAM/stack equivalence and reported crash/highlight repairs
 remain unverified.
+
+### 2026-11-16: recover parser key table reset
+
+Recover reset_key_tables_a9bfc (209 original bytes) in parser_key_reset.c;
+the tracker previously assigned runtime_helpers32 without a C definition.
+ASM and sole caller aaee8@aafb4 establish no arguments or consumed output,
+all six other GPRs preserved, plain RET. Caller retains EDI and ECX. No ABI
+change or existing-caller rebuild required.
+
+Keep original byte/dword/word clear widths, ten nonsequential pointer
+stores to the option vector, the interleaved variable-count clear, then
+latch_b3f48 followed by return_true_3ce2c and its AL store. Preserve all
+four separate trailing byte clears. The ten 15-byte option buffers are
+fixed storage: neither allocate nor clear them. Name the wider pointer
+vector (overlapping the existing first-entry symbol), storage and remaining
+reset fields with neutral names where their meaning remains unestablished.
+Remove generic probe tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py parser_key_reset.c (zero warnings); wdis (all store
+widths/order, latch then flag call, preserved registers, plain RET);
+hybrid_link.py pinned payload/full objects (2642 redirects,598504 arena
+bytes,372/412 modules,1631 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/parser-key-reset-20261116/{parser_key_reset.obj,parser_key_reset.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild. Full RAM/stack
+equivalence and reported crash/highlight repairs remain unverified.
