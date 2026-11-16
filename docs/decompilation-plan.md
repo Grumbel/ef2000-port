@@ -7546,3 +7546,26 @@ local/allocation-wrappers-20261116/{allocation_wrappers.obj,
 allocation_wrappers.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover optional word callback
+
+Recover run_word_callback_ab820 (21 original bytes) in word_callback.c;
+runtime_helpers30 had no definition. Original ASM and caller sites
+f1a02/f1a5f establish EAX value, six other registers preserved, plain RET;
+callers retain EDX and EBX respectively. No existing C users found and no
+caller ABI changes required.
+
+Keep callback presence test followed by a separate live indirect-target
+read; volatile accesses preserve both reads. Pass low sixteen value bits
+zero-extended in EAX, with no added fallback or second guard. Name callback
+slot. Remove generic probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py word_callback.c (zero warnings); wdis (two callback
+memory accesses, conditional mask, indirect EAX argument call, saved
+registers and plain RET); hybrid_link.py pinned payload/full objects
+(2663 redirects,601342 arena bytes,390/430 modules,1610 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/word-callback-20261116/{word_callback.obj,word_callback.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.

@@ -468,3 +468,4 @@ addr	size	type	name	evidence	notes
 0x00160796	1	char[]	g_stored_error_message	eb365 pushes address	NUL-terminated message, capacity unestablished
 0x0012dd9c	4	ef_addr32	g_allocation_callback	39db8/82054 indirect calls	EAX byte size; EAX allocation; default 984f0, optional 9850c
 0x001a1860	4	ef_addr32	g_slot_pointer_table	39dbe stores allocation	count times four-byte slots
+0x0041ed80	4	ef_addr32	g_optional_word_callback	ab820 tests then freshly loads target	EAX low-word argument zero-extended; installed by setter
