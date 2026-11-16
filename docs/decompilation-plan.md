@@ -8280,3 +8280,33 @@ body is also 89 bytes but uses different registers and instructions;
 equal length does not establish byte-identical recompilation. Evidence:
 local/target-close-20261117/. No runtime/UI/replay/differential execution
 or packaged runtime rebuild. Runtime equivalence and crashes unverified.
+
+### 2026-11-17 — byte-identical recompilation evidence in status
+
+Added an independent byte-comparison report to nix run .#status: exact,
+different, not-comparable, not-measured and stale, each with function/body
+byte totals. This supplements the functional decompilation objective in
+section 2.2; no tracker state is promoted and differing instructions are
+not a behavioral failure. tools/recompilation_status.py recompiles a
+production module with ef2000_wcc's profile, uses an explicitly reviewed
+contiguous original body and compiled extent excluding padding, resolves
+external OMF relocations at the original address, and compares all bytes
+without masks, trampoline substitution or added padding. Internal/group
+relocations, uncertain frames and discontiguous layouts fail closed as
+not comparable. No original bytes or objects enter the committed report.
+
+Hash-only records in decomp/symbols/recompilation.json bind the function,
+source/header/ABI/global/tool inputs, flags, compiler binary, object and
+pinned payload. Status conservatively invalidates changed inputs or flags;
+compiler identity is retained as path/SHA-256. Fresh recompilation confirms
+121f0 is exact (29 bytes) and b574 differs (89 bytes). Remaining 4291
+functions are unmeasured; historical prose alone does not count as fresh
+evidence. README documents the record command and layout restrictions.
+
+Validation: production runtime_indexed.c and target_close.c compiled with
+zero warnings; python3 -m unittest tests.test_recompilation_status
+tests.test_decomp_status -q (14 passing); nix run .#status; tracker check;
+git diff --check. Synthetic checks cover external relative relocation,
+strict instruction/length differences, unresolved/internal fixups, crossed
+public boundaries, and stale-source exclusion. No gameplay/UI/replay or
+differential execution. The reliable bulk translation goal remains open.

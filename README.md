@@ -10,8 +10,28 @@ maintainable source is the long-term goal.
 Run `nix run .#status` for current function and original body byte counts,
 compilation milestones, blocked work, and recorded verification. This reads the
 flake's tracker snapshot without game assets, recompilation, or gameplay tests.
-Compilation and behavioral verification are reported separately; byte-identical
-recompilation is not currently tracked.
+Compilation, behavioral verification, and byte-identical recompilation are
+reported separately. Byte comparisons distinguish exact, different, not
+comparable, not measured, and stale evidence. Only current strict matches count;
+compiler differences do not imply incorrect behavior.
+
+To record a comparison, review the original contiguous body and the compiled
+extent (excluding alignment padding), then run:
+
+```sh
+python3 tools/recompilation_status.py --address 0x121f0 --code-size 29 \
+  --reviewed-contiguous --payload local/ghidra-stack-return-20261114/payload.bin \
+  --compiler /path/to/wcc386
+```
+
+This recompiles the production module and resolves external OMF relocations at
+the original address before comparing every byte. Unresolved/internal layout
+relocations are recorded as not comparable. Results in
+`decomp/symbols/recompilation.json` contain hashes and build metadata, never game
+bytes. Source, headers, ABI/global tables, compiler flags, and comparison-tool
+changes invalidate evidence conservatively. The compiler binary is identified by
+its path and SHA-256; recording uses the pinned original payload. Discontiguous
+bodies and adapters need separate layout support before comparison.
 
 The two-stage FlashTek X-32 loader, segment relocation table, initialized image,
 BSS boundaries, and protected-mode entry have been recovered by static analysis.

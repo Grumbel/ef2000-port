@@ -146,7 +146,7 @@ def summary(rows, out=sys.stdout):
         print(f'recovered or excluded: {100.0 * done / total_bytes:.1f}% of bytes', file=out)
 
 
-def status(rows, out=sys.stdout):
+def status(rows, out=sys.stdout, recompilation=None, root=ROOT):
     """Report recorded evidence, without treating compilation as equivalence."""
     total = len(rows)
     total_bytes = sum(int(row['size']) for row in rows)
@@ -171,8 +171,22 @@ def status(rows, out=sys.stdout):
                                 for state in STATES if any(row['state'] == state for row in rows)), file=out)
     print('Counts describe tracker states, including C and assembly; blocked rows may contain drafts.', file=out)
     print('Bytes are summed original function body sizes, not unique image coverage or generated C size.', file=out)
-    print('Compilation does not prove a match. Verified means recorded behavioral evidence;', file=out)
-    print('byte-identical recompilation is not tracked. No recompilation or game tests run here.', file=out)
+    print('Compilation does not prove a match. Verified means recorded behavioral evidence.', file=out)
+    from recompilation_status import current, read_report, DEFAULT_REPORT
+    records = read_report(DEFAULT_REPORT if recompilation is None else recompilation)['records']
+    counts = collections.Counter()
+    sizes = collections.Counter()
+    for row in rows:
+        record = records.get(row['addr'])
+        state = ('not-measured' if record is None else
+                 record['state'] if current(record, row, root) else 'stale')
+        counts[state] += 1
+        sizes[state] += int(row['size'])
+    print('Byte-identical recompilation (strict, resolved at original addresses):', file=out)
+    for state in ('exact', 'different', 'not-comparable', 'not-measured', 'stale'):
+        print(f'  {state:<18} {counts[state]:>8,} functions {sizes[state]:>10,} body bytes', file=out)
+    print('Stale evidence is excluded from matches; a difference is not a behavioral failure.', file=out)
+    print('No recompilation or game tests run here.', file=out)
 
 
 def read_calls(path):
@@ -288,7 +302,9 @@ def main(argv=None):
     seed_parser.add_argument('--functions', type=Path,
                              default=DEFAULT_WORKSPACE / 'full-export/functions.tsv')
     sub.add_parser('summary')
-    sub.add_parser('status')
+    status_parser = sub.add_parser('status')
+    status_parser.add_argument('--recompilation', type=Path,
+                               help='override the committed byte-comparison report')
     next_parser = sub.add_parser('next')
     next_parser.add_argument('--module')
     next_parser.add_argument('--limit', type=int, default=10)
@@ -308,7 +324,7 @@ def main(argv=None):
             return 0
         rows = read_tracker(args.tracker)
         if args.command == 'status':
-            status(rows)
+            status(rows, recompilation=args.recompilation)
         elif args.command == 'summary':
             summary(rows)
         elif args.command == 'next':
@@ -324,7 +340,7 @@ def main(argv=None):
             if errors:
                 return 1
             print(f'tracker ok: {len(rows)} functions')
-    except (OSError, TrackerError) as error:
+    except (OSError, ValueError) as error:
         print(f'decomp_status: {error}', file=sys.stderr)
         return 1
     return 0

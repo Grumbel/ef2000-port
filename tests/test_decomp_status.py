@@ -140,7 +140,7 @@ class DecompStatusTest(unittest.TestCase):
         self.assertIn('Inventory: 4 functions; 40 original body bytes', lines)
         self.assertTrue(any('Compiles or later' in line and '50.0%' in line for line in lines))
         self.assertTrue(any('Verified equivalence' in line and '25.0%' in line for line in lines))
-        self.assertIn('byte-identical recompilation is not tracked.', out.getvalue())
+        self.assertIn('Byte-identical recompilation', out.getvalue())
         empty = io.StringIO()
         decomp_status.status([], empty)
         self.assertIn('0.0%', empty.getvalue())
