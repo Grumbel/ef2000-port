@@ -513,3 +513,4 @@ addr	size	type	name	evidence	notes
 0x00121e40	4	ef_addr32	g_difficulty_row_pool	0x4cf4	row pool base; signed high-word selection uses 76-byte stride
 0x00121e46	2	int16_t	g_difficulty_selection	0x4cf4	parsed AX; read via overlapping signed dword 121e44 shifted 16
 0x00121e8e	2	uint16_t	g_map_zoom_mode	0xa974	16-bit one-minus toggle; non-Boolean values retained
+0x00121e95	1	uint8_t	g_target_view_mode	0xb574	stores 2 on first mismatch, 1 on second mismatch, 0 on both equal; same compared strings

@@ -8257,3 +8257,26 @@ modules,1573 exclusions), decomp_status.py check (4293 functions),
 git diff --check. Evidence: local/difficulty-zoom-20261117/. No gameplay,
 UI, replay or differential execution or packaged runtime rebuild. Runtime
 RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-17 — target-view close callback
+
+Recovered gui_close_target_view_b574 in target_close.c, replacing the
+host-only draft in gui_callbacks_088.c. Original b574..b5cc is 89 bytes,
+EAX widget input, EAX scratch, six other GPRs preserved, plain RET.
+Callback registry slot 12b8e0 names gpwCloseTargetView; no ordinary direct
+callers. The two strcmp calls both compare widget+3f against 180834;
+retained both calls and all three byte stores (2,1,0) at 121e95. The second
+comparison is intentionally not simplified. Then lookup root 1805f0 and
+redraw its byte ID at +10. Existing confirmed guest callee signatures
+cover a4380, a46cc and a5ef8. Added g_target_view_mode and the entry ABI;
+tracker promoted to compiles and stale mechanical exclusion removed.
+
+Validation: ef2000_wcc.py target_close.c and gui_callbacks_088.c (zero
+warnings), wdis (both calls, branches/stores, final lookup/ID/redraw,
+register saves/RET), hybrid_link.py pinned payload/full objects (2702
+redirects,605676 arena bytes,415/454 modules,1572 exclusions),
+decomp_status.py check (4293 functions), git diff --check. The generated
+body is also 89 bytes but uses different registers and instructions;
+equal length does not establish byte-identical recompilation. Evidence:
+local/target-close-20261117/. No runtime/UI/replay/differential execution
+or packaged runtime rebuild. Runtime equivalence and crashes unverified.

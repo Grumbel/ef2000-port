@@ -25,22 +25,6 @@ void gui_change_mode_a960(ef_addr32 widget)
     guest(EF_U16(0x121e8eu) ? 0xa870u : 0x4595cu, widget, 0u, 0u);
 }
 
-/* 0xb574 (89 bytes): yes, the original repeats its comparison against the
- * *same* pointer 0x180834; no assumed second tab name is substituted. */
-void gui_close_target_view_b574(ef_addr32 widget)
-{
-    uint32_t text = widget + 0x3fu;
-    uint32_t target;
-    if (guest(0xa4380u, text, 0x180834u, 0u) != 0u)
-        EF_U8(0x121e95u) = 2u;
-    else if (guest(0xa4380u, text, 0x180834u, 0u) != 0u)
-        EF_U8(0x121e95u) = 1u;
-    else
-        EF_U8(0x121e95u) = 0u;
-    target = guest(0xa46ccu, 0x1805f0u, 0u, 0u);
-    guest(0xa5ef8u, EF_U8(target + 0x10u), 0u, 0u);
-}
-
 /* 0xbde8 (93 bytes), four ID lookups and selector calls. Last selector is
  * a terminal jump in guest code, not an additional widget lookup. */
 void gui_click_pilot1_bde8(void)

@@ -151,7 +151,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000afbc	546	scatter_probe_afbc	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000afbc.json	Original 0xafbc (546 bytes)
 0x0000b1e0	866			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x0000b544	46	apply_two_a4b80_b544	game_helpers4	compiles	game	confirmed	decomp/tests/0x0000b544.json	docs/compiler-abi.md; ; callers none direct; guest pending
-0x0000b574	89	gpwCloseTargetView	gui_callbacks_088	blocked	game	confirmed		Blocked: draft routes callees through a host-only guest-call hook (gui_guest_call_088) with an unconfirmed calling convention; no real call target to link against, so a differential against the original is not possible until those callees are recovered. Prior note: Original repeats exact same compare; guest replay pending
+0x0000b574	89	gui_close_target_view_b574	target_close	compiles	game	confirmed		Recovered direct guest C; registry gpwCloseTargetView; preserves repeated identical comparison; Watcom/ASM/static link reviewed; docs/compiler-abi.md; runtime equivalence pending
 0x0000b5d0	204	gpwRedrawTargetWindow		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
 0x0000b69c	959			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
 0x0000ba5c	445			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
