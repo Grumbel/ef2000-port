@@ -11292,3 +11292,30 @@ Evidence: local/clock-helpers-20261116/{clock_helpers.obj,clock_helpers.lst,
 full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild; full RAM/stack
 equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover device and stored-error checks
+
+Recover require_device_ready_a292c (26 original bytes) and
+check_error_flag_eb35c (24 bytes) in error_gates.c; runtime_helpers30 had no
+definitions. ASM and readiness caller sites a3ebb/a42c4 confirm no inputs,
+AL result and six preserved registers. Stored-error callers dc250/dc281
+consume no result. Both use plain RET. No existing caller ABI changes.
+
+Preserve opposite byte conditions: zero device-ready byte reports fixed
+message; nonzero stored-error byte reports the message at 160796. Each
+freshly loads the error callback and supplies one cdecl stack argument.
+Declare the shim clobbers locally to preserve ECX/EDX. If the callback
+returns, readiness still returns AL one; stored-error simply returns,
+without clearing the flag or message. Name the readiness/error bytes and
+message start (capacity unknown). Remove both generic probe tracker
+references, retaining JSON files.
+
+Commands: ef2000_wcc.py error_gates.c (zero warnings); wdis (conditions,
+callback arguments, AL one after returning error, saved registers and
+plain RETs); hybrid_link.py pinned payload/full objects (2660 redirects,
+601176 arena bytes,388/428 modules,1613 exclusions); decomp_status.py check
+(4293 functions); git diff --check. Evidence:
+local/error-gates-20261116/{error_gates.obj,error_gates.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.

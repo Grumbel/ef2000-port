@@ -463,3 +463,6 @@ addr	size	type	name	evidence	notes
 0x0012dd98	4	ef_addr32	g_sound_slot_records	980a7 reads table base	13-byte records
 0x0015b620	4	ef_addr32	g_clock_callback	a7d34/e1110 indirect calls	no arguments; EAX clock value; reloaded for every poll
 0x0041915c	4	uint32_t	g_remembered_clock	a7d3a stores clock callback result	clock snapshot
+0x00135798	1	uint8_t	g_comms_device_ready	a292c checks before error callback	zero reports device-not-linked error
+0x00160795	1	uint8_t	g_stored_error_pending	eb35c checks before error callback	nonzero reports message at 160796
+0x00160796	1	char[]	g_stored_error_message	eb365 pushes address	NUL-terminated message, capacity unestablished
