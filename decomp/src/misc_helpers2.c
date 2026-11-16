@@ -314,10 +314,11 @@ void update_flags_fa7d2(ef_addr32 file)
 }
 
 /* 0xfba54, 24 bytes. 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX. */
-void call_fba6c(uint32_t first, ef_addr32 record)
+uint32_t call_fba6c(uint32_t first, ef_addr32 record)
 {
-    (void)first;
-    guest_fn_fba6c(EF_U32(record + 0x16u), EF_U32(record + 0x1au));
+    uint32_t second = EF_U32(record + 0x1au);
+    uint32_t value = EF_U32(record + 0x16u);
+    return count_matching_entries_fba6c(value, second, first);
 }
 
 /* 0xfddd2, 27 bytes. Map 0xfddb3 to 0xfddb7 and 0xfddc5 to 0xfddcc, else keep. */

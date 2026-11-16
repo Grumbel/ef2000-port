@@ -1223,7 +1223,7 @@ void reset_flags_f4178(void);
 ef_addr32 call_f9dcb(uint32_t value);
 void store_two_digits(int32_t value, ef_addr32 base, int32_t offset);
 void update_flags_fa7d2(ef_addr32 file);
-void call_fba6c(uint32_t first, ef_addr32 record);
+uint32_t call_fba6c(uint32_t first, ef_addr32 record);
 uint32_t map_address_fddd2(uint32_t address);
 void fill_table_fef26(void);
 void update_fc9f8(int32_t value);
@@ -1312,7 +1312,7 @@ void guest_fn_f2b7c(void); /* 0xf2b7c */
 void guest_fn_f3b78(void); /* 0xf3b78 */
 void guest_fn_f9dcb(uint32_t value, ef_addr32 buffer); /* 0xf9dcb EAX/EDX */
 uint32_t guest_fn_1101be(uint32_t handle); /* 0x1101be EAX */
-void guest_fn_fba6c(uint32_t first, uint32_t second); /* 0xfba6c EAX/EDX */
+uint32_t guest_fn_fba6c(uint32_t first, uint32_t second, ef_addr32 listp); /* 0xfba6c EAX/EDX/EBX */
 void guest_fn_c24(int32_t high, uint32_t address); /* 0xc24 EAX/EDX */
 
 /* runtime_helpers.c */

@@ -7092,3 +7092,35 @@ local/path-animation-20261116/{path_animation.obj,path_animation.lst,
 full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild. Full RAM/stack
 equivalence and reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover shape match count and repair wrapper
+
+Recover count_matching_entries_fba6c (105 original bytes) in
+shape_match_count.c; runtime_helpers35 had no definition. ASM and callers
+bfcb6/fba63 establish EAX/EDX match values, EBX list-head address, EAX count,
+ECX/ESI/EDI/EBP preserved, EBX/EDX scratch, plain RET. Correct false
+EBX/EDX preservation metadata and unused two-argument generic alias.
+
+Repair call_fba6c at fba54: its draft discarded EAX list-head argument,
+omitted EBX at the counting call and declared the returned count void.
+Forward all three inputs, load record+1a before record+16, and return the
+count. Correct wrapper EAX return/EDX scratch metadata; callers fbb2b/fbc83
+sign-extend AX and divide the count by three. Rebuild misc_helpers2 and
+game_helpers130, all existing actual users of the corrected interfaces.
+
+Keep list-head dereference, next at +4, fresh byte count at +12 per loop,
+signed low-word index and 124-byte entry stride, ordered field +8/+12
+matches, node-kind two check, low-AX kind predicate and unsigned total.
+No null guard or new globals. Remove generic probe tracker references,
+retaining their JSON files.
+
+Commands: ef2000_wcc.py shape_match_count.c, misc_helpers2.c and
+game_helpers130.c (zero warnings); wdis counting body and wrapper (word
+loop checks, field order, EBX forwarding and EAX return); hybrid_link.py
+pinned payload/full objects (2644 redirects,598792 arena bytes,374/414
+modules,1629 exclusions); decomp_status.py check (4293 functions); git diff
+--check. Evidence: local/shape-match-count-20261116/{shape_match_count.obj,
+shape_match_count.lst,misc_helpers2.lst,full.json}. Status remains compiles,
+counts unchanged. No runtime/UI/replay/differential execution or packaged
+runtime rebuild; full RAM/stack equivalence and reported crash/highlight
+repairs remain unverified.
