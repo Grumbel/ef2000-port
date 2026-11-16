@@ -11504,3 +11504,30 @@ local/open-mode-20261116/{open_mode.obj,open_mode.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover attack-pattern group output
+
+Recover dump_group_list_b29a8 (129 original bytes) in group_list_dump.c;
+runtime_helpers33 had no definition. ASM and caller sites b26d2/b26ff
+establish EAX list, EDX output, EAX/EDX scratch, five other registers
+preserved, plain RET. Correct false EDX preservation. No existing C users
+found, so no caller objects need recompiling.
+
+Preserve initial signed count read before unchecked byte-indexed name read,
+header output even for zero/negative counts, post-output count reload,
+six-byte group indexing with signed low-word index, group count output,
+and live table/count reloads before each 17-byte record. Retain signed word
+counter comparisons and post-output reloads of outer count. Use original
+format addresses and print helpers, no new checks or formatting strings.
+Name attack-pattern name table start, extent unknown. Remove generic probe
+tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py group_list_dump.c (zero warnings); wdis (header
+argument order, signed count/index operations, live table/count reads,
+17-byte stride, EDX scratch and plain RET); hybrid_link.py pinned payload/
+full objects (2669 redirects,602584 arena bytes,396/436 modules,1604
+exclusions); decomp_status.py check (4293 functions); git diff --check.
+Evidence: local/group-list-dump-20261116/{group_list_dump.obj,
+group_list_dump.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
