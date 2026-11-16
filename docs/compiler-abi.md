@@ -10153,3 +10153,38 @@ UI or replay runs and no claim of crash resolution. Evidence:
 local/page-name-table-20261116/{original.asm,callers.asm,page_name_table.obj,
 page_name_table.lst,full.json}. Commands: ef2000_wcc.py on page_name_table.c;
 wdis; hybrid_link.py; decomp_status.py check; git diff --check.
+
+### Offset page-record immediate dispatch (0x9f940)
+
+Recover `dispatch_offset_page_record_9f940` (446 original bytes) in
+`decomp/src/page_positioned_record.c`. Sole direct caller9e847 passes AX/DX
+script words, advances ESI by4 and retains ESI afterward. Original saves
+EBX/ECX/ESI/EDI, leaves EBP untouched, treats EAX/EDX as scratch and uses
+plain RET. No second direct caller exists in the pinned inventory.
+
+Preserve signed record/point indices,29/6-byte strides, point-Y store before
+setup hook, wrapping offsets and interleaved overlapping coordinate reads.
+View160122 receives integer coordinates in stack order margin,Z,Y,X,out.
+On acceptance publish default rotations with page yaw bias, script globals
+in their original order, repeat test before rotation-pointer publication,
+optional rotation preloads before X/Y/Z stores, and repeat reread between
+Y/Z stores. Call global-input dispatcher16018a through a declaration with
+EAX/EBX/ECX/EDX scratch and ESI/EDI/EBP preserved, confirmed from its original
+body. Always run the final hook, including a rejecting view path where the
+local world buffer can remain uninitialized. Remove obsolete9f940
+unreviewed-mechanical exclusion; keep view-test arithmetic exclusions.
+
+This caller does not verify the existing16018a draft or its draw
+continuations. Review exposed early rotation preloads in that draft that
+still need correction for aliasing; wider callee fidelity remains pending.
+
+Watcom compiles warning-free. Wdis confirms saved registers, signed word
+indices, integer view inputs and stack order, retained world pointer across
+the scratch-clobbering dispatcher, ordered stores/repeat reread and RET.
+Full static link:2624 redirects,357/397 modules,590394 arena bytes; tracker
+and diff checks pass. Inventory3394 compiles,840 blocked. Static review
+only; no execution/UI/replay runs or crash-resolution claim. Evidence:
+local/page-dispatch-record-20261116/{original.asm,callers.asm,
+page_positioned_record.obj,page_positioned_record.lst,full.json}. Commands:
+ef2000_wcc.py on page_positioned_record.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

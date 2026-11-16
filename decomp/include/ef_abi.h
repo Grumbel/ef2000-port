@@ -7584,4 +7584,9 @@ void guest_fn_c41b0_x(uint32_t key); /* original enqueue, AX key */
 #pragma aux guest_fn_c41b0_x parm [eax] modify [eax ebx ecx edx]
 #endif
 void load_page_name_table_9da80(void);
+void dispatch_offset_page_record_9f940(uint32_t record_index, uint32_t point_index);
+void guest_fn_16018a_x(void); /* original global-input dispatcher */
+#ifdef __WATCOMC__
+#pragma aux guest_fn_16018a_x parm caller [] modify [eax ebx ecx edx]
+#endif
 #endif
