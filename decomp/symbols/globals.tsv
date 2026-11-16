@@ -331,3 +331,8 @@ addr	size	type	name	evidence	notes
 0x001600c0	4	uint32_t	g_script_record_lookup_result	original a04b4 ASM	EAX from callee-cleaned stack hook
 0x00132b14	4	ef_addr32	g_script_record_lookup_hook	original a04b4 ASM	one callee-cleaned stack argument; EAX result
 0x00132ad8	4	ef_addr32	g_positioned_record_hook	original a04b4 ASM	EAX/EDX/EBX signed coordinates and ECX low nibble
+0x00417188	6	uint16_t[3]	g_page_record_adjusted_rotation	original a08c8 ASM	wrapping angles passed to script rotation pointer
+0x00417222	2	uint16_t	g_page_record_rotation_bias	original a08c8 ASM	added to middle angle before optional record offsets
+0x00417196	2	int16_t	g_page_record_visibility_gate	original a08c8 ASM	accepted signed range -1023 through zero; read via overlapping dword first
+0x00132af4	4	ef_addr32	g_page_point_setup_hook	original a08c8 ASM	EAX=EDX=0 on this path
+0x00132af0	4	ef_addr32	g_page_point_transform_hook	original a08c8 ASM	EAX destination; EDX origin pointer

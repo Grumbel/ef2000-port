@@ -6084,3 +6084,34 @@ local/view-test-stack-abi-20261116/{page_positioned_record.obj,
 page_positioned_record.lst,misc_drafts1.obj,misc_drafts1.lst,full.json}.
 Commands:ef2000_wcc.py on both affected modules; wdis on both objects;
 hybrid_link.py; decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover rotated page-record startup
+
+Recover a08c8 (356 owned bytes) in page_positioned_record.c. Original ASM,
+pseudo-C and sole direct caller9e8e3 establish signed AX index, six saved
+registers and plain RET. Retain visibility gates, hook-transformed position,
+corrected stack view test, wrapping adjusted rotation and optional offsets,
+script lookup EAX result and original160329 queue-appender call. Inspect
+160329's entry to confirm no register inputs; do not misclassify this call
+as a C runtime helper. Remove a08c8's old exclusion after manual review.
+
+Keep the asserted24-byte data layout, offset preload before angle stores,
+repeat-byte reread between second/third stores and original lookup contract.
+Generated listing exposed missing shared callback/view-test clobbers:
+ECX held the record pointer across calls that overwrite it. Add matching
+shared pragmas for guest_callptr_eaxedx_x,guest_callptr4_x and both view
+tests. Rebuilt a08c8 keeps record in ESI across hooks/view test. Recompile
+all users:page_positioned_record,misc_drafts1,script_branch,load_planes1,
+state_reset1 and guest_callptr1. These are declaration corrections to
+existing adapters; no new runtime adapter or guards.
+
+Compilation succeeds; wdis review confirms register saves, signed gates,
+stack push order, preserved record pointer and rotation-store sequence.
+Full static link:2616 redirects,353/393 modules,586052 arena bytes. Tracker
+and git diff --check pass. Inventory:3386 compiles,848 blocked. Status
+compiles only; no runtime/UI/replay runs. Evidence:
+local/page-rotated-record-20261116/{original.asm,page_positioned_record.obj,
+page_positioned_record.lst,full.json} and rebuilt affected objects there.
+Commands:ef2000_wcc.py on all six affected modules; wdis on
+page_positioned_record.obj; hybrid_link.py; decomp_status.py check;
+git diff --check.

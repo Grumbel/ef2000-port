@@ -9904,3 +9904,27 @@ while the arithmetic implementation and implicit-register callees still
 need individual fidelity review. Old register-only drafted probes are
 inapplicable and are no longer referenced by the tracker. No execution
 verification is claimed.
+
+## Rotated page record at `0xa08c8`
+
+`start_rotated_page_record_a08c8` takes signed AX=record index, preserves
+six other GPRs and returns with plain RET. Sole direct caller9e8e0/9e8e3
+reads a signed script word and consumes no result. Keep the overlapping
+dword/signed-word visibility checks, original24-byte data frame, signed
+record rotation index doubled without a point-table header adjustment,
+and the two register hooks (132af4 EAX=EDX=0;132af0 EAX=frame,EDX=origin).
+View-test arguments use the corrected margin,Z,Y,X,out stack contract.
+
+Adjusted rotation words wrap at16 bits. Read all three optional offsets
+before publishing any adjusted angle, and preserve the repeat-byte reread
+between the second and third stores. Publish lookup EAX at1600c0, then
+call160329, whose entry consumes global script fields and no GPR inputs.
+
+Listing review also exposed missing shared clobber declarations. Match
+`guest_callptr_eaxedx_x` to its implementation (EAX/EDX/EBX parameters,
+EAX/ECX/EDX scratch), and `guest_callptr4_x` (EAX/EDX/EBX/ECX parameters,
+all four scratch). Explicitly mark the two stack view tests' EAX/EBX/ECX/EDX
+clobbers too. Otherwise the compiler can retain the record pointer in ECX
+across calls that overwrite it. Rebuilt a08c8 keeps it in ESI. Recompile
+all users of these two callback helpers, including the helper implementation.
+No runtime execution equivalence is claimed.

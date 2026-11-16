@@ -7511,8 +7511,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux render_texture_stream_c4c30 parm routine []
 #pragma aux render_index_stream_c4ccb parm routine []
 #pragma aux render_index_stream_c4d43 parm routine []
-#pragma aux rotate_view_test_160122 parm routine []
-#pragma aux rotate_view_test_160156 parm routine []
+#pragma aux rotate_view_test_160122 parm routine [] value [eax] modify [eax ebx ecx edx]
+#pragma aux rotate_view_test_160156 parm routine [] value [eax] modify [eax ebx ecx edx]
 #pragma aux guest_fn_10d63b parm routine [] value [eax] modify [eax ebx ecx edx esi edi ebp]
 #endif
 
@@ -7562,4 +7562,13 @@ void execute_script_branch_a9130(ef_addr32 record); /* 0xa9130 EAX */
 void clear_registered_callbacks(void); /* 0xabec4 no inputs */
 void restore_parser_state_ab47c(uint32_t handle); /* 0xab47c EAX */
 void start_positioned_page_record_a04b4(uint32_t record_index, uint32_t point_index); /* 0xa04b4 AX/DX */
+void start_rotated_page_record_a08c8(uint32_t record_index); /* 0xa08c8 AX */
+void guest_fn_160329_x(void); /* 0x160329 no register inputs */
+#ifdef __WATCOMC__
+#pragma aux guest_fn_160329_x parm caller [] modify [eax ebx ecx edx]
+#endif
+#ifdef __WATCOMC__
+#pragma aux guest_callptr_eaxedx_x parm [eax] [edx] [ebx] modify [eax ecx edx]
+#pragma aux guest_callptr4_x parm [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#endif
 #endif
