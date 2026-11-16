@@ -429,3 +429,8 @@ addr	size	type	name	evidence	notes
 0x00420a90	768	uint8_t[]	g_video_palette	d1d7a passes to d663c	256 RGB entries; original bytes not included
 0x0015b750	4	ef_addr32	g_video_prepare_callback	d1d90 indirect call with EAX zero	called before framebuffer clear
 0x0015b74c	4	ef_addr32	g_video_present_callback	d1d9d indirect call with EAX zero	called after framebuffer clear
+0x0041eede	2	uint16_t	g_default_entry_override	aca15 gates default selection	nonzero suppresses selection
+0x0041eec0	4	uint32_t	g_default_entry_kind_state	aca1f reads high byte	high byte one/two chooses Plane2/Plane3; otherwise Plane1
+0x0041eedc	2	uint16_t	g_selected_named_entry	aca4d stores lookup result	reloaded unsigned for 25-byte table indexing
+0x0041eed4	2	uint16_t	g_selected_entry_field21	aca78 stores table word at +21	meaning not established
+0x0041eec8	2	uint16_t	g_selected_entry_field23	aca7f stores table word at +23	meaning not established

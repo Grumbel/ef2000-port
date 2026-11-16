@@ -7275,3 +7275,30 @@ Watcom treats parameter EDX as scratch; hybrid entry restores original
 preserved EDX. Status remains compiles, counts unchanged. No runtime/UI/
 replay/differential execution or packaged runtime rebuild; full RAM/stack
 equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover default named-entry selection
+
+Recover select_default_video_aca14 (115 original bytes) in default_video.c;
+runtime_helpers33 had no definition. ASM and caller sites ac96a/acab5/acb0a
+establish no inputs, EAX scratch, six other registers preserved, plain RET.
+Keep the existing function name but do not infer video-mode semantics from
+it: the selected names are Plane2, Plane3 and Plane1.
+
+Preserve the override-word early return, high-byte kind dispatch (one/two,
+otherwise default), lookup-result narrowing and fresh unsigned word reload.
+The original arithmetic high-byte shift and unsigned comparisons choose
+the same default for all negative values as this logical extraction. Keep
+unchecked 25-byte entry indexing and load both table words before either
+output store, preserving alias order. No bounds checks or lookup guards.
+Name five state fields with neutral names. Remove the generic probe tracker
+reference, retaining its JSON. Existing callers need no ABI rebuild.
+
+Commands: ef2000_wcc.py default_video.c (zero warnings); wdis (override,
+three lookup names, result word store/reload, both loads before stores,
+register saves and plain RET); hybrid_link.py pinned payload/full objects
+(2650 redirects,599764 arena bytes,380/420 modules,1623 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/default-video-20261116/{default_video.obj,default_video.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crash/highlight repairs remain unverified.
