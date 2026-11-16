@@ -5607,3 +5607,38 @@ tools/decomp_status.py check; git diff --check. Evidence:
 local/texture-span-decomp-20261116/{span-reviewed.json,committed-spec.log,
 tracked.json,full.json}. This adds recovered game C, not another validation
 framework; the menu regressions and broader bulk goal remain open.
+
+### 2026-11-16 — Recover perspective and transparent span code
+
+Continue decompiling game code as requested, without starting new execution,
+UI or replay tests. Add draw_perspective_transparent_span_d3e50 (1015 original
+bytes) and draw_transparent_span_d4250 (250 owned bytes) to texture_spans.c,
+including the dispatcher's shared affine body d42b1..d4363. Read the original
+candidate exports and full pinned disassembly; control flow and arithmetic
+are reconstructed from the ASM, not copied pseudo-C. The d429d CALL and
+resource-handler pointer at 15b884 establish the renderer entry contracts:
+d3e50 preserves no GPRs, d4250 preserves EBP, both consume globals and FS.
+
+Preserve the perspective routine's sixteen-pixel blocks before its remaining-
+count check, reciprocal depth writes, signed products and arithmetic shifts,
+transparent texel skips, and low-word AND/DEC count operations. In particular,
+CDQ precedes SHL EAX,4: use the unshifted sign as the dividend's high word.
+An explicit one-instruction IDIV adapter preserves signed EDX:EAX division
+and processor divide-by-zero/quotient-overflow behavior; ordinary wide C
+quotient narrowing would not. The affine fallback retains packed byte
+ADD/ADC carries and initial OR AL,FS:[BX], including the original shade-page
+low byte for the first pixel. Preserve fallback entry into the shared tail
+rather than return early. No special-case guards are added to alter original
+behavior for invalid inputs or narrow direct perspective calls.
+
+OpenWatcom compilation is warning/error-free. Inspect the generated Watcom
+listing to confirm actual FS byte loads, IDIV EBX, register clobbers and the
+dispatcher's calls. Name the added globals, record confirmed signatures,
+remove these two reviewed mechanical exclusions, and retain compiles status
+with static-review-only notes. There is no execution-equivalence promotion.
+Static full relink succeeds: 2601 redirects, 343/383 modules, 577628 arena bytes.
+Tracker remains 4293 functions; 3371 compiles and 863 blocked. Commands:
+tools/ef2000_wcc.py decomp/src/texture_spans.c; wdis on its object;
+tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
+Artifacts: local/texture-span-decomp-20261116/transparent/{texture_spans.obj,
+texture_spans.lst,texture_spans.abi.h} and transparent-full.json beside it.

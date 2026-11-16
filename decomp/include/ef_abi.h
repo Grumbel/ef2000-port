@@ -3842,6 +3842,8 @@ int32_t guest_fn_a312c_w(uint32_t a); /* 0xa312c EAX */
 void guest_fn_d3900_w(void); /* 0xd3900 */
 void guest_fn_d3cb0_w(void); /* 0xd3cb0 */
 void draw_textured_span_d3cb0(void);
+void draw_perspective_transparent_span_d3e50(void);
+void draw_transparent_span_d4250(void);
 #ifdef __WATCOMC__
 #pragma aux guest_fn_d3900_w parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d3cb0_w parm caller [] modify [eax ebx ecx edx esi edi]

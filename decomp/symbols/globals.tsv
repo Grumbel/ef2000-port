@@ -244,3 +244,15 @@ addr	size	type	name	evidence	notes
 0x00485fdc	4	uint32_t	g_texture_right_v	original d3cb0..d3e41 disassembly	right fixed-point texture V
 0x00485ff0	4	uint32_t	g_texture_left_u	original d3cb0..d3e41 disassembly	left fixed-point texture U
 0x00485ff4	4	uint32_t	g_texture_left_v	original d3cb0..d3e41 disassembly	left fixed-point texture V
+0x0015b8f4	4	int32_t	g_texture_left_depth	original d3e50/d4250 ASM	left depth used for perspective correction
+0x0015b8f8	4	int32_t	g_texture_right_depth	original d3e50/d4250 ASM	right depth used for perspective correction
+0x0015b8fc	4	uint32_t	g_texture_block_step_u	original d3e50/d4250 ASM	wrapped U increment for the current block
+0x0015b900	4	uint32_t	g_texture_block_step_v	original d3e50/d4250 ASM	wrapped V increment for the current block
+0x0015b904	4	uint32_t	g_texture_block_start_u	original d3e50/d4250 ASM	U at start of current perspective block or tail
+0x0015b908	4	uint32_t	g_texture_block_start_v	original d3e50/d4250 ASM	V at start of current full perspective block
+0x0015b90c	4	int32_t	g_texture_current_inverse_depth	original d3e50/d4250 ASM	current reciprocal depth, advanced before each block
+0x0015b910	4	int32_t	g_texture_right_inverse_depth	original d3e50/d4250 ASM	right endpoint reciprocal depth
+0x0015b914	4	int32_t	g_texture_inverse_depth_step	original d3e50/d4250 ASM	reciprocal depth increment per sixteen-pixel block
+0x0015b918	4	uint32_t	g_texture_span_pixel_count	original d3e50/d4250 ASM	original inclusive span count
+0x00485fe4	4	int32_t	g_texture_right_depth_fixed	original d3e50/d4250 ASM	right endpoint depth before SAR 8
+0x00485ffc	4	int32_t	g_texture_left_depth_fixed	original d3e50/d4250 ASM	left endpoint depth before SAR 8
