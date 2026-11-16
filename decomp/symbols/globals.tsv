@@ -256,3 +256,4 @@ addr	size	type	name	evidence	notes
 0x0015b918	4	uint32_t	g_texture_span_pixel_count	original d3e50/d4250 ASM	original inclusive span count
 0x00485fe4	4	int32_t	g_texture_right_depth_fixed	original d3e50/d4250 ASM	right endpoint depth before SAR 8
 0x00485ffc	4	int32_t	g_texture_left_depth_fixed	original d3e50/d4250 ASM	left endpoint depth before SAR 8
+0x00158f24	4	uint32_t	g_texture_coordinate_mask	original d43f0 AND EBX,[158f24]	dynamic mask for full packed U, including its fractional high word

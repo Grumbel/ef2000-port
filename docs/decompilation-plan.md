@@ -5642,3 +5642,38 @@ tools/ef2000_wcc.py decomp/src/texture_spans.c; wdis on its object;
 tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
 Artifacts: local/texture-span-decomp-20261116/transparent/{texture_spans.obj,
 texture_spans.lst,texture_spans.abi.h} and transparent-full.json beside it.
+
+### 2026-11-16 — Recover opaque perspective and masked affine spans
+
+Add draw_perspective_span_d3900 (839 original bytes) and
+ draw_masked_transparent_span_d4370 (173 owned bytes) to texture_spans.c.
+Read their candidate exports and complete pinned disassembly, then reconstruct
+C using the existing explicit FS/IDIV adapters. d3900 shares the perspective
+arithmetic/control structure with d3e50 but writes every texel, including
+zero. Preserve its register caching: both increments are cached for a full
+sixteen-pixel block; the tail caches V once but reloads U for every pixel.
+This differs from the transparent routine's per-pixel global reads and is
+kept explicit. Preserve reciprocal and block-start writes, signed product/
+division bits and low-word tail count operations.
+
+For d4370 reuse the transparent affine core with an explicit masked mode.
+Apply the dynamic 158f24 AND to the entire packed U word before every FS texel
+read, including its fractional high word; masking only the texture index
+would change later ADD/ADC carries. Retain the initial shade-byte OR behavior,
+transparent skips, inclusive endpoint and EBP preservation. The unmasked
+selector calls the same core with masked mode disabled. No GPR arguments or
+results are invented; d3900 preserves no GPRs, d4370 preserves EBP.
+
+Watcom compiles the 380-line renderer module with zero warnings/errors.
+Inspect the generated listing and ABI pragmas: the full-word mask reload is
+inside the pixel loop, FS reads remain explicit, and clobbers match original
+entry contracts. Full static relink succeeds with 2603 redirects across
+343/383 modules and 578370 arena bytes. Tracker check and git diff --check
+pass; 3373 functions are compiles and 861 remain blocked. Both new entries
+remain compiles/static-review-only, with no execution-verification promotion.
+No new test, UI or replay runs are started.
+
+Commands: tools/ef2000_wcc.py decomp/src/texture_spans.c; wdis on the object;
+tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
+Evidence: local/texture-span-decomp-20261116/opaque/{texture_spans.obj,
+texture_spans.lst,texture_spans.abi.h} and opaque-full.json beside it.

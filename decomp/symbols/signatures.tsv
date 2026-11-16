@@ -3460,3 +3460,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000d3cb0	draw_textured_span_d3cb0			ebp	0	Original EBP save/restore; all inputs are renderer globals and FS texture memory. Computed RET enters unrolled shared tail d3d70..d3dff; width-one path d3e00..d3e41.
 0x000d3e50	draw_perspective_transparent_span_d3e50				0	Original d3e50 has no register inputs and preserves no GPRs; renderer globals and FS supply inputs. IDIV and sixteen-pixel block/tail control flow retained.
 0x000d4250	draw_transparent_span_d4250			ebp	0	Original pushes EBP; perspective path calls d3e50, fallback enters shared d42b1..d4363 affine body.
+0x000d3900	draw_perspective_span_d3900				0	Original d3900 preserves no GPRs; renderer globals/FS inputs. Cached full-block increments, cached tail V and per-pixel tail U reloads retained.
+0x000d4370	draw_masked_transparent_span_d4370			ebp	0	Original saves EBP; mask at 158f24 applies to full packed U before each FS:[BX] read. No register inputs/results.

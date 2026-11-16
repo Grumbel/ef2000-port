@@ -202,9 +202,98 @@ void draw_perspective_transparent_span_d3e50(void)
     } while ((uint16_t)count != 0u);
 }
 
+/* 0xd3900, 839 bytes. Opaque perspective span. Unlike d3e50, cache both
+ * increments per full block, cache V across the tail, and never skip texel 0.
+ * The same CDQ/SHL and low-word remaining-count behavior is retained. */
+void draw_perspective_span_d3900(void)
+{
+    int32_t left = EF_S16(0x00485feau);
+    ef_addr32 destination = EF_U32(0x00163200u +
+        (uint32_t)(int32_t)EF_S16(0x00485feeu) * 4u) +
+        EF_U32(0x0015b754u) + (uint32_t)left - 1u;
+    int32_t width = (int32_t)EF_S16(0x00485fd2u) - left;
+    uint32_t count;
+    uint32_t difference;
+    uint32_t u;
+    uint32_t v;
+    uint32_t shade_page;
+    uint32_t pixel;
+    uint32_t step_u;
+    uint32_t step_v;
+
+    if (width <= 0)
+        return;
+    count = (uint32_t)width + 1u;
+    EF_U32(0x0015b90cu) = texture_idiv(0x7fffffffu, 0u, EF_U32(0x0015b8f4u));
+    EF_U32(0x0015b910u) = texture_idiv(0x7fffffffu, 0u, EF_U32(0x0015b8f8u));
+    difference = EF_U32(0x0015b910u) - EF_U32(0x0015b90cu);
+    /* CDQ precedes SHL EAX,4: the high word is the unshifted sign. */
+    EF_U32(0x0015b914u) = texture_idiv(difference << 4, 0u - (difference >> 31), count);
+    EF_U32(0x0015b918u) = count;
+    u = EF_U32(0x00485ff0u);
+    v = EF_U32(0x00485ff4u);
+    do {
+        uint32_t depth_delta;
+        uint32_t depth_span;
+        uint32_t target_u;
+        uint32_t target_v;
+
+        EF_U32(0x0015b908u) = v;
+        EF_U32(0x0015b904u) = u;
+        EF_U32(0x0015b90cu) = EF_U32(0x0015b90cu) + EF_U32(0x0015b914u);
+        depth_delta = texture_idiv(0x7fffffffu, 0u, EF_U32(0x0015b90cu)) - EF_U32(0x0015b8f4u);
+        depth_span = EF_U32(0x0015b8f8u) - EF_U32(0x0015b8f4u);
+        target_u = EF_U32(0x00485ff0u) + texture_product_divide(
+            EF_U32(0x00485fd8u) - EF_U32(0x00485ff0u), depth_delta, depth_span);
+        target_v = EF_U32(0x00485ff4u) + texture_product_divide(
+            EF_U32(0x00485fdcu) - EF_U32(0x00485ff4u), depth_delta, depth_span);
+        EF_U32(0x0015b900u) = (uint32_t)((int32_t)(target_v - v) >> 4);
+        EF_U32(0x0015b8fcu) = (uint32_t)((int32_t)(target_u - u) >> 4);
+        shade_page = EF_U32(0x00159084u) & 0xffffff00u;
+        /* Original ECX/EBP cache these increments for the full block. */
+        step_u = EF_U32(0x0015b8fcu);
+        step_v = EF_U32(0x0015b900u);
+        for (pixel = 0u; pixel != 16u; ++pixel) {
+            uint8_t texel;
+            uint8_t color;
+
+            ++destination;
+            texel = texture_byte_fs(((u >> 16) & 255u) | ((v >> 8) & 0xff00u));
+            u += step_u;
+            color = EF_U8(shade_page | texel);
+            v += step_v;
+            EF_U8(destination) = color;
+        }
+        count -= 16u;
+    } while ((count & 0xfff0u) != 0u);
+    /* AND CX,15 retains the high half of ECX. */
+    count &= 0xffff000fu;
+    if ((uint16_t)count == 0u)
+        return;
+    EF_U32(0x0015b904u) = u;
+    EF_U32(0x0015b8fcu) = texture_divide(EF_U32(0x00485fd8u) - u, count);
+    EF_U32(0x0015b900u) = texture_divide(EF_U32(0x00485fdcu) - v, count);
+    shade_page = EF_U32(0x00159084u) & 0xffffff00u;
+    /* EBP is loaded once; ECX's U increment is reloaded on every tail pixel. */
+    step_v = EF_U32(0x0015b900u);
+    do {
+        uint8_t texel;
+        uint8_t color;
+
+        step_u = EF_U32(0x0015b8fcu);
+        ++destination;
+        texel = texture_byte_fs(((u >> 16) & 255u) | ((v >> 8) & 0xff00u));
+        u += step_u;
+        color = EF_U8(shade_page | texel);
+        v += step_v;
+        EF_U8(destination) = color;
+        count = (count & 0xffff0000u) | (uint16_t)(count - 1u);
+    } while ((uint16_t)count != 0u);
+}
+
 /* The shared d42b1 affine body, including the nonzero-texel tail d4350.
  * Preserve packed ADD/ADC byte carries and the first OR AL,FS:[BX]. */
-static void draw_transparent_affine_span(void)
+static void draw_transparent_affine_span(uint32_t mask_coordinates)
 {
     int32_t left = EF_S16(0x00485feau);
     int32_t width = (int32_t)EF_S16(0x00485fd2u) - left;
@@ -235,6 +324,9 @@ static void draw_transparent_affine_span(void)
     do {
         uint64_t sum;
 
+        /* d4370 masks the full packed U word, including fractional bits. */
+        if (mask_coordinates != 0u)
+            packed_u &= EF_U32(0x00158f24u);
         accumulator |= texture_byte_fs(packed_u & 0xffffu);
         if (accumulator != 0u) {
             EF_U8(destination) = EF_U8(shade_page | accumulator);
@@ -276,5 +368,12 @@ void draw_transparent_span_d4250(void)
         return;
     }
 affine:
-    draw_transparent_affine_span();
+    draw_transparent_affine_span(0u);
+}
+
+/* 0xd4370, 173 owned bytes, including the nonzero tail d4410..d4423.
+ * Masked transparent affine variant. Preserve EBP and dynamic mask reads. */
+void draw_masked_transparent_span_d4370(void)
+{
+    draw_transparent_affine_span(1u);
 }
