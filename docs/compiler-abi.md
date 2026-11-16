@@ -10805,3 +10805,35 @@ local/widget-name-20261116/{widget_name.obj,widget_name.lst,full.json}.
 Status remains compiles; counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild. Full RAM/stack equivalence and all
 reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover parser key lookups
+
+Recover lookup_key_a7ec4 (158 original bytes) and find_key_checked_a7f64
+(173 bytes) in parser_key_lookup.c. Both tracker entries named
+runtime_helpers32 without C definitions. ASM and callers 47ec/4c41 and
+27ffe establish EAX mutable name, EAX slot address/stored pointer,
+respectively, all six other GPRs preserved, plain RET. No ABI changes or
+existing-caller rebuild needed; caller 47ec stores preserved EDX through
+the scalar result. Review the original lowercase, copy and compare callees.
+
+Preserve in-place lowercasing, unchecked copy to the name slot at signed
+count, sentinel-terminated scalar search, signed low-word index wrapping,
+21-byte name stride, scalar-kind zero and record-kind one checks, and
+separate fallback slot/name addresses. Record search compares the name
+before checking count, including at count. Keep the original 80-byte
+unchecked formatting buffer and callback argument order; returning error
+callbacks still allow the subsequent kind check and result access. Name
+count/name table, fallback values and error strings. Remove generic probe
+tracker references while retaining their JSON files.
+
+Commands: ef2000_wcc.py parser_key_lookup.c (zero warnings); wdis (signed
+index extension, signed count checks after comparison, scalar address vs
+record dereference, 80-byte local buffer, cdecl formatting cleanup and
+preserved registers); hybrid_link.py pinned payload/full objects (2641
+redirects,598262 arena bytes,371/411 modules,1632 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/parser-key-lookup-20261116/{parser_key_lookup.obj,parser_key_lookup.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild. Generated stack layouts
+differ; full RAM/stack equivalence and reported crash/highlight repairs
+remain unverified.

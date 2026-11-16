@@ -401,3 +401,11 @@ addr	size	type	name	evidence	notes
 0x0018d1f4	1	char[1]	g_widget_empty_text	a7510 original ASM	Read-only widget text/error string
 0x0018d1f8	60	char[60]	g_widget_text_allocation_error	a7510 original ASM	Read-only widget text/error string
 0x0018d234	91	char[91]	g_widget_text_capacity_error	a7510 original ASM	Read-only widget text/error string
+0x00419218	630	char[30][21]	g_parser_variable_names	a7ec4/a7f64 original ASM	30 names; lookup copies sentinel at live count
+0x004194c4	2	int16_t	g_parser_variable_count	a7ec4/a7f64 original ASM	Signed count; sentinel index also read as dword high at 4194c2
+0x001371e8	4	uint32_t	g_parser_fallback_slot	a7ec4/a7f64 original ASM	Returned address for absent scalar key
+0x001371d8	13	char[13]	g_parser_fallback_name	a7ec4/a7f64 original ASM	Read-only fallback/error string
+0x0018d584	38	char[38]	g_parser_scalar_missing_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
+0x0018d5ac	45	char[45]	g_parser_scalar_kind_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
+0x0018d5dc	38	char[38]	g_parser_record_missing_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
+0x0018d604	45	char[45]	g_parser_record_kind_error	a7ec4/a7f64 original ASM	Read-only fallback/error string
