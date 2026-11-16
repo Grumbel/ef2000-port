@@ -357,3 +357,7 @@ addr	size	type	name	evidence	notes
 0x00152e58	4	uint32_t	g_script_queue_world_y	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
 0x00154e58	4	uint32_t	g_script_queue_world_z	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
 0x00156e58	4	ef_addr32	g_script_queue_values	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
+0x00132b08	4	ef_addr32	g_quoted_string_table	original9da80 ASM	nonzero bypasses page-name initialization
+0x00417184	4	uint32_t	g_page_name_count	original9da80 ASM	live count used for parallel allocations
+0x00417180	4	ef_addr32	g_page_name_pointers	original9da80 ASM	parallel dword pointer table
+0x00417170	4	ef_addr32	g_page_name_identifiers	original9da80 ASM	parallel word identifier table

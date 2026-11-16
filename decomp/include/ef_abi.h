@@ -7583,4 +7583,5 @@ void guest_fn_c41b0_x(uint32_t key); /* original enqueue, AX key */
 #ifdef __WATCOMC__
 #pragma aux guest_fn_c41b0_x parm [eax] modify [eax ebx ecx edx]
 #endif
+void load_page_name_table_9da80(void);
 #endif

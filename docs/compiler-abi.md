@@ -10122,3 +10122,34 @@ inventory remains3392 compiles,842 blocked. Evidence:
 local/renderer-enqueue-review-20261116/{original.asm,renderer_sort_queue.obj,
 renderer_sort_queue.lst}. Commands: ef2000_wcc.py on renderer_sort_queue.c;
 wdis; decomp_status.py check; git diff --check. No execution/UI/replay runs.
+
+### Page-name and numeric-ID table loader (0x9da80)
+
+Recover `load_page_name_table_9da80` (365 original bytes) in
+`decomp/src/page_name_table.c`. No register inputs; all six non-EAX GPRs
+preserved. Sole direct caller9d924 ignores EAX but uses retained BL for the
+initialization flag store immediately afterward. Original calls9d990 before
+saving registers; inspect that callee's preservation too. There is no second
+direct caller in the pinned inventory.
+
+Preserve the quoted-string table gate, first loader call, count reset,
+path construction, zero-size exit, temporary size+1 allocation, returned
+ECX terminator base and returned EBX first-pass cursor. A narrow callback
+adapter sets EAX=name and EDX/EBX/ECX=buffer and captures ECX/EBX as two words;
+the loader's original9cbc4 target saves those registers and has no implicit
+ESI input. Parsing still restarts from the allocation base. Assert the
+148-byte frame with144-byte unchecked token storage and signed identifier
+at144; leave extra table allocation slots uninitialized. Preserve live
+count reloads, wrapping allocation sizes, signed word decimal conversion,
+name-table store before identifier-table store and final temporary free.
+Do not add token bounds, empty-line filtering or missing-file recovery.
+
+Watcom compiles warning-free. Wdis confirms six saves, gate, callback
+registers/capture without64-bit shift helpers, allocations, token and space
+loops, signed ID conversion, table stores and RET. Full static link:
+2623 redirects,357/397 modules,589818 arena bytes. Tracker/diff checks pass;
+inventory3393 compiles,841 blocked. Status compiles only; no execution,
+UI or replay runs and no claim of crash resolution. Evidence:
+local/page-name-table-20261116/{original.asm,callers.asm,page_name_table.obj,
+page_name_table.lst,full.json}. Commands: ef2000_wcc.py on page_name_table.c;
+wdis; hybrid_link.py; decomp_status.py check; git diff --check.
