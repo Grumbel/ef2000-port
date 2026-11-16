@@ -421,3 +421,5 @@ addr	size	type	name	evidence	notes
 0x00161e18	2	int16_t	g_path_animation_delta	f36a4 original ASM	Cleared on either stop condition
 0x00161e1a	2	int16_t	g_path_animation_path_index	f36a4 original ASM	Read as signed high word of dword161e18 before drawing
 0x00464440	36	uint32_t[9]	g_rotation_matrix	e99b8 original ASM	Three columns; doubled low-dword products; destination may alias coefficients
+0x001631f4	4	uint32_t	g_small_glyph_stride	f25b0 original ASM	Captured at entry and restored after all six rows
+0x00160cc4	384	uint8_t[64][6]	g_small_glyph_rows	f25b0 original ASM	Three low bits per row; caller masks to64 glyphs, callee indexing unchecked

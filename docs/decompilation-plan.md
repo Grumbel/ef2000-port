@@ -7220,3 +7220,30 @@ in its body; hybrid entry restores original preserved EBX. Status remains
 compiles, counts unchanged. No runtime/UI/replay/differential execution or
 packaged runtime rebuild; full RAM/stack equivalence and reported crashes
 remain unverified.
+
+### 2026-11-16: recover small glyph drawing
+
+Recover draw_glyph_f25b0 (107 original bytes) in small_glyph.c; tracker
+runtime_helpers35 had no definition. ASM and sole caller f2644 establish
+AL colour, EDX X, EBX row, ECX glyph, ESI/EDI/EBP preserved, four scratch
+registers, plain RET. Correct false EBX/ECX/EDX preservation metadata.
+Caller masks glyph to six bits and advances X by four. Rebuild
+game_helpers29, the sole existing C alias user.
+
+Capture stride before framebuffer/row-table reads, preserve unchecked
+glyph and row indexing, load each glyph row live before writing bits4/2/1
+to pixels0/1/2, and advance by captured stride for all six rows. Preserve
+the final stride write even when pixel output aliases that field. No
+clipping or transparency writes added. Name stride and the 64-by-six
+font table; original table bytes remain private. Remove generic probe
+tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py small_glyph.c and game_helpers29.c (zero warnings);
+wdis (entry stride capture, ordered pixel bit tests/stores, six iterations,
+final stride write and plain RET); hybrid_link.py pinned payload/full
+objects (2648 redirects,599456 arena bytes,378/418 modules,1625 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/small-glyph-20261116/{small_glyph.obj,small_glyph.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crash/highlight repairs remain unverified.
