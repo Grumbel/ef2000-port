@@ -8310,3 +8310,23 @@ git diff --check. Synthetic checks cover external relative relocation,
 strict instruction/length differences, unresolved/internal fixups, crossed
 public boundaries, and stale-source exclusion. No gameplay/UI/replay or
 differential execution. The reliable bulk translation goal remains open.
+
+### 2026-11-17 — Translate descriptor-backed XLAT accesses
+
+XLAT now reads through the cached segment access helper, retaining the
+instruction's DS default or explicit override, rather than the legacy flat
+read helper. Descriptor profile 1 no longer rejects XLAT unconditionally.
+The existing 32-bit address restriction remains; AL changes only after a
+successful byte read, with upper EAX and flags preserved. No descriptor
+reload or address-size override support is implied.
+
+Synthetic captured-state checks cover DS, FS and CS XLAT execution, plus
+an expand-down DS limit failure that must preserve registers, flags and
+RAM. Validation: tests.test_asm_capture (4 passing) and
+tests.test_asm_to_c.TranslationTests.test_synthetic_programs_match_registers_flags_and_all_ram
+(1 passing) using the Nix Python/Unicorn environment; tracker check;
+git diff --check. An earlier broader run loaded the fixture before its
+expand-down boundary correction and failed that assertion; the corrected
+capture suite was rerun successfully. No gameplay or UI runs.
+Bulk translation remains incomplete: implicit stack/string accesses,
+far-pointer loads, WAIT/x87 and descriptor reloads remain unwired.

@@ -796,7 +796,7 @@ def instruction_c(insn, starts):
         source = operand(text)
         if source[0] != 'mem' or source[1] != address_expression('ebx') or width_of(source) != 8:
             raise Unsupported('unsupported XLAT addressing')
-        code += ['a = ef_read(s, (uint32_t)(s->r[3] + (s->r[0] & 255u)), 8);',
+        code += ['a = ef_read_segment(s, %d, (uint32_t)(s->r[3] + (s->r[0] & 255u)), 8);' % source[3],
                  'if (s->fault) return s->fault;', write(operand('al'), 'a', 8)]
     elif mnemonic == 'bswap':
         dst = operand(text)
@@ -1022,7 +1022,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
     cases = []
     unwired = {'push', 'pushw', 'pop', 'pusha', 'popa', 'enter', 'leave', 'call',
                'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
-               'les', 'lds', 'lss', 'lfs', 'lgs', 'xlat', 'wait'}
+               'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
     for i in instructions:
         code = renderer(i, starts)
         # Reject paths whose implicit accesses still use the legacy flat helpers.

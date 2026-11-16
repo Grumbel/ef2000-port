@@ -52,6 +52,9 @@ class AsmCaptureTests(unittest.TestCase):
             'mov eax, fs:[0x2000]\nret',
             'mov eax,0x10\nadd eax,0x20\nmov edx,[0x2000]\nret',
             'push eax\npop eax\nret',  # Explicitly unsupported in this stage.
+            'mov ebx,0x2000\nmov eax,0x12340000\nxlatb\nret',
+            'mov ebx,0x2000\nmov eax,0x12340000\nfs xlatb\nret',
+            'mov ebx,0x100\nmov eax,0x12340000\ncs xlatb\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -66,7 +69,7 @@ class AsmCaptureTests(unittest.TestCase):
                     regs = dict(capture.registers, eip=0x100, ebp=0x2100)
                     tables = copy.deepcopy(capture.table_context)
                     # Non-null FS for the explicit override load.
-                    if number == 4:
+                    if number in (4, 8):
                         regs['fs'] = 7
                         tables['descriptors']['fs'] = tables['descriptors']['ds']
                     # Execute-only CS permits instruction fetch, not data loads.
@@ -94,9 +97,9 @@ class AsmCaptureTests(unittest.TestCase):
                         self.assertIn('C status 7', result['differences'][0])
                     else:
                         self.assertEqual(result['state'], 'pass', result)
-                    if number == 0:
+                    if number in (0, 7):
                         # Test the generated access path, not only the helper:
-                        # a four-byte DS read crossing its limit must stop before
+                        # A scalar or XLAT DS read outside its limit must stop before
                         # changing EAX, flags, or any RAM.
                         ram = bytearray(capture.guest_ram)
                         native_ram = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
@@ -109,7 +112,11 @@ class AsmCaptureTests(unittest.TestCase):
                         for index, name in enumerate(asm_to_c.SEGMENTS):
                             state.segment_cache[index] = asm_c_differential.Segment(
                                 *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
-                        state.segment_cache[3].limit = 0x2002
+                        state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
+                        if number == 7:
+                            # Skip the setup MOVs to isolate fault atomicity.
+                            state.pc = record['instructions'][2]['address']
+                            state.r[3], state.r[0] = 0x2000, 0x12340000
                         before = (list(state.r), state.flags, bytes(ram))
                         self.assertEqual(function(ctypes.byref(state), 100), 7)
                         self.assertEqual(state.fault, 7)
