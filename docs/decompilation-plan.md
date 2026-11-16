@@ -8348,3 +8348,22 @@ Validation: tests.test_asm_capture and the synthetic instruction comparison
 matrix in tests.test_asm_to_c; tracker check; git diff --check. No gameplay
 or UI runs. This expands descriptor-backed translation support without
 promoting any recovered function to behavior-verified status.
+
+### 2026-11-17 — Translate descriptor-backed near CALL transfers
+
+The composed C program renderer now checks the near CALL target against
+cached CS and writes the return PC through the SS access helper before
+committing ESP. Register/memory indirect targets are still fetched before
+the stack write, including a target occupying the return-address slot.
+The generic descriptor-mode CALL rejection is removed; standalone rendering
+still rejects calls without the composed program renderer. Target registry
+checks, direct-dependency closure and the absence of original-code fallback
+remain unchanged. No far calls or descriptor reloads are enabled.
+
+Synthetic captured-state comparisons cover direct, register-indirect,
+[ESP-4] and [ESP] calls through translated callees and returns. Explicit CS
+target-limit and expand-down SS write failures preserve registers, flags,
+PC and RAM. Validation: tests.test_asm_c_program and tests.test_asm_capture
+in the matching Nix Python/Unicorn environment; tracker check;
+git diff --check. No gameplay or UI runs. Reliable bulk translation remains
+open, including compound stack, string and descriptor-reload operations.

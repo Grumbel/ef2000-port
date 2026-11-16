@@ -50,7 +50,8 @@ def instruction_c(insn, starts):
         code = []
         target_expression = '0x%xu' % target
     if mnemonic == 'call':
-        code += ['ef_write(s, s->r[4] - 4u, 32, 0x%xu);' % next_pc,
+        code += ['if (ef_check_segment(s, 1, %s, 1, 2)) return s->fault;' % target_expression,
+                 'ef_write_segment(s, 2, s->r[4] - 4u, 32, 0x%xu);' % next_pc,
                  'if (s->fault) return s->fault; s->r[4] -= 4u;']
     code.append('s->pc = %s; break;' % target_expression)
     return ' '.join(code)

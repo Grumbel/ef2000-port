@@ -1023,7 +1023,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'pusha', 'popa', 'enter', 'leave', 'call',
+    unwired = {'pusha', 'popa', 'enter', 'leave',
                'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
                'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
     for i in instructions:

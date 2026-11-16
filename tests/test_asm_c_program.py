@@ -48,6 +48,58 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_descriptor_calls_preserve_target_and_stack_order(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        from tools import asm_segments, asm_to_c
+        programs = [
+            'call leaf\nret',
+            'mov eax,0x200\ncall eax\nret',
+            'mov dword ptr [esp-4],0x200\ncall dword ptr [esp-4]\nret',
+            'push 0x200\ncall dword ptr [esp]\nadd esp,4\nret',
+        ]
+        for index, program in enumerate(programs):
+            source = '.type root,@function\nroot: ' + program + '\n.size root, .-root\n' + '''
+.org 0x200
+.type leaf,@function
+leaf: inc edx
+ret
+.size leaf, .-leaf'''
+            with self.subTest(index=index), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, records = inventory(root, source)
+                out = root/'out'
+                asm_c_program.generate(directory, out, image)
+                asm_c_differential.verify(out, root/'evidence', image, scenarios=1)
+                function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                     ctypes.c_uint32, ctypes.c_uint32]
+                capture = fixture()
+                ram = bytearray(capture.guest_ram)
+                ram[:image.stat().st_size] = image.read_bytes()
+                regs = dict(capture.registers, eip=0x100)
+                capture = replace(capture, address=0x100, registers=regs, guest_ram=bytes(ram))
+                result = asm_c_differential.isolated_probes(
+                    function, b'', 0x100, 1, 100, True, captured=capture)[0]
+                self.assertEqual(result['state'], 'pass', result)
+                if index == 0:
+                    for segment, limit in ((2, regs['esp']-4), (1, 0x1ff)):
+                        native_ram = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
+                        state = asm_c_differential.State(
+                            (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
+                            regs['eflags'], 0x100, 0, native_ram, len(ram))
+                        state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
+                        state.segment_profile = 1
+                        for i, name in enumerate(asm_to_c.SEGMENTS):
+                            state.segment_cache[i] = asm_c_differential.Segment(
+                                *asm_segments.descriptor(regs[name], capture.table_context['descriptors'][name]))
+                        state.segment_cache[segment].limit = limit
+                        before = (list(state.r), state.flags, state.pc, bytes(ram))
+                        self.assertEqual(function(ctypes.byref(state), 100, 0x1100), 7)
+                        self.assertEqual(state.fault, 7)
+                        self.assertEqual((list(state.r), state.flags, state.pc, bytes(ram)), before)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_indirect_register_memory_stack_aliases_and_jump_tables(self):
         programs = [
             'mov eax,0x200\ncall eax\nret',
