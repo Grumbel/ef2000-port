@@ -10699,3 +10699,30 @@ The stack-argument gate excludes e26bc from redirects: existing widget text
 continues calling the original renderer. Tracker promotion is compiles only
 (3406 compiles,828 blocked). No runtime/UI/replay/differential execution;
 stack/RAM equivalence and the reported bugs remain unverified.
+
+### 2026-11-16: clipped bitmap dispatcher
+
+Recover blit_bitmap_clipped_ca290 (474 bytes) in clipped_bitmap.c. Original
+ASM and callers e276e/e281a/a6ff7 establish EAX bitmap, EDX rectangle,
+low BX/CX source X/Y, five stack arguments width,height,X,Y,stride, RET20;
+ESI/EDI/EBP preserved, four scratch registers. The stale implicit-SI blocker
+is false: ESI is loaded from the first stack argument before use.
+
+Keep signed-word early rejection, original dword-high rectangle reads,
+left/top source adjustments, low-word width/height wrapping and repeated
+rectangle loads. Preserve the height-only final zero check (do not add a
+width check). Stride low word 256 chooses original cd82c with seven
+zero-extended stack arguments; otherwise original cd9a6 receives eight
+stack arguments, signed coordinates/extents/source offsets and unsigned
+stride. Add distinct stack-only aliases and explicit pragmas so the old
+register-plus-stack draft interface is not reused. No new globals.
+
+Commands: ef2000_wcc.py clipped_bitmap.c (zero warnings); wdis (signed
+comparisons, both seven/eight-push calls, no caller cleanup, RET20);
+hybrid_link.py with pinned payload/full objects (2637 redirects,597474 arena
+bytes,368/408 modules,1636 exclusions); decomp_status.py check; git diff
+--check. Evidence: local/clipped-bitmap-20261116/{clipped_bitmap.obj,
+clipped_bitmap.lst,full.json}. Tracker:3407 compiles,827 blocked.
+The stack-argument gate still excludes ca290 and its callees; no claim of
+new live redirection. No runtime/UI/replay/differential execution; RAM and
+stack equivalence and reported crash/highlight repairs remain unverified.
