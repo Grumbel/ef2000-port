@@ -10990,3 +10990,33 @@ in the body; the hybrid entry trampoline restores original preserved ECX.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover stream buffer configuration
+
+Recover set_file_buffer_f22af (103 original bytes) in stream_buffer_config.c;
+tracker runtime_helpers35 had no definition. ASM and sole caller 1115af
+establish EAX stream, EDX buffer, EBX mode, ECX size, EAX status, plain RET.
+Original preserves EBX/EDX/ESI/EDI/EBP and uses ECX as scratch: correct its
+false preservation claim. Caller saves its own EBX/ECX and forwards status.
+Review original fa7d2 and 10f071 register preservation and state accesses.
+Rebuild leaf_helpers2, the only actual C caller.
+
+Keep unsigned size rejection above 7fffffff, accepted modes100/200/400,
+and nonnull-buffer/zero-size rejection before touching the stream. Update
+flags first, store nonzero size only, capture byte+0d before buffer+8 store,
+clear its low three bits, read dword+0c before current-pointer store, then
+OR mode into that captured state. Allocate only for null buffer, ignore
+allocator result, and return zero. No new globals, guards or buffer frees.
+Remove generic probe tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py stream_buffer_config.c and leaf_helpers2.c (zero
+warnings); wdis (validation branches, call-before-state writes, byte/dword
+load/store order and zero status); hybrid_link.py pinned payload/full
+objects (2647 redirects,599316 arena bytes,377/417 modules,1626 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/stream-buffer-config-20261116/{stream_buffer_config.obj,
+stream_buffer_config.lst,full.json}. Watcom treats parameter EBX as scratch
+in its body; hybrid entry restores original preserved EBX. Status remains
+compiles, counts unchanged. No runtime/UI/replay/differential execution or
+packaged runtime rebuild; full RAM/stack equivalence and reported crashes
+remain unverified.
