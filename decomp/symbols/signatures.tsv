@@ -3505,3 +3505,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005089c	gui_type2_click_5089c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET
 0x000508fc	gui_type3_click_508fc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET
 0x0005095c	gui_type4_click_5095c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET
+0x00004b54	gui_kots_init_4b54	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md
+0x00084ddc	gui_show_summary_info_84ddc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md
+0x000da2b0	env_clouds_da2b0	EAX:uint32_t	EAX:uint32_t	eax,ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md

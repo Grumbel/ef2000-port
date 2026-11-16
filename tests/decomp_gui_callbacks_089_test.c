@@ -166,7 +166,7 @@ static void test_misc(void)
     EF_U8(0x410u) = 0x84u;
     gui_show_summary_info_84ddc(0x400u);
     check(0, 0xa4b80u, 0x84u, 0u);
-    env_clouds_da2b0();
+    env_clouds_da2b0(0u);
     assert(EF_U8(0x425c88u) == 1u);
 
     reset();

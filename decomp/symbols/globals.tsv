@@ -509,3 +509,4 @@ addr	size	type	name	evidence	notes
 0x001a5540	1	uint8_t	g_assignment_current_byte	4da90 first saved value	copied to tactical slot array
 0x001a5554	4	uint32_t	g_assignment_current_value	4da90 second saved value	read after fresh index
 0x001a5558	4	uint32_t	g_assignment_values_first	4da90 dword-stride save	table extent unresolved
+0x00425c88	1	uint8_t	g_clouds_enabled	0xda2b0	cloud command stores one; all GPRs preserved

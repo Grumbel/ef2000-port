@@ -44,8 +44,8 @@ void dispatch_menu_state_a9e70(void); /* 0xa9e70 */
 void guest_fn_ea270(ef_addr32 descriptor); /* 0xea270: clump loader */
 uint32_t guest_fn_aaee8(uint32_t argc, ef_addr32 argv); /* 0xaaee8 */
 
-/* Batch 089: eleven nontrivial callback bodies plus two small control
- * entries. Host C interfaces do not assert native guest splice ABIs. */
+/* Batch 089: recovered callback entries below have reviewed guest ABIs.
+ * The legacy host hook remains declared for existing host models. */
 uint32_t gui_guest_call_089(uint32_t entry, uint32_t eax, uint32_t edx);
 void gui_kots_init_4b54(ef_addr32 widget);
 /* Recovered frontend_warning.c entries use confirmed guest ABIs. */
@@ -60,7 +60,11 @@ void gui_previous_assignment_4d9cc(void);
 void gui_make_assignment_4da2c(void);
 void gui_view_assignment_4da90(void);
 void gui_show_summary_info_84ddc(ef_addr32 widget);
-void env_clouds_da2b0(void);
+/* EAX is an identity input/output so C preserves the original accumulator. */
+uint32_t env_clouds_da2b0(uint32_t preserved_eax);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux env_clouds_da2b0 parm [eax] value [eax] modify []
+#endif
 /* Recovered credits_gate.c entries: no inputs, original guest ABI. */
 void gui_open_credits_37260(void);
 void gui_new_socket_37254(void);

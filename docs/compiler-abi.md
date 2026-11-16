@@ -11959,3 +11959,32 @@ functions); git diff --check. Evidence:
 local/type-actions-20261116/{type_actions.obj,type_actions.lst,gui_callbacks_089.obj,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-17 — remaining batch 089 callbacks
+
+Recovered the original 4b54 (39 bytes), 84ddc (13), and da2b0 (8) into
+actual guest C in gui_callbacks_089.c, removing its host-call hook. The first
+loads the child pointer at widget+51, closes its byte ID at +10, tests AL
+from hiscore_qualifies, and enters select_first_entry_487c or pending-name
+ac7a8(17f79c). The summary callback closes its own byte ID. Both preserve
+six GPRs, with EAX scratch and no observable return. Registry slots
+12b838/12bb68 confirm the widget callbacks; the cloud command is at 15bb84.
+Ghidra audit-body-holes found zero holes at all three entries. The external
+terminal branches target complete functions, with plain RET and no extra
+stack arguments; 487c overwrites EAX before its first call.
+
+The cloud command stores byte one at 425c88 and preserves all seven GPRs.
+A void C declaration with modify[] still allowed Watcom to use EAX as scratch;
+an explicit EAX identity input/output produces the required preservation.
+Wdis shows EDX saved, incoming EAX retained through the store, EAX restored,
+EDX popped, RET. Updated the legacy host test call for the new C declaration;
+that draft-model test was not executed. Tracker states are compiles, not
+verified; removed the two corresponding stale mechanical exclusion rows.
+
+Validation: ef2000_wcc.py gui_callbacks_089.c (zero warnings), wdis
+(call arguments, AL test, terminal branches, register preservation),
+hybrid_link.py pinned payload/full objects (2698 redirects,605412 arena
+bytes,412/451 modules,1576 exclusions), decomp_status.py check (4293
+functions), git diff --check. Evidence: local/menu-callbacks-20261117/.
+No gameplay, UI, replay or differential runs, and no packaged runtime rebuild.
+Reported crashes and full guest RAM/stack equivalence remain unverified.
