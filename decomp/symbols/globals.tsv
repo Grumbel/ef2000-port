@@ -487,3 +487,5 @@ addr	size	type	name	evidence	notes
 0x00132b0c	4	ef_addr32	g_quoted_string_storage	9d9de stores arena allocation before file read	quoted strings are terminated in place
 0x0016062d	4	uint32_t	g_default_file_translation_mode	bc223/bc258 compare with 0x200	default binary bit only when exactly 0x200
 0x00132cd0	4	ef_addr32[]	g_attack_pattern_names	b29b9 unchecked byte-indexed name pointer read	table extent not established
+0x001379b0	4	uint32_t	g_record_pool_active_count	b01f5 clears after initialization	pool state reset
+0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown

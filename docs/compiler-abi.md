@@ -11636,3 +11636,31 @@ Evidence: local/object-output-20261116/{object_output.obj,object_output.lst,
 game_helpers127.obj,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover record-pool allocation
+
+Recover alloc_record_pool_b0138 (208 original bytes) in record_pool.c;
+runtime_helpers33 had no definition. ASM and sole caller 49461 establish
+EAX list-pointer address, EDX count-pointer address, EAX allocation result,
+EDX scratch, five other registers preserved, plain RET. Correct false EDX
+preservation. No existing C users found; no caller rebuild needed.
+
+Capture head before zeroing output count; walk live byte bounds and table
+pointers with signed low-word indices, accumulating byte weights times twenty
+with wrap. Default zero count to 2000. Preserve four cdecl allocator arguments,
+54-byte size wrap, count reload before clear, and signed live count reloads
+after each three-word sentinel initialization at +30/+32/+34. Reset final
+pool state dword then word; return allocation. No overflow checks, alias
+guards or cached loop limits. Name two final state globals. Remove generic
+probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py record_pool.c (zero warnings); wdis (head-before-
+clear, live traversal reads, allocator argument order, post-call count reload,
+ordered sentinels/live count, final state writes and plain RET);
+hybrid_link.py pinned payload/full objects (2675 redirects,603868 arena
+bytes,401/441 modules,1598 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/record-pool-20261116/{record_pool.obj,record_pool.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
