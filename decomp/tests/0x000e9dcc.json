@@ -1,1 +1,91 @@
-{"address":"0x000e9dcc","function_size":175,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0xe9dcc",
+  "function_size": 175,
+  "max_instructions": 100000,
+  "cases": [
+    {
+      "name": "identity_matrix",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f000000000000000000000000000000000000000000000000000000000000f03f"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "positive_components",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "9a9999999999c93f9a9999999999d93f333333333333d33f333333333333e33f9a9999999999e93f9a9999999999b93f000000000000e03f666666666666e63fcdccccccccccec3f"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "negative_components",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "9a9999999999c9bf9a9999999999d9bf333333333333d3bf333333333333e3bf9a9999999999e9bf9a9999999999b9bf000000000000e0bf666666666666e6bfcdccccccccccecbf"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "above_one",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "9a9999999999c93f9a9999999999d93f333333333333d33f333333333333e33f9a9999999999e93f9a9999999999b93f000000000000e03f666666666666e63f0000000000000040"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "below_minus_one",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "9a9999999999c93f9a9999999999d93f333333333333d33f333333333333e33f9a9999999999e93f9a9999999999b93f000000000000e03f666666666666e63f00000000000000c0"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "negative_zero",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x464480",
+          "hex": "9a9999999999c93f9a9999999999d93f333333333333d33f333333333333e33f9a9999999999e93f9a9999999999b93f000000000000e03f666666666666e63f0000000000000080"
+        },
+        {
+          "address": "0x4321e0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}

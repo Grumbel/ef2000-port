@@ -5301,3 +5301,26 @@ directories. Evidence: local/native-raw-camera-20261116/{run.sh,raw-key.py,
 driver.log,game.log,verification-summary.json,external-window.png,
 returned-window.png}; output/report.json and exit-status. The earlier
 xdotool run is local/native-packaged-shadow-text-20261116/.
+
+### 2026-11-16 — Exercise view-angle extraction during terrain diagnosis
+
+Replace empty drafted probes for e9dcc and e9f84 with six authored cases
+each: identity matrix, positive/negative direction components, values above
+one and below minus one, and negative zero. Initialise the double matrix
+and guard the output-angle region. Both isolated compiled entries match the
+original in all twelve cases, including GPR/ESP state, the three output
+doubles, and in-place clamping when required (24 or 32 compared RAM bytes).
+The two-entry diagnostic link confirms two redirects; each function run
+applies one. Keep both tracker states at compiles: the full external-view
+terrain replay still fails and these cases are not a global fidelity gate.
+Commands: hybrid_link.py --only-address 0xe9dcc --only-address 0xe9f84;
+func_differential.py for each with its explicit spec and --flat-segments;
+decomp_status.py check. Evidence: local/terrain-matrix-probes-20261116/
+{view-angles.json,e9dcc.log,e9f84.log}.
+
+The completed first external-terrain bisection retains 649 candidates after
+1948 diagnostic exclusions. Its 650-redirect trial still differs in 65.7594%
+of terrain-mask pixels. The next bounded pass runs under the committed
+four-billion instruction limit and preserves both those exclusions and all
+default unsafe-entry exclusions. See local/external-terrain-bisect-02-20261116/
+report.json and local/external-terrain-bisect-03-config-20261116/.
