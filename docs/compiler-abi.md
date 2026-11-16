@@ -11581,3 +11581,31 @@ local/record-output-20261116/{record_output.obj,record_output.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover both named-table output variants
+
+Recover dump_table_a_b2810 and dump_table_b_b28b8 (166 original bytes each)
+in table_output.c; runtime_helpers33 had no definitions. ASM and sole
+caller sites b2cb9/b2cd1 establish EAX record, EDX output, EAX/EDX scratch,
+five other registers preserved, plain RET. Correct false EDX preservation
+for both. No existing C users found; no caller object rebuild required.
+
+The variants differ only by first name dictionary (133488 vs 1333f8).
+Share recovered C logic: ordered third/second/first dictionary reads then
+identifier, original header and coordinate calls, overlapping dword high
+reads at +1c/+18/+1a, original route header, live signed count and table
+reloads for 25-byte records. Pass current signed index in DX and output in
+EBX to b2504, increment counter before call, preserve final output even
+for empty tables. No bounds checks or new format strings. Remove both
+generic probe tracker references, retain JSON files.
+
+Commands: ef2000_wcc.py table_output.c (zero warnings); wdis (both wrapper
+dictionary constants, common lookup/read order, cdecl arguments, signed
+loop and b2504 register setup, final output and plain RETs); hybrid_link.py
+pinned payload/full objects (2673 redirects,603372 arena bytes,399/439
+modules,1600 exclusions); decomp_status.py check (4293 functions);
+git diff --check. Evidence:
+local/table-output-20261116/{table_output.obj,table_output.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
