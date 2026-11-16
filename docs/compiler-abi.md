@@ -10028,3 +10028,35 @@ local/page-point-request-20261116/{original.asm,callers.asm,
 page_point_request.obj,page_point_request.lst,full.json}. Commands:
 ef2000_wcc.py on page_point_request.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Chain-positioned page startup (0xa0228)
+
+Recover `start_chain_page_record_a0228` (651 original bytes) in
+`decomp/src/page_positioned_record.c`. Sole direct caller9e881 passes AX/DX
+script words for record/point, retains ESI and ignores EAX/EDX. Original
+saves EBX/ECX/ESI/EDI/EBP and uses plain RET. Confirm the lookup helper's AX/DX
+key comparison against the original a0018 body; its AX result is sign
+extended before the -1 gate. No second direct caller exists in the pinned
+inventory.
+
+Use the signed returned index at78-byte stride, signed24.8 position offsets
+and low-word rotation slots. Assert entry size and position/rotation
+offsets, name the table base without inventing its capacity. Preserve the
+interleaved coordinate stores and overlapping dword reads, 16.16 view-test
+inputs, default-angle stores before entry rotation reads, publication of
+script globals between angle stores, repeat test before Z store and repeat
+reread after optional X/Y stores. Missing-chain return bypasses all hooks;
+view rejection still reaches the final world callback with the original
+uninitialized local if the view routine leaves it untouched. Keep the
+existing view-test arithmetic exclusions.
+
+Watcom compilation is warning-free. Wdis confirms lookup arguments, signed
+result gate, callee-preserved locals across callbacks, SAR8 offsets, SHL16
+view inputs and stack argument order, ordered angle/global stores, repeat
+reread and plain RET. Full static link:2621 redirects,355/395 modules,
+588940 arena bytes. Tracker/diff checks pass. Inventory3391 compiles,
+843 blocked. Static review only; no execution/UI/replay runs or claim of
+crash resolution. Evidence: local/page-chain-record-20261116/{original.asm,
+callers.asm,page_positioned_record.obj,page_positioned_record.lst,full.json}.
+Commands: ef2000_wcc.py on page_positioned_record.c; wdis;
+hybrid_link.py; decomp_status.py check; git diff --check.

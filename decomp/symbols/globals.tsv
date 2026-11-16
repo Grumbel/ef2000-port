@@ -341,3 +341,4 @@ addr	size	type	name	evidence	notes
 0x0041722a	2	int16_t	g_active_page_identifier	original a0c04 text opcodes	read through high word of dword417228 before page-text calls
 0x00132ac8	4	ef_addr32	g_page_request_scale_pointer	original a1590 ASM	points to signed word scaling request rate by percent
 0x00132ad4	4	ef_addr32	g_page_point_request_hook	original a1590 ASM	EAX points to18-byte request; AL acceptance result
+0x00416e40	78	ef_page_chain_record	g_page_chain_records	original a0018/a0228 ASM	first78-byte entry; table capacity unrecovered; position dwords at12/16/20 and rotation low words at36/40/44
