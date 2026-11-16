@@ -5677,3 +5677,33 @@ Commands: tools/ef2000_wcc.py decomp/src/texture_spans.c; wdis on the object;
 tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
 Evidence: local/texture-span-decomp-20261116/opaque/{texture_spans.obj,
 texture_spans.lst,texture_spans.abi.h} and opaque-full.json beside it.
+
+### 2026-11-16 — Recover atlas-textured polygon setup
+
+Recover d2a7c's 518-byte body as build_atlas_textured_object_d2a7c in
+textured_objects.c. Read the complete pinned ASM and candidate export.
+Correct the old blocker hypothesis: the vertex cursor is ESI, not EDI;
+ECX supplies signed count. Return the advanced cursor in ESI and preserve
+EAX/EBX/EDX/EDI/EBP exactly. d23d8's prologue confirms that processing the
+render object preserves that advanced ESI; c448b installs this handler at
+159184. The generated Watcom pragma is parm[esi][ecx], value[esi],
+modify[ecx], and its prologue/epilogue visibly save/restore the same five
+registers as the original.
+
+Reconstruct direct/atlas coordinate paths with 9/16-bit shifts, modulo 32-bit
+atlas bias, alternate span callbacks and the 16388-byte page stride. Retain
+signed nonpositive-count handling, unsigned word vertex offsets, full dword
+clip-mask merging, two normal-path flag stores around V assignment, and the
+final render-object call. Add an asserted vertex-prefix layout without
+claiming a full vertex extent; name the accessed globals. Keep compiles and
+static-review-only evidence, without a new execution-verification claim.
+
+Watcom compilation reports zero warnings/errors; inspect the generated
+listing and ABI header. Full static relink succeeds with 2604 redirects,
+344/384 modules and 578782 arena bytes. Tracker remains 4293 functions,
+3374 compiles and 860 blocked. Commands: tools/ef2000_wcc.py
+ decomp/src/textured_objects.c; wdis object inspection; tools/hybrid_link.py;
+tools/decomp_status.py check; git diff --check. No new execution/UI/replay
+tests are started. Artifacts: local/texture-span-decomp-20261116/
+objects-builder/{textured_objects.obj,textured_objects.lst,
+textured_objects.abi.h} and builder-full.json beside it.

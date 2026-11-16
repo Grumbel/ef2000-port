@@ -5702,6 +5702,7 @@ int32_t setup_edge_step_1014a4(uint32_t out, uint32_t step, uint32_t p0, uint32_
 void project_vertices_fc8cc(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t count, uint32_t list);
 
 void build_textured_object_d2634(ef_addr32 list, uint32_t count);
+ef_addr32 build_atlas_textured_object_d2a7c(ef_addr32 list, uint32_t count);
 
 void add_dirty_rect_e51c4(uint32_t a, uint32_t c, uint32_t b, uint32_t d, uint32_t add);
 

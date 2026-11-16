@@ -3462,3 +3462,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000d4250	draw_transparent_span_d4250			ebp	0	Original pushes EBP; perspective path calls d3e50, fallback enters shared d42b1..d4363 affine body.
 0x000d3900	draw_perspective_span_d3900				0	Original d3900 preserves no GPRs; renderer globals/FS inputs. Cached full-block increments, cached tail V and per-pixel tail U reloads retained.
 0x000d4370	draw_masked_transparent_span_d4370			ebp	0	Original saves EBP; mask at 158f24 applies to full packed U before each FS:[BX] read. No register inputs/results.
+0x000d2a7c	build_atlas_textured_object_d2a7c	ESI:ef_addr32,ECX:uint32_t	ESI:ef_addr32	eax,ebx,edx,edi,ebp	0	Original pushes EAX/EBX/EDX/EDI/EBP; advances ESI by two per vertex; ECX scratch. d23d8 preserves the advanced ESI. Installed at159184 by c448b.

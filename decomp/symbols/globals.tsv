@@ -257,3 +257,16 @@ addr	size	type	name	evidence	notes
 0x00485fe4	4	int32_t	g_texture_right_depth_fixed	original d3e50/d4250 ASM	right endpoint depth before SAR 8
 0x00485ffc	4	int32_t	g_texture_left_depth_fixed	original d3e50/d4250 ASM	left endpoint depth before SAR 8
 0x00158f24	4	uint32_t	g_texture_coordinate_mask	original d43f0 AND EBX,[158f24]	dynamic mask for full packed U, including its fractional high word
+0x00158f0c	4	uint32_t	g_renderer_fixed_texture_mode	original d2a7c ASM	selects9-bit rather than16-bit texture scaling
+0x0015b960	1	uint8_t	g_texture_atlas_bias	original d2a7c ASM	zero selects direct coordinates; nonzero shifts both axes by this byte times32768
+0x0015b95c	4	ef_addr32	g_texture_atlas_page	original d2a7c ASM	selected atlas page pointer
+0x00160000	4	uint32_t	g_texture_atlas_page_index	original d2a7c ASM	page index with16388-byte stride
+0x0017bf70	4	ef_addr32	g_renderer_vertex_base	original d2a7c ASM	base added to unsigned word offsets
+0x0015997c	2	uint16_t	g_texture_coordinates_first_u	original d2a7c ASM	first U in the interleaved word-pair table
+0x0015997e	2	uint16_t	g_texture_coordinates_first_v	original d2a7c ASM	first V in the interleaved word-pair table
+0x00420974	4	uint32_t	g_current_render_object_flags	original d2a7c ASM	render-object field4 cleared during setup
+0x00420990	4	ef_addr32	g_current_render_object_prepare	original d2a7c ASM	prepare callback at object+32
+0x00420994	4	ef_addr32	g_current_render_object_span	original d2a7c ASM	span callback at object+36
+0x0042099c	4	uint32_t	g_current_render_object_clip_mask	original d2a7c ASM	initial1 ANDed with each full vertex flags dword
+0x004209bc	4	ef_addr32	g_current_render_object_vertex_list	original d2a7c ASM	points to current count/pointer array
+0x004209d0	4	uint32_t	g_current_render_vertex_count	original d2a7c ASM	original signed count stored as raw dword
