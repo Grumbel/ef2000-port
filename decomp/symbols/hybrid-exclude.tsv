@@ -21,7 +21,6 @@ addr	reason
 0x000ce328	Hybrid redirect breaks cockpit replay (bisect m2-bisect-005); keep original bytes.
 0x000a6438	Hybrid redirect breaks cockpit replay (bisect m2-bisect-006); keep original bytes.
 0x000a6d00	Mechanical widget redraw body suspected of corrupting the stack (return lands in heap at 0xd6b6fa in cockpit replay, bisect m2-bisect-007); keep original.
-0x000a5ca4	Mechanical body drops the colour byte and three of four coordinates of each set_clip_rect_c94f4 call (bisect m2-bisect-009); keep original.
 0x000c9fc4	Mechanical body has uninitialised stack locals and guessed call args (bisect m2-bisect-010); keep original.
 0x00160255	Mechanical body mis-scales uint32_t* array indices (bisect m2-bisect-011); keep original.
 0x0011c20c	Mechanical body treats 64-bit float fields as uint64_t integers and guesses call args (bisect m2-bisect-012); keep original.

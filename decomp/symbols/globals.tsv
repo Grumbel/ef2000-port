@@ -386,3 +386,6 @@ addr	size	type	name	evidence	notes
 0x0040d150	144	char[144]	g_localized_selected_prefix	original9cf2c/9cfdc ASM	selected prefix copied by9cf2c, built by9cfdc
 0x0040d1e0	4	uint32_t	g_localized_default_prefix_length	original9cf2c/9cfdc ASM	9cf2c loads before compare and reloads on matching prefix
 0x00132b3c	1	uint8_t	g_page_history_value	0xa0f84 passes its address as history values pointer	First byte of default history values used by original160255; capacity not inferred
+0x00137945	1	uint8_t	g_widget_outer_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges
+0x00137947	1	uint8_t	g_widget_inner_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges
+0x0013794a	1	uint8_t	g_widget_upper_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges

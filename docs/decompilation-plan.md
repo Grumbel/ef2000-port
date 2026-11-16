@@ -6732,3 +6732,47 @@ caller.asm,direction.asm,page_history.obj,page_history.lst,
 misc_drafts1.obj,misc_drafts1.lst,full.json}. Commands: ef2000_wcc.py on
 page_history.c and misc_drafts1.c; wdis; hybrid_link.py with pinned payload
 and full-objects; decomp_status.py check; git diff --check.
+
+### Widget frame painter (0xa5ca4)
+
+Recover `draw_widget_frame_a5ca4` in decomp/src/widget_frame.c from the
+596-byte original and private export. The stale implicit-EDI blocker is
+incorrect: original saves EDI and clears it before use. Only EAX widget
+is an input; all six non-EAX GPRs preserved, plain RET. Sole direct caller
+a5fd2 retains its widget in EDX; inspect its redraw sequence and the
+callee's complete body. No second direct caller exists in the inventory.
+
+Preserve the four initial rectangles, three iterations of two outer-edge
+rectangles, two optional upper-edge rectangles, common upper segment and
+final right segment: twelve calls when widget word+c5 is zero, fourteen
+otherwise. Keep byte colours137947/137945/13794a, fresh geometry reads
+between calls, signed word narrowing after wrapped arithmetic, captured
+width-minus-one across the optional draws, and the original reversed Y
+endpoints. Do not normalize rectangles or resize the button/text regions.
+Name the three colour bytes; inferred frame roles are documented in the
+global notes. The old mechanical exclusion described a different broken
+body that dropped four call arguments. Remove it only after confirming all
+five arguments at each of the ten static call sites in this hand recovery.
+
+Review original c94f4: EAX colour, EDX X0, EBX Y0, ECX X1 and a callee-cleaned
+stack Y1, RET4. It saves ESI/EDI/EBP and clobbers the four scratch GPRs;
+old metadata falsely preserved EBX/ECX/EDX. Correct that contract, add an
+explicit shared Watcom pragma, and remove its old generic probe reference
+without deleting the historical JSON. Rebuild misc_drafts1, the only existing
+source using the affected aliases. Its a5ca4 guest alias now correctly
+preserves EDX. The clip entry itself remains original in the hybrid due to
+the existing stack-argument gate; the new painter calls it with the original
+register/stack interface. Do not claim the clip draft is newly spliced.
+
+Watcom compiles both modules warning-free. Wdis confirms sign extension,
+all colour/coordinate loads, one Y1 push per clip call, no caller stack
+cleanup, both optional paths, three loop iterations, preserved registers
+and plain painter RET. Full static link:2634 redirects,363/403 modules,
+595500 arena bytes,1637 exclusions. Tracker:3404 compiles,830 blocked of4293;
+tracker/diff checks pass. No runtime/UI/replay/differential execution and
+no claim that the menu-highlight bug or crashes are fixed. Evidence:
+local/widget-frame-20261116/{original.asm,caller.asm,clip.asm,widget_frame.obj,
+widget_frame.lst,misc_drafts1.obj,misc_drafts1.lst,full.json}. Commands:
+ef2000_wcc.py on widget_frame.c and misc_drafts1.c; wdis; hybrid_link.py
+with pinned payload and full-objects; decomp_status.py check;
+git diff --check.

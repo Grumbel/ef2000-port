@@ -5267,6 +5267,9 @@ uint32_t register_trace_block_d5e0c(ef_addr32 rec);
 
 void add_direction_offset_cee88(ef_addr32 vec, uint32_t a, uint32_t b, int32_t k);
 void set_clip_rect_c94f4(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+#ifdef __WATCOMC__
+#pragma aux set_clip_rect_c94f4 parm [eax] [edx] [ebx] [ecx] [] modify [eax ebx ecx edx]
+#endif
 void prepare_shape_list_d2320(ef_addr32 obj);
 
 
@@ -7597,4 +7600,5 @@ void pump_device_events_a410c(void);
 uint8_t initialize_comms_a3c18(void);
 uint16_t load_page_9de08(ef_addr32 filename, uint32_t mode);
 void update_page_history_a0f84(uint32_t source_index, uint32_t point_index, uint32_t channel);
+void draw_widget_frame_a5ca4(ef_addr32 widget);
 #endif
