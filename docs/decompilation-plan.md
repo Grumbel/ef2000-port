@@ -5814,3 +5814,30 @@ the already corrected EAX signature. Evidence: original payload disassembly
 at 0,1de..220,fe61f..fe6f2; saved payload at 30649b4..3064a80;
 existing calls.log tail. Validation: decomp_status.py check; git diff --check.
 No new execution, UI or replay runs.
+
+### 2026-11-16 — Recover scrolling-text preparation
+
+Recover a82f0 (607 owned bytes) as prepare_scrolling_text_a82f0 in the new
+scrolling_text.c. The former segment-operation blocker is the ten-entry
+CS-relative font switch at a82c8; inspect every target and recover the
+ordinary C dispatch. Review the original body, existing private pseudo-C
+candidate and all six direct callers. EAX is the record input; all other
+GPRs are preserved and no caller consumes EAX. Add the confirmed signature,
+asserted record-prefix fields and named text-layout globals.
+
+Preserve uppercase conversion, placeholder expansion, caret file dispatch,
+80-byte line stride, signed low-word counters with full-register increments,
+low-word total/width stores, fixed8/fixed6 and eight variable-width modes,
+signed truncation-to-zero centering, clock update and cursor reset. Keep the
+original unbounded line writes, read-before-length-check and unconditional
+two-byte skip after CR. Invalid font modes retain old width/left-edge data.
+No new null guards, capacity checks or line-ending normalization.
+
+Watcom compiles warning-free; wdis confirms register saves, plain RET,
+signed counter comparisons and the centering division sequence. Full static
+link succeeds with 2607 redirects, 346/386 modules and580630 arena bytes.
+Tracker/diff checks pass. Status remains compiles, not verified; no new
+execution/UI/replay runs. Inventory:3377 compiles,857 blocked. Evidence:
+local/scrolling-text-20261116/{scrolling_text.obj,scrolling_text.lst,
+scrolling_text.abi.h,full.json}. Commands: ef2000_wcc.py on scrolling_text.c;
+wdis; hybrid_link.py; decomp_status.py check; git diff --check.

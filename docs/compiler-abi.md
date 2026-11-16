@@ -9707,3 +9707,19 @@ callee cleanup. Caller instruction sequences at `0xf8b3d`, `0xf8b8f`,
 `0xf8bb0`, `0xf8bfa` and `0xf8c45` were used to supply explicit helper inputs
 in the C body. This is compile and ABI evidence only; menu replay remains
 pending.
+
+
+## Scrolling-text preparation at `0xa82f0`
+
+`prepare_scrolling_text_a82f0` takes the record address in EAX, preserves
+EBX/ECX/EDX/ESI/EDI/EBP, and returns with a plain RET. The original saves
+five registers and never touches EBP. All six direct callers at a82af,
+a8978, a8a6a, a8b1a, a8cb0 and a8d99 discard EAX. The generated pragma is
+`parm [eax] modify [eax]`; Watcom saves/restores all six non-result registers.
+
+The CS-relative table at a82c8 is a ten-way font dispatch, not a guest
+segment-data access: its entries map modes0..9 to the matching width
+helpers or fixed8/fixed6 arithmetic. Word-index sign extension, full-register
+increments, low-word stores and truncation toward zero in centering are
+retained. The caret path forwards EAX=remaining filename, EDX=record to
+a81e4. Static compilation/listing review only; no execution equivalence claim.
