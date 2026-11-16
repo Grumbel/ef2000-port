@@ -342,3 +342,18 @@ addr	size	type	name	evidence	notes
 0x00132ac8	4	ef_addr32	g_page_request_scale_pointer	original a1590 ASM	points to signed word scaling request rate by percent
 0x00132ad4	4	ef_addr32	g_page_point_request_hook	original a1590 ASM	EAX points to18-byte request; AL acceptance result
 0x00416e40	78	ef_page_chain_record	g_page_chain_records	original a0018/a0228 ASM	first78-byte entry; table capacity unrecovered; position dwords at12/16/20 and rotation low words at36/40/44
+0x00146e52	2	uint16_t	g_script_queue_slot	original160329 ASM	live queue slot
+0x00148e58	1	uint8_t	g_script_queue_kind	original160329 ASM	parallel table base; 1-byte element stride, unchecked word slot
+0x00149658	1	uint8_t	g_script_queue_value	original160329 ASM	parallel table base; 1-byte element stride, unchecked word slot
+0x00149e58	1	uint8_t	g_script_queue_repeat	original160329 ASM	parallel table base; 1-byte element stride, unchecked word slot
+0x0014a658	1	uint8_t	g_script_queue_flags	original160329 ASM	parallel table base; 1-byte element stride, unchecked word slot
+0x0014ae58	2	uint16_t	g_script_queue_identifier	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x0014be58	2	uint16_t	g_script_queue_rotation_x	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x0014ce58	2	uint16_t	g_script_queue_rotation_y	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x0014de58	2	uint16_t	g_script_queue_rotation_z	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x0014ee58	2	uint16_t	g_script_queue_parameter	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x0014fe58	2	uint16_t	g_script_queue_length	original160329 ASM	parallel table base; 2-byte element stride, unchecked word slot
+0x00150e58	4	uint32_t	g_script_queue_world_x	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
+0x00152e58	4	uint32_t	g_script_queue_world_y	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
+0x00154e58	4	uint32_t	g_script_queue_world_z	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot
+0x00156e58	4	ef_addr32	g_script_queue_values	original160329 ASM	parallel table base; 4-byte element stride, unchecked word slot

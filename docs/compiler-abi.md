@@ -10060,3 +10060,40 @@ crash resolution. Evidence: local/page-chain-record-20261116/{original.asm,
 callers.asm,page_positioned_record.obj,page_positioned_record.lst,full.json}.
 Commands: ef2000_wcc.py on page_positioned_record.c; wdis;
 hybrid_link.py; decomp_status.py check; git diff --check.
+
+### Rotated script queue appender (0x160329)
+
+Recover `append_rotated_script_entry_160329` (200 original bytes) in
+`decomp/src/script_queue.c`. Sole direct caller a0a1d uses no register
+arguments/results. Original saves ESI/EDI/EBP, clobbers the four scratch
+registers and uses plain RET. Remove its obsolete unreviewed-mechanical
+exclusion after reviewing the body, caller, vector helper and enqueue entry.
+
+Keep all global reloads and parallel-table writes in their original order,
+including loading all three rotation words before any rotation-table store.
+Do not clamp the unchecked word slot. Name table bases as single elements
+with documented strides rather than inventing capacity bounds.
+
+Inline the arithmetic of implicit-register1600c4 as C: unsigned wrapping
+absolute value, add0x8000, arithmetic right16, wrapping square/sum, unsigned
+integer_sqrt, and restore the original Z sign to the length. Review e2b60
+preservation of EDX to confirm the sign survives. Final key uses wrapping
+signed_length+bias plus SAR2(abs(bias)); retain the INT32_MIN case. Avoid
+the old pointer-parameter vector draft ABI.
+
+Call original c41b0 through an explicit EAX-key declaration. Its blocked C
+model still has an unsigned count comparison where the original uses signed
+JGE, and unresolved self-modifying overflow policy; neither that model nor
+the implicit-register vector draft is enabled by this commit. Their wider
+fidelity review remains pending.
+
+Watcom compiles warning-free. Wdis confirms preserved registers, ordered
+loads/stores, SAR16 rounding and wrapping squares, sign restoration,
+rotation preloads, SAR2 bias and EAX enqueue argument. Full reviewed static
+link:2622 redirects,356/396 modules,589320 arena bytes. Tracker and diff
+checks pass; inventory3392 compiles,842 blocked. Status compiles only; no
+execution/UI/replay runs or crash-resolution claim. Evidence:
+local/script-queue-20261116/{original.asm,vector.asm,callers.asm,
+script_queue.obj,script_queue.lst,reviewed.json}. Commands:
+ef2000_wcc.py on script_queue.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

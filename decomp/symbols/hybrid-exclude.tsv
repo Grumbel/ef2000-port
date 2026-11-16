@@ -363,7 +363,6 @@ addr	reason
 0x0011c0b4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00120800	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00120a52	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x00160329	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0011b6a8	Single-redirect culprit for cockpit replay (bisect m2-bisect-051; invalid fetch); cause unreviewed; keep original.
 0x0009202c	Pair culprit for cockpit replay (bisect m2-bisect-053, unresolved 2-candidate set); cause unreviewed; keep original.
 0x00094194	Pair culprit for cockpit replay (bisect m2-bisect-053, unresolved 2-candidate set); cause unreviewed; keep original.

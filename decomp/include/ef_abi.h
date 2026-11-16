@@ -7578,4 +7578,9 @@ void start_coordinate_page_record_a2728(uint32_t record_index, uint32_t point_x,
 void submit_page_point_a1590(uint32_t point_index, uint32_t channel_index,
     ef_addr32 angles, uint32_t spread_word);
 void start_chain_page_record_a0228(uint32_t record_index, uint32_t point_index);
+void append_rotated_script_entry_160329(void);
+void guest_fn_c41b0_x(uint32_t key); /* original enqueue, AX key */
+#ifdef __WATCOMC__
+#pragma aux guest_fn_c41b0_x parm [eax] modify [eax ebx ecx edx]
+#endif
 #endif
