@@ -11266,3 +11266,29 @@ local/sound-slot-select-20261116/{sound_slot_select.obj,
 sound_slot_select.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover clock snapshot and tick wait
+
+Recover remember_clock_a7d34 (12 original bytes) and wait_ticks_e1110
+(29 bytes) in clock_helpers.c; runtime_helpers30 had no definitions. ASM,
+sole snapshot caller a853a and wait callers e0bb3/e0bfa establish no snapshot
+inputs and EAX delay respectively, six registers preserved, plain RET.
+No existing caller contract changes. The clock callback has no arguments
+and returns EAX; use the established register-call function pointer shape.
+
+Snapshot the callback result into 41915c. For wait, call clock before
+masking delay to 16 bits, add with uint32 wrap, then poll at least once and
+compare unsigned against the fixed deadline. Reload callback pointer on
+every call, with no added null check. Preserve the original clock-wrap
+comparison behavior explicitly. Name callback and snapshot globals. Remove
+both generic probe tracker references, retaining the JSON files.
+
+Commands: ef2000_wcc.py clock_helpers.c (zero warnings); wdis (snapshot
+store, initial call before mask/add, fresh callback load inside loop,
+unsigned comparison, EDX saves and plain RETs); hybrid_link.py pinned
+payload/full objects (2658 redirects,601060 arena bytes,387/427 modules,
+1615 exclusions); decomp_status.py check (4293 functions); git diff --check.
+Evidence: local/clock-helpers-20261116/{clock_helpers.obj,clock_helpers.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild; full RAM/stack
+equivalence and reported crashes remain unverified.

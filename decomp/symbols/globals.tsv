@@ -461,3 +461,5 @@ addr	size	type	name	evidence	notes
 0x0012dd0d	1	uint8_t	g_active_sound_slot	98086 compares; 980cd stores requested slot	updated even after registration failure
 0x0012dd0c	1	uint8_t	g_sound_slot_selected	980d3 sets one	selection latch
 0x0012dd98	4	ef_addr32	g_sound_slot_records	980a7 reads table base	13-byte records
+0x0015b620	4	ef_addr32	g_clock_callback	a7d34/e1110 indirect calls	no arguments; EAX clock value; reloaded for every poll
+0x0041915c	4	uint32_t	g_remembered_clock	a7d3a stores clock callback result	clock snapshot
