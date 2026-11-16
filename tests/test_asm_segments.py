@@ -10,7 +10,7 @@ import subprocess
 import tempfile
 import unittest
 
-from tools import asm_segments
+from tools import asm_segments, asm_to_c, asm_x87
 
 
 class Segment(ctypes.Structure):
@@ -19,6 +19,28 @@ class Segment(ctypes.Structure):
 
 @unittest.skipUnless(shutil.which('cc'), 'requires C compiler')
 class SegmentTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('as') and shutil.which('objcopy') and shutil.which('objdump'),
+                         'requires GNU binutils')
+    def test_operand_segment_matches_independent_modrm_sib_decode(self):
+        from tests.test_asm_to_c import assemble
+        addresses = ['[eax]', '[ebp]', '[esp]', '[eax+ebp*1]', '[ebp+eax*1]',
+                     '[ebp*2+0x1000]', '[esp+esi*4+8]', '[0x1234]']
+        forms = addresses + [segment+':'+address
+                             for segment in asm_to_c.SEGMENTS for address in addresses]
+        with tempfile.TemporaryDirectory() as temporary:
+            _, record = assemble(Path(temporary), '\n'.join('fld dword ptr '+form for form in forms)+'\nret')
+            instructions = record['instructions'][:-1]
+            self.assertEqual(len(instructions), len(forms))
+            for form, instruction in zip(forms, instructions):
+                with self.subTest(form=form):
+                    parsed = asm_to_c.operand(instruction['operands'])
+                    encoded_segment, _ = asm_x87.memory_encoding(instruction, 0xd9, 0)
+                    self.assertEqual(parsed[3], encoded_segment)
+                    self.assertEqual(parsed[2], 32)
+        # Segment metadata never changes the offset expression used by LEA.
+        self.assertEqual(asm_to_c.operand('fs:[ebp+4]')[1],
+                         asm_to_c.operand('ds:[ebp+4]')[1])
+
     def test_rights_privilege_and_boundaries(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

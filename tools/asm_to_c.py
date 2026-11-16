@@ -346,9 +346,16 @@ def operand(text):
         return ('imm', value & 0xffffffff)
     match = re.fullmatch(r'(?:(byte|word|dword|fword|qword|tbyte) ptr )?(?:(es|cs|ss|ds|fs|gs):)?(?:\[([^]]+)\]|(0x[0-9a-f]+))', text)
     if match:
-        size, _, expression, absolute = match.groups()
+        size, segment, expression, absolute = match.groups()
         width = {'byte': 8, 'word': 16, 'dword': 32, 'fword': 48, 'qword': 64, 'tbyte': 80}.get(size)
-        return ('mem', address_expression(expression or absolute), width)
+        address = expression or absolute
+        if segment is None:
+            # Objdump prints an unscaled base before the index. A scaled EBP
+            # index with no EBP base uses DS, unlike an EBP/ESP base using SS.
+            base = re.search(r'(?:^|[+-])(eax|ecx|edx|ebx|esp|ebp|esi|edi)(?=[+-]|$)',
+                             address.replace(' ', ''))
+            segment = 'ss' if base and base.group(1) in ('esp', 'ebp') else 'ds'
+        return ('mem', address_expression(address), width, SEGMENTS.index(segment))
     raise Unsupported('unsupported operand: ' + text)
 
 

@@ -5465,3 +5465,29 @@ three candidates d3844/d3c50/d4430; its old-object replay still fails. This is
 consistent with the independently repaired d3c50 shared tail. Keep its report
 as diagnostic evidence; the repaired full-profile/native results above are
 the current runtime evidence. Report: local/external-terrain-bisect-04-20261116/.
+
+### 2026-11-16 — Retain scalar memory operand segment identity
+
+The operand parser no longer discards ES/CS/SS/DS/FS/GS prefixes. Store the
+segment index as separate memory-operand metadata while retaining the same
+offset expression and width. Default EBP/ESP base addressing selects SS;
+a scaled EBP index with another base or no base selects DS. LEA's offset
+expression remains independent of the segment. Across 56 assembled explicit
+and implicit forms, parsed segment metadata agrees with independent ModRM/SIB
+and prefix decoding by the x87 memory decoder.
+
+Regenerate the complete current program from the pinned workspace/inventory.
+All 4280 entry records, 2528 generated bodies and 2594 source/support/runtime
+files are byte-identical to the preceding dispatch-return corpus; both report
+hashes are 67670f0a17fb34cef3eca02b72e6f2b721ba33bec7fc0e52d1af3c34036bed7a.
+Syntax support remains 4143. This metadata prerequisite does not yet enable
+captured descriptors or change executed semantics. ABI and access-path wiring
+remain required; no captured mismatch is promoted.
+
+Validation: Nix Python -m unittest tests.test_asm_segments
+tests.test_asm_c_program tests.test_asm_capture (14 pass, 8.716 s), then
+tests.test_asm_stack_scalar tests.test_asm_stack_all (4 pass, 11.653 s).
+Generation: tools/asm_c_program.py --workspace local/ghidra-stack-return-20261114
+--inventory local/asm-dispatch-return-body-inventory-20261114 --output
+local/asm-c-segment-operands-program-20261116. Cross-corpus byte comparison:
+local/asm-segment-operands-evidence-20261116.json. git diff --check passes.
