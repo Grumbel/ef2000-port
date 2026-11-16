@@ -336,3 +336,5 @@ addr	size	type	name	evidence	notes
 0x00417196	2	int16_t	g_page_record_visibility_gate	original a08c8 ASM	accepted signed range -1023 through zero; read via overlapping dword first
 0x00132af4	4	ef_addr32	g_page_point_setup_hook	original a08c8 ASM	EAX=EDX=0 on this path
 0x00132af0	4	ef_addr32	g_page_point_transform_hook	original a08c8 ASM	EAX destination; EDX origin pointer
+0x00417224	6	uint16_t[3]	g_page_point_work_coordinates	original a0704 ASM	setup-hook output followed by wrapping word offsets
+0x00417194	6	uint16_t[3]	g_page_point_word_offsets	original a0704 ASM	three offsets applied before stack view test

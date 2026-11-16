@@ -9928,3 +9928,23 @@ clobbers too. Otherwise the compiler can retain the record pointer in ECX
 across calls that overwrite it. Rebuilt a08c8 keeps it in ESI. Recompile
 all users of these two callback helpers, including the helper implementation.
 No runtime execution equivalence is claimed.
+
+## Offset page record at `0xa0704`
+
+`start_offset_page_record_a0704` takes signed AX/DX record/point indices.
+Original saves EBX/ECX/ESI/EDI, leaves EBP untouched and uses plain RET;
+EAX/EDX are scratch. Sole caller9e8cb..9e8d6 loads a signed word pair,
+advances the script by four bytes and discards results.
+
+Store point Y before calling132af4 with EAX=X and EDX=Z. Precompute all
+three wrapping word offsets, then interleave stores to417224/226/228 with
+original overlapping dword reads at417222/224/226 and arithmetic shifts.
+The integer-coordinate view wrapper160122 receives margin,Z,Y,X,out on
+the stack. It writes the original12-byte local position. If AL is nonzero,
+publish default angles and script fields in their original order, test the
+repeat byte before its default-one store, preload all optional offsets,
+and reread repeat between the second/third adjusted-angle stores. The
+lookup uses a callee-cleaned stack argument and EAX result. Final132ad8
+runs regardless of view success and receives signed position high words
+and the low page flag nibble. Static listing/link review only; execution
+fidelity remains unverified.

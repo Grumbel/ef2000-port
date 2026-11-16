@@ -7571,4 +7571,5 @@ void guest_fn_160329_x(void); /* 0x160329 no register inputs */
 #pragma aux guest_callptr_eaxedx_x parm [eax] [edx] [ebx] modify [eax ecx edx]
 #pragma aux guest_callptr4_x parm [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #endif
+void start_offset_page_record_a0704(uint32_t record_index, uint32_t point_index); /* 0xa0704 AX/DX */
 #endif

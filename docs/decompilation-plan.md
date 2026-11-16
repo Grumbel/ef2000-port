@@ -6115,3 +6115,30 @@ page_positioned_record.lst,full.json} and rebuilt affected objects there.
 Commands:ef2000_wcc.py on all six affected modules; wdis on
 page_positioned_record.obj; hybrid_link.py; decomp_status.py check;
 git diff --check.
+
+### 2026-11-16 — Recover offset page-record startup
+
+Recover a0704 (452 owned bytes) in page_positioned_record.c. Original ASM,
+pseudo-C and sole caller9e8cb..9e8d6 establish signed AX/DX indices, four
+saved registers, untouched EBP, EDX scratch and plain RET. Store selected
+point Y, run the X/Z hook, add wrapping word offsets, view-test integer
+coordinates through160122 and initialize optional record rotations before
+script startup. Always invoke the final positioned-record hook.
+
+Retain original overlapping dword reads interleaved with coordinate word
+stores,12-byte position storage, preloaded optional angle offsets, repeat
+byte test before default-one store and reread between second/third angle
+stores, stack lookup/EAX result and final register arguments. No new
+adapters, bounds guards or execution tests. Remove old a0704 exclusion
+only after manual assembly/caller review; name work-coordinate/offset data.
+
+Watcom compiles warning-free; wdis confirms signed strides, hook arguments,
+interleaved stores/reads, correct five-argument stack order, saved record
+pointer and final callback. Full static link:2617 redirects,353/393 modules,
+586660 arena bytes. Tracker/diff checks pass. Inventory:3387 compiles,
+847 blocked. Status remains compiles; runtime fidelity unverified.
+Evidence:local/page-offset-record-20261116/{original.asm,
+page_positioned_record.obj,page_positioned_record.lst,
+page_positioned_record.abi.h,full.json}. Commands:ef2000_wcc.py on
+page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
+git diff --check.
