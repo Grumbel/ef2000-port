@@ -90,18 +90,19 @@ void renderer_finish_queue_c4167(void)
 }
 
 /* c41b0, 170 bytes including the patched branch. AX supplies the sort key.
- * The count saturates at
- * 0x800; overflow uses a different code path after the sort is made, by
+ * Signed word counts below0x800 use insertion, including negative words.
+ * Overflow resets count to0x800 and uses a different path after sorting, by
  * changing the JGE rel8 displacement from 0x1b to 0x6e. */
 void renderer_enqueue_c41b0(uint16_t key)
 {
     uint16_t count = (uint16_t)(EF_U16(0x146e50u) + 1u);
     EF_U16(0x146e50u) = count;
-    if (count < 0x800u) {
+    count = EF_U16(0x146e50u);
+    if ((int16_t)count < 0x800) {
         uint16_t slot = EF_U16(0x146e52u);
         EF_U16(0x146e52u) = count;
-        EF_U16(0x146e56u + 2u * slot) = key;
         EF_U16(0x147e56u + 2u * slot) = slot;
+        EF_U16(0x146e56u + 2u * slot) = key;
     } else if (EF_U8(0xc41c4u) == 0x6eu) {
         EF_U16(0x147e54u) = key;
         EF_U16(0x146e50u) = 0x800u;
@@ -112,7 +113,7 @@ void renderer_enqueue_c41b0(uint16_t key)
         EF_U16(0x146e56u + 2u * slot) = key;
         EF_U16(0x147e56u + 2u * slot) = 0x7ffu;
         EF_U16(0x146e50u) = 0x800u;
-        renderer_partial_quicksort_c3fd4(1, 0x800);
+        renderer_partial_quicksort_c3fd4(1, EF_U16(0x146e50u));
         renderer_insertion_sort_c409c();
         EF_U16(0x146e52u) = EF_U16(0x148e54u);
         EF_U8(0xc41c4u) = 0x6eu;

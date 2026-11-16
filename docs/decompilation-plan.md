@@ -6297,3 +6297,28 @@ local/script-queue-20261116/{original.asm,vector.asm,callers.asm,
 script_queue.obj,script_queue.lst,reviewed.json}. Commands:
 ef2000_wcc.py on script_queue.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Renderer enqueue draft: signed gate and store order
+
+Review original c41b0..c4259 and caller sites160320/1603e8. Both supply AX
+key and consume no returned scratch values. The original increments a word,
+reloads it, then uses signed CMP/JGE against0x800. Correct the existing
+`renderer_enqueue_c41b0` C model to compare `(int16_t)count`, preserving
+negative counts' insertion path and word wraparound. The old unsigned gate
+incorrectly routed0x8000..0xffff to overflow.
+
+Restore the live post-increment count reload, original tag-before-key
+insertion stores and live count reload for the overflow quicksort argument.
+Do not enable this renderer model: its existing blocked status and hybrid
+exclusions remain. The original instruction uses XCHG, while the draft
+models the exchange as separate loads/stores; self-modified branch fetch,
+segment effects, scratch-register behavior and sorting callee ABI still
+need recovery. New script appender160329 continues calling originalc41b0.
+
+Watcom compilation of renderer_sort_queue.c is warning-free. Wdis shows a
+signed JL insertion gate, count reloads and ordered tag/key stores. Tracker
+and git diff checks pass. No new hybrid redirect or runtime verification;
+inventory remains3392 compiles,842 blocked. Evidence:
+local/renderer-enqueue-review-20261116/{original.asm,renderer_sort_queue.obj,
+renderer_sort_queue.lst}. Commands: ef2000_wcc.py on renderer_sort_queue.c;
+wdis; decomp_status.py check; git diff --check. No execution/UI/replay runs.
