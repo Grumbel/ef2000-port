@@ -11742,3 +11742,37 @@ functions); git diff --check. Evidence:
 local/unsupported-errors-20261116/{unsupported_errors.obj,unsupported_errors.lst,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild.
 Full guest RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16 — carried-weapon rating selection
+
+Recover missing pick_best_weapon_16bac (205 original bytes) in
+weapon_select.c. Original ASM and callers 1690e/16f07/17025 establish
+EAX index, EDX kind output, EBX id output, ST0 result; ECX/ESI/EDI/EBP
+preserved, EAX/EDX/EBX scratch, plain RET. Correct the false EAX floating
+return and EBX/EDX preservation in signatures, add explicit header pragma,
+and rebuild misc_drafts1, the sole existing C caller module.
+
+Preserve seven carried-id reads with fresh world-pool base, 202-byte
+record stride, id 0/255 rejection and signed AX filtered lookup. Visit all
+20 three-byte weapon entries; test signed positive quantity before signed
+byte kind, accept unsigned ranges 1..5 and 17..19, compare signed ratings
+with initial -1 and strict improvement. Store kind dword before id word;
+leave outputs untouched if no improvement. Keep final FILD dword/FMUL
+qword in a small ABI adapter returning ST0 without a double spill, so the
+C selection loop does not round the original extended-precision result.
+Name first rating field and scale constant. Tracker remains compiles;
+remove generic probe reference, retain JSON.
+
+Commands: ef2000_wcc.py weapon_select.c and misc_drafts1.c (zero warnings);
+wdis (live pool loads, signed tests, ordered output stores and unspilled
+ST0 return); hybrid_link.py pinned payload/full objects (2684 redirects,
+604872 arena bytes,405/445 modules,1589 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/weapon-select-20261116/{weapon_select.obj,weapon_select.lst,misc_drafts1.obj,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
+
+Also inspected ac240 against its callers and ac2e4: initial CX captures
+old registered count before fill, and indirect callbacks carry loop state
+in ECX. Leave its missing body pending a confirmed callback register
+contract rather than assuming an ordinary C callback.

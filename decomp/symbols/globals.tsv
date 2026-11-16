@@ -492,3 +492,5 @@ addr	size	type	name	evidence	notes
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
 0x0040d008	6	uint16_t[3]	g_event_totals	9a69a..9a6da ordered word additions	three wrapping totals
 0x0040d00e	24	uint16_t[3][4]	g_event_tally_rows	9a624 sums four entries per row	three rows of four word counters
+0x0012bca3	4	int32_t	g_weapon_rating_first	16bac signed comparisons	first rating in 145-byte records; table extent unresolved
+0x001817f3	8	double	g_weapon_rating_scale	16bac final x87 multiply	loaded after output stores
