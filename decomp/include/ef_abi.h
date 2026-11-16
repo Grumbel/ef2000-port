@@ -7555,4 +7555,5 @@ uint32_t heap_grow_10d80b(uint32_t size); /* 0x10d80b EAX */
 uint32_t heap_grow_alternate_10d75c(uint32_t size); /* 0x10d75c EAX */
 void prepare_scrolling_text_a82f0(ef_addr32 record); /* 0xa82f0 EAX */
 void draw_scrolling_text_a8718(void); /* 0xa8718 no register inputs */
+void show_menu_picture_a8a38(ef_addr32 record); /* 0xa8a38 EAX */
 #endif

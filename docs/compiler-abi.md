@@ -9741,3 +9741,22 @@ unaligned loads after PUSH read the initialized top word at original local
 +58, not an implicit entry register or an uninitialized coordinate. Keep the
 80-byte buffer and live local slots +50/+54/+58 in an asserted frame layout.
 Static compilation/listing review only; no execution equivalence claim.
+
+
+## Menu picture presentation at `0xa8a38`
+
+`show_menu_picture_a8a38` takes the picture record in EAX. The original saves
+EBX/ECX/EDX/ESI/EDI, leaves EBP untouched and ends in a plain RET. The only
+direct caller found in the pinned payload is GUI opcode1 at a9f59/a9f5c:
+it loads instruction+9 into EAX and discards the result. The recovered
+menu dispatcher has the same call contract through menu_op_a8a38. Both
+names receive `parm [eax] modify [eax]` from the confirmed signature.
+
+The former callee-flags blocker is incorrect: key handling is followed by
+TEST EAX,EAX, and duration/completion branches have their own CMP/TEST.
+The original local byte is explicitly zeroed and never set; its panel
+reset/release and duration-override branches are unreachable. The duration
+is the signed high word of the dword at record+9. Retain the mandatory first
+iteration, retrace-before-decrement order, signed text-completion comparison
+and key polling only when the remaining duration is positive. Static ABI
+and listing review only; runtime equivalence is unverified.

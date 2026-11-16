@@ -5870,3 +5870,32 @@ Evidence:local/scrolling-text-draw-20261116/{scrolling_text.obj,
 scrolling_text.lst,scrolling_text.abi.h,reviewed.json}. Commands:
 ef2000_wcc.py on scrolling_text.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover LBM picture presentation with optional text
+
+Recover a8a38 (411 owned bytes) as show_menu_picture_a8a38 in the new
+menu_picture.c. Inspect original disassembly, the private pseudo-C candidate,
+the sole original direct caller a9f5c, and recovered opcode1 dispatch. The
+old callee-flags blocker is spurious: every conditional branch has an
+explicit local CMP/TEST. Confirm EAX record input, preservation of all other
+GPRs, no consumed return and plain RET. Add asserted unaligned record fields
+and named path-buffer, palette and state globals.
+
+Preserve filename copy plus .lbm suffix, buffer selection/load/page order,
+nonprogressive text before the first page flip, progressive preparation
+after fade-in, per-frame progressive redraw, signed duration and completion
+comparisons, mandatory first wait iteration, zero-modifier key polling and
+post-wait fade-out. Keep repeated record/global reads across callbacks.
+The original stack flag stays zero: panel reset/release and duration override
+branches are unreachable and no such side effects are added. Clear137205
+even when the entry presentation-disabled flag causes an early return.
+
+Remove the old unreviewed-mechanical exclusion for this manually recovered
+body. Watcom compiles warning-free; wdis confirms preserved registers,
+plain RET, signed duration/completion checks and explicit key-result test.
+Full static relink:2609 redirects,347/387 modules,581706 arena bytes.
+Tracker/diff checks pass. Status remains compiles; no new execution/UI/replay
+runs. Inventory:3379 compiles,855 blocked. Evidence:
+local/menu-picture-20261116/{menu_picture.obj,menu_picture.lst,
+menu_picture.abi.h,reviewed.json}. Commands:ef2000_wcc.py on menu_picture.c;
+wdis; hybrid_link.py; decomp_status.py check; git diff --check.
