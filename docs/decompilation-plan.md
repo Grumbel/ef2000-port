@@ -7160,3 +7160,33 @@ scene_helpers.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crash/highlight repairs remain
 unverified. Matrix-builder e994c remains missing and is separate work.
+
+### 2026-11-16: recover rotation builder dispatch
+
+Recover build_rotation_e994c (106 original bytes) in rotation_dispatch.c;
+tracker runtime_helpers35 had no definition. ASM and callers 80b95/83a66/
+a0511 establish EAX flags, EDX/EBX/ECX angles, plain RET. Original preserves
+ECX/ESI/EDI/EBP, while EAX/EDX/EBX are scratch. Correct false EBX/EDX
+preservation claims here and in e95c0/e977c: both builder prologues save
+ECX/ESI/EDI/EBP and their epilogues restore those only.
+
+Forward the three angles in EAX/EDX/EBX to original e95c0 for bit0 set,
+e977c otherwise. Keep saved flags across the call. Bit1 performs three
+ordered off-diagonal swaps (matrix transposition), not an arithmetic
+mirror. Preserve each pair's load/load/store/store order and leave the
+matrix otherwise unchanged. Existing named matrix covers all accesses.
+Rebuild misc_drafts1 and page_positioned_record, all existing actual C
+callers/definitions affected by these contracts. Remove generic probe
+tracker references while retaining JSON files.
+
+Commands: ef2000_wcc.py rotation_dispatch.c, misc_drafts1.c and
+page_positioned_record.c (zero warnings); wdis (register shuffle, saved
+flags, both builder calls and ordered swaps); hybrid_link.py pinned
+payload/full objects (2646 redirects,599140 arena bytes,376/416 modules,
+1627 exclusions); decomp_status.py check (4293 functions); git diff --check.
+Evidence: local/rotation-dispatch-20261116/{rotation_dispatch.obj,
+rotation_dispatch.lst,full.json}. Watcom treats argument ECX as scratch
+in the body; the hybrid entry trampoline restores original preserved ECX.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crash/highlight repairs remain unverified.
