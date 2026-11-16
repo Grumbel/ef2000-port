@@ -6845,3 +6845,30 @@ warnings); wdis (both branches, four pushes, correct cleanup); hybrid_link.py
 decomp_status.py check; git diff --check. Evidence remains ignored under
 local/widget-title-frame-20261116/. No new runtime, UI, replay or differential
 execution; this is not proof of a menu-highlight or crash fix.
+
+### 2026-11-16: restore missing widget text painter
+
+Recover draw_widget_text_a6c20 (203 original bytes) in widget_text.c.
+The old compiles entry assigned runtime_helpers32, but no C definition
+exists there. Correct the module, keep compiles and remove the generic
+probe reference while retaining the historical JSON. Original ASM and sole
+caller a7082 establish EAX widget, six preserved GPRs, plain RET. Preserve
+signed dword-high clip calculations, unsigned word text extents, equality
+at clip boundaries, unchecked copy into a 132-byte local array, post-copy
+coordinate reloads, signed low-word draw coordinates and high-nibble style.
+Keep original 9d749 in the hybrid: its C draft remains excluded for known
+pair-copy/EDX fidelity differences.
+
+Review e26bc prologue/RET4 and share an explicit pragma for its existing
+alias: EAX zero, EDX X, EBX Y, ECX text, one callee-cleaned style stack
+argument; four scratch GPRs, ESI/EDI/EBP saved. EAX is overwritten before
+use, but preserve the original caller's explicit zero argument. No existing
+C source calls this alias. The renderer body itself remains blocked.
+
+Commands: ef2000_wcc.py widget_text.c (zero warnings); wdis (clip branches,
+post-copy loads, style push and callee stack cleanup); hybrid_link.py with
+pinned payload and complete objects (2637 redirects,596674 arena bytes,
+366/406 modules,1634 exclusions); decomp_status.py check; git diff --check.
+Evidence: local/widget-text-20261116/{widget_text.obj,widget_text.lst,full.json}.
+No runtime/UI/replay/differential execution and no claim of crash or menu
+highlight repair. Stack contents/layout equivalence remains unverified.

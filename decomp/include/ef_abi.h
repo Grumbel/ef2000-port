@@ -3203,6 +3203,9 @@ ef_addr32 find_key_checked_a7f64(ef_addr32 name);
 void reset_key_tables_a9bfc(void);
 void resolve_scene_groups_aa350(void);
 void guest_fn_e26bc(uint32_t a, int32_t x, int32_t y, ef_addr32 text, uint32_t color); /* 0xe26bc */
+#ifdef __WATCOMC__
+#pragma aux guest_fn_e26bc parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#endif
 void guest_fn_c92e4(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e, int32_t f, int32_t g, uint32_t color); /* 0xc92e4 */
 uint16_t guest_fn_aa2f8(ef_addr32 node); /* 0xaa2f8 */
 void guest_fn_aa198(ef_addr32 node); /* 0xaa198 */
