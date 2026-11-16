@@ -144,9 +144,10 @@ static void ef_write_segment(ef_lift_state *s, unsigned segment, uint32_t addres
     if (ef_check_segment(s, segment, address, width/8u, segment == 2 ? 4 : 1)) return;
     ef_write(s, address, width, value);
 }
-static unsigned ef_stack_store(ef_lift_state *s, uint32_t address, unsigned width, uint32_t value) {
+static unsigned ef_stack_store(ef_lift_state *s, unsigned segment, uint32_t address, unsigned width, uint32_t value) {
     unsigned byte;
     if (width != 16 && width != 32) return 9;
+    if (ef_check_segment(s, segment, address, width/8u, segment == 2 ? 4 : 1)) return s->fault;
     /* Preserve the flat oracle's partial writes, without committing ESP. */
     for (byte = 0; byte < width/8u; ++byte) {
         ef_write(s, address+byte, 8, value >> (8u*byte));
@@ -851,26 +852,28 @@ def instruction_c(insn, starts):
     elif mnemonic in ('push', 'pushw', 'pop'):
         op = operand(text)
         if op[0] == 'seg' and mnemonic == 'push':
-            code += ['ef_write(s, s->r[4] - 4u, 32, %s);' % read(op, 16),
+            code += ['if (s->segment_profile) return 7;',
+                     'ef_write(s, s->r[4] - 4u, 32, %s);' % read(op, 16),
                      'if (s->fault) return s->fault; s->r[4] -= 4u;']
         elif op[0] == 'seg' and mnemonic == 'pop' and op[1] != 1:
-            code += ['a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',
+            code += ['if (s->segment_profile) return 7;',
+                     'a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',
                      'ef_load_segment(s, %d, a);' % op[1],
                      'if (s->fault) return s->fault; s->r[4] += 4u;']
         elif mnemonic in ('push', 'pushw') and op[0] in ('reg', 'mem', 'imm'):
             width = scalar_stack_width(insn, op)
             code += ['a = %s; if (s->fault) return s->fault;' % read(op, width),
-                     'b = ef_stack_store(s, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
+                     'b = ef_stack_store(s, 2, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
                      's->r[4] -= %du;' % (width//8)]
         elif mnemonic == 'pop' and op[0] in ('reg', 'mem'):
             width = scalar_stack_width(insn, op)
-            code += ['a = ef_read(s, s->r[4], %d); if (s->fault) return s->fault;' % width]
+            code += ['a = ef_read_segment(s, 2, s->r[4], %d); if (s->fault) return s->fault;' % width]
             if op[0] == 'mem':
                 # Evaluate the destination using post-increment ESP, but keep
                 # architectural ESP intact until every destination byte stores.
                 destination = op[1].replace('s->r[4]', '(s->r[4] + %du)' % (width//8))
                 code += ['b = %s;' % destination,
-                         'result = ef_stack_store(s, b, %d, a); if (result) return result;' % width,
+                         'result = ef_stack_store(s, %d, b, %d, a); if (result) return result;' % (op[3], width),
                          's->r[4] += %du;' % (width//8)]
             else:
                 code += ['s->r[4] += %du;' % (width//8), write(op, 'a', width)]
@@ -1020,7 +1023,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'push', 'pushw', 'pop', 'pusha', 'popa', 'enter', 'leave', 'call',
+    unwired = {'pusha', 'popa', 'enter', 'leave', 'call',
                'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
                'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
     for i in instructions:

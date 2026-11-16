@@ -8330,3 +8330,21 @@ expand-down boundary correction and failed that assertion; the corrected
 capture suite was rerun successfully. No gameplay or UI runs.
 Bulk translation remains incomplete: implicit stack/string accesses,
 far-pointer loads, WAIT/x87 and descriptor reloads remain unwired.
+
+### 2026-11-17 — Translate descriptor-backed scalar stack operations
+
+Scalar 16/32-bit PUSH and POP now retain SS for implicit stack accesses
+and the decoded segment for explicit memory operands. Stack stores check
+the complete descriptor extent before writing bytes; the legacy flat RAM
+fault ordering remains unchanged. POP memory destinations still calculate
+using post-increment ESP and commit ESP only after the destination stores.
+Segment-register PUSH/POP remain explicitly rejected in descriptor mode;
+PUSHA/POPA, ENTER/LEAVE and CALL remain separate unwired operations.
+
+Synthetic captured-state checks add register and memory stack operations,
+16-bit operands, PUSH ESP / POP ESP, post-increment ESP addressing, and
+SS write / DS destination limit rejection without architectural mutation.
+Validation: tests.test_asm_capture and the synthetic instruction comparison
+matrix in tests.test_asm_to_c; tracker check; git diff --check. No gameplay
+or UI runs. This expands descriptor-backed translation support without
+promoting any recovered function to behavior-verified status.

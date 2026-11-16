@@ -51,10 +51,15 @@ class AsmCaptureTests(unittest.TestCase):
             'mov eax, cs:[0x100]\nmov word ptr ds:[0x2004], ax\nret',
             'mov eax, fs:[0x2000]\nret',
             'mov eax,0x10\nadd eax,0x20\nmov edx,[0x2000]\nret',
-            'push eax\npop eax\nret',  # Explicitly unsupported in this stage.
+            'pusha\npopa\nret',  # Explicitly unsupported in this stage.
             'mov ebx,0x2000\nmov eax,0x12340000\nxlatb\nret',
             'mov ebx,0x2000\nmov eax,0x12340000\nfs xlatb\nret',
             'mov ebx,0x100\nmov eax,0x12340000\ncs xlatb\nret',
+            'push eax\npop edx\nret',
+            'push ax\npop dx\nret',
+            'push dword ptr ds:[0x2000]\npop dword ptr ss:[esp+4]\nret',
+            'push esp\npop esp\nret',
+            'push eax\npop dword ptr ds:[0x2000]\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -97,9 +102,9 @@ class AsmCaptureTests(unittest.TestCase):
                         self.assertIn('C status 7', result['differences'][0])
                     else:
                         self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 7):
+                    if number in (0, 7, 10, 14):
                         # Test the generated access path, not only the helper:
-                        # A scalar or XLAT DS read outside its limit must stop before
+                        # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
                         ram = bytearray(capture.guest_ram)
                         native_ram = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
@@ -112,7 +117,13 @@ class AsmCaptureTests(unittest.TestCase):
                         for index, name in enumerate(asm_to_c.SEGMENTS):
                             state.segment_cache[index] = asm_c_differential.Segment(
                                 *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
-                        state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
+                        if number in (0, 7, 14):
+                            state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
+                        if number == 10:
+                            state.segment_cache[2].limit = regs['esp'] - 4
+                        if number == 14:
+                            # Isolate POP: source SS succeeds, destination DS fails.
+                            state.pc = record['instructions'][1]['address']
                         if number == 7:
                             # Skip the setup MOVs to isolate fault atomicity.
                             state.pc = record['instructions'][2]['address']
