@@ -10482,3 +10482,53 @@ decomp_startup.host.o,full.json}. Commands: ef2000_wcc.py; wdis; cc -c
 on the two affected native files; hybrid_link.py with pinned payload and
 full-objects; decomp_status.py check; git diff --check. No claim of runtime
 integration verification, bit identity or crash resolution.
+
+### Page history update and rendering (0xa0f84)
+
+Recover `update_page_history_a0f84` in decomp/src/page_history.c from the
+1181-byte original and private export. AX source-record index, DX point,
+BX history channel, all signed words. Preserve ECX/ESI/EDI/EBP; EAX/EBX/EDX
+are scratch, plain RET. Sole direct caller9f0fa reads a three-word script
+operand and advances the ESI interpreter PC before calling; no second
+direct caller exists in the observed inventory. Assert the36-byte frame's
+world vector, rotation/source pointers, channel and counter offsets.
+
+Keep initial state/resource pointers, point-Y publication and the setup
+callback's signed X/Z values, ordered coordinate additions and update-flag
+read before the final coordinate store. Preserve the enabled oscillator's
+word addition, bound read/store order, conditional live negation, signed
+count/capacity comparison and descending five-word copies. The shift loop
+reloads the live count each iteration. Append lifetime/coordinates/yaw in
+original order, then optionally add source yaw and increment the live count.
+The aging loop captures its original signed bound, decrements each lifetime
+and the live count separately, and invokes the direction helper on every
+entry, including expired ones. Do not compact or clamp the queue.
+
+Keep the integer160122 stack order and uninitialized world output on
+rejection. Accepted paths publish current rotation/script inputs in their
+original interleaving, preload optional rotation offsets before writes,
+reread repeat between Y/Z writes, invoke the callee-cleaned lookup and
+original160255 dispatcher, then recalculate the history state from live
+globals. Draw using a captured signed count, but recalculate state after
+every iteration, including the last; each accepted entry gets its own view
+call and script dispatch. Preserve the unconditional final world callback.
+Name the default history-values byte132b3c without inventing a capacity.
+
+Correct existing add_direction_offset_cee88 ABI metadata after inspecting
+all180 original bytes: EAX is unchanged, ESI/EDI saved, EBP untouched,
+but EBX/ECX/EDX are scratch. Remove its generic old probe reference; retain
+the JSON archive. Rebuild misc_drafts1, the only existing source defining
+or using that alias apart from the new history module. Keep the existing
+helper's arithmetic; no replacement of the original view/dispatch bodies.
+
+Watcom compiles both modules with zero warnings/errors. Wdis confirms
+signed loop tests, live count reloads, word copies and stores, direction
+arguments, both five-argument stack view calls, callback publication and
+register/RET contracts. Full static link:2633 redirects,362/402 modules,
+594522 arena bytes. Tracker:3403 compiles,831 blocked of4293; tracker/diff
+checks pass. Static review only, no runtime/UI/replay/differential execution
+or crash-resolution claim. Evidence: local/page-history-20261116/{original.asm,
+caller.asm,direction.asm,page_history.obj,page_history.lst,
+misc_drafts1.obj,misc_drafts1.lst,full.json}. Commands: ef2000_wcc.py on
+page_history.c and misc_drafts1.c; wdis; hybrid_link.py with pinned payload
+and full-objects; decomp_status.py check; git diff --check.

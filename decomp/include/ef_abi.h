@@ -7596,4 +7596,5 @@ uint8_t render_page_9e0c4(uint32_t page_id, uint32_t x, uint32_t y, uint32_t z);
 void pump_device_events_a410c(void);
 uint8_t initialize_comms_a3c18(void);
 uint16_t load_page_9de08(ef_addr32 filename, uint32_t mode);
+void update_page_history_a0f84(uint32_t source_index, uint32_t point_index, uint32_t channel);
 #endif
