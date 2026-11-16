@@ -11531,3 +11531,28 @@ Evidence: local/group-list-dump-20261116/{group_list_dump.obj,
 group_list_dump.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover timeslot point output
+
+Recover print_point_b2d8c (155 original bytes) in point_output.c;
+runtime_helpers34 had no definition. ASM and sole caller b2f28 establish
+EAX seven-byte record, EDX output, six other registers preserved, plain RET.
+No existing C users found; no caller ABI changes. Watcom treats parameter
+EDX as scratch; hybrid entry restores original preserved EDX.
+
+Keep action-byte format branch, overlapping dword reads at +5 then +3
+with arithmetic high-word extraction, optional mission-name lookup before
+action-name lookup, descending byte-field reads and original cdecl argument
+order. No narrowed memory reads, enum checks or new format strings. Extend
+evidence on the existing 19-/30-name dictionary globals rather than duplicate
+them. Remove generic probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py point_output.c (zero warnings); wdis (branch,
+overlapping dword loads/shifts, lookup and byte-read order, cdecl pushes,
+32-/36-byte cleanup and plain RET); hybrid_link.py pinned payload/full
+objects (2670 redirects,602826 arena bytes,397/437 modules,1603 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/point-output-20261116/{point_output.obj,point_output.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
