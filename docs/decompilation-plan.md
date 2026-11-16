@@ -8228,3 +8228,32 @@ local/type-refresh-20261117/. Tracker is compiles; the stale mechanical
 exclusion was removed. No runtime/UI/replay/differential execution or
 packaged runtime rebuild. Full RAM/stack equivalence and reported crashes
 remain unverified.
+
+### 2026-11-17 — difficulty and map-zoom callbacks
+
+Recovered gui_change_difficulty_4cf4 (86 original bytes) and
+gui_zoom_map_a974 (49) into difficulty_zoom.c; removed their host-only
+implementations from gui_callbacks_088.c and rebuilt that module. Both take
+EAX widget, preserve six other GPRs and return with EAX scratch. Callback
+registry slots 12b810 and 12b968 establish the UI entry points; there are
+no ordinary direct call sites to these entries. Original callees and their
+confirmed register contracts were checked against the call sequences.
+
+Difficulty parses widget+3f, writes only AX to 121e46, looks up 17f7a4,
+then reloads the overlapping signed dword at 121e44 and shifts by 16.
+Unsigned arithmetic retains the original wrapping (selection-1)*76 plus
+pool 121e40 and offset 28. Calls 7c4fc with target EDX; only after it
+returns reads the target byte ID and calls a5ef8. Zoom stores the exact
+16-bit 1-minus-old value at 121e8e, then selects 132119 for nonzero or
+13211e for zero and calls a7588. Non-Boolean values remain distinguishable.
+Added three guest-global facts and confirmed signatures, promoted the two
+rows to compiles, and removed their stale mechanical exclusions.
+
+Validation: ef2000_wcc.py difficulty_zoom.c and gui_callbacks_088.c (zero
+warnings), wdis (store width, post-call reloads, signed shift, wrap stride,
+16-bit subtraction, arguments and register saves/RET), hybrid_link.py
+pinned payload/full objects (2701 redirects,605690 arena bytes,414/453
+modules,1573 exclusions), decomp_status.py check (4293 functions),
+git diff --check. Evidence: local/difficulty-zoom-20261117/. No gameplay,
+UI, replay or differential execution or packaged runtime rebuild. Runtime
+RAM/stack equivalence and reported crashes remain unverified.

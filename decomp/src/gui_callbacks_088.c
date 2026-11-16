@@ -19,34 +19,10 @@ void gui_mainloop_4318(ef_addr32 widget)
     guest(0x40dcu, widget, widget, 0u);
 }
 
-/* 0x4cf4 (86 bytes): signed high-half difficulty index with the original
- * arithmetic 76-byte stride; only AX of the parsed integer is stored. */
-void gui_change_difficulty_4cf4(ef_addr32 widget)
-{
-    uint32_t parsed = guest(0x9d4cdu, widget + 0x3fu, 0u, 0u);
-    uint32_t target, row;
-    int32_t selection;
-    EF_U16(0x121e46u) = (uint16_t)parsed;
-    target = guest(0xa46ccu, 0x17f7a4u, 0u, 0u);
-    selection = (int32_t)EF_U32(0x121e44u) >> 16;
-    row = (uint32_t)(selection - 1) * 76u + EF_U32(0x121e40u) + 0x28u;
-    guest(0x7c4fcu, row, target, 0u);
-    guest(0xa5ef8u, EF_U8(target + 0x10u), target, 0u);
-}
-
 /* 0xa960 (19 bytes): both alternatives tail-jump out of this function. */
 void gui_change_mode_a960(ef_addr32 widget)
 {
     guest(EF_U16(0x121e8eu) ? 0xa870u : 0x4595cu, widget, 0u, 0u);
-}
-
-/* 0xa974 (49 bytes): subtraction, not Boolean negation; non-Boolean
- * starting values remain distinguishable in the original 16-bit word. */
-void gui_zoom_map_a974(ef_addr32 widget)
-{
-    uint16_t mode = (uint16_t)(1u - EF_U16(0x121e8eu));
-    EF_U16(0x121e8eu) = mode;
-    guest(0xa7588u, widget, mode ? 0x132119u : 0x13211eu, 0u);
 }
 
 /* 0xb574 (89 bytes): yes, the original repeats its comparison against the
