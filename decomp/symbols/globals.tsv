@@ -381,3 +381,4 @@ addr	size	type	name	evidence	notes
 0x0013581c	1	uint8_t	g_comms_initial_clock_dl	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
 0x0013581d	1	uint8_t	g_comms_initialize_flag_1	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
 0x0013581e	1	uint8_t	g_comms_initialize_flag_2	0xa3c18 original initialization accesses	Static recovery; docs/compiler-abi.md
+0x00417160	4	uint32_t	g_page_load_remaining	0x9de08 decrements and tests for zero	Calls load_record_a1ec8 exactly on wrap-subtraction result zero

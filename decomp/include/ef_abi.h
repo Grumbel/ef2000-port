@@ -2201,7 +2201,7 @@ uint32_t get_global_b3f50(void);
 uint32_t get_global_c3824(void);
 uint32_t get_global_c382c(void);
 int32_t random_modulo_b55a4(ef_addr32 record);
-uint32_t guest_fn_9de08(ef_addr32 text, uint32_t flag); /* 0x9de08 EAX/EDX */
+uint16_t guest_fn_9de08(ef_addr32 text, uint32_t flag); /* 0x9de08 EAX/EDX */
 
 /* runtime_helpers7.c */
 void build_path_9c9c0(ef_addr32 buffer, ef_addr32 name);
@@ -7592,4 +7592,5 @@ void start_biased_page_record_9fc00(uint32_t record_index, uint32_t point_index)
 uint8_t render_page_9e0c4(uint32_t page_id, uint32_t x, uint32_t y, uint32_t z);
 void pump_device_events_a410c(void);
 uint8_t initialize_comms_a3c18(void);
+uint16_t load_page_9de08(ef_addr32 filename, uint32_t mode);
 #endif

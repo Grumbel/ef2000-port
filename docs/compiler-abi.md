@@ -10391,3 +10391,49 @@ runtime_helpers7.lst,runtime_helpers7.abi.h,full.json}. Commands:
 ef2000_wcc.py on runtime_helpers7.c; wdis; hybrid_link.py with pinned
 payload and full-objects; decomp_status.py check; git diff --check.
 No runtime, UI, replay or differential executions.
+
+### Page resource loading and mode cache (0x9de08)
+
+Recover `load_page_9de08` in decomp/src/page_load.c from the440-byte
+original and private export. EAX filename, low EDX mode, AX page ID;
+preserve EBX/ECX/ESI/EDI/EBP, no stack arguments, plain RET. Inspect
+3cb1b and7a93f: both store only AX. The9ddff zero-mode wrapper passes the
+same filename. Confirm the consumed word-result contract in the shared
+alias declaration; the original EAX high word is not a consumed ID result.
+
+Keep the asserted168-byte local frame: name0, path80, mode160, reused164,
+with unchecked path construction and uninitialized padding. Call the
+corrected three-register9dc88 helper, then signed-word resource lookup and
+optional registration. Read the resource count/header bytes before the
+reuse flag write. All allocation/fill paths narrow the computed size to
+BX, including the non-cache path. Preserve the cache-head word at+6,
+linked record words at+8, repeated mode-bit reads, requested-mode byte
+comparisons, assertion callback and append-link stores. Capture reused
+before the final ID lookup, but reload it for the later script gate.
+For a new record, fill first, capture mode and flags, write next=-1, clear
+mode bits, write the resource ID, then publish the combined saved flags.
+Run page text0 only for a new record and reread its flag byte to clear
+bit7 afterward. Decrement the live32-bit remaining count with wraparound
+and call a1ec8 exactly when the stored result is zero. Name that counter.
+
+Also correct register_resource_9dcf8's falsely preserved EDX metadata:
+the original saves the five other non-EAX registers, clears EDX before
+table writes and does not restore it. Remove its generic historical probe
+reference, retaining the JSON file. Rebuild misc_drafts1 and
+runtime_helpers6 for the changed result/clobber declarations; these are
+all existing C users of the affected aliases.
+
+Watcom compiles all three modules without warnings/errors. Wdis confirms
+the two allocation/cache branches, signed IDs, reuse capture before lookup,
+ordered record writes, callback/script calls, counter gate, caller low-word
+use and preserved-register/RET contracts. Final full static hybrid link:
+2629 redirects,361/401 modules,592846 arena bytes. Tracker:3399 compiles,
+835 blocked of4293; tracker/diff checks pass. Static review only, no new
+execution, UI/replay or differential proof, and no crash-resolution claim.
+Evidence: local/page-load-20261116/{original.asm,caller1.asm,caller2.asm,
+page_load.obj,page_load.lst,misc_drafts1.obj,misc_drafts1.lst,
+runtime_helpers6.obj,runtime_helpers6.lst,reviewed.json}. Commands:
+ef2000_wcc.py on page_load.c,misc_drafts1.c,runtime_helpers6.c; wdis;
+hybrid_link.py with pinned payload/full-objects; decomp_status.py check;
+git diff --check. The earlier full.json predates the final reuse-load-order
+correction; reviewed.json is the authoritative final static link.
