@@ -6926,3 +6926,29 @@ clipped_bitmap.lst,full.json}. Tracker:3407 compiles,827 blocked.
 The stack-argument gate still excludes ca290 and its callees; no claim of
 new live redirection. No runtime/UI/replay/differential execution; RAM and
 stack equivalence and reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover missing text width body
+
+Recover text_width_e284c (106 original bytes) in text_width.c; the tracker
+previously assigned runtime_helpers35 despite there being no C definition.
+Original ASM and sole caller a63c0@a63d4 establish EAX text, DX style,
+EAX width, plain RET, EBX/ECX/ESI/EDI/EBP preserved. Correct the false EDX
+preservation claim: the original clears EDX and accumulates width there.
+Rebuild runtime_helpers10, the sole existing generic-alias caller.
+
+Keep null-text zero, unsigned dword accumulation, unchecked 16-bit style
+indexing, glyph width plus spacing for present glyphs, space advance only
+for absent space glyphs, and zero advance for other absent glyphs. Retain
+the old probe JSON without presenting it as differential evidence; remove
+its tracker reference. Existing named globals cover both metric tables.
+
+Commands: ef2000_wcc.py text_width.c and runtime_helpers10.c (zero warnings);
+wdis text_width.obj (word style reload, byte metric reads, preserved
+registers and plain RET); hybrid_link.py pinned payload/full objects
+(2638 redirects,597618 arena bytes,369/409 modules,1635 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/text-width-20261116/{text_width.obj,text_width.lst,full.json}.
+Status remains compiles, not verified; counts remain3407 compiles,827
+blocked. No runtime/UI/replay/differential execution. Generated stack
+layout differs from the original; RAM/stack equivalence and all reported
+crash/highlight repairs remain unverified. No packaged runtime rebuild.
