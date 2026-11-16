@@ -505,3 +505,7 @@ addr	size	type	name	evidence	notes
 0x00126576	1	uint8_t	g_frontend_network_active	37270 branch	nonzero suppresses alternate path
 0x0041f2e8	1	uint8_t	g_frontend_pending_latch	371a6 writes 100	mode-one fallback
 0x0019769e	4	int32_t	g_frontend_selected_pair	3727d overlapping high-word read	signed high word minus one suppresses alternate path
+0x001a5531	1	uint8_t	g_assignment_entry_count	4d9cc/4da2c wrap bound	fresh read after intermediate index store
+0x001a5540	1	uint8_t	g_assignment_current_byte	4da90 first saved value	copied to tactical slot array
+0x001a5554	4	uint32_t	g_assignment_current_value	4da90 second saved value	read after fresh index
+0x001a5558	4	uint32_t	g_assignment_values_first	4da90 dword-stride save	table extent unresolved

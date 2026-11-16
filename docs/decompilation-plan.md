@@ -8071,3 +8071,32 @@ functions); git diff --check. Evidence:
 local/credits-gate-20261116/{body-holes.tsv,body-holes.log,credits_gate.obj,credits_gate.lst,reviewed.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16 — assignment navigation and save callbacks
+
+Recover 4d9cc/4da2c/4da90 (95/99/85 original bytes) in assignment_actions.c,
+replacing their host-hook gui_callbacks_089 drafts. Keep existing C names
+and record original registry names mpPrevAssign/mpMakeAssign/mpViewAssign.
+ASM and callback registration/direct 4dad9 call establish no inputs, EAX
+scratch, six preserved registers, plain RET. Confirm callees: 4f314 takes
+EAX/EDX binding strings, 4db60 has no inputs. Add signatures, move three
+tracker rows blocked -> compiles and remove stale mechanical exclusions.
+
+Preserve initial assignment gate and fixed binding arguments; increment
+or decrement/store index BEFORE wrap-bound read/adjustment, then reload
+index for category lookup. Reverse accepts 254 and 255 as wraparound.
+Retain original unbounded search if no category three/four exists. Save
+callback loads index then byte, stores byte, freshly reloads index then
+dword value, stores dword, invokes advancing callback and redraws again.
+Volatile guest accesses preserve these alias-sensitive reads/stores,
+including potential overlap between unchecked slot tables and index.
+Reuse existing tactical globals, name four newly documented fields.
+
+Commands: ef2000_wcc.py assignment_actions.c and gui_callbacks_089.c (zero
+warnings); wdis (ordered stores/reloads, wrap comparisons, call arguments,
+EDX preservation and double redraw); hybrid_link.py pinned payload/full
+objects (2690 redirects,605412 arena bytes,409/449 modules,1583 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/assignment-actions-20261116/{assignment_actions.obj,assignment_actions.lst,gui_callbacks_089.obj,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.

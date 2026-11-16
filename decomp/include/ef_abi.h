@@ -53,6 +53,7 @@ void gui_draw_fuel_bar_50638(void);
 void gui_type2_click_5089c(ef_addr32 widget);
 void gui_type3_click_508fc(ef_addr32 widget);
 void gui_type4_click_5095c(ef_addr32 widget);
+/* Recovered assignment_actions.c entries use confirmed guest ABIs. */
 void gui_previous_assignment_4d9cc(void);
 void gui_make_assignment_4da2c(void);
 void gui_view_assignment_4da90(void);

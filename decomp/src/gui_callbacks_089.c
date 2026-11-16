@@ -86,64 +86,6 @@ void gui_type4_click_5095c(ef_addr32 widget)
     type_click(widget, 1u);
 }
 
-/* 0x4d9cc, 95 bytes: find next assignment of category 3 or 4. The guest
- * repeats forever if no matching entry exists; retain that behavior. */
-void gui_previous_assignment_4d9cc(void)
-{
-    if (EF_U8(0x1a5532u) == 0u) {
-        guest(0x4f314u, 0x132351u, 0x132373u);
-        return;
-    }
-    for (;;) {
-        uint8_t index = (uint8_t)(EF_U8(0x1a5598u) + 1u);
-        uint8_t kind;
-        if (index >= EF_U8(0x1a5531u))
-            index = 0u;
-        EF_U8(0x1a5598u) = index;
-        kind = EF_U8(0x1a5510u + index);
-        if (kind == 3u || kind == 4u)
-            break;
-    }
-    guest(0x4db60u, 0u, 0u);
-}
-
-/* 0x4da2c, 99 bytes: previous assignment (signedness and 0xfe threshold
- * follow original AL-zero-extension), with the same terminal redraw. */
-void gui_make_assignment_4da2c(void)
-{
-    if (EF_U8(0x1a5532u) == 0u) {
-        guest(0x4f314u, 0x132351u, 0x132373u);
-        return;
-    }
-    for (;;) {
-        uint8_t index = (uint8_t)(EF_U8(0x1a5598u) - 1u);
-        uint8_t kind;
-        if (index >= 0xfeu)
-            index = (uint8_t)(EF_U8(0x1a5531u) - 1u);
-        EF_U8(0x1a5598u) = index;
-        kind = EF_U8(0x1a5510u + index);
-        if (kind == 3u || kind == 4u)
-            break;
-    }
-    guest(0x4db60u, 0u, 0u);
-}
-
-/* 0x4da90, 85 bytes: save current assignment then call the original
- * previous-assignment routine and redraw a second time. */
-void gui_view_assignment_4da90(void)
-{
-    uint32_t index;
-    if (EF_U8(0x1a5532u) == 0u) {
-        guest(0x4f314u, 0x132351u, 0x132373u);
-        return;
-    }
-    index = EF_U8(0x1a5598u);
-    EF_U8(0x1a5544u + index) = EF_U8(0x1a5540u);
-    EF_U32(0x1a5558u + index * 4u) = EF_U32(0x1a5554u);
-    gui_previous_assignment_4d9cc();
-    guest(0x4db60u, 0u, 0u);
-}
-
 /* 0x84ddc, 13 bytes: widget child ID followed by external terminal JMP. */
 void gui_show_summary_info_84ddc(ef_addr32 widget)
 {
