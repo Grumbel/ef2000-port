@@ -389,3 +389,4 @@ addr	size	type	name	evidence	notes
 0x00137945	1	uint8_t	g_widget_outer_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges
 0x00137947	1	uint8_t	g_widget_inner_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges
 0x0013794a	1	uint8_t	g_widget_upper_frame_colour	0xa5ca4 reloads before rectangle calls	Palette colour byte; frame role inferred from drawn edges
+0x0041edfc	164	ef_addr32[41]	g_widget_pointer_table	a667a loads owner indexed by child byte +50	Existing a4e98 clears 41 dwords; child layout copies owner width to +c5

@@ -10576,3 +10576,25 @@ widget_frame.lst,misc_drafts1.obj,misc_drafts1.lst,full.json}. Commands:
 ef2000_wcc.py on widget_frame.c and misc_drafts1.c; wdis; hybrid_link.py
 with pinned payload and full-objects; decomp_status.py check;
 git diff --check.
+
+### 2026-11-16: child widget layout (static recovery)
+
+Recover position_widget_child_a6438 (616 original bytes) in widget_layout.c.
+Review the original switch table and sole caller a66bc: EAX parent, EDX child,
+all six non-EAX GPRs preserved, plain RET; caller keeps ECX/EBX live.
+The CS override selects a constant jump table, requiring no segment operation
+in C. Preserve all 15 cases, low-word coordinate wrapping, short-circuit
+flag reads, original dword coordinate loads and interleaved stores, including
+case 9's owner-width copy. Name the 41-entry widget pointer table.
+Remove the old mechanical-body exclusion only for this new hand recovery.
+
+Compile widget_layout.c and its sole existing alias caller scene_helpers.c
+with ef2000_wcc.py; both warning-free. Inspect the generated body with wdis:
+register parameters can be scratch in the compiled body; hybrid_link's
+signature-based trampoline restores the original six-register contract.
+Full static link against the pinned payload:2635 redirects,364/404 modules,
+596158 arena bytes,1636 exclusions. Tracker:3405 compiles,829 blocked.
+Run decomp_status.py check and git diff --check. Evidence remains ignored in
+local/widget-layout-20261116/{widget_layout.obj,widget_layout.lst,final.json}.
+No runtime, UI, replay or differential run; compiles only. This does not
+establish that the menu-highlight or reported crashes are fixed.

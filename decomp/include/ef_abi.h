@@ -961,7 +961,8 @@ void guest_fn_a5484(ef_addr32 widget, int32_t x, int32_t y); /* 0xa5484 EAX/EDX/
 void guest_fn_f13ac(ef_addr32 widget); /* 0xf13ac EAX tail */
 void guest_fn_a5764(uint32_t value); /* 0xa5764 EAX */
 ef_addr32 guest_fn_a788c(ef_addr32 widget, ef_addr32 name); /* 0xa788c EAX/EDX -> EAX */
-void guest_fn_a6438(ef_addr32 parent, ef_addr32 child); /* 0xa6438 EAX/EDX */
+void position_widget_child_a6438(ef_addr32 parent, ef_addr32 child); /* 0xa6438 EAX/EDX */
+void guest_fn_a6438(ef_addr32 parent, ef_addr32 child); /* 0xa6438 alias */
 void guest_fn_a69d0(ef_addr32 parent, ef_addr32 child); /* 0xa69d0 EAX/EDX */
 void guest_fn_a6d00(ef_addr32 widget); /* 0xa6d00 EAX */
 void guest_fn_a5ef8(uint32_t value); /* 0xa5ef8 EAX */
