@@ -5,7 +5,12 @@
 
 from dataclasses import replace
 import copy
+import ctypes
+from pathlib import Path
+import shutil
 import struct
+import subprocess
+import tempfile
 import unittest
 
 from tools import asm_capture, asm_c_differential, call_capture
@@ -34,6 +39,41 @@ def fixture():
 
 
 class AsmCaptureTests(unittest.TestCase):
+    @unittest.skipUnless(shutil.which('cc') and shutil.which('objdump'), 'requires C compiler and objdump')
+    def test_captured_input_reaches_generated_c_without_flattening_selectors(self):
+        from tools import asm_inventory, asm_to_c
+        capture = fixture()
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root/'fixture.bin'
+            image.write_bytes(capture.guest_ram)
+            instructions = asm_inventory.decode_window(image, 0x1000, 7)
+            record = dict(address=0x1000, boundary='ghidra-body-ranges',
+                          ghidra_instruction_layout_matches=True, overlapping_entries=[],
+                          undecodable_addresses=[], ranges=[[0x1000, 0x1007]], instructions=instructions)
+            (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+            (root/'lift.c').write_text(asm_to_c.translate(record))
+            subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99',
+                            '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
+                            str(root/'lift.c'), '-o', str(root/'lift.so')], check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'lift.so'))
+            function = library.ef_lift_00001000
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
+            function.restype = ctypes.c_uint
+            results = asm_c_differential.isolated_probes(function, b'', 0x1000, 1, 100, False,
+                                                        captured=capture)
+            self.assertEqual(results[0]['state'], 'mismatch')
+            self.assertIn('C status 7 (unsupported segment profile)', results[0]['differences'][0])
+            # The original executed and returned using its captured stack. C's
+            # unsupported selector profile remains a failure, never a pass.
+            memory = bytearray(capture.guest_ram)
+            memory[0x1000:0x1002] = b'\x0f\x0b'  # Original UD2 fault.
+            faulting = replace(capture, guest_ram=bytes(memory))
+            result = asm_c_differential.isolated_probes(function, b'', 0x1000, 1, 100, False,
+                                                       captured=faulting)[0]
+            self.assertEqual(result['state'], 'inconclusive')
+            self.assertIn('original fault:', result['reason'])
+
     def test_restore_privilege_memory_tables_and_physical_x87(self):
         from unicorn import UcError, x86_const
         capture = fixture()

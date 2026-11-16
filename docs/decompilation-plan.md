@@ -5411,3 +5411,32 @@ local/capture-x87-restore-evidence-20261116.json binds capture and restorer
 hashes. This completes context restoration for that profile, not execution of
 captured inputs through generated C; that integration and segment-access
 semantics remain required. Existing four corpus mismatches remain failures.
+
+### 2026-11-16 — Execute captured ASM inputs through both oracles
+
+Connect EFCAP002 restoration to asm_c_differential.compare and its isolated
+worker. Captured inputs retain original RAM, GPRs, flags, physical x87 and
+selectors; use the captured stack return PC as the stop address without
+writing synthetic scratch objects or replacing the return word. Add repeatable
+--capture inputs to the bulk CLI, validate source-image binding and translated
+entry availability, and record captured results/hashes separately from prepared
+probes. A captured mismatch contributes to the CLI's failing exit status.
+Keep full RAM/GPR/flags/selector/raw-x87 comparison and original-fault versus
+post-original C-failure classification unchanged. Report status 7 accurately
+as unsupported segment profile.
+
+The saved original 0x604 capture completes its original execution but the
+existing ABI3 generated dispatcher rejects real ring-3 selectors with status 7.
+This is a concrete mismatch, not a pass: the next requirement is descriptor-
+based segment support in the C model, including access semantics rather than
+allow-listing these selector numbers. Existing corpus failures remain recorded.
+Evidence: local/capture-x87-generated-replay-20261116.json binds capture,
+driver and existing generated library. Synthetic generated-C/fork tests verify
+that captured ring-3 selectors are not flattened into the prepared profile and
+that an original UD2 remains inconclusive. Captured generated-C integration is
+now exercised, but passing captured state and game equivalence remain unproven.
+
+Validation: EF_CAPTURE_UNICORN_TEST=local/codex-build/ef2000-call-capture-unicorn-test
+Nix Python -m unittest tests.test_asm_capture tests.test_call_capture
+tests.test_func_differential tests.test_asm_c_program: 25 tests pass without
+skips in 8.996 seconds. git diff --check passes.

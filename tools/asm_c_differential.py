@@ -111,23 +111,41 @@ def probes(count, seed):
 
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
-            initial_x87=None, native_x87=None):
+            initial_x87=None, native_x87=None, captured=None):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError
     from unicorn import x86_const
 
-    memory_size, sentinel = 0x400000, 0x3ff000
-    memory = bytearray(memory_size)
-    memory[:len(payload)] = payload
-    # Give all eight pointer probes deterministic object bytes, without
-    # inventing semantic field types or substituting guest services.
-    memory[0x300000:0x302000] = bytes(range(256)) * 32
-    stack = registers[4]
-    memory[stack:stack+4] = sentinel.to_bytes(4, 'little')
-    cpu = Uc(UC_ARCH_X86, UC_MODE_32)
-    cpu.mem_map(0, memory_size)
-    cpu.mem_write(0, bytes(memory))
-    selectors = bind_flat_segments(cpu)
-    initial_fpu = bind_x87(cpu, initial_x87)
+    if captured is None:
+        memory_size, sentinel = 0x400000, 0x3ff000
+        memory = bytearray(memory_size)
+        memory[:len(payload)] = payload
+        # Prepared probes intentionally use deterministic scratch objects.
+        memory[0x300000:0x302000] = bytes(range(256)) * 32
+        stack = registers[4]
+        memory[stack:stack+4] = sentinel.to_bytes(4, 'little')
+        cpu = Uc(UC_ARCH_X86, UC_MODE_32)
+        cpu.mem_map(0, memory_size)
+        cpu.mem_write(0, bytes(memory))
+        selectors = bind_flat_segments(cpu)
+        initial_fpu = bind_x87(cpu, initial_x87)
+    else:
+        try:
+            from . import asm_capture
+        except ImportError:
+            import asm_capture
+        if captured.address != address:
+            raise ValueError('capture targets a different function')
+        registers = [captured.registers[name] for name in asm_to_c.REGS]
+        flags = captured.registers['eflags']
+        memory = bytearray(captured.guest_ram)
+        memory_size = len(memory)
+        stack = registers[4]
+        sentinel = int.from_bytes(memory[stack:stack+4], 'little')
+        if not 0 < sentinel < memory_size or sentinel == address:
+            raise ValueError('captured return PC is not a distinct mapped stop address')
+        cpu = asm_capture.restore(captured)
+        selectors = [captured.registers[name] for name in asm_to_c.SEGMENTS]
+        initial_fpu = capture_x87(cpu)
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
         if binding is not None:
@@ -159,8 +177,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     status = (function(ctypes.byref(state), budget, sentinel) if program else
               function(ctypes.byref(state), budget))
     if status:
-        reason = ('pending x87 exception delivery unsupported' if status == 8 else
-                  'budget/pc/memory/divide')
+        reason = {7: 'unsupported segment profile',
+                  8: 'pending x87 exception delivery unsupported'}.get(status, 'budget/pc/memory/divide')
         return outcome(state='mismatch', differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
     if phase:
@@ -197,23 +215,26 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     return outcome(state='mismatch' if differences else 'pass', differences=differences)
 
 
-def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None):
+def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None, captured=None):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
     probes are explicitly inconclusive. fork keeps the compiled library and
     payload immutable in the parent and avoids serializing ctypes pointers.
     """
+    if captured is not None:
+        scenarios = 1
     context = multiprocessing.get_context('fork')
     receiver, sender = context.Pipe(duplex=False)
 
     def work():
         try:
             resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
-            for index, (registers, flags) in enumerate(probes(scenarios, address)):
+            inputs = probes(scenarios, address) if captured is None else [([], 0)]
+            for index, (registers, flags) in enumerate(inputs):
                 sender.send(('phase', index, 'setup'))
                 result = compare(function, payload, address, registers, flags, budget=budget,
-                                 program=program, native_x87=native_x87,
+                                 program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)))
                 sender.send(('result', index, result))
         except Exception as error:
@@ -261,7 +282,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None, softfloat_build=None, x87_oracle='unicorn'):
+           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=()):
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
     payload = image.read_bytes()
@@ -320,6 +341,17 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         asm_softfloat.validated_build(softfloat_build, watcom=bool(watcom))
     if not generated:
         raise ValueError('no generated C sources to test')
+    try:
+        from . import call_capture
+    except ImportError:
+        import call_capture
+    captured_inputs = []
+    for path in captures:
+        blob = Path(path).read_bytes()
+        captured = call_capture.decode(blob, payload)
+        if captured.address not in {e['address'] for e in generated}:
+            raise ValueError('capture entry has no generated translation')
+        captured_inputs.append((Path(path), hashlib.sha256(blob).hexdigest(), captured))
     output.mkdir(parents=True, exist_ok=False)
     native_x87, native_report = (asm_x87_oracle.build(output/'original-x87', compiler=compiler)
                                  if x87_oracle == 'hardware' else (None, None))
@@ -379,6 +411,16 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
             print('Compared %d/%d entries' % (len(entries), len(generated)), flush=True)
+    capture_results = []
+    for path, digest, captured in captured_inputs:
+        function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % captured.address)
+        function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
+        function.restype = ctypes.c_uint
+        result = isolated_probes(function, payload, captured.address, 1, budget, program,
+                                 native_x87=native_x87, captured=captured)[0]
+        capture_results.append(dict(file=str(path), capture_sha256=digest,
+                                    address=captured.address, sequence=captured.sequence,
+                                    segment_profile='captured-zero-base-ring3-table-derived', **result))
     report = dict(schema=1, model=manifest['model'],
                   payload_sha256=manifest['payload_sha256'],
                   translation_report_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
@@ -388,7 +430,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_sha256={e['file']: e['source_sha256'] for e in support},
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
-                  scenarios=scenarios, instruction_budget=budget, entries=entries,
+                  scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
@@ -396,7 +438,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   comparison_profile=comparison_profile,
                   narrow_backend=backend,
                   binary_backend=binary_backend,
-                  limits='Prepared states, flat segments, supported instructions only; no ABI or game integration proof.')
+                  limits='Prepared states plus separately reported captured inputs when requested; zero-base segments, supported instructions only. Captured segment caches are table-derived; generated C may reject their profile. No ABI or game integration proof.')
     (output / 'report.json').write_text(json.dumps(report, indent=2) + '\n')
     return report
 
@@ -413,6 +455,8 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
+    parser.add_argument('--capture', type=Path, action='append', default=[],
+                        help='also compare an original EFCAP002 call input; repeatable')
     args = parser.parse_args(argv)
     try:
         directory, output = args.translations.resolve(), args.output.resolve()
@@ -422,10 +466,12 @@ def main(argv=None):
         report = verify(directory, output, workspace / 'payload.bin', compiler=args.compiler,
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
-                        x87_oracle=args.x87_oracle)
+                        x87_oracle=args.x87_oracle, captures=args.capture)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
-        return 1 if counts['mismatch'] else 0
+        if report['captures']:
+            print('captures:', dict(Counter(e['state'] for e in report['captures'])))
+        return 1 if counts['mismatch'] or any(e['state'] == 'mismatch' for e in report['captures']) else 0
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'asm_c_differential: {error}\n')
 
