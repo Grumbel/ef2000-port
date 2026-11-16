@@ -9995,3 +9995,36 @@ Evidence: local/page-coordinate-record-20261116/{original.asm,
 page_positioned_record.obj,page_positioned_record.lst,full.json}.
 Commands: ef2000_wcc.py on page_positioned_record.c; wdis;
 hybrid_link.py; decomp_status.py check; git diff --check.
+
+### Page-point callback request (0xa1590)
+
+Recover `submit_page_point_a1590` (479 original bytes) in
+`decomp/src/page_point_request.c`. Call sites9ebea and9ec08 provide AX=point,
+DX=channel, EBX=angle pointer, CX=spread (zero at the first site). Both retain
+ESI, advance script input afterward and ignore EAX. Original saves
+ESI/EDI/EBP; EAX/EBX/ECX/EDX are scratch and return is plain RET.
+
+The previous indirect-call blocker is resolved by the actual instruction
+sequence: hook132ad4 consumes EAX pointing to an18-byte request and returns
+AL. It does not consume the five parameters suggested by private decompiler
+output. Assert request size and pitch/identifier/channel offsets; publish
+all nine words in original order. Use a narrow register-call adapter with
+all four scratch registers declared; game logic remains C.
+
+Preserve signed byte count comparison, sign-bit gate, signed percent scale,
+two generator calls and signed remainder for nonzero spread, word offset
+wraparound, ordered coordinate stores and relative-coordinate reads,
+post-store angle reads, page yaw flag bits, live request identifiers and
+acceptance-only byte increment. No bounds checks or fallback behavior added.
+Named the scale-pointer and request-hook globals.
+
+Watcom compilation is warning-free. Wdis confirms signed comparison and
+division, two generator calls, word stores, request field offsets, EAX
+callback argument, AL test, ESI/EDI/EBP saves and plain RET. Full static link:
+2620 redirects,355/395 modules,588124 arena bytes; tracker and diff checks
+pass. Inventory3390 compiles,844 blocked. Status compiles only, with no
+execution/UI/replay runs or crash-resolution claim. Evidence:
+local/page-point-request-20261116/{original.asm,callers.asm,
+page_point_request.obj,page_point_request.lst,full.json}. Commands:
+ef2000_wcc.py on page_point_request.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

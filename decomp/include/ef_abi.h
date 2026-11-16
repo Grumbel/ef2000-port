@@ -7575,4 +7575,6 @@ void start_offset_page_record_a0704(uint32_t record_index, uint32_t point_index)
 void step_page_value_script_a0c04(uint32_t record_index, uint32_t channel_index); /* 0xa0c04 AX/DX */
 void start_coordinate_page_record_a2728(uint32_t record_index, uint32_t point_x,
     uint32_t point_y, uint32_t point_z);
+void submit_page_point_a1590(uint32_t point_index, uint32_t channel_index,
+    ef_addr32 angles, uint32_t spread_word);
 #endif
