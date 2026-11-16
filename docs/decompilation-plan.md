@@ -6142,3 +6142,28 @@ page_positioned_record.obj,page_positioned_record.lst,
 page_positioned_record.abi.h,full.json}. Commands:ef2000_wcc.py on
 page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
 git diff --check.
+
+### 2026-11-16 — Recover page-value bytecode interpreter
+
+Recover a0c04 (340 owned bytes) in page_value_script.c. Original ASM,
+pseudo-C, CS jump table a0be4 and callers9e023/9e218 establish signed
+AX/DX record/channel indices, five saved registers, EDX scratch and plain
+RET. The prior segment blocker was the pinned switch table; translate its
+eight cases, with5/default stopping. Assert29-byte record layout including
+eight cursors/values, rotation index and repeat byte.
+
+Preserve byte/word wraparound, value-store before cursor increment,
+entry-only zero check, relative branches, cursor store before potentially
+aliasing text operand reads and interpreter continuation after recursive
+page-text calls. Do not normalize index signedness or add loop bounds.
+Remove old a0c04 exclusion after manual table/body/caller review.
+
+Watcom compiles warning-free. Wdis confirms opcode cases, signed cursor
+addressing, post-store text operands, recursive call arguments and RET.
+Full static link:2618 redirects,354/394 modules,587044 arena bytes. Tracker
+and git diff --check pass. Inventory:3388 compiles,846 blocked. Status
+compiles only; no execution/UI/replay runs. Evidence:
+local/page-value-script-20261116/{original.asm,page_value_script.obj,
+page_value_script.lst,page_value_script.abi.h,full.json}. Commands:
+ef2000_wcc.py on page_value_script.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

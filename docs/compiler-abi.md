@@ -9948,3 +9948,22 @@ lookup uses a callee-cleaned stack argument and EAX result. Final132ad8
 runs regardless of view success and receives signed position high words
 and the low page flag nibble. Static listing/link review only; execution
 fidelity remains unverified.
+
+## Page-value bytecode at `0xa0c04`
+
+`step_page_value_script_a0c04` takes signed AX/DX record/channel indices,
+preserves EBX/ECX/ESI/EDI/EBP and uses plain RET; EDX is scratch. Callers
+9e023/9e218 maintain EBX/ECX loops and consume no EAX result. The pinned
+CS jump table a0be4 maps opcodes0..7; case5 shares the default stop path.
+The 29-byte record layout has eight word cursors at+2, rotation index+18,
+eight values+20 and repeat+28; offsets/size are asserted.
+
+Set/increment/decrement update a byte, then increment the cursor and
+return. Compare/relative branches continue interpreting after word-wrapped
+cursor updates. Only function entry checks zero: a branch wrapping to zero
+continues at index0. Opcodes6/7 advance the cursor before reading text
+operands, preserving aliasing, then continue after recursive text calls.
+Opcode6 sign-extends the instruction high word as text index; opcode7
+zero-extends the following word as a doubled relative text offset. Both
+read the active page through the high word of dword417228. No guards or
+extra zero checks. Static listing/link review only; execution unverified.
