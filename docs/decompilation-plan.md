@@ -8006,3 +8006,33 @@ decomp_status.py check (4293 functions); git diff --check. Evidence:
 local/match-ratio-20261116/{match_ratio.obj,match_ratio.lst,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16 — ordered dword fill with secondary result
+
+Recover missing fill_dwords_deb87 (108 original bytes) in dword_fill.c.
+Original ASM, pseudo-C and callers a3b59/deb67 establish EAX destination,
+EDX pattern, ECX count, EAX end-pointer and ECX residual outputs. Correct
+signature to include both outputs and preserved EDX. Existing void alias
+callers discard results; no alias ABI change or caller rebuild required.
+
+Keep alignment stores until 32-byte boundary or count exhaustion; unsigned
+count arithmetic, ordered four/eight-word blocks, read-ahead byte before
+the second four stores, final group and one/two/three-word tail. Preserve
+ECX equal to one after a three-word tail, zero otherwise. Volatile stores
+prevent combining/reordering. Wdis showed Watcom discarding the initial
+void-cast volatile read, so use an explicit CMP-byte adapter; use an empty
+EAX/ECX result adapter with EDX pattern input to avoid __U8LS and restore
+EDX before return. No added guards, alignment restrictions or fault masking.
+
+Commands: ef2000_wcc.py dword_fill.c (zero warnings); wdis (ordered stores,
+read-ahead CMP, residual register, end pointer, EDX preservation and RET);
+hybrid_link.py pinned payload/full objects (2685 redirects,605322 arena
+bytes,407/447 modules,1588 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/dword-fill-20261116/{dword_fill.obj,dword_fill.lst,full.json}.
+Status remains compiles, remove generic probe tracker reference but retain
+JSON. The linker explicitly excludes deb87: multiple return registers need
+a custom trampoline. Thus this recovered body is compiled but NOT redirected
+into the game. No runtime/UI/replay/differential execution or packaged
+runtime rebuild; full RAM/stack equivalence and reported crashes remain
+unverified.

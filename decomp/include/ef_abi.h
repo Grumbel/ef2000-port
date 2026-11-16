@@ -3275,7 +3275,10 @@ uint16_t guest_fn_bb7c0(ef_addr32 entry); /* 0xbb7c0 -> AX */
 
 /* runtime_helpers35.c */
 void init_video_d1d40(uint32_t width, uint32_t height);
-void fill_dwords_deb87(ef_addr32 dst, uint32_t value, uint32_t count);
+uint64_t fill_dwords_deb87(ef_addr32 dst, uint32_t value, uint32_t count);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux fill_dwords_deb87 parm [eax] [edx] [ecx] value [eax ecx] modify [eax ecx]
+#endif
 uint32_t text_width_e284c(ef_addr32 text, uint16_t font);
 void build_rotation_e994c(uint32_t flags, uint32_t a, uint32_t b, uint32_t c);
 void transform_vector_e99b8(ef_addr32 out, int32_t x, int32_t y, int32_t z);
