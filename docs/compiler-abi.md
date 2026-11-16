@@ -11450,3 +11450,32 @@ local/event-count-20261116/{event_count.obj,event_count.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover quoted-string table loading
+
+Recover load_string_table_9d990 (191 original bytes) in string_table_load.c;
+runtime_helpers31 had no definition. ASM and sole caller 9da8d establish
+no inputs, six other registers preserved, plain RET; caller ignores EAX.
+Keep original unchecked 144-byte path buffer, copy/append targets, indirect
+size query, returning zero-length error path and exact-length allocation.
+Existing caller contract unchanged.
+
+Store storage pointer before file read. A narrow register adapter supplies
+EAX path and EDX/EBX/ECX buffer, then captures returned ECX and EBX, matching
+the original decimal source and scan cursor rather than assuming either
+still equals allocation. Allocate low-word count times four, scan quotes
+without NUL/bounds checks, publish pointers before scanning closing quotes,
+replace closing quotes with NUL, and publish table pointer last. No extra
+terminator, frees or guards. Name storage global. Remove generic probe
+tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py string_table_load.c (zero warnings); wdis (144-byte
+frame, callback registers and capture, allocation sizes, low-word indexing,
+ordered quote scan/stores, final publication and plain RET); hybrid_link.py
+pinned payload/full objects (2667 redirects,602166 arena bytes,394/434
+modules,1606 exclusions); decomp_status.py check (4293 functions);
+git diff --check. Evidence:
+local/string-table-load-20261116/{string_table_load.obj,
+string_table_load.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
