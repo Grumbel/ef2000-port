@@ -40,25 +40,33 @@ void set_clip_9d7d4(int32_t x, int32_t y)
     EF_U16(0x00417228u) = (uint16_t)(0u - (uint32_t)y);
 }
 
-/* 0x9dc88, 110 bytes. Lower-case the name part (at most 8 chars) of a file name and append it to a path. */
-void append_base_name_9dc88(ef_addr32 scratch, ef_addr32 path, ef_addr32 name)
+/* 0x9dc88,110 bytes. Lower-case at most eight base-name characters and
+ * build the path. EBX is an output: caller 9de22 retains its high word
+ * while replacing BH/BL in the size calculation, later narrowed to BX. */
+uint32_t append_base_name_9dc88(ef_addr32 scratch, ef_addr32 path, ef_addr32 name)
 {
     int16_t i = 0;
+    uint32_t returned_bx = name;
 
     for (;;) {
         uint8_t c = EF_U8(name + (uint32_t)(int32_t)i);
 
-        if (c == 0 || c == 0x2e || (int32_t)i == 8)
+        if (c == 0)
+            break;
+        returned_bx = c;
+        if (c == 0x2e || (int32_t)i == 8)
             break;
         if (c >= 0x41 && c <= 0x5a)
             c = (uint8_t)(c + 0x20);
-        EF_U8(scratch + (uint32_t)(int32_t)i) = c;
+        returned_bx = (uint32_t)(int32_t)i;
         i++;
+        EF_U8(scratch + returned_bx) = c;
     }
     EF_U8(scratch + (uint32_t)(int32_t)i) = 0;
     copy_string_9d749(path, 0x0041719au);
     guest_fn_9ca57(path, scratch);
     guest_fn_9ca57(path, 0x0018b2a0u);
+    return returned_bx;
 }
 
 /* 0x9f7d0, 55 bytes. Clear the flag byte of a page slot and mark the page dirty. */

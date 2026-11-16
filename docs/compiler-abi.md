@@ -10358,3 +10358,36 @@ local/comms-initialize-20261116/{original.asm,caller1.asm,caller2.asm,
 comms_initialize.obj,comms_initialize.lst,full.json}. Commands:
 ef2000_wcc.py on comms_initialize.c; wdis; hybrid_link.py with pinned payload
 and full-objects; decomp_status.py check; git diff --check.
+
+### Base-name helper consumed EBX result (0x9dc88)
+
+Review the page loader9de08 and correct the existing append_base_name_9dc88
+ABI and draft. Original9dc88 saves ECX/ESI/EDI, leaves EBP untouched, and
+clobbers EAX/EDX/EBX. Its sole direct caller9de22 consumes EBX after the
+call: BH/BL are overwritten to compute the record size, retaining upper
+EBX for intermediate arithmetic. Allocation and fill calls subsequently
+narrow to BX, so the previously retained filename-pointer high bits are
+not evidence of an allocation failure. Do not claim this fixes a crash.
+
+Return EBX explicitly using the confirmed signature and generated Watcom
+value[ebx] convention. Preserve its exact path-dependent value: the input
+name pointer if the first byte is NUL; the last copied signed index if a
+later NUL ends the scan; the terminating nonzero byte for dot or the
+8-character bound. The original reads the ninth byte before checking the
+bound. Keep that load and the byte/lowercase/copy ordering. The subsequent
+copy_string and two strcat calls preserve EBX; review their original
+instructions too. Stop declaring EBX/EDX preserved. Remove the tracker
+reference to the old generic probe, which supplied no string memory or
+meaningful EBX-result coverage; retain the JSON as historical evidence.
+No existing C callers require rebuilding beyond runtime_helpers7.
+
+Watcom compiles runtime_helpers7 warning-free. Wdis shows the empty-name
+input retained, byte and index exit paths, final MOV EBX,ECX, preservation
+of ECX/ESI/EDI/EBP and plain RET. Full static hybrid link retains2628
+redirects,360/400 modules,592208 arena bytes. Tracker/diff checks pass;
+3398 compiles and836 blocked, with no new verification claims. Evidence:
+local/page-basename-abi-20261116/{original.asm,caller.asm,runtime_helpers7.obj,
+runtime_helpers7.lst,runtime_helpers7.abi.h,full.json}. Commands:
+ef2000_wcc.py on runtime_helpers7.c; wdis; hybrid_link.py with pinned
+payload and full-objects; decomp_status.py check; git diff --check.
+No runtime, UI, replay or differential executions.

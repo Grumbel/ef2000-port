@@ -2206,7 +2206,7 @@ uint32_t guest_fn_9de08(ef_addr32 text, uint32_t flag); /* 0x9de08 EAX/EDX */
 /* runtime_helpers7.c */
 void build_path_9c9c0(ef_addr32 buffer, ef_addr32 name);
 void set_clip_9d7d4(int32_t x, int32_t y);
-void append_base_name_9dc88(ef_addr32 scratch, ef_addr32 path, ef_addr32 name);
+uint32_t append_base_name_9dc88(ef_addr32 scratch, ef_addr32 path, ef_addr32 name);
 void clear_page_slot_9f7d0(int16_t index, uint32_t value);
 void set_page_slot_9f808(int16_t index, uint32_t value, uint8_t flags, uint32_t position);
 void copy_page_words_a0d58(int16_t offset, uint16_t count, ef_addr32 source);
