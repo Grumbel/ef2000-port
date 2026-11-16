@@ -295,3 +295,14 @@ addr	size	type	name	evidence	notes
 0x00137205	1	uint8_t	g_menu_picture_state	original a8a38 entry	cleared before the presentation-disabled check; wider meaning unestablished
 0x00417254	4	ef_addr32	g_menu_picture_path_buffer	original a8a38 ASM	copy record filename then append .lbm; reload pointer for each call
 0x00425c8c	768	uint8_t[768]	g_menu_picture_palette	original a8a38 ASM	palette source for apply/fade-in/fade-out
+0x00160644	4	uint32_t	g_data_playback_file_context	original eac48 ASM	seek/archive context used to remember the first-frame stream position
+0x00484150	4	uint32_t	g_data_playback_rewind_position	original eac48 ASM	saved after reading the first data block
+0x00484154	4	uint32_t	g_data_playback_last_tick	original eac48 ASM	initial clock tick for timed record pumping
+0x0048415c	4	ef_addr32	g_data_playback_screen_buffer	original eac48 ASM	snapshot of c3824 before decoding first frame
+0x00484164	768	uint8_t[768]	g_data_playback_palette	original eac48 ASM	file-header palette compared/remapped then copied to425c8c
+0x00484464	2	uint16_t	g_data_playback_planar_layout	original eac48 ASM	nonzero selects c38cc; zero selects10dfec
+0x00484466	2	uint16_t	g_data_playback_tick_interval	original eac48 ASM	positive parsed option2 truncated to word; otherwise zero
+0x00484468	2	uint16_t	g_data_playback_pass	original eac48 ASM	initialized to2 after first-frame setup
+0x0048446a	2	uint16_t	g_data_playback_fade_applied	original eac48 ASM	cleared before palette copy; set1 after SLOW_FADE
+0x00464580	1	uint8_t	g_data_playback_decoded_block	original eac48 ASM	start of decompression output; capacity not established here
+0x00474360	1	uint8_t	g_data_playback_compressed_block	original eac48 ASM	start of decompression input; capacity not established here

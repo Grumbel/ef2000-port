@@ -9760,3 +9760,26 @@ is the signed high word of the dword at record+9. Retain the mandatory first
 iteration, retrace-before-decrement order, signed text-completion comparison
 and key polling only when the remaining duration is positive. Static ABI
 and listing review only; runtime equivalence is unverified.
+
+
+## Data-playback initialization at `0xeac48`
+
+`initialize_data_playback_eac48` takes signed EAX=count and EDX=pointer
+vector, returns EAX=0 and preserves EBX/ECX/ESI/EDI/EBP. The original saves
+EBX/ECX/ESI, leaves EDI/EBP untouched, uses EDX as scratch and returns with
+plain RET. Callers 97e1b/97e5f pass five arguments; a8d27/f3581 pass seven.
+They test AX after the call. The generated contract is
+`parm [eax] [edx] value [eax] modify [edx]`.
+
+The ten-option local vector substitutes the original empty-string pointer
+for absent or null entries. Its conditional callback at option6 receives
+EAX=-1, with no stack arguments and no consumed result. Use the existing
+register-EAX adapter, not the cdecl one-stack-argument adapter. Preserve the
+original nonzero-pointer check even though empty-string substitution means
+an omitted callback is not a null function pointer. Palette comparisons
+consume AX, and the positive interval is deliberately parsed twice.
+
+The four register placeholders in compare_remapped_palette_d660c,
+unpack_planes_c38cc and decode_planes_10dfec are unused by their reviewed
+bodies; actual inputs are stack palette/source/destination pointers. Static
+compilation/listing review only; execution equivalence remains unverified.

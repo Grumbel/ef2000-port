@@ -5899,3 +5899,32 @@ runs. Inventory:3379 compiles,855 blocked. Evidence:
 local/menu-picture-20261116/{menu_picture.obj,menu_picture.lst,
 menu_picture.abi.h,reviewed.json}. Commands:ef2000_wcc.py on menu_picture.c;
 wdis; hybrid_link.py; decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover data-playback initialization before animation caller
+
+Inspect adjacent menu animation handler a8bd4, then recover its blocked
+initializer eac48 (453 owned bytes) as initialize_data_playback_eac48 in
+new data_playback.c. Review original ASM, private pseudo-C candidate and
+four callers. EAX is signed argument count, EDX the vector, EAX result0;
+preserve EBX/ECX/ESI/EDI/EBP. The indirect-call blocker is the option6 hook:
+original sets EAX=-1 and pushes no arguments, so use the existing EAX adapter.
+Keep empty-string substitution and the original nonzero callback check.
+
+Recover ten-entry option copying, repeated positive interval parsing,
+first-block load/decompression, planar/run-list decoder selection, initial
+seek position, short-circuited palette comparison and four page toggles,
+conditional callback, palette copying/fade choices, pass2 and clock latch.
+Preserve low-word palette-result tests and interval stores. Name touched
+globals without inventing decompression-buffer capacities. Original helpers
+with four unused register placeholders are reviewed before supplying those
+placeholders; all meaningful inputs remain the original stack arguments.
+
+Watcom compiles warning-free; wdis confirms signed option bounds, repeated
+parse, register callback argument, stack helper cleanup, preserved register
+contract and zero return. Full static link:2610 redirects,348/388 modules,
+582282 arena bytes. Tracker/diff checks pass. Status remains compiles; no new
+execution/UI/replay runs. Inventory:3380 compiles,854 blocked. The larger
+a8bd4 caller remains untranslated. Evidence:local/data-playback-20261116/
+{data_playback.obj,data_playback.lst,data_playback.abi.h,full.json}.
+Commands:ef2000_wcc.py on data_playback.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.
