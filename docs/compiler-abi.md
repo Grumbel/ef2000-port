@@ -11609,3 +11609,30 @@ local/table-output-20261116/{table_output.obj,table_output.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover object and timeslot-list output
+
+Recover print_object_b2e98 (176 original bytes) in object_output.c;
+runtime_helpers34 had no definition. ASM and sole caller b2e55 establish
+EAX record, EDX output, EAX/EDX scratch, five other registers preserved,
+plain RET. Correct false EDX preservation and rebuild game_helpers127,
+the sole C alias user. Correct point_output.c comment: caller stride is
+nine bytes, not seven; previous point-output evidence wording was wrong.
+
+Preserve header field read order, two raw dwords for the original double's
+cdecl argument slot (no floating conversion), unchecked dictionary reads,
+coordinate call, signed-low-word active count formatting, signed live count
+and table reloads, nine-byte indexing, nonzero action-byte filter, final
+format even for empty lists. No new guards or formatting text. Existing
+dictionary globals reused. Remove generic probe tracker reference, retain
+JSON.
+
+Commands: ef2000_wcc.py object_output.c and game_helpers127.c (zero warnings);
+wdis (header field order and raw dword pushes, 40-byte cleanup, active count
+sign extension, nine-byte loop and plain RET); hybrid_link.py pinned payload/
+full objects (2674 redirects,603644 arena bytes,400/440 modules,1599
+exclusions); decomp_status.py check (4293 functions); git diff --check.
+Evidence: local/object-output-20261116/{object_output.obj,object_output.lst,
+game_helpers127.obj,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.

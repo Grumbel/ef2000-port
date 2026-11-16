@@ -5,7 +5,7 @@
 #include "ef_mem.h"
 
 /* 0xb2d8c, 155 bytes. EAX record, EDX output; six other registers
- * preserved, plain RET. Sole caller b2f28 advances seven-byte records. */
+ * preserved, plain RET. Sole caller b2f28 advances nine-byte records. */
 void print_point_b2d8c(ef_addr32 rec, uint32_t out)
 {
     int32_t last;
