@@ -5324,3 +5324,15 @@ of terrain-mask pixels. The next bounded pass runs under the committed
 four-billion instruction limit and preserves both those exclusions and all
 default unsafe-entry exclusions. See local/external-terrain-bisect-02-20261116/
 report.json and local/external-terrain-bisect-03-config-20261116/.
+
+### 2026-11-16 — Test projected corners with nonzero viewport inputs
+
+Replace d8528's empty drafted probe with four authored viewport cases:
+320x200, 640x400, negative centre/scale values, and maximum positive signed
+scale. Initialise the six input words, viewport height and guarded output
+region. The one-redirect patch matches the original in all four cases,
+including 16 output bytes and GPR/ESP state. Keep the function at compiles
+while full terrain fidelity remains unresolved. Commands:
+func_differential.py 0xd8528 --spec decomp/tests/0x000d8528.json
+--flat-segments with the isolated corners.efpatch; decomp_status.py check.
+Evidence: local/terrain-matrix-probes-20261116/{corners.json,corners.log}.

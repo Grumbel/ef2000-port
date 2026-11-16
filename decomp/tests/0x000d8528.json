@@ -1,1 +1,95 @@
-{"address":"0x000d8528","function_size":231,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{},"memory":[]}]}
+{
+  "address": "0xd8528",
+  "function_size": 231,
+  "max_instructions": 10000,
+  "cases": [
+    {
+      "name": "viewport_320x200",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x420e78",
+          "hex": "a00064009f006400"
+        },
+        {
+          "address": "0x420eaa",
+          "hex": "00010001"
+        },
+        {
+          "address": "0x15bdcc",
+          "hex": "c7000000"
+        },
+        {
+          "address": "0x15baf0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "viewport_640x400",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x420e78",
+          "hex": "4001c8003f01c800"
+        },
+        {
+          "address": "0x420eaa",
+          "hex": "40010002"
+        },
+        {
+          "address": "0x15bdcc",
+          "hex": "8f010000"
+        },
+        {
+          "address": "0x15baf0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "negative_center_and_scale",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x420e78",
+          "hex": "d8ffecff28001400"
+        },
+        {
+          "address": "0x420eaa",
+          "hex": "80ff0001"
+        },
+        {
+          "address": "0x15bdcc",
+          "hex": "c7000000"
+        },
+        {
+          "address": "0x15baf0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    },
+    {
+      "name": "maximum_positive_scale",
+      "registers": {},
+      "memory": [
+        {
+          "address": "0x420e78",
+          "hex": "a00063009f006400"
+        },
+        {
+          "address": "0x420eaa",
+          "hex": "ff7fff7f"
+        },
+        {
+          "address": "0x15bdcc",
+          "hex": "c7000000"
+        },
+        {
+          "address": "0x15baf0",
+          "hex": "a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5a5"
+        }
+      ]
+    }
+  ]
+}
