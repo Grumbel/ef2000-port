@@ -7124,3 +7124,39 @@ shape_match_count.lst,misc_helpers2.lst,full.json}. Status remains compiles,
 counts unchanged. No runtime/UI/replay/differential execution or packaged
 runtime rebuild; full RAM/stack equivalence and reported crash/highlight
 repairs remain unverified.
+
+### 2026-11-16: recover vector transform and component forwarding
+
+Recover transform_vector_e99b8 (106 original bytes) in vector_transform.c;
+tracker runtime_helpers35 had no definition. ASM and callers 80ba5/83737/
+a0526 establish EAX destination, EDX/EBX/ECX components, ESI/EDI/EBP
+preserved, three component registers scratch, plain RET. Correct false
+preservation metadata. Use unsigned products/addition/doubling for the
+original low-dword wrap, without signed-overflow C behavior.
+
+Preserve coefficient load order around output stores, including the
+second-row first product before output zero, final-row second/third
+products before output one, and final-row first coefficient afterwards.
+Destination aliasing the matrix must retain those effects. Name the
+36-byte matrix. No coefficient snapshot or widened accumulation.
+
+Repair scale_vector_down_16 at 83734: its draft declared only destination
+and omitted EDX/EBX/ECX component arguments when calling the transform.
+Restore four inputs in body/header/metadata and mark component registers
+scratch. Read all three output dwords before the arithmetic-shift stores.
+Original sole caller 83a78 uses the four-register interface. Correct stale
+transform alias likewise. Rebuild scene_helpers, misc_drafts1 and
+page_positioned_record, all actual C users of changed contracts. Remove
+generic probe tracker references, retaining their JSON files.
+
+Commands: ef2000_wcc.py vector_transform.c, scene_helpers.c, misc_drafts1.c
+and page_positioned_record.c (zero warnings); wdis transform and wrapper
+(low products, coefficient/store order, component forwarding and arithmetic
+shifts); hybrid_link.py pinned payload/full objects (2645 redirects,598990
+arena bytes,375/415 modules,1628 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/vector-transform-20261116/{vector_transform.obj,vector_transform.lst,
+scene_helpers.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crash/highlight repairs remain
+unverified. Matrix-builder e994c remains missing and is separate work.

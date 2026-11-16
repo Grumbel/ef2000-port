@@ -420,3 +420,4 @@ addr	size	type	name	evidence	notes
 0x00161e16	2	int16_t	g_path_animation_stage	f36a4 original ASM	Low-word addition; negative resets to zero, exactly five refreshes then becomes four
 0x00161e18	2	int16_t	g_path_animation_delta	f36a4 original ASM	Cleared on either stop condition
 0x00161e1a	2	int16_t	g_path_animation_path_index	f36a4 original ASM	Read as signed high word of dword161e18 before drawing
+0x00464440	36	uint32_t[9]	g_rotation_matrix	e99b8 original ASM	Three columns; doubled low-dword products; destination may alias coefficients

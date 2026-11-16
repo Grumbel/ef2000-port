@@ -15,12 +15,16 @@ uint32_t forward_if_flag_12b104(uint8_t value)
 
 /* 0x83734, 35 bytes. Call 0xe99b8, then arithmetic-shift three dwords of the
  * vector at EAX right by 16 in place. EBX, ECX and EDX are clobbered. */
-void scale_vector_down_16(ef_addr32 vector)
+void scale_vector_down_16(ef_addr32 vector, int32_t x, int32_t y, int32_t z)
 {
-    guest_fn_e99b8(vector);
-    EF_S32(vector) >>= 16;
-    EF_S32(vector + 4u) >>= 16;
-    EF_S32(vector + 8u) >>= 16;
+    int32_t a, b, c;
+    transform_vector_e99b8(vector, x, y, z);
+    a = EF_S32(vector);
+    b = EF_S32(vector + 4u);
+    c = EF_S32(vector + 8u);
+    EF_S32(vector) = a >> 16;
+    EF_S32(vector + 4u) = b >> 16;
+    EF_S32(vector + 8u) = c >> 16;
 }
 
 /* 0x84394, 25 bytes. Pass dwords 0/4/8 of the vector to 0x83708(0x1fcc3e, ...). */

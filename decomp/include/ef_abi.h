@@ -879,7 +879,7 @@ uint8_t guest_fn_d7594(uint32_t value); /* 0xd7594 EAX -> AL */
 
 /* scene_helpers.c */
 uint32_t forward_if_flag_12b104(uint8_t value); /* 0x815f4 AL */
-void scale_vector_down_16(ef_addr32 vector); /* 0x83734 EAX */
+void scale_vector_down_16(ef_addr32 vector, int32_t x, int32_t y, int32_t z); /* 0x83734 EAX/EDX/EBX/ECX */
 void forward_vector_to_83708(ef_addr32 vector); /* 0x84394 EAX */
 uint8_t reset_pending_mode_844e4(void); /* 0x844e4 -> AL */
 void reset_target_search(void); /* 0x88548 */
@@ -926,7 +926,7 @@ void clear_children_dirty(ef_addr32 parent); /* 0xa7434 EAX */
 uint32_t call_9c858_18d57c(void); /* 0xa7b80 */
 void latch_b3f48(void); /* 0xa7b8c */
 uint32_t guest_fn_d72b4(uint32_t value); /* 0xd72b4 EAX tail */
-void guest_fn_e99b8(ef_addr32 vector); /* 0xe99b8 EAX */
+void guest_fn_e99b8(ef_addr32 vector, int32_t x, int32_t y, int32_t z); /* 0xe99b8 EAX/EDX/EBX/ECX */
 void guest_fn_83708(ef_addr32 destination, uint32_t x, uint32_t y, uint32_t z); /* 0x83708 EAX/EDX/EBX/ECX */
 void guest_fn_dc832(uint32_t first, uint32_t second, uint32_t count); /* 0xdc832 EAX/EDX/EBX */
 void guest_fn_8a318(ef_addr32 record); /* 0x8a318 EAX */
