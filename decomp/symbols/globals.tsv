@@ -475,3 +475,4 @@ addr	size	type	name	evidence	notes
 0x00146e10	4	int32_t	g_stack_pool_handle_limit	b3e08 reads before count store	signed limit comparison
 0x00146e2c	2	uint16_t	g_stack_pool_handle_bias	b3e39 adds low word	return AX adjustment
 0x0041f370	4	ef_addr32	g_stack_pool_handle_table	b3df4 reads table base	four-byte allocation addresses
+0x004194c2	2	uint16_t	g_parser_group_count	ab2a9 reads live outer-loop bound	signed low-word loop index compared with unsigned word count

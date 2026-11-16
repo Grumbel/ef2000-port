@@ -11397,3 +11397,30 @@ local/pool-block-20261116/{pool_block.obj,pool_block.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover group-node field visitor
+
+Recover visit_group_nodes_ab28c (149 original bytes) in group_node_visit.c;
+runtime_helpers33 had no definition. Original ASM and sole caller ab5a8
+establish EAX stream/context, six other registers preserved, plain RET.
+Existing parser_restore.c caller needs no contract change.
+
+Preserve signed-low-word indices against live zero-extended word bounds,
+initial head capture, per-group first-item read, and next links read after
+processing. For type fourteen, capture record once, visit +1e unconditionally,
+then freshly load +22 and +26 after preceding calls and visit when nonzero.
+Finish with original ab174 on the context, even for zero groups. No null
+link guards, cached counts or traversal fixes. Name group count. Original
+outer stack counter's uninitialized high word is irrelevant to its low-word
+increment and sign-extended comparison; C retains those low-word semantics.
+Remove generic probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py group_node_visit.c (zero warnings); wdis (signed
+indices/live word bounds, type branch, ordered field calls/loads, next-link
+reads, final ab174 and plain RET); hybrid_link.py pinned payload/full
+objects (2665 redirects,601746 arena bytes,392/432 modules,1608 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/group-node-visit-20261116/{group_node_visit.obj,group_node_visit.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild; full RAM/stack
+equivalence and reported crashes remain unverified.
