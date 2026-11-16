@@ -11988,3 +11988,33 @@ bytes,412/451 modules,1576 exclusions), decomp_status.py check (4293
 functions), git diff --check. Evidence: local/menu-callbacks-20261117/.
 No gameplay, UI, replay or differential runs, and no packaged runtime rebuild.
 Reported crashes and full guest RAM/stack equivalence remain unverified.
+
+### 2026-11-17 — type-selection refresh continuation
+
+Recovered refresh_type_widgets_5086c in type_refresh.c (273 original body
+bytes): 5086c..5089a plus 50a52..50b34. The body-hole audit reports the
+439-byte gap 5089b..50a51 as one padding byte and 438 bytes of other
+functions (four callbacks plus tactical_lookup_contains); no boundary repair
+is needed. Original entry has no incoming GPR reads, saves EBX/ECX/EDX,
+leaves ESI/EDI/EBP, and returns with EAX scratch. Two reviewed callers
+5089c@508f4 and 508fc@50954 discard EAX and restore their saved registers.
+The existing guest_fn_5086c_w alias remains available to recovered callers.
+
+The C body finds root 184af0, clears child dirty state, then visits slots
+1..4 using each fresh byte at 1a553b+slot. The twelve original format
+addresses map codes 0..5,18,7,6,16,17,22 to suffixes 0..11. It formats into
+one 20-byte stack buffer and enables the corresponding named child. An
+unsupported code intentionally skips formatting, retaining the previous
+name or the original uninitialized first-iteration buffer. No zeroing,
+validation, or fallback has been introduced. Existing g_dialog_slot_flags
+covers the touched guest bytes.
+
+Validation: ef2000_wcc.py type_refresh.c (zero warnings), wdis (all twelve
+formats, skipped format path, 20-byte buffer, four iterations, cdecl stack
+cleanup, register saves/RET), hybrid_link.py pinned payload/full objects
+(2699 redirects,605686 arena bytes,413/452 modules,1575 exclusions),
+decomp_status.py check (4293 functions), git diff --check. Evidence:
+local/type-refresh-20261117/. Tracker is compiles; the stale mechanical
+exclusion was removed. No runtime/UI/replay/differential execution or
+packaged runtime rebuild. Full RAM/stack equivalence and reported crashes
+remain unverified.

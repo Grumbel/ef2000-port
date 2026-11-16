@@ -3864,7 +3864,8 @@ void check_unit_leaves_map_3dbf0(void);
 void replay_plane_grid_7a9bc(void);
 void draw_player_coordinates_5a998(void);
 void guest_fn_50b68_w(uint32_t a, uint32_t b); /* 0x50b68 EAX/EDX */
-void guest_fn_5086c_w(void); /* 0x5086c */
+void guest_fn_5086c_w(void); /* 0x5086c; alias of refresh_type_widgets_5086c */
+void refresh_type_widgets_5086c(void);
 void guest_fn_a1b54_w(uint32_t a, uint32_t b, uint32_t c); /* 0xa1b54 EAX/EDX/EBX */
 void guest_fn_a1d00_w(int32_t a); /* 0xa1d00 EAX */
 void guest_fn_5c7dc_w(uint32_t a); /* 0x5c7dc EAX */

@@ -3508,3 +3508,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00004b54	gui_kots_init_4b54	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md
 0x00084ddc	gui_show_summary_info_84ddc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md
 0x000da2b0	env_clouds_da2b0	EAX:uint32_t	EAX:uint32_t	eax,ebx,ecx,edx,esi,edi,ebp	0	Original ASM; callback registry 12b838/12bb68/15bb84; complete terminal callees 487c/ac7a8/a4b80; docs/compiler-abi.md
+0x0005086c	refresh_type_widgets_5086c			ebx,ecx,edx,esi,edi,ebp	0	Original 5086c..5089a and 50a52..50b34; no incoming reads; saves EBX/ECX/EDX; callers 5089c@508f4 and 508fc@50954 discard EAX; docs/compiler-abi.md
