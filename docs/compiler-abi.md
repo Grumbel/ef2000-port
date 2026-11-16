@@ -11719,3 +11719,26 @@ local/record-update-20261116/{record_update.obj,record_update.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16 — unsupported-operation error wrappers
+
+Recover unsupported_84650, unsupported_query_e1730/e1744/e1758/e1780
+(17 bytes each) and fatal_with_arg_e1948 (16 bytes) in
+unsupported_errors.c. These runtime_helpers30 entries lacked definitions.
+Original ASM and callers establish no query inputs, AL-only zero results,
+and EAX value input for e1948, with plain RET. Keep each distinct format
+address, fresh shared callback load, cdecl caller cleanup and return after
+error reporting; e1948 passes format then value. Review callers 34150/3415e,
+34ef5/34f03,343a3,342e1,846bf and e1efb/e1fc8. Preserve existing signatures;
+no caller rebuild needed. Explicit bridge scratch declarations prevent C
+register allocation across the callback. Wdis confirms AL-only clearing,
+format/value order and preserved registers. Remove generic probe tracker
+references but retain JSON files. Status remains compiles.
+
+Commands: ef2000_wcc.py unsupported_errors.c (zero warnings); wdis;
+hybrid_link.py pinned payload/full objects (2683 redirects,604650 arena
+bytes,404/444 modules,1590 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/unsupported-errors-20261116/{unsupported_errors.obj,unsupported_errors.lst,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild.
+Full guest RAM/stack equivalence and reported crashes remain unverified.
