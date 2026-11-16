@@ -8159,3 +8159,13 @@ functions); git diff --check. Evidence:
 local/type-actions-20261116/{type_actions.obj,type_actions.lst,gui_callbacks_089.obj,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-17 — project status command
+
+Added `nix run .#status`, an asset-free report from the flake snapshot's
+function tracker. Reports cumulative draft/compilation/integration milestones,
+verified evidence, blocked and incorrect work with original body byte shares.
+Explicitly distinguishes recorded behavioral verification from untracked
+byte-identical recompilation; does not promote tracker states or run game tests.
+Validation: `nix run .#status`, `python3 tests/test_decomp_status.py`
+(10 tests), `python3 tools/decomp_status.py check`, `git diff --check`.

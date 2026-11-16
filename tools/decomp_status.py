@@ -11,6 +11,7 @@ docs/decompilation-plan.md, sections 3.2 and 4.
 
 Commands:
   seed     merge a Ghidra full-export functions.tsv into the tracker
+  status   print a concise project progress report
   summary  print counts per state, kind and module
   next     propose the next functions to recover
   check    validate the tracker (used by nix flake check)
@@ -145,6 +146,35 @@ def summary(rows, out=sys.stdout):
         print(f'recovered or excluded: {100.0 * done / total_bytes:.1f}% of bytes', file=out)
 
 
+def status(rows, out=sys.stdout):
+    """Report recorded evidence, without treating compilation as equivalence."""
+    total = len(rows)
+    total_bytes = sum(int(row['size']) for row in rows)
+    print('EF2000 decompilation — recorded tracker evidence', file=out)
+    print(f'Inventory: {total:,} functions; {total_bytes:,} original body bytes', file=out)
+    print(f'{"Milestone":<34} {"Functions":>10} {"Body bytes":>12} {"Bytes %":>8}', file=out)
+    groups = (
+        ('C/ASM draft or later (cumulative)', ('drafted', 'compiles', 'compiles-bad', 'spliced', 'verified')),
+        ('Compiles or later (cumulative)', ('compiles', 'spliced', 'verified')),
+        ('Spliced or verified (cumulative)', ('spliced', 'verified')),
+        ('Verified equivalence', ('verified',)),
+        ('Blocked', ('blocked',)),
+        ('Compiled, known incorrect', ('compiles-bad',)),
+        ('Library / data / dead', ('library', 'data', 'dead')),
+    )
+    for label, states in groups:
+        selected = [row for row in rows if row['state'] in states]
+        size = sum(int(row['size']) for row in selected)
+        share = 100.0 * size / total_bytes if total_bytes else 0.0
+        print(f'{label:<34} {len(selected):>10,} {size:>12,} {share:>7.1f}%', file=out)
+    print('States: ' + ', '.join(f'{state}={sum(row["state"] == state for row in rows):,}'
+                                for state in STATES if any(row['state'] == state for row in rows)), file=out)
+    print('Counts describe tracker states, including C and assembly; blocked rows may contain drafts.', file=out)
+    print('Bytes are summed original function body sizes, not unique image coverage or generated C size.', file=out)
+    print('Compilation does not prove a match. Verified means recorded behavioral evidence;', file=out)
+    print('byte-identical recompilation is not tracked. No recompilation or game tests run here.', file=out)
+
+
 def read_calls(path):
     callees = collections.defaultdict(set)
     indirect = collections.Counter()
@@ -258,6 +288,7 @@ def main(argv=None):
     seed_parser.add_argument('--functions', type=Path,
                              default=DEFAULT_WORKSPACE / 'full-export/functions.tsv')
     sub.add_parser('summary')
+    sub.add_parser('status')
     next_parser = sub.add_parser('next')
     next_parser.add_argument('--module')
     next_parser.add_argument('--limit', type=int, default=10)
@@ -276,7 +307,9 @@ def main(argv=None):
                       file=sys.stderr)
             return 0
         rows = read_tracker(args.tracker)
-        if args.command == 'summary':
+        if args.command == 'status':
+            status(rows)
+        elif args.command == 'summary':
             summary(rows)
         elif args.command == 'next':
             callees, indirect = read_calls(args.calls)

@@ -605,6 +605,9 @@
         hybrid = app "${hybridWorkflow}/bin/ef2000-hybrid"
           "Run the original EF2000 game with recovered C hybrid patches";
       in {
+        status = app "${pkgs.writeShellScriptBin "ef2000-status" ''
+          exec ${pkgs.python3}/bin/python3 ${source}/tools/decomp_status.py status "$@"
+        ''}/bin/ef2000-status" "Summarize recorded decompilation progress and verification";
         default = native;
         ef2000 = native;
         ef2000-native = nativeSb16;

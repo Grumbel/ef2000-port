@@ -128,6 +128,23 @@ class DecompStatusTest(unittest.TestCase):
         decomp_status.summary(decomp_status.read_tracker(self.tracker), out)
         self.assertIn('3 functions, 60 body bytes', out.getvalue())
 
+    def test_status_separates_compilation_from_verification(self):
+        rows = []
+        for index, state in enumerate(('compiles', 'verified', 'blocked', 'compiles-bad')):
+            row = decomp_status.new_row(0x100 + index * 16, 10, '')
+            row['state'] = state
+            rows.append(row)
+        out = io.StringIO()
+        decomp_status.status(rows, out)
+        lines = out.getvalue().splitlines()
+        self.assertIn('Inventory: 4 functions; 40 original body bytes', lines)
+        self.assertTrue(any('Compiles or later' in line and '50.0%' in line for line in lines))
+        self.assertTrue(any('Verified equivalence' in line and '25.0%' in line for line in lines))
+        self.assertIn('byte-identical recompilation is not tracked.', out.getvalue())
+        empty = io.StringIO()
+        decomp_status.status([], empty)
+        self.assertIn('0.0%', empty.getvalue())
+
     def test_committed_tracker_is_valid(self):
         tracker = ROOT / 'decomp/symbols/functions.tsv'
         if not tracker.exists():

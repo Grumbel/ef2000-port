@@ -7,6 +7,12 @@ maintainable source is the long-term goal.
 
 ## Status
 
+Run `nix run .#status` for current function and original body byte counts,
+compilation milestones, blocked work, and recorded verification. This reads the
+flake's tracker snapshot without game assets, recompilation, or gameplay tests.
+Compilation and behavioral verification are reported separately; byte-identical
+recompilation is not currently tracked.
+
 The two-stage FlashTek X-32 loader, segment relocation table, initialized image,
 BSS boundaries, and protected-mode entry have been recovered by static analysis.
 The extractor reproduces the static relocation passes. A native x86-64 Linux
