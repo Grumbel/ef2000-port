@@ -5707,3 +5707,33 @@ tools/decomp_status.py check; git diff --check. No new execution/UI/replay
 tests are started. Artifacts: local/texture-span-decomp-20261116/
 objects-builder/{textured_objects.obj,textured_objects.lst,
 textured_objects.abi.h} and builder-full.json beside it.
+
+### 2026-11-16 — Recover render-object bounds classification
+
+Recover d2130's 416-byte body as classify_render_bounds_d2130 in
+render_bounds.c after reading the complete original ASM and candidate export.
+Confirm EAX=object with all other GPRs preserved; d23d8 and d299c consume
+classification flags rather than an EAX result. Keep the existing bounds
+calculators and the explicit four-register callback adapter. Plane predicates
+receive EAX=context, EDX=x, EBX=y, ECX=z and return AL; the recorded ce498/ce550
+predicate contracts preserve the adapter's nonvolatile registers. Do not
+replace dynamic predicates with guessed geometric formulas.
+
+Translate signed 2D overlap and partial-clip comparisons, five short-circuit
+3D rejection tests using maximum Z, then five lower-bound tests using minimum
+Z. Preserve the different final-plane order between those two groups, current
+bounds reads after callbacks, old flag bits, and the separate near-plane flag
+in byte+2d. No null-callback fallback or flag reset is added. Add an asserted
+prefix view covering every accessed object-field offset and name clip-bound/
+predicate globals. Remove the old unreviewed mechanical exclusion and retain
+compiles/static-review-only status.
+
+Watcom builds the 85-line module with zero warnings/errors. Listing inspection
+confirms the EAX input contract, preservation and callback argument forwarding;
+static full relink succeeds with 2605 redirects across 345/385 modules and 579380
+arena bytes. Tracker check and git diff --check pass: 3375 compiles, 859 blocked,
+4293 total. No new execution/UI/replay tests are started. Commands:
+tools/ef2000_wcc.py decomp/src/render_bounds.c; wdis object inspection;
+tools/hybrid_link.py; tools/decomp_status.py check; git diff --check.
+Artifacts: local/texture-span-decomp-20261116/bounds/{render_bounds.obj,
+render_bounds.lst,render_bounds.abi.h} and bounds-full.json beside it.

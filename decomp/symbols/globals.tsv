@@ -270,3 +270,12 @@ addr	size	type	name	evidence	notes
 0x0042099c	4	uint32_t	g_current_render_object_clip_mask	original d2a7c ASM	initial1 ANDed with each full vertex flags dword
 0x004209bc	4	ef_addr32	g_current_render_object_vertex_list	original d2a7c ASM	points to current count/pointer array
 0x004209d0	4	uint32_t	g_current_render_vertex_count	original d2a7c ASM	original signed count stored as raw dword
+0x004208b4	4	int32_t	g_render_clip_max_y	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x004208b8	4	int32_t	g_render_clip_max_x	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x004208bc	4	int32_t	g_render_clip_min_x	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x004208c0	4	int32_t	g_render_clip_min_y	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0042087c	4	ef_addr32	g_render_near_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0042083c	4	ef_addr32	g_render_right_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0042089c	4	ef_addr32	g_render_left_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0042085c	4	ef_addr32	g_render_upper_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
+0x0042081c	4	ef_addr32	g_render_lower_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result

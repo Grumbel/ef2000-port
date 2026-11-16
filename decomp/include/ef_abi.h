@@ -4096,6 +4096,7 @@ void guest_fn_d605c_x(uint32_t a, uint32_t b, uint32_t c); /* 0xd605c EAX EDX EB
 void fill_bit_pattern_table_c2f80(ef_addr32 table);
 int32_t approx_distance3_ce578(int32_t a, int32_t b, int32_t c);
 void compute_vertex_bounds_d1fc0(ef_addr32 object);
+void classify_render_bounds_d2130(ef_addr32 object);
 void mark_records_by_map_cell_cb55c(ef_addr32 list, ef_addr32 map, uint32_t extra);
 
 /* game_helpers89.c */
