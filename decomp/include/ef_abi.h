@@ -2424,7 +2424,7 @@ ef_addr32 find_child_by_name_a788c(ef_addr32 widget, ef_addr32 key);
 void fill_entries_a8060(void);
 uint32_t select_list_node_a9d0c(void);
 uint32_t guest_fn_e284c(uint32_t a, uint32_t b); /* 0xe284c EAX/EDX */
-void guest_fn_a7510(ef_addr32 widget); /* 0xa7510 EAX */
+void guest_fn_a7510(ef_addr32 widget, ef_addr32 text); /* 0xa7510 EAX/EDX */
 
 /* runtime_helpers11.c */
 void redraw_widget_ac9a0(ef_addr32 widget);

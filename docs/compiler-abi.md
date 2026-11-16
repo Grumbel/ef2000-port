@@ -10776,3 +10776,32 @@ local/screen-clip-order-20261116/{misc_drafts1.obj,misc_drafts1.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence remains
 unverified.
+
+### 2026-11-16: recover missing widget text setter
+
+Recover set_record_name_a7510 (119 original bytes) in widget_name.c; tracker
+runtime_helpers32 had no definition. ASM and sole caller a758f establish
+EAX widget, EDX text, plain RET, EBX/ECX/ESI/EDI/EBP preserved. Correct EDX
+preservation metadata: final original 9d749 advances it. Caller overwrites
+EDX with one before relayout. Correct unused generic alias to two arguments;
+rebuild runtime_helpers10, the only existing named caller.
+
+Keep null-name substitution, low-word length store followed by capacity
+reload and capacity+1 allocation, pointer store before failure callback,
+unsigned full-length capacity comparison, and original formatted callback
+arguments. Preserve the final unchecked original 9d749 copy even after an
+error callback returns; no truncation, capacity growth or null guard. Keep
+original strlen semantics via b1b8b and zeroing allocator ab840. Name the
+error callback pointer and three read-only strings without copying assets.
+Remove generic probe tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py widget_name.c and runtime_helpers10.c (zero warnings);
+wdis widget_name.obj (word store/reload, unsigned jbe, callback argument
+order via existing cdecl bridges, final pointer reload/copy and plain RET);
+hybrid_link.py pinned payload/full objects (2639 redirects,597842 arena
+bytes,370/410 modules,1634 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/widget-name-20261116/{widget_name.obj,widget_name.lst,full.json}.
+Status remains compiles; counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild. Full RAM/stack equivalence and all
+reported crash/highlight repairs remain unverified.
