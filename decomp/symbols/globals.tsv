@@ -366,3 +366,7 @@ addr	size	type	name	evidence	notes
 0x00132abc	2	uint16_t	g_page_scene_distance	original9e0c4 ASM	length of signed word scene-relative coordinates
 0x00132af8	16	ef_addr32[4]	g_page_setup_hooks	original9e0c4 ASM	four page flag modes select active setup hook
 0x00137a00	1	uint8_t	g_page_value_updates_enabled	original9e0c4 ASM	nonzero runs script channels even after view rejection
+0x001357c8	1	uint8_t	g_device_event_mode	original a410c shared-tail ASM	selects rank/offset or dispatch/sample prepass
+0x0013583c	1	uint8_t	g_device_event_scan_enabled	original a410c shared-tail ASM	post-loop scan flag
+0x00136b84	4	ef_addr32	g_device_event_ids	original a410c shared-tail ASM	live byte-index list pointer
+0x00136b88	4	ef_addr32	g_device_event_count_pointer	original a410c shared-tail ASM	live pointer to byte list length

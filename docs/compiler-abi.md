@@ -10293,3 +10293,33 @@ caller-two.asm,render_page.obj,render_page.lst,small_wrappers6.obj,
 small_wrappers6.lst,full.json}. Commands: ef2000_wcc.py on render_page.c,
 small_wrappers6.c and eight alias users; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Multi-span device event pump (0xa410c)
+
+Recover `pump_device_events_a410c` in decomp/src/device_event_pump.c.
+The existing observed-body inventory already owns all107 bytes:33 at
+ a410c..a412c,19 at a39d9..a39eb and55 at a3583..a35b9. Inspect pinned
+instructions and inventory call sites across all three spans. The old
+boundary blocker is stale: neither ownership nor neighboring boundaries
+need changing. The entry branches to the alternate prepass or jumps to
+the common earlier loop; both paths push EBX/EDX before its shared epilogue.
+Do not include neighboring a4130 or a4138 code.
+
+No inputs; non-EAX GPRs preserved. Sole direct caller a4057 ignores EAX and
+retains EBX's running total. Check prepass and event-handler preservation
+from original prologues/body as well as signature records. Preserve the
+mode-selected two-call prepass, live byte count pointer and ID list reloads,
+low-word loop index, byte ID zero extension and optional post-loop scan.
+Name the four globals. Rebuild caller module ui_state_helpers against the
+confirmed alias contract; no second direct caller exists in the inventory.
+
+Watcom compiles both modules warning-free. Wdis confirms both prepasses,
+DX zero extension, live pointer/count loads, handler call and scan gate,
+non-EAX preservation and plain RET. Full static link:2627 redirects,
+359/399 modules,591682 arena bytes. Tracker/diff checks pass; inventory3397
+compiles,837 blocked. Static review only; no execution/UI/replay runs or
+claim of crash resolution. Evidence: local/device-event-pump-20261116/{entry.asm,
+alternate.asm,tail.asm,caller.asm,device_event_pump.obj,
+device_event_pump.lst,full.json}. Commands: ef2000_wcc.py on
+device_event_pump.c and ui_state_helpers.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.
