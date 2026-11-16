@@ -423,3 +423,9 @@ addr	size	type	name	evidence	notes
 0x00464440	36	uint32_t[9]	g_rotation_matrix	e99b8 original ASM	Three columns; doubled low-dword products; destination may alias coefficients
 0x001631f4	4	uint32_t	g_small_glyph_stride	f25b0 original ASM	Captured at entry and restored after all six rows
 0x00160cc4	384	uint8_t[64][6]	g_small_glyph_rows	f25b0 original ASM	Three low bits per row; caller masks to64 glyphs, callee indexing unchecked
+0x0015b744	4	uint32_t	g_video_width	d1d4d store; d1d5d reload	video startup row-table step
+0x0015b748	4	uint32_t	g_video_height	d1d42 store; d1d64 reload	video startup row-table count
+0x00420950	4	ef_addr32	g_video_callback	d1d52 stores fedfc	video startup callback installation
+0x00420a90	768	uint8_t[]	g_video_palette	d1d7a passes to d663c	256 RGB entries; original bytes not included
+0x0015b750	4	ef_addr32	g_video_prepare_callback	d1d90 indirect call with EAX zero	called before framebuffer clear
+0x0015b74c	4	ef_addr32	g_video_present_callback	d1d9d indirect call with EAX zero	called after framebuffer clear

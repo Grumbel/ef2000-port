@@ -11047,3 +11047,31 @@ local/small-glyph-20261116/{small_glyph.obj,small_glyph.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover video startup
+
+Recover init_video_d1d40 (102 original bytes) in video_startup.c; the
+runtime_helpers35 tracker entry had no definition. Original ASM and callers
+d1dde/d1e31 establish EAX width, EDX height, EBX/ECX/EDX/ESI/EDI/EBP
+preserved and plain RET. No caller contract changes required.
+
+Preserve height-before-width stores, callback installation before driver
+query, and fresh width/height loads after the query. Pass height then width
+as the row-table builder's callee-cleaned stack arguments. Preserve the
+subsequent drawing setup, table reset, palette upload, buffer release and
+allocation calls, then load and invoke the prepare callback with EAX zero,
+clear the framebuffer, and freshly load/invoke the present callback with
+EAX zero. No callback guards or allocation changes. Name six touched global
+fields; no original palette bytes included. Remove generic probe tracker
+reference, retaining its JSON.
+
+Commands: ef2000_wcc.py video_startup.c (zero warnings); wdis (ordered
+stores, post-query dimension reloads, stack argument order, call sequence
+and plain RET); hybrid_link.py pinned payload/full objects (2649 redirects,
+599602 arena bytes,379/419 modules,1624 exclusions); decomp_status.py check
+(4293 functions); git diff --check. Evidence:
+local/video-startup-20261116/{video_startup.obj,video_startup.lst,full.json}.
+Watcom treats parameter EDX as scratch; hybrid entry restores original
+preserved EDX. Status remains compiles, counts unchanged. No runtime/UI/
+replay/differential execution or packaged runtime rebuild; full RAM/stack
+equivalence and reported crashes remain unverified.
