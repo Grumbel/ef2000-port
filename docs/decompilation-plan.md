@@ -6033,3 +6033,30 @@ local/parser-restore-20261116/{original.asm,parser_restore.obj,
 parser_restore.lst,parser_restore.abi.h,full.json}. Commands:ef2000_wcc.py
 on parser_restore.c; wdis; hybrid_link.py; decomp_status.py check;
 git diff --check.
+
+### 2026-11-16 — Recover positioned page-record startup
+
+Recover a04b4 (344 owned bytes) in page_positioned_record.c. Original ASM
+and sole direct caller9f521 establish signed AX/DX record/point indices,
+five saved registers, EDX scratch and plain RET. Build the page rotation,
+transform the selected point, add wrapping world offsets, view-test the
+position and initialize script fields before starting160255. Always run
+the final positioned-record hook, including failed view tests.
+
+Retain the asserted24-byte frame, overlapping dword coordinate/angle reads,
+AL-only view result, repeated repeat-byte read around the rotation-pointer
+store, callee-cleaned stack lookup132b14/EAX result1600c0, and final
+EAX/EDX/EBX/ECX callback arguments. Reuse established callback adapters;
+no new runtime adapters or input guards. Remove the old a04b4 exclusion
+after manual review. Name the touched page/script fields and hooks.
+
+Watcom compiles without warnings; wdis confirms signed index strides,
+dword shifts, frame layout, lookup-result store and callback adapters.
+Full static link:2615 redirects,353/393 modules,585554 arena bytes. Tracker
+and git diff --check pass. Inventory:3385 compiles,849 blocked. Status
+compiles; no runtime/UI/replay runs or execution-equivalence claim.
+Evidence:local/page-positioned-record-20261116/{original.asm,
+page_positioned_record.obj,page_positioned_record.lst,
+page_positioned_record.abi.h,full.json}. Commands:ef2000_wcc.py on
+page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
+git diff --check.

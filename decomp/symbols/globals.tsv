@@ -319,3 +319,15 @@ addr	size	type	name	evidence	notes
 0x00418708	120	uint32_t[30]	g_parser_variable_slots	ab47c 30 read destinations	flag selects inline dword or pointer to 21-byte record
 0x0041948e	30	uint8_t[30]	g_parser_variable_record_flags	ab47c variable read dispatch	zero inline dword; nonzero indirect record
 0x00419200	4	ef_addr32	g_parser_group_head	ab47c position resolution	groups linked at +0; first instruction at +8
+0x00417164	12	uint32_t[3]	g_page_record_world_origin	original a04b4 ASM	three wrapping additions
+0x00417174	4	ef_addr32	g_active_page_record_data	original a04b4 ASM	record base and low-nibble hook option
+0x0041717c	4	ef_addr32	g_active_page_point_data	original a04b4 ASM	six-byte point entries at +0a and margin word+2
+0x0041718e	6	int16_t[3]	g_page_record_rotation	original a04b4 ASM	signed angles and script rotation pointer
+0x001600a8	4	int32_t	g_script_record_identifier	original a04b4 ASM	sign-extended record word
+0x001600ac	4	ef_addr32	g_script_record_parameters	original a04b4 ASM	record+14
+0x001600b0	4	ef_addr32	g_script_record_world_position	original a04b4 ASM	points into live local frame
+0x001600b4	4	ef_addr32	g_script_record_rotation	original a04b4 ASM	points at41718e
+0x001600b8	4	uint32_t	g_script_record_repeat	original a04b4 ASM	record byte+1c or one
+0x001600c0	4	uint32_t	g_script_record_lookup_result	original a04b4 ASM	EAX from callee-cleaned stack hook
+0x00132b14	4	ef_addr32	g_script_record_lookup_hook	original a04b4 ASM	one callee-cleaned stack argument; EAX result
+0x00132ad8	4	ef_addr32	g_positioned_record_hook	original a04b4 ASM	EAX/EDX/EBX signed coordinates and ECX low nibble

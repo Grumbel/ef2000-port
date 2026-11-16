@@ -9866,3 +9866,22 @@ and optionally construct the original four-byte order message before
 calling a905c. Preserve the byte/word/byte message store order. Finally set
 137205 to 1. Watcom listing review and full static linking pass; runtime
 execution equivalence remains unverified.
+
+## Positioned page record at `0xa04b4`
+
+`start_positioned_page_record_a04b4` takes signed low-word AX/DX indices,
+preserves EBX/ECX/ESI/EDI/EBP and uses plain RET; EAX/EDX are scratch.
+The sole direct caller 9f516..9f521 loads both words from the script stream,
+advances its cursor and consumes neither result. The local frame contains
+three transformed dwords at +0 and three world-position dwords at +12.
+
+Rotation inputs and point Y/Z retain the original overlapping dword reads
+and arithmetic shifts. World offsets add with 32-bit wraparound. The view
+test receives five callee-cleaned stack arguments in out,Z,Y,X,margin order.
+Test AL, publish the local world pointer and script fields, then invoke
+132b14 with one callee-cleaned stack argument and store its EAX at1600c0.
+The repeat byte is tested before publishing the rotation pointer, and
+reread on the nonzero path afterward. Finally invoke132ad8 through the
+existing four-register adapter with signed world high words in EAX/EDX/EBX
+and the page's low flag nibble in ECX, including when the view test fails.
+Static compilation/listing/link review only; execution fidelity unverified.
