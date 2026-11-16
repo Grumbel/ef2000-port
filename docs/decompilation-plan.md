@@ -5928,3 +5928,35 @@ a8bd4 caller remains untranslated. Evidence:local/data-playback-20261116/
 {data_playback.obj,data_playback.lst,data_playback.abi.h,full.json}.
 Commands:ef2000_wcc.py on data_playback.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover menu animation presentation and cleanup
+
+Recover a8bd4 (937 owned bytes) as show_menu_animation_a8bd4 in new
+menu_animation.c, following the recovered eac48 initializer. Review original
+ASM, private pseudo-C candidate, sole direct opcode0 caller a9f4f and the
+recovered dispatcher contract. EAX=source record; preserve all six other
+GPRs; no consumed result; plain RET. Add asserted 23-byte animation and
+24-byte text prefixes, plus original local-frame slot offsets. Name option
+buffers and the panel gate without changing existing global meanings.
+
+Recover the capability/name gate, mode1 transition, early disabled return,
+record/text/data cloning, decimal interval formatting, text setup, palette
+fades, audio/panel gates, seven-option initialization, both playback loops,
+key waits and cleanup/free order. Preserve signed interval and duration
+fields as distinct inputs. Full playback stops only after pump and text
+completion; timed playback retains the flag-dependent duration reset/hold
+rule. The original full-playback audio branches have identical completion
+tests and share that test in C. No allocation guard, terminator byte or
+initialization of unwritten local slots is introduced. Retain the mode2
+restore on the capability skip, and its bypass on the disabled return.
+
+Resolve the segment-operation blocker with a narrow adapter for the actual
+MOVSD/MOVSD/MOVSW copy, preserving live DS/ES/DF rather than flattening the
+operation. Watcom compiles warning-free; wdis confirms those instructions
+without CLD, six register saves/restores, signed comparisons and plain RET.
+Full static relink:2611 redirects,349/389 modules,583404 arena bytes.
+Tracker/diff checks pass. Status remains compiles; no new execution/UI/replay
+runs. Inventory:3381 compiles,853 blocked. Evidence:
+local/menu-animation-20261116/{original.asm,menu_animation.obj,
+menu_animation.lst,menu_animation.abi.h,full.json}. Commands:ef2000_wcc.py on
+menu_animation.c; wdis; hybrid_link.py; decomp_status.py check; git diff --check.

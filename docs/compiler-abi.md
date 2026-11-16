@@ -9783,3 +9783,27 @@ The four register placeholders in compare_remapped_palette_d660c,
 unpack_planes_c38cc and decode_planes_10dfec are unused by their reviewed
 bodies; actual inputs are stack palette/source/destination pointers. Static
 compilation/listing review only; execution equivalence remains unverified.
+
+
+## Menu animation presentation at `0xa8bd4`
+
+`show_menu_animation_a8bd4` takes EAX=source record and preserves all six
+non-EAX GPRs. The original saves them all and ends with plain RET. The sole
+direct caller at a9f4c/a9f4f loads GUI opcode0's instruction+9 operand;
+no EAX result is consumed. The recovered dispatcher has the same contract
+through menu_op_a8bd4. Both names receive `parm [eax] modify [eax]`.
+
+The 23-byte record and optional 24-byte text record contain unaligned
+fields. Assert all accessed offsets, including separate signed interval
+word+b and timed duration word+e. Preserve the original local-frame slots
+for allocated text, cloned text record, loop latch and audio/panel flag;
+do not initialize slots that the original leaves unwritten.
+
+The fixed effect-name copy uses two MOVSDs and MOVSW with live DS, ES and
+DF. Its narrow Watcom adapter supplies ESI=18d6b8 and EDI=destination, does
+not insert CLD, and declares both register clobbers. Other builds require
+an explicit provider. Full-playback mode waits for both pump completion
+and signed text completion; timed mode decrements duration and applies the
+original audio/panel-dependent text rule. Keep the disabled-presentation
+return that bypasses mode2 restoration. Static ABI/listing review only;
+execution equivalence is unverified.

@@ -306,3 +306,7 @@ addr	size	type	name	evidence	notes
 0x0048446a	2	uint16_t	g_data_playback_fade_applied	original eac48 ASM	cleared before palette copy; set1 after SLOW_FADE
 0x00464580	1	uint8_t	g_data_playback_decoded_block	original eac48 ASM	start of decompression output; capacity not established here
 0x00474360	1	uint8_t	g_data_playback_compressed_block	original eac48 ASM	start of decompression input; capacity not established here
+0x00417250	4	ef_addr32	g_menu_animation_option0	original a8bd4 initialization call	start of seven-pointer playback option vector; entry0 unchanged here
+0x00417258	4	ef_addr32	g_menu_animation_interval_buffer	original a8bd4 ASM	format signed interval from record+b using original decimal format
+0x00417260	4	ef_addr32	g_menu_animation_effect_buffer	original a8bd4 ASM	ES destination of two MOVSDs and MOVSW from original DAVE_FADE string
+0x0012b0f4	1	uint8_t	g_menu_animation_panel_active	original a8bd4 ASM	when zero clear the local audio/panel flag after sound-entry setup
