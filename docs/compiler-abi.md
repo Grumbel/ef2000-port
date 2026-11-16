@@ -10254,3 +10254,42 @@ caller-one.asm,caller-two.asm,page_positioned_record.obj,
 page_positioned_record.lst,full.json}. Commands: ef2000_wcc.py on
 page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
 git diff --check.
+
+### Page render entry and hook forwarding (0x9e0c4/0x9e094)
+
+Recover `render_page_9e0c4` (466 original bytes) in
+`decomp/src/render_page.c`. Original AX=page ID, EDX/EBX/ECX=coordinates,
+AL=acceptance; ESI/EDI/EBP saved, four other GPRs scratch, plain RET.
+Review callers4d601,80cd2 and wrapper9e0b1; both zero-coordinate and shifted
+world-coordinate paths confirm the input order. Lookup b3f58 preserves
+coordinates. Publish signed page parameter and word ID, record/resource
+pointers and coordinate high words before view160156(margin,Z,Y,X,out).
+
+On acceptance preserve world-origin publication, signed word relative
+scene distance, mode-dependent setup hook and interleaved rotation loads/
+stores, then page text1. Run live-bound value-script loops independently of
+acceptance, selecting one or eight channels once before iterating. Always
+call the final hook with current global world output and page flags, even
+on view rejection. Return the saved acceptance byte after all callbacks;
+add no bounds, rejection cleanup or stale-state fallback.
+
+Correct existing hook wrapper9e094, whose C draft discarded its three
+coordinate inputs. Forward all four register arguments and AL result;
+retain stack argument publication, hook restoration and RET4. Original
+saves ESI/EDI and leaves EBP untouched, rather than preserving all scratch
+registers. Replace its incompatible pragma/signature and retire the old
+probe reference. Remove obsolete one-argument page alias. Rebuild all eight
+direct page-alias user modules plus small_wrappers6 with the new signature.
+
+Watcom compiles the new routine, wrapper and alias users successfully.
+New routine/wrapper compile warning-free. Wdis confirms four register
+arguments, five stack view arguments, accepted/rejected paths, live script
+bounds, final hook, AL result, wrapper forwarding and RET4. Full static
+link:2626 redirects,358/398 modules,591552 arena bytes. Tracker/diff checks
+pass; inventory3396 compiles,838 blocked. Status compiles only; no
+execution/UI/replay runs and no claim of crash resolution. Evidence:
+local/render-page-20261116/{original.asm,wrapper.asm,caller-one.asm,
+caller-two.asm,render_page.obj,render_page.lst,small_wrappers6.obj,
+small_wrappers6.lst,full.json}. Commands: ef2000_wcc.py on render_page.c,
+small_wrappers6.c and eight alias users; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

@@ -4887,9 +4887,8 @@ void guest_fn_1111e5_x(uint32_t a); /* 0x1111e5 cdecl, one stack argument, calle
 uint32_t release_ref_108ffa(ef_addr32 obj);
 void expect_byte_109328(ef_addr32 cursor, uint32_t expected);
 void forward_to_11b134_11b1b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
-void run_with_hook_9e094(uint32_t value, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg);
+uint8_t run_with_hook_9e094(uint32_t value, uint32_t x, uint32_t y, uint32_t z, uint32_t arg);
 void guest_fn_11b134_x(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3); /* 0x11b134 four stack arguments, callee cleanup */
-void guest_fn_9e0c4_x(int32_t value); /* 0x9e0c4 EAX */
 
 void print_status_lines_b1bf8(uint32_t handle);
 uint32_t report_message_b3374(uint32_t value);
@@ -7347,7 +7346,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux setup_camera_955c0 modify exact []
 #pragma aux setup_external_view_95704 modify exact []
 #pragma aux read_camera_record_97ca8 modify exact []
-#pragma aux run_with_hook_9e094 modify exact []
+#pragma aux run_with_hook_9e094 parm [eax] [edx] [ebx] [ecx] [] value [al] modify [eax ebx ecx edx]
 #pragma aux set_patch_dword_a45e4 modify exact []
 #pragma aux set_widget_params_a5b1c modify exact []
 #pragma aux file_size_a7b3c modify exact []
@@ -7590,4 +7589,5 @@ void guest_fn_16018a_x(void); /* original global-input dispatcher */
 #pragma aux guest_fn_16018a_x parm caller [] modify [eax ebx ecx edx]
 #endif
 void start_biased_page_record_9fc00(uint32_t record_index, uint32_t point_index);
+uint8_t render_page_9e0c4(uint32_t page_id, uint32_t x, uint32_t y, uint32_t z);
 #endif

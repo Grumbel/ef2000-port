@@ -361,3 +361,8 @@ addr	size	type	name	evidence	notes
 0x00417184	4	uint32_t	g_page_name_count	original9da80 ASM	live count used for parallel allocations
 0x00417180	4	ef_addr32	g_page_name_pointers	original9da80 ASM	parallel dword pointer table
 0x00417170	4	ef_addr32	g_page_name_identifiers	original9da80 ASM	parallel word identifier table
+0x00417154	12	int32_t[3]	g_page_view_world	original9e0c4 ASM	view-test output used unconditionally by final hook
+0x0040d200	4	ef_addr32	g_page_resource_data	original9e0c4 ASM	resource pointer table base; unsigned word index
+0x00132abc	2	uint16_t	g_page_scene_distance	original9e0c4 ASM	length of signed word scene-relative coordinates
+0x00132af8	16	ef_addr32[4]	g_page_setup_hooks	original9e0c4 ASM	four page flag modes select active setup hook
+0x00137a00	1	uint8_t	g_page_value_updates_enabled	original9e0c4 ASM	nonzero runs script channels even after view rejection

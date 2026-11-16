@@ -52,13 +52,14 @@ void forward_to_11b134_11b1b0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 }
 
 /* 0x9e094, 45 bytes. Run 0x9e0c4 with the hook at 0x132b14 pointing to 0x9e08c and the stack argument saved at 0x41714c, then restore the default hook 0x16010e. */
-void run_with_hook_9e094(uint32_t value, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t arg)
+uint8_t run_with_hook_9e094(uint32_t value, uint32_t x, uint32_t y, uint32_t z, uint32_t arg)
 {
-    (void)u1; (void)u2; (void)u3;
+    uint8_t accepted;
     EF_U32(0x0041714cu) = arg;
     EF_U32(0x00132b14u) = 0x0009e08cu;
-    guest_fn_9e0c4_x((int32_t)(int16_t)value);
+    accepted = render_page_9e0c4((uint32_t)(int32_t)(int16_t)value, x, y, z);
     EF_U32(0x00132b14u) = 0x0016010eu;
+    return accepted;
 }
 
 /* 0xb1bf8, 57 bytes. Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle. */
