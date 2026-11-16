@@ -232,3 +232,15 @@ addr	size	type	name	evidence	notes
 0x001a6630	2	uint16_t	g_scene_latch_a	0x56007 clears	Cleared together with 0x127dae
 0x00127dae	2	uint16_t	g_scene_latch_b	0x5600e clears	Cleared together with 0x1a6630
 0x001a5c32	1	uint8_t[23*]	g_activity_records	0x55876 clears byte 0	23-byte records indexed by unsigned byte
+0x00159084	4	ef_addr32	g_texture_shade_page	original d3cb0..d3e41 disassembly	shade lookup page; texture byte replaces its low address byte
+0x00159b7c	4	int32_t	g_texture_reciprocal_table_first	original d3cb0..d3e41 disassembly	base of width-indexed reciprocal table; this row names its first dword
+0x0015b920	4	int32_t	g_texture_span_blocks	original d3cb0..d3e41 disassembly	remaining groups of eight; decrements to -1
+0x0015b754	4	ef_addr32	g_raster_framebuffer	original d3cb0..d3e41 disassembly	current frame base
+0x00163200	4	int32_t	g_raster_row_table_first	original d3cb0..d3e41 disassembly	base of signed-y-indexed row offsets; this row names its first dword
+0x00485fd2	2	int16_t	g_texture_right_x	original d3cb0..d3e41 disassembly	inclusive right endpoint x
+0x00485fea	2	int16_t	g_texture_left_x	original d3cb0..d3e41 disassembly	left endpoint x
+0x00485fee	2	int16_t	g_texture_span_y	original d3cb0..d3e41 disassembly	scanline y
+0x00485fd8	4	uint32_t	g_texture_right_u	original d3cb0..d3e41 disassembly	right fixed-point texture U
+0x00485fdc	4	uint32_t	g_texture_right_v	original d3cb0..d3e41 disassembly	right fixed-point texture V
+0x00485ff0	4	uint32_t	g_texture_left_u	original d3cb0..d3e41 disassembly	left fixed-point texture U
+0x00485ff4	4	uint32_t	g_texture_left_v	original d3cb0..d3e41 disassembly	left fixed-point texture V

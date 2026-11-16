@@ -5568,3 +5568,42 @@ The deterministic credits error capture at local/menu-credit-capture-20261116/
 is running; the ongoing ASM descriptor corpus remains undisturbed. These
 menu regressions are now explicit open runtime work, not covered by the
 previous successful flight/camera verification.
+
+### 2026-11-16 — Recover the textured-span renderer in C
+
+Following the owner's request to concentrate on decompiling game code, recover
+d3cb0 as draw_textured_span_d3cb0 in decomp/src/texture_spans.c. Read original
+ASM and the candidate export; the ASM's computed RET enters eight unrolled
+pixel bodies d3d70..d3def, joins d3df0..d3dff and has a separate endpoint path
+d3e00..d3e41. Retain original tracked ownership of 248 bytes rather than invent
+new Ghidra body coverage. The fresh headless audit command cannot run because
+its old 12.1.4 installation was removed; existing pinned inventory still confirms
+the 248 owned bytes/layout. The complete shared-tail control flow is reviewed
+from pinned disassembly, without changing ownership metadata.
+
+Translate signed 32-bit by signed 32-bit IMUL/SHLD bit selection using a 64-bit product,
+packed U/V fractional ADD/ADC carries, byte-wrapped texture indices, the
+inclusive last pixel, the remainder-first groups of eight and observable
+15b920 counter writes. Preserve MOV AL's address-byte replacement for the
+shade page, including an unaligned page input. Width one reads both endpoints
+directly. A one-instruction Watcom FS byte-load adapter retains the actual
+guest texture segment; native C requires an explicit provider, never host TLS
+or silently flat DS. Confirm no register arguments/return value and only EBP
+preservation from the entry/tails; callers include the d2634 callback pointer
+and d3c50 shared fallback. Name the accessed globals and remove this reviewed
+entry's old mechanical exclusion. Keep compiles, without game-verification
+promotion.
+
+OpenWatcom builds with zero warnings/errors. Thirty authored fixed-point cases
+match original RAM, EBP and ESP, covering negative/zero width, width one,
+eight-pixel boundaries and signed/carry-heavy endpoints; the isolated patch
+has one actual redirect and uses the existing __I8M runtime helper. The tracked
+linker produces a byte-identical tested patch. Full static relink with the
+packaged objects succeeds with 2599 redirects. No new UI runs are started.
+Commands: tools/ef2000_wcc.py decomp/src/texture_spans.c;
+tools/func_differential.py 0xd3cb0 --spec decomp/tests/0x000d3cb0.json
+--flat-segments with the isolated patch; tools/hybrid_link.py;
+tools/decomp_status.py check; git diff --check. Evidence:
+local/texture-span-decomp-20261116/{span-reviewed.json,committed-spec.log,
+tracked.json,full.json}. This adds recovered game C, not another validation
+framework; the menu regressions and broader bulk goal remain open.
