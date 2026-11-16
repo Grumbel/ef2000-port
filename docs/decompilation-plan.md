@@ -7679,3 +7679,28 @@ local/string-table-load-20261116/{string_table_load.obj,
 string_table_load.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover file-open mode parsing
+
+Recover parse_open_mode_bc1d3 (180 original bytes) in open_mode.c;
+runtime_helpers34 had no definition. ASM and sole caller bc291 establish
+EAX mode, EAX flags, six other registers preserved, plain RET. Caller
+retains EDX mode and ECX stream. No caller ABI change.
+
+Lowercase only initial byte via original e7835; reject anything other than
+r/w/a by storing error nine via ebe6d and returning zero. Preserve repeated
+second-byte reads and ordered optional third-byte reads with volatile byte
+accesses. Preserve +b/+t/b+/t+ flag rules, exact default-mode dword comparison
+with 0x200, lowercase-only suffix recognition, and final read/write/append
+bits. No mode-length checks or standard-library replacement. Name default
+translation-mode global. Remove generic probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py open_mode.c (zero warnings); wdis (initial lowercase
+call, error path, suffix reads and flag branches, default comparison, final
+bits, register saves and plain RET); hybrid_link.py pinned payload/full
+objects (2668 redirects,602408 arena bytes,395/435 modules,1605 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/open-mode-20261116/{open_mode.obj,open_mode.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
