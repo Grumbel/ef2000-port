@@ -500,3 +500,8 @@ addr	size	type	name	evidence	notes
 0x001a5280	2	uint16_t	g_match_group_id_first	c964 record group comparisons	word-stride table; extent unresolved
 0x001809b3	8	double	g_match_ratio_scale	c964 x87 ratio calculation	loaded once after division
 0x00197670	4	float	g_match_ratio	c964 final x87 store	single precision result
+0x00125846	1	uint8_t	g_frontend_connection_mode	37260 branch and 37254 store	mode one socket, mode three alternate path
+0x00125935	1	uint8_t	g_socket_pending_ready	shared 3718e tail tests	controls name scheduling versus byte latch
+0x00126576	1	uint8_t	g_frontend_network_active	37270 branch	nonzero suppresses alternate path
+0x0041f2e8	1	uint8_t	g_frontend_pending_latch	371a6 writes 100	mode-one fallback
+0x0019769e	4	int32_t	g_frontend_selected_pair	3727d overlapping high-word read	signed high word minus one suppresses alternate path

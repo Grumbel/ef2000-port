@@ -155,26 +155,3 @@ void env_clouds_da2b0(void)
 {
     EF_U8(0x425c88u) = 1u;
 }
-
-/* 0x37260, 83 bytes: three external tails. Read a signed 32-bit high
- * half, not just the unsigned 16-bit selection. */
-void gui_open_credits_37260(void)
-{
-    uint32_t eax = EF_U8(0x125846u);
-    if (eax != 3u) {
-        guest(0x3718eu, eax, 0u);
-    } else if (EF_U8(0x126576u) != 0u) {
-        guest(0x371adu, eax, 0u);
-    } else {
-        eax = (uint32_t)((int32_t)EF_U32(0x19769eu) >> 16);
-        guest(eax == 0xffffffffu ? 0x371adu : 0xb1e0u, eax, 0u);
-    }
-}
-
-/* 0x37254, 12 bytes: this entry has no RET. It falls through directly
- * into onopenCredits 37260 after setting the flag and clearing EAX. */
-void gui_new_socket_37254(void)
-{
-    EF_U8(0x125846u) = 1u;
-    gui_open_credits_37260();
-}

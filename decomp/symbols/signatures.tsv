@@ -3495,3 +3495,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000a6438	position_widget_child_a6438	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 616 bytes; sole caller a66bc; docs/compiler-abi.md
 0x000e26bc	draw_styled_text_e26bc	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t,ECX:ef_addr32,[ESP+4]:uint32_t		esi,edi,ebp	4	Original 400 bytes; EAX unused caller passes zero; low BX Y and low stack byte style; sole caller a6cdb; docs/compiler-abi.md
 0x000ca290	blit_bitmap_clipped_ca290	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t		esi,edi,ebp	20	Original 474 bytes; source low BX/CX; width,height,X,Y,stride stack; callers e276e/e281a/a6ff7; docs/compiler-abi.md
+0x00037260	gui_open_credits_37260			ebx,ecx,edx,esi,edi,ebp	0	ASM no inputs; registry onopenCredits; shared tails 3718e/371ad and b1e0; ac7a8 receives fixed EAX name; EAX scratch
+0x00037254	gui_new_socket_37254			ebx,ecx,edx,esi,edi,ebp	0	ASM no inputs; registry gnNewSocket; mode store then fallthrough to 37260; EAX scratch

@@ -11836,3 +11836,38 @@ a custom trampoline. Thus this recovered body is compiled but NOT redirected
 into the game. No runtime/UI/replay/differential execution or packaged
 runtime rebuild; full RAM/stack equivalence and reported crashes remain
 unverified.
+
+### 2026-11-16 — front-end shared-tail callbacks
+
+Recover gui_open_credits_37260 (registry onopenCredits,83 body bytes) and
+gui_new_socket_37254 (registry gnNewSocket,12 bytes) in credits_gate.c.
+Remove their host-hook draft definitions from gui_callbacks_089.c. Original
+ASM, both pseudo-C exports and callback-table references 12b548/12b588
+establish no inputs, EAX scratch, six preserved registers and plain RET.
+Add confirmed signature rows and move tracker entries blocked -> compiles.
+
+Resolve shared 3718e..371ad branches directly: mode one tests 125935,
+then schedules name 183290 via ac7a8 or stores latch byte 100; other modes
+return except mode three, where network flag zero and signed high word of
+the overlapping dword at 19769e not minus one tail-call b1e0. Inspect b1e0
+entry: incoming EAX is not an input. New-socket stores mode one then runs
+the complete shared callback. Keep its mode reload, guest call targets,
+byte stores and overlapping dword read; do not retain host hook calls.
+Original callback registry names do not establish the meaning of every
+branch, nor prove a repair of the reported credits crash.
+
+Run Ghidra 12.1.4 audit-body-holes read-only with temporary config/cache/home
+under /tmp. Its one row identifies gap 371ae..3725f as padding plus other
+functions, including the socket entry. No boundary repair needed. Earlier
+launcher attempts failed before the temporary directories existed; final
+audit completed successfully. Remove the two stale unreviewed-mechanical
+exclusions now that these entries have ASM-reviewed hand definitions.
+
+Commands: ghidra_ef2000.py audit-body-holes 0x37254 0x37260;
+ef2000_wcc.py credits_gate.c and gui_callbacks_089.c (zero warnings); wdis;
+hybrid_link.py pinned payload/full objects (2687 redirects,605342 arena
+bytes,408/448 modules,1586 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/credits-gate-20261116/{body-holes.tsv,body-holes.log,credits_gate.obj,credits_gate.lst,reviewed.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.

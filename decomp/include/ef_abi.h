@@ -58,6 +58,7 @@ void gui_make_assignment_4da2c(void);
 void gui_view_assignment_4da90(void);
 void gui_show_summary_info_84ddc(ef_addr32 widget);
 void env_clouds_da2b0(void);
+/* Recovered credits_gate.c entries: no inputs, original guest ABI. */
 void gui_open_credits_37260(void);
 void gui_new_socket_37254(void);
 
