@@ -9723,3 +9723,21 @@ helpers or fixed8/fixed6 arithmetic. Word-index sign extension, full-register
 increments, low-word stores and truncation toward zero in centering are
 retained. The caret path forwards EAX=remaining filename, EDX=record to
 a81e4. Static compilation/listing review only; no execution equivalence claim.
+
+
+## Scrolling-text drawing at `0xa8718`
+
+`draw_scrolling_text_a8718` reads its record from 4191d0 and has no register
+inputs. The original pushes all six non-EAX GPRs, overwrites EAX with the
+global record address, and ends with a plain RET. Callers a8984/a89c0/a8ac5
+supply a redundant EAX record but consume no EAX result. The generated
+Watcom pragma is `parm caller [] modify [eax]` and preserves the same six registers.
+
+The draw dispatcher a8660 receives EAX=text, EDX=left, EBX=top, ECX=color
+and a callee-cleaned stack line index. This establishes that the record's
+first word is top and its second word is left; correct those field/global
+names from the preparation-only interpretation. The progressive path's
+unaligned loads after PUSH read the initialized top word at original local
++58, not an implicit entry register or an uninitialized coordinate. Keep the
+80-byte buffer and live local slots +50/+54/+58 in an asserted frame layout.
+Static compilation/listing review only; no execution equivalence claim.

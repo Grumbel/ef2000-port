@@ -5841,3 +5841,32 @@ execution/UI/replay runs. Inventory:3377 compiles,857 blocked. Evidence:
 local/scrolling-text-20261116/{scrolling_text.obj,scrolling_text.lst,
 scrolling_text.abi.h,full.json}. Commands: ef2000_wcc.py on scrolling_text.c;
 wdis; hybrid_link.py; decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover complete and progressive scrolling-text drawing
+
+Recover a8718 (574 owned bytes) as draw_scrolling_text_a8718 in
+scrolling_text.c. Review original ASM, the existing private pseudo-C
+candidate, callers a8984/a89c0/a8ac5 and helper ABIs. The old implicit-EDI
+blocker is spurious: the function saves registers, reads the global record
+and initializes its line counters. No register inputs; preserve all six
+non-EAX GPRs. Extend asserted record fields for shadow, progressive mode
+and color; correct coordinate names to top/left from the dispatcher ABI.
+
+Recover both complete-line drawing and clock-paced character reveal, with
+optional one-pixel black shadows, font-height advancement, signed-word
+progress/length comparisons, wrapping stores and truncation-to-zero signed
+half-tick advancement. Retain the unsigned comparison against the signed
+remaining count, unchecked partial-line writes and the final draw even for
+an empty prefix. Keep the original local-frame slots +50/+54/+58 explicit,
+including their placement after the 80-byte partial buffer. No buffer clear,
+capacity guard or malformed-state normalization is introduced.
+
+Watcom compiles warning-free. Wdis confirms six register saves/restores,
+plain RET, signed counter comparisons, unsigned partial-copy comparison
+and signed division sequence. Full static relink:2608 redirects,
+346/386 modules,581208 arena bytes. Tracker/diff checks pass. Status remains
+compiles; no new execution/UI/replay runs. Inventory:3378 compiles,856 blocked.
+Evidence:local/scrolling-text-draw-20261116/{scrolling_text.obj,
+scrolling_text.lst,scrolling_text.abi.h,reviewed.json}. Commands:
+ef2000_wcc.py on scrolling_text.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

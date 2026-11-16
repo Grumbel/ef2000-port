@@ -281,12 +281,13 @@ addr	size	type	name	evidence	notes
 0x0042081c	4	ef_addr32	g_render_lower_plane_test	original d2130 ASM	signed clip bound or plane callback slot; callbacks use EAX=context, EDX=x, EBX=y, ECX=z, AL=result
 0x0015b91c	4	ef_addr32	g_texture_blend_table	original d5a90 setup and pixel bodies	page base refreshed before width rejection; indexed by texture byte times256 plus existing framebuffer byte
 0x004191d0	4	ef_addr32	g_scrolling_text_record	original a82f0 ASM	current record; reloaded for length/font
-0x004194b6	2	uint16_t	g_scrolling_text_x	original a82f0 ASM	record word0
-0x004194b2	2	uint16_t	g_scrolling_text_y	original a82f0 ASM	record word2
+0x004194b6	2	uint16_t	g_scrolling_text_top	original a82f0 ASM	record word0
+0x004194b2	2	uint16_t	g_scrolling_text_left	original a82f0 ASM	record word2
 0x004194b8	2	int16_t	g_scrolling_text_line_count	original a82f0 ASM	signed word count
 0x004194ae	2	uint16_t	g_scrolling_text_total_characters	original a82f0 ASM	wrapping sum of expanded line lengths
-0x004194ba	2	uint16_t	g_scrolling_text_line_cursor	original a82f0 ASM	reset after remembering the clock
+0x004194ba	2	uint16_t	g_scrolling_text_tick_remainder	original a82f0/a8718 ASM	reset on preparation; signed half-tick remainder during reveal
 0x004187a8	40	int16_t[20]	g_scrolling_text_lengths	original a82f0 ASM	expanded line lengths; no capacity checks
 0x00418780	40	int16_t[20]	g_scrolling_text_widths	original a82f0 ASM	font pixel widths; stored as low words
 0x004187d0	40	int16_t[20]	g_scrolling_text_left_edges	original a82f0 ASM	centered around x160
 0x004187f8	1	char	g_scrolling_text_lines	original a82f0 ASM	start of uppercase line storage with80-byte stride; capacity not established; original has no bounds checks
+0x00425fa6	2	int16_t	g_scrolling_text_visible_characters	original a8718 ASM	clock-paced reveal count; clamped to total characters
