@@ -7438,3 +7438,31 @@ local/unusable-slot-20261116/{unusable_slot.obj,unusable_slot.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover sound-slot selection
+
+Recover select_sound_slot_98050 (141 original bytes) in sound_slot_select.c;
+runtime_helpers31 had no definition. ASM and caller sites 3ed7e/98266
+establish AL slot, six other registers preserved, plain RET. Existing
+caller contract unchanged. Keep original byte enable/mode gates and invalid
+slot error callback with format and zero-extended slot on the cdecl stack.
+If that callback returns, continue unchecked as the original does.
+
+Preserve current-slot comparison, reset-before-table-base read, 13-byte
+record indexing, registration result branch, ordered mode/enable clears,
+status-file rewrite, and final slot/latch stores even after failure. Name
+four globals; reuse existing enable symbol. Declare the stack-call shim's
+ECX clobber locally (matching guest_callptr1.c), so the compiler preserves
+the requested slot across the error call. Wdis confirms a saved byte and
+reloads, rather than a live CL across the clobber. Remove generic probe
+tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py sound_slot_select.c (zero warnings); wdis (gates,
+callback arguments and saved slot, reset-before-table read, failure writes,
+final latch and plain RET); hybrid_link.py pinned payload/full objects
+(2656 redirects,600960 arena bytes,386/426 modules,1617 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/sound-slot-select-20261116/{sound_slot_select.obj,
+sound_slot_select.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
