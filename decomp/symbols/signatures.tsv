@@ -3502,3 +3502,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004da90	gui_view_assignment_4da90			ebx,ecx,edx,esi,edi,ebp	0	ASM no inputs; EAX scratch; plain RET; callback-table entry; 4da90 calls 4d9cc; guest callees 4f314 and 4db60
 0x0004b1a4	gui_campaign_warning_ok_4b1a4			ebx,ecx,edx,esi,edi,ebp	0	ASM no inputs; EAX scratch; signed AX difference compared after call; registry cgWarningOkClick; plain RET
 0x00050638	gui_draw_fuel_bar_50638		EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	ASM no inputs; ac9e8 then terminal a4db0 with fixed EAX key; registry mpDrawFuelBar; EAX pointer return; plain RET
+0x0005089c	gui_type2_click_5089c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET
+0x000508fc	gui_type3_click_508fc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET
+0x0005095c	gui_type4_click_5095c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 96 bytes; widget input; conditional second-digit read; AL-only lookup result; six preserved registers; EAX scratch; plain RET

@@ -8129,3 +8129,33 @@ payload/full objects (2692 redirects,605384 arena bytes,410/450 modules,
 Evidence: local/frontend-warning-20261116/{frontend_warning.obj,frontend_warning.lst,gui_callbacks_089.obj,full.json}.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-17 — type-selection widget callbacks
+
+Recover 5089c/508fc/5095c (96 original bytes each) in type_actions.c,
+replacing host-hook gui_callbacks_089 drafts. Original ASM and all three
+pseudo-C exports establish EAX widget input, six preserved registers,
+EAX scratch and plain RET. Registry names mpType2Click/mpType3Click/
+mpType4Click select groups 3/4/1. Add signatures, move three tracker rows
+blocked -> compiles and remove stale unreviewed-mechanical exclusions.
+
+Preserve zero-extended first byte minus 48 with wrapping subtraction;
+only signed low word equal to one permits the second-byte read. Accept
+second digits 48..57 and subtract 38, otherwise retain first result.
+Original 50a1c consumes AL group only and preserves EDX; do not invent
+an item input. If AL result is nonzero, pass binding strings 1326e7/132704
+to 4f314. Otherwise call 50b68 with group and item masked to low byte,
+then original 5086c with no inputs. Inspect both callees' ASM and the
+5086c register saves; use a local explicit no-input/EAX-scratch pragma
+for its existing guest alias. The latter remains original, since its own
+shared-tail C recovery is blocked. No added validation or digit parser.
+
+Commands: ef2000_wcc.py type_actions.c and gui_callbacks_089.c (zero
+warnings); wdis (conditional second read, group-only lookup, mask,
+argument registers, binding branch, final refresh and register saves);
+hybrid_link.py pinned payload/full objects (2695 redirects,605406 arena
+bytes,411/451 modules,1578 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/type-actions-20261116/{type_actions.obj,type_actions.lst,gui_callbacks_089.obj,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.

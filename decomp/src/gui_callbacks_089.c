@@ -25,42 +25,6 @@ void gui_kots_init_4b54(ef_addr32 widget)
         guest(0xac7a8u, 0x17f79cu, 0u);
 }
 
-/* 0x5089c, 0x508fc and 0x5095c: three distinct 96-byte callback bodies.
- * The widget's two ASCII digits encode a 1-based selection. This is not
- * atoi: second digit is read only if first digit is exactly '1'. */
-static void type_click(ef_addr32 widget, uint32_t group)
-{
-    uint32_t item = (uint32_t)EF_U8(widget + 0x42u) - 0x30u;
-    uint32_t result;
-    if ((int16_t)item == 1) {
-        uint32_t digit = EF_U8(widget + 0x43u);
-        if (digit >= 0x30u && digit <= 0x39u)
-            item = digit - 0x26u;
-    }
-    result = guest(0x50a1cu, group, item);
-    if ((uint8_t)result != 0u) {
-        guest(0x4f314u, 0x1326e7u, 0x132704u);
-        return;
-    }
-    result = guest(0x50b68u, group, item & 0xffu);
-    guest(0x5086cu, result, item);
-}
-
-void gui_type2_click_5089c(ef_addr32 widget)
-{
-    type_click(widget, 3u);
-}
-
-void gui_type3_click_508fc(ef_addr32 widget)
-{
-    type_click(widget, 4u);
-}
-
-void gui_type4_click_5095c(ef_addr32 widget)
-{
-    type_click(widget, 1u);
-}
-
 /* 0x84ddc, 13 bytes: widget child ID followed by external terminal JMP. */
 void gui_show_summary_info_84ddc(ef_addr32 widget)
 {

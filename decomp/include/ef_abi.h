@@ -51,6 +51,7 @@ void gui_kots_init_4b54(ef_addr32 widget);
 /* Recovered frontend_warning.c entries use confirmed guest ABIs. */
 void gui_campaign_warning_ok_4b1a4(void);
 ef_addr32 gui_draw_fuel_bar_50638(void);
+/* Recovered type_actions.c entries use confirmed guest widget ABI. */
 void gui_type2_click_5089c(ef_addr32 widget);
 void gui_type3_click_508fc(ef_addr32 widget);
 void gui_type4_click_5095c(ef_addr32 widget);
