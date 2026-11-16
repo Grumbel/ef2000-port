@@ -5356,3 +5356,17 @@ on game_helpers64.c; hybrid_link.py --only-address 0xd3c50;
 func_differential.py 0xd3c50 --spec decomp/tests/0x000d3c50.json
 --flat-segments; decomp_status.py check; git diff --check.
 Evidence: local/textured-tail-20261116/{before,after}.log and span.json.
+
+### 2026-11-16 — Verify restored terrain in the full translated profile
+
+The d3c50 repair completes the deterministic four-billion-instruction
+external-view replay with all 2598 translated entries enabled: exit 0,
+status instruction_limit, 16000 ticks and no guest fault. The framebuffer
+again shows the aircraft over continuous terrain instead of a large grey
+missing-ground region. Against the same original replay, the diagnostic
+G>R and G>B terrain-mask disagreement drops from 56.365625% to 2.6078125%;
+terrain pixels rise from 21001 to 56332 (original 56347 of 64000). This
+establishes restoration of the large missing-ground region, not exact
+framebuffer equivalence or full flight fidelity. The current Nix package
+build and native flight verification remain pending. Evidence:
+local/textured-tail-20261116/{replay.sh,replay.log,replay.ppm,comparison.json}.
