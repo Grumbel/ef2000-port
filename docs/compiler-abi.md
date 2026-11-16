@@ -9967,3 +9967,31 @@ Opcode6 sign-extends the instruction high word as text index; opcode7
 zero-extends the following word as a doubled relative text offset. Both
 read the active page through the high word of dword417228. No guards or
 extra zero checks. Static listing/link review only; execution unverified.
+
+### Direct-coordinate page record (0xa2728)
+
+Recovered `start_coordinate_page_record_a2728` in
+`decomp/src/page_positioned_record.c` (399 original bytes). Sole direct
+caller a26fc passes AX=record and DX/BX/CX=word coordinates, retaining
+ESI/EDI afterward. Original saves ESI/EDI, leaves EBP untouched, clobbers
+EAX/EBX/ECX/EDX and uses plain RET. No second direct caller exists in the
+pinned inventory. The four-register legacy guest alias remains compatible.
+
+Preserve signed word callback arguments, word offsets, interleaved stores
+and overlapping dword high-word reads, then shift those coordinates left16
+for the stack view test160156(margin,Z,Y,X,out). Preserve the uninitialized
+world output on a rejecting view path, unconditional final hook, rotation
+operand reads before their corresponding stores, and repeat-byte reread
+after publishing the rotation pointer. The known view-test exclusions stay
+in place; this caller does not establish their arithmetic fidelity.
+
+Watcom compilation is warning-free. Wdis review confirms the four input
+registers, preserved ESI/EDI/EBP, left16 shifts, stack push order, record and
+rotation pointers retained across callbacks, ordered angle stores, repeat
+reread and plain RET. Full static link:2619 redirects,354/394 modules,
+587552 arena bytes. Tracker and git diff checks pass. Status compiles only;
+no execution, UI or replay runs, and no claim of crash resolution.
+Evidence: local/page-coordinate-record-20261116/{original.asm,
+page_positioned_record.obj,page_positioned_record.lst,full.json}.
+Commands: ef2000_wcc.py on page_positioned_record.c; wdis;
+hybrid_link.py; decomp_status.py check; git diff --check.
