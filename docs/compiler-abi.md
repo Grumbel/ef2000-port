@@ -11319,3 +11319,30 @@ local/error-gates-20261116/{error_gates.obj,error_gates.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover pointer-table and node allocation wrappers
+
+Recover alloc_slot_table_39db0 (20 original bytes) and make_node_8204c
+(18 bytes) in allocation_wrappers.c; runtime_helpers30 had no definitions.
+ASM and sole callers 39dd4/4b0a5 establish AL count with no consumed output,
+and EAX value with EAX node output, respectively; six other registers
+preserved and plain RET. Inspect allocator targets 984f0/9850c: EAX byte
+size only, saved EDX, no flags argument. Existing caller ABI unchanged.
+
+Allocate count narrowed to byte times four and store pointer at 1a1860.
+For node, allocate twelve bytes then unconditionally store original value
+at offset zero and return allocation. No extra initialization or null check;
+allocator supplies its original behavior for remaining bytes. Name callback
+and pointer-table globals. Remove both generic probe tracker references,
+retaining JSON files.
+
+Commands: ef2000_wcc.py allocation_wrappers.c (zero warnings); wdis (byte
+extension and size scaling, indirect EAX size calls, saved node value,
+unconditional first-word store, EAX node return and plain RETs);
+hybrid_link.py pinned payload/full objects (2662 redirects,601276 arena
+bytes,389/429 modules,1611 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/allocation-wrappers-20261116/{allocation_wrappers.obj,
+allocation_wrappers.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
