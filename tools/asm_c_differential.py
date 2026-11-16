@@ -30,6 +30,10 @@ except ImportError:
     import asm_x87_oracle
 
 
+class Segment(ctypes.Structure):
+    _fields_ = [(name, ctypes.c_uint32) for name in ('selector', 'base', 'limit', 'access', 'flags')]
+
+
 class State(ctypes.Structure):
     _fields_ = [('r', ctypes.c_uint32 * 8), ('flags', ctypes.c_uint32),
                 ('pc', ctypes.c_uint32), ('fault', ctypes.c_uint32),
@@ -39,7 +43,8 @@ class State(ctypes.Structure):
                 ('x87_tag', ctypes.c_uint32), ('x87_ip', ctypes.c_uint32),
                 ('x87_cs', ctypes.c_uint32), ('x87_dp', ctypes.c_uint32),
                 ('x87_ds', ctypes.c_uint32), ('x87_opcode', ctypes.c_uint32),
-                ('x87_compare_profile', ctypes.c_uint32)]
+                ('x87_compare_profile', ctypes.c_uint32),
+                ('segment_profile', ctypes.c_uint32), ('segment_cache', Segment * 6)]
 
 
 X87_FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',
@@ -168,10 +173,20 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
     state.segment[:] = selectors
+    if captured is not None:
+        try:
+            from . import asm_segments
+        except ImportError:
+            import asm_segments
+        state.segment_profile = 1
+        for index, name in enumerate(asm_to_c.SEGMENTS):
+            raw = captured.table_context['descriptors'][name]
+            state.segment_cache[index] = Segment(*asm_segments.descriptor(selectors[index], raw or 0))
     set_x87(state, initial_fpu)
     profile = (native_x87.comparison_profile if native_x87 is not None else
                asm_x87_oracle.unicorn_comparison_profile())['flags']
     state.x87_compare_profile = profile
+    segment_configuration = (state.segment_profile, bytes(state.segment_cache))
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -184,6 +199,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if phase:
         phase('comparison')
     differences = []
+    if (state.segment_profile, bytes(state.segment_cache)) != segment_configuration:
+        differences.append('C descriptor profile/cache configuration changed')
     if state.x87_compare_profile != profile:
         differences.append('C comparison CPU profile changed')
     expected = [cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + n.upper()))
@@ -431,6 +448,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
+                  capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
+                                          for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
+                                         if captured_inputs else {},
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',

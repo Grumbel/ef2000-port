@@ -5491,3 +5491,43 @@ Generation: tools/asm_c_program.py --workspace local/ghidra-stack-return-2026111
 --inventory local/asm-dispatch-return-body-inventory-20261114 --output
 local/asm-c-segment-operands-program-20261116. Cross-corpus byte comparison:
 local/asm-segment-operands-evidence-20261116.json. git diff --check passes.
+
+### 2026-11-16 — Wire descriptor-backed scalar execution into ABI 4
+
+Extend explicit state with a segment-profile selector and six decoded cache
+records; bump ABI 3 to 4 so old generated artifacts are rejected. Bind the
+captured descriptor records without changing selectors. Scalar operand reads
+and writes now check segment rights/privilege/limits; RET checks SS; every
+instruction case checks full CS fetch length. Mutable immediate reads use
+instruction-fetch permission, so execute-only CS remains valid. Reject
+nonzero bases, long-mode descriptors and unknown profile values. Preserve and
+compare descriptor-profile/cache configuration alongside full existing state.
+Captured reports additionally bind restoration/decoder/capture-reader hashes.
+
+Keep descriptor-mode PUSH/POP/PUSHA/POPA/ENTER/LEAVE/CALL, strings, far-pointer
+loads, XLAT, WAIT/x87 and segment reloads explicitly unsupported until their
+implicit accesses/table lookup are wired. Even a same-selector reload must
+consult current table memory rather than assume its existing cache is current.
+Legacy prepared-probe semantics stay under profile zero. Restoration now also
+permits nonconforming execute-only 32-bit CS, verified by captured instruction
+and immediate fetches without data-reading that code segment.
+
+Synthetic captures pass full RAM/GPR/flags/selectors/raw-x87 comparisons for
+DS/SS/FS and readable-CS loads, scalar stores/arithmetic, LEA with null FS,
+and execute-only CS fetches. A generated cross-limit DS load returns status 7
+before changing GPRs/flags/RAM. Unsupported balanced stack use and same-selector
+reload remain explicit mismatches; original UD2 remains inconclusive. The
+10-module regression (asm_capture, asm_c_segments, asm_inventory, asm_to_c,
+asm_c_program, asm_c_x87, asm_wait, asm_stack_all, asm_stack_scalar,
+asm_segments) passes 60 tests in 152.785 seconds; the final execute-only
+immediate case is rerun successfully. A generated scalar Watcom -we probe
+compiles with zero warnings/errors. git diff --check passes.
+
+Regeneration preserves the full selected set: 2528 bodies, syntax support4143;
+all2528 body sources change to include fetch/access guards. New runtime hash
+8a87f1ccafb8487e6a516d340544e83c5c90e8ca630753617a6a8776db0112ab.
+Evidence: local/asm-descriptor-scalar-20261116/{generation-evidence.json,
+scalar.c,scalar.obj}; local/asm-c-descriptor-scalar-program-20261116/.
+The full Watcom/hardware-oracle corpus plus the saved 0x604 capture is prepared
+at local/asm-descriptor-scalar-corpus-config-20261116/command.json. Its result
+is a separate gate; no captured-game or full-corpus passing claim is made.

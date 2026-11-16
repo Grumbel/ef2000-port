@@ -17,15 +17,16 @@ from pathlib import Path
 import re
 
 try:
-    from . import asm_inventory, asm_x87
+    from . import asm_inventory, asm_x87, asm_segments
 except ImportError:
     import asm_inventory
     import asm_x87
+    import asm_segments
 
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
 SEGMENTS = ('es', 'cs', 'ss', 'ds', 'fs', 'gs')
-STATE_ABI = 3
+STATE_ABI = 4
 REG = {name: (index, 32, 0) for index, name in enumerate(REGS)}
 for index, name in enumerate(('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')):
     REG[name] = (index, 16, 0)
@@ -51,6 +52,7 @@ RUNTIME = r'''/* Generated explicit-state x86 translation support. NEVER COMMIT.
 #ifndef EF_LIFT_STATE_H
 #define EF_LIFT_STATE_H
 #include <stdint.h>
+''' + asm_segments.RUNTIME + r'''
 typedef struct {
     uint32_t r[8];
     uint32_t flags, pc, fault;
@@ -62,9 +64,20 @@ typedef struct {
     uint32_t x87_ip, x87_cs, x87_dp, x87_ds, x87_opcode;
     /* Bit 0/1: update comparison CCs on unmasked invalid/denormal. */
     uint32_t x87_compare_profile;
+    uint32_t segment_profile; /* 0=legacy aliases, 1=descriptor-derived caches. */
+    ef_lift_segment segment_cache[6];
 } ef_lift_state;
 static unsigned ef_segments_valid(ef_lift_state *s) {
     unsigned i;
+    if (s->segment_profile == 1) {
+        for (i = 0; i < 6; ++i) {
+            const ef_lift_segment *cache = &s->segment_cache[i];
+            if (cache->selector != s->segment[i] || cache->base || cache->flags & 2u) return 0;
+        }
+        return (s->segment[1] & 3u) == 3u &&
+            (s->segment_cache[1].flags & 4u) && (s->segment_cache[2].flags & 4u);
+    }
+    if (s->segment_profile) return 0;
     for (i = 0; i < 6; ++i) {
         uint32_t selector = s->segment[i];
         if (i == 1) { if (selector != 0 && selector != 8) return 0; }
@@ -75,6 +88,11 @@ static unsigned ef_segments_valid(ef_lift_state *s) {
 }
 static void ef_load_segment(ef_lift_state *s, unsigned index, uint32_t selector) {
     selector &= 0xffffu;
+    if (s->segment_profile) {
+        /* Reloads require current table lookup, even for the same selector:
+         * table memory may have changed since its cache was loaded. */
+        s->fault = 7; return;
+    }
     if (index == 1 || (index == 2 && selector != 16 && selector != 24) ||
         (selector > 3 && selector != 8 && selector != 16 && selector != 24)) {
         s->fault = 7; return;
@@ -99,6 +117,32 @@ static void ef_write(ef_lift_state *s, uint32_t address, unsigned width, uint32_
         s->fault = 3; return;
     }
     for (i = 0; i < bytes; ++i) s->memory[address+i] = (uint8_t)(value >> (8*i));
+}
+/* A descriptor-backed access must retain its segment and permission kind. */
+static unsigned ef_check_segment(ef_lift_state *s, unsigned segment, uint32_t address,
+                                 uint32_t bytes, unsigned kind) {
+    uint32_t linear;
+    if (!s->segment_profile) return 0;
+    if (s->segment_profile != 1 || segment >= 6 ||
+        s->segment[segment] != s->segment_cache[segment].selector ||
+        ef_segment_linear(&s->segment_cache[segment], s->segment[1] & 3u,
+                          address, bytes, kind, &linear) || linear != address) {
+        s->fault = 7; return 7;
+    }
+    return 0;
+}
+static uint32_t ef_read_segment(ef_lift_state *s, unsigned segment, uint32_t address, unsigned width) {
+    if (ef_check_segment(s, segment, address, width/8u, segment == 2 ? 3 : 0)) return 0;
+    return ef_read(s, address, width);
+}
+static uint32_t ef_read_code(ef_lift_state *s, uint32_t address, unsigned width) {
+    if (ef_check_segment(s, 1, address, width/8u, 2)) return 0;
+    return ef_read(s, address, width);
+}
+static void ef_write_segment(ef_lift_state *s, unsigned segment, uint32_t address,
+                             unsigned width, uint32_t value) {
+    if (ef_check_segment(s, segment, address, width/8u, segment == 2 ? 4 : 1)) return;
+    ef_write(s, address, width, value);
 }
 static unsigned ef_stack_store(ef_lift_state *s, uint32_t address, unsigned width, uint32_t value) {
     unsigned byte;
@@ -427,7 +471,7 @@ def read(op, width):
         return '((s->r[%d] >> %d) & 0x%xu)' % (op[1], op[3], (1 << op[2])-1)
     if op[0] == 'seg':
         return '(s->segment[%d] & 0xffffu)' % op[1]
-    return 'ef_read(s, %s, %d)' % (op[1], width)
+    return 'ef_read_segment(s, %d, %s, %d)' % (op[3], op[1], width)
 
 
 def write(op, value, width):
@@ -439,7 +483,7 @@ def write(op, value, width):
         return 's->r[%d] = (s->r[%d] & 0x%xu) | (((%s) & 0x%xu) << %d);' % (
             index, index, ~mask & 0xffffffff, value, (1 << bits)-1, shift)
     if op[0] == 'mem':
-        return 'ef_write(s, %s, %d, %s);' % (op[1], width, value)
+        return 'ef_write_segment(s, %d, %s, %d, %s);' % (op[3], op[1], width, value)
     raise Unsupported('immediate destination')
 
 
@@ -500,7 +544,7 @@ def immediate_expression(insn):
     if field is None:
         return None
     offset, width, signed = field
-    expression = 'ef_read(s, 0x%xu, %d)' % (insn['address'] + offset, width)
+    expression = 'ef_read_code(s, 0x%xu, %d)' % (insn['address'] + offset, width)
     return '((%s ^ 0x80u) - 0x80u)' % expression if signed else expression
 
 
@@ -593,7 +637,7 @@ def instruction_c(insn, starts):
         cleanup = int(text, 0) if text else 0
         if cleanup > 65535:
             raise Unsupported('invalid return cleanup')
-        return ('s->pc = ef_read(s, s->r[4], 32); if (s->fault) return s->fault; '
+        return ('s->pc = ef_read_segment(s, 2, s->r[4], 32); if (s->fault) return s->fault; '
                 's->r[4] += %du; return 0;' % (4 + cleanup))
     if next_pc not in starts:
         raise Unsupported('fallthrough outside body')
@@ -975,7 +1019,18 @@ def translate(record, *, starts=None, renderer=instruction_c):
     if record['address'] not in local_starts:
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
-    cases = ['case 0x%xu: %s' % (i['address'], renderer(i, starts)) for i in instructions]
+    cases = []
+    unwired = {'push', 'pushw', 'pop', 'pusha', 'popa', 'enter', 'leave', 'call',
+               'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
+               'les', 'lds', 'lss', 'lfs', 'lgs', 'xlat', 'wait'}
+    for i in instructions:
+        code = renderer(i, starts)
+        # Reject paths whose implicit accesses still use the legacy flat helpers.
+        if i['mnemonic'] in unwired or i['mnemonic'].startswith('f'):
+            code = 'if (s->segment_profile) return 7; ' + code
+        fetch = 'if (ef_check_segment(s, 1, 0x%xu, %du, 2)) return s->fault; ' % (
+            i['address'], len(bytes.fromhex(i['bytes'])))
+        cases.append('case 0x%xu: %s%s' % (i['address'], fetch, code))
     variables = [name for name in ('a', 'b', 'result', 'carry')
                  if re.search(r'\b' + name + r'\b', '\n'.join(cases))]
     declarations = 'uint32_t ' + ', '.join(variables) + ';' if variables else ''

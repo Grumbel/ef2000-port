@@ -48,7 +48,7 @@ def restore(capture):
         access = (descriptor >> 40) & 255
         if base or selector & 3 != 3 or access & 0xf0 != 0xf0:
             raise ValueError('requires present zero-base ring-3 descriptors: ' + name)
-        if name == 'cs' and (access & 0xe != 0xa or not descriptor & (1 << 54)):
+        if name == 'cs' and (access & 0xc != 8 or not descriptor & (1 << 54)):
             raise ValueError('requires nonconforming 32-bit code segment')
         if name == 'ss' and (access & 0xa != 2 or not descriptor & (1 << 54)):
             raise ValueError('requires writable 32-bit stack segment')

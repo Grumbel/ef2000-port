@@ -39,6 +39,82 @@ def fixture():
 
 
 class AsmCaptureTests(unittest.TestCase):
+    @unittest.skipUnless(all(shutil.which(tool) for tool in ('cc', 'as', 'objcopy', 'objdump')),
+                         'requires C compiler and GNU binutils')
+    def test_descriptor_scalar_paths_compare_full_captured_state(self):
+        from tools import asm_to_c
+        from tests.test_asm_to_c import assemble
+        sources = [
+            'mov eax, dword ptr ds:[0x2000]\nadd dword ptr ss:[esp+4], eax\nret',
+            'mov eax, dword ptr [ebp]\nmov edx, dword ptr [eax+ebp*1]\nret',
+            'lea eax, fs:[ebp+4]\nret',  # LEA never accesses null FS.
+            'mov eax, cs:[0x100]\nmov word ptr ds:[0x2004], ax\nret',
+            'mov eax, fs:[0x2000]\nret',
+            'mov eax,0x10\nadd eax,0x20\nmov edx,[0x2000]\nret',
+            'push eax\npop eax\nret',  # Explicitly unsupported in this stage.
+        ]
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for number, source in enumerate(sources):
+                with self.subTest(source=source):
+                    image, record = assemble(root, source)
+                    capture = fixture()
+                    memory = bytearray(capture.guest_ram)
+                    memory[:image.stat().st_size] = image.read_bytes()
+                    memory[0x2000:0x2004] = struct.pack('<I', 0x10)
+                    memory[0x2100:0x2104] = struct.pack('<I', 0x2000)
+                    regs = dict(capture.registers, eip=0x100, ebp=0x2100)
+                    tables = copy.deepcopy(capture.table_context)
+                    # Non-null FS for the explicit override load.
+                    if number == 4:
+                        regs['fs'] = 7
+                        tables['descriptors']['fs'] = tables['descriptors']['ds']
+                    # Execute-only CS permits instruction fetch, not data loads.
+                    if number == 5:
+                        tables['descriptors']['cs'] &= ~(2 << 40)
+                        data = bytearray(tables['ldtr']['bytes'])
+                        data[8:16] = struct.pack('<Q', tables['descriptors']['cs'])
+                        tables['ldtr']['bytes'] = bytes(data)
+                    capture = replace(capture, address=0x100, registers=regs, guest_ram=bytes(memory),
+                                      table_context=tables)
+                    (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+                    (root/'lift.c').write_text(asm_to_c.translate(record))
+                    library_path = root/('scalar%d.so' % number)
+                    subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99',
+                                    '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
+                                    str(root/'lift.c'), '-o', str(library_path)], check=True, capture_output=True)
+                    library = ctypes.CDLL(str(library_path))
+                    function = library.ef_lift_00000100
+                    function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
+                    function.restype = ctypes.c_uint
+                    result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, False,
+                                                               captured=capture)[0]
+                    if number == 6:
+                        self.assertEqual(result['state'], 'mismatch')
+                        self.assertIn('C status 7', result['differences'][0])
+                    else:
+                        self.assertEqual(result['state'], 'pass', result)
+                    if number == 0:
+                        # Test the generated access path, not only the helper:
+                        # a four-byte DS read crossing its limit must stop before
+                        # changing EAX, flags, or any RAM.
+                        ram = bytearray(capture.guest_ram)
+                        native_ram = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
+                        state = asm_c_differential.State(
+                            (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
+                            regs['eflags'], 0x100, 0, native_ram, len(ram))
+                        state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
+                        state.segment_profile = 1
+                        from tools import asm_segments
+                        for index, name in enumerate(asm_to_c.SEGMENTS):
+                            state.segment_cache[index] = asm_c_differential.Segment(
+                                *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
+                        state.segment_cache[3].limit = 0x2002
+                        before = (list(state.r), state.flags, bytes(ram))
+                        self.assertEqual(function(ctypes.byref(state), 100), 7)
+                        self.assertEqual(state.fault, 7)
+                        self.assertEqual((list(state.r), state.flags, bytes(ram)), before)
+
     @unittest.skipUnless(shutil.which('cc') and shutil.which('objdump'), 'requires C compiler and objdump')
     def test_captured_input_reaches_generated_c_without_flattening_selectors(self):
         from tools import asm_inventory, asm_to_c
@@ -63,9 +139,9 @@ class AsmCaptureTests(unittest.TestCase):
             results = asm_c_differential.isolated_probes(function, b'', 0x1000, 1, 100, False,
                                                         captured=capture)
             self.assertEqual(results[0]['state'], 'mismatch')
-            self.assertIn('C status 7 (unsupported segment profile)', results[0]['differences'][0])
-            # The original executed and returned using its captured stack. C's
-            # unsupported selector profile remains a failure, never a pass.
+            self.assertIn('C status 7', results[0]['differences'][0])
+            # Segment reloads require table lookup even for the same selector.
+            # Until implemented, retain this explicit failure with real selectors.
             memory = bytearray(capture.guest_ram)
             memory[0x1000:0x1002] = b'\x0f\x0b'  # Original UD2 fault.
             faulting = replace(capture, guest_ram=bytes(memory))
