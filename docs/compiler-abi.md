@@ -10188,3 +10188,36 @@ local/page-dispatch-record-20261116/{original.asm,callers.asm,
 page_positioned_record.obj,page_positioned_record.lst,full.json}. Commands:
 ef2000_wcc.py on page_positioned_record.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### Immediate script dispatcher ordering and ABI (0x16018a)
+
+Correct the existing `append_table_entry_16018a` C draft in
+`decomp/src/misc_drafts1.c` against original16018a..160254 and callers9f935
+and9fac2. Both callers supply globals and ignore scratch results; original
+saves ESI/EDI/EBP and clobbers EAX/EBX/ECX/EDX. Correct the signature record
+from its old preserve-all contract; remove its obsolete probe reference
+whose register assumptions no longer apply. Status stays compiles.
+
+Read the value byte before the live slot/repeat loads and repeat-table
+store. Delay rotation-pointer and all three rotation-word loads until after
+coordinate, value-pointer, identifier and absolute-high-Z stores. Preload
+all rotation words before writing any rotation table. This preserves
+aliasing both when a queue write modifies the script globals and when the
+source points into a destination table. Keep the unchecked word slot,
+16-bit absolute-value overflow and live slot reload before draw dispatch.
+
+Confirmed existing generated pragmas already send slot in ESI and declare
+all GPRs scratch for c552e/c565e. The corrected outer contract now saves only
+ESI/EDI/EBP around those callbacks. Recompile misc_drafts1, the only module
+with direct named calls to this definition; the newer page caller uses an
+explicit matching guest alias. Draw-continuation fidelity remains unproven.
+
+Watcom compiles warning-free. Wdis confirms value/slot/repeat read order,
+delayed rotation preloads, word stores, signed high-Z magnitude, ESI slot
+reload, matching saves and plain RET. Full static link stays2624 redirects,
+357/397 modules; arena590340 bytes. Tracker and diff checks pass. Inventory
+unchanged3394 compiles,840 blocked. No execution/UI/replay runs or crash
+resolution claim. Evidence: local/script-dispatch-review-20261116/{original.asm,
+caller-one.asm,caller-two.asm,misc_drafts1.obj,misc_drafts1.lst,full.json}.
+Commands: ef2000_wcc.py on misc_drafts1.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

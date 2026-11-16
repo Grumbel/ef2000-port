@@ -7900,12 +7900,13 @@ void append_table_entry_16018a(void)
 {
     uint32_t src = EF_U32(0x001600b0u);
     uint32_t d0 = EF_U32(src), d1 = EF_U32(src + 4u), d2 = EF_U32(src + 8u);
+    uint8_t value = EF_U8(EF_U32(0x001600acu));
     uint32_t idx = EF_U16(0x00146e52u);
-    uint32_t wp = EF_U32(0x001600b4u);
-    uint16_t w0 = EF_U16(wp), w1 = EF_U16(wp + 2u), w2 = EF_U16(wp + 4u);
+    uint32_t wp;
+    uint16_t w0, w1, w2;
     int16_t hi = (int16_t)(d2 >> 16);
     EF_U8(0x00149e58u + idx) = EF_U8(0x001600b8u);
-    EF_U8(0x00149658u + idx) = EF_U8(EF_U32(0x001600acu));
+    EF_U8(0x00149658u + idx) = value;
     EF_U8(0x0014a658u + idx) = 0u;
     EF_U32(0x00150e58u + idx * 4u) = d0;
     EF_U32(0x00152e58u + idx * 4u) = d1;
@@ -7913,6 +7914,11 @@ void append_table_entry_16018a(void)
     EF_U32(0x00156e58u + idx * 4u) = EF_U32(0x001600acu);
     EF_U16(0x0014ae58u + idx * 2u) = (uint16_t)EF_U32(0x001600a8u);
     EF_U16(0x0014fe58u + idx * 2u) = (uint16_t)(hi < 0 ? -hi : hi);
+    /* Preload all three words here, after the aliasing table writes. */
+    wp = EF_U32(0x001600b4u);
+    w0 = EF_U16(wp);
+    w1 = EF_U16(wp + 2u);
+    w2 = EF_U16(wp + 4u);
     EF_U16(0x0014be58u + idx * 2u) = w0;
     EF_U16(0x0014ce58u + idx * 2u) = w1;
     EF_U16(0x0014de58u + idx * 2u) = w2;
