@@ -5440,3 +5440,28 @@ Validation: EF_CAPTURE_UNICORN_TEST=local/codex-build/ef2000-call-capture-unicor
 Nix Python -m unittest tests.test_asm_capture tests.test_call_capture
 tests.test_func_differential tests.test_asm_c_program: 25 tests pass without
 skips in 8.996 seconds. git diff --check passes.
+
+### 2026-11-16 — Implement descriptor-derived segment access checks
+
+Add tools/asm_segments.py with an independent C access helper for a loaded
+segment descriptor: decode base/effective inclusive limit/access/flags;
+validate present/code/data/writable/readable rights, CPL/RPL/DPL and conforming
+code, distinguish instruction/data/stack accesses, and check expand-up/down
+bounds, 16/32-bit expand-down maxima and offset overflow. A rejected access
+leaves its output address unchanged. Tests cover 30 explicit permission and
+boundary cases plus descriptor decoding (including the captured expand-down
+0x260 lower bound). GCC -Werror and Watcom -we compile the probe without
+warnings. Nix Python unittest tests.test_asm_segments tests.test_asm_capture
+passes five tests (0.266 s). Probe artifacts: local/asm-segments-20261116/.
+
+This is the access-check prerequisite only; it is not yet wired into the
+explicit-state ABI or generated scalar/stack/string/x87 memory paths. Do not
+allow captured selectors based on their numeric values while bypassing those
+checks. Existing captured replay status 7 remains a mismatch. Segment identity
+must also be retained by the operand parser, which currently drops prefixes.
+
+The earlier terrain bisection finishes naturally at its round limit with
+three candidates d3844/d3c50/d4430; its old-object replay still fails. This is
+consistent with the independently repaired d3c50 shared tail. Keep its report
+as diagnostic evidence; the repaired full-profile/native results above are
+the current runtime evidence. Report: local/external-terrain-bisect-04-20261116/.
