@@ -5385,3 +5385,29 @@ flight/camera sequence, not broader playability or exact rendering fidelity.
 Evidence: local/hybrid-textured-tail-build-20261116/{build.log,exit-status};
 local/native-textured-tail-20261116/{run.sh,verification-summary.json,
 external-window.png,returned-window.png,output/report.json}.
+
+### 2026-11-16 — Restore captured ring-3 ASM input context
+
+Add tools/asm_capture.py as the restoration prerequisite for EFCAP002
+explicit-state differential replay. Require complete descriptor windows,
+present zero-base ring-3 segments and 32-bit code/stack; reject unavailable
+context, nonzero bases, VM86 and nested-task inputs. Restore original GDT/LDT
+windows and cached LDTR tuple. Direct CS/SS writes do not restore CPL in
+Unicorn: establish ring 3 with a one-instruction IRET from disposable ring-0
+transition code outside guest RAM. Remove the transition page, restore table
+bytes after descriptor loads, and require every captured register and all
+physical raw-80/environment fields to round-trip. Segment caches are derived
+from captured tables: the format does not record hidden caches, so do not
+claim reconstruction of caches whose descriptors changed after loading.
+
+Synthetic tests verify expand-down SS, actual privilege by reloading SS at
+ring 3, full RAM/table preservation, nonzero empty x87 payloads, scratch-page
+removal and unsupported-profile rejection. With EF_CAPTURE_UNICORN_TEST
+pointing at the built capture fixture, tests.test_asm_capture,
+tests.test_call_capture and tests.test_func_differential pass 16 tests without
+skips (0.331 s). The pinned original 0x604 EFCAP002 also restores all 64 MiB
+RAM byte-identically and round-trips registers/raw x87. Evidence:
+local/capture-x87-restore-evidence-20261116.json binds capture and restorer
+hashes. This completes context restoration for that profile, not execution of
+captured inputs through generated C; that integration and segment-access
+semantics remain required. Existing four corpus mismatches remain failures.
