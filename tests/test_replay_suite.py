@@ -208,6 +208,21 @@ class SyntheticReplayTests(unittest.TestCase):
         self.assertTrue(summary['passed'])
         self.assertEqual(summary['sound_mode'], 'sb16-dma')
 
+    def test_four_billion_instruction_replay_preserves_large_checkpoints(self):
+        case = replay_suite.validate_manifest(manifest(
+            limit=4_000_000_000, checkpoints=[3_000_000_000]), PATCHES)[0]
+        summary = self.run_case(case)
+        self.assertTrue(summary['passed'])
+        samples = summary['checks'][0]['checkpoints']
+        self.assertEqual([sample['instructions'] for sample in samples],
+                         [3_000_000_000, 4_000_000_000])
+        for instructions in (3_000_000_000, 4_000_000_000):
+            for variant in ('original', 'patched'):
+                self.assertTrue((self.root / 'result/startup' /
+                    f'at-{instructions}' / variant / 'frame.ppm').exists())
+        with self.assertRaisesRegex(ValueError, 'instruction limit'):
+            replay_suite.validate_manifest(manifest(limit=4_000_000_001), PATCHES)
+
     def test_multiple_checkpoints_compare_baselines_and_patch_from_entry(self):
         case = replay_suite.validate_manifest(manifest(checkpoints=[1000, 4000],
             guest_hashes=[{'address': '0x300', 'length': 4}]), PATCHES)[0]

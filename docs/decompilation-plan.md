@@ -5220,7 +5220,9 @@ comment but lacked EF_CDECL, so compiled callers supplied four GPR arguments
 to an original stack-argument entry. Add EF_CDECL and correct the public
 signature's stack cleanup from 16 to 0 (RET at 48d58). Original callers
 912fb and 3b78 push the four fixed arguments; 912b8 explicitly removes 16.
-The original variadic renderer remains original; no unknown suffix is copied.
+The corrected zero-cleanup signature also enables the compiled variadic
+48c90 direct entry; no unknown suffix is copied. The full profile now has
+2598 redirects and 575712 arena bytes across 342/382 modules.
 Rebuild all five direct-caller modules: misc_drafts1, small_wrappers4,
 small_wrappers7, state_reset1 and game_helpers43.
 
@@ -5260,5 +5262,25 @@ Diagnostic-only traps, never committed: local/native-camera-null-format-20261116
 and local/native-camera-null-caller-20261116/. The first packaged screenshot
 helper hung after the fault destroyed its window; only that private test
 session was terminated. Subsequent captures use a five-second timeout.
-The fresh package built above predates this alias fix; rebuilding the latest
-package and plain-function-key checks remain pending.
+The fresh package built above predates this alias fix.
+
+### 2026-11-16 — Allow flight replays through four billion instructions
+
+Raise the replay manifest instruction ceiling from two to four billion:
+the current full hybrid needs this budget to reach the external-view terrain
+comparison. The existing runner accepts it, but manifest validation rejected
+the bisection before execution. A synthetic replay regression runs both
+original and patched samples at three- and four-billion instruction budgets,
+checks their checkpoint records and frames, and rejects budgets above the
+new ceiling. Commands: python -m unittest tests.test_replay_suite
+tests.test_hybrid_bisect (23 tests pass); decomp_status.py check (4293).
+
+The 3e374775 Nix hybrid build now succeeds (exit-status 0 in
+local/hybrid-shadow-text-build-20261116/). The packaged private-Xvfb test
+has loaded that revision with 2598 redirects; its plain F4/F1 check is still
+running. The external-terrain bisection is also running, using an ignored
+prototype of this validation-limit change. Rendering equivalence remains
+unproven; the paired four-billion-instruction captures show about 88% terrain
+pixels in the original versus 33% in the hybrid. Evidence lives under
+local/external-view-replay-20261116/ and
+local/external-terrain-bisect-02-20261116/.

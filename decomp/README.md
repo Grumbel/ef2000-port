@@ -337,8 +337,8 @@ original executable through the native64 harness until the source is complete.
 The original-code runtime remains the validation oracle. See
 `LICENSE-NOTE.md` before distributing any recovered source.
 
-Current hand-written hybrid check (2026-11-16): 2,597 C redirects across
-342/382 linked modules. The 38f929b0 full Unicorn profile reaches flight and
+Current hand-written hybrid check (2026-11-16): 2,598 C redirects across
+342/382 linked modules. The earlier 38f929b0 full Unicorn profile reaches flight and
 exhausts four billion instructions without a guest fault (16,000 ticks,
 15,933 IRQ0 deliveries). Cockpit, sky, terrain and HUD are now visible.
 The pressed main-menu button frame matches the original across all 640×400

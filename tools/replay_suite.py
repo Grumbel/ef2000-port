@@ -64,7 +64,7 @@ def validate_manifest(manifest, patch_addresses, patch_intervals=()):
         names.add(name)
         instructions = case.get('instructions')
         timer = case.get('timer_instructions', 23866)
-        if (type(instructions) is not int or not 1000 <= instructions <= 2_000_000_000
+        if (type(instructions) is not int or not 1000 <= instructions <= 4_000_000_000
                 or type(timer) is not int or not 1 <= timer <= 1_000_000):
             raise ValueError(f'{name}: invalid instruction limit or timer interval')
         checkpoints = case.get('checkpoints', [])
