@@ -494,3 +494,9 @@ addr	size	type	name	evidence	notes
 0x0040d00e	24	uint16_t[3][4]	g_event_tally_rows	9a624 sums four entries per row	three rows of four word counters
 0x0012bca3	4	int32_t	g_weapon_rating_first	16bac signed comparisons	first rating in 145-byte records; table extent unresolved
 0x001817f3	8	double	g_weapon_rating_scale	16bac final x87 multiply	loaded after output stores
+0x001a53c0	2	int16_t	g_match_group_count	c964 captured loop bound and final writeback	signed low-word iteration
+0x00197320	2	uint16_t	g_match_enabled_first	c964 enabled-word table reads	word-stride table; extent unresolved
+0x001a53b0	2	uint16_t	g_match_total_first	c964 denominator accumulation	word-stride table; extent unresolved
+0x001a5280	2	uint16_t	g_match_group_id_first	c964 record group comparisons	word-stride table; extent unresolved
+0x001809b3	8	double	g_match_ratio_scale	c964 x87 ratio calculation	loaded once after division
+0x00197670	4	float	g_match_ratio	c964 final x87 store	single precision result

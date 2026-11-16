@@ -11776,3 +11776,33 @@ Also inspected ac240 against its callers and ac2e4: initial CX captures
 old registered count before fill, and indirect callbacks carry loop state
 in ECX. Leave its missing body pending a confirmed callback register
 contract rather than assuming an ordinary C callback.
+
+### 2026-11-16 — matching-record ratio calculation
+
+Recover missing update_match_ratio_c964 (218 original bytes) in
+match_ratio.c. ASM and sole caller c27f establish no inputs, six preserved
+registers, EAX scratch and plain RET; existing ABI needs no caller rebuild.
+Capture signed word group count before dword active-record count, sum
+only enabled group totals with dword wrapping, and scan signed low-word
+record indices against the captured dword bound. Reload pool per record,
+selected word before record word, group field on each inner iteration,
+and preserve short-circuit group/enabled/overlapping dword state reads.
+Use volatile guest reads to retain the original access order.
+
+The final operation consumes both dword accumulators as signed words.
+Keep FILD word/FILD word/FDIVP/FLD scale/FXCH/FMUL/FSUBP/FSTP float in a
+small x87 adapter, including zero-denominator behavior and one final
+single-precision rounding. Preserve final dword active-count then word
+group-count writebacks. Explicit counter stores avoid a compiler-created
+MOVSD initializer and its additional direction-flag dependency. Name six
+ratio fields/tables/constants without inventing table extents. Remove
+generic probe tracker reference, retain JSON; status remains compiles.
+
+Commands: ef2000_wcc.py match_ratio.c (zero warnings); wdis (ordered loads,
+signed word iteration, dword accumulation, original x87 opcodes, ordered
+writebacks and plain RET); hybrid_link.py pinned payload/full objects
+(2685 redirects,605146 arena bytes,406/446 modules,1588 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/match-ratio-20261116/{match_ratio.obj,match_ratio.lst,full.json}.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
