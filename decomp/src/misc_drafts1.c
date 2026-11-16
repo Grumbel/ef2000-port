@@ -20729,8 +20729,10 @@ void run_exit_handlers_9bdbb(uint32_t eax, uint32_t edx)
 	}
 }
 
-/* 0x1e9, 57 bytes. Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01h) with AH=40h and the string length, then the exit handlers run for priorities 0..0xff and the program terminates through INT 21h AH=4Ch with the exit code EAX (cdecl-less register convention: EAX = code, EDX = message). */
-void fatal_exit_1e9(uint32_t code, uint32_t message)
+/* 0x1e9, 57 bytes. EAX=message, EDX=exit code. PUSH EDX/PUSH EAX
+ * saves the code below the message; after opening CON, POP EDX recovers
+ * the message for the write, and the later POP EAX recovers the exit code. */
+void fatal_exit_1e9(ef_addr32 message, uint32_t code)
 {
 	uint32_t in[7], out[7];
 	uint8_t sregs[12];
@@ -20748,11 +20750,12 @@ void fatal_exit_1e9(uint32_t code, uint32_t message)
 	guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
 }
 
-/* 0x11d258, 29 bytes. Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register arguments (EAX = code, EDX = message). */
-void report_error_11d258(uint32_t code, uint32_t message)
+/* 0x11d258, 29 bytes. Preserve the incoming message/code around the
+ * debugger hook, then forward EAX=message and EDX=code to the fatal exit. */
+void report_error_11d258(ef_addr32 message, uint32_t code)
 {
 	if (debugger_hook_1204b6() == 0u)
-		fatal_exit_1e9(code, message);
+		fatal_exit_1e9(message, code);
 }
 
 /* 0xac780, 37 bytes. Tail fragment of the preceding routine (reached when its test succeeds; the original jumps back to the return at 0xac77e otherwise): when the word at 0x41eed2 equals 1, clear the registered callbacks and the UI state, show the text at 0x41f262 and finish by tail-calling the redraw. */

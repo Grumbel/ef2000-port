@@ -5538,7 +5538,7 @@ Test the current 3ce674d0 game-code package on private Xvfb with fresh isolated
 config/state/drive overlays. Mitarbeiter triggers the text-layout allocation
 error "Gui SetWindowText ... No memory for text format data", writes
 TACTCOM.$$$ in the overlay and later faults during teardown at original31a.
-Multiplayer faults at compiled3064a06, in fatal_exit_1e9 while reading message
+Multiplayer faults at compiled 3064a06, in fatal_exit_1e9 while reading message
 pointer1; this is also downstream failure handling, not a proven root cause.
 Kampagne opens its choice dialog, but Kampagne erstellen faults at compiled
 30438ea in sort_nodes_by_order_e6848 after receiving a null list head. Do not
@@ -5757,3 +5757,33 @@ are started. Evidence: local/texture-span-decomp-20261116/blended/
 {texture_spans.obj,texture_spans.lst,texture_spans.abi.h} and blended-full.json.
 Commands: ef2000_wcc.py on texture_spans.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check. Inventory: 3376 compiles, 858 blocked.
+
+### 2026-11-16 — Correct fatal-exit message/code interpretation
+
+The owner's quick-fight control crash again stops at compiled 3064a06 in the
+fatal error handler while treating ffff0001 as a string. Read the original
+1e9 stack flow: PUSH EDX saves the exit code, PUSH EAX saves the message;
+POP EDX after opening CON retrieves the message for scanning/writing, and
+POP EAX later retrieves the exit code. The C interpretation was reversed.
+Correct fatal_exit_1e9 to EAX=message, EDX=code and carry those names/types
+through report_error_11d258, its declarations and signature notes. Original
+callers 10e438 and 11d695 independently load literal string addresses into EAX
+and 1 into EDX. No error is suppressed and no invalid-pointer guard is added.
+
+Watcom recompiles misc_drafts1.c with zero warnings/errors. Its listing now
+captures the message from EAX into EDI and code from EDX into EBP, rather than
+reading the code as a pointer. Full static relink with the recovered renderer
+modules succeeds: 2606 redirects, 579924 arena bytes. Tracker/diff checks pass.
+No new execution/UI/replay runs are started. Evidence:
+local/fatal-message-abi-20261116/{objects/misc_drafts1.obj,misc_drafts1.lst,
+full.json}; supplied saved run 535d7fe2685b4b00a02656838b2afdf2.
+
+This repairs the secondary fatal-handler fault, not the error that requested
+termination; quick-fight input usability remains unresolved. The supplied
+Helsinki free-flight run 3fae26aee20d474687ca8f52f767a68f is distinct: its saved
+fault at 30008dc is the first byte read in ascii_stricmp_9d524. The original
+caller a788c (return PC a78a4) traverses child widgets via +91/+21 and supplies
+child+3f. The invalid child is 14000000, producing pointer 1400003f and linear
+fault 2400003f. Existing logs narrow this to an invalid UI child link before
+name comparison; no source repair is claimed for that corruption. Preserve
+both open issues while continuing original-code recovery.

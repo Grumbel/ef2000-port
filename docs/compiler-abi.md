@@ -8950,8 +8950,8 @@ in EAX, format string address, one value).
 | Entry | Inputs | Outputs | Callers | Observed effect |
 | --- | --- | --- | --- | --- |
 | `0x9bdbb` | EAX:uint32_t,EDX:uint32_t | none | 1e9@218 | Run the registered exit handlers with priority between MIN (AL) and MAX (DL): the 6-byte records at 0x195ade..0x195af0 h |
-| `0x1e9` | EAX:uint32_t,EDX:uint32_t | none | 11d258@11d26d | Fatal exit with a message: STRING (EDX, zero-terminated) is written to the file opened by name 0x120d1b (INT 21h AX=3D01 |
-| `0x11d258` | EAX:uint32_t,EDX:uint32_t | none | 10e438@10e443,11d695@11d69f | Report an error: if the debugger hook (0x1204b6) returns zero, call the fatal exit 0x1e9 with the same two register argu |
+| `0x1e9` | EAX:ef_addr32,EDX:uint32_t | none | 11d258@11d26d | EAX is the message pointer, EDX the exit code; original stack pops recover them for write and exit. |
+| `0x11d258` | EAX:ef_addr32,EDX:uint32_t | none | 10e438@10e443,11d695@11d69f | Forward message/code after the debugger hook; EAX=message, EDX=exit code. |
 
 ## misc_drafts1 (2026-11-03)
 

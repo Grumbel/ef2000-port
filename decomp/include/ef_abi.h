@@ -6724,11 +6724,11 @@ uint8_t shade_lookup_c6428(uint32_t *esi);
 uint8_t shade_lookup_store_c64d0(uint32_t *esi);
 
 void run_exit_handlers_9bdbb(uint32_t eax, uint32_t edx);
-void fatal_exit_1e9(uint32_t code, uint32_t message);
-void report_error_11d258(uint32_t code, uint32_t message);
+void fatal_exit_1e9(ef_addr32 message, uint32_t code);
+void report_error_11d258(ef_addr32 message, uint32_t code);
 void run_exit_handlers_9bdbb(uint32_t eax, uint32_t edx);
-void fatal_exit_1e9(uint32_t code, uint32_t message);
-void report_error_11d258(uint32_t code, uint32_t message);
+void fatal_exit_1e9(ef_addr32 message, uint32_t code);
+void report_error_11d258(ef_addr32 message, uint32_t code);
 
 void show_status_ac780(void);
 void show_status_ac780(void);
