@@ -417,3 +417,6 @@ addr	size	type	name	evidence	notes
 0x00137201	1	uint8_t	g_parser_state_137201	a9bfc original ASM	Separate byte reset, not a wider clear
 0x00417250	40	ef_addr32[10]	g_parser_option_buffers	a9bfc original ASM	Ten pointers installed in nonsequential order; overlaps menu animation option0
 0x004194c6	150	char[10][15]	g_parser_option_storage	a9bfc original ASM	Ten consecutive option buffers; contents left unchanged
+0x00161e16	2	int16_t	g_path_animation_stage	f36a4 original ASM	Low-word addition; negative resets to zero, exactly five refreshes then becomes four
+0x00161e18	2	int16_t	g_path_animation_delta	f36a4 original ASM	Cleared on either stop condition
+0x00161e1a	2	int16_t	g_path_animation_path_index	f36a4 original ASM	Read as signed high word of dword161e18 before drawing

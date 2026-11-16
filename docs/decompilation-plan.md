@@ -7064,3 +7064,31 @@ local/parser-key-reset-20261116/{parser_key_reset.obj,parser_key_reset.lst,
 full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild. Full RAM/stack
 equivalence and reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover path animation step
+
+Recover step_animation_f36a4 (109 original bytes) in path_animation.c;
+tracker runtime_helpers35 had no definition. ASM and sole caller f4079
+establish no arguments or consumed output, six other GPRs preserved,
+plain RET. Caller keeps its hover value in EDI. No ABI changes or existing
+caller rebuild required; the C display dispatcher still uses its original
+guest-call boundary.
+
+Draw the path selected by the signed high word at 161e18 before reading
+stage and delta. Keep wrapped word addition and stage store, negative-stage
+reset of delta then stage, and the fresh overlapping dword-high read at
+161e14. Only exactly five calls refresh_f35f0 before clearing delta and
+setting stage four; values above five do not stop. Name the stage, delta
+and path-index fields. Remove generic probe tracker reference, retaining
+its JSON. No new timing assumptions or frame guards.
+
+Commands: ef2000_wcc.py path_animation.c (zero warnings); wdis (draw before
+metric reloads, word store/sign test, fresh dword read, exact-five branch,
+refresh-before-reset order, preserved registers and plain RET);
+hybrid_link.py pinned payload/full objects (2643 redirects,598666 arena
+bytes,373/413 modules,1630 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/path-animation-20261116/{path_animation.obj,path_animation.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild. Full RAM/stack
+equivalence and reported crash/highlight repairs remain unverified.
