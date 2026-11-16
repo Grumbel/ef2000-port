@@ -9877,7 +9877,7 @@ three transformed dwords at +0 and three world-position dwords at +12.
 
 Rotation inputs and point Y/Z retain the original overlapping dword reads
 and arithmetic shifts. World offsets add with 32-bit wraparound. The view
-test receives five callee-cleaned stack arguments in out,Z,Y,X,margin order.
+test receives five callee-cleaned stack arguments in margin,Z,Y,X,out order (nearest to the return address first).
 Test AL, publish the local world pointer and script fields, then invoke
 132b14 with one callee-cleaned stack argument and store its EAX at1600c0.
 The repeat byte is tested before publishing the rotation pointer, and
@@ -9885,3 +9885,22 @@ reread on the nonzero path afterward. Finally invoke132ad8 through the
 existing four-register adapter with signed world high words in EAX/EDX/EBX
 and the page's low flag nibble in ECX, including when the view test fails.
 Static compilation/listing/link review only; execution fidelity unverified.
+
+## View-test stack-order correction at `0x160122` / `0x160156`
+
+The actual incoming stack order is margin,Z,Y,X,out at ESP+4..20.
+Both original ENTER frames read margin at EBP+8, Z at+c, Y at+10,
+X at+14 and out at+18, and end with RET20. The earlier declaration
+out,Z,Y,X,margin reversed the two outer arguments. It also had incorrect
+register-input metadata and a four-byte cleanup claim. Original callers
+9e140/9fcd7/a057a and9fa11/a07d3 establish the stack contract. ESI/EDI/EBP
+are preserved; EAX is the result and EBX/ECX/EDX are scratch.
+
+Correct both declarations/definitions and the positioned-page caller.
+Generated caller pushes out,X,Y,Z,margin, so the margin is nearest the
+return address. Generated bodies load the corresponding five stack slots
+and return20. Keep their existing hybrid exclusions: this corrects the ABI,
+while the arithmetic implementation and implicit-register callees still
+need individual fidelity review. Old register-only drafted probes are
+inapplicable and are no longer referenced by the tracker. No execution
+verification is claimed.

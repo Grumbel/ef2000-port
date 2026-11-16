@@ -389,8 +389,8 @@ addr	reason
 0x10dbc1	abi_check: stack/x87 convention differs from the original (original 0, compiled 4  ); declare before linking
 0x120a07	abi_check: stack/x87 convention differs from the original (original 0, compiled 12  ); declare before linking
 0x15c0ea	abi_check: stack/x87 convention differs from the original (original 16, compiled 0  ); declare before linking
-0x160122	abi_check: stack/x87 convention differs from the original (original 20, compiled 4  ); declare before linking
-0x160156	abi_check: stack/x87 convention differs from the original (original 20, compiled 4  ); declare before linking
+0x160122	Stack ABI corrected by static review; arithmetic body and implicit-register callees remain pending individual fidelity review.
+0x160156	Stack ABI corrected by static review; arithmetic body and implicit-register callees remain pending individual fidelity review.
 0x00001cd8	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000041fc	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000042a4	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)

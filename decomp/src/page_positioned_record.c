@@ -35,9 +35,9 @@ void start_positioned_page_record_a04b4(uint32_t record_index, uint32_t point_in
     EF_U32(world + 4u) = EF_U32(0x00417168u) + EF_U32(frame + 4u);
     EF_U32(world + 8u) = EF_U32(0x0041716cu) + EF_U32(frame + 8u);
 
-    if ((uint8_t)rotate_view_test_160156(world, EF_U32(world + 8u),
-            EF_U32(world + 4u), EF_U32(world),
-            EF_U16(EF_U32(0x0041717cu) + 2u)) != 0u) {
+    if ((uint8_t)rotate_view_test_160156(
+            EF_U16(EF_U32(0x0041717cu) + 2u), EF_U32(world + 8u),
+            EF_U32(world + 4u), EF_U32(world), world) != 0u) {
         EF_U32(0x001600a8u) = (uint32_t)(int32_t)EF_S16(record);
         EF_U32(0x001600acu) = record + 0x14u;
         EF_U32(0x001600b0u) = world;

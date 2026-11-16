@@ -6060,3 +6060,27 @@ page_positioned_record.obj,page_positioned_record.lst,
 page_positioned_record.abi.h,full.json}. Commands:ef2000_wcc.py on
 page_positioned_record.c; wdis; hybrid_link.py; decomp_status.py check;
 git diff --check.
+
+### 2026-11-16 — Correct view-test stack argument order
+
+Static review of the next page routine exposed an existing declaration
+error at160122/160156 that the a04b4 recovery in165d3508 inherited. Their
+original ENTER frames consume margin,Z,Y,X,out at ESP+4..20 and RET20;
+the old declaration reversed out and margin and the tracker incorrectly
+claimed four register inputs plus four-byte cleanup. Correct both C
+signatures/definitions, stack metadata, preserved registers and a04b4's
+call. Correct compiler-abi.md's preceding stack-order description too.
+
+Original callers9e140/9fcd7/a057a and9fa11/a07d3 confirm the convention.
+Watcom compiles both affected modules without warnings. Wdis confirms
+out/X/Y/Z/margin push order in a04b4 and correct stack loads/RET20 in both
+view-test bodies. Keep their existing exclusions pending individual
+arithmetic/implicit-register fidelity review; update the exclusion reasons
+and remove tracker references to obsolete register-only drafted probes.
+
+Full static link:2615 redirects,353/393 modules,585570 arena bytes. Tracker
+check and git diff --check pass. No execution/UI/replay runs. Evidence:
+local/view-test-stack-abi-20261116/{page_positioned_record.obj,
+page_positioned_record.lst,misc_drafts1.obj,misc_drafts1.lst,full.json}.
+Commands:ef2000_wcc.py on both affected modules; wdis on both objects;
+hybrid_link.py; decomp_status.py check; git diff --check.
