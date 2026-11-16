@@ -2491,7 +2491,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b1bf8	57	print_status_lines_b1bf8	small_wrappers6	compiles	game	confirmed	decomp/tests/0x000b1bf8.json	docs/compiler-abi.md; Print the two status lines (0x1264e2; 0x1a364c and 0x1a364b) to a handle.; callers b3084@b3099; guest pending
 0x000b1c34	77	dump_entry_list_b1c34	game_helpers127	compiles	game	confirmed	decomp/tests/0x000b1c34.json	docs/compiler-abi.md; Dump a numbered entry list: the format string, the entry count, then each entry (numbered from 0 in word +0x13) via 0xb1; callers b3084@b310c; guest pending
 0x000b1f80	618	dump_record_b1f80	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b1f80.json	Original 0xb1f80 (618 bytes)
-0x000b21ec	140	print_record_b21ec	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b21ec.json	docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
+0x000b21ec	140	print_record_b21ec	record_output	compiles	game	confirmed		docs/compiler-abi.md; Print one record to a text handle.; callers b1f80@b21c7,b2758@b27d0; guest pending
 0x000b23bc	226	dump_record_b23bc	game_helpers128	compiles	game	confirmed	decomp/tests/0x000b23bc.json	docs/compiler-abi.md; Dump one 0x13-byte record to a handle: an index or fallback value, its kind name, an optional dword and six signed words; callers b2560@b26a9; guest pending
 0x000b2504	89	print_move_record_b2504	game_helpers82	compiles	game	confirmed	decomp/tests/0x000b2504.json	docs/compiler-abi.md; Print a movement record with its kind name.; callers b2560@b261a,b2810@b2898,b28b8@b2940; guest pending
 0x000b2560	504			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).

@@ -11556,3 +11556,28 @@ local/point-output-20261116/{point_output.obj,point_output.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover record text output
+
+Recover print_record_b21ec (140 original bytes) in record_output.c;
+runtime_helpers33 had no definition. ASM and caller sites b21c7/b27d0
+establish EAX record, EDX output, six other registers preserved, plain RET.
+Existing C users game_helpers130/misc_drafts1 need no ABI change or rebuild.
+
+Preserve null-record branch's three output calls, including repeated final
+format. For populated record, read overlapping dwords at +12/+10/+e/+c/
++a/+8 in descending order and arithmetic-shift their high words, then read
+bytes +9 through +5 and name pointer +0. Preserve original fourteen cdecl
+arguments and 56-byte cleanup. No narrowing memory reads, added field
+checks or new formatting text. No new globals. Remove generic probe
+tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py record_output.c (zero warnings); wdis (descending
+dword/byte reads, signed shifts, argument push order, 56-byte cleanup,
+three null-case calls and plain RET); hybrid_link.py pinned payload/full
+objects (2671 redirects,603100 arena bytes,398/438 modules,1602 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/record-output-20261116/{record_output.obj,record_output.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
