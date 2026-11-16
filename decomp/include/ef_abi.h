@@ -3264,7 +3264,7 @@ void print_object_b2e98(ef_addr32 rec, uint32_t out);
 uint32_t read_file_payload_size_b3b90(ef_addr32 name);
 uint32_t take_pool_block_b3db0(uint32_t size);
 uint32_t parse_open_mode_bc1d3(ef_addr32 mode);
-uint8_t clear_unusable_slots_bd5f8(ef_addr32 rec);
+uint32_t clear_unusable_slots_bd5f8(ef_addr32 rec);
 void link_matching_entries_be320(ef_addr32 listp, ef_addr32 otherp);
 uint16_t guest_fn_b2e64(ef_addr32 record); /* 0xb2e64 -> AX */
 uint32_t guest_fn_a7ae0(uint32_t handle, uint32_t flag); /* 0xa7ae0 stack */

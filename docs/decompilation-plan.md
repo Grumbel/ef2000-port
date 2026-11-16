@@ -7410,3 +7410,31 @@ local/named-entry-select-20261116/{named_entry_select.obj,
 named_entry_select.lst,full.json}. Status remains compiles, counts unchanged.
 No runtime/UI/replay/differential execution or packaged runtime rebuild;
 full RAM/stack equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover reverse unusable-slot cleanup
+
+Recover clear_unusable_slots_bd5f8 (144 original bytes) in unusable_slot.c;
+runtime_helpers34 had no definition. ASM and caller sites bdc8d/bdcd7
+establish EAX record, full EAX zero/one result, six other registers preserved,
+plain RET. Callers test AX: correct the prior AL-only declaration/signature.
+No existing C users found, so no caller object rebuild needed.
+
+Preserve kind-two early return and kind-25 signed-low-word count check.
+Scan from unsigned byte count minus one downward, skip zero first words,
+call the slot predicate with signed DX, test only its low AX, and reload
+the table pointer after the predicate while retaining the old byte offset.
+Clear only the first unusable occupied slot in reverse order and return
+one; return zero otherwise. Full-width loop comparisons are equivalent
+here because the byte-derived index remains in -1..254. No extra guards,
+clears or rescan. Add minimum packed record/entry layouts and assertions.
+Remove generic probe tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py unusable_slot.c (zero warnings); wdis (kind gates,
+signed count test, reverse loop, predicate AX test, post-call pointer reload,
+full EAX result and plain RET); hybrid_link.py pinned payload/full objects
+(2655 redirects,600766 arena bytes,385/425 modules,1618 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/unusable-slot-20261116/{unusable_slot.obj,unusable_slot.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
