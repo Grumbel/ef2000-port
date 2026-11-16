@@ -7624,3 +7624,29 @@ local/group-node-visit-20261116/{group_node_visit.obj,group_node_visit.lst,
 full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
 differential execution or packaged runtime rebuild; full RAM/stack
 equivalence and reported crashes remain unverified.
+
+### 2026-11-16: recover event counter updates
+
+Recover count_event_9aa78 (182 original bytes) in event_count.c;
+runtime_helpers31 had no definition. ASM and sole caller 9a683 establish
+DX kind only, EAX scratch, six other registers preserved, plain RET. Remove
+false EAX record parameter from both declarations and signature; explicit
+DX-only pragma preserves register placement. No existing C users found.
+Watcom treats parameter EDX as scratch; hybrid entry restores original EDX.
+
+Capture slot word, select rows for kinds 0/13/1d/26/31/49/4f, sign-extend
+slot for unchecked indexing, increment selected word with wrap, then write
+back captured slot even for unknown kinds. This final store matters if an
+unchecked counter index aliases the slot itself. No bounds checks or slot
+normalization. Name slot and seven nominal three-word rows. Remove generic
+probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py event_count.c (zero warnings); wdis (DX input,
+signed index extension, seven branches, wrapping word increment and final
+slot writeback, plain RET); hybrid_link.py pinned payload/full objects
+(2666 redirects,601924 arena bytes,393/433 modules,1607 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/event-count-20261116/{event_count.obj,event_count.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.

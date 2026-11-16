@@ -476,3 +476,11 @@ addr	size	type	name	evidence	notes
 0x00146e2c	2	uint16_t	g_stack_pool_handle_bias	b3e39 adds low word	return AX adjustment
 0x0041f370	4	ef_addr32	g_stack_pool_handle_table	b3df4 reads table base	four-byte allocation addresses
 0x004194c2	2	uint16_t	g_parser_group_count	ab2a9 reads live outer-loop bound	signed low-word loop index compared with unsigned word count
+0x0040d028	2	int16_t	g_event_counter_slot	9aa79 captures; 9ab25 restores word	unchecked signed row index
+0x0040cfde	6	uint16_t[]	g_event_counter_row_0	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040cfe4	6	uint16_t[]	g_event_counter_row_1	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040cfea	6	uint16_t[]	g_event_counter_row_2	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040cff0	6	uint16_t[]	g_event_counter_row_3	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040cff6	6	uint16_t[]	g_event_counter_row_4	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040cffc	6	uint16_t[]	g_event_counter_row_5	9aa78 word increments	three nominal slots, original indexing unchecked
+0x0040d002	6	uint16_t[]	g_event_counter_row_6	9aa78 word increments	three nominal slots, original indexing unchecked

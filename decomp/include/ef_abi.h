@@ -3167,7 +3167,7 @@ void switch_page_eb272(uint32_t page);
 /* runtime_helpers31.c */
 void select_sound_slot_98050(uint8_t slot);
 void update_records_9a624(void);
-void count_event_9aa78(ef_addr32 record, int16_t kind);
+void count_event_9aa78(int16_t kind);
 void read_text_line_9d1e8(ef_addr32 stream);
 void load_string_table_9d990(void);
 uint32_t guest_fn_d5e0c(ef_addr32 slot); /* 0xd5e0c EAX -> EAX */
@@ -3179,7 +3179,7 @@ void guest_fn_9b780(void); /* 0x9b780 */
 void guest_fn_9b8a0(void); /* 0x9b8a0 */
 uint16_t guest_fn_9d964(ef_addr32 text); /* 0x9d964 EAX -> AX */
 void guest_fatal_arg0(ef_addr32 format); /* [0x132a74] cdecl, no extra argument */
-void count_event_9aa78(ef_addr32 record, int16_t kind);
+void count_event_9aa78(int16_t kind);
 
 /* game_helpers51.c */
 void create_state_file_a1b54(ef_addr32 name, uint16_t version);
@@ -7622,4 +7622,8 @@ uint8_t initialize_comms_a3c18(void);
 uint16_t load_page_9de08(ef_addr32 filename, uint32_t mode);
 void update_page_history_a0f84(uint32_t source_index, uint32_t point_index, uint32_t channel);
 void draw_widget_frame_a5ca4(ef_addr32 widget);
+#endif
+
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux count_event_9aa78 parm [edx] modify [eax]
 #endif
