@@ -7560,4 +7560,5 @@ uint32_t initialize_data_playback_eac48(int32_t count, ef_addr32 arguments); /* 
 void show_menu_animation_a8bd4(ef_addr32 source); /* 0xa8bd4 EAX */
 void execute_script_branch_a9130(ef_addr32 record); /* 0xa9130 EAX */
 void clear_registered_callbacks(void); /* 0xabec4 no inputs */
+void restore_parser_state_ab47c(uint32_t handle); /* 0xab47c EAX */
 #endif

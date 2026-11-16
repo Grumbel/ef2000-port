@@ -6007,3 +6007,29 @@ local/registered-callbacks-20261116/{registered_callbacks.obj,
 registered_callbacks.lst,registered_callbacks.abi.h,full.json}. Commands:
 ef2000_wcc.py on registered_callbacks.c; wdis; hybrid_link.py;
 decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover parser-state restoration
+
+Recover ab47c (386 owned bytes) in parser_restore.c. Original ASM clears
+EDI before use, disproving its earlier implicit-input blocker. Callers
+286a9/28819 establish EAX=opened handle, preserved EDX for close, discarded
+EAX result and plain RET. Read thirty inline-dword/indirect-record variable
+slots, restore the subroutine return table and current instruction through
+signed-word group/item indices, restore linked nodes, then read and apply
+the optional order target and set presentation state137205.
+
+Retain the asserted 12-byte frame and partial two-byte slot reads, unchecked
+list walks, -1 current-position sentinel, low-word loop comparisons and
+count sample before each unchecked return-table store (overflow can alias
+count). Do not initialize unused local bytes or add guards. Remove ab47c's
+old mechanical exclusion only after this manual review.
+
+Watcom compiles without warnings; wdis confirms callee-cleanup stack reads,
+word-index walks, pre-store count sample, message store order and plain RET.
+Full static link:2614 redirects,352/392 modules,585138 arena bytes. Tracker
+check and git diff --check pass. Inventory:3384 compiles,850 blocked. Status
+compiles only; no new runtime/UI/replay runs. Evidence:
+local/parser-restore-20261116/{original.asm,parser_restore.obj,
+parser_restore.lst,parser_restore.abi.h,full.json}. Commands:ef2000_wcc.py
+on parser_restore.c; wdis; hybrid_link.py; decomp_status.py check;
+git diff --check.

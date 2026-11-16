@@ -9845,3 +9845,24 @@ read again at CALL after the null test. An explicit union splits the pair
 without a runtime 64-bit shift helper. After callbacks the count is cleared
 before the 0x150-byte fill of 41e960. Static listing/link review only;
 execution equivalence remains unverified.
+
+## Parser-state restoration at `0xab47c`
+
+`restore_parser_state_ab47c` takes EAX=handle and preserves the other six
+GPRs with plain RET. Original callers 286a9 and 28819 pass opened handles,
+discard EAX and subsequently close using preserved EDX. The old triage
+claim of an implicit EDI input was incorrect: ab486 clears EDI.
+
+The original 12-byte local layout is order+0, group+4, item+8. Position
+reads write two bytes into each four-byte slot; remaining bytes stay
+uninitialized. Resolve signed word indices through group+0 and item+1,
+starting with the group's first item at +8. There are no null or range
+checks. For each restored return entry, sample count4194ac before writing
+the unchecked table418e38; an overflowing table write can alias the count.
+The final group=-1 sentinel leaves the current instruction unchanged.
+
+After linked-node restoration, preset order137202 to -1, read its word,
+and optionally construct the original four-byte order message before
+calling a905c. Preserve the byte/word/byte message store order. Finally set
+137205 to 1. Watcom listing review and full static linking pass; runtime
+execution equivalence remains unverified.
