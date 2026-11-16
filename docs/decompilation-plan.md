@@ -6872,3 +6872,30 @@ pinned payload and complete objects (2637 redirects,596674 arena bytes,
 Evidence: local/widget-text-20261116/{widget_text.obj,widget_text.lst,full.json}.
 No runtime/UI/replay/differential execution and no claim of crash or menu
 highlight repair. Stack contents/layout equivalence remains unverified.
+
+### 2026-11-16: styled text renderer
+
+Recover draw_styled_text_e26bc (400 bytes) in styled_text.c from the original
+ASM and private export. Review sole caller a6cdb: EAX zero (unused), EDX X,
+low BX Y, ECX text, low byte of one stack argument selects style; RET4;
+ESI/EDI/EBP preserved and four scratch GPRs. The stale implicit-SI blocker
+is incorrect: ESI is assigned EDX before its low word is read.
+
+Keep format 1/2 atlas and format 3 packed-glyph loops, initial X+4, signed
+low-word destination coordinates, missing-glyph space handling, per-character
+style offsets, width reload after height for atlas draws, original glyph
+source coordinates, and post-blit text/width/spacing reloads. Name style
+fields and first glyph metric table; preserve unchecked style indexing.
+Review ca290 prologue/RET20: four register arguments plus width,height,X,Y,
+stride on the callee-cleaned stack. Add a narrow shared alias/pragma for
+this original blitter. No existing C callers use that new alias.
+
+Commands: ef2000_wcc.py styled_text.c (zero warnings); wdis (five blitter
+argument pushes, no caller cleanup, post-call reloads and renderer RET4);
+hybrid_link.py (2637 redirects,596994 arena bytes,367/407 modules,1635
+exclusions); decomp_status.py check; git diff --check. Evidence:
+local/styled-text-20261116/{styled_text.obj,styled_text.lst,full.json}.
+The stack-argument gate excludes e26bc from redirects: existing widget text
+continues calling the original renderer. Tracker promotion is compiles only
+(3406 compiles,828 blocked). No runtime/UI/replay/differential execution;
+stack/RAM equivalence and the reported bugs remain unverified.

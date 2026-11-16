@@ -3203,6 +3203,12 @@ ef_addr32 find_key_checked_a7f64(ef_addr32 name);
 void reset_key_tables_a9bfc(void);
 void resolve_scene_groups_aa350(void);
 void guest_fn_e26bc(uint32_t a, int32_t x, int32_t y, ef_addr32 text, uint32_t color); /* 0xe26bc */
+void draw_styled_text_e26bc(uint32_t unused, uint32_t x, uint32_t y, ef_addr32 text, uint32_t style);
+void guest_blit_clip_ca290(ef_addr32 bitmap, ef_addr32 clip, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t x, uint32_t y, uint32_t stride); /* 0xca290 */
+#ifdef __WATCOMC__
+#pragma aux draw_styled_text_e26bc parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#pragma aux guest_blit_clip_ca290 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#endif
 #ifdef __WATCOMC__
 #pragma aux guest_fn_e26bc parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #endif

@@ -392,3 +392,8 @@ addr	size	type	name	evidence	notes
 0x0041edfc	164	ef_addr32[41]	g_widget_pointer_table	a667a loads owner indexed by child byte +50	Existing a4e98 clears 41 dwords; child layout copies owner width to +c5
 0x0041ec1c	4	ef_addr32	g_selected_title_bitmap	a719b loads before c92e4 call	Title frame bitmap for selected title control
 0x0041ec24	4	ef_addr32	g_unselected_title_bitmap	a71ca loads before c92e4 call	Title frame bitmap for unselected title control
+0x001378d9	1	uint8_t	g_text_style_space_advance	e279a/e27af	First style; subsequent styles have 10-byte stride
+0x001378da	1	uint8_t	g_text_style_glyph_spacing	e2789/e2836	First style; subsequent styles have 10-byte stride
+0x001378dd	4	ef_addr32	g_text_style_bitmap	e2768/e2812	First style; subsequent styles have 10-byte stride
+0x001378e1	1	uint8_t	g_text_style_format	e26da	First style format 1/2 atlas or 3 packed; 10-byte stride
+0x004198d0	2048	uint8_t[256][8]	g_text_style_glyph_metrics	e271e..e2762	First style; 2048-byte stride; source X/Y,width,height at bytes 0..3
