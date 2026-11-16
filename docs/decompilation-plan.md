@@ -6952,3 +6952,27 @@ Status remains compiles, not verified; counts remain3407 compiles,827
 blocked. No runtime/UI/replay/differential execution. Generated stack
 layout differs from the original; RAM/stack equivalence and all reported
 crash/highlight repairs remain unverified. No packaged runtime rebuild.
+
+### 2026-11-16: screen clip access order
+
+Review clip_rect_to_screen_e58a8 (183 original bytes) against original ASM
+and callers a5f9a/a5fcb and a6dc6. No arguments or consumed return; original
+preserves EBX/ECX/EDX/ESI/EDI and untouched EBP. Keep signature unchanged.
+Correct the C draft's reversed negative-origin stores: capture adjusted
+extent, clear origin, then store extent, for each axis. Restore original
+signed dword-high reads at 41ec0a/41ec06 and 41ec08/41ec0c for the right and
+bottom checks. Preserve signed comparisons, inclusive limit rejection,
+word wrap and the absence of empty/negative-size guards. No new globals.
+Remove the generic probe tracker reference; retain its JSON as old evidence.
+This is an access-order fidelity correction, not a demonstrated highlight
+or crash fix; ordinary final clip values were already equivalent.
+
+Commands: ef2000_wcc.py misc_drafts1.c (zero warnings); wdis (both origin
+stores before extent stores, four dword loads and arithmetic shifts);
+hybrid_link.py pinned payload/full objects (2638 redirects,597634 arena
+bytes,369/409 modules,1635 exclusions); decomp_status.py check (4293
+functions); git diff --check. Evidence:
+local/screen-clip-order-20261116/{misc_drafts1.obj,misc_drafts1.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence remains
+unverified.

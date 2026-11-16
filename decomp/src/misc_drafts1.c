@@ -2559,18 +2559,28 @@ void clip_rect_to_screen_e58a8(void)
 {
     int16_t x = (int16_t)EF_U16(0x0041ec08u);
     int16_t y;
+    uint16_t extent;
+    int32_t end, origin;
+
     if (x < 0) {
-        EF_U16(0x0041ec0cu) = (uint16_t)(EF_U16(0x0041ec0cu) + (uint16_t)x);
+        extent = (uint16_t)(EF_U16(0x0041ec0cu) + (uint16_t)x);
         EF_U16(0x0041ec08u) = 0u;
+        EF_U16(0x0041ec0cu) = extent;
     }
-    if ((int32_t)(int16_t)EF_U16(0x0041ec0cu) + (int32_t)(int16_t)EF_U16(0x0041ec08u) >= (int32_t)EF_U32(0x0015b744u))
+    /* Keep the original overlapping dword reads and origin-first writes. */
+    end = EF_S32(0x0041ec0au) >> 16;
+    origin = EF_S32(0x0041ec06u) >> 16;
+    if (end + origin >= EF_S32(0x0015b744u))
         EF_U16(0x0041ec0cu) = (uint16_t)(EF_U16(0x0015b744u) - EF_U16(0x0041ec08u));
     y = (int16_t)EF_U16(0x0041ec0au);
     if (y < 0) {
-        EF_U16(0x0041ec0eu) = (uint16_t)(EF_U16(0x0041ec0eu) + (uint16_t)y);
+        extent = (uint16_t)(EF_U16(0x0041ec0eu) + (uint16_t)y);
         EF_U16(0x0041ec0au) = 0u;
+        EF_U16(0x0041ec0eu) = extent;
     }
-    if ((int32_t)(int16_t)EF_U16(0x0041ec0eu) + (int32_t)(int16_t)EF_U16(0x0041ec0au) >= (int32_t)EF_U32(0x0015b748u))
+    origin = EF_S32(0x0041ec08u) >> 16;
+    end = EF_S32(0x0041ec0cu) >> 16;
+    if (end + origin >= EF_S32(0x0015b748u))
         EF_U16(0x0041ec0eu) = (uint16_t)(EF_U16(0x0015b748u) - EF_U16(0x0041ec0au));
 }
 
