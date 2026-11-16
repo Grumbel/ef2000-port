@@ -469,3 +469,9 @@ addr	size	type	name	evidence	notes
 0x0012dd9c	4	ef_addr32	g_allocation_callback	39db8/82054 indirect calls	EAX byte size; EAX allocation; default 984f0, optional 9850c
 0x001a1860	4	ef_addr32	g_slot_pointer_table	39dbe stores allocation	count times four-byte slots
 0x0041ed80	4	ef_addr32	g_optional_word_callback	ab820 tests then freshly loads target	EAX low-word argument zero-extended; installed by setter
+0x00146e20	4	uint32_t	g_stack_pool_remaining	b3db7 subtracts size and stores before error	wrapping count, signed threshold test
+0x00146e24	2	uint16_t	g_stack_pool_handle_count	b3ddb reads; b3e11 increments word	reloaded after table store and after clear
+0x00146e28	4	ef_addr32	g_stack_pool_base	b3de1 reads base	block equals base plus remaining
+0x00146e10	4	int32_t	g_stack_pool_handle_limit	b3e08 reads before count store	signed limit comparison
+0x00146e2c	2	uint16_t	g_stack_pool_handle_bias	b3e39 adds low word	return AX adjustment
+0x0041f370	4	ef_addr32	g_stack_pool_handle_table	b3df4 reads table base	four-byte allocation addresses

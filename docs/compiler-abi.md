@@ -11369,3 +11369,31 @@ local/word-callback-20261116/{word_callback.obj,word_callback.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover stack-pool block allocation
+
+Recover take_pool_block_b3db0 (150 original bytes) in pool_block.c;
+runtime_helpers34 had no definition. ASM and callers e749/bc4a establish
+EAX size, full EAX mixed address/handle result, six other registers preserved,
+plain RET. Both callers sign-extend AX before resolving a handle. No caller
+ABI changes. Original b3fb0 saves/restores EAX, so the return retains the
+block address's upper sixteen bits, replacing only AX with count plus bias.
+
+Preserve wrapping remaining subtraction/store before signed threshold
+error, then fresh count/base/remaining/table reads. Store block in table,
+reload count after that potentially aliasing store, read signed limit before
+word count update, then report exhausted handles if necessary. Returning
+errors continue. Clear original size bytes at captured block, reload count
+and bias afterward, preserve mixed return bits. Declare callback shim
+clobbers locally. Name six globals; remove generic probe tracker reference,
+retain JSON.
+
+Commands: ef2000_wcc.py pool_block.c (zero warnings); wdis (signed checks,
+ordered reads/stores and reloads, callback argument preservation, clear
+size, mixed return and plain RET); hybrid_link.py pinned payload/full
+objects (2664 redirects,601568 arena bytes,391/431 modules,1609 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/pool-block-20261116/{pool_block.obj,pool_block.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
