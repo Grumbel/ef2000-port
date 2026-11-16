@@ -456,3 +456,4 @@ addr	size	type	name	evidence	notes
 0x0041ec18	4	uint32_t	g_ui_state_dword_41ec18	ac16c ordered reset or device query	neutral name where meaning unresolved
 0x0041f2de	1	uint8_t	g_ui_state_byte_41f2de	ac16c ordered reset or device query	neutral name where meaning unresolved
 0x0041f284	89	uint8_t[]	g_ui_state_table_41f284	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041eeda	2	uint16_t	g_named_entry_enabled	acac0 clears for null name, sets otherwise	word flag; original names remain private

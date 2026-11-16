@@ -7383,3 +7383,30 @@ local/ui-state-clear-20261116/{ui_state_clear.obj,ui_state_clear.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover named-entry selection
+
+Recover select_video_mode_acac0 (166 original bytes) in named_entry_select.c;
+runtime_helpers33 had no definition. ASM and caller sites ac1fd/e19ee
+establish EAX name, six other registers preserved, plain RET. Keep existing
+symbol name without inferring video-mode semantics; selectors operate on
+named 25-byte table entries. No existing caller ABI changes.
+
+Preserve ordered case-insensitive null/normal comparisons. Null clears the
+enabled word, sets override and still performs the original-name lookup;
+normal sets enabled, clears override and invokes the default selector;
+explicit names set both flags and perform lookup. Narrow lookup output,
+reload selected index unsigned, then retain load/store/load/store table
+word order, unlike aca14's load/load/store/store order. No null pointer or
+lookup failure guards. Name enabled word. Remove generic probe tracker
+reference, retain its JSON.
+
+Commands: ef2000_wcc.py named_entry_select.c (zero warnings); wdis (three
+branches, flag-before-lookup order, selected word reload, ordered table
+copies and plain RET); hybrid_link.py pinned payload/full objects (2654
+redirects,600620 arena bytes,384/424 modules,1619 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/named-entry-select-20261116/{named_entry_select.obj,
+named_entry_select.lst,full.json}. Status remains compiles, counts unchanged.
+No runtime/UI/replay/differential execution or packaged runtime rebuild;
+full RAM/stack equivalence and reported crashes remain unverified.
