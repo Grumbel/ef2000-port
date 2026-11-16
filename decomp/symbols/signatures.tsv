@@ -943,7 +943,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000dcc10	reset_clip_dcc10			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000dcc10 (67 bytes); Reset the 320x200 clip state.; callers a9e70@a9e8d; docs/compiler-abi.md
 0x000dcc54	reset_clip_dcc54			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000dcc54 (67 bytes); Same as dcc10 with the stores in a different order.; callers a9e70@a9eb7; docs/compiler-abi.md
 0x000e0b88	open_device_e0b88	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e0b88 (65 bytes); Open the device selected by value and report success.; callers e0b6c@e0b71,e0bcc@e0c37,e1194@e11c6; docs/compiler-abi.md
-0x000e5830	refresh_slot_e5830	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5830 (62 bytes); ; callers a6d00@a6d44; docs/compiler-abi.md
+0x000e5830	refresh_slot_e5830	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5830 (62 bytes); ; callers a6d00@a6d44; docs/compiler-abi.md
 0x000e5960	compute_rect_e5960	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5960 (58 bytes); Compute the rectangle of a record into 0x41ec08..0x41ec0e.; callers a5ef8@a5f95,e588c@e588f; docs/compiler-abi.md
 0x000e5c03	compare_strings_e5c03	EAX:ef_addr32,EDX:ef_addr32,EBX:uint32_t	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e5c03 (41 bytes); strncmp.; callers 81354@81369,82e00@82e17,c3430@c3495; docs/compiler-abi.md
 0x000eb448	enter_handler_eb448	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000eb448 (48 bytes); ; callers ea50c@ea5e7,eb2c0@eb315; docs/compiler-abi.md

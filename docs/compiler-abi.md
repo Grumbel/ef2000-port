@@ -10598,3 +10598,23 @@ Run decomp_status.py check and git diff --check. Evidence remains ignored in
 local/widget-layout-20261116/{widget_layout.obj,widget_layout.lst,final.json}.
 No runtime, UI, replay or differential run; compiles only. This does not
 establish that the menu-highlight or reported crashes are fixed.
+
+### 2026-11-16: preserve widget refresh clipping result
+
+Review e5830 (62 bytes), its sole caller a6d44/a6d49, and the original
+clipping entry e52a4. The helper returns AL unchanged from e52a4; redraw
+branches on that byte (0/1/2) for dirty rectangle save/restore or early exit.
+Replace the recovered void interface with uint8_t and explicitly return the
+named clipping helper result. Record AL in signatures.tsv and remove the
+old generic probe reference (retain its historical JSON). Earlier generated
+code may incidentally retain AL; a void C interface did not guarantee it.
+No other C source calls this helper. Preserve the pre-call mode capture and
+post-call reload of widget owner ID.
+
+Commands: ef2000_wcc.py on runtime_helpers4.c (zero warnings); wdis (AL
+survives the epilogue); hybrid_link.py with the pinned payload and complete
+object snapshot (2635 redirects,596158 arena bytes,364/404 modules,1636
+exclusions); decomp_status.py check; git diff --check. Evidence:
+local/widget-refresh-result-20261116/{runtime_helpers4.obj,
+runtime_helpers4.lst,full.json}. Static review only, no runtime/UI/replay
+or differential execution; no claim that the highlight bug is fixed.

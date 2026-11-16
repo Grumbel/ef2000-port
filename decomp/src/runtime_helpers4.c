@@ -19,13 +19,14 @@ uint32_t open_device_e0b88(ef_addr32 value)
     return (guest_fn_e0b10(0x001905f8u) & 0xffu) != 0;
 }
 
-/* 0xe5830, 62 bytes. */
-void refresh_slot_e5830(ef_addr32 object)
+/* 0xe5830, 62 bytes. Return AL from window clipping; sole caller
+ * a6d49 branches on 0/1/2 to save, skip or restore dirty rectangles. */
+uint8_t refresh_slot_e5830(ef_addr32 object)
 {
     uint8_t flag = EF_U8(0x0013725cu) != 2u;
 
     guest_fn_e59cc(EF_U32(0x0041edfcu + (uint32_t)EF_U8(object + 0x50u) * 4u), object);
-    guest_fn_e52a4(EF_U8(object + 0x50u), flag);
+    return clip_against_windows_e52a4(EF_U8(object + 0x50u), flag);
 }
 
 /* 0xe5960, 58 bytes. Compute the rectangle of a record into 0x41ec08..0x41ec0e. */

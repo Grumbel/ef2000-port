@@ -1889,7 +1889,7 @@ void guest_fn_cdf48(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcdf48 
 
 /* runtime_helpers4.c */
 uint32_t open_device_e0b88(ef_addr32 value);
-void refresh_slot_e5830(ef_addr32 object);
+uint8_t refresh_slot_e5830(ef_addr32 object);
 void compute_rect_e5960(ef_addr32 record);
 int32_t compare_strings_e5c03(ef_addr32 a, ef_addr32 b, uint32_t count); /* 0xe5c03 EAX/EDX */
 void enter_handler_eb448(uint32_t value);
