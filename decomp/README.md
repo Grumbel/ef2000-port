@@ -355,6 +355,9 @@ four-billion-instruction external-view replay reduces terrain-mask disagreement
 from 56.37% to 2.61%. Exact rendering equivalence, broader flight usability,
 and combined hand-written/mechanical milestones remain unproven. These checks
 do not establish full-game equivalence.
+Private menu checks also reproduce crashes in Mitarbeiter, Multiplayer and
+Kampagne → Kampagne erstellen; the unpatched original completes these paths.
+Those regressions remain open despite the passing flight/camera sequence.
 The tracked source inventory contains 4,293 functions: 3,368
 `compiles`, 30 `verified`, 11 `spliced`, 866 `blocked`, and 9 `compiles-bad`,
 plus nine entries in other states. These inventory counts do not measure

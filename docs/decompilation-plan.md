@@ -5531,3 +5531,40 @@ scalar.c,scalar.obj}; local/asm-c-descriptor-scalar-program-20261116/.
 The full Watcom/hardware-oracle corpus plus the saved 0x604 capture is prepared
 at local/asm-descriptor-scalar-corpus-config-20261116/command.json. Its result
 is a separate gate; no captured-game or full-corpus passing claim is made.
+
+### 2026-11-16 — Reproduce three additional main-menu regressions
+
+Test the current 3ce674d0 game-code package on private Xvfb with fresh isolated
+config/state/drive overlays. Mitarbeiter triggers the text-layout allocation
+error "Gui SetWindowText ... No memory for text format data", writes
+TACTCOM.$$$ in the overlay and later faults during teardown at original31a.
+Multiplayer faults at compiled3064a06, in fatal_exit_1e9 while reading message
+pointer1; this is also downstream failure handling, not a proven root cause.
+Kampagne opens its choice dialog, but Kampagne erstellen faults at compiled
+30438ea in sort_nodes_by_order_e6848 after receiving a null list head. Do not
+add null guards or suppress the errors without identifying the earlier defect.
+A diagnostic relink using the packaged objects reproduces the exact patch SHA
+ ecbe0f843d808c1631a1821427f2a3f759ab93cd7c186192357b1666b39dbbad,
+so symbol-to-fault mapping is bound to the tested image.
+
+The same three sequences in the unpatched native original succeed: credits
+text is visible, Multiplayer opens network/IPX settings and creates COMMS.CFG
+in its overlay, and campaign creation reaches the campaign map. All original
+runs finish at their 90-second time limit with no guest faults; all hybrid
+runs report unexpected_guest_fault (21). Startup checkpoints are verified for
+all six. Two initial concurrent automated attempts raced onto the same private
+Xvfb number; discard their navigation results. Valid reruns use distinct fixed
+private displays191/192 and originals193/194/195; no desktop input is used.
+
+Evidence: local/menu-regressions-20261116/summary.json;
+local/native-menu-mitarbeiter-20261116/;
+local/native-menu-{multiplayer,campaign}-20261116-02/;
+local/original-menu-{mitarbeiter,multiplayer,campaign}-20261116/;
+local/menu-fault-map-20261116/symbols.json. Five authored word-wrap probes
+(short, long word, spaces, CR and tabs) pass against original e1e6c with an
+actual one-redirect patch, so they do not isolate the credits regression.
+Evidence: local/menu-textwrap-probes-20261116/{wrap.json,old.json,old.log}.
+The deterministic credits error capture at local/menu-credit-capture-20261116/
+is running; the ongoing ASM descriptor corpus remains undisturbed. These
+menu regressions are now explicit open runtime work, not covered by the
+previous successful flight/camera verification.
