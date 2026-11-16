@@ -315,3 +315,4 @@ addr	size	type	name	evidence	notes
 0x004191dc	4	ef_addr32	g_script_current_instruction	original a9130 ASM	saved when taking a subroutine branch
 0x004191ec	4	ef_addr32	g_script_pending_branch	original a9130 ASM	target selected by conditional/unconditional branch
 0x001371f9	1	uint8_t	g_script_condition_automatic	original a9130 ASM	nonzero enables automatic comparison helpers for modes0/1/3
+0x0041eecc	2	uint16_t	g_registered_callback_count	abec4 live loop bound and reset	reloaded after each callback

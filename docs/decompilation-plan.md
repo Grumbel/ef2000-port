@@ -5987,3 +5987,23 @@ new execution/UI/replay runs. Inventory:3382 compiles,852 blocked. Evidence:
 local/script-branch-20261116/{script_branch.obj,script_branch.lst,
 script_branch.abi.h,full.json}. Commands:ef2000_wcc.py on script_branch.c;
 wdis; hybrid_link.py; decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover registered callback cleanup
+
+Recover abec4 (84 owned bytes) in registered_callbacks.c. Original ASM and
+callers ac429/ac78c establish no inputs or consumed result, saved
+EBX/ECX/EDX and plain RET. Replace the earlier blanket indirect-call blocker
+with a narrow register adapter: EAX=0, ECX=record offset, EBX/EDX loop state.
+Keep the callback-returned EBX/EDX values, signed index comparison, live
+unsigned-word count reload, repeated target read, wrapping increments and
+count-clear before the 0x150-byte fill. No bounds guards added.
+
+Watcom compiles without warnings. Wdis confirms callback setup, loop state,
+count reload, cleanup parameters and saved registers; no 64-bit helper is
+needed. Full static link:2613 redirects,351/391 modules,584624 arena bytes.
+Tracker check and git diff --check pass. Status compiles; no execution/UI
+runs or equivalence claim. Inventory:3383 compiles,851 blocked. Evidence:
+local/registered-callbacks-20261116/{registered_callbacks.obj,
+registered_callbacks.lst,registered_callbacks.abi.h,full.json}. Commands:
+ef2000_wcc.py on registered_callbacks.c; wdis; hybrid_link.py;
+decomp_status.py check; git diff --check.

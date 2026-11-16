@@ -9830,3 +9830,18 @@ the return count; the prompted path increments the count before storing
 the saved instruction. Retain both orders because unchecked table entries
 can alias the count. Static compilation/listing review only; runtime
 execution equivalence remains unverified.
+
+## Registered callback cleanup at `0xabec4`
+
+`clear_registered_callbacks` has no inputs or consumed result. Original
+callers ac429 and ac78c discard EAX; EBX/ECX/EDX are saved and restored,
+with ESI/EDI/EBP untouched. The plain-RET routine reloads the unsigned word
+count at 41eecc and compares it against the signed EDX loop index.
+
+The narrow callback adapter supplies EAX=0, ECX=EBX=record byte offset and
+EDX=loop index, then returns the callback's EBX/EDX as a two-word pair.
+Neither loop variable is assumed unchanged by the callback. The target is
+read again at CALL after the null test. An explicit union splits the pair
+without a runtime 64-bit shift helper. After callbacks the count is cleared
+before the 0x150-byte fill of 41e960. Static listing/link review only;
+execution equivalence remains unverified.
