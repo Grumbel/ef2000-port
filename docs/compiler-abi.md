@@ -11664,3 +11664,30 @@ local/record-pool-20261116/{record_pool.obj,record_pool.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover matching-entry linkage
+
+Recover link_matching_entries_be320 (210 original bytes) in entry_link.c;
+runtime_helpers34 had no definition. ASM and sole caller b15e4 establish
+EAX/EDX list-pointer addresses, EAX/EDX scratch, five other registers
+preserved, plain RET. Correct false EDX preservation; caller replaces EDX
+immediately afterward. No existing C users found; no caller rebuild needed.
+
+Preserve first-list eligibility byte checks, kind exclusions 15/17/16,
+fresh second-head read for each eligible node, second-node byte/word gates,
+live entry count/table reads with signed low-word index and 124-byte stride.
+Keep entry-kind exclusions 6/8/7/9, ordered identity/index word comparisons,
+original bb7c0 lookup, +53 word clear before +51 result store, continued
+scanning after matches, and next links read after processing. No new null
+checks or early exits. No new globals. Remove generic probe tracker
+reference, retain JSON.
+
+Commands: ef2000_wcc.py entry_link.c (zero warnings); wdis (gates and
+comparison order, live table/count reads, lookup/store order, post-processing
+links, saved registers and plain RET); hybrid_link.py pinned payload/full
+objects (2676 redirects,604108 arena bytes,402/442 modules,1597 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/entry-link-20261116/{entry_link.obj,entry_link.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
