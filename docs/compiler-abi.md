@@ -11156,3 +11156,30 @@ local/ui-state-reset-20261116/{ui_state_reset.obj,ui_state_reset.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover nested UI-state clear
+
+Recover clear_ui_state_ac16c (211 original bytes) in ui_state_clear.c;
+runtime_helpers33 had no definition. Original ASM and callers ac158/ac791
+establish no register inputs, EAX scratch, six other registers preserved,
+plain RET. ca5e4 has no inputs and saves EDX; no inferred start-index
+parameter added. Existing caller contracts remain unchanged.
+
+Keep ordered pool/record/widget clears, four individual word stores, the
+336-byte table fill, device flag read before callback-count clear, and
+conditional motion polling with BOTH output pointers equal to 41eeb0.
+Reload device flag after polling and before three individual byte clears;
+use that captured value for named selection. Preserve final flag/dword
+writes and the 89-byte table fill. No merged clears, guards or changes to
+selection semantics. Name fifteen touched fields neutrally where meanings
+remain unresolved. Remove generic probe tracker reference, retain its JSON.
+
+Commands: ef2000_wcc.py ui_state_clear.c (zero warnings); wdis (ordered
+writes/calls, two live device reads, shared motion output address, both fill
+lengths and plain RET); hybrid_link.py pinned payload/full objects (2653
+redirects,600394 arena bytes,383/423 modules,1620 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/ui-state-clear-20261116/{ui_state_clear.obj,ui_state_clear.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.

@@ -441,3 +441,18 @@ addr	size	type	name	evidence	notes
 0x0041f2e7	1	uint8_t	g_ui_reset_flag	ac152 sets before ac16c	meaning otherwise unestablished
 0x0041f833	1	uint8_t	g_ui_state_flag_41f833	ac15d clears after ac16c	also cleared by ac16c
 0x0041f2e6	1	uint8_t	g_ui_state_flag_41f2e6	ac163 clears after ac16c	also cleared by ac16c
+0x0041eeb6	2	uint16_t	g_ui_state_word_41eeb6	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041eed8	2	uint16_t	g_ui_state_word_41eed8	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041eed0	2	uint16_t	g_ui_state_word_41eed0	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041eece	2	uint16_t	g_ui_state_word_41eece	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041ecd0	4	uint32_t	g_ui_state_dword_41ecd0	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041e960	336	uint8_t[]	g_ui_state_table_41e960	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041f2e1	1	uint8_t	g_ui_pointer_device_enabled	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041eeb0	2	int16_t	g_ui_discarded_motion	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0013725d	1	uint8_t	g_ui_state_byte_13725d	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0013725c	1	uint8_t	g_ui_state_byte_13725c	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041f2e5	1	uint8_t	g_ui_state_byte_41f2e5	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041f2e4	1	uint8_t	g_ui_state_byte_41f2e4	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041ec18	4	uint32_t	g_ui_state_dword_41ec18	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041f2de	1	uint8_t	g_ui_state_byte_41f2de	ac16c ordered reset or device query	neutral name where meaning unresolved
+0x0041f284	89	uint8_t[]	g_ui_state_table_41f284	ac16c ordered reset or device query	neutral name where meaning unresolved
