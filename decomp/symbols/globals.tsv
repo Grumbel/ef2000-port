@@ -489,3 +489,6 @@ addr	size	type	name	evidence	notes
 0x00132cd0	4	ef_addr32[]	g_attack_pattern_names	b29b9 unchecked byte-indexed name pointer read	table extent not established
 0x001379b0	4	uint32_t	g_record_pool_active_count	b01f5 clears after initialization	pool state reset
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
+0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
+0x0040d008	6	uint16_t[3]	g_event_totals	9a69a..9a6da ordered word additions	three wrapping totals
+0x0040d00e	24	uint16_t[3][4]	g_event_tally_rows	9a624 sums four entries per row	three rows of four word counters

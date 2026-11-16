@@ -7891,3 +7891,31 @@ local/entry-link-20261116/{entry_link.obj,entry_link.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crashes remain unverified.
+
+### 2026-11-16: recover active-record statistics dispatch
+
+Recover update_records_9a624 (213 original bytes) in record_update.c;
+runtime_helpers31 had no definition. ASM and sole caller 98bf1 establish
+no inputs, six registers preserved, EAX scratch, plain RET. No caller ABI
+changes. Air-counter ASM overwrites incoming EDX before use, so retain its
+single-record argument; ground/event counters consume signed low-word
+classification. Event counter uses the corrected DX-only contract.
+
+Preserve signed low-word index against live dword active count, fresh pool
+base each iteration, overlapping dword high-word active-state read, classify
+before kind reload, and kind 0/1-or-2/3 dispatch. Then perform four iterations
+of ordered load/load/add/store on three word totals without clearing them;
+keep word wrap and final 9b780 then 9b8a0 calls. No bounds checks or cached
+mutable counts. Name pool pointer, totals and tally rows. Remove generic
+probe tracker reference, retain JSON.
+
+Commands: ef2000_wcc.py record_update.c (zero warnings); wdis (live
+count/base, signed index, classifier/kind order and argument registers,
+ordered wrapping word sums, final calls and plain RET); hybrid_link.py
+pinned payload/full objects (2677 redirects,604382 arena bytes,403/443
+modules,1596 exclusions); decomp_status.py check (4293 functions);
+git diff --check. Evidence:
+local/record-update-20261116/{record_update.obj,record_update.lst,full.json}.
+Status remains compiles, counts unchanged. No runtime/UI/replay/differential
+execution or packaged runtime rebuild; full RAM/stack equivalence and
+reported crashes remain unverified.
