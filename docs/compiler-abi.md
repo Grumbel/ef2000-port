@@ -10437,3 +10437,48 @@ ef2000_wcc.py on page_load.c,misc_drafts1.c,runtime_helpers6.c; wdis;
 hybrid_link.py with pinned payload/full-objects; decomp_status.py check;
 git diff --check. The earlier full.json predates the final reuse-load-order
 correction; reviewed.json is the authoritative final static link.
+
+### Localized callback guest frames (0x9cf2c/9cf74/9cfa4)
+
+Restore the original guest interfaces in localized_file_handlers.c.
+The early Linux probe had replaced the144-byte locals with an extra FRAME
+argument, leaving9cf74 and9cfa4 unspliceable. Their guest entries now own
+uninitialized unchecked144-byte local arrays. Keep explicit-frame helpers
+under distinct non-entry names for the bounded Linux probe and update its
+two bindings in runtime/decomp_startup.c. No recovered logic moves into
+runtime code. The existing host buffer validation remains unchanged.
+
+9cf74 takes EAX name, returns EAX size and preserves all six non-EAX GPRs.
+9cfa4 takes EAX name/EDX destination, returns consumed AL success, preserves
+EBX/ECX/ESI/EDI/EBP; EDX can be clobbered by the archive-read path. Inspect
+registration9cfdc, which installs them at132ab4/132ab8; these are callbacks,
+not direct entries in the old call inventory. Review9d9bb/9d9e9 and
+e9517/e9547 indirect call pairs: the size is consumed and ECX is live across
+the read. ca225/ca268 also consume the size and only AL of read success.
+Review original9cb20,9cbc4 and its eba64 archive path to distinguish preserved
+registers from scratch. Confirm both new signatures in the symbol database.
+No extra frame enters either guest callback ABI.
+
+The path builder already had its guest signature. Correct its matching
+prefix branch to reload40d1e0 after compare, as the original does, rather
+than reusing the earlier length. Name the two144-byte prefix buffers and
+length. Keep no extra separator, localized-first size lookup, zero-size
+fallback to the original name, and the read's independent size test.
+The old strcat-dependent differential failure is still unresolved; classify
+all three as static-reviewed compiles, not verified. No new differential
+or gameplay runs were performed.
+
+Watcom compiles warning-free. Wdis confirms each144-byte local allocation,
+EAX-only size argument, EAX/EDX read arguments, plain RET, register saves,
+prefix-length reload and both fallback branches. Native cc also compiles
+the source and updated runtime binding with -std=c11 -O2 -Wall -Wextra
+-Werror -DEF_DECOMP_NATIVE=1 and the normal decomp/runtime include paths.
+Final full static link:2632 redirects,361/401 modules,592944 arena bytes.
+Tracker:3402 compiles,832 blocked of4293; tracker/diff checks pass. Evidence:
+local/localized-callback-abi-20261116/{original.asm,registration.asm,
+caller1.asm,caller2.asm,caller3.asm,localized_file_handlers.obj,
+localized_file_handlers.lst,localized_file_handlers.host.o,
+decomp_startup.host.o,full.json}. Commands: ef2000_wcc.py; wdis; cc -c
+on the two affected native files; hybrid_link.py with pinned payload and
+full-objects; decomp_status.py check; git diff --check. No claim of runtime
+integration verification, bit identity or crash resolution.

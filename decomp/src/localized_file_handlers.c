@@ -5,7 +5,7 @@
 #include "ef_mem.h"
 
 /* 0x9cf2c, 72 bytes. Construct the selected-language candidate path.
- * FRAME replaces the original 0x90-byte Watcom stack local in its callers.
+ * FRAME is the destination in the caller's 0x90-byte local buffer.
  * If NAME already starts with the default directory, do not duplicate it. */
 void build_localized_path_9cf2c(ef_addr32 frame, ef_addr32 name)
 {
@@ -13,13 +13,14 @@ void build_localized_path_9cf2c(ef_addr32 frame, ef_addr32 name)
     uint32_t prefix_length = EF_U32(0x0040d1e0u);
     if (prefix_length != 0 &&
         compare_strings_e5c03(name, 0x0040d0c0u, prefix_length) == 0)
-        suffix += prefix_length;
+        suffix += EF_U32(0x0040d1e0u);
     copy_string_9d749(frame, 0x0040d150u);
     (void)strcat_9ca57(frame, suffix);
 }
 
-/* 0x9cf74, 48 bytes. Try the localized path, then the original filename. */
-uint32_t size_localized_file_9cf74(ef_addr32 name, ef_addr32 frame)
+/* Shared with the Linux probe, which supplies a guest-memory frame. These
+ * helpers are not original guest entry points or extra guest arguments. */
+uint32_t size_localized_file_in_frame(ef_addr32 name, ef_addr32 frame)
 {
     uint32_t size;
     build_localized_path_9cf2c(frame, name);
@@ -29,14 +30,28 @@ uint32_t size_localized_file_9cf74(ef_addr32 name, ef_addr32 frame)
     return size;
 }
 
-/* 0x9cfa4, 56 bytes. Use the same resolution for the read callback.
- * The Watcom implementation preserves the caller's ECX (allocated size + 1).
- * The derived C text loader retains that count in its own local variable. */
-uint32_t load_localized_file_9cfa4(ef_addr32 name, ef_addr32 dest,
-                                  ef_addr32 frame)
+uint32_t load_localized_file_in_frame(ef_addr32 name, ef_addr32 dest,
+                                      ef_addr32 frame)
 {
     build_localized_path_9cf2c(frame, name);
     if (find_in_archives_9cb20(frame) != 0)
         return try_handlers_9cbc4(frame, dest);
     return try_handlers_9cbc4(name, dest);
+}
+
+/* 0x9cf74,48 bytes. EAX name, EAX size, all non-EAX GPRs preserved.
+ * The unchecked 144-byte local is uninitialized in the original. */
+uint32_t size_localized_file_9cf74(ef_addr32 name)
+{
+    uint8_t frame[144];
+    return size_localized_file_in_frame(name, (ef_addr32)(uintptr_t)frame);
+}
+
+/* 0x9cfa4,56 bytes. EAX name, EDX destination, AL success; preserves
+ * EBX/ECX/ESI/EDI/EBP. In particular ECX survives the read callback. */
+uint8_t load_localized_file_9cfa4(ef_addr32 name, ef_addr32 dest)
+{
+    uint8_t frame[144];
+    return (uint8_t)load_localized_file_in_frame(name, dest,
+                                               (ef_addr32)(uintptr_t)frame);
 }

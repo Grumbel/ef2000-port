@@ -716,7 +716,7 @@ uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t name)
     if (fn != 0x0009cf74u || EF_U32(0x00132ab4u) != fn)
         fatal_unexpected("unbound localized file-size callback");
     validate_localized_name(name);
-    return size_localized_file_9cf74(name, TACTCOM_TEXT_FRAME);
+    return size_localized_file_in_frame(name, TACTCOM_TEXT_FRAME);
 }
 
 void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t name, uint32_t dest)
@@ -725,7 +725,7 @@ void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t name, uint32_t dest)
     if (fn != 0x0009cfa4u || EF_U32(0x00132ab8u) != fn)
         fatal_unexpected("unbound localized file-read callback");
     validate_localized_name(name);
-    result = load_localized_file_9cfa4(name, dest, TACTCOM_TEXT_FRAME);
+    result = load_localized_file_in_frame(name, dest, TACTCOM_TEXT_FRAME);
     if (result != 1u)
         stop_at_guest_boundary(0x000b3c04u);
 }
