@@ -9807,3 +9807,26 @@ and signed text completion; timed mode decrements duration and applies the
 original audio/panel-dependent text rule. Keep the disabled-presentation
 return that bypasses mode2 restoration. Static ABI/listing review only;
 execution equivalence is unverified.
+
+
+## Script branches and interactive comparison at `0xa9130`
+
+`execute_script_branch_a9130` takes EAX=record, preserves all six non-EAX
+GPRs and uses plain RET. The sole original direct caller a9f73/a9f76 loads
+the opcode3 operand from instruction+9; no EAX result is consumed. The
+recovered dispatcher agrees through menu_op_a9130. Both names receive
+`parm [eax] modify [eax]`.
+
+The prompt frame has the original 168-byte layout, with message+0,
+variable+64, target description+7c, action+90 and comparison+9c. Literal
+adapters retain the precise MOVS widths and live DS/ES/DF. Modes4/5 instead
+perform the original DS word read and local word store. Unsupported modes
+leave local bytes unwritten. Narrow volatile reads preserve the IRQ-updated
+key polling sequence: Space takes the branch, Enter continues, and a fresh
+read decides the action after leaving the loop.
+
+The direct subroutine path stores the current instruction then increments
+the return count; the prompted path increments the count before storing
+the saved instruction. Retain both orders because unchecked table entries
+can alias the count. Static compilation/listing review only; runtime
+execution equivalence remains unverified.

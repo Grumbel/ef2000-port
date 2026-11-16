@@ -5960,3 +5960,30 @@ runs. Inventory:3381 compiles,853 blocked. Evidence:
 local/menu-animation-20261116/{original.asm,menu_animation.obj,
 menu_animation.lst,menu_animation.abi.h,full.json}. Commands:ef2000_wcc.py on
 menu_animation.c; wdis; hybrid_link.py; decomp_status.py check; git diff --check.
+
+### 2026-11-16 — Recover script branch execution and interactive prompt
+
+Recover a9130 (794 owned bytes) as execute_script_branch_a9130 in new
+script_branch.c. Inspect original ASM, both CS switch tables, private
+pseudo-C candidate, sole direct opcode3 caller a9f76 and recovered dispatcher.
+Confirm EAX record input, all six other GPRs preserved, no consumed result
+and plain RET. Add asserted unaligned record and original 168-byte local
+frame fields; name pending/current instruction and unchecked return storage.
+
+Recover unconditional branches, the automatic equal/not-equal/not-greater
+helper gates, prompt palette setup, variable/operation/target descriptions,
+formatting, repeated strlen uppercase loop, variable-value lookup, IRQ-key
+polling and Space/Enter behavior. Resolve the segment blocker with narrow
+MOVS-width adapters retaining DS/ES/DF; no flat-copy substitution or CLD.
+Keep default-case local bytes unwritten. Direct and prompted subroutine
+branches have different count/table store orders; retain both, including
+unchecked-overflow aliasing. Do not add bounds checks or normalize inputs.
+
+Watcom compiles warning-free; wdis confirms six register saves/restores,
+plain RET, original literal-copy widths, repeated key loads and distinct
+return-table store orders. Full static link:2612 redirects,350/390 modules,
+584494 arena bytes. Tracker/diff checks pass. Status remains compiles; no
+new execution/UI/replay runs. Inventory:3382 compiles,852 blocked. Evidence:
+local/script-branch-20261116/{script_branch.obj,script_branch.lst,
+script_branch.abi.h,full.json}. Commands:ef2000_wcc.py on script_branch.c;
+wdis; hybrid_link.py; decomp_status.py check; git diff --check.

@@ -310,3 +310,8 @@ addr	size	type	name	evidence	notes
 0x00417258	4	ef_addr32	g_menu_animation_interval_buffer	original a8bd4 ASM	format signed interval from record+b using original decimal format
 0x00417260	4	ef_addr32	g_menu_animation_effect_buffer	original a8bd4 ASM	ES destination of two MOVSDs and MOVSW from original DAVE_FADE string
 0x0012b0f4	1	uint8_t	g_menu_animation_panel_active	original a8bd4 ASM	when zero clear the local audio/panel flag after sound-entry setup
+0x004194ac	2	uint16_t	g_script_return_count	original a9130 ASM	signed high word of dword4194aa; unchecked subroutine-return index
+0x00418e38	4	ef_addr32	g_script_return_table	original a9130 ASM	start of unchecked instruction-pointer table; capacity not established
+0x004191dc	4	ef_addr32	g_script_current_instruction	original a9130 ASM	saved when taking a subroutine branch
+0x004191ec	4	ef_addr32	g_script_pending_branch	original a9130 ASM	target selected by conditional/unconditional branch
+0x001371f9	1	uint8_t	g_script_condition_automatic	original a9130 ASM	nonzero enables automatic comparison helpers for modes0/1/3
