@@ -2483,7 +2483,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b19e4	41	free_list_b19e4	list_helpers	compiles	game	confirmed	decomp/tests/0x000b19e4.json	docs/compiler-abi.md; As 0xb1814 through 0xb19a0.; callers b1b10@b1b48; guest pending
 0x000b1a10	42	release_pointer_b1a10	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1a10.json	docs/compiler-abi.md; Release *EAX via 0xcc768 when set, clear it and dwords 0x1379a8/0x1379b0.; callers 494c@4a46,494c@4a66,494c@4a83; guest pending
 0x000b1a3c	42	release_pointer_b1a3c	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1a3c.json	docs/compiler-abi.md; As 0xb1a10 with dwords 0x1379ac and 0x1379b4.; callers ba5c@bb72,bfcc@c4be,b1b10@b1b7a; guest pending
-0x000b1a68	121	free_record_tree_b1a68	runtime_helpers33	compiles	game	confirmed	decomp/tests/0x000b1a68.json	docs/compiler-abi.md; Free a record and all of its sub-tables.; callers b1ae4@b1af5; guest pending
+0x000b1a68	121	free_record_tree_b1a68	record_tree_free	compiles	game	confirmed		docs/compiler-abi.md; Free a record and all of its sub-tables.; callers b1ae4@b1af5; guest pending
 0x000b1ae4	41	free_list_b1ae4	list_helpers	compiles	game	confirmed	decomp/tests/0x000b1ae4.json	docs/compiler-abi.md; As 0xb1814 through 0xb1a68.; callers b1b10@b1b57; guest pending
 0x000b1b10	123	reset_view_tables_b1b10	entity_helpers2	compiles	game	confirmed	decomp/tests/0x000b1b10.json	docs/compiler-abi.md; ; callers c594@c608; guest pending
 0x000b1b8b	25	strlen_ds	node_string_helpers	compiles	game	confirmed		Recovered as plain strlen from disassembly 0xb1b8b..0xb1ba3; links; original cannot execute in the flat unicorn harness (pop es faults at 0xb1b9e) so no differential

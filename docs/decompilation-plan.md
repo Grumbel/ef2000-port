@@ -7302,3 +7302,30 @@ local/default-video-20261116/{default_video.obj,default_video.lst,full.json}.
 Status remains compiles, counts unchanged. No runtime/UI/replay/differential
 execution or packaged runtime rebuild; full RAM/stack equivalence and
 reported crash/highlight repairs remain unverified.
+
+### 2026-11-16: recover record-tree cleanup
+
+Recover free_record_tree_b1a68 (121 original bytes) in record_tree_free.c;
+runtime_helpers33 had no definition. ASM and sole caller b1af5 establish
+EAX record, all six other registers preserved, plain RET. The caller keeps
+its next-list pointer in EDX across cleanup. Follow cc768/c3f80 tail jumps
+to the existing heap-free boundary; retain the original cc768 call target.
+No ABI changes to existing users.
+
+Preserve null-root early return, signed word counts and signed low-word
+indices, 32-bit counter increments, unchecked six-/ten-byte indexing,
+per-iteration root table/count reloads, and free order: nonnull entry
+allocations, nonnull group entry tables, nonnull root group table, root.
+Do not clear freed pointers or cache mutable counts across calls. Add
+minimum packed record/group/entry layouts with offset/size assertions.
+Remove generic probe tracker reference, retaining its JSON.
+
+Commands: ef2000_wcc.py record_tree_free.c (zero warnings); wdis (signed
+word comparisons/index extension, live table/count reads, conditional free
+order, register saves and plain RET); hybrid_link.py pinned payload/full
+objects (2651 redirects,599926 arena bytes,381/421 modules,1622 exclusions);
+decomp_status.py check (4293 functions); git diff --check. Evidence:
+local/record-tree-free-20261116/{record_tree_free.obj,record_tree_free.lst,
+full.json}. Status remains compiles, counts unchanged. No runtime/UI/replay/
+differential execution or packaged runtime rebuild; full RAM/stack
+equivalence and reported crashes remain unverified.
