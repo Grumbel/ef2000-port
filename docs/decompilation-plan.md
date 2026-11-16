@@ -5787,3 +5787,30 @@ child+3f. The invalid child is 14000000, producing pointer 1400003f and linear
 fault 2400003f. Existing logs narrow this to an invalid UI child link before
 name comparison; no source repair is claimed for that corruption. Preserve
 both open issues while continuing original-code recovery.
+
+### 2026-11-16 — Identify quick-fight null-code termination
+
+Static inspection of the supplied quick-fight run
+535d7fe2685b4b00a02656838b2afdf2 narrows the primary error. Its saved
+FAULT_CONTEXT has BP=00120cfc. In the original, address zero jumps to 1de,
+which pushes EBP, copies ESP to EBP, loads EAX=120cfc and writes DL=1 before
+falling through to fatal_exit_1e9. The compiled handler in that saved run
+copies EAX to EBP and EDX to EDI: EBP therefore retains the message address,
+while EDI=ffff0001 retains the partially overwritten exit code. This matches
+the null-code trap, whose message is "Null code pointer was called".
+The upper bits of EDX are intentionally unchanged by MOV DL,1; do not
+interpret ffff0001 as a corrupt message supplied by the flight caller.
+
+The last logged keyboard bytes are E0,50 (extended down-arrow make). The
+original IRQ handler fe61f queues/translates the key and updates its state;
+its ordinary-key path has no indirect function call. This does not identify
+the later flight callback that reached zero, nor establish that keyboard
+initialization is at fault. The saved run has no guest-stack memory dump to
+recover that caller; its nearby stack fields belong to the interrupt bridge
+inside fatal_exit_1e9. Keep the flight-control regression open.
+
+Correct the stale EDX message description in the function tracker to match
+the already corrected EAX signature. Evidence: original payload disassembly
+at 0,1de..220,fe61f..fe6f2; saved payload at 30649b4..3064a80;
+existing calls.log tail. Validation: decomp_status.py check; git diff --check.
+No new execution, UI or replay runs.
