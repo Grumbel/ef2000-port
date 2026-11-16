@@ -6818,3 +6818,30 @@ exclusions); decomp_status.py check; git diff --check. Evidence:
 local/widget-refresh-result-20261116/{runtime_helpers4.obj,
 runtime_helpers4.lst,full.json}. Static review only, no runtime/UI/replay
 or differential execution; no claim that the highlight bug is fixed.
+
+### 2026-11-16: restore missing title frame painter
+
+Recover draw_widget_frame_a713c (199 original bytes) in widget_title_frame.c.
+The tracker incorrectly assigned it to runtime_helpers32, whose source has
+no definition. Keep its state compiles, correct the module, remove its old
+generic probe reference and retain the historical JSON. Review original
+ASM and sole direct caller a70be: EAX widget, six other GPRs preserved,
+plain RET. Preserve two separate flag reads, signed dword-high coordinate
+visibility check, checked title lookup, low-word wrapping and selected/
+unselected bitmap branches (unselected width decrements by one).
+
+Move the rectangle helper c92e4's explicit four-register/four-stack,
+callee-cleaned pragma from screen_clip1.c to the shared header so the new
+caller sees it. Conservatively declare all four scratch GPRs clobbered:
+original c92e4 saves only ESI/EDI/EBP around eb174. Preserve its existing
+9/9 differential evidence with stubbed eb174; that does not prove the real
+callee's scratch-register preservation. Rebuild screen_clip1. The stack
+argument gate still excludes c92e4 from hybrid redirection; the new painter
+calls original c92e4, forwarding stride, source X/Y and bitmap on the stack.
+
+Commands: ef2000_wcc.py on widget_title_frame.c and screen_clip1.c (zero
+warnings); wdis (both branches, four pushes, correct cleanup); hybrid_link.py
+(2636 redirects,596384 arena bytes,365/405 modules,1635 exclusions);
+decomp_status.py check; git diff --check. Evidence remains ignored under
+local/widget-title-frame-20261116/. No new runtime, UI, replay or differential
+execution; this is not proof of a menu-highlight or crash fix.

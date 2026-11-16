@@ -7,8 +7,6 @@
 
 /* Clipped screen operations and buffer setup. */
 
-#pragma aux draw_clipped_c92e4 parm routine [eax] [edx] [ebx] [ecx] modify [eax]
-
 /* 0xc3770, 121 bytes. Allocate the two work buffers at 0x146e40/0x146e44 (size 0x164600) if needed, complain when either failed, then zero both. */
 void init_work_buffers_c3770(void)
 {
