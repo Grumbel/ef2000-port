@@ -12,12 +12,18 @@ typedef struct EF_PACKED ef_widget_link {
     ef_addr32 next;
     uint8_t unknown_25[2];
     ef_addr32 text;
-    uint8_t unknown_2b[0x3c];
+    uint8_t unknown_2b[0x14];
+    uint8_t number_label;
+    uint8_t unknown_40[0x11];
+    ef_addr32 parent;
+    uint8_t unknown_55[0x12];
     uint16_t content_height;
 } ef_widget_link;
 EF_STATIC_ASSERT(ef_widget_next_off, offsetof(ef_widget_link, next) == 0x21);
 
 EF_STATIC_ASSERT(ef_widget_text_off, offsetof(ef_widget_link, text) == 0x27);
+EF_STATIC_ASSERT(ef_widget_number_label_off, offsetof(ef_widget_link, number_label) == 0x3f);
+EF_STATIC_ASSERT(ef_widget_parent_off, offsetof(ef_widget_link, parent) == 0x51);
 
 EF_STATIC_ASSERT(ef_widget_content_height_off, offsetof(ef_widget_link, content_height) == 0x67);
 

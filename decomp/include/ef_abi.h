@@ -7722,3 +7722,8 @@ void initialize_players_window_33c64(ef_addr32 root);
 #ifdef __WATCOMC__
 #pragma aux initialize_players_window_33c64 parm [eax] modify [eax]
 #endif
+
+void change_network_loop_345e8(ef_addr32 widget);
+#ifdef __WATCOMC__
+#pragma aux change_network_loop_345e8 parm [eax] modify [eax]
+#endif

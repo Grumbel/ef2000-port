@@ -11335,3 +11335,35 @@ Commands: tools/ef2000_wcc.py decomp/src/network_players_window.c --compiler
 <pinned-wcc386> --output local/network-players-window-20261117.obj;
 pinned-Unicorn Python local/network-players-window-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — recover loop-number change handler 0x345e8
+
+Recover 450-byte change_network_loop_345e8 after reading original ASM and
+private pseudo-C. EAX widget; six other GPRs pushed/popped, plain RET;
+callback slot 12b5a8 and no direct inventory callers. Assert number-label +3f
+and parent +51 in the existing partial widget layout without changing other
+offsets. Parse decimal slot, report invalid range through cdecl function
+pointer 132a74, validate at most eight hex characters, permit empty text,
+and test full scanner EAX rather than AL. Preserve shutdown/store/compact/
+settings/wait-window ordering, status-14 removal of every matching value,
+modal error and initialization retry, then network and parent-name refresh.
+Pass wait-window result explicitly to c9fc4; preceding aca88 preserves EAX.
+
+Pinned Watcom compile: zero warnings. 751 scoped original/emitted-body
+comparisons with parser/session/dialog models pass: slots -1/0/1/4/5,
+scanner returns 0/1/101, empty/valid/ninth-invalid/invalid/high-byte text,
+initialization statuses 0/14/22, retry success/failure and inactive early
+return. Error callback is allowed to return in the model; scanner models
+always write output, so original uninitialized slot after a nonwriting
+failed scan followed by returning error is not verified. Compare normalized
+call traces (local formatted text by content), six saved GPRs, ESP and RAM
+except code placement/stack scratch. Actual callees, EAX scratch, flags and
+stack scratch remain unproved; no byte identity, splice/replay or universal
+equivalence claim. Retain hybrid exclusion. Tracker 3438 compiles / 794
+blocked. Private report local/network-loop-settings-source-20261117/report.json
+SHA-256 49ebfea4df71d42c2b4b2f3d4f79ef576b1b6d9f8a5f07aa792b2fbace3c6d8b.
+Commands: tools/ef2000_wcc.py decomp/src/network_loop_settings.c --compiler
+<pinned-wcc386> --output local/network-loop-settings-20261117.obj;
+pinned-Unicorn Python local/network-loop-settings-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
