@@ -10727,3 +10727,39 @@ python3 -m unittest tests.test_asm_dos_file_service;
 pinned-Unicorn unittest tests.test_asm_c_program.ProgramTests.test_data16_and_register_segment_prefixes;
 python3 -m unittest tests.test_asm_to_c.TranslationTests.test_data16_aliases_reject_unsupported_encodings;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — Recover chunked copy and its stack ABI
+
+Recover copy_blocks_e9a24 (132 contiguous original bytes) in block_copy.c.
+Audit callers a2e90@a2ea7 (33-byte option copy) and d663c@d6662 (768-byte
+palette copy): stack arguments count/source/destination, callee RET 12,
+EAX advanced destination, preserved EBX/ESI/EDI/EBP and scratch ECX/EDX.
+Record the canonical signature and tighten the existing guest alias's clobbers.
+Keep the original 16-byte preload/store groups within each 32-byte block,
+8-byte groups and byte tail. These differ from memcpy/memmove for overlaps.
+Retain unsigned address/count wrapping and signed branch predicates, including
+ADD overflow: the tail predicates compare signed remaining against -32/-8.
+Do not normalize negative sizes into conventional copy semantics.
+
+The complete module compiles with zero OpenWatcom warnings/errors. In 2220
+cases, compare both actual host-compiled recovered C and the emitted Watcom
+object against original ASM. The object has no externals or relocations;
+execute its actual public code in a separate Unicorn guest. Compare EAX and
+complete RAM except code placement and stack scratch; the object additionally
+matches original EBX/ESI/EDI/EBP and ESP after RET 12. Cases span counts 0..96,
+127/128/129, 255/256/257, 511/512/513, 768, four negative count patterns, and
+20 overlapping/separate address offsets, with unaligned source/destination.
+Extreme negative counts 0x80000000..0x8000001f follow the recovered arithmetic
+but are not executed: they can enter enormous copy loops. Scratch registers,
+flags and guest stack scratch are excluded; no binary identity or gameplay
+claim. Evidence: local/block-copy-source-20261117/report.json SHA-256
+42ebfe52d150545594e194cc8ba8e9d7c6c207370752ac89747b37d49871a995.
+
+Move tracker blocked -> compiles; 3425 compiles, 807 blocked. Update the
+existing broad-hybrid exclusion to reflect the manual ABI recovery while
+retaining the earlier menu fault history and remaining verification limits.
+Commands: tools/ef2000_wcc.py decomp/src/block_copy.c --compiler <pinned-wcc386>
+--output local/block-copy-20261117.obj; pinned-Unicorn Python
+local/block-copy-source-20261117/check.py; python3 tools/decomp_status.py check;
+git diff --check.
