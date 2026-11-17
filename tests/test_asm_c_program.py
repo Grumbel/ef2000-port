@@ -680,6 +680,70 @@ leaf: ret
                         self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EFLAGS), state.flags)
                         self.assertEqual(bytes(cpu.mem_read(0, 4096)), bytes(memory))
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_service_aware_port_differential_checks_traces_and_ram(self):
+        forms = ['in al,dx', 'in ax,dx', 'in eax,dx',
+                 'out dx,al', 'out dx,ax', 'out dx,eax',
+                 'in al,0x80', 'in ax,0x80', 'in eax,0x80',
+                 'out 0x80,al', 'out 0x80,ax', 'out 0x80,eax']
+        source = '.type root,@function\nroot: ' + '\n'.join(forms) + '\nret\n.size root, .-root'
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root/'out'
+            asm_c_program.generate(directory, out, image, port_boundaries=True)
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, sorted(out.glob('*.c'))), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'program.so'))
+            run = library.ef_lift_run
+            run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+            registers = [0xabcd1234, 2, 0xbeef03da, 4, 0x3f0000, 6, 7, 8]
+            for memory_services in (False, True):
+                def factory():
+                    calls = 0
+                    def handler(request, values, *ram):
+                        nonlocal calls
+                        calls += 1
+                        if request['direction'] == 'in':
+                            mask = (1 << request['width']) - 1
+                            values['ax'] = (values['ax'] & ~mask) | ((0x87654321+calls) & mask)
+                        elif ram:
+                            ram[0][0x300100+calls] = values['ax'] & 255
+                        return values
+                    return handler
+                result = asm_c_differential.compare(run, image.read_bytes(), 0x100,
+                    registers, 0xad7, program=True, port_factory=factory, memory_services=memory_services)
+                self.assertEqual(result['state'], 'pass', result)
+                self.assertEqual(len(result['port_services']['original']), 12)
+                self.assertEqual(result['port_services']['original'], result['port_services']['translated'])
+                if memory_services:
+                    self.assertIn('memory', result['port_services']['original'][0])
+            def invalid_factory():
+                def handler(request, values):
+                    values['cx'] ^= 1
+                    return values
+                return handler
+            result = asm_c_differential.compare(run, image.read_bytes(), 0x100,
+                registers, 0xad7, program=True, port_factory=invalid_factory)
+            self.assertEqual(result['state'], 'inconclusive', result)
+            self.assertIn('unrelated registers', result['reason'])
+            instances = 0
+            def divergent_factory():
+                nonlocal instances
+                instances += 1
+                value = instances
+                def handler(request, values):
+                    if request['direction'] == 'in':
+                        mask = (1 << request['width']) - 1
+                        values['ax'] = (values['ax'] & ~mask) | value
+                    return values
+                return handler
+            result = asm_c_differential.compare(run, image.read_bytes(), 0x100,
+                registers, 0xad7, program=True, port_factory=divergent_factory)
+            self.assertEqual(result['state'], 'mismatch', result)
+            self.assertIn('port service request/response trace', result['differences'])
+
     def test_port_service_decoder_rejects_ambiguous_encodings(self):
         for encoded, mnemonic, operands in [('f3ec', 'in', 'al,dx'),
                                              ('66ec', 'in', 'al,dx'),

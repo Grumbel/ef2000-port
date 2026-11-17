@@ -11150,3 +11150,26 @@ Command: pinned-Unicorn Python local/asm-retrace-original-20261117/check.py.
 This establishes the sampled hybrid policy for this body, not real-device
 fidelity, all initial states, replay/splice evidence or byte identity. Tracker
 unchanged. Keyboard/gameport and other unsupported ports still reject.
+
+### 2026-11-17: reusable service-aware port differential comparisons
+
+Extend asm_c_differential.compare with explicit port_factory, constructing
+independent original/translated device instances. Forward normalized port,
+direction, width and instruction IP; compare full request/response traces in
+addition to existing GPR/flags/segment/x87/RAM checks. Support disposable RAM
+snapshots and before/after hashes when memory_services is selected. Validate
+that IN only changes its addressed accumulator bits and OUT changes no GPRs or
+flags; reject invalid/resizing responses before committing RAM. Original
+service failures are inconclusive, translated failures after an original return
+are mismatches. Stop rejected Unicorn IN callbacks explicitly with an integer
+return to avoid ctypes swallowing an exception as an undefined port value.
+
+Pinned-Unicorn Python -m unittest tests.test_asm_c_program: 29 PASS. New tests
+exercise all twelve scalar forms with/without RAM effects, trace equality,
+divergent per-side responses and illegal unrelated-register mutations. Existing
+interrupt, dispatch, fuel, x87 and memory-service checks still pass. Tracker
+and diff checks pass. This is explicit-model comparison evidence; no default
+hardware model is supplied and the general verifier still refuses service
+programs without an appropriate driver. No tracker promotions or byte-identity
+claims. Reusable compare API replaces the need for bespoke port tracing in
+future original-body checks.

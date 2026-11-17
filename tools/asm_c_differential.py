@@ -119,13 +119,20 @@ def probes(count, seed):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None, memory_services=False):
-    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR
+            prepared_memory_size=None, memory_services=False, port_factory=None):
+    """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
+
+    port_factory returns handler(request, registers[, ram]) -> registers.
+    Request contains ip, direction, port and width. IN may change only the
+    addressed accumulator bits; OUT preserves registers/flags. Optional RAM
+    effects use the same disposable snapshot rules as interrupt services.
+    """
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR, UC_HOOK_INSN
     from unicorn import x86_const
 
-    if service_factory is not None and not program:
+    if (service_factory is not None or port_factory is not None) and not program:
         raise ValueError('host services require the program dispatcher')
-    if memory_services and service_factory is None:
+    if memory_services and service_factory is None and port_factory is None:
         raise ValueError('memory services require a service factory')
     if prepared_memory_size is not None:
         if captured is not None:
@@ -137,6 +144,35 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_service = service_factory() if service_factory else None
     translated_service = service_factory() if service_factory else None
     original_events, translated_events = [], []
+    original_port = port_factory() if port_factory else None
+    translated_port = port_factory() if port_factory else None
+    original_ports, translated_ports = [], []
+
+    def port_service(handler, request, values, event_log, ram=None):
+        args = (dict(request), dict(values))
+        if memory_services:
+            before_memory = hashlib.sha256(ram).hexdigest()
+            expected_size = len(ram)
+            args += (ram,)
+        response = handler(*args)
+        if (set(response) != set(values) or any(type(v) is not int or not 0 <= v <= 0xffffffff
+                                               for v in response.values())):
+            raise ValueError('invalid port service register response')
+        allowed = dict(values)
+        if request['direction'] == 'in':
+            mask = (1 << request['width']) - 1
+            allowed['ax'] = (values['ax'] & ~mask) | (response['ax'] & mask)
+        if response != allowed:
+            raise ValueError('port service changed flags, unrelated registers or high accumulator bits')
+        if memory_services and len(ram) != expected_size:
+            raise ValueError('port service resized guest RAM')
+        event = dict(request=request, before=dict(values), after=dict(response))
+        if memory_services:
+            event['memory'] = dict(before_sha256=before_memory,
+                                   after_sha256=hashlib.sha256(ram).hexdigest())
+        event_log.append(event)
+        return response
+
 
     def service(handler, ip, values, event_log, vector=0x21, ram=None):
         # RAM is a disposable snapshot: commit only after validating the response.
@@ -206,6 +242,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             fields['original_x87'] = binding.evidence()
         if service_factory is not None:
             fields['host_services'] = dict(original=original_events, translated=translated_events)
+        if port_factory is not None:
+            fields['port_services'] = dict(original=original_ports, translated=translated_ports)
         return fields
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
@@ -226,10 +264,42 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 engine.reg_write(getattr(x86_const, 'UC_X86_REG_'+r.upper()), response[n])
             engine.reg_write(x86_const.UC_X86_REG_EFLAGS, response['flags'])
         cpu.hook_add(UC_HOOK_INTR, interrupt)
+    port_errors = []
+    if original_port is not None:
+        def original_port_request(engine, port, size, output):
+            values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
+                      for n, r in zip(service_names, asm_to_c.REGS)}
+            values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+            request = dict(ip=engine.reg_read(x86_const.UC_X86_REG_EIP),
+                           direction='out' if output else 'in', port=port, width=size*8)
+            ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
+            response = port_service(original_port, request, values, original_ports, ram)
+            if memory_services:
+                engine.mem_write(0, bytes(ram))
+            return response['ax'] & ((1 << (size*8))-1)
+        def port_in(engine, port, size, _):
+            try:
+                return original_port_request(engine, port, size, False)
+            except (ValueError, RuntimeError) as error:
+                port_errors.append(str(error))
+                engine.emu_stop()
+                return 0  # ctypes IN callbacks must return an integer even on rejection.
+        def port_out(engine, port, size, value, _):
+            try:
+                if value != engine.reg_read(x86_const.UC_X86_REG_EAX) & ((1 << (size*8))-1):
+                    raise ValueError('original OUT value differs from accumulator')
+                original_port_request(engine, port, size, True)
+            except (ValueError, RuntimeError) as error:
+                port_errors.append(str(error))
+                engine.emu_stop()
+        cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, x86_const.UC_X86_INS_IN)
+        cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, x86_const.UC_X86_INS_OUT)
     if phase:
         phase('original')
     try:
         cpu.emu_start(address, sentinel, count=budget)
+        if port_errors:
+            raise ValueError(port_errors[0])
     except asm_x87_oracle.Unavailable as error:
         return outcome(state='inconclusive', reason='original native x87 unavailable: '+str(error))
     except UcError as error:
@@ -266,14 +336,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
-    if translated_service is None:
+    if translated_service is None and translated_port is None:
         status = (function(ctypes.byref(state), budget, sentinel) if program else
                   function(ctypes.byref(state), budget))
     else:
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if status in (0x121, 0x131):
+            if status in (0x121, 0x131) and translated_service is not None:
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
@@ -282,6 +352,33 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                                        status-0x100, ram)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C service unavailable: '+str(error)])
+                if memory_services:
+                    memory[:] = ram
+                state.r[:] = [response[n] for n in service_names]
+                state.flags = response['flags']
+                status = 0 if state.pc == sentinel else 1
+            if (status & 0xf000) == 0x1000 and translated_port is not None:
+                length, opcode = (status >> 8) & 15, status & 255
+                ip = state.pc - length
+                values = dict(zip(service_names, state.r))
+                values['flags'] = state.flags
+                try:
+                    if ip < 0 or state.pc > len(memory) or not length:
+                        raise ValueError('invalid port continuation')
+                    encoded = bytes(memory[ip:state.pc])
+                    word = encoded[0] == 0x66
+                    immediate = opcode < 0xec
+                    if (opcode not in (0xe4, 0xe5, 0xe6, 0xe7, 0xec, 0xed, 0xee, 0xef) or
+                            length != int(word) + (2 if immediate else 1) or
+                            (word and not opcode & 1) or encoded[int(word)] != opcode):
+                        raise ValueError('invalid port boundary encoding')
+                    request = dict(ip=ip, direction='out' if opcode & 2 else 'in',
+                                   port=encoded[-1] if immediate else state.r[2] & 0xffff,
+                                   width=(16 if word else 32) if opcode & 1 else 8)
+                    ram = bytearray(memory) if memory_services else None
+                    response = port_service(translated_port, request, values, translated_ports, ram)
+                except (ValueError, RuntimeError) as error:
+                    return outcome(state='mismatch', differences=['C port service unavailable: '+str(error)])
                 if memory_services:
                     memory[:] = ram
                 state.r[:] = [response[n] for n in service_names]
@@ -297,6 +394,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if phase:
         phase('comparison')
     differences = []
+    if original_ports != translated_ports:
+        differences.append('port service request/response trace')
     if original_events != translated_events:
         differences.append('host service request/response trace')
     if captured is not None:
