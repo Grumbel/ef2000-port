@@ -65,6 +65,28 @@ class TranslationTests(unittest.TestCase):
             with self.assertRaises(asm_to_c.Unsupported):
                 asm_to_c.instruction_c(insn, {0, 1})
 
+    def test_system_transfers_are_not_missing_body_tails(self):
+        # The same unsupported operation must be diagnosed with or without a
+        # decoded successor; neither case may produce executable C.
+        for mnemonic, encoded in [('retf', 'cb'), ('iret', 'cf'),
+                                  ('int3', 'cc'), ('int', 'cd21'),
+                                  ('hlt', 'f4'), ('ud2', '0f0b')]:
+            for successor in (False, True):
+                with self.subTest(mnemonic=mnemonic, successor=successor):
+                    insn = dict(address=0x100, bytes=encoded,
+                                mnemonic=mnemonic, operands='')
+                    starts = {0x100}
+                    if successor:
+                        starts.add(0x100 + len(bytes.fromhex(encoded)))
+                    with self.assertRaisesRegex(
+                            asm_to_c.Unsupported,
+                            '^unsupported instruction: ' + mnemonic + '$'):
+                        asm_to_c.instruction_c(insn, starts)
+
+        with self.assertRaisesRegex(asm_to_c.Unsupported, '^fallthrough outside body$'):
+            asm_to_c.instruction_c(dict(address=0x100, bytes='90',
+                                       mnemonic='nop', operands=''), {0x100})
+
     def test_segment_push_requires_matching_encoding(self):
         for mnemonic, encoded, segment in (('push', '661e', 'ds'),
                                            ('pushw', '1e', 'ds'),

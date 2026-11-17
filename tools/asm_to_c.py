@@ -722,6 +722,13 @@ def instruction_c(insn, starts):
         return ('a = ef_read_segment(s, 2, s->r[4], 32); if (s->fault) return s->fault; '
                 'if (ef_check_segment(s, 1, a, 1, 2)) return s->fault; '
                 's->pc = a; s->r[4] += %du; return 0;' % (4 + cleanup))
+    # These transfers require architectural state we do not model yet. Report
+    # that limitation before checking ordinary fallthrough: extending a body
+    # past RETF/IRET or a debugger trap cannot make the operation translatable.
+    if (mnemonic.startswith(('ret', 'iret')) or
+            mnemonic in ('int', 'int3', 'into', 'hlt', 'ud2', 'lcall', 'ljmp',
+                         'syscall', 'sysenter', 'sysexit', 'sysret')):
+        raise Unsupported('unsupported instruction: ' + mnemonic)
     if next_pc not in starts:
         raise Unsupported('fallthrough outside body')
     repeat = None

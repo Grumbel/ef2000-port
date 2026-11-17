@@ -9491,3 +9491,24 @@ not transitive reachability or unique additional-function predictions.
 This refresh establishes generation, direct closure and compilation, not
 byte-identical output, general behavioral equivalence, runtime splicing or
 golden replay. Tracker states are unchanged. No gameplay/UI runs were used.
+
+### 2026-11-17: distinguish unsupported transfers from missing tails
+
+Inspection of the remaining fallthrough failures found that four are
+unsupported system transfers, rather than evidence of missing instructions.
+`asm_to_c.instruction_c` now rejects far returns, interrupt returns, traps
+and other unmodeled system transfers before checking ordinary fallthrough.
+It still emits no implementation for these operations. In particular, a
+body must not be extended beyond RETF/IRET merely to satisfy the translator.
+
+Against the latest repaired normalized inventory and its complete instruction
+start set, 0xfa02c and 0x1204b6 now diagnose unsupported INT3, 0xfcc01 RETF,
+and 0xfcc6f IRET. The real missing tails at 0xc6428 and 0xc8c34 still diagnose
+fallthrough outside body. No bytes, ownership ranges or tracker states were
+changed. The preceding bulk report remains historical evidence; no new
+coverage or whole-program build is claimed for this diagnostic-only change.
+
+Validation: three focused TranslationTests pass, including the new
+`test_system_transfers_are_not_missing_body_tails`, which checks identical
+rejection with and without a decoded successor and retains the missing-tail
+diagnostic for a NOP. Tracker and diff checks pass. No gameplay run was used.
