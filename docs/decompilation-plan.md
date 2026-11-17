@@ -11487,3 +11487,22 @@ Commands: tools/ef2000_wcc.py decomp/src/network_controls.c --compiler
 <pinned-wcc386> --output local/network-controls-20261117.obj;
 pinned-Unicorn Python local/network-controls-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: replace three modem text callback probe hooks
+
+Recovered 33720/33738/337ac (21 bytes each) into network_text_callbacks.c.
+Use real 9d749 string-copy and a2bdc settings-write calls instead of the
+host-only probe. Confirmed EAX widget input, text +0x27, preserved six GPRs;
+callback slots 12b648/12b650/12b660, no direct callers. Watcom zero warnings.
+48 scoped actual compiled-C/original-ASM comparisons PASS: empty/ASCII/long/
+high-bit strings, source equal to destination, and settings callback mutation.
+Execute original strcpy; model settings writer. Compare call traces, six saved
+GPRs, ESP and 5 MiB RAM excluding code placement and stack scratch. EAX,
+flags, stack and integration/splice/replay remain unproved. Keep hybrid excluded.
+Tracker: 3444 compiles / 788 blocked / 454672 blocked body bytes.
+Private report local/network-text-source-20261117/report.json, SHA-256
+a82a049f5250642bca6d091becc6050ea308ad68349700ab5e2ba2992cd06e1e.
+Commands: tools/ef2000_wcc.py decomp/src/network_text_callbacks.c --compiler
+<pinned-wcc386> --output local/network-text-20261117.obj;
+pinned-Unicorn Python local/network-text-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

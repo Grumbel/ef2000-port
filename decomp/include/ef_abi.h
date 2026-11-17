@@ -7742,3 +7742,10 @@ void refresh_network_controls_33630(void);
 #ifdef __WATCOMC__
 #pragma aux refresh_network_controls_33630 parm [] modify [eax]
 #endif
+
+/* Modem text callbacks preserve all six non-EAX general registers. */
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_new_number_33720 parm [eax] modify [eax]
+#pragma aux net_new_pt_33738 parm [eax] modify [eax]
+#pragma aux net_open_modem_status_337ac parm [eax] modify [eax]
+#endif

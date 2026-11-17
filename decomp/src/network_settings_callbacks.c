@@ -76,23 +76,6 @@ void net_open_ipx_settings_336f0(ef_addr32 widget)
     refresh_network();
 }
 
-/* 33720 and 33738, distinct, 21-byte widget-text store callbacks. */
-static void store_widget_text(ef_addr32 widget, ef_addr32 dest)
-{
-    guest(0x9d749u, dest, EF_U32(widget + 0x27u), 0u);
-    notify_network_change();
-}
-
-void net_new_number_33720(ef_addr32 widget)
-{
-    store_widget_text(widget, 0x15f57du);
-}
-
-void net_new_pt_33738(ef_addr32 widget)
-{
-    store_widget_text(widget, 0x15f53du);
-}
-
 /* 33760, 74 bytes: toggle the current initialization-string slot, format
  * the selected string, write it into the target widget and redraw. The
  * formatter callback stands in for the original local sprintf buffer. */
@@ -105,11 +88,6 @@ void net_new_init_string_33760(ef_addr32 widget)
               EF_U32(0x125958u + 4u * choice));
     guest(0xa7588u, widget, label, 0u);
     notify_network_change();
-}
-
-void net_open_modem_status_337ac(ef_addr32 widget)
-{
-    store_widget_text(widget, 0x15f4fdu);
 }
 
 /* 337c4, 37 bytes: zero-extended byte sent to e1540, whose AL is saved. */
