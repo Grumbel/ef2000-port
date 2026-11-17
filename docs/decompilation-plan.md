@@ -11776,3 +11776,34 @@ Commands: ghidra_ef2000.py audit-body-holes 0x11d695 / audit-flow-gaps
 --workspace local/ghidra-offset-tail-20261117 --analyze-headless
 local/ghidra-headless-private-20261114, with private output reports;
 objdump original ranges; python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover the missing 256-way byte-mask dispatcher
+
+Add pinned EF2000RecoverByteDispatch.java for 11dab0..11e31f: 2159 bytes,
+642 instructions, 256 distinct table targets, all at decoded starts.
+Validate full image/body/table SHA-256, foreign ownership, direct internal
+flow, sole computed jump 11db3e, terminal RET and exact repeat-apply shape.
+Run report on the read-only original, apply on a disposable project and
+repeat apply successfully. Export fresh inventory (4281 Ghidra entries),
+then a single-body ASM inventory and generated C dispatcher. Keep preceding
+error body/table ownership unchanged until its debugger contract is resolved.
+Add the missing helper to functions.tsv, blocked, rather than silently omit
+its 2159 bytes. Tracker now 4294 entries / 914314 bytes, 772 blocked; no
+verified promotions. Name draw_byte_mask_11dab0 is provisional.
+768 scoped comparisons PASS: every mask byte with colors 0/127/255,
+one byte and one row; compare all GPRs, flags, selectors, raw x87 state and
+full 5 MiB RAM, including stack. No callees or services modeled. Native host
+C builds with warnings as errors; generated body also compiles with Watcom
+but emits 15 W202 unused runtime-helper warnings. This does not establish
+Watcom execution equivalence, multirow behavior, gameplay or byte identity.
+Private comparison report local/byte-dispatch-source-20261117/report.json
+SHA-256 f2eb91b8e33007e009cc6758f3590dc5f6bc07b3b1342ba0b137475a59dc17f5.
+Private generation report local/asm-byte-dispatch-c-20261117/report.json
+SHA-256 128f1207fd266a2974131926c8d606c3f65fefb13cabcbaeaeb0363d1e46621c.
+Commands: headless EF2000RecoverByteDispatch.java report/apply/repeat;
+ghidra_ef2000.py inventory; asm_inventory.py --address 0x11dab0 --body-ranges
+<fresh body-ranges.json>; asm_c_program.generate(single-body inventory);
+pinned-Unicorn Python local/byte-dispatch-source-20261117/check.py;
+pinned-wcc386 -bt=dos -3r -zp1 -fpi87 -fp3 -ob -ot -s -wx -za99
+-i=<generated directory> -fo=local/byte-dispatch-generated-20261117.obj
+<generated ef_lift_0011dab0.c>; decomp_status.py check; git diff --check.

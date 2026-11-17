@@ -765,3 +765,33 @@ The asset-free command tests run with
 `python3 -m unittest discover -s tests -p 'test_ghidra_annotations.py'`.
 Set `GHIDRA_HOME` and a suitable `JAVA_HOME`
 to additionally run a real synthetic x86 Ghidra import/apply/export round trip.
+
+## Recover the reviewed byte-mask dispatcher
+
+`EF2000RecoverByteDispatch.java` recovers the previously unowned
+`0x11dab0..0x11e31f` body and adds all 256 computed-jump references from
+`0x11db3e`. It pins the full image, body and table hashes, checks ownership,
+requires every direct branch and table target to be an instruction start
+inside the body, and requires the final RET. The table remains at
+`0x11d6b0..0x11dab0`; this recipe intentionally leaves its existing erroneous
+ownership by the preceding error body unchanged because that call's debugger
+return contract still needs recovery. Do not interpret this as a complete
+repair of `0x11d695` or as an equivalence certificate.
+
+Use a disposable copy of the latest recovered workspace, with the normal
+private Ghidra user/config directories. Run the script via headless:
+
+```sh
+analyzeHeadless local/ghidra-byte-dispatch/projects EF2000 \
+  -scriptPath tools/ghidra -process payload.bin -noanalysis \
+  -postScript EF2000RecoverByteDispatch.java /absolute/local/proposal.tsv report
+# Review the proposal, then apply only to the disposable project:
+analyzeHeadless local/ghidra-byte-dispatch/projects EF2000 \
+  -scriptPath tools/ghidra -process payload.bin -noanalysis \
+  -postScript EF2000RecoverByteDispatch.java /absolute/local/applied.tsv apply
+```
+
+Report mode rolls back its transaction. Repeating apply is supported only
+when the existing name and full body exactly match the pinned recipe.
+Export a fresh `inventory` afterward and regenerate the ASM inventory with
+its `body-ranges.json`; previous inventories cannot cover this helper.
