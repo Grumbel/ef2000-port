@@ -8505,3 +8505,16 @@ execution comparisons remain covered. Validation: tests.test_asm_capture
 and tests.test_asm_c_program (13 passing); git diff --check. No gameplay
 runs. This closes a fault-state mismatch, not the remaining descriptor
 reload or ENTER gaps.
+
+### 2026-11-17 — Validate near RET targets against cached CS
+
+Generated near RET now checks the return offset against the active code
+segment before committing PC or ESP, using the same cached-CS validation
+as near CALL. Previously a target beyond CS could be accepted as a stop
+address or reach the dispatcher after ESP had already advanced. The
+program fixture places RET at the last valid code byte with a readable
+stack containing an out-of-limit return offset; rejection preserves GPRs,
+flags, PC and all RAM. Existing captured successful calls and returns and
+SS-fault cases remain covered. Validation: tests.test_asm_capture and
+tests.test_asm_c_program (13 passing); git diff --check. No gameplay runs.
+Descriptor reloads and ENTER remain pending.

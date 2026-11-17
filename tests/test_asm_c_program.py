@@ -85,7 +85,8 @@ ret
                 if index == 0:
                     for segment, limit, pc in ((2, regs['esp']-4, 0x100),
                                                (1, 0x1ff, 0x100),
-                                               (2, regs['esp'], 0x201)):
+                                               (2, regs['esp'], 0x201),
+                                               (1, 0x201, 0x201)):
                         native_ram = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
                         state = asm_c_differential.State(
                             (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),

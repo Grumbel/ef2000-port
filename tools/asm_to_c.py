@@ -650,6 +650,7 @@ def instruction_c(insn, starts):
         if cleanup > 65535:
             raise Unsupported('invalid return cleanup')
         return ('a = ef_read_segment(s, 2, s->r[4], 32); if (s->fault) return s->fault; '
+                'if (ef_check_segment(s, 1, a, 1, 2)) return s->fault; '
                 's->pc = a; s->r[4] += %du; return 0;' % (4 + cleanup))
     if next_pc not in starts:
         raise Unsupported('fallthrough outside body')
