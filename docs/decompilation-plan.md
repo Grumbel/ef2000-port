@@ -8634,3 +8634,32 @@ This completes the constant-load instruction family, not transcendental
 arithmetic or whole-body coverage: FYL2X, F2XM1, FSCALE and other remaining
 instructions still prevent relevant original bodies from translating.
 ENTER and descriptor reloads remain open as well.
+
+### 2026-11-17 — Audit ENTER allocation checks before enabling descriptors
+
+The pinned original inventory contains 47 ENTER instructions, all with
+nesting zero (allocation sizes include 0, 4, 8, 16, 40, 324 and 2,132).
+Investigated the remaining descriptor guard rather than removing it on
+successful-path evidence alone. Intel's instruction reference specifies
+#SS when the resulting ESP lies outside SS, and a page fault when a write
+using the final stack pointer would fault:
+<https://cdrdv2-public.intel.com/671200/325462-sdm-vol-1-2abcd-3abcd.pdf>
+(ENTER instruction reference).
+
+A restored ring-3 EFCAP002 synthetic fixture exposes an oracle limitation:
+Unicorn 2.1.4 executes `enter 64,0` successfully with initial ESP 0x18000
+and expand-down SS limit 0x17ff0. It sets ESP to 0x17fbc, below that limit,
+and writes the saved EBP at 0x17ffc. It also accepts final ESP equal to
+the limit (0x17fbc). These outcomes cannot validate architectural ENTER
+allocation checks. The existing generated-path limit rejection tests
+must not be described as comparisons against original fault behavior.
+
+Reproduction and the five boundary-case observations are retained in
+`local/asm-c-enter-20261117/{probe.py,probe.json}`; they use synthetic
+instructions and the existing fixture, without gameplay or original data.
+No translator guard was relaxed. Next evidence needed is protected-mode
+native ENTER fault capture, including whether the saved-EBP write survives
+a final-allocation fault, followed by descriptor and RAM validation that
+preserves that ordering. Successful synthetic ENTER comparisons alone are
+insufficient. This audit changes the validation path, not translation
+coverage; reliable bulk translation remains unfinished.
