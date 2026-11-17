@@ -12080,3 +12080,13 @@ all 16 prepared probes with 5 MiB RAM. The new tracker entry records its
 observed boundary. The original caller still needs a differential rerun
 with a regenerated bulk dispatcher. Artifacts are in
 `local/ghidra-callback-leaf-20261118/`. All 47 Ghidra tooling tests passed.
+
+2026-11-18 — Regenerated the boundary-enabled bulk dispatcher from the
+fresh Ghidra export. It generates 4,023 bodies and excludes 259. The
+4,281 prior manifest entries are identical, including all generated
+source digests. The registry now resolves 0x1c53c. The host C build linked
+and the caller at 0x1c780 matched on all 16 prepared inputs with 5 MiB RAM
+and the hardware x87 oracle. This includes the input that previously
+mismatched through the missing callback. No host services were reached
+on those inputs. The caller probe results and input provenance are in
+`local/ghidra-callback-leaf-20261118/caller-probes.json`.
