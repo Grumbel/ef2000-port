@@ -8718,3 +8718,34 @@ original-body unit compiled warning-free with OpenWatcom; git diff --check.
 No gameplay runs and no manual tracker promotion. This removes the known
 BSR instruction blocker; whole-corpus regeneration, descriptor reloads and
 unsupported x87 arithmetic remain pending.
+
+### 2026-11-17 — Refresh bulk translation after constants, ENTER and bit scans
+
+Regenerated the independently decoded, pinned original-body inventory with
+the current translator. Syntactically supported bodies increased from
+4,143 to 4,144; direct-dependency-closed generated bodies increased from
+2,528 to 2,532, covering 411,382 original body bytes. Newly generated
+bodies are `0xeff6e`, `0xeff7f`, `0xf07cd` and `0xf0810` (602 bytes).
+Forty-five generated body sources changed. These counts describe mechanical
+translation, not verified equivalence or byte-identical recompilation.
+
+Sources and the translation report remain ignored under
+`local/asm-c-enter-bitscan-program-20261117/`; report SHA-256:
+`6eac0ed14aa5bd3d59693d82e98ab17e6490ce815a490e0a0216eb0140acb794`.
+The refreshed report identifies F2XM1 at `0xdcb96` and FYL2X at
+`0xfa362` / `0x11d3f0` as remaining instruction blockers; adding their
+preceding constants has not made these whole bodies translatable.
+
+Compiled all 2,532 generated bodies and 65 dispatcher/support C units
+with OpenWatcom (`-q -bt=dos -3r -za99 -w1 -we` plus the corpus include
+directory): 2,597 objects, zero failures, zero diagnostics and no missing
+objects. Per-source/object hashes, compiler hash, flags and the pinned
+translation-report hash are retained in
+`local/asm-c-enter-bitscan-watcom-20261117/{check.py,report.json}`.
+Compilation report SHA-256:
+`377a033e15311443ca80e89f8611bcbc509a82710244533e9e0140d238e21132`.
+This establishes complete target compilation for this corpus, not a full
+target link or behavioral validation of all bodies. No gameplay runs,
+new captures or manual tracker promotions; git diff --check passed.
+Descriptor reloads and unsupported x87 arithmetic remain open, so reliable
+bulk translation is not complete.
