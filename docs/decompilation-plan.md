@@ -8749,3 +8749,33 @@ target link or behavioral validation of all bodies. No gameplay runs,
 new captures or manual tracker promotions; git diff --check passed.
 Descriptor reloads and unsupported x87 arithmetic remain open, so reliable
 bulk translation is not complete.
+
+### 2026-11-17 — Translate segment PUSH through the loaded stack descriptor
+
+Removed the descriptor-profile blanket rejection for canonical segment
+PUSH. Both 16-bit and 32-bit operand forms now store through SS, validate
+the actual stack extent and commit ESP only after the store succeeds.
+Source selectors, including null selectors, are values rather than memory
+accesses or descriptor reloads. Exact opcode/selector/operand-size checks
+reject mismatched spellings and unimplemented prefixes. The 32-bit form
+retains the existing Unicorn policy of a zero-extended four-byte store;
+this is not a claim that all x86 implementations store the upper half.
+
+Validation: tests.test_asm_capture passed (4 tests), with twelve new
+full-state cases covering all six segment registers at both operand sizes,
+nonzero initial stack bytes and expand-down SS rejection before any RAM,
+register or flag changes. The synthetic all-register/flags/RAM comparison
+and tests.test_asm_c_program passed in the subsequent 11-test run; only the
+new encoding rejection test initially failed because its fixture omitted
+the fallthrough address. Correcting that fixture made the focused test
+pass. A mixed 16/32-bit generated unit compiled warning-free with Watcom;
+git diff --check passed. No gameplay runs.
+
+An ignored native compatibility-mode probe also observed a four-byte,
+zero-extended PUSH DS store on this host; source and result remain under
+`local/asm-c-segment-push-20261117/{probe.c,probe.json}`. An inventory audit
+there records 154 canonical segment-PUSH sites in 78 bodies (all 32-bit),
+without promoting their tracker states or claiming whole-body execution.
+Segment POP and far-pointer loads still reject descriptor reloads. Bulk
+regeneration after this change and the remaining x87 operations are still
+needed for reliable bulk translation.

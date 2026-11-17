@@ -65,6 +65,18 @@ class TranslationTests(unittest.TestCase):
             with self.assertRaises(asm_to_c.Unsupported):
                 asm_to_c.instruction_c(insn, {0, 1})
 
+    def test_segment_push_requires_matching_encoding(self):
+        for mnemonic, encoded, segment in (('push', '661e', 'ds'),
+                                           ('pushw', '1e', 'ds'),
+                                           ('push', '0fa8', 'fs'),
+                                           ('push', '1e', 'cs'),
+                                           ('pushw', '67661e', 'ds')):
+            with self.subTest(mnemonic=mnemonic, encoded=encoded, segment=segment):
+                with self.assertRaisesRegex(asm_to_c.Unsupported, 'segment PUSH encoding'):
+                    asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                              mnemonic=mnemonic, operands=segment),
+                                              {0x100, 0x100+len(bytes.fromhex(encoded))})
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_synthetic_programs_match_registers_flags_and_all_ram(self):
         sources = [

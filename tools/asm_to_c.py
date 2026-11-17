@@ -894,10 +894,16 @@ def instruction_c(insn, starts):
         code.append('a = ef_stack_all(s, %d); if (a) return a;' % (mnemonic == 'popa'))
     elif mnemonic in ('push', 'pushw', 'pop'):
         op = operand(text)
-        if op[0] == 'seg' and mnemonic == 'push':
-            code += ['if (s->segment_profile) return 7;',
-                     'ef_write(s, s->r[4] - 4u, 32, %s);' % read(op, 16),
-                     'if (s->fault) return s->fault; s->r[4] -= 4u;']
+        if op[0] == 'seg' and mnemonic in ('push', 'pushw'):
+            width = 16 if mnemonic == 'pushw' else 32
+            opcode = ('06', '0e', '16', '1e', '0fa0', '0fa8')[op[1]]
+            if insn['bytes'] != ('66' if width == 16 else '') + opcode:
+                raise Unsupported('segment PUSH encoding/spelling mismatch')
+            # For operand-size 32 use the flat oracle's zero-extended store.
+            # Intel permits implementations to leave the upper half unchanged.
+            code += ['a = %s;' % read(op, 16),
+                     'b = ef_stack_store(s, 2, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
+                     's->r[4] -= %du;' % (width//8)]
         elif op[0] == 'seg' and mnemonic == 'pop' and op[1] != 1:
             code += ['if (s->segment_profile) return 7;',
                      'a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',

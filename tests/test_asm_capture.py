@@ -85,6 +85,10 @@ class AsmCaptureTests(unittest.TestCase):
             'bsr eax,dword ptr [0x2000]\nbsf dx,ax\nret',
             'xor eax,eax\nbsr edx,eax\nbsf dx,ax\nret',
         ]
+        segment_push_start = len(sources)
+        sources += [f'{push} {segment}\npop {destination}\nret'
+                    for push, destination in (('push', 'eax'), ('pushw', 'ax'))
+                    for segment in ('es', 'cs', 'ss', 'ds', 'fs', 'gs')]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             for number, source in enumerate(sources):
@@ -95,6 +99,8 @@ class AsmCaptureTests(unittest.TestCase):
                     memory[:image.stat().st_size] = image.read_bytes()
                     memory[0x2000:0x2004] = struct.pack('<I', 0x10)
                     memory[0x2100:0x2104] = struct.pack('<I', 0x2000)
+                    if number >= segment_push_start:
+                        memory[0x17ff0:0x18000] = bytes([0xa5])*16
                     regs = dict(capture.registers, eip=0x100, ebp=0x2100)
                     tables = copy.deepcopy(capture.table_context)
                     # Non-null FS for the explicit override load.
@@ -125,7 +131,7 @@ class AsmCaptureTests(unittest.TestCase):
                     result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, False,
                                                                native_x87=native, captured=capture)[0]
                     self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 6, 7, 10, 14, 15, 16, 17, 28, 29):
+                    if number in (0, 6, 7, 10, 14, 15, 16, 17, 28, 29) or number >= segment_push_start:
                         # Test the generated access path, not only the helper:
                         # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
@@ -144,8 +150,9 @@ class AsmCaptureTests(unittest.TestCase):
                             state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
                         if number == 6:
                             state.segment_cache[2].limit = regs['esp'] - 32
-                        if number == 10:
-                            state.segment_cache[2].limit = regs['esp'] - 4
+                        if number == 10 or number >= segment_push_start:
+                            width = 2 if record['instructions'][0]['mnemonic'] == 'pushw' else 4
+                            state.segment_cache[2].limit = regs['esp'] - width
                         if number in (28, 29):
                             # Reject before x87 stack/status or memory changes.
                             state.segment_cache[3].limit = 0x2000 if number == 28 else 0x2200
