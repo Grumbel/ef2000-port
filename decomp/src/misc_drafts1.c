@@ -20449,7 +20449,10 @@ void load_ds_from_120cd4_222(void)
 {
 }
 
-/* 0x10e414, 2 bytes. Epilogue fragment (POP EDI; RET) of the neighbouring routine; the register pop has no observable effect here. */
+/* 0x10e414, 2 bytes. KNOWN INCORRECT DRAFT; excluded by tracker.
+ * POP EDI consumes the nested CALL return address, producing the inline table
+ * pointer in EDI, then RET returns through the outer frame. This empty ordinary
+ * C function does not preserve those stack/register effects. */
 void pop_edi_ret_10e414(void)
 {
 }

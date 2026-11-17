@@ -8845,3 +8845,54 @@ still needs a separate flow audit. No manual tracker promotion or gameplay
 runs. Whole-corpus regeneration after this and segment PUSH remains
 pending, as do descriptor reloads and unsupported x87 arithmetic; reliable
 bulk translation remains incomplete.
+
+### 2026-11-17 — Repair decimal table boundary and retract the empty epilogue stub
+
+Ran audit-body-holes for `0x10e35f` and `0x10e414`; it reported zero
+holes, which did not validate the inline bytes as executable code. Reading
+the original caller `0x10e250` establishes that EDI supplies CS-relative
+table reads after CALL `0x10e35f`. The accessor itself executes exactly
+CALL `0x10e414`, POP EDI, RET: the nested CALL's continuation `0x10e364`
+is the table pointer, not an instruction continuation. The RET consumes
+the outer return address. The previous inventory decoded table values as
+DAA, AAM, port I/O and false calls, contaminating flow/signature evidence.
+
+Added `tools/ghidra/EF2000RecoverDecimalTable.java`, gated by 32-bit language,
+pinned full-image and region SHA-256, original instruction layout and
+reviewed ownership/body extents. On a disposable project copy it sets the
+accessor body to its five-byte CALL, marks that CALL as CALL_RETURN, and
+replaces the 176 inline bytes `0x10e364..0x10e413` with data while retaining
+the helper at `0x10e414`. Apply succeeded (167 to 5 code bytes); a subsequent
+read-only report-mode run confirmed the same five-byte body and table.
+The original project/payload and existing pinned inventories are unchanged;
+future bulk inventory regeneration must use the repaired project.
+
+Corrected functions.tsv size for `0x10e35f`. Retracted the `compiles` /
+confirmed claim for the empty `pop_edi_ret_10e414` draft: it is now
+`compiles-bad` / unverified, and its source and signature evidence explain
+the observable EDI and nonstandard stack effects. It is not a normal void
+callee and is excluded by hybrid-link eligibility. No replacement C body
+is claimed; its code and all-RAM stack-write effects still need recovery.
+
+Validation: original accessor execution under controlled ring-3 states
+with flags 0x202, 0x246 and 0xad7 always traced only `0x10e35f`,
+`0x10e414`, `0x10e415`, returning to the outer sentinel with EDI=0x10e364.
+Checked all registers/flags and full RAM, including the retained nested
+CALL write below entry ESP. Reproduction/results are ignored under
+`local/ghidra-inline-table-20261117/{check.py,execution.json,recovery.tsv,recheck.tsv}`;
+initial body-hole audit is `local/inline-table-body-holes-20261117.tsv`.
+`python3 tools/decomp_status.py check` and git diff --check pass. No
+gameplay, UI runs or verified-function promotions.
+
+Recipe invocation, against a disposable copy with the pinned payload:
+
+```sh
+analyzeHeadless WORKSPACE/projects EF2000 -scriptPath tools/ghidra \
+  -process payload.bin -noanalysis -postScript EF2000RecoverDecimalTable.java \
+  /absolute/path/recovery.tsv apply
+```
+
+Use `report` with `-readOnly` to roll back the proposed metadata changes.
+This repairs a real inventory boundary; descriptor reloads, unsupported
+x87 arithmetic and broader execution still leave reliable bulk translation
+incomplete.
