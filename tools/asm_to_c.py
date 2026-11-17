@@ -161,6 +161,13 @@ static unsigned ef_stack_store(ef_lift_state *s, unsigned segment, uint32_t addr
 static unsigned ef_stack_all(ef_lift_state *s, unsigned pop) {
     uint32_t stack = s->r[4], address, value;
     unsigned slot, byte, index;
+    /* Validate descriptor extents before any register or RAM changes. The
+     * discarded saved-ESP slot of POPA is not a memory operand. */
+    for (slot = 0; slot < 8; ++slot) {
+        if (pop && slot == 3) continue;
+        address = (pop ? stack : stack-32u) + slot*4u;
+        if (ef_check_segment(s, 2, address, 4, pop ? 3 : 4)) return s->fault;
+    }
     for (slot = 0; slot < 8; ++slot) {
         index = 7u-slot;
         if (pop && index == 4) continue; /* Discard the saved ESP slot, without reading it. */
@@ -1033,7 +1040,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'pusha', 'popa', 'enter',
+    unwired = {'enter',
                'les', 'lds', 'lss', 'lfs', 'lgs'}
     for i in instructions:
         code = renderer(i, starts)

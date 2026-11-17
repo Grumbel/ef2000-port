@@ -51,7 +51,7 @@ class AsmCaptureTests(unittest.TestCase):
             'mov eax, cs:[0x100]\nmov word ptr ds:[0x2004], ax\nret',
             'mov eax, fs:[0x2000]\nret',
             'mov eax,0x10\nadd eax,0x20\nmov edx,[0x2000]\nret',
-            'pusha\npopa\nret',  # Explicitly unsupported in this stage.
+            'pusha\nxor eax,eax\nxor edx,edx\npopa\nret',
             'mov ebx,0x2000\nmov eax,0x12340000\nxlatb\nret',
             'mov ebx,0x2000\nmov eax,0x12340000\nfs xlatb\nret',
             'mov ebx,0x100\nmov eax,0x12340000\ncs xlatb\nret',
@@ -117,12 +117,8 @@ class AsmCaptureTests(unittest.TestCase):
                         native, _ = asm_x87_oracle.build(root/('native%d' % number))
                     result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, False,
                                                                native_x87=native, captured=capture)[0]
-                    if number == 6:
-                        self.assertEqual(result['state'], 'mismatch')
-                        self.assertIn('C status 7', result['differences'][0])
-                    else:
-                        self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 7, 10, 14, 15, 16, 17, 28, 29):
+                    self.assertEqual(result['state'], 'pass', result)
+                    if number in (0, 6, 7, 10, 14, 15, 16, 17, 28, 29):
                         # Test the generated access path, not only the helper:
                         # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
@@ -139,6 +135,8 @@ class AsmCaptureTests(unittest.TestCase):
                                 *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
                         if number in (0, 7, 14):
                             state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
+                        if number == 6:
+                            state.segment_cache[2].limit = regs['esp'] - 32
                         if number == 10:
                             state.segment_cache[2].limit = regs['esp'] - 4
                         if number in (28, 29):
@@ -175,6 +173,15 @@ class AsmCaptureTests(unittest.TestCase):
                         self.assertEqual(state.fault, expected_fault)
                         self.assertEqual((list(state.r), state.flags, bytes(ram)), before)
                         self.assertEqual((bytes(state.x87), tuple(getattr(state, n) for n in asm_c_differential.X87_FIELDS)), x87_before)
+                        if number == 6:
+                            # Reject POPA before changing any of its seven outputs.
+                            state.fault = 0
+                            state.pc = next(i['address'] for i in record['instructions']
+                                            if i['mnemonic'] == 'popa')
+                            state.segment_cache[2].limit = regs['esp'] + 28
+                            self.assertEqual(function(ctypes.byref(state), 100), 7)
+                            self.assertEqual((list(state.r), state.flags, bytes(ram)), before)
+
 
     @unittest.skipUnless(shutil.which('cc') and shutil.which('objdump'), 'requires C compiler and objdump')
     def test_captured_input_reaches_generated_c_without_flattening_selectors(self):

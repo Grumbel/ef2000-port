@@ -8474,3 +8474,22 @@ git diff --check. No gameplay or UI runs. This enables existing supported
 x87 instruction forms, not arbitrary x87 instructions or exception delivery.
 Descriptor reloads, compound stack operations and broader captured-path
 coverage still keep the reliable bulk translation goal open.
+
+### 2026-11-17 — Translate descriptor-backed PUSHA/POPA
+
+The existing 32-bit register-stack helper now validates each actual memory
+operand against cached SS before changing registers or RAM. PUSHA retains
+the original ESP value in its saved slot; POPA skips that slot without
+reading it. Removed their descriptor-mode rejection. Existing flat RAM
+fault ordering and partial effects remain unchanged; 16-bit PUSHA/POPA
+forms are still rejected by the encoding check.
+
+The captured fixture now saves all registers, changes EAX/EDX and restores
+through POPA, comparing full state and RAM with original execution.
+Generated-path SS limit failures for both instructions preserve GPRs,
+flags and RAM. Validation: tests.test_asm_capture and
+tests.test_asm_c_program (13 passing), followed by a focused capture-suite
+rerun for the added POPA rejection assertion; tracker check;
+git diff --check. No gameplay or UI runs. ENTER and descriptor reloads
+remain unwired, and broader captured execution is still required for the
+reliable bulk translation goal.
