@@ -7754,3 +7754,7 @@ void refresh_network_controls_33630(void);
 #pragma aux net_new_fifo_len_336c0 parm [] modify [eax]
 #pragma aux net_open_ipx_settings_336f0 parm [] modify [eax]
 #endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_new_init_string_33760 parm [eax] modify [eax]
+#endif

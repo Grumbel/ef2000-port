@@ -561,3 +561,5 @@ addr	size	type	name	evidence	notes
 0x0015f53d	1	char[]	g_modem_prefix	net_new_pt_33738 strcpy destination	Minimum observed extent only; allocation capacity not established
 0x0015f4fd	1	char[]	g_modem_device	net_open_modem_status_337ac strcpy destination	Minimum observed extent only; allocation capacity not established
 0x0015f098	1	uint8_t	g_serial_fifo_toggle_guard	336c0 original CMP/JZ	When initialized, nonzero permits toggling g_serial_fifo_mode
+0x0015f688	1	uint8_t	g_modem_initialization_choice	33760 original XOR AH,1 then store	Unchecked byte indexes pointer table at 125958
+0x00125958	8	ef_addr32[2]	g_modem_initialization_labels	33760 original indexed dword load	Two intended choices; original allows all byte indices without bounds check

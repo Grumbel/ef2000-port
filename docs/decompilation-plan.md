@@ -11529,3 +11529,23 @@ Commands: tools/ef2000_wcc.py decomp/src/network_option_callbacks.c --compiler
 <pinned-wcc386> --output local/network-options-20261117.obj;
 pinned-Unicorn Python local/network-options-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover initialization string selector
+
+Recovered 33760 (74 bytes) into network_init_string.c, replacing formatter
+and guest-call probes with real cdecl a4342 and Watcom a7588/a2bdc calls.
+Confirm EAX widget, preserved six GPRs, 16-byte local, callback slot 12b658,
+no direct callers. Preserve unchecked byte XOR table indexing and unbounded
+%s formatting, including load-before-choice-store order. Watcom clean.
+56 scoped compiled-C/original-ASM comparisons PASS: seven index bytes,
+four fitting strings, and optional callback mutations. Three callees modeled;
+compare normalized calls, six saved GPRs, ESP and 5 MiB RAM excluding code
+placement/stack scratch. EAX, flags, stack, overflow and integration unproved.
+Keep hybrid excluded; state compiles. Tracker 3447 compiles / 785 blocked /
+454506 blocked body bytes. Private report
+local/network-init-source-20261117/report.json, SHA-256
+fdea187645105b8c2db51644ef191cb7e510b57caa72873e66d286fbb94d6347.
+Commands: tools/ef2000_wcc.py decomp/src/network_init_string.c --compiler
+<pinned-wcc386> --output local/network-init-20261117.obj;
+pinned-Unicorn Python local/network-init-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

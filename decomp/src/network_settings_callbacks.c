@@ -52,20 +52,6 @@ void net_new_parity_3361c(ef_addr32 widget)
     refresh_network();
 }
 
-/* 33760, 74 bytes: toggle the current initialization-string slot, format
- * the selected string, write it into the target widget and redraw. The
- * formatter callback stands in for the original local sprintf buffer. */
-void net_new_init_string_33760(ef_addr32 widget)
-{
-    uint8_t choice = (uint8_t)(EF_U8(0x15f688u) ^ 1u);
-    ef_addr32 label;
-    EF_U8(0x15f688u) = choice;
-    label = net_ui_format_option_086(0x182bc0u,
-              EF_U32(0x125958u + 4u * choice));
-    guest(0xa7588u, widget, label, 0u);
-    notify_network_change();
-}
-
 /* 337c4, 37 bytes: zero-extended byte sent to e1540, whose AL is saved. */
 void net_new_port_337c4(ef_addr32 widget)
 {
