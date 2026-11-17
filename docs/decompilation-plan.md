@@ -9669,3 +9669,31 @@ Compiler report SHA-256:
 `9bfd2c00c2a0d8b75151866918b73bf7ed665eb47df20dbfb00261feadf45395`.
 This refresh measures generation and compiler coverage only; it supplies no
 new full-state equivalence, gameplay, splice or replay evidence.
+
+### 2026-11-17: implement null data-selector loads in descriptor mode
+
+Descriptor-profile MOV loads of ES, DS, FS and GS now accept null selectors
+0..3 without consulting descriptor tables. The selected register retains
+its RPL, and its cache becomes unusable, so subsequent data accesses reject
+with status 7 without changing registers, flags or RAM. Null SS and non-null
+reloads retain the unsupported result; table lookup, accessed-bit updates,
+privilege transitions and POP segment loads are not implemented by this step.
+This is a bounded part of the segment-model blocker, not its resolution.
+
+The differential harness previously required all caches to remain unchanged.
+It now derives the expected unusable cache for a changed null data selector
+from the original CPU's final selector, while preserving the unchanged-cache
+check for all other cases. It does not use the generated C's selector to
+choose the expected cache.
+
+`python3 -m unittest tests.test_asm_capture tests.test_asm_segments` passes
+all eight tests with pinned Unicorn. The new regression supplies initially
+usable descriptors and compares 16 MOV/return cases (four data registers,
+four RPLs) against the original, including full RAM, GPRs, flags and selectors.
+It separately checks cache invalidation and rejection of a subsequent read.
+The prior same-selector non-null reload still reports unsupported.
+The generated `local/asm-null-segments-20261117/lift.c` compiles with pinned
+Watcom using `-q -bt=dos -3r -za99 -w1 -we` with zero diagnostics.
+The runtime header hash changes; the preceding bulk report remains historical
+and is not evidence of compilation against this new header. No tracker
+promotion, runtime splice or gameplay/replay result is claimed.

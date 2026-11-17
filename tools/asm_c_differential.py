@@ -186,7 +186,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     profile = (native_x87.comparison_profile if native_x87 is not None else
                asm_x87_oracle.unicorn_comparison_profile())['flags']
     state.x87_compare_profile = profile
-    segment_configuration = (state.segment_profile, bytes(state.segment_cache))
+    segment_configuration = state.segment_profile
+    expected_caches = (Segment * 6).from_buffer_copy(bytes(state.segment_cache))
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -199,7 +200,17 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if phase:
         phase('comparison')
     differences = []
-    if (state.segment_profile, bytes(state.segment_cache)) != segment_configuration:
+    if captured is not None:
+        for index, name in enumerate(asm_to_c.SEGMENTS):
+            original_selector = cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + name.upper()))
+            # Only null data-selector transitions have implemented reload
+            # semantics. Derive this expectation from the original CPU, never
+            # from the generated C's output selector or cache.
+            if (index not in (1, 2) and original_selector != selectors[index] and
+                    original_selector & 0xfffc == 0):
+                expected_caches[index] = Segment(original_selector, 0, 0, 0, 0)
+    if (state.segment_profile != segment_configuration or
+            bytes(state.segment_cache) != bytes(expected_caches)):
         differences.append('C descriptor profile/cache configuration changed')
     if state.x87_compare_profile != profile:
         differences.append('C comparison CPU profile changed')

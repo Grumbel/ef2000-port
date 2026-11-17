@@ -88,6 +88,17 @@ static unsigned ef_segments_valid(ef_lift_state *s) {
 }
 static void ef_load_segment(ef_lift_state *s, unsigned index, uint32_t selector) {
     selector &= 0xffffu;
+    if (s->segment_profile == 1 && index < 6 && index != 1 && index != 2 &&
+        (selector & 0xfffcu) == 0) {
+        /* Null data selectors need no descriptor lookup. Make the cache
+         * unusable so that subsequent accesses fault, including after a
+         * previously usable descriptor was loaded. RPL is still retained. */
+        ef_lift_segment *cache = &s->segment_cache[index];
+        cache->selector = selector;
+        cache->base = cache->limit = cache->access = cache->flags = 0;
+        s->segment[index] = selector;
+        return;
+    }
     if (s->segment_profile) {
         /* Reloads require current table lookup, even for the same selector:
          * table memory may have changed since its cache was loaded. */
