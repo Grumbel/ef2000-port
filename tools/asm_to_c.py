@@ -958,6 +958,19 @@ def instruction_c(insn, starts):
     elif mnemonic == 'leave' and not text:
         code += ['a = ef_read_segment(s, 2, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
+    elif mnemonic in ('popf', 'popfw'):
+        width = 16 if mnemonic == 'popfw' else 32
+        if text or insn['bytes'] != ('669d' if width == 16 else '9d'):
+            raise Unsupported('POPF encoding/spelling mismatch')
+        # Protected-mode privilege comes from CS, not the requested stack
+        # image. Virtual-8086 substitution requires CR4 state we do not model.
+        code += ['if (s->flags & 0x20000u) return 7;',
+                 'a = ef_read_segment(s, 2, s->r[4], %d); if (s->fault) return s->fault;' % width,
+                 'b = %s;' % ('0x4fd5u' if width == 16 else '0x244fd5u'),
+                 'if (!(s->segment[1] & 3u)) b |= 0x3000u;',
+                 'if ((s->segment[1] & 3u) > ((s->flags >> 12) & 3u)) b &= ~0x200u;',
+                 's->flags = ((s->flags & ~b) | (a & b)) & ~0x10000u;',
+                 's->r[4] += %du;' % (width//8)]
     elif mnemonic in ('pushf', 'pushfw'):
         width = 16 if mnemonic == 'pushfw' else 32
         if text or insn['bytes'] != ('669c' if width == 16 else '9c'):

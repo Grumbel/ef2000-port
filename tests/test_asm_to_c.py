@@ -45,7 +45,7 @@ class TranslationTests(unittest.TestCase):
             root = Path(temporary)
             for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
                            'addr16 loop 1f\n1: ret',
-                           'in eax,dx\nret', 'popf\nret',
+                           'in eax,dx\nret', 'cpuid\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
                     _, record = assemble(root, source)
@@ -308,6 +308,35 @@ class TranslationTests(unittest.TestCase):
                             self.assertEqual(state.pc, 0x100)
                         self.assertEqual(bytes(memory), bytes(expected))
                         self.assertEqual(state.flags, flags)
+
+    def test_popf_faults_preserve_state_and_success_clears_rf(self):
+        for mnemonic in ('popf', 'popfw'):
+            with self.subTest(mnemonic=mnemonic), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                _, record = assemble(root, mnemonic+'\nret')
+                (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+                (root/'lift.c').write_text(asm_to_c.translate(record))
+                subprocess.run(['cc', '-shared', '-fPIC', '-O2', str(root/'lift.c'),
+                                '-o', str(root/'lift.so')], check=True, capture_output=True)
+                function = ctypes.CDLL(str(root/'lift.so')).ef_lift_00000100
+                function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32]
+                width = 2 if mnemonic == 'popfw' else 4
+                for stack, flags, result in ((7, 0x10202, 3), (0, 0x20202, 7), (0, 0x10202, 1)):
+                    memory = (ctypes.c_uint8*8)(*bytes.fromhex('0200000000000000'))
+                    state = State((ctypes.c_uint32*8)(0, 0, 0, 0, stack, 0, 0, 0),
+                                  flags, 0x100, 0, memory, 8)
+                    self.assertEqual(function(ctypes.byref(state), 1), result)
+                    self.assertEqual(bytes(memory), bytes.fromhex('0200000000000000'))
+                    self.assertEqual(state.r[4], width if result == 1 else stack)
+                    self.assertEqual(state.pc, 0x100+len(bytes.fromhex(record['instructions'][0]['bytes'])) if result == 1 else 0x100)
+                    self.assertEqual(state.flags, 2 if result == 1 else flags)
+
+    def test_popf_rejects_mismatched_encoding(self):
+        for mnemonic, encoded, text in [('popf', '669d', ''), ('popfw', '9d', ''),
+                                        ('popf', '9c', ''), ('popf', '9d', 'eax')]:
+            with self.subTest(encoded=encoded), self.assertRaises(asm_to_c.Unsupported):
+                asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                          mnemonic=mnemonic, operands=text), {0x100, 0x102})
 
     def test_pushf_rejects_mismatched_encoding(self):
         for mnemonic, encoded, text in [('pushf', '669c', ''),

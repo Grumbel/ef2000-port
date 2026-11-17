@@ -9216,3 +9216,33 @@ rejected. `local/asm-c-pushf-20261117/check.py` compiles all eight observed
 PUSHF sites from five original bodies with OpenWatcom without diagnostics.
 No whole-body verification, tracker promotion or new bulk coverage count is
 claimed; subsequent POPF and service operations still need implementation.
+
+### 2026-11-17: translate protected-mode POPF with privilege masks
+
+The renderer accepts exact 9D/66 9D POPF encodings. It reads through SS,
+checks the read before any flag or ESP update, and applies the non-reserved
+writable-bit mask for the operand width. CPL comes from the existing CS
+selector; only CPL 0 can update IOPL, and IF changes only when current CPL
+is at most current IOPL. The stack image cannot grant itself privilege.
+VM/VIF/VIP and reserved bits remain unchanged, RF clears on success, and
+16-bit POPF preserves the upper flag bits apart from RF. Virtual-8086
+execution remains explicitly unsupported. These rules follow Intel SDM
+volume 2B, POPF/POPFD, operation/table 4-15:
+https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2b-manual.pdf
+
+`tests.test_asm_c_program`, the focused POPF encoding and fault/RF tests,
+and the unsupported-input test pass (20 tests). Six stack images at both
+widths cover requested IOPL/IF, arithmetic/direction/NT/AC/ID, reserved,
+RF and virtual-interrupt bits. Four prepared CPL-0 comparisons plus two
+ring-3 captures (initial IOPL 0 and 3) per image give 72 full-state
+comparisons. TF-setting execution is deliberately absent from this matrix;
+debug exception delivery is not established by these comparisons. Six direct
+checks additionally cover out-of-range reads with unchanged state, explicit
+virtual-8086 rejection, and successful RF clearing. Four encoding/spelling
+mismatches remain rejected.
+
+`local/asm-c-popf-20261117/check.py` compiles all five original POPF sites
+with OpenWatcom without diagnostics. Re-analysis of the five preceding
+PUSHF-blocked bodies now reaches CPUID at 0xf2819 and CLI at 0x110f0c,
+0x110fd4, 0x1110c5 and 0x1111e1. No whole-body verification, tracker
+promotion or new closed-corpus count is claimed.

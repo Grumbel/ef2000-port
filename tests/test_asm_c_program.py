@@ -154,6 +154,30 @@ ret
                     result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, True, captured=capture)[0]
                     self.assertEqual(result['state'], 'pass', result)
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_pop_flags_privilege_and_width(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        for width in (16, 32):
+            for value in (0, 0x3000, 0x244ed5, 0x180000, 0x10000, 0xfffffeff):
+                with self.subTest(width=width, value=value), tempfile.TemporaryDirectory() as temporary:
+                    root = Path(temporary)
+                    source = '.type root,@function\nroot: mov eax,0x%x\npush %s\npopf%s\nret\n.size root, .-root' % (value, 'ax' if width == 16 else 'eax', 'w' if width == 16 else '')
+                    image, directory, _ = inventory(root, source)
+                    asm_c_program.generate(directory, root/'out', image)
+                    report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=4)
+                    self.assertEqual(report['entries'][0]['counts'], {'pass': 4}, report)
+                    function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+                    function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+                    for flags in (0x202, 0x3202):
+                        capture = fixture()
+                        ram = bytearray(capture.guest_ram)
+                        ram[:image.stat().st_size] = image.read_bytes()
+                        capture = replace(capture, address=0x100,
+                                          registers=dict(capture.registers, eip=0x100, eflags=flags), guest_ram=bytes(ram))
+                        result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, True, captured=capture)[0]
+                        self.assertEqual(result['state'], 'pass', result)
+
     def test_legacy_notrack_rejects_other_encodings(self):
         for encoded, text in [('ff6576', 'jmp DWORD PTR [ebp+0x76]'),
                               ('3eff5576', 'call DWORD PTR [ebp+0x76]'),
