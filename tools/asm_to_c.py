@@ -360,18 +360,27 @@ class Unsupported(ValueError):
 
 
 def address_expression(text):
-    """Parse only 32-bit base/index/scale/displacement addressing."""
+    """Parse 32-bit addressing and legal 16-bit register combinations."""
     text = text.replace(' ', '')
     parts = re.findall(r'[+-]?[^+-]+', text)
     if not parts or ''.join(parts) != text:
         raise Unsupported('unsupported address expression')
     terms = []
+    narrow = [part.lstrip('+') for part in parts
+              if part.lstrip('+') in ('bx', 'bp', 'si', 'di')]
+    if narrow:
+        allowed = {('bx',), ('bp',), ('si',), ('di',),
+                   ('bx', 'si'), ('bx', 'di'), ('bp', 'si'), ('bp', 'di')}
+        if tuple(narrow) not in allowed:
+            raise Unsupported('unsupported 16-bit address registers')
     for part in parts:
         negative = part.startswith('-')
         part = part.lstrip('+-')
-        if part in REGS:
+        if narrow and part in ('bx', 'bp', 'si', 'di') and not negative:
+            term = '(s->r[%d] & 0xffffu)' % REG[part][0]
+        elif part in REGS and not narrow:
             term = 's->r[%d]' % REGS.index(part)
-        elif re.fullmatch(r'(?:eax|ecx|edx|ebx|esp|ebp|esi|edi)\*[1248]', part):
+        elif not narrow and re.fullmatch(r'(?:eax|ecx|edx|ebx|esp|ebp|esi|edi)\*[1248]', part):
             register, scale = part.split('*')
             term = '(s->r[%d] * %su)' % (REGS.index(register), scale)
         elif re.fullmatch(r'0x[0-9a-f]+|[0-9]+', part):
@@ -382,7 +391,8 @@ def address_expression(text):
         else:
             raise Unsupported('unsupported address term: ' + part)
         terms.append(('-' if negative else '+') + term)
-    return '(uint32_t)(0u' + ''.join(terms) + ')'
+    expression = '(uint32_t)(0u' + ''.join(terms) + ')'
+    return '(' + expression + ' & 0xffffu)' if narrow else expression
 
 
 def operand(text):
@@ -404,9 +414,9 @@ def operand(text):
         if segment is None:
             # Objdump prints an unscaled base before the index. A scaled EBP
             # index with no EBP base uses DS, unlike an EBP/ESP base using SS.
-            base = re.search(r'(?:^|[+-])(eax|ecx|edx|ebx|esp|ebp|esi|edi)(?=[+-]|$)',
+            base = re.search(r'(?:^|[+-])(eax|ecx|edx|ebx|esp|ebp|esi|edi|bx|bp|si|di)(?=[+-]|$)',
                              address.replace(' ', ''))
-            segment = 'ss' if base and base.group(1) in ('esp', 'ebp') else 'ds'
+            segment = 'ss' if base and base.group(1) in ('esp', 'ebp', 'bp') else 'ds'
         return ('mem', address_expression(address), width, SEGMENTS.index(segment))
     raise Unsupported('unsupported operand: ' + text)
 

@@ -48,6 +48,46 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_address16_wraps_offsets_and_preserves_register_high_halves(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        expressions = ['bx', 'bp', 'si', 'di', 'bx+si', 'bx+di', 'bp+si', 'bp+di',
+                       'fs:bx', 'fs:si+0x100']
+        for expression in expressions:
+            prefix, address = expression.split(':') if ':' in expression else ('', expression)
+            memory = (prefix+':' if prefix else '') + '[%s]'
+            source = '''.type root,@function
+root: mov ebx,0xabcdfff0
+mov ebp,0xdeadfff8
+mov esi,0x12340220
+mov edi,0x56780230
+mov eax,DWORD PTR %s
+mov DWORD PTR %s,ecx
+lea edx,[%s]
+ret
+.size root, .-root''' % (memory % address, memory % (address+'+4'), address)
+            with self.subTest(expression=expression), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, _ = inventory(root, source)
+                asm_c_program.generate(directory, root/'out', image)
+                report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=4)
+                self.assertEqual(report['entries'][0]['counts'], {'pass': 4}, report)
+                function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                     ctypes.c_uint32, ctypes.c_uint32]
+                capture = fixture()
+                context = dict(capture.table_context)
+                context['descriptors'] = dict(context['descriptors'], fs=context['descriptors']['ds'])
+                ram = bytearray(capture.guest_ram)
+                ram[:image.stat().st_size] = image.read_bytes()
+                capture = replace(capture, address=0x100,
+                                  registers=dict(capture.registers, eip=0x100, fs=7),
+                                  table_context=context, guest_ram=bytes(ram))
+                result = asm_c_differential.isolated_probes(
+                    function, b'', 0x100, 1, 100, True, captured=capture)[0]
+                self.assertEqual(result['state'], 'pass', result)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_data16_and_register_segment_prefixes(self):
         from dataclasses import replace
         from tests.test_asm_capture import fixture

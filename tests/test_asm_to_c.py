@@ -297,6 +297,17 @@ class TranslationTests(unittest.TestCase):
                                           mnemonic=mnemonic, operands=text),
                                       {0x100, 0x100+len(bytes.fromhex(encoded))})
 
+    def test_address16_rejects_invalid_combinations_and_selects_ss_for_bp(self):
+        for text in ('bx+bp', 'si+di', 'bx+bx', 'bx+eax', 'bx+ecx*2',
+                     'bx*2', 'si-bp', '-bx', 'bx+si+di'):
+            with self.subTest(text=text), self.assertRaises(asm_to_c.Unsupported):
+                asm_to_c.address_expression(text)
+        for text in ('bp', 'bp+si', 'bp+di-0x10'):
+            self.assertEqual(asm_to_c.operand('DWORD PTR ['+text+']')[3], 2)
+        for text in ('bx', 'bx+si', 'si', 'di'):
+            self.assertEqual(asm_to_c.operand('DWORD PTR ['+text+']')[3], 3)
+        self.assertEqual(asm_to_c.operand('BYTE PTR fs:[bp+si]')[3], 4)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_aam_values_bases_flags_and_zero_base_fault(self):
         flags = [0x202 | carry | auxiliary | overflow

@@ -9020,3 +9020,26 @@ compiles all 12 observed CS/DS alias sites, from six original bodies, with
 OpenWatcom without diagnostics. This is site-level compilation evidence;
 no whole-body equivalence, updated bulk count or tracker promotion is claimed.
 `python3 tools/decomp_status.py check` and `git diff --check` pass.
+
+### 2026-11-17: translate 16-bit effective addresses
+
+The operand parser now supports the eight encodable BX/BP/SI/DI register
+combinations, wrapping the effective offset to 16 bits after adding registers
+and displacement. GPR high halves do not participate or change. BP-based
+forms default to SS; other forms default to DS, and explicit overrides remain
+selected. Mixed-width, scaled 16-bit and illegal register combinations are
+rejected. This adds scalar addressing support, not 16-bit REP count/index
+semantics or descriptor reload support.
+
+`tests.test_asm_c_program` and
+`tests.test_asm_to_c.TranslationTests.test_address16_rejects_invalid_combinations_and_selects_ss_for_bp`
+pass (15 tests). Ten new load/store/LEA cases include all eight combinations
+and FS overrides, large register high halves and offset wrap, with four
+prepared comparisons plus a ring-3 capture each (50 full GPR/flags/RAM
+comparisons). Nine invalid address forms remain rejected, and default SS/DS
+selection is checked explicitly. `local/asm-c-address16-20261117/check.py`
+compiles all 43 observed scalar 16-bit-address sites from six original bodies
+(0xd3900, 0xd3e50, 0xd4250, 0xd4370, 0xd53ff, 0xd5a90) with OpenWatcom
+without diagnostics. Original FS-based MOV/MOVZX/OR accesses now render;
+whole-body behavior and dynamic dependencies remain separate evidence gates.
+No tracker promotion or new bulk coverage count is claimed.
