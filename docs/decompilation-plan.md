@@ -9292,3 +9292,38 @@ state header. Registry consumers are rebuilt. Compiler flags remain
 `-q -bt=dos -3r -za99 -w1 -we`. An initial redundant rebuild was interrupted;
 its partial output is not used as proof. This refresh required no gameplay
 runs. `python3 tools/decomp_status.py check` and `git diff --check` pass.
+
+### 2026-11-17: recover the missing drawing tail in 0x4c120
+
+The flow-gap audit identifies fallthrough from MOV at 0x4c2c3 to 0x4c2c5,
+where a false data reference had started an orphan decode at 0x4c2c9.
+Reading the original disassembly from the actual fallthrough recovers
+91 bytes through 0x4c31f: 28 instructions including calls at 0x4c2c5,
+0x4c307 and 0x4c31b. They rejoin the existing node-loop tail at 0x4c320.
+The earlier Ghidra pseudo-C also describes the drawing path but is not used
+as executable proof. No other function owns the recovered bytes.
+
+`tools/ghidra/EF2000Recover4c120Tail.java` pins the x86 language, complete
+payload hash, missing-region hash, exact old/repaired bodies, incoming
+fallthrough, and all recovered instruction lengths and mnemonics. It rejects
+other owners and applies the repair in a transaction (report mode rolls
+back). Applied in `local/ghidra-draw-tail-20261117`, it grows the body from
+446 to 537 bytes; a second report run accepts 537 unchanged. This workspace
+includes the preceding decimal-table, bfcc-loop and kotsAccept repairs.
+
+Fresh `local/ghidra-draw-tail-inventory-20261117/body-ranges.json` and the
+single-body normalized `local/asm-draw-tail-20261117` inventory confirm all
+166 instruction boundaries match. The complete generated body compiles with
+OpenWatcom `-q -bt=dos -3r -za99 -w1 -we` without diagnostics. All eight
+original direct calls target previously closed generated bodies (0xcc22c,
+0xcc1ac, 0xcc1ec, 0xc95ac and 0xc9680). No new all-corpus count is claimed.
+
+`local/ghidra-draw-tail-20261117/check.py` / `execution.json` additionally
+record 12 original-versus-generated comparisons for the two recovered
+argument-setup blocks, 0x4c2ca..0x4c306 and 0x4c30c..0x4c31a. Three stack
+patterns and two flag images compare all GPRs, flags, PC, selectors and
+2 MiB RAM, including the original stack writes. Calls are outside these
+block comparisons; this does not establish whole-body behavior or callee
+behavior. The tracker size and boundary note are corrected while its
+blocked/unverified state remains. No gameplay run was required.
+`python3 tools/decomp_status.py check` and `git diff --check` pass.
