@@ -10215,3 +10215,29 @@ local/asm-dpmi-allocate-20261117/check.py and report.json, SHA-256
 ca4111cb26d967000e3b0d098c048447f5b3efe4b78f12222fe4361e1d2f3950.
 No tracker promotion or gameplay runs. Next work is accurate stateful service
 models and memory/selector effects before this larger cluster can be trusted.
+
+### 2026-11-17: recover empty-heap cleanup as C
+
+Add decomp/src/heap_release_empty.c for 0x10d466, keeping DPMI and DOS
+selector release as explicit unresolved platform boundaries. Preserve the
+original emptiness calculation, saved next pointer, unlink-before-header-read
+ordering, handle-word split and continuation after release failure. The
+existing heap_release.c block coalescer is separate and unchanged.
+Both direct callers and shared epilogue were audited in the preceding ABI
+commit. Add the declaration and point the blocked tracker row at the draft;
+no verified/compiles state promotion because service/guest ABI work remains.
+
+Pinned Watcom compilation with -q -bt=dos -3r -zp1 -za99 -w1 -we
+-i=decomp/include succeeds without diagnostics. A focused original-Unicorn
+versus recovered-host-C comparison passes 96 cases: all eight empty/busy
+patterns in a three-node heap list, DPMI-only/mixed/DOS-only release types,
+success/failure carry responses, and two incoming flag patterns. Compare RAM
+apart from original stack scratch 0x3effc0..0x3f0004 and compare release
+arguments/order. Original DOS ES restoration is checked using a distinct
+valid selector. The host uses the existing recovered unlink helper extracted
+from runtime_helpers.c; it does not independently verify that helper's guest
+ABI. The checks do not compare final registers/flags or validate real extender
+release semantics. These are deliberately narrower than whole-state evidence.
+Reproducer: local/heap-release-source-20261117/check.py; report.json SHA-256
+c840b27a5f9f0531b136b2ba01355c80a9708463c4a4418547d60196a38415ab.
+Tracker/diff checks pass. No gameplay runs.

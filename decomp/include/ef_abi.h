@@ -1364,6 +1364,7 @@ void skip_class_chars(ef_addr32 pointer);
 ef_addr32 copy_padded(ef_addr32 destination, ef_addr32 source, uint32_t count);
 ef_addr32 find_last_char(ef_addr32 text, uint8_t ch);
 void unlink_node_10d427(ef_addr32 node);
+void heap_release_empty_10d466(void); /* 0x10d466; release services pending */
 int32_t count_matching_streams(uint32_t mask);
 uint32_t field_10dfe0(void);
 void guest_fn_1141a0(uint32_t a, uint32_t b); /* 0x1141a0 cdecl */
