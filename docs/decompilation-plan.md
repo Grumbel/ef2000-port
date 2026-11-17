@@ -9361,3 +9361,34 @@ Eight direct callees are absent from the preceding closed generated set:
 0x4f314, 0xa3dc, 0xa4c84, 0xb1e0, 0xb3168, 0xc1438, 0xe490 and 0xf918.
 Whole-body equivalence and dynamic execution remain unproven. No gameplay
 run or updated bulk-closure count is claimed. Tracker and diff checks pass.
+
+### 2026-11-17: recover the software floating-point tail at 0xf0cec
+
+The remaining audited fallthrough at 0xf0e09 starts XOR ESI,0x8000;
+the stale orphan listing began four bytes late. Its 183-byte continuation
+contains 66 instructions and ends in RET at 0xf0ebf, immediately before
+the next function at 0xf0ec0. `EF2000RecoverF0cecTail.java` pins the full
+payload and region hash, checks the exact old/repaired body and preceding
+PUSH fallthrough, rejects other owners, and validates continuous recovered
+instructions before transactionally reporting/applying the new body.
+Region SHA-256:
+`be41d5347a8994a54d49e6d7d538d2615caff571529a339774e99377d5735b5d`.
+
+`local/ghidra-soft-tail-20261117/proposal.tsv` records rollback-only
+285-to-468-byte recovery in the preceding project; `recovery.tsv` records
+acceptance of the already repaired 468-byte body. The latest workspace is
+`local/ghidra-soft-tail-20261117`, including all preceding boundary repairs.
+Its fresh inventory is `local/ghidra-soft-tail-inventory-20261117`.
+The normalized body in `local/asm-soft-tail-20261117` matches all 163
+Ghidra/objdump instruction boundaries and compiles with OpenWatcom without
+diagnostics (`-q -bt=dos -3r -za99 -w1 -we`). Every direct call target is
+already in the preceding closed generated set. No new corpus count or
+whole-body equivalence is claimed.
+
+The local `check.py` / `execution.json` record six full GPR/flags/PC,
+selector and 2MiB RAM comparisons against original execution of
+0xf0e09..0xf0e1e, before the first recovered helper call. Three stack
+patterns and two flag images exercise the recovered XOR/rotate and argument
+loads; called arithmetic, later loops and floating-point results remain
+unverified. Tracker size is corrected from 285 to 468 bytes with no state
+promotion. Tracker and diff checks pass; no gameplay runs were required.
