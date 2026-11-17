@@ -9910,3 +9910,40 @@ The final report records source/object hashes for all six bodies. SHA-256:
 Tracker validation and diff checks pass. This adds evidence for generated
 whole bodies, not for the existing handwritten drafts or byte-identical
 recompilation. No tracker promotion, runtime integration or replay is claimed.
+
+### 2026-11-17: translate protected-mode LSL against live descriptor RAM
+
+The generator now handles 16/32-bit LSL destinations and register or 16-bit
+memory selector sources. The explicit-state helper reads the selected live
+GDT/LDT descriptor, checks bounds/type/visibility, expands page-granular
+limits, and returns a limit without installing a cache or writing the
+accessed bit. Null, out-of-table, invalid-type and privilege-rejected
+selectors clear ZF and retain the destination. Missing descriptor context,
+truncated RAM or overflowing table addresses remain unsupported status 7,
+before flags or destination changes. Descriptor presence is not a load-limit
+requirement; all code/data types and the protected-mode LDT/TSS types are
+accepted according to Intel's LSL description and descriptor-type table:
+https://cdrdv2-public.intel.com/782156/325383-sdm-vol-2abcd.pdf .
+
+`tests.test_asm_capture.AsmCaptureTests.test_lsl_live_descriptors_match_original`
+compares 1,024 original/C cases (all 256 access bytes, two destination widths,
+register/memory sources), including nonzero descriptor bases and effective
+limits with granularity. Another 48 null/out-of-table comparisons exercise
+both incoming ZF values. Twelve C context-rejection checks assert unchanged
+GPRs, flags, selectors, caches and RAM. The combined capture/segment/program
+run passes 29 methods before the final rejection-check addition; the focused
+LSL method is repeated afterward.
+
+The complete 78-byte `0x10d63b` body now translates and compiles with pinned
+Watcom (`-q -bt=dos -3r -za99 -w1 -we`) with no diagnostics. Twenty-four
+captured original/C whole calls pass, including the LSL path, zero-global
+path and both final comparison outcomes. Generated artifacts and inputs are
+in `local/asm-lsl-20261117`; source SHA-256:
+`425a8631ccaf56b725c4833aff2d2ca86c177720932a6e50e93a1fd2d050a98b`;
+object SHA-256:
+`0ac38f02b15b3f737c4a89c360ec1fd3f234f55fe62393363b359658d619d632`;
+report SHA-256:
+`9aaffe6b501240bda6e714633a3ee6e87031d3230d7f2fa8381e0f1628dc6a32`.
+The second LSL-containing body, `0x10d80b`, still depends on unsupported
+extender calls; no new bulk-closure count, runtime integration or tracker
+promotion is claimed. Tracker and diff checks pass.

@@ -89,6 +89,35 @@ static unsigned ef_segments_valid(ef_lift_state *s) {
     }
     return 1;
 }
+/* Protected-mode LSL: selector rejection is ZF=0, not a guest fault.
+ * Missing live context remains unsupported. P and the accessed bit are
+ * irrelevant; unlike a segment load this instruction never installs a cache.
+ */
+static unsigned ef_lsl(ef_lift_state *s, uint32_t selector, uint32_t *limit) {
+    uint32_t offset, address, low, high, access, type, dpl, cpl;
+    unsigned table;
+    selector &= 0xffffu;
+    if (s->segment_profile != 1) { s->fault = 7; return 0; }
+    if (!(selector & 0xfffcu)) return 0;
+    table = (selector >> 2) & 1u;
+    if (!(s->table_mask & (1u << table))) { s->fault = 7; return 0; }
+    offset = selector & 0xfff8u;
+    if (offset > s->table_limit[table] || s->table_limit[table] - offset < 7u) return 0;
+    if (s->table_base[table] > UINT32_MAX - offset) { s->fault = 7; return 0; }
+    address = s->table_base[table] + offset;
+    if (s->memory_size < 8u || address > s->memory_size - 8u) { s->fault = 7; return 0; }
+    low = (uint32_t)s->memory[address] | (uint32_t)s->memory[address+1] << 8 |
+          (uint32_t)s->memory[address+2] << 16 | (uint32_t)s->memory[address+3] << 24;
+    high = (uint32_t)s->memory[address+4] | (uint32_t)s->memory[address+5] << 8 |
+           (uint32_t)s->memory[address+6] << 16 | (uint32_t)s->memory[address+7] << 24;
+    access = (high >> 8) & 255u; type = access & 15u;
+    dpl = (access >> 5) & 3u; cpl = s->segment[1] & 3u;
+    if (!(access & 16u) && type != 1 && type != 2 && type != 3 && type != 9 && type != 11) return 0;
+    if ((access & 28u) != 28u && (cpl > dpl || (selector & 3u) > dpl)) return 0;
+    *limit = (low & 0xffffu) | (high & 0xf0000u);
+    if (high & 0x800000u) *limit = (*limit << 12) | 4095u;
+    return 1;
+}
 static void ef_load_segment(ef_lift_state *s, unsigned index, uint32_t selector) {
     selector &= 0xffffu;
     if (s->segment_profile == 1 && index < 6 && index != 1 && index != 2 &&
@@ -894,6 +923,18 @@ def instruction_c(insn, starts):
         code.append(write(operand('ah'), '(s->flags & 0xd5u) | 2u', 8))
     elif mnemonic == 'nop' and not text:
         pass
+    elif mnemonic == 'lsl':
+        arguments = [operand(part) for part in text.split(',')]
+        if (len(arguments) != 2 or arguments[0][0] != 'reg' or
+                width_of(arguments[0]) not in (16, 32) or
+                arguments[1][0] not in ('reg', 'mem') or
+                width_of(arguments[1]) not in (None, 16, 32)):
+            raise Unsupported('unsupported LSL operands')
+        dst, src = arguments
+        code += ['a = %s; if (s->fault) return s->fault;' % read(src, 16),
+                 'b = ef_lsl(s, a, &a); if (s->fault) return s->fault;',
+                 's->flags = (s->flags & ~64u) | (b ? 64u : 0u);',
+                 'if (b) { %s }' % write(dst, 'a', width_of(dst))]
     elif mnemonic == 'mov' and any(part.strip().lower() in SEGMENTS for part in text.split(',')):
         arguments = [operand(part) for part in text.split(',')]
         if len(arguments) != 2:

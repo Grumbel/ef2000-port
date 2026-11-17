@@ -39,6 +39,81 @@ def fixture():
 
 
 class AsmCaptureTests(unittest.TestCase):
+    def test_lsl_live_descriptors_match_original(self):
+        from tests.test_asm_to_c import assemble
+        from tools import asm_to_c
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for destination, source in (('eax', 'ebx'), ('ax', 'bx'),
+                                        ('eax', 'word ptr [0x2000]'),
+                                        ('ax', 'word ptr [0x2000]')):
+                image, record = assemble(root, 'lsl %s,%s\nret' % (destination, source))
+                (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+                (root/'lift.c').write_text(asm_to_c.translate(record))
+                path = root/('lsl%d.so' % len(list(root.glob('*.so'))))
+                subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99', '-Wall',
+                                '-Wextra', '-Werror', '-Wno-unused-function', str(root/'lift.c'),
+                                '-o', str(path)], check=True, capture_output=True)
+                function = ctypes.CDLL(str(path)).ef_lift_00000100
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
+                function.restype = ctypes.c_uint
+                for access in range(256):
+                    capture = fixture()
+                    tables = copy.deepcopy(capture.table_context)
+                    raw = 0x2345 | (1 << 48) | (access << 40) | (0x80 << 16)
+                    if access & 1:
+                        raw |= 1 << 55
+                    tables['gdtr']['bytes'] += struct.pack('<Q', raw)
+                    tables['gdtr']['limit'] = 23
+                    ram = bytearray(0x40000)
+                    ram[:len(capture.guest_ram)] = capture.guest_ram
+                    ram[:image.stat().st_size] = image.read_bytes()
+                    for name in ('gdtr', 'ldtr'):
+                        table = tables[name]
+                        ram[table['base']:table['base']+len(table['bytes'])] = table['bytes']
+                    ram[0x2000:0x2002] = struct.pack('<H', 19)
+                    regs = dict(capture.registers, eip=0x100, eax=0xdeadbeef, ebx=0xabcd0013)
+                    capture = replace(capture, address=0x100, registers=regs,
+                                      guest_ram=bytes(ram), table_context=tables)
+                    result = asm_c_differential.compare(function, b'', 0x100, [], 0,
+                                                        captured=capture, budget=100)
+                    self.assertEqual(result, dict(state='pass', differences=[]),
+                                     (destination, source, access))
+                # Null and out-of-table selectors clear ZF without touching
+                # the destination. Exercise both incoming ZF values.
+                for selector in (0, 1, 2, 3, 23, 0xffff):
+                    for flags in (0x202, 0x246):
+                        ram[0x2000:0x2002] = struct.pack('<H', selector)
+                        regs = dict(regs, ebx=0xabcd0000 | selector, eflags=flags)
+                        capture = replace(capture, registers=regs, guest_ram=bytes(ram))
+                        self.assertEqual(asm_c_differential.compare(
+                            function, b'', 0x100, [], 0, captured=capture, budget=100),
+                            dict(state='pass', differences=[]), (destination, source, selector))
+                from tools import asm_segments
+                ram[0x2000:0x2002] = struct.pack('<H', 19)
+                for failure in ('disabled', 'ram-cut', 'base-wrap'):
+                    memory = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
+                    state = asm_c_differential.State(
+                        (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
+                        0x246, 0x100, 0, memory, len(ram))
+                    state.r[3] = 19
+                    state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
+                    state.segment_profile = 1
+                    for index, name in enumerate(asm_to_c.SEGMENTS):
+                        state.segment_cache[index] = asm_c_differential.Segment(
+                            *asm_segments.descriptor(regs[name], tables['descriptors'][name] or 0))
+                    state.table_mask = 0 if failure == 'disabled' else 3
+                    state.table_base[:] = [tables[n]['base'] for n in ('gdtr', 'ldtr')]
+                    state.table_limit[:] = [tables[n]['limit'] for n in ('gdtr', 'ldtr')]
+                    if failure == 'ram-cut':
+                        state.memory_size = 0x30017
+                    if failure == 'base-wrap':
+                        state.table_base[0] = 0xfffffff8
+                    before = (list(state.r), state.flags, list(state.segment),
+                              bytes(state.segment_cache), bytes(ram))
+                    self.assertEqual(function(ctypes.byref(state), 1), 7, failure)
+                    self.assertEqual((list(state.r), state.flags, list(state.segment),
+                                      bytes(state.segment_cache), bytes(ram)), before, failure)
     def test_reload_observer_keeps_cache_when_table_changes_after_load(self):
         capture = fixture()
         tables = copy.deepcopy(capture.table_context)
