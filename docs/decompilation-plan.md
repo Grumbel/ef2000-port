@@ -9187,3 +9187,32 @@ twelve full GPR/flags/PC/selector/2 MiB RAM matches. The generated region
 compiles with OpenWatcom without diagnostics. This evidence excludes the
 initial string comparison, nonzero-object helper calls and whole-function
 behavior; it is not a tracker verification or gameplay claim.
+
+### 2026-11-17: translate protected-mode PUSHF in both operand widths
+
+Tracing kotsAccept's remaining callees reaches INT services through
+0xa5ef8/0xa5b70 and port I/O through 0xab954/0xde580; these are genuine
+service dependencies rather than additional gaps in those two small callees.
+No no-op or successful-return approximation is introduced for them.
+
+The instruction renderer now accepts checked `9C` PUSHF and `66 9C` PUSHFW.
+It saves the low word or the doubleword image with RF/VM cleared, using the
+existing SS-checked stack-store helper, and commits ESP only after successful
+writes. The saved-image rule follows Intel SDM volume 2B, PUSHF/PUSHFD
+(https://www.intel.com/content/dam/www/public/us/en/documents/manuals/64-ia-32-architectures-software-developer-vol-2b-manual.pdf).
+Virtual-8086 execution is explicitly unsupported (result 7), since the state
+model has no CR4.VME/virtual interrupt substitution semantics. POPF remains
+unsupported; its privilege and writable-flag rules are not inferred here.
+
+`tests.test_asm_c_program` and the focused PUSHF encoding, saved-image/fault
+and unsupported-input tests pass (19 tests). Both widths have 16 prepared
+full-state comparisons plus three ring-3 captured comparisons each (38 total),
+including ID and arithmetic/direction flag combinations. Eight direct modeled
+checks cover saved RF masking, successful writes, partial/out-of-range stack
+writes with unchanged ESP/PC, and rejection of virtual-8086 state. These direct
+checks supplement the original comparisons; they are not native RF or
+virtual-8086 execution proofs. Four mismatched encoding/spelling cases remain
+rejected. `local/asm-c-pushf-20261117/check.py` compiles all eight observed
+PUSHF sites from five original bodies with OpenWatcom without diagnostics.
+No whole-body verification, tracker promotion or new bulk coverage count is
+claimed; subsequent POPF and service operations still need implementation.

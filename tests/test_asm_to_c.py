@@ -45,7 +45,7 @@ class TranslationTests(unittest.TestCase):
             root = Path(temporary)
             for source in ('call eax\nret', 'cpuid\nret', 'jmp eax',
                            'addr16 loop 1f\n1: ret',
-                           'in eax,dx\nret', 'pushf\nret', 'popf\nret',
+                           'in eax,dx\nret', 'popf\nret',
                            'enter 8, 1\nleave\nret'):
                 with self.subTest(source=source):
                     _, record = assemble(root, source)
@@ -270,6 +270,53 @@ class TranslationTests(unittest.TestCase):
                     asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
                                               mnemonic='aam', operands=operand),
                                           {0x100, 0x100+len(bytes.fromhex(encoded))})
+
+    def test_pushf_masks_saved_flags_and_commits_stack_last(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+            for source, width in [('pushf', 32), ('pushfw', 16)]:
+                _, record = assemble(root, source+'\nret')
+                code = root/'lift.c'
+                code.write_text(asm_to_c.translate(record))
+                library = root/('flags%d.so' % width)
+                subprocess.run(['cc', '-shared', '-fPIC', str(code), '-o', str(library)], check=True)
+                function = ctypes.CDLL(str(library)).ef_lift_00000100
+                function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32]
+                for flags, stack in ((0x210202, 8), (0x202, 10), (0x202, 1), (0x20202, 8)):
+                    with self.subTest(width=width, flags=flags, stack=stack):
+                        memory = (ctypes.c_uint8*8)(*[0xa5]*8)
+                        state = State((ctypes.c_uint32*8)(0, 0, 0, 0, stack, 0, 0, 0),
+                                      flags, 0x100, 0, memory, 8)
+                        result = function(ctypes.byref(state), 1)
+                        expected = bytearray([0xa5]*8)
+                        if flags & 0x20000:
+                            self.assertEqual(result, 7)  # Unmodeled virtual-8086 state.
+                            self.assertEqual(state.r[4], stack)
+                            self.assertEqual(state.pc, 0x100)
+                        elif stack == 8:
+                            self.assertEqual(result, 1)  # One instruction exhausted fuel.
+                            value = flags & (0xfcffff if width == 32 else 0xffff)
+                            expected[8-width//8:] = value.to_bytes(width//8, 'little')
+                            self.assertEqual(state.r[4], 8-width//8)
+                            self.assertEqual(state.pc, 0x101 if width == 32 else 0x102)
+                        else:
+                            self.assertEqual(result, 3)
+                            if width == 32 and stack == 10:
+                                expected[6:] = b'\x02\x02'  # Existing partial-store policy.
+                            self.assertEqual(state.r[4], stack)
+                            self.assertEqual(state.pc, 0x100)
+                        self.assertEqual(bytes(memory), bytes(expected))
+                        self.assertEqual(state.flags, flags)
+
+    def test_pushf_rejects_mismatched_encoding(self):
+        for mnemonic, encoded, text in [('pushf', '669c', ''),
+                                        ('pushfw', '9c', ''),
+                                        ('pushf', '9d', ''),
+                                        ('pushf', '9c', 'eax')]:
+            with self.subTest(encoded=encoded), self.assertRaises(asm_to_c.Unsupported):
+                asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                          mnemonic=mnemonic, operands=text), {0x100, 0x102})
 
     def test_data16_aliases_reject_unsupported_encodings(self):
         for encoded, text in [('f3a4', 'rep movs BYTE PTR es:[edi],BYTE PTR ds:[esi]'),

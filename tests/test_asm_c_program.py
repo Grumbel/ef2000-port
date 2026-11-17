@@ -131,6 +131,29 @@ ret
             report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=8)
             self.assertEqual(report['entries'][0]['counts'], {'pass': 8}, report)
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_push_flags_widths(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        for instruction, register in [('pushf', 'eax'), ('pushfw', 'ax')]:
+            with self.subTest(instruction=instruction), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                source = '.type root,@function\nroot: %s\npop %s\nret\n.size root, .-root' % (instruction, register)
+                image, directory, _ = inventory(root, source)
+                asm_c_program.generate(directory, root/'out', image)
+                report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=16)
+                self.assertEqual(report['entries'][0]['counts'], {'pass': 16}, report)
+                function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+                for flags in (0x202, 0xad7, 0x200202):
+                    capture = fixture()
+                    ram = bytearray(capture.guest_ram)
+                    ram[:image.stat().st_size] = image.read_bytes()
+                    capture = replace(capture, address=0x100,
+                                      registers=dict(capture.registers, eip=0x100, eflags=flags), guest_ram=bytes(ram))
+                    result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, True, captured=capture)[0]
+                    self.assertEqual(result['state'], 'pass', result)
+
     def test_legacy_notrack_rejects_other_encodings(self):
         for encoded, text in [('ff6576', 'jmp DWORD PTR [ebp+0x76]'),
                               ('3eff5576', 'call DWORD PTR [ebp+0x76]'),

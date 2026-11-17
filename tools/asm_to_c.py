@@ -958,6 +958,16 @@ def instruction_c(insn, starts):
     elif mnemonic == 'leave' and not text:
         code += ['a = ef_read_segment(s, 2, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
+    elif mnemonic in ('pushf', 'pushfw'):
+        width = 16 if mnemonic == 'pushfw' else 32
+        if text or insn['bytes'] != ('669c' if width == 16 else '9c'):
+            raise Unsupported('PUSHF encoding/spelling mismatch')
+        # This model has no virtual-8086/CR4.VME state. Do not approximate
+        # its privilege checks or virtual interrupt flag substitution.
+        code += ['if (s->flags & 0x20000u) return 7;',
+                 'a = s->flags & %s;' % ('0xffffu' if width == 16 else '0xfcffffu'),
+                 'b = ef_stack_store(s, 2, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
+                 's->r[4] -= %du;' % (width//8)]
     elif mnemonic in ('pusha', 'popa'):
         if text or insn['bytes'] != ('60' if mnemonic == 'pusha' else '61'):
             raise Unsupported('unsupported PUSHA/POPA encoding/spelling')
