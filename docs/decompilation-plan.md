@@ -8957,3 +8957,24 @@ compiler, flags, each source/object and the translation report; SHA-256
 This replaces the interrupted compile from the paused turn. It is object
 compilation evidence, not a full target link or a corpus-wide equivalence proof.
 `python3 tools/decomp_status.py check` and `git diff --check` also pass.
+
+### 2026-11-17: preserve DS on legacy indirect jumps
+
+The shared-PC composer now translates objdump's `notrack jmp` alias as a
+legacy 32-bit DS override. It accepts only leading `3E FF /4` memory jumps
+with a DWORD memory operand, rejects ambiguous explicit segment spellings,
+and forces DS even for EBP/ESP addressing. It retains the original bytes
+for dispatcher checks and instruction length; control-flow analysis and
+dynamic-transfer metadata use the normalized jump. CET enforcement is not
+part of this pre-CET execution model. This does not enable other prefix
+aliases, far transfers or register NOTRACK forms.
+
+The regression test compares eight prepared executions and a ring-3 capture
+with distinct DS/SS LDT entries: DS permits [0x400], while expand-down SS
+rejects it. Five malformed/unsupported encodings remain rejected.
+`local/asm-c-legacy-jump-20261117/check.py` selects an original jump site from
+each of the three previously blocked bodies (0xee22c, 0xee589, 0xeed92),
+checks two flags states each against original execution, and compiles five
+body/dispatcher units with OpenWatcom without diagnostics. All six comparisons
+pass full GPR/flags/RAM checks. These are individual jump-site checks, not
+whole-body or dynamic-target coverage proof; no tracker promotion is made.

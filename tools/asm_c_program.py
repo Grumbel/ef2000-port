@@ -28,7 +28,29 @@ except ImportError:
 MODEL = 'flat-x86-program-explicit-state'
 
 
+def legacy_transfer(insn):
+    """Interpret objdump's CET-era alias in the pre-CET 32-bit model."""
+    if insn['mnemonic'] != 'notrack':
+        return insn
+    encoded = bytes.fromhex(insn['bytes'])
+    parts = insn['operands'].split(None, 1)
+    if (len(encoded) < 3 or encoded[:2] != b'\x3e\xff' or
+            (encoded[2] >> 3) & 7 != 4 or encoded[2] >> 6 == 3 or
+            len(parts) != 2 or parts[0] != 'jmp'):
+        raise asm_to_c.Unsupported('unsupported legacy NOTRACK encoding/spelling')
+    target = asm_to_c.operand(parts[1])
+    if target[0] != 'mem' or asm_to_c.width_of(target) != 32:
+        raise asm_to_c.Unsupported('unsupported legacy NOTRACK operand')
+    # The prefix overrides even an EBP/ESP base's default SS selection.
+    text = parts[1]
+    if ':' in text:
+        raise asm_to_c.Unsupported('ambiguous legacy NOTRACK segment')
+    text = text.replace('[', 'ds:[', 1)
+    return dict(insn, mnemonic='jmp', operands=text)
+
+
 def instruction_c(insn, starts, *, consuming_targets=frozenset()):
+    insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
     indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
     if mnemonic != 'call' and not indirect:
@@ -100,7 +122,8 @@ def analyse(records):
         except asm_to_c.Unsupported as error:
             reasons[address] = str(error)
             continue
-        edges = asm_to_c.asm_inventory.control_flow_report(record['instructions'])['edges']
+        edges = asm_to_c.asm_inventory.control_flow_report(
+            [legacy_transfer(i) for i in record['instructions']])['edges']
         dependencies[address] = {owners[edge['target']] for edge in edges
                                  if edge['kind'] in ('call', 'jump', 'fallthrough') and
                                  edge['target'] in owners and owners[edge['target']] != address}
@@ -219,7 +242,7 @@ def generate(inventory, output, image, *, shard_entries=2048):
             item.update(state='generated-unverified', file='ef_lift_%08x.c' % address,
                         source_sha256=hashlib.sha256(codes[address].encode()).hexdigest(),
                         dependencies=sorted(dependencies[address]),
-                        dynamic_transfer_sites=[i['address'] for i in record['instructions']
+                        dynamic_transfer_sites=[i['address'] for i in map(legacy_transfer, record['instructions'])
                                                 if i['mnemonic'] in ('call', 'jmp') and
                                                 'direct_target' not in i],
                         instruction_addresses=[i['address'] for i in record['instructions']],

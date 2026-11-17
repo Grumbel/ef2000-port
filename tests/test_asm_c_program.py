@@ -47,6 +47,65 @@ def inventory(root, source):
 @unittest.skipUnless(all(shutil.which(tool) for tool in ('as', 'objcopy', 'nm', 'cc')),
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
+    def test_legacy_notrack_rejects_other_encodings(self):
+        for encoded, text in [('ff6576', 'jmp DWORD PTR [ebp+0x76]'),
+                              ('3eff5576', 'call DWORD PTR [ebp+0x76]'),
+                              ('3effe0', 'jmp eax'),
+                              ('3eff6576', 'jmp WORD PTR [ebp+0x76]'),
+                              ('3eff6576', 'jmp DWORD PTR ss:[ebp+0x76]')]:
+            with self.subTest(encoded=encoded, text=text), self.assertRaises(ValueError):
+                asm_c_program.legacy_transfer(dict(address=0x100, bytes=encoded,
+                                                  mnemonic='notrack', operands=text))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_legacy_notrack_jump_uses_ds_for_ebp_memory(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        source = '''.type root,@function
+root: mov dword ptr [0x400],0x200
+mov ebp,0x400
+.byte 0x3e
+jmp dword ptr [ebp]
+.size root, .-root
+.org 0x200
+.type leaf,@function
+leaf: inc edx
+ret
+.size leaf, .-leaf'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            generated = asm_c_program.generate(directory, root/'out', image)
+            entry = next(e for e in generated['entries'] if e['address'] == 0x100)
+            self.assertEqual(len(entry['dynamic_transfer_sites']), 1)
+            report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=8)
+            self.assertTrue(all(e['counts'] == {'pass': 8} for e in report['entries']), report)
+            function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                 ctypes.c_uint32, ctypes.c_uint32]
+            capture = fixture()
+            ram = bytearray(capture.guest_ram)
+            ram[:image.stat().st_size] = image.read_bytes()
+            # Separate LDT entries: [0x400] fails through expand-down SS,
+            # whose lower limit is 0x600, but succeeds through DS (0x100).
+            context = dict(capture.table_context)
+            descriptors = dict(context['descriptors'])
+            data = descriptors['ds']
+            descriptors['ss'] = descriptors['es'] = (data & ~0xffff) | 0x600
+            context['descriptors'] = descriptors
+            context['ldtr'] = dict(context['ldtr'], limit=23,
+                                  bytes=b''.join(v.to_bytes(8, 'little') for v in
+                                      (descriptors['ss'], descriptors['cs'], data)))
+            gdt = bytearray(context['gdtr']['bytes'])
+            gdt[8:10] = (23).to_bytes(2, 'little')
+            context['gdtr'] = dict(context['gdtr'], bytes=bytes(gdt))
+            capture = replace(capture, address=0x100,
+                              registers=dict(capture.registers, eip=0x100, ds=23),
+                              table_context=context, guest_ram=bytes(ram))
+            result = asm_c_differential.isolated_probes(
+                function, b'', 0x100, 1, 100, True, captured=capture)[0]
+            self.assertEqual(result['state'], 'pass', result)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_inline_data_continuation_consumed_by_pop_ret(self):
         for body, supported in [('pop edi\nret', True),
