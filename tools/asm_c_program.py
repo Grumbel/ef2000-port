@@ -121,7 +121,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
 
 
 def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
-            port_boundaries=False, port_sites=None):
+            port_boundaries=False, port_sites=None, failure_details=None):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -163,6 +163,24 @@ def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
             codes[address] = asm_to_c.translate(record, starts=starts, renderer=renderer)
         except asm_to_c.Unsupported as error:
             reasons[address] = str(error)
+            if failure_details is not None:
+                # Only audit established bodies. Layout rejection is a body
+                # failure, not evidence about individual instructions.
+                established = (record.get('boundary') == 'ghidra-body-ranges' and
+                               record.get('ghidra_instruction_layout_matches') is True and
+                               not record.get('overlapping_entries') and
+                               not record.get('undecodable_addresses') and
+                               address in {i['address'] for i in record['instructions']})
+                if established:
+                    failures = []
+                    for insn in record['instructions']:
+                        try:
+                            renderer(insn, starts)
+                        except asm_to_c.Unsupported as instruction_error:
+                            failures.append(dict(address=insn['address'],
+                                                 mnemonic=insn['mnemonic'],
+                                                 reason=str(instruction_error)))
+                    failure_details[address] = failures
             continue
         edges = asm_to_c.asm_inventory.control_flow_report(
             [legacy_transfer(i) for i in record['instructions']])['edges']
@@ -355,7 +373,9 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     if interrupt_sites is not None and not interrupt_boundaries:
         raise ValueError('interrupt sites require interrupt boundaries')
     manifest, records = asm_to_c.read_inventory(inventory, image)
-    codes, dependencies, closed, reasons = analyse(records, interrupt_boundaries=interrupt_boundaries,
+    failure_details = {}
+    codes, dependencies, closed, reasons = analyse(records, failure_details=failure_details,
+                                                  interrupt_boundaries=interrupt_boundaries,
                                                   interrupt_sites=interrupt_sites,
                                                   port_boundaries=port_boundaries, port_sites=port_sites)
     blockers = root_blockers(dependencies, closed, reasons)
@@ -369,6 +389,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
         item = dict(address=address, state='unsupported', reason=reasons.get(address, ''))
         if address not in closed:
             item['root_blockers'] = blockers[address]
+            if address in failure_details:
+                item['instruction_failures'] = failure_details[address]
             if address in dependencies:
                 item['dependencies'] = sorted(dependencies[address])
         if address in closed:
@@ -399,6 +421,9 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
+    result['instruction_failure_scope'] = (
+        'all renderer rejections in established root bodies; body-layout failures excluded; '
+        'not an execution, equivalence or indirect-target coverage proof')
     result['host_service_reachability_scope'] = (
         'interrupt sites only; conservative direct-edge closure; dynamic targets and runtime request numbers unknown; '
         'reachable sites do not prove service implementation or equivalence')

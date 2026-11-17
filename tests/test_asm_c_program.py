@@ -576,6 +576,58 @@ leaf: ret
             self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
             self.assertEqual(sum(e['state'] == 'generated-unverified' for e in result['entries']), 1)
 
+    def test_reports_failures_after_first_unsupported_instruction(self):
+        source = '''.type root,@function
+root: call bad
+ret
+.size root, .-root
+.org 0x200
+.type bad,@function
+bad: cpuid
+nop
+sti
+int3
+ret
+.size bad, .-bad
+.org 0x300
+.type leaf,@function
+leaf: ret
+.size leaf, .-leaf'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            report = asm_c_program.generate(directory, root / 'out', image)
+            entries = {e['address']: e for e in report['entries']}
+            self.assertEqual(entries[0x100]['root_blockers'], [0x200])
+            self.assertNotIn('instruction_failures', entries[0x100])
+            self.assertEqual(entries[0x200]['instruction_failures'], [
+                dict(address=0x200, mnemonic='cpuid', reason='unsupported instruction: cpuid'),
+                dict(address=0x203, mnemonic='sti', reason='unsupported instruction: sti'),
+                dict(address=0x204, mnemonic='int3', reason='unsupported instruction: int3')])
+            self.assertEqual(entries[0x200]['reason'], 'unsupported instruction: cpuid')
+            self.assertEqual(report['syntactically_supported'], 2)
+            self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
+            self.assertFalse((root / 'out/ef_lift_00000200.c').exists())
+
+    def test_failure_audit_excludes_unestablished_bodies(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            _, _, records = inventory(root, '''.type bad,@function
+bad: cpuid
+ret
+.size bad, .-bad''')
+            for field, value in (('boundary', 'guessed'),
+                                 ('ghidra_instruction_layout_matches', False),
+                                 ('overlapping_entries', [0x101]),
+                                 ('undecodable_addresses', [0x101]),
+                                 ('address', 0x101)):
+                record = dict(records[0], **{field: value})
+                failures = {}
+                _, _, closed, reasons = asm_c_program.analyse([record], failure_details=failures)
+                self.assertFalse(closed)
+                self.assertIn(record['address'], reasons)
+                self.assertEqual(failures, {})
+
     def test_root_blockers_propagate_through_recursive_dependencies(self):
         dependencies = {1: {2}, 2: {1, 3, 4}, 5: {5}}
         reasons = {1: 'dependency', 2: 'dependency', 3: 'int', 4: 'in'}

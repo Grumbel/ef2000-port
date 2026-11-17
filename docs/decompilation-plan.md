@@ -11736,3 +11736,24 @@ Commands: tools/ef2000_wcc.py decomp/src/network_status_callbacks.c --compiler
 <pinned-wcc386> --output local/network-status-20261117.obj;
 pinned-Unicorn Python local/network-status-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: audit every rejected instruction in bulk root bodies
+
+The program generator now records instruction_failures for all renderer
+rejections in each established root body, rather than exposing only the first.
+Keep first-failure reasons and direct dependency closure unchanged. Bodies
+rejected for boundary/layout/overlap/decode/entry failures are not instruction
+audited. Tests cover multiple hidden failures, transitive exclusion, and all
+five body rejection gates. This is static renderer evidence, not execution,
+indirect-target coverage or equivalence evidence; it grants no promotions.
+Full inventory with interrupt and port boundaries still yields 3602 generated
+unverified / 678 unsupported, now with 70 rejected sites in 32 root bodies.
+Hidden rejections include FSCALE, FRSTOR and nine FICOM sites, all nine in
+11d695 alongside INS/ARPL and unresolved branches: inspect that body's code/data
+boundaries before treating those FICOM spellings as implementation priorities.
+Private report local/asm-all-failures-20261117/report.json SHA-256
+91746c1bc4d26f2cefc0e3b38b0110eea1a64d537bea13456197f5d37308970a.
+Commands: pinned-Unicorn Python -m unittest tests.test_asm_c_program;
+asm_c_program.generate(local/asm-latest-body-inventory-20261117,
+local/asm-all-failures-20261117, local/ghidra-offset-tail-20261117/payload.bin,
+interrupt_boundaries=True, port_boundaries=True); git diff --check.
