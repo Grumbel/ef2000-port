@@ -139,6 +139,28 @@ def analyse(records):
     return codes, dependencies, closed, reasons
 
 
+def root_blockers(dependencies, closed, reasons):
+    """Propagate first translation failures through direct edges, including cycles.
+
+    These are observed blockers, not an exhaustive instruction audit: fixing a
+    body's first failure can expose another failure in that same body.
+    """
+    roots = {address: ({address} if address not in dependencies else set())
+             for address in reasons}
+    changed = True
+    while changed:
+        changed = False
+        for address, targets in dependencies.items():
+            if address in closed:
+                continue
+            found = roots[address]
+            before = len(found)
+            for target in targets - closed:
+                found.update(roots[target])
+            changed |= len(found) != before
+    return {address: sorted(targets) for address, targets in roots.items()}
+
+
 def dispatcher(records, *, shard_entries=2048):
     """Keep each Watcom unit below its constant-initializer limits."""
     if type(shard_entries) is not int or not 1 <= shard_entries <= 2048:
@@ -232,12 +254,17 @@ unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
 def generate(inventory, output, image, *, shard_entries=2048):
     manifest, records = asm_to_c.read_inventory(inventory, image)
     codes, dependencies, closed, reasons = analyse(records)
+    blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
     report = []
     for record in records:
         address = record['address']
         item = dict(address=address, state='unsupported', reason=reasons.get(address, ''))
+        if address not in closed:
+            item['root_blockers'] = blockers[address]
+            if address in dependencies:
+                item['dependencies'] = sorted(dependencies[address])
         if address in closed:
             item.update(state='generated-unverified', file='ef_lift_%08x.c' % address,
                         source_sha256=hashlib.sha256(codes[address].encode()).hexdigest(),

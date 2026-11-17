@@ -534,8 +534,18 @@ leaf: ret
             self.assertIn('untranslated direct dependencies', reasons[0x200])
             self.assertIn('unsupported instruction', reasons[0x300])
             result = asm_c_program.generate(directory, root / 'out', image)
+            entries = {e['address']: e for e in result['entries']}
+            for address in (0x100, 0x200, 0x300):
+                self.assertEqual(entries[address]['root_blockers'], [0x300])
+            self.assertNotIn('root_blockers', entries[0x400])
             self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
             self.assertEqual(sum(e['state'] == 'generated-unverified' for e in result['entries']), 1)
+
+    def test_root_blockers_propagate_through_recursive_dependencies(self):
+        dependencies = {1: {2}, 2: {1, 3, 4}, 5: {5}}
+        reasons = {1: 'dependency', 2: 'dependency', 3: 'int', 4: 'in'}
+        self.assertEqual(asm_c_program.root_blockers(dependencies, {5}, reasons),
+                         {1: [3, 4], 2: [3, 4], 3: [3], 4: [4]})
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_instruction_budget_is_shared_across_calls_and_can_resume(self):

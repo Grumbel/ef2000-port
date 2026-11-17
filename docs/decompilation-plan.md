@@ -9988,3 +9988,28 @@ hashes are rechecked against the report. Compiler report SHA-256:
 Tracker/diff checks pass. This establishes bulk compiler coverage and bounded
 whole-call evidence, not byte-identical recompilation, full-program
 equivalence, runtime integration, splice or replay.
+
+### 2026-11-17: expose transitive first-failure blockers
+
+Bulk generation reports now retain direct dependencies for dependency-excluded
+bodies and list `root_blockers` for every excluded body. A fixed-point
+propagation handles recursive call clusters without dropping failures reachable
+through a cycle. These are first observed translation failures, not exhaustive
+instruction audits or a promise that fixing one admits every caller. Generated
+code, admission rules and tracker states are unchanged.
+
+Reconstructing the graph from the current live-program report identifies
+interrupt bodies `0x23b` and `0x10d75c` as reachable from 1058 and 1057 excluded
+bodies respectively (including themselves). `0xfa95f` reaches 767;
+`0x110393`, 762; `0x1101be`, 740. FSIN `0xb45ac` and FCOS `0xb45a2`
+reach 324 and 323. Counts overlap. The ignored evidence is
+`local/asm-c-live-program-20261117/blocker-impact.json`. This prioritizes
+faithful interrupt/runtime support rather than treating all dependency
+exclusions as independent missing translations.
+
+Validation: `python3 -m unittest
+ tests.test_asm_c_program.ProgramTests.test_unsupported_callee_removes_all_transitive_callers
+ tests.test_asm_c_program.ProgramTests.test_root_blockers_propagate_through_recursive_dependencies`
+passes both methods, covering emitted report metadata, a recursive cluster,
+multiple roots and an admitted recursive body. No gameplay runs or tracker
+promotions.
