@@ -12106,3 +12106,16 @@ dependency closure excludes it. The blocker is STI at 0xd6745 in
 0xd66c2, on the path that polls game port 0x201. Updated both tracker
 notes with the specific dependency and preserved their states. Trace
 evidence: `local/ghidra-callback-leaf-20261118/joystick-callback-paths.json`.
+
+2026-11-18 — The 5 MiB one-input sweep finished with 2,604 matches,
+1,378 inconclusive and 41 mismatches across 4,023 generated bodies.
+Twenty-nine mismatches stopped at the missing scanner callback 0xdf244.
+The guarded leaf recipe checks the ESI literal at 0xdf252 in 0xdf248,
+body ownership and the DEC/RET boundary. A disposable project proposed
+and applied the four-byte body and confirmed idempotence on a second
+apply. The fresh export contains 4,283 bodies. The scoped generated C
+compiled with OpenWatcom and matched 15 prepared inputs. One input was
+inconclusive because the original read through an unmapped EDX pointer.
+All 47 Ghidra wrapper tests passed. Evidence is under
+`local/ghidra-scan-unget-20261118/`. Caller paths still need comparison
+with the regenerated bulk dispatcher.

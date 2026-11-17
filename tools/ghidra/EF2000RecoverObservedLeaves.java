@@ -32,10 +32,11 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xc64d0, 0xc64ea, 0, 20},
         {0xc5e65, 0xc5e66, 0xc6cdf, 0},
         {0x1c53c, 0x1c545, 0x1c902, 0},
+        {0xdf244, 0xdf248, 0xdf252, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
-        "dispatch_return_c5e65", "dispatch_clear_latch_1c53c"
+        "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244"
     };
 
     @Override
@@ -110,10 +111,12 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     }
                 } else if (literal != 0) {
                     Instruction reference = getInstructionAt(toAddr(literal));
+                    Function caller = getFunctionContaining(toAddr(literal));
+                    String register = entry == 0xdf244 ? "ESI" : "ECX";
                     boolean matches = false;
                     if (reference != null && reference.getMnemonicString().equals("MOV") &&
-                            reference.getRegister(0) != null && reference.getRegister(0).getName().equals("ECX") &&
-                            getFunctionContaining(toAddr(literal)) != null) {
+                            reference.getRegister(0) != null && reference.getRegister(0).getName().equals(register) &&
+                            caller != null && (entry != 0xdf244 || caller.getEntryPoint().getOffset() == 0xdf248)) {
                         for (Object object : reference.getOpObjects(1)) {
                             if (object instanceof Scalar && ((Scalar)object).getUnsignedValue() == entry) matches = true;
                             if (object instanceof Address && ((Address)object).getOffset() == entry) matches = true;
@@ -157,7 +160,8 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     boolean last = cursor + instruction.getLength() == end;
                     if (last ? !mnemonic.equals("RET") :
                             !Set.of("PUSH", "POP", "MOV", "LEA", "INC", "LODS", "LODSW", "ADD", "XLAT", "XLATB").contains(mnemonic) &&
-                            !(entry == 0x1c53c && cursor == entry && mnemonic.equals("XOR"))) {
+                            !(entry == 0x1c53c && cursor == entry && mnemonic.equals("XOR")) &&
+                            !(entry == 0xdf244 && cursor == entry && mnemonic.equals("DEC"))) {
                         throw new IllegalStateException("unexpected leaf control flow at " + toAddr(cursor));
                     }
                     cursor += instruction.getLength();
