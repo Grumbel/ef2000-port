@@ -12090,3 +12090,10 @@ and the hardware x87 oracle. This includes the input that previously
 mismatched through the missing callback. No host services were reached
 on those inputs. The caller probe results and input provenance are in
 `local/ghidra-callback-leaf-20261118/caller-probes.json`.
+
+2026-11-18 — Bulk differential mismatches now record the translated stop
+PC, return status and state fault as structured fields. Reports for
+sharded dispatchers also record whether that PC is in the generated
+instruction registry. Prepared and captured probes retain the original
+mismatch classification. The synthetic indirect-call regression checks
+that a stop at an excluded function is reported as unregistered.

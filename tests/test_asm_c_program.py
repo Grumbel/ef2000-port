@@ -415,6 +415,8 @@ ret
             report = asm_c_differential.verify(out, root/'evidence', image, scenarios=2)
             self.assertEqual(report['entries'][0]['counts'], {'mismatch': 2})
             self.assertTrue(all('C status 2' in p['differences'][0] for p in report['entries'][0]['probes']))
+            self.assertEqual([p['translated_stop'] for p in report['entries'][0]['probes']],
+                             [dict(status=2, pc=0x200, fault=0, registered_pc=False)] * 2)
 
     def test_indirect_widths_and_far_transfers_still_fail_closed(self):
         for mnemonic, operand in [('call', 'ax'), ('jmp', 'WORD PTR [eax]'),

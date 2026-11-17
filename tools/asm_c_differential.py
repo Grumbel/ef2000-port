@@ -414,7 +414,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if status:
         reason = {7: 'unsupported segment profile',
                   8: 'pending x87 exception delivery unsupported'}.get(status, 'budget/pc/memory/divide')
-        return outcome(state='mismatch', differences=[
+        return outcome(state='mismatch', translated_stop=dict(status=status, pc=state.pc, fault=state.fault),
+                       differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
     if phase:
         phase('comparison')
@@ -623,6 +624,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('translation runtime digest mismatch')
     generated = [e for e in manifest['entries'] if e['state'] == 'generated-unverified']
     support = manifest.get('dispatcher_support', [])
+    registered_pcs = None
     if program and manifest.get('dispatcher_layout') == 'pc-shards-v1':
         size = manifest.get('dispatcher_shard_entries')
         if type(size) is not int or not 1 <= size <= 2048:
@@ -634,6 +636,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                 any(not isinstance(e, dict) or not isinstance(e.get('file'), str) for e in support) or
                 sorted(e['file'] for e in support) != sorted(names)):
             raise ValueError('invalid dispatcher support inventory')
+        registered_pcs = {pc for entry in generated for pc in entry.get('instruction_addresses', [])}
     elif support or manifest.get('dispatcher_layout'):
         raise ValueError('unsupported dispatcher layout')
     artifacts = generated + ([manifest['dispatcher']] + support if program else [])
@@ -709,6 +712,12 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     loaded = ctypes.CDLL(str(library.resolve()))
     comparison_profile = (native_x87.comparison_profile if native_x87 is not None else
                           asm_x87_oracle.unicorn_comparison_profile())
+
+    def record_registry_membership(result):
+        stop = result.get('translated_stop')
+        if stop is not None and registered_pcs is not None:
+            stop['registered_pc'] = stop['pc'] in registered_pcs
+
     entries = []
     progress = output / 'progress.jsonl'
     for entry in manifest['entries']:
@@ -721,6 +730,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size)
+        for result in results:
+            record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
@@ -737,6 +748,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.restype = ctypes.c_uint
         result = isolated_probes(function, payload, captured.address, 1, budget, program,
                                  native_x87=native_x87, captured=captured, reject_services=reject_services)[0]
+        record_registry_membership(result)
         capture_results.append(dict(file=str(path), capture_sha256=digest,
                                     address=captured.address, sequence=captured.sequence,
                                     segment_profile='captured-zero-base-ring3-table-derived', **result))
