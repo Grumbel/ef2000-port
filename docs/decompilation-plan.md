@@ -11988,3 +11988,11 @@ bodies and 259 rejections. All 51 added bodies (22,196 original body
 bytes) and the dispatcher compiled without OpenWatcom diagnostics.
 The evidence is under `local/asm-int3-boundary-20261118/`. Actual
 guest breakpoint-handler behavior remains unverified.
+
+2026-11-18 — Added opt-in differential probes for boundary-enabled
+programs. The original-side interrupt and scalar port hooks reject
+requests, so probes that hit an unmodeled service are inconclusive.
+Completed original paths still require a full state match from C.
+The 36 whole-program generator tests include a batch with one passing
+leaf and two inconclusive service paths. This is prepared-state
+evidence and does not change any tracker milestones.

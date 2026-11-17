@@ -1056,6 +1056,36 @@ ret
             self.assertEqual(run(ctypes.byref(state), 2, 0xf00, callback, None), 0)
             self.assertEqual((state.r[3], state.r[4]), (42, 0x804))
 
+    def test_differential_checks_paths_without_servicing_boundaries(self):
+        source = """.type leaf,@function
+leaf: inc eax
+ret
+.size leaf, .-leaf
+.org 0x200
+.type dos,@function
+dos: int 0x21
+ret
+.size dos, .-dos
+.org 0x300
+.type device,@function
+device: in al,0x61
+ret
+.size device, .-device"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root / 'out'
+            asm_c_program.generate(directory, out, image, interrupt_boundaries=True,
+                                   port_boundaries=True)
+            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
+                                               service_free_paths=True)
+            self.assertEqual(report['host_service_policy'], 'reject-on-reach')
+            entries = {entry['address']: entry for entry in report['entries']}
+            self.assertEqual(entries[0x100]['state'], 'probes-pass')
+            for address in (0x200, 0x300):
+                self.assertEqual(entries[address]['state'], 'inconclusive')
+                self.assertIn('unmodeled host service', entries[address]['probes'][0]['reason'])
+
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function
 root: int 0x21

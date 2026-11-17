@@ -1286,9 +1286,13 @@ interrupt stack frame. Do not resume an unserviced request.
 
 Reports record the contract and admitted instruction sites under
 `host_service_boundaries`. Direct closure here means closure with required
-external services; it is not standalone execution coverage. The existing
-differential driver rejects these reports until a service-aware driver is
-provided. Unrestricted boundary generation admits vectors 21h and 31h.
+external services; it is not standalone execution coverage. The differential
+CLI rejects boundary-enabled reports by default. Use `--service-free-paths`
+to compare individual paths while rejecting interrupts and scalar port I/O
+if reached. An original execution that reaches such a request is
+inconclusive. A C execution that reaches one after the original completes
+is a mismatch. The report records the policy as `reject-on-reach`.
+Unrestricted boundary generation admits vectors 21h and 31h.
 Selecting exact sites with `--interrupt-site` also permits other two-byte
 INT encodings and the one-byte INT3 encoding. INT3 yields status `0x203`
 with the architectural continuation at `PC` and callback IP at `PC-1`.

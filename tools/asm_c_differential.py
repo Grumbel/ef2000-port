@@ -441,7 +441,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     return outcome(state='mismatch' if differences else 'pass', differences=differences)
 
 
-def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None, captured=None):
+def reject_host_service(*args):
+    raise ValueError('probe reached an unmodeled host service')
+
+
+def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
+                    captured=None, *, reject_services=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -461,7 +466,10 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                 sender.send(('phase', index, 'setup'))
                 result = compare(function, payload, address, registers, flags, budget=budget,
                                  program=program, native_x87=native_x87, captured=captured,
-                                 phase=lambda stage: sender.send(('phase', index, stage)))
+                                 phase=lambda stage: sender.send(('phase', index, stage)),
+                                 service_factory=(lambda: reject_host_service) if reject_services else None,
+                                 vector_services=reject_services,
+                                 port_factory=(lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
             sender.send(('error', -1, repr(error)))
@@ -508,7 +516,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=()):
+           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False):
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
     payload = image.read_bytes()
@@ -518,7 +526,11 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
-    if manifest.get('host_service_boundaries') or manifest.get('host_port_service_boundaries'):
+    reject_services = bool(manifest.get('host_service_boundaries') or
+                           manifest.get('host_port_service_boundaries'))
+    if reject_services and not program:
+        raise ValueError('host service boundaries require the program dispatcher')
+    if reject_services and not service_free_paths:
         raise ValueError('host service boundaries require a service-aware differential driver')
     if (manifest.get('model') not in ('flat-x86-explicit-state', 'flat-x86-program-explicit-state') or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
@@ -637,7 +649,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
-        results = isolated_probes(function, payload, address, scenarios, budget, program, native_x87=native_x87)
+        results = isolated_probes(function, payload, address, scenarios, budget, program,
+                                  native_x87=native_x87, reject_services=reject_services)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
@@ -653,7 +666,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
         result = isolated_probes(function, payload, captured.address, 1, budget, program,
-                                 native_x87=native_x87, captured=captured)[0]
+                                 native_x87=native_x87, captured=captured, reject_services=reject_services)[0]
         capture_results.append(dict(file=str(path), capture_sha256=digest,
                                     address=captured.address, sequence=captured.sequence,
                                     segment_profile='captured-zero-base-ring3-table-derived', **result))
@@ -667,6 +680,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
+                  host_service_policy='reject-on-reach' if reject_services else 'no-boundaries',
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
                                          if captured_inputs else {},
@@ -692,6 +706,8 @@ def main(argv=None):
     parser.add_argument('--softfloat-build', type=Path, help='validated SoftFloat build for narrowing stores and arithmetic')
     parser.add_argument('--x87-oracle', choices=('unicorn', 'hardware'), default='unicorn',
                         help='explicit independent native x87 coprocessor for original execution')
+    parser.add_argument('--service-free-paths', action='store_true',
+                        help='compare paths in boundary-enabled programs, stopping at any host service')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
     parser.add_argument('--capture', type=Path, action='append', default=[],
@@ -705,7 +721,8 @@ def main(argv=None):
         report = verify(directory, output, workspace / 'payload.bin', compiler=args.compiler,
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
-                        x87_oracle=args.x87_oracle, captures=args.capture)
+                        x87_oracle=args.x87_oracle, captures=args.capture,
+                        service_free_paths=args.service_free_paths)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
