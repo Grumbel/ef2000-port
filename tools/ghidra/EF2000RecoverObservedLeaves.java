@@ -31,10 +31,11 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xe300f, 0xe3022, 0xe3026, 0},
         {0xc64d0, 0xc64ea, 0, 20},
         {0xc5e65, 0xc5e66, 0xc6cdf, 0},
+        {0x1c53c, 0x1c545, 0x1c902, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
-        "dispatch_return_c5e65"
+        "dispatch_return_c5e65", "dispatch_clear_latch_1c53c"
     };
 
     @Override
@@ -92,6 +93,21 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     if (trap == null || !trap.getMnemonicString().equals("INT3") || trap.getLength() != 1) {
                         throw new IllegalStateException("unexpected preceding trap boundary");
                     }
+                } else if (entry == 0x1c53c) {
+                    Instruction call = getInstructionAt(toAddr(literal));
+                    Function caller = getFunctionContaining(toAddr(literal));
+                    boolean table = false, indexRegister = false;
+                    if (call != null && call.getMnemonicString().equals("CALL") && call.getFlowType().isComputed()) {
+                        for (Object object : call.getOpObjects(0)) {
+                            if (object instanceof Scalar && ((Scalar)object).getUnsignedValue() == 0x122d34) table = true;
+                            if (object instanceof Address && ((Address)object).getOffset() == 0x122d34) table = true;
+                            if (object instanceof Register && ((Register)object).getName().equals("EAX")) indexRegister = true;
+                        }
+                    }
+                    if (!table || !indexRegister || caller == null || caller.getEntryPoint().getOffset() != 0x1c780 ||
+                            Integer.toUnsignedLong(currentProgram.getMemory().getInt(toAddr(0x122d34))) != entry) {
+                        throw new IllegalStateException("missing observed callback-table corroboration");
+                    }
                 } else if (literal != 0) {
                     Instruction reference = getInstructionAt(toAddr(literal));
                     boolean matches = false;
@@ -140,7 +156,8 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     String mnemonic = instruction.getMnemonicString();
                     boolean last = cursor + instruction.getLength() == end;
                     if (last ? !mnemonic.equals("RET") :
-                            !Set.of("PUSH", "POP", "MOV", "LEA", "INC", "LODS", "LODSW", "ADD", "XLAT", "XLATB").contains(mnemonic)) {
+                            !Set.of("PUSH", "POP", "MOV", "LEA", "INC", "LODS", "LODSW", "ADD", "XLAT", "XLATB").contains(mnemonic) &&
+                            !(entry == 0x1c53c && cursor == entry && mnemonic.equals("XOR"))) {
                         throw new IllegalStateException("unexpected leaf control flow at " + toAddr(cursor));
                     }
                     cursor += instruction.getLength();

@@ -174,9 +174,10 @@ class GhidraWorkflowTests(unittest.TestCase):
                 '0x000a432f\t0x000a4342\tfirst\t0\t19\tproposed\n'
                 '0x000e300f\t0x000e3022\tsecond\t0\t19\tproposed\n'
                 '0x000c64d0\t0x000c64ea\tthird\t20\t26\tproposed\n'
-                '0x000c5e65\t0x000c5e66\tfourth\t0\t1\tproposed\n')
+                '0x000c5e65\t0x000c5e66\tfourth\t0\t1\tproposed\n'
+                '0x0001c53c\t0x0001c545\tfifth\t0\t9\tproposed\n')
         with patch.object(ghidra.subprocess, 'run', side_effect=run):
-            self.assertEqual(len(ghidra.recover_observed_leaves(args)), 4)
+            self.assertEqual(len(ghidra.recover_observed_leaves(args)), 5)
         with patch.object(ghidra.subprocess, 'run'):
             with self.assertRaisesRegex(ValueError, 'fresh observed-leaf report'):
                 ghidra.recover_observed_leaves(args)

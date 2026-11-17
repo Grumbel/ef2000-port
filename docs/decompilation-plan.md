@@ -12069,3 +12069,14 @@ with distinct entry boundaries from the formatter probes at 0x7f/0x80.
 The first two have multiple exits and call 0x122a0, so their full bodies
 and closure still need review. Raw path evidence stays under
 `local/asm-service-free-parallel-20261118/missing-target-paths.json`.
+
+2026-11-18 — Recovered the 0x1c53c callback body in Ghidra. The guarded
+recipe verifies the computed call at 0x1c902, its caller owner and the
+pointer in the first 0x122d34 table slot. A disposable project reported
+the boundary, applied it and then reported it already recovered on a
+second apply. The fresh export inventories 4,282 functions. Generated C
+for the nine-byte leaf compiled warning-free with OpenWatcom and matched
+all 16 prepared probes with 5 MiB RAM. The new tracker entry records its
+observed boundary. The original caller still needs a differential rerun
+with a regenerated bulk dispatcher. Artifacts are in
+`local/ghidra-callback-leaf-20261118/`. All 47 Ghidra tooling tests passed.
