@@ -894,8 +894,11 @@ def instruction_c(insn, starts):
             raise Unsupported('unsupported far-pointer load')
         dst, src = arguments
         width = width_of(dst)
-        code += ['a = ef_read(s, %s, %d);' % (src[1], width),
-                 'b = ef_read(s, (uint32_t)(%s + %du), 16);' % (src[1], width//8),
+        code += ['if (ef_check_segment(s, %d, %s, %du, %d)) return s->fault;' %
+                 (src[3], src[1], width//8 + 2, 3 if src[3] == 2 else 0),
+                 'a = ef_read_segment(s, %d, %s, %d);' % (src[3], src[1], width),
+                 'if (s->fault) return s->fault;',
+                 'b = ef_read_segment(s, %d, (uint32_t)(%s + %du), 16);' % (src[3], src[1], width//8),
                  'if (s->fault) return s->fault;',
                  'ef_load_segment(s, %d, b);' % SEGMENTS.index(mnemonic[1] + 's'),
                  'if (s->fault) return s->fault;', write(dst, 'a', width)]
@@ -1199,12 +1202,8 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'les', 'lds', 'lss', 'lfs', 'lgs'}
     for i in instructions:
         code = renderer(i, starts)
-        # Reject paths whose implicit accesses still use the legacy flat helpers.
-        if i['mnemonic'] in unwired:
-            code = 'if (s->segment_profile) return 7; ' + code
         fetch = 'if (ef_check_segment(s, 1, 0x%xu, %du, 2)) return s->fault; ' % (
             i['address'], len(bytes.fromhex(i['bytes'])))
         cases.append('case 0x%xu: %s%s' % (i['address'], fetch, code))

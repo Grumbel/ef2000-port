@@ -243,17 +243,26 @@ class AsmCaptureTests(unittest.TestCase):
                 if segment in ('cs', 'ss'):
                     continue
                 for selector in range(4):
-                    for form in ('mov', 'pop', 'popw'):
+                    for form in ('mov', 'pop', 'popw', 'far16', 'far32'):
                         with self.subTest(segment=segment, selector=selector, form=form):
-                            source = ('mov eax,%d\nmov %s,ax\nret' % (selector, segment) if form == 'mov' else
-                                      '%s %d\n%s %s\nret' %
-                                      ('pushw' if form == 'popw' else 'push',
-                                       selector if form == 'popw' else selector | 0xabcd0000, form, segment))
+                            if form == 'mov':
+                                source = 'mov eax,%d\nmov %s,ax\nret' % (selector, segment)
+                            elif form.startswith('far'):
+                                source = 'l%s %s,cs:[0x2000]\nret' % (
+                                    segment, 'ax' if form == 'far16' else 'eax')
+                            else:
+                                source = '%s %d\n%s %s\nret' % (
+                                    'pushw' if form == 'popw' else 'push',
+                                    selector if form == 'popw' else selector | 0xabcd0000, form, segment)
                             image, record = assemble(root, source)
                             capture = fixture()
                             ram = bytearray(capture.guest_ram)
                             ram[:image.stat().st_size] = image.read_bytes()
-                            regs = dict(capture.registers, eip=0x100)
+                            if form.startswith('far'):
+                                pointer = (struct.pack('<HH', 0x1234, selector) if form == 'far16' else
+                                           struct.pack('<IH', 0x87654321, selector))
+                                ram[0x2000:0x2000+len(pointer)] = pointer
+                            regs = dict(capture.registers, eip=0x100, eax=0xdeadbeef)
                             tables = copy.deepcopy(capture.table_context)
                             regs[segment] = 7
                             tables['descriptors'][segment] = tables['descriptors']['ds']
@@ -297,7 +306,23 @@ class AsmCaptureTests(unittest.TestCase):
                             before = (list(state.r), state.flags, bytes(memory))
                             self.assertEqual(null_read(ctypes.byref(state), index), 7)
                             self.assertEqual((list(state.r), state.flags, bytes(memory)), before)
-                            if form != 'mov':
+                            if form.startswith('far'):
+                                width = 2 if form == 'far16' else 4
+                                for fault in ('segment', 'memory', 'reload'):
+                                    state.fault = 0
+                                    state.pc = 0x100
+                                    state.r[0] = 0xdeadbeef
+                                    state.segment_cache[1].limit = (0x2000 + width if fault == 'segment'
+                                                                    else 0xffffffff)
+                                    state.memory_size = (0x2000 + width + 1 if fault == 'memory' else len(ram))
+                                    memory[0x2000 + width] = 7 if fault == 'reload' else selector
+                                    before = (list(state.r), list(state.segment), state.flags,
+                                              bytes(state.segment_cache), bytes(memory))
+                                    self.assertEqual(function(ctypes.byref(state), 1),
+                                                     3 if fault == 'memory' else 7)
+                                    self.assertEqual((list(state.r), list(state.segment), state.flags,
+                                                      bytes(state.segment_cache), bytes(memory)), before)
+                            if form in ('pop', 'popw'):
                                 # A bad stack extent must fault before changing
                                 # the selector/cache or advancing ESP.
                                 state.fault = 0

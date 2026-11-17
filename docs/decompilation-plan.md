@@ -9722,3 +9722,34 @@ selector read succeeds with only two bytes inside the SS limit.
 The generated mixed-operand fixture in `local/asm-null-pop-20261117/lift.c`
 compiles with pinned Watcom using `-q -bt=dos -3r -za99 -w1 -we`, with zero
 diagnostics. No tracker promotion, runtime splice or gameplay run is claimed.
+
+### 2026-11-17: retain source-segment checks for far-pointer loads
+
+LES/LDS/LFS/LGS/LSS previously read their pointer through flat RAM helpers,
+with a blanket rejection of captured descriptor contexts. The translator now
+checks the complete offset-plus-selector extent through the operand's source
+segment before reading either field, including stack access rights for an
+SS source. Both field reads retain that segment. Destination-register writes
+remain after successful selector loading, so source faults and unsupported
+reloads cannot partially commit the destination. The blanket guard is removed
+only after wiring these implicit reads; non-null descriptor-table loads and
+null SS still fail through the segment loader.
+
+`AsmCaptureTests.test_null_data_selector_reload` now passes 80 original/C
+full-state cases: the previous MOV/POP forms plus 32 far-pointer cases covering
+LES/LDS/LFS/LGS, 16/32-bit offsets and four null-selector RPLs. The 16-bit cases
+preserve the destination's upper half. Each far-pointer case also checks three
+C fault paths (96 checks): a selector truncated by the segment limit, one
+truncated by bounded RAM, and a non-null selector requiring an unsupported
+table reload. Registers, selectors, caches, flags and RAM remain unchanged
+on these faults. Existing cache invalidation/access and POP fault checks pass.
+
+Validation: `python3 -m unittest
+ tests.test_asm_capture.AsmCaptureTests.test_null_data_selector_reload
+ tests.test_asm_c_segments.SegmentStringTests.test_segment_moves_push_pop_and_far_pointer_loads`
+passes, including 48 legacy-profile programs with two differential scenarios
+each. The generated eight-form fixture in
+`local/asm-null-far-20261117/lift.c` compiles with pinned Watcom using
+`-q -bt=dos -3r -za99 -w1 -we`, with zero diagnostics. Tracker and diff checks
+pass. No original-game whole-body equivalence, bulk coverage increase, tracker
+promotion, runtime splice or gameplay result is claimed.
