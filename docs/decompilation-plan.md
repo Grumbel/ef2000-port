@@ -9158,3 +9158,32 @@ whole-function verification. The repaired body renders syntactically, while
 untranslated direct dependencies still prevent closed generation. No gameplay
 run or tracker promotion is claimed. Future inventory refreshes should use
 the repaired disposable project rather than the preceding decimal-only copy.
+
+### 2026-11-17: recover kotsAccept's alternate branches
+
+The branch at 0x52a0 reaches 0x5327 beyond kotsAccept's previously recorded
+body. The flow-gap/body-hole audits do not report this case because the
+conditional target is outside the body rather than a fallthrough or internal
+hole. Inspection of the original bytes and ownership inventory establishes
+two alternate paths ending at RETs 0x53d3 and 0x5484, with no other function
+owning 0x5327..0x5484. The following alignment instruction is excluded.
+
+`tools/ghidra/EF2000RecoverKotsAccept.java` checks the language, pinned payload,
+350-byte region hash, old/repaired body and incoming conditional branch. It
+rejects other owners, redisassembles the region, checks complete instruction
+coverage (104 instructions) and both terminal RETs, then expands the body
+from 251 to 601 bytes. Tracker size and boundary notes are corrected without
+promoting its blocked/unverified state. Apply and repeat report runs in
+`local/ghidra-kots-branches-20261117` succeed; a fresh inventory exports a
+contiguous body whose instruction spans match the original decoder. The
+repaired function renders syntactically; untranslated callees still prevent
+closed generation. Use this workspace for subsequent inventory refreshes;
+it includes the earlier decimal-table and 0xbfcc repairs.
+
+`local/ghidra-kots-branches-20261117/check.py` compares paths starting at
+0x533b and 0x53d4 through their status-byte stores, stopping before stack
+cleanup. Counts 0, 1 and 3, EBX/ECX zero and two initial flag values produce
+twelve full GPR/flags/PC/selector/2 MiB RAM matches. The generated region
+compiles with OpenWatcom without diagnostics. This evidence excludes the
+initial string comparison, nonzero-object helper calls and whole-function
+behavior; it is not a tracker verification or gameplay claim.
