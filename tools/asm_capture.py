@@ -16,6 +16,28 @@ except ImportError:
     import asm_c_differential as differential
 
 
+def live_table_windows(capture):
+    """Return only complete descriptor tables backed by identical guest RAM.
+
+    Restoration may map snapshot tables outside captured RAM. Such mappings
+    cannot be exposed to the bounded C memory model as live descriptor tables.
+    This does not enable segment reloads or reconstruct hidden caches.
+    """
+    windows = []
+    for name in ('gdtr', 'ldtr'):
+        table = capture.table_context[name]
+        base, limit = table['base'], table['limit']
+        raw = table['bytes']
+        end = base + limit + 1
+        if (0 <= base <= 0xffffffff and 0 <= limit <= 0xffffffff and
+                end <= 0x100000000 and end <= len(capture.guest_ram) and
+                len(raw) == limit + 1 and capture.guest_ram[base:end] == raw):
+            windows.append((base, limit))
+        else:
+            windows.append(None)
+    return tuple(windows)
+
+
 def restore(capture):
     """Return a fresh Unicorn CPU with the captured zero-base ring-3 context.
 

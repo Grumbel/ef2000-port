@@ -39,6 +39,30 @@ def fixture():
 
 
 class AsmCaptureTests(unittest.TestCase):
+    def test_live_table_windows_require_complete_matching_ram(self):
+        captured = fixture()
+        self.assertEqual(asm_capture.live_table_windows(captured), (None, None))
+        ram = bytearray(0x30110)
+        for name in ('gdtr', 'ldtr'):
+            table = captured.table_context[name]
+            ram[table['base']:table['base'] + len(table['bytes'])] = table['bytes']
+        captured = replace(captured, guest_ram=bytes(ram))
+        expected = ((0x30000, 15), (0x30100, 15))
+        self.assertEqual(asm_capture.live_table_windows(captured), expected)
+        self.assertEqual(asm_capture.live_table_windows(
+            replace(captured, guest_ram=bytes(ram[:-1]))), (expected[0], None))
+        ram[0x30000] ^= 1
+        self.assertEqual(asm_capture.live_table_windows(
+            replace(captured, guest_ram=bytes(ram))), (None, expected[1]))
+        for base, limit, raw in ((-1, 15, bytes(16)),
+                                 (0xffffffff, 15, bytes(16)),
+                                 (0x30000, 16, bytes(16)),
+                                 (0x30000, 14, bytes(16))):
+            tables = copy.deepcopy(captured.table_context)
+            tables['gdtr'].update(base=base, limit=limit, bytes=raw)
+            self.assertEqual(asm_capture.live_table_windows(
+                replace(captured, table_context=tables)), (None, expected[1]))
+
     @unittest.skipUnless(all(shutil.which(tool) for tool in ('cc', 'as', 'objcopy', 'objdump')),
                          'requires C compiler and GNU binutils')
     def test_descriptor_scalar_paths_compare_full_captured_state(self):

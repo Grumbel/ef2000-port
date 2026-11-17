@@ -9832,3 +9832,16 @@ runtime integration, bulk closure increase or replay is claimed.
  tests.test_asm_c_program` passes all 26 methods, including the preceding
 80 null-reload cases and 8,192 lookup privilege combinations. Tracker and
 diff checks pass.
+
+### 2026-11-17: gate captured live tables on complete RAM backing
+
+`asm_capture.live_table_windows` identifies GDT/LDT windows only when the
+complete captured table fits the bounded guest RAM and its bytes match
+exactly. Snapshot mappings outside RAM, truncated tables, mismatched bytes,
+invalid extents and 32-bit address overflow remain unavailable. This helper
+is preparatory: the differential runner still leaves live reloads disabled
+until cache transitions can be checked against original execution evidence.
+
+`python3 -m unittest tests.test_asm_capture.AsmCaptureTests.test_live_table_windows_require_complete_matching_ram`
+passes; `git diff --check` passes. No tracker promotion or new bulk equivalence
+is claimed.
