@@ -12052,3 +12052,20 @@ and three mismatches. Dispatcher PCs 0x13a50, 0x12f18 and 0x1c53c are absent
 from all ranges in the current inventory and need boundary review. Sample
 reports: `local/asm-service-free-parallel-20261118/blocked-fault-sample*.json`.
 The additional RAM is zero-filled and does not model initialized game state.
+
+2026-11-18 — Completed 16 prepared probes per generated blocked row:
+186 of 699 matched on every input, 512 were inconclusive on at least one
+input without a mismatch, and 0xed133 reproduced two prior callback
+mismatches. Evidence: `blocked-probes-16.jsonl` in the parallel-run artifact.
+
+Traced the three 5 MiB sample mismatches on the original CPU and checked
+their pointer slots in the SHA-pinned payload. At 0x12dfd, the indexed call
+through base 0x121fcd reaches 0x13a50 (slot 0x122333). At 0x12188, a call
+through the same base reaches 0x12f18 (slot 0x121fea). At 0x1c902, the
+indexed call through base 0x122d34 reaches 0x1c53c (first slot), executes a
+nine-byte leaf and returns to 0x1c908. The current inventory has no body
+covering any of these targets. These are payload-backed table targets,
+with distinct entry boundaries from the formatter probes at 0x7f/0x80.
+The first two have multiple exits and call 0x122a0, so their full bodies
+and closure still need review. Raw path evidence stays under
+`local/asm-service-free-parallel-20261118/missing-target-paths.json`.
