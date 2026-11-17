@@ -10013,3 +10013,28 @@ Validation: `python3 -m unittest
 passes both methods, covering emitted report metadata, a recursive cluster,
 multiple roots and an admitted recursive body. No gameplay runs or tracker
 promotions.
+
+### 2026-11-17: repair X-32 break-service draft arguments and result
+
+Inspecting the highest-impact interrupt roots against normalized original
+instructions and `Machine::interrupt` finds that 0x235/0x23b adjust the X-32
+program break, despite historical timer-vector names. The original MOV
+ECX,EAX at 0x23f supplies the requested break; MOV AX,0x3508 preserves EAX's
+upper half. After the service, 0x24e stores returned ECX, not the request,
+at 0x120cd0. The existing C draft supplied zero ECX and stored the request.
+Correct both and preserve the original partial AX write in service inputs.
+Update tracker/signature explanations without renaming existing linkage.
+
+The C++ runtime already implements this service at interrupt IP 0x245,
+including page rounding and allocation accounting. It is not generic DOS
+get-vector semantics. The other high-impact root 0x10d75c uses AH=0x48 and
+requires a separate allocation path. Generated explicit-state C currently
+has no bridge to either service; INT remains unsupported. The scalar draft
+still uses the existing external DOS adapter and is not a full-state
+replacement. No coverage or verification promotion follows this correction.
+
+Validation: pinned `wcc386 -q -bt=dos -3r -zp1 -za99 -w1 -we
+-i=decomp/include -fo=/tmp/ef2000-break-draft.obj decomp/src/misc_drafts1.c`
+passes with zero diagnostics; tracker and diff checks pass. An initial
+compile without the required `-zp1` failed existing world-grid layout
+assertions; the repository flags resolve those errors. No gameplay runs.

@@ -21737,7 +21737,7 @@ uint32_t translate_key_masked_1084c0(uint32_t value, uint32_t carry)
 
 /* 0x235, 50 bytes through the shared return paths at 0x25d and 0x266. This
  * entry is also the taken target of the JAE at 0x231. Its first compare
- * chooses whether to fetch vector 8 before exchanging the active vector. */
+ * chooses whether to grow the X-32 break before exchanging the logical break. */
 uint32_t install_timer_vector_235(uint32_t value)
 {
 	uint32_t carry;
@@ -21845,24 +21845,25 @@ uint32_t dispatch_swapped_c4e3b(uint32_t esi, uint32_t *ebx)
 	return EF_U32(0xc4e62u + index);
 }
 
-/* 0x23b, 44 bytes. Implicit-register fragment (EAX = new handler, SKIP = the condition flag of the preceding compare, CARRY is an out flag): unless SKIP is set, read interrupt vector 8 (int 21h, AX = 0x3508), save it at 0x132a40 and the new handler at 0x120cd0; the old value at 0x132a30 is exchanged with EAX and returned. On a DOS error returns 0xffffffff with CARRY set. */
-uint32_t set_timer_vector_23b(uint32_t handler, uint32_t skip, uint32_t *carry)
+/* 0x23b, 44 bytes. X-32 break fragment: EAX is the requested logical break; SKIP represents incoming CF|ZF. Unless skipped, INT 21h AX=0x3508 receives the request in ECX. Save returned EAX at 0x132a40 and returned ECX (the committed rounded break) at 0x120cd0. Exchange the requested logical break with 0x132a30. Carry indicates service failure. Historical function name retained. */
+uint32_t set_timer_vector_23b(uint32_t requested, uint32_t skip, uint32_t *carry)
 {
 	uint32_t old;
 
 	if (!skip) {
 		uint32_t out[7];
 
-		run_dos_int_ex(0x21u, 0x3508u, 0u, 0u, 0u, out);
+		run_dos_int_ex(0x21u, (requested & 0xffff0000u) | 0x3508u,
+                       0u, requested, 0u, out);
 		if (out[6] != 0u) {
 			*carry = 1u;
 			return 0xffffffffu;
 		}
 		EF_U32(0x132a40u) = out[0];
-		EF_U32(0x120cd0u) = handler;
+		EF_U32(0x120cd0u) = out[2];
 	}
 	old = EF_U32(0x132a30u);
-	EF_U32(0x132a30u) = handler;
+	EF_U32(0x132a30u) = requested;
 	*carry = 0u;
 	return old;
 }
