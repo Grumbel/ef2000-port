@@ -10163,3 +10163,17 @@ existing measured conventional-memory service description and runtime
 handler. Tracker and diff checks pass. No gameplay runs or new equivalence
 claims. The next bridge work requires recovering the extended allocation
 contract, or supporting the DPMI/selector path, before admitting those services.
+
+### 2026-11-17: recover the allocator's release prerequisite
+
+Inspect original 0x10d466 and both direct callers 0x10d4c4/0x10d689.
+Name it heap_release_empty_10d466 and record its no-argument, five-register
+preserving ABI, including the shared 0x10d756 epilogue. It unlinks empty
+heaps before releasing their backing allocations through DPMI AX0502 or
+ES-based DOS AH49, then continues irrespective of service carry results.
+Thus allocation support alone cannot admit the mode-1 allocator chain.
+Document the heap emptiness check, handle layout and service sites in
+x32-services.md; replace another generic tracker blocker with concrete
+requirements. No translation/state promotion or runtime behavior change.
+`python3 tools/decomp_status.py check` and `git diff --check` pass.
+Evidence is static original instructions and both callers; no gameplay runs.

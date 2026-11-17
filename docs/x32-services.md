@@ -234,3 +234,21 @@ selector base. The fallback therefore needs selector-aware allocation/free
 and DPMI support as well. Neither it nor the extended INT21 request belongs
 to the audited IP=0x245 heap-break callback. These concrete dependencies replace
 the old generic "compiler runtime does not map to C" tracker explanations.
+
+Mode-1 allocation also has a release prerequisite: `0x10d689` calls
+`0x10d466` before requesting memory. Its other direct caller is `0x10d4c4`.
+The cleanup walks the heap list at `0x16464c`, recognizes an empty heap when
+`*(uint32_t *)(*(uint32_t *)(heap+0x24)) + 0x2c == *(uint32_t *)heap`,
+saves its next link, and unlinks it through `0x10d427`. For a backing allocation
+at `heap-8`, a zero second dword selects DPMI INT31 AX=0502 at `0x10d4ab`,
+with the handle split between DI and SI. A nonzero second dword selects DOS
+AH=49 at `0x10d4b6`, loading ES with that selector and restoring ES afterward.
+It continues walking without branching on either release result. A bridge
+must preserve this behavior and the allocation/handle bookkeeping across
+calls; adding an allocation-only callback does not close this dependency.
+
+The cleanup consumes no incoming general register arguments. It preserves
+EBX/ECX/EDX/ESI/EDI with five pushes and the shared epilogue at `0x10d756`;
+EBP is untouched. Both callers preserve their live EAX before calling it.
+EAX and arithmetic flags are clobbered, with no return value consumed.
+This ABI is now recorded separately from the still-unsupported service model.
