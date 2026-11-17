@@ -6138,7 +6138,7 @@ uint16_t guest_fn_27d18_x(ef_addr32 req); /* 0x27d18 EAX -> AX */
 uint16_t guest_fn_28224_x(uint32_t mode); /* 0x28224 AL -> AX */
 
 void load_directory_list_7a66c(ef_addr32 path);
-int32_t guest_fn_df26f_x(ef_addr32 src, ef_addr32 fmt, ...); /* 0xdf26f cdecl, sscanf-like */
+int32_t EF_CDECL guest_fn_df26f_x(ef_addr32 src, ef_addr32 fmt, ...); /* 0xdf26f cdecl, sscanf-like */
 
 void jitter_offset_322ac(void);
 
@@ -7762,4 +7762,8 @@ void refresh_network_controls_33630(void);
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_parity_3361c parm [] modify [eax]
 #pragma aux net_new_port_337c4 parm [] modify [eax]
+#endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_new_baud_335c0 parm [eax] modify [eax]
 #endif

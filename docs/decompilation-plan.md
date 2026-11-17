@@ -11571,3 +11571,25 @@ Commands: tools/ef2000_wcc.py decomp/src/network_option_callbacks.c --compiler
 <pinned-wcc386> --output local/network-port-parity-20261117.obj;
 pinned-Unicorn Python local/network-port-parity-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover baud selection callback and retire settings probes
+
+Recovered 335c0 (89 bytes), replacing all remaining probe hooks in
+network_settings_callbacks.c with real guest calls. Confirm EAX widget,
+six preserved GPRs, cdecl df26f scanner, text read after clear/shutdown,
+exactly one assignment in signed range [1,4], and rejection stored as ff.
+Callback slot 12b5f8, no direct callers. Watcom zero warnings.
+30 scoped compiled-C/original-ASM comparisons PASS executing the original
+scanner and its callees. Cover empty/invalid input, signed values, range
+boundaries, whitespace, trailing text and integer overflow text, plus optional
+mutations by four modeled setup/settings/refresh callees. Compare six saved
+GPRs, ESP, normalized call traces and 5 MiB RAM excluding code placement and
+stack scratch. Scratch EAX, flags, stack and integration remain unproved.
+Keep hybrid excluded, state compiles. Tracker 3450 compiles / 782 blocked /
+454360 blocked body bytes. Private report
+local/network-baud-source-20261117/report.json, SHA-256
+23753a7d384401f3a138cc8952c2de0747a551c4e8ec53290aa1d743fb812488.
+Commands: tools/ef2000_wcc.py decomp/src/network_settings_callbacks.c --compiler
+<pinned-wcc386> --output local/network-baud-20261117.obj;
+pinned-Unicorn Python local/network-baud-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
