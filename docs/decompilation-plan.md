@@ -10142,3 +10142,24 @@ dispatcher, all 66 registry units, native adapter and allocation implementation
 (71 units total) with no diagnostics. Previously unchanged translation bodies
 are not recompiled. Earlier whole-wrapper evidence remains relevant to the
 audited service path; this run adds no gameplay or universal equivalence claim.
+
+### 2026-11-17: distinguish alternate heap allocation ABIs before bridging
+
+Audit original 0x10d80b/0x10d75c/0x10d689 and startup 0x86. Normal startup
+writes mode 3 at 0xbb and 0x132a60=1 at 0xc2. Alternate growth is selected
+for mode 1 with its submode byte zero, or mode 9. Mode 1 requires DPMI
+allocation and selector-base services, plus DOS allocation/free fallback.
+The other alternate path issues full EAX=0x80004800 and consumes returned
+EAX as a pointer. The measured ordinary paragraph service returns a segment
+in EAX and a linear pointer in EBX, so reusing it would create an ABI error.
+The existing C++ AH-only dispatch does not establish the extended contract.
+Keep this service unsupported rather than codifying that assumption.
+
+Name the two unnamed allocator rows and replace generic blocked notes with
+the exact service sites and dependencies. Document the distinction in
+`docs/x32-services.md`; no state promotion or runtime behavior change.
+Evidence is original normalized application instructions, compared with the
+existing measured conventional-memory service description and runtime
+handler. Tracker and diff checks pass. No gameplay runs or new equivalence
+claims. The next bridge work requires recovering the extended allocation
+contract, or supporting the DPMI/selector path, before admitting those services.

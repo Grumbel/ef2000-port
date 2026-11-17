@@ -205,3 +205,32 @@ Stack and data segments differ in the reference extender: context accesses need
 SS, as the original game handler's EBP operands already do. Updating saved EIP
 and returning with IRET resumes at the new address while preserving the
 register sentinels. See `exception-reference.json` for hashes and captured words.
+
+## Alternate application allocator: do not conflate its services
+
+Static review of application entries `0x10d80b`, `0x10d75c` and `0x10d689`
+identifies additional allocation ABIs that the native generated-service bridge
+has not implemented. The normal startup stores mode 3 at application `0xbb`
+(`0x132a5e`) and sets `0x132a60=1` at `0xc2`. `0x10d80b` selects its alternate
+allocator only for mode 1 with `0x132a5f=0`, or mode 9. This is branch evidence,
+not proof that arbitrary guest execution can never change those bytes.
+
+The alternate entry `0x10d75c` calls `0x10d689` in mode 1. Otherwise it issues
+INT21 at `0x10d7ab` with full EAX=`0x80004800` and requested size in EBX.
+After checking carry it uses returned EAX as the allocation address and writes
+heap metadata through it. This cannot be modeled by blindly reusing the
+measured ordinary paragraph service above, whose EAX is a segment and whose
+linear pointer is in EBX. The exact alternate extender contract remains
+unrecovered. The C++ runtime currently dispatches AH=48 without distinguishing
+this full EAX value; that implementation is not evidence for this alternate
+path. No claim that this causes a reported gameplay crash follows from this
+static audit.
+
+`0x10d689` first uses DPMI INT31 AX=0501 at `0x10d6a3`, with size in BX:CX.
+It constructs the returned address from BX:CX and stores the returned DI/SI
+handle words. Its fallback uses DOS allocation at `0x10d703` and `0x10d717`,
+DOS free via ES at `0x10d728`, then INT31 AX=0006 at `0x10d737` to obtain a
+selector base. The fallback therefore needs selector-aware allocation/free
+and DPMI support as well. Neither it nor the extended INT21 request belongs
+to the audited IP=0x245 heap-break callback. These concrete dependencies replace
+the old generic "compiler runtime does not map to C" tracker explanations.
