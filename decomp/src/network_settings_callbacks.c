@@ -52,30 +52,6 @@ void net_new_parity_3361c(ef_addr32 widget)
     refresh_network();
 }
 
-/* 336c0, 45 bytes: toggle the FIFO-length option unless both guard bytes
- * indicate that doing so is prohibited; then JMP to the shared refresh. */
-void net_new_fifo_len_336c0(ef_addr32 widget)
-{
-    guest(0x34ea4u, widget, 0u, 0u);
-    guest(0xa3da0u, 0u, 0u, 0u);
-    if (EF_U8(0x13578cu) == 0u || EF_U8(0x15f098u) == 0u)
-        EF_U8(0x15f099u) ^= 1u;
-    notify_network_change();
-    refresh_network();
-}
-
-/* 336f0, 47 bytes: an early jump to 33618 is a RETURN, not a refresh. */
-void net_open_ipx_settings_336f0(ef_addr32 widget)
-{
-    if (EF_U8(0x15f099u) == 0u)
-        return;
-    guest(0x34ea4u, widget, 0u, 0u);
-    guest(0xa3da0u, 0u, 0u, 0u);
-    EF_U8(0x15f09au) = (uint8_t)((EF_U8(0x15f09au) + 1u) & 3u);
-    notify_network_change();
-    refresh_network();
-}
-
 /* 33760, 74 bytes: toggle the current initialization-string slot, format
  * the selected string, write it into the target widget and redraw. The
  * formatter callback stands in for the original local sprintf buffer. */

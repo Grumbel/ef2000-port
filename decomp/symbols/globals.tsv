@@ -560,3 +560,4 @@ addr	size	type	name	evidence	notes
 0x0015f57d	1	char[]	g_modem_number	net_new_number_33720 strcpy destination	Minimum observed extent only; allocation capacity not established
 0x0015f53d	1	char[]	g_modem_prefix	net_new_pt_33738 strcpy destination	Minimum observed extent only; allocation capacity not established
 0x0015f4fd	1	char[]	g_modem_device	net_open_modem_status_337ac strcpy destination	Minimum observed extent only; allocation capacity not established
+0x0015f098	1	uint8_t	g_serial_fifo_toggle_guard	336c0 original CMP/JZ	When initialized, nonzero permits toggling g_serial_fifo_mode

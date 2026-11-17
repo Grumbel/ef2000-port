@@ -11506,3 +11506,26 @@ Commands: tools/ef2000_wcc.py decomp/src/network_text_callbacks.c --compiler
 <pinned-wcc386> --output local/network-text-20261117.obj;
 pinned-Unicorn Python local/network-text-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover FIFO option callbacks
+
+Recovered 336c0 (45 bytes) and 336f0 (47 bytes), replacing host-only probes
+with real clear-session, shutdown-device, settings-write and shared-refresh
+calls. Neither callback consumes an argument. Callback slots 12b618/12b620;
+no direct callers. Authoritative ASM corrects the old draft's inverted guard:
+FIFO toggles when initialization is zero OR the guard is nonzero. Preserve
+IPX enable sampling before calls and option sampling after shutdown; zero
+returns through 33618, other exits tail-jump 33630.
+Watcom clean; 288 scoped compiled-C/original-ASM comparisons PASS across
+binary initialization/guard, enable 0/1/255, six option values including byte
+wrap, and optional mutations by every modeled callee. Compare call traces,
+six saved GPRs, ESP and 5 MiB RAM excluding code placement and stack scratch.
+Four callees modeled; scratch EAX, flags, stack and integration unproved.
+Keep hybrid excluded, state compiles. Tracker 3446 compiles / 786 blocked /
+454580 blocked body bytes. Private report
+local/network-options-source-20261117/report.json, SHA-256
+0663df70201cd2ecd312e0e85dcae3f8de295481e246668c0f8225eaf2aa88e0.
+Commands: tools/ef2000_wcc.py decomp/src/network_option_callbacks.c --compiler
+<pinned-wcc386> --output local/network-options-20261117.obj;
+pinned-Unicorn Python local/network-options-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

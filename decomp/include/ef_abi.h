@@ -133,8 +133,8 @@ int net_ui_parse_decimal_086(ef_addr32 text, uint32_t format,
 ef_addr32 net_ui_format_option_086(uint32_t format, uint32_t value);
 void net_new_baud_335c0(ef_addr32 widget);
 void net_new_parity_3361c(ef_addr32 widget);
-void net_new_fifo_len_336c0(ef_addr32 widget);
-void net_open_ipx_settings_336f0(ef_addr32 widget);
+void net_new_fifo_len_336c0(void);
+void net_open_ipx_settings_336f0(void);
 void net_new_number_33720(ef_addr32 widget);
 void net_new_pt_33738(ef_addr32 widget);
 void net_open_loops_form_33ad8(ef_addr32 widget);
@@ -7748,4 +7748,9 @@ void refresh_network_controls_33630(void);
 #pragma aux net_new_number_33720 parm [eax] modify [eax]
 #pragma aux net_new_pt_33738 parm [eax] modify [eax]
 #pragma aux net_open_modem_status_337ac parm [eax] modify [eax]
+#endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_new_fifo_len_336c0 parm [] modify [eax]
+#pragma aux net_open_ipx_settings_336f0 parm [] modify [eax]
 #endif
