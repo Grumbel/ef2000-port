@@ -9110,3 +9110,23 @@ objects. Its report records compiler, source and object hashes; report
 SHA-256 is `77d64ccb8d1db989fa0638f1b192114ed499c1e3af2e2c182d2d8e1e9f0a849c`.
 No full target link, new whole-body equivalence result, gameplay run or
 tracker promotion is claimed by this refresh.
+
+### 2026-11-17: retain CS on combined-prefix segment MOV
+
+The original nine-byte helper at 0x222 starts with `66 2E 8E /r`: a
+word-sized DS load from CS-relative memory. The renderer now recognizes the
+combined operand-size/CS prefix for memory segment MOV, validates the segment
+register and direction as before, and requires the explicit CS operand
+spelling. It keeps both original prefix bytes for fetch/length validation and
+uses CS for the memory access. Missing/contradictory overrides and loading CS
+remain rejected. No other combined prefix forms are inferred.
+
+`tests.test_asm_c_program` plus the two focused data16 translation tests pass
+(17 tests). The added load fixture passes eight prepared full GPR/flags/RAM
+comparisons against original instruction execution in the flat profile;
+rendering assertions separately check CS selection and four-byte instruction
+length, and three additional malformed forms are rejected.
+`local/asm-c-cs-segment-20261117/report.json` records warning-free OpenWatcom
+compilation of the original complete 0x222 helper. This does not implement
+protected-profile descriptor reloads, prove the original helper across all
+selector values, promote a tracker row or refresh whole-corpus counts.

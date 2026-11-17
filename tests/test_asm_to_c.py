@@ -278,11 +278,24 @@ class TranslationTests(unittest.TestCase):
                               ('668c00', 'mov DWORD PTR [eax],es'),
                               ('668c00', 'mov WORD PTR [eax],ds'),
                               ('668e08', 'mov cs,WORD PTR [eax]'),
-                              ('6690', ''), ('6690', 'nop')]:
+                              ('6690', ''), ('6690', 'nop'),
+                              ('662e8e18', 'mov ds,WORD PTR [eax]'),
+                              ('662e8e18', 'mov ds,WORD PTR ds:[eax]'),
+                              ('662e8e08', 'mov cs,WORD PTR cs:[eax]')]:
             with self.subTest(encoded=encoded, text=text), self.assertRaises(asm_to_c.Unsupported):
                 asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
                                           mnemonic='data16', operands=text),
                                       {0x100, 0x100+len(bytes.fromhex(encoded))})
+
+    def test_data16_cs_segment_mov_preserves_memory_override(self):
+        for opcode, text in [('8e18', 'mov ds,WORD PTR cs:[eax]'),
+                             ('8c18', 'mov WORD PTR cs:[eax],ds')]:
+            with self.subTest(opcode=opcode):
+                insn = dict(address=0x100, bytes='662e'+opcode,
+                            mnemonic='data16', operands=text)
+                code = asm_to_c.instruction_c(insn, {0x100, 0x104})
+                self.assertIn('s, 1,', code)  # CS, rather than default DS.
+                self.assertIn('0x104', code)  # Both prefixes count toward PC.
 
     def test_register_segment_prefixes_require_matching_bytes(self):
         for encoded, mnemonic, text in [('3eb801000000', 'cs', 'mov eax,0x1'),

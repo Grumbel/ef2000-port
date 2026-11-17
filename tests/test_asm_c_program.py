@@ -120,6 +120,17 @@ ret
                     function, b'', 0x100, 1, 100, True, captured=capture)[0]
                 self.assertEqual(result['state'], 'pass', result)
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_data16_cs_segment_load(self):
+        # Flat-profile DS=0 reload; the source is explicitly read through CS.
+        source = '.type root,@function\nroot: .byte 0x66,0x2e,0x8e,0x1d\n.long 0x2000\nret\n.size root, .-root'
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            asm_c_program.generate(directory, root/'out', image)
+            report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=8)
+            self.assertEqual(report['entries'][0]['counts'], {'pass': 8}, report)
+
     def test_legacy_notrack_rejects_other_encodings(self):
         for encoded, text in [('ff6576', 'jmp DWORD PTR [ebp+0x76]'),
                               ('3eff5576', 'call DWORD PTR [ebp+0x76]'),

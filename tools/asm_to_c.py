@@ -661,20 +661,27 @@ def instruction_c(insn, starts):
         if not parts:
             raise Unsupported('unsupported data16 spelling')
         mnemonic, text = parts[0], parts[1] if len(parts) > 1 else ''
+        # A checked CS override may accompany the ignored operand-size prefix
+        # on a memory segment MOV. Keep the textual override for operand().
+        segment_encoding = encoded
+        cs_override = encoded[:2] == b'\x66\x2e'
+        if cs_override:
+            segment_encoding = encoded[:1] + encoded[2:]
         if encoded == b'\x66\xf3\xa4' and mnemonic == 'rep':
             # Operand size has no effect on MOVSB; address size remains 32.
             if text != 'movs BYTE PTR es:[edi],BYTE PTR ds:[esi]':
                 raise Unsupported('unsupported data16 MOVSB spelling')
-        elif (len(encoded) >= 3 and encoded[0] == 0x66 and
-              encoded[1] in (0x8c, 0x8e) and encoded[2] >> 6 != 3 and
+        elif (len(segment_encoding) >= 3 and segment_encoding[0] == 0x66 and
+              segment_encoding[1] in (0x8c, 0x8e) and segment_encoding[2] >> 6 != 3 and
               mnemonic == 'mov'):
             arguments = [operand(part) for part in text.split(',')]
             if len(arguments) != 2:
                 raise Unsupported('unsupported data16 segment MOV operands')
-            seg, mem = arguments if encoded[1] == 0x8e else arguments[::-1]
-            if (seg[0] != 'seg' or seg[1] != ((encoded[2] >> 3) & 7) or
+            seg, mem = arguments if segment_encoding[1] == 0x8e else arguments[::-1]
+            if (seg[0] != 'seg' or seg[1] != ((segment_encoding[2] >> 3) & 7) or
                     mem[0] != 'mem' or width_of(mem) != 16 or
-                    (encoded[1] == 0x8e and seg[1] == 1)):
+                    (segment_encoding[1] == 0x8e and seg[1] == 1) or
+                    (cs_override and 'cs:' not in text)):
                 raise Unsupported('unsupported data16 segment MOV operands')
         else:
             raise Unsupported('unsupported data16 encoding/spelling')
