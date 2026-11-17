@@ -1028,11 +1028,14 @@ def translate(record, *, starts=None, renderer=instruction_c):
     starts = local_starts if starts is None else starts
     cases = []
     unwired = {'pusha', 'popa', 'enter',
-               'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
+               'les', 'lds', 'lss', 'lfs', 'lgs'}
     for i in instructions:
         code = renderer(i, starts)
         # Reject paths whose implicit accesses still use the legacy flat helpers.
-        if i['mnemonic'] in unwired or i['mnemonic'].startswith('f'):
+        x87_flat_memory = (i['mnemonic'].startswith('f') and
+                           i['mnemonic'] not in ('fnstcw', 'fnstsw', 'fldcw') and
+                           'ptr ' in i['operands'].lower())
+        if i['mnemonic'] in unwired or x87_flat_memory:
             code = 'if (s->segment_profile) return 7; ' + code
         fetch = 'if (ef_check_segment(s, 1, 0x%xu, %du, 2)) return s->fault; ' % (
             i['address'], len(bytes.fromhex(i['bytes'])))

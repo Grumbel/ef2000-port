@@ -8433,3 +8433,23 @@ with wcc386 -bt=dos -3r -za99 -w1 -we. Tracker check and git diff --check
 pass. No synthetic corpus rerun, gameplay or UI session. Remaining segment
 reload, compound stack, x87 and fault-path coverage keeps the reliable bulk
 translation goal open.
+
+### 2026-11-17 — Enable descriptor-backed x87 register and control paths
+
+Replaced blanket rejection of every x87 instruction with rejection of x87
+memory operands whose helpers still use flat reads/writes. Register-only
+stack/arithmetic operations and FNINIT/FNCLEX/WAIT can now execute with
+captured descriptor caches. FNSTCW/FNSTSW/FLDCW already use decoded segment
+helpers and are enabled as well. Unchecked real/integer/extended memory
+operations remain rejected before execution; no descriptor lookup or
+pending-exception delivery support is added.
+
+Captured-state fixtures compare register-stack operations, sign/absolute
+value, physical stack exchange/pop, status output, control-word store/load,
+clear exceptions and WAIT against the independent native x87 oracle.
+The native oracle is required here: the initial Unicorn-only run disagreed
+on x87 IP/opcode bookkeeping. No state fields were masked to pass. A negative
+fixture retains rejection of FLD tbyte memory in descriptor mode.
+Validation: tests.test_asm_capture and tests.test_asm_c_program in the matching
+Nix Python/Unicorn environment; tracker check; git diff --check. No gameplay
+or UI runs; reliable bulk translation remains incomplete.

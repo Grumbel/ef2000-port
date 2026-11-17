@@ -42,7 +42,7 @@ class AsmCaptureTests(unittest.TestCase):
     @unittest.skipUnless(all(shutil.which(tool) for tool in ('cc', 'as', 'objcopy', 'objdump')),
                          'requires C compiler and GNU binutils')
     def test_descriptor_scalar_paths_compare_full_captured_state(self):
-        from tools import asm_to_c
+        from tools import asm_to_c, asm_x87_oracle
         from tests.test_asm_to_c import assemble
         sources = [
             'mov eax, dword ptr ds:[0x2000]\nadd dword ptr ss:[esp+4], eax\nret',
@@ -71,6 +71,9 @@ class AsmCaptureTests(unittest.TestCase):
             'mov esi,0x2003\nmov edi,0x2203\nmov ecx,4\nstd\nrep movsb\ncld\nret',
             'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\nfs rep movsb\nret',
             'mov esi,0\nmov edi,0\nmov ecx,0\nrep movsd\nret',
+            'fninit\nfld1\nfchs\nfabs\nfldz\nfxch st(1)\nfstp st(1)\nfnstsw ax\nret',
+            'fninit\nfnstcw word ptr [0x2000]\nfldcw word ptr [0x2000]\nfnclex\nfwait\nret',
+            'fld tbyte ptr [0x2000]\nret',  # Memory helper still uses flat accesses.
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -106,9 +109,12 @@ class AsmCaptureTests(unittest.TestCase):
                     function = library.ef_lift_00000100
                     function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
                     function.restype = ctypes.c_uint
+                    native = None
+                    if number >= 26:
+                        native, _ = asm_x87_oracle.build(root/('native%d' % number))
                     result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, False,
-                                                               captured=capture)[0]
-                    if number == 6:
+                                                               native_x87=native, captured=capture)[0]
+                    if number in (6, 28):
                         self.assertEqual(result['state'], 'mismatch')
                         self.assertIn('C status 7', result['differences'][0])
                     else:
