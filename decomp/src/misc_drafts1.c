@@ -6339,10 +6339,11 @@ uint32_t delete_file_fe541(uint32_t name)
 uint32_t dos_read_10f0e8(uint32_t handle, uint32_t buffer, uint32_t count)
 {
     uint32_t out[7];
-    run_dos_int_ex(0x21u, 0x3f00u, handle, count, buffer, out);
+    run_dos_int_ex(0x21u, (handle & 0xffff00ffu) | 0x3f00u, handle, count, buffer, out);
     if (out[6] != 0u)
         return (uint32_t)report_dos_error_1101e8(out[0] & 0xffffu);
-    return out[0];
+    /* RCL/ROR replaces the returned sign bit with carry. */
+    return out[0] & 0x7fffffffu;
 }
 
 /* 0xfe710, 31 bytes. Set the BIOS video mode MODE (int 10h) and read it back (AH = 0xf): returns 1 when the mode now equals the requested low byte, else 0. Stack argument (ret 4). */

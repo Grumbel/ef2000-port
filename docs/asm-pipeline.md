@@ -1357,7 +1357,7 @@ runtime globals; they do not establish that a probe represents a captured call.
 `runtime/dos_drive.cpp` as C++17 against the generated `ef_lift_state.h`, and
 pass the callback/context to `ef_lift_run_services`. It accepts only INT21 at
 fa973/1103b7 (AH=42 seek), 1103e0 (AH=40 write), fa9a8 (AH=3e close), and 1101c7 (AX=4400 device
-query). Unknown site/vector/function/context requests return 0x122 unchanged.
+query), fa9a8 (AH=3e close), and 10f0ef (AH=3f read). Unknown site/vector/function/context requests return 0x122 unchanged.
 The callback follows the existing hybrid runtime's flat-address file policy,
 32-bit buffer counts and copy-on-write overlay; numeric DOS errors become
 CF/EAX. Other host failures propagate. This is an adapter to the existing

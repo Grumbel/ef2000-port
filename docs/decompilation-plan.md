@@ -10514,3 +10514,29 @@ and request EAX/EBX/EDX. Report SHA-256:
 `8a147649f109d02ebb97bc84bdcf13ef470c427b6974405d9ed8e5f85ba5de43`.
 Full ABI, original extender services and integration remain unverified; tracker
 states are unchanged.
+
+
+### 2026-11-17 — Recovered read carry encoding and native RAM effects
+
+Corrected `dos_read_10f0e8`: preserve the incoming handle's non-AH EAX bits
+when constructing the DOS request, and clear returned bit 31 on success,
+matching the original RCL/ROR carry encoding. Confirmed EAX/EDX/EBX inputs
+at callers f1e7d and 10f23c; recorded EBX/EDX scratch and ECX preservation.
+The existing recovered error helper remains connected.
+
+Added native AH=3f dispatch at 10f0ef using DosDrive, including actual guest
+RAM writes, short EOF results and the hybrid runtime's ECX/EDX result clearing.
+The focused real-drive test checks exact state, changed buffer extent, EOF,
+overflow rejection and preserved file position. Command:
+`python3 -m unittest tests.test_asm_dos_file_service` passes. Pinned Unicorn
+Python `local/dos-read-source-20261117/check.py` passes 64 recovered-source
+comparisons with register-only DOS models: EAX return, RAM except stack scratch,
+and request EAX/EBX/EDX; this does not verify real read memory effects against
+original DOS. Report SHA-256:
+`9cb3c831b35aa4028981f6fbf4429cd64e05dbf4364ab222f3d72a27d9fb199b`.
+Extracted read C compiles without diagnostics with wcc386 -q -bt=dos -3r
+-zp1 -za99 -w1 -we -i=decomp/include. Full ABI and integration remain open.
+
+The generation snapshot with fa9a8 additionally allowed is
+`local/asm-file-close-services-20261117/report.json`: two additional generated
+bodies over the previous file-service snapshot. No tracker promotions follow.

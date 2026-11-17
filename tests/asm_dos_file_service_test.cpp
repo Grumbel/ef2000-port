@@ -57,6 +57,25 @@ int main(int argc, char **argv)
         before.r[0] = 5; before.flags |= 1;
         assert(std::memcmp(&state, &before, sizeof state) == 0);
     }
+    // Actual read RAM effects, short EOF, and no position change on bad spans.
+    drive.seek(handle, 0, 0);
+    state.r[0] = 0xabcd3f00; state.r[1] = 20; state.r[2] = 0x400; state.r[3] = handle;
+    ram.fill(0xa5); before = state;
+    assert(ef_asm_dos_file_service(&state, 0x10f0ef, 0x21, &drive) == 0);
+    before.r[0] = 8; before.r[1] = before.r[2] = 0; before.flags &= ~1u;
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
+    assert(std::memcmp(ram.data() + 0x400, "NEWginal", 8) == 0);
+    for (unsigned i = 0; i < ram.size(); ++i)
+        if (i < 0x400 || i >= 0x408) assert(ram[i] == 0xa5);
+    state.r[0] = 0x3f00; state.r[1] = 1; state.r[2] = 0x400;
+    assert(ef_asm_dos_file_service(&state, 0x10f0ef, 0x21, &drive) == 0);
+    assert(state.r[0] == 0 && ram[0x400] == 'N');
+    state.r[0] = 0x3f00; state.r[1] = 0xffffffff; state.r[2] = 0x400;
+    before = state;
+    assert(ef_asm_dos_file_service(&state, 0x10f0ef, 0x21, &drive) == 0);
+    before.r[0] = 5; before.flags |= 1u;
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
+    assert(drive.seek(handle, 0, 1) == 8);
     // Rejections leave state and file position untouched.
     state.r[0] = 0x4201; state.r[1] = state.r[2] = 0; state.r[3] = handle;
     before = state;

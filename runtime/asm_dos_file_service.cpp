@@ -2,6 +2,7 @@
 // SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 #include "asm_dos_file_service.hpp"
 #include "dos_drive.hpp"
+#include <algorithm>
 
 extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
                                            unsigned vector, void *context)
@@ -13,6 +14,7 @@ extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
           (ip == 0x1103b7u && ah == 0x42u) ||
           (ip == 0x1103e0u && ah == 0x40u) ||
           (ip == 0xfa9a8u && ah == 0x3eu) ||
+          (ip == 0x10f0efu && ah == 0x3fu) ||
           (ip == 0x1101c7u && ax == 0x4400u))) return 0x122u;
 
     auto& drive = *static_cast<ef2000::DosDrive*>(context);
@@ -24,6 +26,14 @@ extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
             const uint64_t position = drive.seek(handle, offset, ax & 255u);
             guest->r[0] = position & 0xffffu;
             guest->r[2] = (guest->r[2] & 0xffff0000u) | ((position >> 16) & 0xffffu);
+        } else if (ah == 0x3fu) {
+            const uint32_t address = guest->r[2], count = guest->r[1];
+            if (!guest->memory || address <= 0x260u || address >= guest->memory_size ||
+                count > guest->memory_size - address) throw unsigned(5);
+            const auto bytes = drive.read(handle, count);
+            std::copy(bytes.begin(), bytes.end(), guest->memory + address);
+            guest->r[0] = bytes.size();
+            guest->r[1] = guest->r[2] = 0;
         } else if (ah == 0x40u) {
             const uint32_t address = guest->r[2], count = guest->r[1];
             if (!guest->memory || address <= 0x260u || address >= guest->memory_size ||
