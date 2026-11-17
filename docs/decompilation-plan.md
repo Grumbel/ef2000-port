@@ -10418,3 +10418,33 @@ prepared-input evidence, not trace coverage or splice/replay verification.
 Reproducer: local/asm-dos-error-cluster-20261117/check.py; report SHA-256
 6b18ee7a3ad2a3f5ec8a0f0d2746af6be06e11cb494b543307ef65b25475f722.
 No tracker promotion or gameplay runs. Tracker and diff checks pass.
+
+
+### 2026-11-17 — Generated DOS file cluster and remaining blockers
+
+Expanded the restricted service-boundary generation snapshot with the audited
+DOS seek/device-query/append-seek/write sites fa973, 1101c7, 1103b7 and 1103e0.
+Together with the previous nine heap sites, this generates 2,912 bodies covering
+516,233 original body bytes: 82 bodies / 8,532 bytes beyond the heap snapshot.
+This is direct-edge closure only; dynamic targets and actual services remain open.
+Snapshot: `local/asm-file-services-20261117/generated/report.json`, SHA-256
+`49135065831f571ece5317a2fd2c95c574cccc07c631e57c8e8adb1e3a70c33b`.
+
+The eight-body write/slot/device/error/store/address cluster compiles as generated
+host C and passes 128 standard full-state prepared-input comparisons with 5 MiB
+RAM, including exact service request/response traces. Only the three interrupt
+sites use explicit register-only service models; these do not model file I/O,
+selector changes or DOS memory effects. This closes the earlier scoped source
+checks' register/flags/stack comparison gap for this generated cluster, not for
+the handwritten recovered C. No tracker promotion or gameplay claim follows.
+Command: pinned Unicorn Python running
+`local/asm-dos-file-cluster-20261117/check.py`; report SHA-256
+`90fc0a9fc610ec720eaf6f2e53e9e04fa0f671d4064bf08571e053b55409e1f3`.
+
+`tools/decomp_status.py status --translation-report` against this snapshot finds
+369 of 810 blocked rows generated but unverified, 431 excluded, 10 outside the
+inventory. Largest remaining overlapping roots: interrupt at 2b0 (193 rows),
+fcos b45a2 (147), fsin b45ac (146), out feec8 (131), in dc2e0 (130), fpatan
+dc1e9 (125), interrupt 11124c (119). Service yields expose boundaries; they do
+not implement them. Reliable bulk translation still requires those contracts,
+unsupported instruction semantics, dynamic-target coverage and equivalence evidence.
