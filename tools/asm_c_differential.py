@@ -153,6 +153,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         cpu = asm_capture.restore(captured)
         selectors = [captured.registers[name] for name in asm_to_c.SEGMENTS]
         initial_fpu = capture_x87(cpu)
+    reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
         if binding is not None:
@@ -171,6 +172,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         return outcome(state='inconclusive', reason='original fault: ' + str(error))
     if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
         return outcome(state='inconclusive', reason='original instruction budget exhausted')
+    if reloads is not None:
+        reloads.finish()
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
@@ -184,12 +187,17 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         for index, name in enumerate(asm_to_c.SEGMENTS):
             raw = captured.table_context['descriptors'][name]
             state.segment_cache[index] = Segment(*asm_segments.descriptor(selectors[index], raw or 0))
+        for index, window in enumerate(asm_capture.live_table_windows(captured)):
+            if window is not None:
+                state.table_mask |= 1 << index
+                state.table_base[index], state.table_limit[index] = window
     set_x87(state, initial_fpu)
     profile = (native_x87.comparison_profile if native_x87 is not None else
                asm_x87_oracle.unicorn_comparison_profile())['flags']
     state.x87_compare_profile = profile
     segment_configuration = state.segment_profile
     expected_caches = (Segment * 6).from_buffer_copy(bytes(state.segment_cache))
+    table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
     status = (function(ctypes.byref(state), budget, sentinel) if program else
@@ -203,14 +211,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         phase('comparison')
     differences = []
     if captured is not None:
-        for index, name in enumerate(asm_to_c.SEGMENTS):
-            original_selector = cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + name.upper()))
-            # Only null data-selector transitions have implemented reload
-            # semantics. Derive this expectation from the original CPU, never
-            # from the generated C's output selector or cache.
-            if (index not in (1, 2) and original_selector != selectors[index] and
-                    original_selector & 0xfffc == 0):
-                expected_caches[index] = Segment(original_selector, 0, 0, 0, 0)
+        for index, cache in enumerate(reloads.caches):
+            expected_caches[index] = Segment(*cache)
+    if (state.table_mask, tuple(state.table_base), tuple(state.table_limit)) != table_configuration:
+        differences.append('C descriptor table configuration changed')
     if (state.segment_profile != segment_configuration or
             bytes(state.segment_cache) != bytes(expected_caches)):
         differences.append('C descriptor profile/cache configuration changed')

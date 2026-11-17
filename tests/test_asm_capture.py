@@ -39,6 +39,27 @@ def fixture():
 
 
 class AsmCaptureTests(unittest.TestCase):
+    def test_reload_observer_keeps_cache_when_table_changes_after_load(self):
+        capture = fixture()
+        tables = copy.deepcopy(capture.table_context)
+        tables['ldtr']['bytes'] = struct.pack('<Q', 0x0040f2000000ffff) + tables['ldtr']['bytes'][8:]
+        ram = bytearray(0x40000)
+        ram[:len(capture.guest_ram)] = capture.guest_ram
+        for name in ('gdtr', 'ldtr'):
+            table = tables[name]
+            ram[table['base']:table['base'] + len(table['bytes'])] = table['bytes']
+        # Reload the unchanged ES selector, then overwrite its table limit.
+        code = bytes.fromhex('8ec366c705000103000001c3')
+        ram[0x1000:0x1000 + len(code)] = code
+        capture = replace(capture, registers=dict(capture.registers, ebx=7),
+                          guest_ram=bytes(ram), table_context=tables)
+        cpu = asm_capture.restore(capture)
+        observer = asm_capture.DataReloadObserver(cpu, capture)
+        cpu.emu_start(0x1000, 0x1100, count=100)
+        observer.complete()
+        self.assertEqual(observer.caches[0], (7, 0, 0xffff, 0xf3, 4))
+        self.assertEqual(bytes(cpu.mem_read(0x30100, 2)), bytes.fromhex('0001'))
+
     def test_live_table_windows_require_complete_matching_ram(self):
         captured = fixture()
         self.assertEqual(asm_capture.live_table_windows(captured), (None, None))
@@ -414,6 +435,9 @@ class AsmCaptureTests(unittest.TestCase):
                         function = ctypes.CDLL(str(path)).ef_lift_00000100
                         function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
                         function.restype = ctypes.c_uint
+                        result = asm_c_differential.compare(function, b'', 0x100, [], 0,
+                                                            captured=capture, budget=100)
+                        self.assertEqual(result, dict(state='pass', differences=[]))
                         memory = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
                         state = asm_c_differential.State(
                             (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),

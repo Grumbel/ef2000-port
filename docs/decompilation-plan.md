@@ -9845,3 +9845,41 @@ until cache transitions can be checked against original execution evidence.
 `python3 -m unittest tests.test_asm_capture.AsmCaptureTests.test_live_table_windows_require_complete_matching_ram`
 passes; `git diff --check` passes. No tracker promotion or new bulk equivalence
 is claimed.
+
+### 2026-11-17: verify live descriptor reloads in captured whole calls
+
+The captured differential runner now supplies opt-in GDT/LDT windows only
+when `live_table_windows` proves complete, matching RAM backing. It checks
+that C leaves the table mask/base/limit configuration unchanged. An original
+instruction observer recognizes MOV, POP and far-pointer data-selector loads,
+saves descriptor bytes before execution, and commits cache expectations at
+the following instruction boundary. This handles same-selector reloads and
+keeps later table writes from changing earlier cache expectations. Original
+faults and budget exhaustion remain inconclusive. SS reloads and other
+unsupported loader profiles remain unsupported.
+
+The eight existing live-table original/C cases now also pass through the
+public comparison runner, exercising four data registers through GDT and
+LDT with guest descriptor writes before reload. A separate original-only
+regression reloads the same selector and then changes its descriptor limit;
+the observer retains the loaded limit rather than using final table bytes.
+The preceding null-load comparisons exercise MOV/POP/far-pointer observation.
+
+Fresh ABI-5 generation of the complete 100-instruction `0xe7d27` body in
+`local/asm-live-wholecall-20261117` passes all 72 original/C whole calls,
+including all 36 multi-character cases previously rejected at MOV ES,DX.
+These compare RAM, GPRs, flags, selectors, modeled caches and x87 state.
+Pinned Watcom compilation with `-q -bt=dos -3r -za99 -w1 -we` has no
+errors or diagnostics. Source SHA-256:
+`39baa984790c25a31c852c679f196f6ee93769f9727d3024081edaf38842fd82`;
+object SHA-256:
+`8cdae35043346888befe79798bde5a5b96b5c86a5a6d72681f0c9dd373225a0b`;
+execution report SHA-256:
+`f45288c872df30d114b369c07cbc058fb2228c7ddf10659f42e70edbf8da3b7e`.
+No tracker promotion, runtime splice or gameplay replay is claimed.
+
+The combined `tests.test_asm_capture`, `tests.test_asm_segments` and
+`tests.test_asm_c_program` run passes all 28 methods. The live-table cases now
+also run through the public differential comparison path (eight whole calls).
+A separate original-only regression reloads selector 7 and subsequently
+changes its descriptor, checking that the observer retains the loaded cache.

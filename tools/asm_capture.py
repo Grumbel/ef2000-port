@@ -38,6 +38,75 @@ def live_table_windows(capture):
     return tuple(windows)
 
 
+def data_reload_target(code):
+    """Recognize data-selector loads in an oracle-decoded instruction."""
+    while code and code[0] in (0x26, 0x2e, 0x36, 0x3e, 0x64, 0x65, 0x66, 0x67):
+        code = code[1:]
+    if not code:
+        return None
+    if code[0] == 0x8e and len(code) >= 2:
+        target = (code[1] >> 3) & 7
+        return target if target in (0, 3, 4, 5) else None
+    if code[0] in (0x07, 0x1f, 0xc4, 0xc5):
+        return {0x07: 0, 0x1f: 3, 0xc4: 0, 0xc5: 3}[code[0]]
+    if len(code) >= 2 and code[0] == 0x0f:
+        return {0xa1: 4, 0xa9: 5, 0xb4: 4, 0xb5: 5}.get(code[1])
+    return None
+
+
+class DataReloadObserver:
+    """Observe successful original reloads, including unchanged selectors.
+
+    Save descriptor bytes before the instruction and commit the expectation
+    only at the following instruction boundary. Later guest table writes
+    must not retroactively change a hidden-cache expectation.
+    """
+
+    def __init__(self, cpu, capture):
+        from unicorn import UC_HOOK_CODE, x86_const
+        try:
+            from . import asm_segments
+        except ImportError:
+            import asm_segments
+        self.cpu, self.capture = cpu, capture
+        self.decode = asm_segments.descriptor
+        self.registers = [getattr(x86_const, 'UC_X86_REG_' + name.upper())
+                          for name in ('es', 'cs', 'ss', 'ds', 'fs', 'gs')]
+        self.caches = [self.decode(capture.registers[name],
+                                  capture.table_context['descriptors'][name] or 0)
+                       for name in ('es', 'cs', 'ss', 'ds', 'fs', 'gs')]
+        self.pending = None
+        self.hook = cpu.hook_add(UC_HOOK_CODE, self.before)
+
+    def complete(self):
+        if self.pending is None:
+            return
+        target, tables = self.pending
+        selector = self.cpu.reg_read(self.registers[target])
+        if selector & 0xfffc == 0:
+            self.caches[target] = (selector, 0, 0, 0, 0)
+        else:
+            offset = selector & 0xfff8
+            raw = tables[(selector >> 2) & 1][offset:offset + 8]
+            if len(raw) != 8:
+                raise ValueError('successful original reload outside captured table window')
+            self.caches[target] = self.decode(selector, int.from_bytes(raw, 'little') | (1 << 40))
+        self.pending = None
+
+    def before(self, cpu, address, size, unused):
+        self.complete()
+        target = data_reload_target(bytes(cpu.mem_read(address, size)))
+        if target is not None:
+            tables = self.capture.table_context
+            self.pending = (target, tuple(bytes(cpu.mem_read(tables[name]['base'],
+                                                           tables[name]['limit'] + 1))
+                                          for name in ('gdtr', 'ldtr')))
+
+    def finish(self):
+        self.complete()
+        self.cpu.hook_del(self.hook)
+
+
 def restore(capture):
     """Return a fresh Unicorn CPU with the captured zero-base ring-3 context.
 
