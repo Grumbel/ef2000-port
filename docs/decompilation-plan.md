@@ -8404,3 +8404,32 @@ tests.test_asm_c_program and the synthetic instruction comparison matrix in
 tests.test_asm_to_c; tracker check; git diff --check. No gameplay or UI runs.
 ENTER, PUSHA/POPA, far loads, WAIT/x87 and descriptor reloads remain unwired;
 reliable bulk translation remains incomplete.
+
+### 2026-11-17 — Regenerate bulk C and recover captured 0x604 execution
+
+Regenerated the pinned inventory with descriptor-aware XLAT, scalar stack,
+near CALL, LEAVE and string translations. Direct closure remains 2528
+bodies (4143 syntactically supported); this work changes descriptor-mode
+execution coverage, not body inventory. Compared with the November 16 scalar
+snapshot, 2172 generated bodies lose 24438 unconditional descriptor-mode
+instruction guards. These counts are coverage indicators, not equivalence
+claims or recovered-function tracker promotions.
+
+Compiled the complete regenerated program as a warning-free host library
+(-O0, C99, -Wall -Wextra -Werror), retaining the existing unchanged narrow
+and binary x87 backends. Reused the pinned EFCAP002 input for 0x604 with
+its original 64 MiB RAM, selectors, descriptor caches and x87 state.
+The full-state comparison now passes with no differences; the earlier
+scalar snapshot stopped at entry with C status 7. Original execution used
+the independent native x87 oracle (no x87 operations occurred on this path).
+This is one captured path, not universal equivalence or gameplay validation.
+
+Evidence (ignored): local/asm-c-segment-stack-string-program-20261117/
+contains generated C, provenance report and descriptor-guard delta;
+local/asm-c-segment-stack-string-capture-20261117/ contains the reproducible
+check.py, host unit/library, compile log, capture/source/library hashes and
+comparison report. The translated 0x604 unit also compiles warning-free
+with wcc386 -bt=dos -3r -za99 -w1 -we. Tracker check and git diff --check
+pass. No synthetic corpus rerun, gameplay or UI session. Remaining segment
+reload, compound stack, x87 and fault-path coverage keeps the reliable bulk
+translation goal open.
