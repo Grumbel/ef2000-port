@@ -9753,3 +9753,44 @@ each. The generated eight-form fixture in
 `-q -bt=dos -3r -za99 -w1 -we`, with zero diagnostics. Tracker and diff checks
 pass. No original-game whole-body equivalence, bulk coverage increase, tracker
 promotion, runtime splice or gameplay result is claimed.
+
+### 2026-11-17: validate current descriptor bytes before non-null reloads
+
+Non-null segment reloads remain a concrete blocker for e7d27 and other
+captured paths. Reusing a previously loaded cache is invalid when table RAM
+has changed. Before extending the explicit-state ABI with current GDT/LDT
+context, `tools/asm_segments.py` now provides a separate, side-effect-free
+lookup primitive. It accepts an already selected table base/limit and current
+guest RAM, checks selector width/nullness, table extent, address overflow and
+RAM extent, decodes the descriptor, and validates data/stack load rights.
+Success returns a candidate cache with accessed rights plus the access-byte
+address; installation and the actual accessed-bit RAM write remain the
+loader's responsibility. Errors leave outputs and RAM untouched. Null data
+selectors continue to use the existing path; LDT entry zero is not null.
+
+Load privilege rules follow Intel's MOV protected-mode operation and exception
+conditions (Intel SDM Volume 2B, MOV):
+https://cdrdv2-public.intel.com/825757/253667-sdm-vol-2b.pdf
+Readable conforming code is distinguished from data/nonconforming code.
+This helper does not deliver architectural exceptions, select a table,
+install a cache, implement SS interrupt inhibition or enable any new generated
+path. In particular, non-null reloads still fail closed. The next integration
+must supply live table context, retain guest table writes, commit the accessed
+bit with cache installation, and derive differential cache expectations from
+original execution rather than the C result.
+
+`python3 -m unittest tests.test_asm_segments` passes 8,192 lookup privilege
+combinations (256 access bytes, four CPLs, four RPLs, data/stack), including
+unchanged RAM/output rejection checks, plus table/RAM bounds, same-selector
+changed-table bytes and descriptor decoding. These are specification-based
+checks, not 8,192 original/C comparisons. A standalone lookup/access wrapper
+in `local/asm-segment-lookup-20261117/lookup.c` compiles with pinned Watcom
+`-q -bt=dos -3r -za99 -w1 -we` with zero diagnostics. The generated runtime
+header changes, but its state layout and enabled reload semantics do not.
+No tracker promotion, bulk coverage increase or runtime integration is claimed.
+The combined segment tests and 80-case captured null-reload regression pass
+(four unittest methods). A standalone lookup/access wrapper in
+`local/asm-segment-lookup-20261117/lookup.c` compiles with pinned Watcom using
+`-q -bt=dos -3r -za99 -w1 -we` without diagnostics. Tracker/diff checks pass.
+No tracker promotion, new bulk closure, original-game equivalence, splice or
+replay is claimed.
