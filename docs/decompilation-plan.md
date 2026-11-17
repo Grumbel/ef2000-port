@@ -11900,3 +11900,13 @@ eight TOP positions. At 2**63 both instructions leave TOP, tags and the
 operand unchanged and set C2. All ten oracle tests passed with pinned
 Unicorn. These observations are available for future translator
 comparisons. The generator still rejects both instructions.
+
+2026-11-18 — Added F2XM1, FYL2X and FPREM to the independent native
+x87 oracle. Exact-operand probes cover physical register preservation,
+TOP and tags at all eight stack positions, plus FPREM quotient bits.
+All eleven oracle tests passed with pinned Unicorn. In the current
+bulk snapshot, 366 rejected entries list only roots whose primary
+diagnostics are among the eight observed transcendental and remainder
+instructions. This is a prioritization figure from the reported root
+reasons. It does not predict how many bodies will generate after those
+instructions are implemented.
