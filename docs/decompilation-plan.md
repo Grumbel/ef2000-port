@@ -8978,3 +8978,24 @@ checks two flags states each against original execution, and compiles five
 body/dispatcher units with OpenWatcom without diagnostics. All six comparisons
 pass full GPR/flags/RAM checks. These are individual jump-site checks, not
 whole-body or dynamic-target coverage proof; no tracker promotion is made.
+
+### 2026-11-17: translate observed data16 aliases
+
+The scalar renderer accepts checked `data16` aliases for `66 8C /r` and
+`66 8E /r` segment-register MOVs with WORD memory operands, plus the observed
+`66 F3 A4` REP MOVSB form. It validates opcode, ModRM segment selection,
+operand direction and width rather than discarding arbitrary operand-size
+prefixes. MOVSB remains byte-sized with 32-bit ECX/ESI/EDI; segment stores
+remain 16-bit writes. Descriptor-backed segment reloads retain their existing
+rejection: this change does not supply current-table lookup/cache updates.
+
+Validation: `tests.test_asm_c_program` and
+`tests.test_asm_to_c.TranslationTests.test_data16_aliases_reject_unsupported_encodings`
+pass (14 tests). The new cases compare eight prepared states plus a ring-3
+captured state for each of ES/DS WORD stores and prefixed REP MOVSB, checking
+full registers, flags and RAM. Eight unsupported/mismatched alias spellings
+are rejected. `local/asm-c-data16-20261117/check.py` translates and compiles
+six actual prefixed instruction sites from 0x109e6f, 0x110fd4, 0x120ad0,
+0x120bc0 and 0x120c06 with OpenWatcom without diagnostics. These isolated
+site objects are compilation evidence, not original whole-body equivalence
+or a new bulk coverage count. No tracker states are promoted.

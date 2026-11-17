@@ -616,6 +616,30 @@ def string_instruction_c(mnemonic, text, repeat, pc, next_pc):
 
 
 def instruction_c(insn, starts):
+    if insn['mnemonic'] == 'data16':
+        encoded = bytes.fromhex(insn['bytes'])
+        parts = insn['operands'].split(None, 1)
+        if not parts:
+            raise Unsupported('unsupported data16 spelling')
+        mnemonic, text = parts[0], parts[1] if len(parts) > 1 else ''
+        if encoded == b'\x66\xf3\xa4' and mnemonic == 'rep':
+            # Operand size has no effect on MOVSB; address size remains 32.
+            if text != 'movs BYTE PTR es:[edi],BYTE PTR ds:[esi]':
+                raise Unsupported('unsupported data16 MOVSB spelling')
+        elif (len(encoded) >= 3 and encoded[0] == 0x66 and
+              encoded[1] in (0x8c, 0x8e) and encoded[2] >> 6 != 3 and
+              mnemonic == 'mov'):
+            arguments = [operand(part) for part in text.split(',')]
+            if len(arguments) != 2:
+                raise Unsupported('unsupported data16 segment MOV operands')
+            seg, mem = arguments if encoded[1] == 0x8e else arguments[::-1]
+            if (seg[0] != 'seg' or seg[1] != ((encoded[2] >> 3) & 7) or
+                    mem[0] != 'mem' or width_of(mem) != 16 or
+                    (encoded[1] == 0x8e and seg[1] == 1)):
+                raise Unsupported('unsupported data16 segment MOV operands')
+        else:
+            raise Unsupported('unsupported data16 encoding/spelling')
+        insn = dict(insn, mnemonic=mnemonic, operands=text)
     mnemonic, text = insn['mnemonic'], insn['operands']
     next_pc = insn['address'] + len(bytes.fromhex(insn['bytes']))
     if mnemonic in ('loop', 'loope', 'loopz', 'loopne', 'loopnz', 'jecxz', 'jcxz'):

@@ -47,6 +47,36 @@ def inventory(root, source):
 @unittest.skipUnless(all(shutil.which(tool) for tool in ('as', 'objcopy', 'nm', 'cc')),
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_data16_segment_stores_and_byte_repeat(self):
+        from dataclasses import replace
+        from tests.test_asm_capture import fixture
+        sources = [
+            '.byte 0x66,0x8c,0x05\n.long 0x2000\nret',
+            '.byte 0x66,0x8c,0x1d\n.long 0x2000\nret',
+            'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\n.byte 0x66\nrep movsb\nret',
+        ]
+        for source in sources:
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, _ = inventory(root, '.type root,@function\nroot: '+source+
+                                                 '\n.size root, .-root')
+                asm_c_program.generate(directory, root/'out', image)
+                report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=8)
+                self.assertEqual(report['entries'][0]['counts'], {'pass': 8}, report)
+                function = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                     ctypes.c_uint32, ctypes.c_uint32]
+                capture = fixture()
+                ram = bytearray(capture.guest_ram)
+                ram[:image.stat().st_size] = image.read_bytes()
+                ram[0x2000:0x2008] = b'abcdefgh'
+                capture = replace(capture, address=0x100,
+                                  registers=dict(capture.registers, eip=0x100), guest_ram=bytes(ram))
+                result = asm_c_differential.isolated_probes(
+                    function, b'', 0x100, 1, 100, True, captured=capture)[0]
+                self.assertEqual(result['state'], 'pass', result)
+
     def test_legacy_notrack_rejects_other_encodings(self):
         for encoded, text in [('ff6576', 'jmp DWORD PTR [ebp+0x76]'),
                               ('3eff5576', 'call DWORD PTR [ebp+0x76]'),

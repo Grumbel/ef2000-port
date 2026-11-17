@@ -271,6 +271,19 @@ class TranslationTests(unittest.TestCase):
                                               mnemonic='aam', operands=operand),
                                           {0x100, 0x100+len(bytes.fromhex(encoded))})
 
+    def test_data16_aliases_reject_unsupported_encodings(self):
+        for encoded, text in [('f3a4', 'rep movs BYTE PTR es:[edi],BYTE PTR ds:[esi]'),
+                              ('66f3a5', 'rep movs BYTE PTR es:[edi],BYTE PTR ds:[esi]'),
+                              ('66f3a4', 'rep movs WORD PTR es:[edi],WORD PTR ds:[esi]'),
+                              ('668c00', 'mov DWORD PTR [eax],es'),
+                              ('668c00', 'mov WORD PTR [eax],ds'),
+                              ('668e08', 'mov cs,WORD PTR [eax]'),
+                              ('6690', ''), ('6690', 'nop')]:
+            with self.subTest(encoded=encoded, text=text), self.assertRaises(asm_to_c.Unsupported):
+                asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                          mnemonic='data16', operands=text),
+                                      {0x100, 0x100+len(bytes.fromhex(encoded))})
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_aam_values_bases_flags_and_zero_base_fault(self):
         flags = [0x202 | carry | auxiliary | overflow
