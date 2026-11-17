@@ -747,6 +747,8 @@ def instruction_c(insn, starts):
         encoded = bytes.fromhex(insn['bytes'])
         if len(encoded) != 2 or not 0xd8 <= encoded[0] <= 0xdf or encoded[1] < 0xc0:
             raise Unsupported('unsupported x87 stack encoding')
+        if mnemonic == 'fldl2e' and encoded != b'\xd9\xea':
+            raise Unsupported('x87 constant encoding/spelling mismatch')
         code += ['a = ef_x87_stack(s, %d, %d); if (a) return a;' % (operation, argument),
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], ((encoded[0] & 7) << 8) | encoded[1])]

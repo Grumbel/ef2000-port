@@ -8572,3 +8572,27 @@ coverage target: its current translation is blocked by unsupported FLDL2E.
 Other retained snapshots mostly lack descriptor context, target excluded
 interrupt helpers, or contain relocated hybrid addresses. Broader captured
 execution, ENTER and descriptor reloads remain open.
+
+### 2026-11-17 — Translate the x87 FLDL2E constant load
+
+Added FLDL2E to the explicit-state stack helper and instruction renderer,
+with exact D9 EA encoding validation. The extended log2(e) significand
+selects its last bit using rounding control; precision control does not
+narrow the constant and no precision exception is introduced. Existing
+push, stack-overflow, pending-exception, tag and environment handling is
+retained. The native original-execution oracle now admits this instruction;
+the generated implementation still executes no original instructions.
+
+Expanded the hardware stack comparison to 192,512 raw cases and 3,008
+rendered cases, varying all four rounding modes, all three supported
+precision settings, TOP, occupancy and masked/unmasked stack faults.
+Added both flat and descriptor-backed full-state constant-store paths
+against the native oracle. Validation: tests.test_asm_x87_stack,
+tests.test_asm_x87_oracle and tests.test_asm_capture (12 passing); a
+standalone generated FLDL2E/RET unit compiled warning-free with OpenWatcom;
+git diff --check. No gameplay runs.
+
+Reading the complete `0xdcb96` body also exposed F2XM1 and FSCALE after
+FLDL2E. Thus that retained EFCAP002 capture is not unlocked by this change,
+and no claim of a newly verified original function is made. The preceding
+full-corpus compile evidence applies to its pinned pre-FLDL2E sources.

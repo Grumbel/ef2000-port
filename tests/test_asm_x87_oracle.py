@@ -144,6 +144,7 @@ class OracleTests(unittest.TestCase):
                    'fnstcw word ptr [0x300200]\nfnstsw word ptr [0x300202]\nret',
                    'mov word ptr [0x300100],0xffff\nfldcw word ptr [0x300100]\nret',
                    'fld1\nfstp tbyte ptr [0x300200]\nfld tbyte ptr [0x300200]\nret',
+                   'fldl2e\nfstp tbyte ptr [0x300200]\nret',
                    'fldz\nfchs\nfabs\nfld st(0)\nfxch st(1)\nfstp st(1)\nffree st(0)\nfincstp\nfdecstp\nret']
         for source in sources:
             with self.subTest(source=source), tempfile.TemporaryDirectory() as temporary:

@@ -77,6 +77,7 @@ class AsmCaptureTests(unittest.TestCase):
             'fninit\nfild word ptr [0x2000]\nfstp tbyte ptr [0x2200]\nret',
             'fninit\nfld dword ptr [0x2000]\nfstp tbyte ptr [0x2200]\nret',
             'fninit\nfld tbyte ptr fs:[0x2000]\nfstp tbyte ptr [0x2200]\nret',
+            'fninit\nfldl2e\nfstp tbyte ptr [0x2200]\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
