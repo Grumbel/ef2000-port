@@ -10945,3 +10945,34 @@ decomp/src/network_service_list.c --compiler <pinned-wcc386>
 --output local/network-service-list-20261117.obj; pinned-Unicorn Python
 local/network-service-list-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover provider selection 0x34140
+
+Recover 151-byte EAX selection-record callback (table pointer 0x12bb88; no
+direct inventory callers). Assert inline number-text offset +0x3f. Preserve
+unchecked parsed index minus one, conditional provider-open call, checked
+window/widget lookup, name show, selected flag, fresh index read for name
+copy and final dialog action. The shown name is selected before the show;
+the stored name uses the index after show. Record signature/globals.
+
+Scoped comparison exposed generated ABI inference putting guest_fn_e1744's
+argument on stack despite original call-site EAX setup. Add explicit EAX/AL
+pragma with conservative EAX/ECX/EDX clobbers. Inspect original e1744: it is
+an unsupported-operation error stub and does not consume EAX. Preserving the
+call-site register contract does not implement DirectPlay. Recompile affected
+runtime_helpers28.c as well as new module: both clean Watcom.
+
+Twenty-four original/emitted-body comparisons under explicit parser, provider,
+error, lookup, show, copy and final-action models match traces, saved EBX/EDX,
+ESP and all RAM except code placement/stack scratch. Cover parsed values
+0/1/3, both query/open outcomes and show-driven selected-index mutation. Error
+model deliberately returns and normalizes helper-register versus original
+cdecl message passing; actual fatal behavior and actual callees are not
+proved. Other registers, flags and stack scratch excluded. No binary identity
+or splice/replay claim; retain exclusion. Report:
+local/network-service-open-source-20261117/report.json SHA-256
+157f4fb7490e84874a05d2755f59020d8469b6781cfc3fa7a6513135536b6849.
+Tracker: 3432 compiles, 800 blocked. Commands: tools/ef2000_wcc.py on
+network_service_open.c and runtime_helpers28.c with pinned compiler;
+pinned-Unicorn Python local/network-service-open-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

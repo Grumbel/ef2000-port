@@ -7680,3 +7680,14 @@ void show_network_service_list_340a4(ef_addr32 root);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux show_network_service_list_340a4 parm [eax] modify [eax]
 #endif
+
+void open_network_service_34140(ef_addr32 selection);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux open_network_service_34140 parm [eax] modify [eax ecx esi edi ebp]
+#endif
+
+/* Call sites pass the selected provider in EAX. The German executable's
+ * unsupported-provider stub ignores it; keep it in-register, not on stack. */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_e1744 parm [eax] value [al] modify [eax ecx edx]
+#endif
