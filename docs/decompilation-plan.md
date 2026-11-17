@@ -10464,3 +10464,27 @@ positions, FPATAN result placement/pop/tag effects, and FSIN/FCOS range rejectio
 at 2**63 with unchanged operand and C2 set. This enables independent observations
 for the three large trigonometric dependency roots; it does not implement their
 C semantics, establish general transcendental equivalence or promote tracker rows.
+
+
+### 2026-11-17 — Generated file wrappers use the real overlay drive
+
+Added `runtime/asm_dos_file_service.{hpp,cpp}`, a native dispatcher callback
+for the four audited seek/write/device-query interrupt sites. It uses the
+existing DosDrive backend and the same register/error/flat-address policy as
+the hybrid interpreter, including full ECX buffer counts, signed CX:DX seeks,
+upper-DX preservation and numeric DOS errors. Unknown requests reject unchanged.
+This is host service plumbing, not recovered original extender semantics.
+
+`python3 -m unittest tests.test_asm_dos_file_service` passes: real temporary
+file write/seek/device queries, exact guest-state preservation, error bounds,
+rejected requests and overlay/original contents. C++17 compilation uses
+-Wall -Wextra -Werror. Pinned Unicorn Python running
+`local/asm-dos-file-cluster-20261117/native.py` passes four standard full-state
+comparisons of the actual generated eight-body cluster, with independent real
+DosDrive instances for original/generated runs (append/ordinary writes and
+valid/invalid handles). Service buffers are immutable prepared data in these
+probes; no general memory-changing service comparison is claimed. Both runs'
+exact service traces and final overlay/original files match. Report SHA-256:
+`32a4f79388b20d5c53119c24f2216394c2848abac9ef4efe545fba573e0fd9e8`.
+The callback remains opt-in for the native runner, not interactive hybrid wiring;
+tracker states and original-service fidelity claims remain unchanged.

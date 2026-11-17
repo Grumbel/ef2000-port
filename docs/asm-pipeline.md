@@ -1351,3 +1351,16 @@ Captured RAM cannot be resized through this option. Payloads and return-stack
 slots must fit the prepared mapping; the stop address and deterministic scratch
 region retain their usual locations. Larger mappings enable evidence for more
 runtime globals; they do not establish that a probe represents a captured call.
+
+`runtime/asm_dos_file_service.cpp` provides the native-runner callback
+`ef_asm_dos_file_service` with an `ef2000::DosDrive*` context. Compile it and
+`runtime/dos_drive.cpp` as C++17 against the generated `ef_lift_state.h`, and
+pass the callback/context to `ef_lift_run_services`. It accepts only INT21 at
+fa973/1103b7 (AH=42 seek), 1103e0 (AH=40 write), and 1101c7 (AX=4400 device
+query). Unknown site/vector/function/context requests return 0x122 unchanged.
+The callback follows the existing hybrid runtime's flat-address file policy,
+32-bit buffer counts and copy-on-write overlay; numeric DOS errors become
+CF/EAX. Other host failures propagate. This is an adapter to the existing
+runtime service policy, not an implementation of the original DOS extender.
+It is not yet selected by the interactive hybrid command, and does not handle
+open/read/close, DPMI, segment changes or general interrupt dispatch.
