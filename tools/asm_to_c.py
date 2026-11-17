@@ -806,7 +806,8 @@ def instruction_c(insn, starts):
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.
     stack_operation = asm_x87.stack_operation(mnemonic, text)
-    memory_compare = mnemonic in ('fcom', 'fcomp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
+    integer_compare = mnemonic in ('ficom', 'ficomp') and text.strip().lower().startswith(('word ptr ', 'dword ptr '))
+    memory_compare = integer_compare or mnemonic in ('fcom', 'fcomp') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     memory_binary = mnemonic in ('fadd', 'fmul', 'fsub', 'fsubr', 'fdiv', 'fdivr') and text.strip().lower().startswith(('dword ptr ', 'qword ptr '))
     try:
         binary_operation = None if memory_binary else asm_x87.binary_register(insn)
@@ -821,8 +822,14 @@ def instruction_c(insn, starts):
         op = operand(text)
         try:
             if memory_compare:
-                encoding, group = (0xd8 if width_of(op) == 32 else 0xdc), (3 if mnemonic == 'fcomp' else 2)
-                helper = 'ef_x87_compare_memory(s, b, %d, %d)' % (width_of(op), mnemonic == 'fcomp')
+                width = width_of(op)
+                pop = mnemonic in ('fcomp', 'ficomp')
+                if integer_compare:
+                    encoding = 0xde if width == 16 else 0xda
+                else:
+                    encoding = 0xd8 if width == 32 else 0xdc
+                group = 3 if pop else 2
+                helper = 'ef_x87_compare_memory(s, b, %d, %d, %d)' % (width, pop, integer_compare)
             elif memory_binary:
                 encoding = 0xd8 if width_of(op) == 32 else 0xdc
                 group, operation, reverse = {'fadd': (0, 0, 0), 'fmul': (1, 2, 0),

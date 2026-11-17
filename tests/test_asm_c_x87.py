@@ -25,6 +25,33 @@ def seeded_x87():
 @unittest.skipUnless(unicorn and all(shutil.which(t) for t in ('as', 'objcopy', 'cc')),
                      'requires Unicorn, binutils and C compiler')
 class X87StateTests(unittest.TestCase):
+    def test_signed_integer_memory_comparisons(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            (root / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+            for width, opcode, minimum, maximum in (
+                    ('word', 0x615, -32768, 32767),
+                    ('dword', 0x215, -2147483648, 2147483647)):
+                for mnemonic, pop in (('ficom', 0), ('ficomp', 1)):
+                    for value in (minimum, 0, maximum):
+                        with self.subTest(width=width, mnemonic=mnemonic, value=value):
+                            image, record = assemble(root,
+                                f'mov {width} ptr [0x300100], {value}\nfldz\n'
+                                f'{mnemonic} {width} ptr [0x300100]\nret')
+                            code = root / 'compare.c'
+                            code.write_text(asm_to_c.translate(record))
+                            library = root / f'{width}-{mnemonic}-{value}.so'
+                            subprocess.run(['cc', '-shared', '-fPIC', str(code),
+                                            '-o', str(library)], check=True)
+                            function = ctypes.CDLL(str(library)).ef_lift_00000100
+                            function.argtypes = [ctypes.POINTER(diff.State), ctypes.c_uint32]
+                            function.restype = ctypes.c_uint
+                            result = diff.compare(function, image.read_bytes(), 0x100,
+                                                  [0, 0, 0, 0, 0x3f0000, 0, 0, 0], 0x202)
+                            # Unicorn leaves FOP at zero for these memory operations.
+                            self.assertEqual(result['differences'], [
+                                f'x87_opcode: C={opcode + 8 * pop:#x} x86=0x0'])
+
     def test_old_state_abi_is_rejected_before_compilation(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

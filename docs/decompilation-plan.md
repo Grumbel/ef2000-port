@@ -11834,3 +11834,10 @@ CLI.
 2026-11-18 — Bulk translation reports now carry the validated omission
 list from the inventory manifest. A full run accounted for all 4,294
 tracker entries with 4,281 translation results and 13 missing bodies.
+
+2026-11-18 — The generator handles FICOM and FICOMP with signed 16- and
+32-bit memory operands through the existing integer conversion and
+comparison helpers. Twelve synthetic cases cover both widths and pop
+forms at each signed extreme and zero. Unicorn agrees on the compared
+state except FOP, which it leaves zero for these instructions. This
+instruction support does not resolve the error body's table ownership.

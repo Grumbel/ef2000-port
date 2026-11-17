@@ -443,8 +443,24 @@ static unsigned ef_x87_store_integer(ef_lift_state *s, uint32_t address, unsigne
 '''
 
 INTEGER_LOAD_RUNTIME = r'''
+static void ef_x87_signed_integer_bits(uint64_t magnitude, unsigned width, uint32_t value[3]) {
+    uint32_t exponent, negative;
+    negative = (unsigned)(magnitude >> (width-1));
+    if (negative) {
+        /* Unsigned negation also handles INT64_MIN without signed UB. */
+        magnitude = (uint64_t)0 - magnitude;
+        if (width != 64) magnitude &= ((uint64_t)1 << width) - 1u;
+    }
+    exponent = 0;
+    if (magnitude) {
+        exponent = 16446u;
+        while (!(magnitude & ((uint64_t)1 << 63))) { magnitude <<= 1; --exponent; }
+    }
+    value[0] = (uint32_t)magnitude; value[1] = (uint32_t)(magnitude >> 32);
+    value[2] = exponent | (negative ? 0x8000u : 0u);
+}
 static unsigned ef_x87_load_integer(ef_lift_state *s, uint32_t address, unsigned width) {
-    uint32_t value[3], exponent, negative;
+    uint32_t value[3];
     uint64_t magnitude;
     unsigned destination = (ef_x87_index(s, 0) + 7u) & 7u;
     if (width != 16 && width != 32 && width != 64) return 9;
@@ -459,19 +475,7 @@ static unsigned ef_x87_load_integer(ef_lift_state *s, uint32_t address, unsigned
         s->x87_status &= ~0x200u;
         magnitude = ef_read(s, address, width == 64 ? 32 : width);
         if (width == 64) magnitude |= (uint64_t)ef_read(s, address + 4u, 32) << 32;
-        negative = (unsigned)(magnitude >> (width-1));
-        if (negative) {
-            /* Unsigned negation also handles INT64_MIN without signed UB. */
-            magnitude = (uint64_t)0 - magnitude;
-            if (width != 64) magnitude &= ((uint64_t)1 << width) - 1u;
-        }
-        exponent = 0;
-        if (magnitude) {
-            exponent = 16446u;
-            while (!(magnitude & ((uint64_t)1 << 63))) { magnitude <<= 1; --exponent; }
-        }
-        value[0] = (uint32_t)magnitude; value[1] = (uint32_t)(magnitude >> 32);
-        value[2] = exponent | (negative ? 0x8000u : 0u);
+        ef_x87_signed_integer_bits(magnitude, width, value);
     }
     ef_x87_put(s, destination, value); ef_x87_top(s, destination);
     return 0;
@@ -644,15 +648,17 @@ static unsigned ef_x87_compare_register(ef_lift_state *s, unsigned index, unsign
     return ef_x87_compare_values(s, s->x87[top], index == 8 ? zero : s->x87[other],
         ef_x87_empty(s, top) || (index != 8 && ef_x87_empty(s, other)), quiet, pop, 0);
 }
-static unsigned ef_x87_compare_memory(ef_lift_state *s, uint32_t address, unsigned width, unsigned pop) {
+static unsigned ef_x87_compare_memory(ef_lift_state *s, uint32_t address, unsigned width, unsigned pop, unsigned integer) {
     uint32_t value[3], low, high = 0;
     unsigned top = ef_x87_index(s, 0), flags;
-    if (width != 32 && width != 64) return 9;
+    if (integer ? (width != 16 && width != 32) : (width != 32 && width != 64)) return 9;
     if (s->x87_status & 0x80u) return 8;
     if (s->memory_size < width/8u || address > s->memory_size-width/8u) { s->fault = 3; return 3; }
-    low = ef_read(s, address, 32);
+    low = ef_read(s, address, width == 16 ? 16 : 32);
     if (width == 64) high = ef_read(s, address+4u, 32);
-    flags = ef_x87_real_bits(low, high, width, value);
+    flags = 0;
+    if (integer) ef_x87_signed_integer_bits(low, width, value);
+    else flags = ef_x87_real_bits(low, high, width, value);
     return ef_x87_compare_values(s, s->x87[top], value, ef_x87_empty(s, top), 0, pop, (flags & 2u) != 0);
 }
 '''
