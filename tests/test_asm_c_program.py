@@ -582,6 +582,115 @@ leaf: ret
         self.assertEqual(asm_c_program.root_blockers(dependencies, {5}, reasons),
                          {1: [3, 4], 2: [3, 4], 3: [3], 4: [4]})
 
+    def test_port_boundaries_preserve_state_and_request_exact_width(self):
+        forms = [('in', 'al,dx'), ('in', 'ax,dx'), ('in', 'eax,dx'),
+                 ('out', 'dx,al'), ('out', 'dx,ax'), ('out', 'dx,eax'),
+                 ('in', 'al,0x80'), ('in', 'ax,0x80'), ('in', 'eax,0x80'),
+                 ('out', '0x80,al'), ('out', '0x80,ax'), ('out', '0x80,eax')]
+        source = '\n'.join('.org 0x%x\n.type f%d,@function\nf%d: %s %s\nret\n.size f%d, .-f%d' %
+                           (0x100 + n*16, n, n, op, operands, n, n)
+                           for n, (op, operands) in enumerate(forms))
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            self.assertFalse(asm_c_program.analyse(records)[2])
+            self.assertEqual(len(asm_c_program.analyse(records, port_boundaries=True,
+                                                      port_sites={0x100})[2]), 1)
+            out = root/'out'
+            report = asm_c_program.generate(directory, out, image, port_boundaries=True)
+            with self.assertRaisesRegex(ValueError, 'service-aware'):
+                asm_c_differential.verify(out, root/'evidence', image, scenarios=1)
+            with self.assertRaisesRegex(ValueError, 'require port boundaries'):
+                asm_c_program.generate(directory, root/'bad', image, port_sites={0x100})
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, sorted(out.glob('*.c'))), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'program.so'))
+            run = library.ef_lift_run
+            run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+            callback_type = ctypes.CFUNCTYPE(ctypes.c_uint, ctypes.POINTER(asm_c_differential.State),
+                                             ctypes.c_uint32, ctypes.c_uint, ctypes.c_void_p)
+            service_run = library.ef_lift_run_services
+            service_run.argtypes = run.argtypes + [callback_type, ctypes.c_void_p]
+            requests = report['host_port_service_boundaries']['requests']
+            self.assertEqual(len(requests), 12)
+            for request in requests:
+                with self.subTest(request=request):
+                    memory = bytearray(4096)
+                    memory[:image.stat().st_size] = image.read_bytes()
+                    memory[0x800:0x804] = (0xf00).to_bytes(4, 'little')
+                    array = (ctypes.c_uint8 * len(memory)).from_buffer(memory)
+                    state = asm_c_differential.State(
+                        (ctypes.c_uint32 * 8)(0xabcd1234, 2, 0xbeef03da, 4, 0x800, 6, 7, 8),
+                        0xad7, request['ip'], 0, array, len(memory))
+                    before, ram_before = bytes(state), bytes(memory)
+                    self.assertEqual(run(ctypes.byref(state), 1, 0xf00), request['status'])
+                    self.assertEqual(state.pc, request['ip'] + request['length'])
+                    state.pc = request['ip']
+                    self.assertEqual(bytes(state), before)
+                    self.assertEqual(bytes(memory), ram_before)
+                    events = []
+                    @callback_type
+                    def service(guest, ip, status, context):
+                        events.append((ip, status))
+                        if request['direction'] == 'in':
+                            mask = (1 << request['width']) - 1
+                            guest.contents.r[0] = (guest.contents.r[0] & ~mask) | (0x87654321 & mask)
+                        return 0
+                    # One instruction consumes the complete fuel unit, including service.
+                    self.assertEqual(service_run(ctypes.byref(state), 1, 0xf00, service, None), 1)
+                    self.assertEqual(events, [(request['ip'], request['status'])])
+                    self.assertEqual(service_run(ctypes.byref(state), 1, 0xf00, service, None), 0)
+                    self.assertEqual(state.pc, 0xf00)
+                    self.assertEqual(state.r[4], 0x804)
+                    self.assertEqual(state.flags, 0xad7)
+                    mask = (1 << request['width']) - 1
+                    expected = ((0xabcd1234 & ~mask) | (0x87654321 & mask)
+                                if request['direction'] == 'in' else 0xabcd1234)
+                    self.assertEqual(state.r[0], expected)
+                    self.assertEqual(list(state.r)[1:4], [2, 0xbeef03da, 4])
+                    self.assertEqual(list(state.r)[5:], [6, 7, 8])
+                    self.assertEqual(bytes(memory), ram_before)
+                    if unicorn:
+                        from unicorn import x86_const as x86
+                        cpu = unicorn.Uc(unicorn.UC_ARCH_X86, unicorn.UC_MODE_32)
+                        cpu.mem_map(0, 4096)
+                        cpu.mem_write(0, ram_before)
+                        registers = [x86.UC_X86_REG_EAX, x86.UC_X86_REG_ECX, x86.UC_X86_REG_EDX,
+                                     x86.UC_X86_REG_EBX, x86.UC_X86_REG_ESP, x86.UC_X86_REG_EBP,
+                                     x86.UC_X86_REG_ESI, x86.UC_X86_REG_EDI]
+                        for register, value in zip(registers, [0xabcd1234, 2, 0xbeef03da, 4, 0x800, 6, 7, 8]):
+                            cpu.reg_write(register, value)
+                        cpu.reg_write(x86.UC_X86_REG_EFLAGS, 0xad7)
+                        ports = []
+                        def port_in(cpu, port, size, context):
+                            ports.append(('in', port, size))
+                            return 0x87654321 & ((1 << (size*8))-1)
+                        def port_out(cpu, port, size, value, context):
+                            ports.append(('out', port, size, value))
+                        cpu.hook_add(unicorn.UC_HOOK_INSN, port_in, None, 1, 0, x86.UC_X86_INS_IN)
+                        cpu.hook_add(unicorn.UC_HOOK_INSN, port_out, None, 1, 0, x86.UC_X86_INS_OUT)
+                        cpu.emu_start(request['ip'], 0xf00, count=2)
+                        port = 0x3da if request['port'] == 'dx' else request['port']
+                        event = (request['direction'], port, request['width']//8)
+                        if request['direction'] == 'out':
+                            event += (0xabcd1234 & mask,)
+                        self.assertEqual(ports, [event])
+                        self.assertEqual([cpu.reg_read(r) for r in registers], list(state.r))
+                        self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EFLAGS), state.flags)
+                        self.assertEqual(bytes(cpu.mem_read(0, 4096)), bytes(memory))
+
+    def test_port_service_decoder_rejects_ambiguous_encodings(self):
+        for encoded, mnemonic, operands in [('f3ec', 'in', 'al,dx'),
+                                             ('66ec', 'in', 'al,dx'),
+                                             ('ec00', 'in', 'al,dx'),
+                                             ('ec', 'in', 'eax,dx'),
+                                             ('ee', 'in', 'al,dx')]:
+            with self.subTest(encoded=encoded, operands=operands):
+                with self.assertRaises(asm_c_program.asm_to_c.Unsupported):
+                    asm_c_program.port_service_request(dict(address=0x100, bytes=encoded,
+                                                           mnemonic=mnemonic, operands=operands))
+
     def test_service_reachability_handles_cycles_and_excludes_unsupported_bodies(self):
         records = [dict(address=a, instructions=insns) for a, insns in [
             (1, []), (2, []),

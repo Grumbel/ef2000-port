@@ -415,7 +415,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
-    if manifest.get('host_service_boundaries'):
+    if manifest.get('host_service_boundaries') or manifest.get('host_port_service_boundaries'):
         raise ValueError('host service boundaries require a service-aware differential driver')
     if (manifest.get('model') not in ('flat-x86-explicit-state', 'flat-x86-program-explicit-state') or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):

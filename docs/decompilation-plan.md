@@ -11056,3 +11056,41 @@ Document usage in README. The current private reachability snapshot reports
 Validation: python3 -m unittest tests.test_decomp_status (12 PASS), including
 old-report compatibility and exclusion of nonblocked functions; status against
 local/asm-service-reachability-20261117/report.json; tracker check; diff check.
+
+### 2026-11-17: translate scalar port operations through explicit boundaries
+
+Add opt-in --port-boundaries and repeatable --port-site to the bulk translator.
+Validate exact scalar IN/OUT opcode, prefix, operand and length combinations
+for AL/AX/EAX with DX or immediate ports. Reject ambiguous/repeated forms.
+Yield without changing registers, flags or RAM; PC advances to the checked
+continuation. The service runner forwards original IP and an encoded request
+(opcode and instruction length), charges one shared fuel unit and propagates
+service errors/faults. Document the callback contract in its generated header.
+Host code must implement device effects and IN's partial accumulator update;
+no device behavior or architectural I/O privilege handling is fabricated.
+
+Record required port requests and scope in host_port_service_boundaries.
+The general differential verifier refuses these programs, just as it refuses
+unserviced interrupt programs. Default translation continues rejecting ports.
+This enables C composition across port instructions but does not establish
+that the corresponding game functions can run correctly.
+
+Pinned-Unicorn test suite: 28 PASS. Across twelve scalar encoding forms,
+compare explicit modeled port callbacks against original Unicorn execution:
+port/width/value traces, GPRs, flags and full RAM match. Also check raw yield
+state preservation, callback IP/status, partial accumulator updates, fuel,
+site restriction, malformed encodings and verifier refusal. Actual devices,
+privilege faults, timing and whole-function equivalence remain unproved.
+
+Private full-inventory snapshot local/asm-port-frontier-20261117/report.json
+SHA-256 305bae590910f8bc03b37f0aa91f6cb974612e27f95f9a866ea56b856600b145:
+3219 generated bodies / 571821 original body bytes, with 57 port requests;
+187 more bodies than the preceding 3032-body frontier. All 187 new bodies pass
+cc -std=c99 -Werror=implicit-function-declaration -fsyntax-only. Compile report
+local/asm-port-frontier-20261117/new-body-compile-report.json SHA-256
+cb2b1d9d099469c19a96ad3046736a35338a47c9730c2e4a12a2fbd35dc745a5.
+Snapshot uses preceding admitted interrupt sites and all scalar port sites;
+this is syntactic coverage with explicit service obligations, not verification.
+Tracker unchanged. Commands: pinned-Unicorn Python -m unittest
+tests.test_asm_c_program; full inventory generate(..., port_boundaries=True);
+new-body syntax checks; python3 tools/decomp_status.py check; git diff --check.

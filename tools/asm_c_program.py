@@ -49,8 +49,31 @@ def legacy_transfer(insn):
     return dict(insn, mnemonic='jmp', operands=text)
 
 
+def port_service_request(insn):
+    """Decode only scalar IN/OUT encodings; never infer device behavior."""
+    encoded = bytes.fromhex(insn['bytes'])
+    word = encoded[:1] == b'\x66'
+    body = encoded[1:] if word else encoded
+    if not body or body[0] not in (0xe4, 0xe5, 0xe6, 0xe7, 0xec, 0xed, 0xee, 0xef):
+        raise asm_to_c.Unsupported('unsupported port service encoding')
+    opcode = body[0]
+    immediate = opcode < 0xec
+    if len(body) != (2 if immediate else 1) or (word and not opcode & 1):
+        raise asm_to_c.Unsupported('unsupported port service encoding')
+    width = (16 if word else 32) if opcode & 1 else 8
+    direction = 'out' if opcode & 2 else 'in'
+    accumulator = {8: 'al', 16: 'ax', 32: 'eax'}[width]
+    port = ('0x%x' % body[1]) if immediate else 'dx'
+    operands = [accumulator, port] if direction == 'in' else [port, accumulator]
+    if insn['mnemonic'] != direction or insn['operands'].replace(' ', '').lower() != ','.join(operands):
+        raise asm_to_c.Unsupported('port service encoding/operand mismatch')
+    return dict(ip=insn['address'], direction=direction, width=width,
+                port=body[1] if immediate else 'dx', length=len(encoded),
+                status=0x1000 | (len(encoded) << 8) | opcode)
+
+
 def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
-                  interrupt_sites=None):
+                  interrupt_sites=None, port_boundaries=False, port_sites=None):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
     if (interrupt_boundaries and mnemonic == 'int' and insn['bytes'] in ('cd21', 'cd31') and
@@ -61,6 +84,13 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
         # A host-service boundary, not architectural interrupt delivery.
         # No stack frame, flag change or service result is fabricated.
         return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x100 + int(insn['bytes'][2:], 16))
+    if (port_boundaries and mnemonic in ('in', 'out') and
+            (port_sites is None or insn['address'] in port_sites)):
+        request = port_service_request(insn)
+        next_pc = insn['address'] + request['length']
+        if next_pc not in starts:
+            raise asm_to_c.Unsupported('unresolved port return continuation')
+        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, request['status'])
     indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
     if mnemonic != 'call' and not indirect:
         return asm_to_c.instruction_c(insn, starts)
@@ -90,7 +120,8 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
     return ' '.join(code)
 
 
-def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None):
+def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
+            port_boundaries=False, port_sites=None):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -123,7 +154,8 @@ def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None):
                 not ret['operands']):
             consuming_targets.add(record['address'])
     renderer = partial(instruction_c, consuming_targets=consuming_targets,
-                       interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites)
+                       interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites,
+                       port_boundaries=port_boundaries, port_sites=port_sites)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -187,6 +219,13 @@ def dispatcher(records, *, shard_entries=2048):
 #define EF_LIFT_REGISTRY_H
 #include "ef_lift_state.h"
 typedef unsigned (*ef_lift_step_function)(ef_lift_state *, uint32_t);
+/* Callback arguments: state, original instruction IP, request, context.
+ * INT requests are vectors 0x21/0x31. Port requests encode
+ * 0x1000 | (instruction_length << 8) | opcode. Decode the original bytes
+ * to distinguish operand-size prefixes and immediate ports; read DX low word
+ * for register ports. IN must update only AL/AX/EAX; OUT preserves registers.
+ * These are host policy boundaries, without architectural I/O privilege checks.
+ */
 typedef unsigned (*ef_lift_service_function)(ef_lift_state *, uint32_t, unsigned, void *);
 unsigned ef_lift_run(ef_lift_state *, uint32_t, uint32_t);
 unsigned ef_lift_run_services(ef_lift_state *, uint32_t, uint32_t,
@@ -274,6 +313,13 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
             if (s->fault) return s->fault;
             status = s->pc == stop_pc ? 0 : 1;
         }
+        if ((status & 0xf000u) == 0x1000u && service) {
+            unsigned length = (status >> 8) & 15u;
+            status = service(s, s->pc - length, status, context);
+            if (status) return status;
+            if (s->fault) return s->fault;
+            status = s->pc == stop_pc ? 0 : 1;
+        }
         if (status != 1) return status;
     }
     return s->pc == stop_pc ? 0 : 1;
@@ -302,12 +348,15 @@ def reachable_service_sites(records, dependencies, closed):
 
 
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
-             interrupt_sites=None):
+             interrupt_sites=None, port_boundaries=False, port_sites=None):
+    if port_sites is not None and not port_boundaries:
+        raise ValueError('port sites require port boundaries')
     if interrupt_sites is not None and not interrupt_boundaries:
         raise ValueError('interrupt sites require interrupt boundaries')
     manifest, records = asm_to_c.read_inventory(inventory, image)
     codes, dependencies, closed, reasons = analyse(records, interrupt_boundaries=interrupt_boundaries,
-                                                  interrupt_sites=interrupt_sites)
+                                                  interrupt_sites=interrupt_sites,
+                                                  port_boundaries=port_boundaries, port_sites=port_sites)
     blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
@@ -348,7 +397,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
     result['host_service_reachability_scope'] = (
-        'conservative direct-edge closure; dynamic targets and runtime request numbers unknown; '
+        'interrupt sites only; conservative direct-edge closure; dynamic targets and runtime request numbers unknown; '
         'reachable sites do not prove service implementation or equivalence')
     if interrupt_boundaries:
         sites = sorted((i['address'], int(i['bytes'][2:], 16))
@@ -361,6 +410,14 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
             sites=[ip for ip, vector in sites],
             requests=[dict(ip=ip, vector=vector) for ip, vector in sites],
             contract='PC is continuation; service IP is PC-2; vector is status-0x100; host must service request before resuming')
+    if port_boundaries:
+        result['host_port_service_boundaries'] = dict(
+            model='scalar-port-service-yield-v1',
+            requests=[port_service_request(i) for r in records if r['address'] in closed
+                      for i in r['instructions'] if i['mnemonic'] in ('in', 'out')],
+            contract='PC is continuation; callback IP is PC-length; request is yield status; '
+                     'host must implement IN accumulator update or OUT device effect; '
+                     'no architectural privilege checks or device behavior are implemented')
     asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
@@ -375,6 +432,10 @@ def main(argv=None):
                         help='yield INT 21h/31h to an external host service; does not implement the service')
     parser.add_argument('--interrupt-site', type=lambda value: int(value, 0), action='append',
                         help='restrict yielded INT 21h/31h sites to these instruction addresses (repeatable)')
+    parser.add_argument('--port-boundaries', action='store_true',
+                        help='yield scalar IN/OUT to a host service; does not implement devices')
+    parser.add_argument('--port-site', type=lambda value: int(value, 0), action='append',
+                        help='restrict yielded IN/OUT instruction addresses (repeatable)')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -383,7 +444,9 @@ def main(argv=None):
         workspace = asm_to_c.asm_inventory.ghidra_ef2000.validated_workspace(args.workspace)
         report = generate(args.inventory, output, workspace / 'payload.bin',
                           interrupt_boundaries=args.interrupt_boundaries,
-                          interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site))
+                          interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site),
+                          port_boundaries=args.port_boundaries,
+                          port_sites=None if args.port_site is None else frozenset(args.port_site))
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')
