@@ -9246,3 +9246,49 @@ with OpenWatcom without diagnostics. Re-analysis of the five preceding
 PUSHF-blocked bodies now reaches CPUID at 0xf2819 and CLI at 0x110f0c,
 0x110fd4, 0x1110c5 and 0x1111e1. No whole-body verification, tracker
 promotion or new closed-corpus count is claimed.
+
+### 2026-11-17: refresh bulk C after stack flags and boundary repairs
+
+Re-exported the same 4,280 selected functions from the repaired
+`local/ghidra-kots-branches-20261117` workspace using its fresh Ghidra body
+ranges. The byte-checked normalized inventory is
+`local/asm-refreshed-body-inventory-20261117`; generation output is
+`local/asm-c-refreshed-program-20261117`. The translation report SHA-256 is
+`97b68ea7f70e89c147a039e386e915fa5663d56d1378d1291464ed22de625fff`.
+
+There are now 4,162 syntactically supported bodies and 2,572 bodies whose
+direct dependencies are also translatable, covering 423,515 original body
+bytes. Compared with the preceding bulk snapshot, five bodies (3,507 bytes)
+are added and none removed: 0x222 (9), 0xee22c (3,350), 0xee3ce (82),
+0xee420 (28), and 0xef41f (38). The checked combined CS/data16 segment MOV
+in 0x222 unlocks the other four through direct dependencies. Existing closed
+bodies have unchanged generated source hashes. The repaired 0xbfcc and
+0x522c bodies no longer fail on unresolved external branches, but still need
+untranslated callees; PUSHF/POPF bodies now expose CLI/CPUID blockers.
+
+The 1,708 remaining unsupported bodies have first-failure classifications:
+1,590 untranslated direct dependencies, 101 unsupported instructions,
+16 fallthroughs outside the body, and one overlapping count-branch path.
+Instruction failures are INT (59), IN (12), CLI (8), OUT (6), FPATAN (3),
+FYL2X and LSL (2 each), and one each of FCOS, FSIN, FPREM, FPTAN, F2XM1,
+CPUID, FSINCOS, FNSAVE and STI. These are first failures, not an exhaustive
+instruction census. Interrupt and I/O service semantics must be recovered;
+no successful-return or no-op substitute is counted as translation.
+
+The manual tracker still has 810 blocked rows (457,749 bytes), including
+303 rows (157,174 tracker bytes) in this generated but unverified set.
+Historical triage notes do not represent current renderer capability.
+No tracker state is promoted: direct-edge closure does not establish dynamic
+target coverage, whole-program linkage, or behavioral equivalence.
+
+OpenWatcom evidence is `local/asm-c-refreshed-watcom-20261117/report.json`
+(SHA-256 `9cdb3a45badec080dfa8d334ba7d1bf446c89b5889c2cdc8eb53df4e50560e01`).
+All 2,638 units have successful, diagnostic-free compilation evidence:
+71 newly compiled units (five bodies plus 66 dispatcher/support units), and
+2,567 unchanged body results reused from the preceding complete build.
+The local check verifies the compiler, source, object and shared state-header
+hashes before reuse; ordinary body sources include only that unchanged
+state header. Registry consumers are rebuilt. Compiler flags remain
+`-q -bt=dos -3r -za99 -w1 -we`. An initial redundant rebuild was interrupted;
+its partial output is not used as proof. This refresh required no gameplay
+runs. `python3 tools/decomp_status.py check` and `git diff --check` pass.
