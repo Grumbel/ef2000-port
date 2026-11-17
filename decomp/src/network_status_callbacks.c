@@ -58,12 +58,3 @@ void net_set_nonentry_flag_35e90(ef_addr32 widget)
 {
     open_rx_status(widget);
 }
-
-/* 35eb8, 75 bytes: the two display options are complementary and tied to
- * the live network-type flag at 13578d, not to a cached UI checkbox. */
-void net_new_type_35eb8(ef_addr32 widget)
-{
-    uint32_t enabled = EF_U8(0x13578du) != 0u;
-    guest(0xa73ccu, widget, 0x183114u, enabled);
-    guest(0xa73ccu, widget, 0x18311cu, enabled ^ 1u);
-}

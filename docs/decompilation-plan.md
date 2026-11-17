@@ -11657,3 +11657,23 @@ Commands: tools/ef2000_wcc.py decomp/src/network_directplay_list.c --compiler
 <pinned-wcc386> --output local/network-directplay-list-20261117.obj;
 pinned-Unicorn Python local/network-directplay-list-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover network type display callback
+
+Recovered 35eb8 (75 bytes) into network_type_callback.c with real a73cc
+calls. Confirm EAX root, six preserved GPRs, type byte normalized once before
+either call and complementary EBX flags for names 183114/18311c. Callback
+slot 12b5e8, no direct callers. Watcom zero warnings.
+128 scoped compiled-C/original-ASM comparisons PASS executing original
+a73cc flag setter; lookup and refresh modeled. Cover four type bytes,
+four existing widget flag patterns, suppressed/active refresh, missing widgets,
+and type mutation by callbacks. Compare traces, six saved GPRs, ESP and
+5 MiB RAM excluding code placement/stack scratch. Scratch EAX, flags, stack
+and actual integration remain unproved. Keep hybrid excluded, state compiles.
+Tracker 3455 compiles / 777 blocked / 454038 blocked body bytes.
+Private report local/network-type-source-20261117/report.json, SHA-256
+5f24a5ec44430278f0fd456acc7c0f9ff461964f572de3e4bc2b8ef1e80e5424.
+Commands: tools/ef2000_wcc.py decomp/src/network_type_callback.c --compiler
+<pinned-wcc386> --output local/network-type-20261117.obj;
+pinned-Unicorn Python local/network-type-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
