@@ -9794,3 +9794,41 @@ The combined segment tests and 80-case captured null-reload regression pass
 `-q -bt=dos -3r -za99 -w1 -we` without diagnostics. Tracker/diff checks pass.
 No tracker promotion, new bulk closure, original-game equivalence, splice or
 replay is claimed.
+
+### 2026-11-17: install data-segment caches from opt-in live tables
+
+The descriptor lookup primitive is now connected to the explicit-state data
+segment loader. State ABI 5 adds an opt-in table mask and current GDT/LDT
+base/limit pairs. A non-null ES/DS/FS/GS reload selects its table from TI,
+looks up current bounded guest RAM, rejects unsupported bases/modes, writes
+the accessed bit, and installs the candidate cache and visible selector.
+All validation precedes these commits. Descriptor snapshots are never reused
+as the source of a reload. The ctypes state mirrors the new ABI; old generated
+ABI-4 artifacts must be regenerated before differential verification.
+
+SS reloads remain unsupported because interrupt/debug inhibition is absent.
+Nonzero bases, long-mode descriptors and conforming-code caches remain
+unsupported by this profile. The latter have a distinct access-rule audit
+pending despite the lookup primitive understanding their load privileges.
+Table windows must be explicitly supplied by the caller; automatic capture
+wiring is not enabled yet. It must check that captured table bytes really
+live in bounded RAM and compare cache changes against original execution.
+
+`AsmCaptureTests.test_live_table_reload_observes_guest_writes` passes eight
+whole-call original/C cases: four data segment registers, each through GDT
+and LDT. Guest instructions change descriptor limit/type bytes before the
+reload; LDT cases reload the same visible selector, proving the old cache
+is not reused. All cases compare complete 256-KiB RAM (including accessed-bit
+writes), GPRs, flags, PC and visible selectors, plus the installed cache decoded
+from original table RAM. Table configuration remains unchanged. Forty further
+C rejection checks cover disabled tables, short table limits, truncated RAM,
+nonzero bases and unsupported mode bits without register/cache/RAM changes.
+
+The generated loader fixture in `local/asm-live-reload-20261117/lift.c`
+compiles with pinned Watcom using `-q -bt=dos -3r -za99 -w1 -we`, with zero
+diagnostics. No original-game whole-body equivalence, tracker promotion,
+runtime integration, bulk closure increase or replay is claimed.
+`python3 -m unittest tests.test_asm_capture tests.test_asm_segments
+ tests.test_asm_c_program` passes all 26 methods, including the preceding
+80 null-reload cases and 8,192 lookup privilege combinations. Tracker and
+diff checks pass.

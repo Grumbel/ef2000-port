@@ -346,6 +346,101 @@ class AsmCaptureTests(unittest.TestCase):
                                 self.assertEqual(state.r[4], regs['esp'] + (2 if form == 'popw' else 4))
                                 self.assertEqual(state.segment[index], selector)
 
+    @unittest.skipUnless(all(shutil.which(tool) for tool in ('cc', 'as', 'objcopy', 'objdump')),
+                         'requires C compiler and GNU binutils')
+    def test_live_table_reload_observes_guest_writes(self):
+        from tools import asm_to_c, asm_segments
+        from tests.test_asm_to_c import assemble
+        from unicorn import x86_const
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            for segment in ('es', 'ds', 'fs', 'gs'):
+                for table_index, selector in ((0, 19), (1, 7)):
+                    with self.subTest(segment=segment, table=table_index):
+                        capture = fixture()
+                        tables = copy.deepcopy(capture.table_context)
+                        tables['gdtr']['bytes'] += struct.pack('<Q', 0x0040f2000000ffff)
+                        tables['gdtr']['limit'] = 23
+                        target = tables[('gdtr', 'ldtr')[table_index]]['base'] + (selector & 0xfff8)
+                        source = ('mov word ptr ds:[%d],0xffff\nmov byte ptr ds:[%d],0xf2\n'
+                                  'mov %s,bx\nmov eax,%s:[0x2000]\nret' %
+                                  (target, target+5, segment, segment))
+                        image, record = assemble(root, source)
+                        ram = bytearray(0x40000)
+                        ram[:len(capture.guest_ram)] = capture.guest_ram
+                        ram[:image.stat().st_size] = image.read_bytes()
+                        for name in ('gdtr', 'ldtr'):
+                            table = tables[name]
+                            ram[table['base']:table['base']+len(table['bytes'])] = table['bytes']
+                        ram[0x2000:0x2004] = struct.pack('<I', 0x12345678)
+                        regs = dict(capture.registers, eip=0x100, ebx=selector)
+                        regs[segment] = 7
+                        tables['descriptors'][segment] = tables['descriptors']['ds']
+                        capture = replace(capture, address=0x100, registers=regs,
+                                          guest_ram=bytes(ram), table_context=tables)
+                        cpu = asm_capture.restore(capture)
+                        cpu.emu_start(0x100, 0x1100, count=100)
+                        self.assertEqual(cpu.reg_read(x86_const.UC_X86_REG_EIP), 0x1100)
+                        (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+                        (root/'lift.c').write_text(asm_to_c.translate(record))
+                        path = root/('%s%d.so' % (segment, table_index))
+                        subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99',
+                                        '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
+                                        str(root/'lift.c'), '-o', str(path)], check=True, capture_output=True)
+                        function = ctypes.CDLL(str(path)).ef_lift_00000100
+                        function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
+                        function.restype = ctypes.c_uint
+                        memory = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
+                        state = asm_c_differential.State(
+                            (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
+                            regs['eflags'], 0x100, 0, memory, len(ram))
+                        state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
+                        state.segment_profile = 1
+                        for n, name in enumerate(asm_to_c.SEGMENTS):
+                            state.segment_cache[n] = asm_c_differential.Segment(
+                                *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
+                        state.table_mask = 3
+                        for n, name in enumerate(('gdtr', 'ldtr')):
+                            state.table_base[n] = tables[name]['base']
+                            state.table_limit[n] = tables[name]['limit']
+                        asm_c_differential.set_x87(state, capture.x87)
+                        self.assertEqual(function(ctypes.byref(state), 100), 0)
+                        self.assertEqual(bytes(memory), bytes(cpu.mem_read(0, len(ram))))
+                        for n, name in enumerate(asm_to_c.REGS):
+                            self.assertEqual(state.r[n], cpu.reg_read(getattr(x86_const, 'UC_X86_REG_'+name.upper())))
+                        self.assertEqual(state.flags, cpu.reg_read(x86_const.UC_X86_REG_EFLAGS))
+                        self.assertEqual(state.pc, cpu.reg_read(x86_const.UC_X86_REG_EIP))
+                        for n, name in enumerate(asm_to_c.SEGMENTS):
+                            self.assertEqual(state.segment[n], cpu.reg_read(getattr(x86_const, 'UC_X86_REG_'+name.upper())))
+                        cache = state.segment_cache[asm_to_c.SEGMENTS.index(segment)]
+                        raw = int.from_bytes(cpu.mem_read(target, 8), 'little')
+                        self.assertEqual(tuple(getattr(cache, n) for n, _ in asm_c_differential.Segment._fields_),
+                                         asm_segments.descriptor(selector, raw))
+                        self.assertEqual(raw >> 40 & 255, 0xf3)
+                        self.assertEqual((state.table_mask, list(state.table_base), list(state.table_limit)),
+                                         (3, [tables[n]['base'] for n in ('gdtr', 'ldtr')],
+                                          [tables[n]['limit'] for n in ('gdtr', 'ldtr')]))
+                        for failure in ('disabled', 'table-limit', 'ram-limit', 'nonzero-base', 'long-mode'):
+                            state.fault = 0
+                            state.pc = next(i['address'] for i in record['instructions']
+                                            if i['mnemonic'] == 'mov' and i['operands'].startswith(segment+','))
+                            state.r[0] = 0xdeadbeef
+                            state.table_mask = 0 if failure == 'disabled' else 3
+                            state.table_limit[table_index] = ((selector & 0xfff8)+6 if failure == 'table-limit'
+                                                             else tables[('gdtr', 'ldtr')[table_index]]['limit'])
+                            state.memory_size = target+7 if failure == 'ram-limit' else len(ram)
+                            saved = bytes(memory[target:target+8])
+                            if failure == 'nonzero-base':
+                                memory[target+2] = 0x80
+                            if failure == 'long-mode':
+                                memory[target+6] |= 0x20
+                            before = (list(state.r), list(state.segment), state.flags,
+                                      bytes(state.segment_cache), bytes(memory))
+                            self.assertEqual(function(ctypes.byref(state), 1), 7, failure)
+                            self.assertEqual((list(state.r), list(state.segment), state.flags,
+                                              bytes(state.segment_cache), bytes(memory)), before, failure)
+                            memory[target:target+8] = saved
+
     def test_restore_privilege_memory_tables_and_physical_x87(self):
         from unicorn import UcError, x86_const
         capture = fixture()

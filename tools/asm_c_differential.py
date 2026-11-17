@@ -44,7 +44,9 @@ class State(ctypes.Structure):
                 ('x87_cs', ctypes.c_uint32), ('x87_dp', ctypes.c_uint32),
                 ('x87_ds', ctypes.c_uint32), ('x87_opcode', ctypes.c_uint32),
                 ('x87_compare_profile', ctypes.c_uint32),
-                ('segment_profile', ctypes.c_uint32), ('segment_cache', Segment * 6)]
+                ('segment_profile', ctypes.c_uint32), ('segment_cache', Segment * 6),
+                ('table_mask', ctypes.c_uint32), ('table_base', ctypes.c_uint32 * 2),
+                ('table_limit', ctypes.c_uint32 * 2)]
 
 
 X87_FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',

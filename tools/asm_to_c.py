@@ -26,7 +26,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
 SEGMENTS = ('es', 'cs', 'ss', 'ds', 'fs', 'gs')
-STATE_ABI = 4
+STATE_ABI = 5
 REG = {name: (index, 32, 0) for index, name in enumerate(REGS)}
 for index, name in enumerate(('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')):
     REG[name] = (index, 16, 0)
@@ -66,6 +66,9 @@ typedef struct {
     uint32_t x87_compare_profile;
     uint32_t segment_profile; /* 0=legacy aliases, 1=descriptor-derived caches. */
     ef_lift_segment segment_cache[6];
+    /* Opt-in live table windows in bounded RAM: bit 0=GDT, bit 1=LDT.
+     * Bases/limits describe loaded table context, not saved descriptors. */
+    uint32_t table_mask, table_base[2], table_limit[2];
 } ef_lift_state;
 static unsigned ef_segments_valid(ef_lift_state *s) {
     unsigned i;
@@ -100,8 +103,25 @@ static void ef_load_segment(ef_lift_state *s, unsigned index, uint32_t selector)
         return;
     }
     if (s->segment_profile) {
-        /* Reloads require current table lookup, even for the same selector:
-         * table memory may have changed since its cache was loaded. */
+        if (s->segment_profile == 1 && index < 6 && index != 1 && index != 2) {
+            unsigned table = (selector >> 2) & 1u;
+            uint32_t access_address;
+            ef_lift_segment candidate;
+            if ((s->table_mask & (1u << table)) &&
+                !ef_segment_lookup(s->memory, s->memory_size,
+                                   s->table_base[table], s->table_limit[table],
+                                   selector, s->segment[1] & 3u, 0,
+                                   &candidate, &access_address) &&
+                !candidate.base && !(candidate.flags & 2u) &&
+                /* Conforming-code access checks need a separate audit. */
+                (candidate.access & 12u) != 12u) {
+                s->memory[access_address] |= 1u;
+                s->segment_cache[index] = candidate;
+                s->segment[index] = selector;
+                return;
+            }
+        }
+        /* SS loads also need interrupt/debug inhibition, not modeled here. */
         s->fault = 7; return;
     }
     if (index == 1 || (index == 2 && selector != 16 && selector != 24) ||
