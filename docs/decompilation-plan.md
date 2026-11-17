@@ -10241,3 +10241,32 @@ release semantics. These are deliberately narrower than whole-state evidence.
 Reproducer: local/heap-release-source-20261117/check.py; report.json SHA-256
 c840b27a5f9f0531b136b2ba01355c80a9708463c4a4418547d60196a38415ab.
 Tracker/diff checks pass. No gameplay runs.
+
+### 2026-11-17: recover mode-1 allocator C including DOS fallback
+
+Add decomp/src/heap_alloc_mode1.c for original 0x10d689 (211 bytes),
+with explicit semantic service boundaries in ef_heap_services.h. Recover
+cleanup-before-allocation, DPMI handle stores (including the success/null
+address case), backing headers, reservation cap, size limit, two DOS
+allocations, unconditional temporary release after the second request, and
+selector-base result consumption without testing carry. Encode the original
+RCL/ROR DOS result convention explicitly instead of assuming an X-32 pointer.
+Record EAX size/result and preserved registers from original pushes/pops,
+shared epilogue and the only direct caller found, 10d75c@10d78f.
+Name the fallback reservation-size global. Services remain unresolved and
+this source does not claim the original guest register/flag ABI is reproduced.
+The tracker stays blocked; generated service-dependent admission is unchanged.
+
+Pinned Watcom -q -bt=dos -3r -zp1 -za99 -w1 -we -i=decomp/include
+compiles the new source without diagnostics. Focused original-Unicorn versus
+recovered-host-C evidence passes 108 cases: DPMI success, failure and success
+with address zero; temporary/second DOS allocation failures; DOS success;
+sizes 0,1,7,16,65536,65537; reservation globals 0,0xfffff,0xf0000000.
+Return addresses, RAM (except original stack scratch) and ordered service
+arguments match. Tests also inject ignored DOS release and selector-base
+carry failures. Cleanup has an empty list here; its nonempty cases were
+checked separately. Full register/flag ABI and actual extender behavior are
+outside this evidence. Reproducer: local/heap-mode1-source-20261117/check.py;
+report.json SHA-256:
+d2efd036867dbb5e8e4635a320796017173a58bbdc4af46b5503211a18d8a980.
+Tracker/diff checks pass. No gameplay runs.
