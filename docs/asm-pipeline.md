@@ -1290,3 +1290,19 @@ differential driver rejects these reports until a service-aware driver is
 provided. Other vectors, prefixed forms and missing continuations remain
 unsupported. The runtime byte guards still check the original instruction
 before yielding. No ABI layout change is needed.
+
+The low-level `asm_c_differential.compare(..., program=True,
+service_factory=...)` API supports register-only service models. The factory
+must create independent, identically initialized handlers for the original
+and translated executions. Each handler receives `(interrupt_ip, registers)`
+with full-width `ax,cx,dx,bx,sp,bp,si,di,flags` and returns the same keys.
+The original hook and C boundary use that same interface; request/response
+traces are recorded and compared as well as final guest state. The C driver
+steps one instruction at a time to preserve the total instruction budget
+across yields. Service rejection on the original path is inconclusive.
+
+This interface cannot service memory writes or selector changes. The existing
+`serve_startup_int21` plus separate `Allocation` instances can exercise X-32
+break adjustment through it. Such evidence proves translation relative to
+that service model, not independent correctness of the model. The general
+verification CLI continues to reject boundary-enabled reports.

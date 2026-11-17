@@ -10060,3 +10060,30 @@ host-returned CF through the next ADC and returns through the original
 stack. All three generated fixture units compile with pinned Watcom
 `-q -bt=dos -3r -za99 -w1 -we`. Tracker and diff checks pass. No gameplay
 runs or original-game equivalence claim.
+
+### 2026-11-17: compare translated interrupt callers through the X-32 model
+
+Extend low-level `asm_c_differential.compare` with an explicit service factory
+creating independent original/C register-service handlers. Original INT21
+hooks and translated yield events use the same register contract, record
+request/response traces, and compare them alongside the full existing guest
+state/RAM comparison. The translated dispatcher consumes a single instruction
+per call so service resumption cannot reset the total instruction budget.
+Original service rejection is inconclusive. Memory/selector-changing services
+and the general verification CLI are still unsupported.
+
+A synthetic X-32 heap-growth wrapper passes four requested-break cases using
+`serve_startup_int21` and independent `Allocation` models; the models' final
+state is also checked. An exhausted request is inconclusive. The actual
+0x235/0x23b pair in `local/asm-int21-break-20261117` generates and compiles
+with pinned Watcom and passes 48 original/C calls: both entries, six request
+values and four incoming flag states, including skip and page-rounding paths.
+Complete guest state/RAM and service traces match; independent allocation
+instances end identically. Report SHA-256:
+`9a443dc7f430e12d84e83a1cd7fd6660138414e567ffd80b77b60116ef6a659c`.
+This compares original wrapper instructions against translated C under the
+shared service model, not the original extender implementation. It does not
+verify the handwritten draft, integrate the runtime bridge, admit general
+interrupts or promote tracker coverage. All 20 methods in
+`tests.test_asm_c_program` pass with Unicorn (18.3 seconds); tracker/diff
+checks pass. No gameplay runs.

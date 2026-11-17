@@ -591,6 +591,51 @@ ret
             self.assertEqual(state.r[4], 0x804)
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_interrupt_bridge_matches_original_x32_heap_growth(self):
+        from tools.unicorn_backend import serve_startup_int21
+        from tools.x32_allocation import Allocation
+        source = '''.org 0x240
+.type root,@function
+root: mov ax,0x3508
+nop
+int 0x21
+adc eax,0
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root/'out'
+            asm_c_program.generate(directory, out, image, interrupt_boundaries=True)
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, sorted(out.glob('*.c'))), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            function = ctypes.CDLL(str(root/'program.so')).ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                 ctypes.c_uint32, ctypes.c_uint32]
+            for requested in (0x4df000, 0x4df001, 0x4e0000, 0x4e1001):
+                allocations = []
+                def factory():
+                    allocation = Allocation()
+                    allocations.append(allocation)
+                    return lambda ip, regs: serve_startup_int21(ip, regs, allocation)
+                with self.subTest(requested=requested):
+                    result = asm_c_differential.compare(
+                        function, image.read_bytes(), 0x240,
+                        [0xabcd0000, requested, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                        program=True, service_factory=factory)
+                    self.assertEqual(result['state'], 'pass', result)
+                    self.assertEqual(len(result['host_services']['original']), 1)
+                    self.assertEqual(allocations[0], allocations[1])
+                    self.assertEqual(allocations[0].heap_end, (requested+4095)&~4095)
+            result = asm_c_differential.compare(
+                function, image.read_bytes(), 0x240,
+                [0, 0x5000000, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                program=True, service_factory=factory)
+            self.assertEqual(result['state'], 'inconclusive', result)
+            self.assertIn('service unavailable', result['reason'])
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_instruction_budget_is_shared_across_calls_and_can_resume(self):
         source = '''.type root,@function
 root: call leaf
