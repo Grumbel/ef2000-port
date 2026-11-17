@@ -173,12 +173,12 @@ class OracleTests(unittest.TestCase):
             signal.signal(signal.SIGUSR1, previous_handler)
             signal.pthread_sigmask(signal.SIG_SETMASK, previous_mask)
 
-    def compiled(self, root, source):
+    def compiled(self, root, source, *flags):
         image, record = assemble(root, source)
         (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
         (root/'lifted.c').write_text(asm_to_c.translate(record))
         subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra', '-Werror',
-                        '-Wno-unused-function', str(root/'lifted.c'), '-o', str(root/'lifted.so')], check=True)
+                        '-Wno-unused-function', *flags, str(root/'lifted.c'), '-o', str(root/'lifted.so')], check=True)
         library = ctypes.CDLL(str(root/'lifted.so'))
         function = library.ef_lift_00000100
         function.argtypes, function.restype = [ctypes.POINTER(diff.State), ctypes.c_uint32], ctypes.c_uint
@@ -254,6 +254,19 @@ class OracleTests(unittest.TestCase):
                                 f'{mnemonic} {width} ptr [0x300100]\nret')
                             result = self.compare(function, payload)
                             self.assertEqual(result['state'], 'pass', result)
+
+    def test_generated_native_registers_match_full_state(self):
+        from tests.test_asm_c_x87 import seeded_x87
+        for mnemonic in ('f2xm1', 'fyl2x', 'fptan', 'fpatan', 'fprem', 'fsincos', 'fsin', 'fcos'):
+            with self.subTest(mnemonic=mnemonic), tempfile.TemporaryDirectory() as temporary:
+                payload, function = self.compiled(Path(temporary), mnemonic + '\nret',
+                                                  '-D_GNU_SOURCE', '-DEF_LIFT_ENABLE_NATIVE_X87')
+                for top in range(8):
+                    initial = dict(seeded_x87(), x87_status=top << 11)
+                    initial['x87'] = [[0, 0x80000000, 0x3ffe] for _ in range(8)]
+                    initial['x87_tag'] = 3 << (2 * ((top - 1) & 7))
+                    result = self.compare(function, payload, initial_x87=initial)
+                    self.assertEqual(result['state'], 'pass', result)
 
     def test_hardware_result_does_not_waive_any_compared_state(self):
         with tempfile.TemporaryDirectory() as temporary:

@@ -662,3 +662,123 @@ static unsigned ef_x87_compare_memory(ef_lift_state *s, uint32_t address, unsign
     return ef_x87_compare_values(s, s->x87[top], value, ef_x87_empty(s, top), 0, pop, (flags & 2u) != 0);
 }
 '''
+
+NATIVE_BACKEND = 'native-x87-register-v1'
+NATIVE_DEFINE = '#define EF_LIFT_NEEDS_NATIVE_X87 1\n'
+NATIVE_ENABLE = 'EF_LIFT_ENABLE_NATIVE_X87'
+
+NATIVE_REGISTER = {
+    'f2xm1': 0xf0, 'fyl2x': 0xf1, 'fptan': 0xf2, 'fpatan': 0xf3,
+    'fprem': 0xf8, 'fsincos': 0xfb, 'fsin': 0xfe, 'fcos': 0xff,
+}
+
+
+def native_runtime():
+    """Emit fixed generic opcodes, independent of the input executable."""
+    opening = r'''
+#if defined(EF_LIFT_NEEDS_NATIVE_X87) && !defined(EF_LIFT_NATIVE_X87_RUNTIME)
+#define EF_LIFT_NATIVE_X87_RUNTIME
+#if defined(EF_LIFT_ENABLE_NATIVE_X87)
+#if defined(__WATCOMC__) && defined(__386__)
+'''
+    declaration = 'static void ef_x87_%s(uint8_t *saved, uint8_t *image)'
+    watcom = [
+        declaration % name + ';\n' +
+        '#pragma aux ef_x87_%s = "fnsave [eax]" "frstor [edx]" "%s" '
+        '"fnsave [edx]" "frstor [eax]" parm [eax] [edx] modify exact [];' % (name, name)
+        for name in NATIVE_REGISTER
+    ]
+    gcc = [
+        declaration % name + r''' {
+    __asm__ volatile("fnsave (%0); frstor (%1); ''' + name + r'''; fnsave (%1); frstor (%0)"
+                     : : "r"(saved), "r"(image) : "memory");
+}''' for name in NATIVE_REGISTER
+    ]
+    dispatch = [
+        '    case 0x%02xu: ef_x87_%s(saved, image); break;' % (opcode, name)
+        for name, opcode in NATIVE_REGISTER.items()
+    ]
+    return (opening + '\n'.join(watcom) +
+            '\n#elif defined(__GNUC__) && defined(__linux__) && (defined(__i386__) || defined(__x86_64__))\n' +
+            '#include <signal.h>\n#include <sys/resource.h>\n' +
+            '\n'.join(gcc) + r'''
+#else
+#error EF_LIFT_ENABLE_NATIVE_X87 requires GNU Linux x86 or OpenWatcom 386
+#endif
+
+/* FSAVE uses little-endian words and stores ST(0)..ST(7) in logical order. */
+static void ef_x87_image_put(uint8_t *p, uint32_t value, unsigned width) {
+    unsigned byte;
+    for (byte = 0; byte < width; ++byte) p[byte] = (uint8_t)(value >> (byte * 8));
+}
+static uint32_t ef_x87_image_get(const uint8_t *p, unsigned width) {
+    uint32_t value = 0;
+    unsigned byte;
+    for (byte = 0; byte < width; ++byte) value |= (uint32_t)p[byte] << (byte * 8);
+    return value;
+}
+#endif
+
+static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
+#if defined(EF_LIFT_ENABLE_NATIVE_X87)
+    uint8_t saved[108], image[108] = {0};
+    uint8_t *slot;
+    uint32_t *value;
+    unsigned logical;
+#if defined(__linux__)
+    sigset_t blocked, original;
+    struct rusage before, after;
+    int sampled;
+#endif
+    if ((s->x87_status & 0x80u) || (s->x87_status & ~s->x87_control & 0x3fu)) return 8;
+    ef_x87_image_put(image, s->x87_control, 2);
+    ef_x87_image_put(image + 4, s->x87_status, 2);
+    ef_x87_image_put(image + 8, s->x87_tag, 2);
+    ef_x87_image_put(image + 18, s->x87_opcode, 2);
+    for (logical = 0; logical < 8; ++logical) {
+        slot = image + 28 + 10 * logical;
+        value = s->x87[ef_x87_index(s, logical)];
+        ef_x87_image_put(slot, value[0], 4);
+        ef_x87_image_put(slot + 4, value[1], 4);
+        ef_x87_image_put(slot + 8, value[2], 2);
+    }
+#if defined(__linux__)
+    /* Signal return and preemption can lose hardware x87 metadata on AMD. */
+    if (sigfillset(&blocked) || sigprocmask(SIG_BLOCK, &blocked, &original)) return 9;
+    if (getrusage(RUSAGE_THREAD, &before)) {
+        sigprocmask(SIG_SETMASK, &original, 0);
+        return 9;
+    }
+#endif
+    switch (opcode) {
+''' + '\n'.join(dispatch) + r'''
+    default:
+#if defined(__linux__)
+        sigprocmask(SIG_SETMASK, &original, 0);
+#endif
+        return 9;
+    }
+#if defined(__linux__)
+    sampled = getrusage(RUSAGE_THREAD, &after);
+    if (sigprocmask(SIG_SETMASK, &original, 0) || sampled ||
+        before.ru_nvcsw != after.ru_nvcsw || before.ru_nivcsw != after.ru_nivcsw) return 9;
+#endif
+    s->x87_status = ef_x87_image_get(image + 4, 2);
+    s->x87_tag = ef_x87_image_get(image + 8, 2);
+    s->x87_opcode = ef_x87_image_get(image + 18, 2) & 0x7ffu;
+    for (logical = 0; logical < 8; ++logical) {
+        slot = image + 28 + 10 * logical;
+        value = s->x87[ef_x87_index(s, logical)];
+        value[0] = ef_x87_image_get(slot, 4);
+        value[1] = ef_x87_image_get(slot + 4, 4);
+        value[2] = ef_x87_image_get(slot + 8, 2);
+    }
+    return 0;
+#else
+    (void)s;
+    (void)opcode;
+    return 9;
+#endif
+}
+#endif
+''')

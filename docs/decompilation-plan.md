@@ -11923,3 +11923,15 @@ control, status, tag and sign bytes. Private reproduction is in
 CPU or emulator's x87 semantics. Generator integration still needs an
 explicit target contract, pending-exception handling and tests for host
 state isolation and guest instruction metadata.
+
+2026-11-18 — Connected the opt-in native x87 register backend for F2XM1,
+FYL2X, FPTAN, FPATAN, FPREM, FSINCOS, FSIN and FCOS. The differential
+suite compared generated C with the native reference for each opcode
+at every TOP, and 45 oracle and whole-program generator tests passed.
+The unchanged corpus and boundary settings now yield 3,686 generated
+entries and 595 rejections. All 83 newly generated bodies compiled
+without diagnostics with OpenWatcom and cover 36,123 original body
+bytes. The report is under `local/asm-native-x87-20261118/`. This is
+generation and compilation evidence. Tracker promotion and corpus-wide
+behavioral verification remain pending. FNSAVE and FSCALE are the
+largest remaining x87 root diagnostics among blocked tracker rows.

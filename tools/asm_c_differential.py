@@ -546,9 +546,14 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     sources = [directory / e['file'] for e in artifacts if e['file'].endswith('.c')]
     needs_narrow = any(asm_to_c.asm_x87.NARROW_DEFINE in source.read_text() for source in sources)
     needs_binary = any(asm_to_c.asm_x87.BINARY_DEFINE in source.read_text() for source in sources)
+    needs_native = any(asm_to_c.asm_x87.NATIVE_DEFINE in source.read_text() for source in sources)
     expected_backends = [asm_to_c.asm_x87.NARROW_BACKEND] if needs_narrow else []
     if needs_binary:
         expected_backends.append(asm_to_c.asm_x87.BINARY_BACKEND)
+    if needs_native:
+        expected_backends.append(asm_to_c.asm_x87.NATIVE_BACKEND)
+        if x87_oracle != 'hardware':
+            raise ValueError('native x87 translations require --x87-oracle hardware')
     if manifest.get('required_backends', []) != expected_backends:
         raise ValueError('translation backend declaration mismatch')
     if needs_narrow:
@@ -589,7 +594,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         objects.mkdir()
         for source in sources:
             obj = objects / (source.stem + '.obj')
-            result = subprocess.run([watcom, '-bt=dos', '-3r', '-za99', '-w1', '-we',
+            native_flag = ['-d' + asm_to_c.asm_x87.NATIVE_ENABLE] if needs_native else []
+            result = subprocess.run([watcom, *native_flag, '-bt=dos', '-3r', '-za99', '-w1', '-we',
                                      '-i=' + str(directory), '-fo=' + str(obj), str(source)],
                                     capture_output=True, text=True)
             log = result.stdout + result.stderr
@@ -606,6 +612,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                               for source in sources))
     command = [compiler, '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra',
                '-Werror', '-Wno-unused-function', '-I', str(directory), str(unit), '-o', str(library)]
+    if needs_native:
+        command += ['-D_GNU_SOURCE', '-D' + asm_to_c.asm_x87.NATIVE_ENABLE]
     if backend:
         command += [str(output / 'narrow-backend/narrow.so'), '-Wl,-z,defs']
     if binary_backend:

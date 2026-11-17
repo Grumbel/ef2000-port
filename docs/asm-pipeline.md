@@ -1385,3 +1385,17 @@ The configured callback `ef_asm_dos_file_service_configured` accepts an
 options used for virtual configuration-file reads. The original callback keeps
 its `DosDrive*` context ABI and defaults those options to false. Open/create
 validate a full 260-byte flat filename window, matching the hybrid bridge.
+
+The generator declares `native-x87-register-v1` when generated units use
+F2XM1, FYL2X, FPTAN, FPATAN, FPREM, FSINCOS, FSIN or FCOS. The backend
+runs a fixed instruction set against an isolated x87 save image. It
+inherits the executing CPU or emulator's numerical behavior. GNU
+Linux x86 builds enable it with `-D_GNU_SOURCE
+-DEF_LIFT_ENABLE_NATIVE_X87`, and OpenWatcom 386 builds use
+`-dEF_LIFT_ENABLE_NATIVE_X87`. The differential verifier enables these
+flags when the manifest requires this backend and requires
+`--x87-oracle hardware`. Such a comparison checks state marshaling and
+integration against the oracle on the same host. Cross-CPU numerical
+equivalence requires separate evidence. Builds without the opt-in
+flag stop at a native instruction with unsupported status. Pending
+guest x87 exceptions still stop before instruction execution.

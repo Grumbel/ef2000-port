@@ -412,7 +412,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
                           asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.ROUND_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
-RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME
+RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME + asm_x87.native_runtime()
 
 
 class Unsupported(ValueError):
@@ -867,6 +867,12 @@ def instruction_c(insn, starts):
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
                  's->x87_dp = b; s->x87_ds = s->segment[%d];' % segment]
+    elif mnemonic in asm_x87.NATIVE_REGISTER:
+        opcode = asm_x87.NATIVE_REGISTER[mnemonic]
+        if text or insn['bytes'] != 'd9%02x' % opcode:
+            raise Unsupported('unsupported x87 native register encoding/spelling')
+        code += ['a = ef_x87_native_register(s, 0x%02xu); if (a) return a;' % opcode,
+                 's->x87_ip = 0x%xu; s->x87_cs = s->segment[1];' % insn['address']]
     elif mnemonic == 'fsqrt':
         if text or insn['bytes'] != 'd9fa':
             raise Unsupported('unsupported FSQRT encoding/spelling')
@@ -1295,6 +1301,8 @@ def translate(record, *, starts=None, renderer=instruction_c):
     prefix = asm_x87.NARROW_DEFINE if any('ef_x87_store_real(' in case for case in cases) else ''
     if any('ef_x87_register_binary(' in case or 'ef_x87_memory_binary(' in case or 'ef_x87_sqrt(' in case for case in cases):
         prefix += asm_x87.BINARY_DEFINE
+    if any('ef_x87_native_register(' in case for case in cases):
+        prefix += asm_x87.NATIVE_DEFINE
     return prefix + '''/* Mechanical ASM-derived draft. NEVER COMMIT. Flat 32-bit segments only. */
 #include "ef_lift_state.h"
 unsigned ef_lift_%08x(ef_lift_state *s, uint32_t fuel) {
@@ -1407,6 +1415,9 @@ def bind_backends(report, codes):
     if any(asm_x87.BINARY_DEFINE in code for code in codes):
         report['required_backends'].append(asm_x87.BINARY_BACKEND)
         report['binary_backend_source_sha256'] = hashlib.sha256((ROOT / 'tools/asm_x87_binary.c').read_bytes()).hexdigest()
+
+    if any(asm_x87.NATIVE_DEFINE in code for code in codes):
+        report['required_backends'].append(asm_x87.NATIVE_BACKEND)
 
 
 def main(argv=None):
