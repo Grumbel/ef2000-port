@@ -8999,3 +8999,24 @@ six actual prefixed instruction sites from 0x109e6f, 0x110fd4, 0x120ad0,
 0x120bc0 and 0x120c06 with OpenWatcom without diagnostics. These isolated
 site objects are compilation evidence, not original whole-body equivalence
 or a new bulk coverage count. No tracker states are promoted.
+
+### 2026-11-17: translate ignored CS/DS prefixes on register MOVs
+
+The renderer now accepts the observed CS/DS-prefixed register-only MOV
+aliases: B8..BF imm32 and 89/8B with register ModRM. It checks prefix byte,
+register selection, operand direction/width and the encoded immediate before
+rendering. These forms have no data-memory access for a segment override to
+select; original instruction length and byte validation remain intact.
+Memory MOVs and other prefixed opcodes are not admitted by this rule. Their
+segment semantics must be handled independently.
+
+`tests.test_asm_c_program` and
+`tests.test_asm_to_c.TranslationTests.test_register_segment_prefixes_require_matching_bytes`
+pass (14 tests). Three new forms each pass eight prepared full-state probes
+and a ring-3 capture (27 comparisons); seven mismatched or unsupported
+prefix spellings are rejected. The existing data16/call/indirect-transfer
+regressions also pass. `local/asm-c-register-prefix-20261117/check.py`
+compiles all 12 observed CS/DS alias sites, from six original bodies, with
+OpenWatcom without diagnostics. This is site-level compilation evidence;
+no whole-body equivalence, updated bulk count or tracker promotion is claimed.
+`python3 tools/decomp_status.py check` and `git diff --check` pass.

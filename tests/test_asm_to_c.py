@@ -284,6 +284,19 @@ class TranslationTests(unittest.TestCase):
                                           mnemonic='data16', operands=text),
                                       {0x100, 0x100+len(bytes.fromhex(encoded))})
 
+    def test_register_segment_prefixes_require_matching_bytes(self):
+        for encoded, mnemonic, text in [('3eb801000000', 'cs', 'mov eax,0x1'),
+                                          ('3eb801000000', 'ds', 'mov ecx,0x1'),
+                                          ('3eb801000000', 'ds', 'mov eax,0x2'),
+                                          ('2e8b00', 'cs', 'mov eax,DWORD PTR [eax]'),
+                                          ('2e8bc0', 'cs', 'mov ax,ax'),
+                                          ('2e8bc0', 'cs', 'mov eax,ebx'),
+                                          ('3e90', 'ds', 'nop')]:
+            with self.subTest(encoded=encoded, text=text), self.assertRaises(asm_to_c.Unsupported):
+                asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                          mnemonic=mnemonic, operands=text),
+                                      {0x100, 0x100+len(bytes.fromhex(encoded))})
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_aam_values_bases_flags_and_zero_base_fault(self):
         flags = [0x202 | carry | auxiliary | overflow

@@ -48,13 +48,16 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
-    def test_data16_segment_stores_and_byte_repeat(self):
+    def test_data16_and_register_segment_prefixes(self):
         from dataclasses import replace
         from tests.test_asm_capture import fixture
         sources = [
             '.byte 0x66,0x8c,0x05\n.long 0x2000\nret',
             '.byte 0x66,0x8c,0x1d\n.long 0x2000\nret',
             'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\n.byte 0x66\nrep movsb\nret',
+            '.byte 0x3e\nmov ecx,0x12345678\nret',
+            '.byte 0x2e,0x8b,0xc0\nret',
+            '.byte 0x3e,0x89,0xd8\nret',
         ]
         for source in sources:
             with self.subTest(source=source), tempfile.TemporaryDirectory() as temporary:

@@ -616,6 +616,28 @@ def string_instruction_c(mnemonic, text, repeat, pc, next_pc):
 
 
 def instruction_c(insn, starts):
+    if insn['mnemonic'] in ('cs', 'ds'):
+        encoded = bytes.fromhex(insn['bytes'])
+        parts = insn['operands'].split(None, 1)
+        valid = False
+        if (len(parts) == 2 and parts[0] == 'mov' and encoded and
+                encoded[0] == (0x2e if insn['mnemonic'] == 'cs' else 0x3e)):
+            arguments = [operand(part) for part in parts[1].split(',')]
+            if len(arguments) == 2:
+                dst, src = arguments
+                if len(encoded) == 6 and 0xb8 <= encoded[1] <= 0xbf:
+                    valid = (dst == operand(REGS[encoded[1]-0xb8]) and
+                             src == ('imm', int.from_bytes(encoded[2:], 'little')))
+                elif (len(encoded) == 3 and encoded[1] in (0x89, 0x8b) and
+                      encoded[2] >> 6 == 3):
+                    reg = operand(REGS[(encoded[2] >> 3) & 7])
+                    rm = operand(REGS[encoded[2] & 7])
+                    valid = arguments == ([reg, rm] if encoded[1] == 0x8b else [rm, reg])
+        if not valid:
+            raise Unsupported('unsupported register MOV segment prefix')
+        # No data memory operand exists, so this prefix selects no segment.
+        # Retain its byte for fetch checks, length and static-code validation.
+        insn = dict(insn, mnemonic='mov', operands=parts[1])
     if insn['mnemonic'] == 'data16':
         encoded = bytes.fromhex(insn['bytes'])
         parts = insn['operands'].split(None, 1)
