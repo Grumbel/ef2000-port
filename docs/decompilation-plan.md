@@ -11367,3 +11367,33 @@ Commands: tools/ef2000_wcc.py decomp/src/network_loop_settings.c --compiler
 <pinned-wcc386> --output local/network-loop-settings-20261117.obj;
 pinned-Unicorn Python local/network-loop-settings-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17 — Translate privilege-authorized CLI
+
+Add exact-encoding CLI support to the explicit-state translator: clear only
+IF when protected-mode CPL <= IOPL. VM86 and privilege failures return
+unsupported (7), preserving state rather than inventing CR4.PVI/VME, VIF or
+#GP delivery. STI remains unsupported because its interrupt shadow is not
+modeled. No asynchronous interrupt delivery or host service is added.
+
+New synthetic checks cover IF initially clear/set, IOPL 0..3, CPL 0/3,
+VM86 rejection, zero fuel, instruction fuel/PC, unchanged RAM/registers and
+restartable rejected contexts. Four authorized ring-zero cases also compare
+against Unicorn. These checks establish only the modeled CLI scope, not
+hardware interrupt delivery or whole-function equivalence.
+
+Regeneration with all INT21/31 and scalar ports as external boundaries
+produces 3602 generated-unverified entries (previously 3599): 101f70,
+1111e1 and 11f2d3 newly enter the closure. Other CLI callers retain additional
+blockers. Tracker states stay unchanged. Private report:
+local/asm-cli-reachability-20261117/report.json, SHA-256
+1fb3ff12460a306442a193383099a6dcca62001e15ba97fd75cda1d9993f4ff7.
+Commands: python3 -m unittest tests.test_asm_cli;
+pinned-Unicorn Python -m unittest tests.test_asm_cli;
+tools/asm_c_program.py --inventory local/asm-latest-body-inventory-20261117
+--workspace local/ghidra-offset-tail-20261117
+--output local/asm-cli-reachability-20261117 --interrupt-boundaries
+--port-boundaries; python3 tools/decomp_status.py check; git diff --check.
+Regression validation: pinned-Unicorn Python -m unittest
+tests.test_asm_to_c tests.test_asm_c_program: 58/58 PASS; focused CLI
+suite: 3/3 PASS. No original-function equivalence promotion.

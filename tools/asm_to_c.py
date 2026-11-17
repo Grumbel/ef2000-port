@@ -1042,6 +1042,16 @@ def instruction_c(insn, starts):
     elif mnemonic == 'leave' and not text:
         code += ['a = ef_read_segment(s, 2, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
+    elif mnemonic == 'cli':
+        if text or insn['bytes'] != 'fa':
+            raise Unsupported('CLI encoding/spelling mismatch')
+        # Only the protected-mode case authorized by IOPL is modeled.
+        # Reject VM86 and privilege failures rather than approximating
+        # CR4.PVI/VME, VIF or a general-protection exception. CLI creates no
+        # interrupt shadow; STI must remain unsupported until that is modeled.
+        code += ['if ((s->flags & 0x20000u) ||',
+                 '    (s->segment[1] & 3u) > ((s->flags >> 12) & 3u)) return 7;',
+                 's->flags &= ~0x200u;']
     elif mnemonic in ('popf', 'popfw'):
         width = 16 if mnemonic == 'popfw' else 32
         if text or insn['bytes'] != ('669d' if width == 16 else '9d'):
