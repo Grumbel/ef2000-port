@@ -1387,7 +1387,7 @@ its `DosDrive*` context ABI and defaults those options to false. Open/create
 validate a full 260-byte flat filename window, matching the hybrid bridge.
 
 The generator declares `native-x87-register-v1` when generated units use
-F2XM1, FYL2X, FPTAN, FPATAN, FPREM, FSINCOS, FSIN or FCOS. The backend
+F2XM1, FYL2X, FPTAN, FPATAN, FPREM, FSINCOS, FSCALE, FSIN or FCOS. The backend
 runs a fixed instruction set against an isolated x87 save image. It
 inherits the executing CPU or emulator's numerical behavior. GNU
 Linux x86 builds enable it with `-D_GNU_SOURCE

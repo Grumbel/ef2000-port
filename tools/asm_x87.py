@@ -669,7 +669,7 @@ NATIVE_ENABLE = 'EF_LIFT_ENABLE_NATIVE_X87'
 
 NATIVE_REGISTER = {
     'f2xm1': 0xf0, 'fyl2x': 0xf1, 'fptan': 0xf2, 'fpatan': 0xf3,
-    'fprem': 0xf8, 'fsincos': 0xfb, 'fsin': 0xfe, 'fcos': 0xff,
+    'fprem': 0xf8, 'fsincos': 0xfb, 'fscale': 0xfd, 'fsin': 0xfe, 'fcos': 0xff,
 }
 
 

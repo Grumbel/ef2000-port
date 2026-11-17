@@ -257,7 +257,7 @@ class OracleTests(unittest.TestCase):
 
     def test_generated_native_registers_match_full_state(self):
         from tests.test_asm_c_x87 import seeded_x87
-        for mnemonic in ('f2xm1', 'fyl2x', 'fptan', 'fpatan', 'fprem', 'fsincos', 'fsin', 'fcos'):
+        for mnemonic in ('f2xm1', 'fyl2x', 'fptan', 'fpatan', 'fprem', 'fsincos', 'fscale', 'fsin', 'fcos'):
             with self.subTest(mnemonic=mnemonic), tempfile.TemporaryDirectory() as temporary:
                 payload, function = self.compiled(Path(temporary), mnemonic + '\nret',
                                                   '-D_GNU_SOURCE', '-DEF_LIFT_ENABLE_NATIVE_X87')
@@ -265,6 +265,12 @@ class OracleTests(unittest.TestCase):
                     initial = dict(seeded_x87(), x87_status=top << 11)
                     initial['x87'] = [[0, 0x80000000, 0x3ffe] for _ in range(8)]
                     initial['x87_tag'] = 3 << (2 * ((top - 1) & 7))
+                    if mnemonic == 'fscale':
+                        # ±1.5 scales by ±1 after truncation regardless of RC.
+                        initial['x87'][(top + 1) & 7] = [0, 0xc0000000, 0x3fff | ((top & 1) << 15)]
+                        initial['x87_control'] = 0x37f | ((top >> 1) << 10)
+                        observed, *_ = self.native.execute(0xd9fd, initial, b'', 0)
+                        self.assertEqual(observed['x87'][top], [0, 0x80000000, 0x3fff - 2 * (top & 1)])
                     result = self.compare(function, payload, initial_x87=initial)
                     self.assertEqual(result['state'], 'pass', result)
 

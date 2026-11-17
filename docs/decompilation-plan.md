@@ -11935,3 +11935,12 @@ bytes. The report is under `local/asm-native-x87-20261118/`. This is
 generation and compilation evidence. Tracker promotion and corpus-wide
 behavioral verification remain pending. FNSAVE and FSCALE are the
 largest remaining x87 root diagnostics among blocked tracker rows.
+
+2026-11-18 — Added FSCALE to the opt-in native register backend and
+hardware oracle. Generated C matches the full state for signed
+fractional scale operands at every TOP and across all four rounding
+modes. All twelve oracle tests passed. Bulk generation now yields
+3,701 entries with 580 rejections. All fifteen newly generated
+entries (5,368 body bytes) compiled without OpenWatcom diagnostics.
+The report is under `local/asm-fscale-20261118/`. The largest
+remaining x87 root body contains both FNSAVE and FRSTOR.
