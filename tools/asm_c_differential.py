@@ -118,7 +118,7 @@ def probes(count, seed):
 
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
-            initial_x87=None, native_x87=None, captured=None, service_factory=None):
+            initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR
     from unicorn import x86_const
 
@@ -129,14 +129,20 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     translated_service = service_factory() if service_factory else None
     original_events, translated_events = [], []
 
-    def service(handler, ip, values, event_log):
+    def service(handler, ip, values, event_log, vector=0x21):
         # Register-only services: selectors and memory-changing services need
         # a richer bridge and are deliberately outside this interface.
-        response = handler(ip, dict(values))
+        if vector != 0x21 and not vector_services:
+            raise ValueError('host service handler requires vector_services for INT31')
+        response = (handler(vector, ip, dict(values)) if vector_services else
+                    handler(ip, dict(values)))
         if set(response) != set(values) or any(type(v) is not int or not 0 <= v <= 0xffffffff
                                                for v in response.values()):
             raise ValueError('invalid host service register response')
-        event_log.append(dict(ip=ip, before=dict(values), after=dict(response)))
+        event = dict(ip=ip, before=dict(values), after=dict(response))
+        if vector_services:
+            event['vector'] = vector
+        event_log.append(event)
         return response
 
     if captured is None:
@@ -183,13 +189,13 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
     if original_service is not None:
         def interrupt(engine, vector, _):
-            if vector != 0x21:
+            if vector not in (0x21, 0x31):
                 raise ValueError('unsupported host service vector')
             values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
             response = service(original_service, engine.reg_read(x86_const.UC_X86_REG_EIP)-2,
-                               values, original_events)
+                               values, original_events, vector)
             for n, r in zip(service_names, asm_to_c.REGS):
                 engine.reg_write(getattr(x86_const, 'UC_X86_REG_'+r.upper()), response[n])
             engine.reg_write(x86_const.UC_X86_REG_EFLAGS, response['flags'])
@@ -241,11 +247,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if status == 0x121:
+            if status in (0x121, 0x131):
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
-                    response = service(translated_service, state.pc-2, values, translated_events)
+                    response = service(translated_service, state.pc-2, values, translated_events, status-0x100)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C service unavailable: '+str(error)])
                 state.r[:] = [response[n] for n in service_names]

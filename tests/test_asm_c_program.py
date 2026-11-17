@@ -573,6 +573,79 @@ ret
             with self.assertRaisesRegex(ValueError, 'require interrupt boundaries'):
                 asm_c_program.generate(directory, root/'bad', image, interrupt_sites={0x100})
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_mixed_dos_dpmi_boundaries_preserve_vector_and_shared_fuel(self):
+        source = """.type root,@function
+root: int 0x31
+adc eax,0
+int 0x21
+adc ebx,0
+ret
+.size root, .-root"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            self.assertFalse(asm_c_program.analyse(records)[2])
+            self.assertFalse(asm_c_program.analyse(
+                records, interrupt_boundaries=True, interrupt_sites={0x105})[2])
+            out = root/'out'
+            report = asm_c_program.generate(directory, out, image, interrupt_boundaries=True)
+            self.assertEqual(report['host_service_boundaries']['requests'],
+                             [dict(ip=0x100, vector=0x31), dict(ip=0x105, vector=0x21)])
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, sorted(out.glob('*.c'))), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'program.so'))
+            function = library.ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                 ctypes.c_uint32, ctypes.c_uint32]
+            def respond(vector, ip, values):
+                self.assertIn((vector, ip), ((0x31, 0x100), (0x21, 0x105)))
+                values['ax' if vector == 0x31 else 'bx'] = 41
+                values['flags'] |= 1
+                return values
+            result = asm_c_differential.compare(
+                function, image.read_bytes(), 0x100,
+                [0x501, 2, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                program=True, service_factory=lambda: respond, vector_services=True)
+            self.assertEqual(result['state'], 'pass', result)
+            self.assertEqual([e['vector'] for e in result['host_services']['original']],
+                             [0x31, 0x21])
+            # Legacy INT21-only handlers must reject DPMI rather than misroute it.
+            result = asm_c_differential.compare(
+                function, image.read_bytes(), 0x100,
+                [0x501, 2, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                program=True, service_factory=lambda: lambda ip, values: values)
+            self.assertEqual(result['state'], 'inconclusive', result)
+            memory = bytearray(4096)
+            memory[:image.stat().st_size] = image.read_bytes()
+            memory[0x800:0x804] = (0xf00).to_bytes(4, 'little')
+            array = (ctypes.c_uint8 * len(memory)).from_buffer(memory)
+            state = asm_c_differential.State(
+                (ctypes.c_uint32 * 8)(0x501, 2, 3, 4, 0x800, 6, 7, 8),
+                0x246, 0x100, 0, array, len(memory))
+            run = library.ef_lift_run_services
+            callback_type = ctypes.CFUNCTYPE(ctypes.c_uint,
+                ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
+                ctypes.c_uint, ctypes.c_void_p)
+            run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
+                            ctypes.c_uint32, ctypes.c_void_p, ctypes.c_void_p]
+            self.assertEqual(run(ctypes.byref(state), 1, 0xf00, None, None), 0x131)
+            self.assertEqual(state.pc, 0x102)
+            state.pc = 0x100
+            events = []
+            @callback_type
+            def callback(guest, ip, vector, context):
+                events.append((ip, vector))
+                guest.contents.r[0 if vector == 0x31 else 3] = 41
+                guest.contents.flags |= 1
+                return 0
+            self.assertEqual(run(ctypes.byref(state), 3, 0xf00, callback, None), 1)
+            self.assertEqual(events, [(0x100, 0x31), (0x105, 0x21)])
+            self.assertEqual((state.pc, state.r[0], state.r[3]), (0x107, 42, 41))
+            self.assertEqual(run(ctypes.byref(state), 2, 0xf00, callback, None), 0)
+            self.assertEqual((state.r[3], state.r[4]), (42, 0x804))
+
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function
 root: int 0x21

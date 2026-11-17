@@ -10177,3 +10177,41 @@ x32-services.md; replace another generic tracker blocker with concrete
 requirements. No translation/state promotion or runtime behavior change.
 `python3 tools/decomp_status.py check` and `git diff --check` pass.
 Evidence is static original instructions and both callers; no gameplay runs.
+
+### 2026-11-17: carry DPMI service boundaries through generated execution
+
+Extend experimental exact-encoding host boundaries from CD21 to CD31.
+Status 0x131 carries vector 31h; the native runner dispatches both vectors
+without resetting fuel. Per-site IP/vector requests and status mappings use
+report model int-service-yield-v2. Existing site restrictions apply to both
+vectors; default generation still rejects interrupts. No fabricated interrupt
+frame, service return or memory/selector change is introduced.
+The differential API's opt-in vector_services handlers receive the vector;
+legacy INT21 handlers reject DPMI explicitly. Original/C traces include
+vectors when that interface is selected.
+
+All 23 tests in tests.test_asm_c_program pass with pinned Unicorn (19.633s),
+including mixed-vector trace equality, callback routing, absent callbacks,
+site restriction and shared fuel/resumption. Tracker and diff checks pass.
+
+Fresh generation admits only the nine identified heap sites: 0x245,
+0x10d4ab, 0x10d4b6, 0x10d6a3, 0x10d703, 0x10d717, 0x10d728, 0x10d737,
+0x10d7ab. It generates 2830 bodies / 507701 original body bytes, leaving
+1450 excluded. This adds 239 bodies / 78884 bytes over the prior IP245-only
+result, including 0x10d466/0x10d689/0x10d75c/0x10d80b. These bodies require
+external services that remain incomplete; admission is not execution coverage.
+Pinned Watcom flags -q -bt=dos -3r -za99 -w1 -we compile all 239 new bodies,
+dispatcher and 77 registry units (317 units) without diagnostics.
+Report: local/asm-c-heap-services-20261117/report.json, SHA-256
+d69a7d912efc54dcea07434514bfde3de0d29dfdb9f3c81ca7dc8763ce10a464.
+
+A three-body generated cluster (0x10d427/0x10d466/0x10d689) passes 48
+whole-call original/C comparisons for mode-1 allocation's DPMI success path:
+six sizes, two allocation addresses, four flag patterns, empty initial heap
+list, explicit register-only service responses. Complete guest state/RAM and
+service traces match. This does not validate the original extender, nonempty
+heap release or allocation-failure fallback. Reproducer and evidence:
+local/asm-dpmi-allocate-20261117/check.py and report.json, SHA-256
+ca4111cb26d967000e3b0d098c048447f5b3efe4b78f12222fe4361e1d2f3950.
+No tracker promotion or gameplay runs. Next work is accurate stateful service
+models and memory/selector effects before this larger cluster can be trusted.

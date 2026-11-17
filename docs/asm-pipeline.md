@@ -1272,13 +1272,14 @@ state boundary proof, not native ABI/captured-game/replay verification. The new
 tracker row remains unknown/asm/unverified. Services/traps, other ISA, reviewed
 dynamic targets, captured callers and full-game integration remain active.
 
-### External INT 21h service boundary (experimental)
+### External DOS/DPMI service boundaries (experimental)
 
 `asm_c_program.py --interrupt-boundaries` accepts the exact unprefixed
-`CD 21` encoding as an external service boundary. It does not implement x86
+`CD 21` and `CD 31` encodings as external service boundaries. It does not implement x86
 interrupt delivery or DOS/X-32 services. Default generation still rejects it.
-The generated dispatcher returns `0x121` with PC advanced by two and all
-other guest state unchanged. The host must handle vector 0x21 using service
+The generated dispatcher returns `0x121` for INT21 or `0x131` for INT31,
+with PC advanced by two and all other guest state unchanged. The host must
+handle the vector encoded by `status-0x100` using service
 IP `PC-2`, update the shared guest registers/flags/RAM and any affected
 selector caches, then resume at the continuation. There is no fabricated
 interrupt stack frame. Do not resume an unserviced request.
@@ -1287,7 +1288,7 @@ Reports record the contract and admitted instruction sites under
 `host_service_boundaries`. Direct closure here means closure with required
 external services; it is not standalone execution coverage. The existing
 differential driver rejects these reports until a service-aware driver is
-provided. Other vectors, prefixed forms and missing continuations remain
+provided. Vectors other than 21h/31h, prefixed forms and missing continuations remain
 unsupported. The runtime byte guards still check the original instruction
 before yielding. No ABI layout change is needed.
 
@@ -1312,7 +1313,7 @@ context)` from the generated registry header. The callback receives the
 state, service IP, vector and caller-owned context. Return zero only after
 servicing the request; a nonzero result stops immediately. The runner checks
 pending faults after callbacks and shares one instruction budget across
-all service calls. A missing callback preserves the raw `0x121` yield.
+all service calls. A missing callback preserves the raw `0x121` or `0x131` yield.
 
 `runtime/asm_x32_service.c` supplies a native callback for the audited
 IP=0x245, AX=0x3508 heap-growth request, using `runtime/x32.c`. Its context
@@ -1325,7 +1326,20 @@ wired into the interactive game runtime.
 Use `--interrupt-site 0x245` together with `--interrupt-boundaries` to limit
 admission to the audited native heap callback. Repeat the site option only
 for additional services the host actually supports. Without a restriction,
-experimental boundary generation accepts all otherwise-supported INT21
+experimental boundary generation accepts all otherwise-supported INT21/INT31
 sites and therefore can require services the native callback does not supply.
 The report's admitted service-site list remains the authority for host
 requirements; call-graph admission alone does not prove service coverage.
+
+
+Boundary report model `int-service-yield-v2` lists per-site `requests` with
+both instruction IP and vector, plus the status mapping; `sites` retains the
+IP-only list. The low-level comparison API accepts `vector_services=True`
+when its service-factory handlers take `(vector, interrupt_ip, registers)`.
+This records vectors in the compared service traces. Legacy two-argument
+handlers remain INT21-only and reject INT31 requests explicitly.
+The native runner dispatches both vectors with the same shared fuel rules.
+This enables modeling DPMI allocation/release boundaries, but implements no
+DPMI service itself. The existing native X-32 callback still accepts only its
+audited INT21 request. Selector/memory-changing services still require a
+richer comparison bridge before their effects can be verified.

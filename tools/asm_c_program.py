@@ -53,14 +53,14 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
                   interrupt_sites=None):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
-    if (interrupt_boundaries and mnemonic == 'int' and insn['bytes'] == 'cd21' and
+    if (interrupt_boundaries and mnemonic == 'int' and insn['bytes'] in ('cd21', 'cd31') and
             (interrupt_sites is None or insn['address'] in interrupt_sites)):
         next_pc = insn['address'] + 2
         if next_pc not in starts:
             raise asm_to_c.Unsupported('unresolved interrupt return continuation')
         # A host-service boundary, not architectural interrupt delivery.
         # No stack frame, flag change or service result is fabricated.
-        return 's->pc = 0x%xu; return 0x121u;' % next_pc
+        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x100 + int(insn['bytes'][2:], 16))
     indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
     if mnemonic != 'call' and not indirect:
         return asm_to_c.instruction_c(insn, starts)
@@ -268,8 +268,8 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
     if (s->fault) return s->fault;
     while (fuel--) {
         status = ef_lift_run(s, 1, stop_pc);
-        if (status == 0x121u && service) {
-            status = service(s, s->pc - 2u, 0x21u, context);
+        if ((status == 0x121u || status == 0x131u) && service) {
+            status = service(s, s->pc - 2u, status - 0x100u, context);
             if (status) return status;
             if (s->fault) return s->fault;
             status = s->pc == stop_pc ? 0 : 1;
@@ -326,11 +326,16 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
     if interrupt_boundaries:
+        sites = sorted((i['address'], int(i['bytes'][2:], 16))
+                       for r in records if r['address'] in closed
+                       for i in r['instructions'] if i['mnemonic'] == 'int'
+                       and i['bytes'] in ('cd21', 'cd31'))
         result['host_service_boundaries'] = dict(
-            model='int21-yield-v1', status=0x121,
-            sites=sorted(i['address'] for r in records if r['address'] in closed
-                         for i in r['instructions'] if i['mnemonic'] == 'int' and i['bytes'] == 'cd21'),
-            contract='PC is continuation; service IP is PC-2; host must service INT 21h before resuming')
+            model='int-service-yield-v2',
+            statuses={'0x21': 0x121, '0x31': 0x131},
+            sites=[ip for ip, vector in sites],
+            requests=[dict(ip=ip, vector=vector) for ip, vector in sites],
+            contract='PC is continuation; service IP is PC-2; vector is status-0x100; host must service request before resuming')
     asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
@@ -342,9 +347,9 @@ def main(argv=None):
     parser.add_argument('--workspace', type=Path, default=asm_to_c.ROOT / 'local/ghidra')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interrupt-boundaries', action='store_true',
-                        help='yield INT 21h to an external host service; does not implement the service')
+                        help='yield INT 21h/31h to an external host service; does not implement the service')
     parser.add_argument('--interrupt-site', type=lambda value: int(value, 0), action='append',
-                        help='restrict yielded INT 21h sites to these instruction addresses (repeatable)')
+                        help='restrict yielded INT 21h/31h sites to these instruction addresses (repeatable)')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
