@@ -7776,3 +7776,7 @@ void refresh_network_controls_33630(void);
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_open_loops_form_33ad8 parm [eax] modify [eax]
 #endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_directplay_game_selected_341d8 parm [eax] modify [eax]
+#endif

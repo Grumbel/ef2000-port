@@ -11635,3 +11635,25 @@ Commands: tools/ef2000_wcc.py decomp/src/network_init_string.c --compiler
 <pinned-wcc386> --output local/network-loops-form-20261117.obj;
 pinned-Unicorn Python local/network-loops-form-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover DirectPlay row display callback
+
+Recovered 341d8 (62 bytes) into network_directplay_list.c, replacing lookup
+and display probes with real guest calls. Confirm EAX root, six preserved
+GPRs, callback slot 12bb90, no direct callers; widget link offset +21 has an
+existing struct assertion. Correct the old draft's cached count: original
+reloads signed count at every iteration, then reads the next link after show.
+Use unsigned index increment and row address arithmetic to preserve wrap.
+Watcom zero warnings. 144 scoped compiled-C/original-ASM comparisons PASS:
+six initial signed counts, lookup mutations, display mutations that stop/grow
+or negate count, and next-link replacement. Compare traces, six saved GPRs,
+ESP and 5 MiB RAM excluding code placement/stack scratch. Two callees modeled;
+scratch EAX, flags, stack, huge traversal and integration remain unproved.
+Keep hybrid excluded, state compiles. Tracker 3454 compiles / 778 blocked /
+454113 blocked body bytes. Private report
+local/network-directplay-list-source-20261117/report.json, SHA-256
+6cf0f60638e1ac4fdfc83700b7140835ef74d1829af688c0444456c75602c76b.
+Commands: tools/ef2000_wcc.py decomp/src/network_directplay_list.c --compiler
+<pinned-wcc386> --output local/network-directplay-list-20261117.obj;
+pinned-Unicorn Python local/network-directplay-list-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

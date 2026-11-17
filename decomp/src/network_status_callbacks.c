@@ -9,20 +9,6 @@ static uint32_t guest(uint32_t entry, uint32_t eax, uint32_t edx, uint32_t ebx)
     return net_ui_guest_call_086(entry, eax, edx, ebx);
 }
 
-/* 341d8, 62 bytes: walk 0x21-linked widget nodes, copying the name from
- * consecutive 64-byte DirectPlay rows, starting at 4288f0. The iteration
- * limit is signed, exactly as the original JL comparison. */
-void net_directplay_game_selected_341d8(ef_addr32 widget)
-{
-    ef_addr32 child = guest(0xa78bcu, widget, 0x182d94u, 0x4288f0u);
-    int32_t i;
-    int32_t count = (int32_t)EF_U32(0x429210u);
-    for (i = 0; i < count; ++i) {
-        guest(0xa7588u, child, 0x4288f0u + (uint32_t)i * 64u, 0u);
-        child = EF_U32(child + 0x21u);
-    }
-}
-
 /* 345d4, 19 bytes: false shares 345d2 RET in the previous function;
  * true tail-jumps to a4d90 with the modem-ending dialog name. */
 void net_new_end_string_345d4(void)

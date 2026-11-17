@@ -564,3 +564,5 @@ addr	size	type	name	evidence	notes
 0x0015f688	1	uint8_t	g_modem_initialization_choice	33760 original XOR AH,1 then store	Unchecked byte indexes pointer table at 125958
 0x00125958	8	ef_addr32[2]	g_modem_initialization_labels	33760 original indexed dword load	Two intended choices; original allows all byte indices without bounds check
 0x0015f07d	1	uint8_t	g_serial_parity_index	3361c calls df2e4 to increment and mask to 7	Counter helper preserves upper EAX bits, callback treats EAX as scratch
+0x00429210	4	int32_t	g_directplay_row_count	341d8 signed CMP/SETL each loop	Reloaded after each display callback
+0x004288f0	64	char[]	g_directplay_first_row	341d8 starts row pointer here, advances 64 bytes	Minimum observed first-row extent; overall capacity unestablished
