@@ -11823,3 +11823,10 @@ had no entry in the body map. Across the full generator input, the largest
 overlapping dependency groups reach FSIN (325 entries), FCOS (324),
 FPATAN (298), or the polluted error body at 0x11d695 (159). Generation
 provides no additional compilation, behavioral, or byte match evidence.
+
+2026-11-18 — The bulk inventory CLI now accepts `--skip-missing-bodies`
+with `--body-ranges`. It records omitted tracker addresses in
+`manifest.json` under `missing_body_addresses`. The default and targeted
+exports still require a body for every selected tracker entry. This makes
+the inventory selection from the previous audit reproducible through the
+CLI.

@@ -193,23 +193,27 @@ def load_body_ranges(path, payload):
 
 
 def export_inventory(image, rows, output, *, objdump='objdump', runner=subprocess.run,
-                     body_ranges=None):
+                     body_ranges=None, skip_missing_bodies=False):
     """Caller supplies a validated payload. Never change tracker recovery states."""
     payload = image.read_bytes()
     bodies, body_digest = load_body_ranges(body_ranges, payload) if body_ranges else ({}, None)
     boundary = 'ghidra-body-ranges' if body_ranges else 'unverified-linear-window'
+    omitted = []
     prepared = []
     seen = set()
     for row in rows:
         address, size = int(row['addr'], 16), int(row['size'])
         if address in seen:
             raise ValueError(f'duplicate entry {address:#x}')
+        seen.add(address)
         if not body_ranges and (address < 0 or size <= 0 or address + size > len(payload)):
             raise ValueError(f'invalid linear window at {address:#x}, size {size}')
         if body_ranges and address not in bodies:
+            if skip_missing_bodies:
+                omitted.append(address)
+                continue
             raise ValueError(f'no Ghidra body ranges for {address:#x}')
         ranges = bodies[address]['ranges'] if body_ranges else [[address, address + size]]
-        seen.add(address)
         prepared.append((address, ranges, row))
     # Refuse overwrite: stale files must not silently become part of a new run.
     output.mkdir(parents=True, exist_ok=False)
@@ -276,6 +280,8 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
                         [row for _, _, row in sorted(prepared)], sort_keys=True).encode()).hexdigest(),
                     warning='Ghidra bodies and decoded windows are analysis hypotheses, not verified code.',
                     entries=entries)
+    if skip_missing_bodies:
+        manifest['missing_body_addresses'] = sorted(omitted)
     (output / 'manifest.json').write_text(json.dumps(manifest, indent=2) + '\n')
     return manifest
 
@@ -288,7 +294,11 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--objdump', default='objdump')
     parser.add_argument('--body-ranges', type=Path, help='payload-bound Ghidra body-ranges.json')
+    parser.add_argument('--skip-missing-bodies', action='store_true',
+                        help='omit tracker entries without Ghidra bodies and list them in the manifest')
     args = parser.parse_args(argv)
+    if args.skip_missing_bodies and (not args.body_ranges or args.address):
+        parser.error('--skip-missing-bodies requires --body-ranges and a bulk selection')
     try:
         output = args.output.resolve()
         if not output.is_relative_to(ghidra_ef2000.ROOT / 'local'):
@@ -302,8 +312,11 @@ def main(argv=None):
             if missing:
                 raise ValueError(f'addresses absent from tracker: {sorted(missing)}')
         manifest = export_inventory(workspace / ghidra_ef2000.IMAGE_NAME, rows,
-                                    output, objdump=args.objdump, body_ranges=args.body_ranges)
+                                    output, objdump=args.objdump, body_ranges=args.body_ranges,
+                                    skip_missing_bodies=args.skip_missing_bodies)
         print(f'Exported {len(manifest["entries"])} entries ({manifest["boundary"]}) to {output}')
+        if manifest.get('missing_body_addresses'):
+            print(f'Omitted {len(manifest["missing_body_addresses"])} entries without Ghidra bodies')
     except (OSError, ValueError, subprocess.CalledProcessError) as error:
         parser.exit(1, f'asm_inventory: {error}\n')
 
