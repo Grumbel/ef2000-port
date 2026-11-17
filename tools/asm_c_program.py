@@ -418,6 +418,13 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                   syntactically_supported=len(codes), entries=report)
     if 'missing_body_addresses' in manifest:
         result['missing_body_addresses'] = manifest['missing_body_addresses']
+    impact = Counter(root for roots in blockers.values() for root in roots)
+    result['root_blocker_impact'] = [
+        dict(address=root, affected_entries=count, reason=reasons[root])
+        for root, count in sorted(impact.items(), key=lambda item: (-item[1], item[0]))
+    ]
+    result['root_blocker_impact_scope'] = (
+        'direct dependencies only; counts include each root itself and can overlap')
     result['dispatcher_layout'] = 'pc-shards-v1'
     result['dispatcher_shard_entries'] = shard_entries
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())

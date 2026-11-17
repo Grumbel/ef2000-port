@@ -11850,3 +11850,8 @@ and INT3 remain. All 4,281 per-entry generation states match the previous
 run (3,603 generated, 678 rejected). The private report
 `local/asm-ficom-bulk-20261118/report.json` has SHA-256
 `233c50461ab751e3d6c65e6068b6576550725c13bdb6e645528131ec23c615d8`.
+
+2026-11-18 — Bulk reports now rank root failures in
+`root_blocker_impact` by the number of affected entries. The counts
+include the root itself and may overlap because a body can depend on
+several rejected roots. This ranking follows direct edges only.

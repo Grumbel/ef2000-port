@@ -599,6 +599,8 @@ leaf: ret
             report = asm_c_program.generate(directory, root / 'out', image)
             entries = {e['address']: e for e in report['entries']}
             self.assertEqual(entries[0x100]['root_blockers'], [0x200])
+            self.assertEqual(report['root_blocker_impact'], [
+                dict(address=0x200, affected_entries=2, reason='unsupported instruction: cpuid')])
             self.assertNotIn('instruction_failures', entries[0x100])
             self.assertEqual(entries[0x200]['instruction_failures'], [
                 dict(address=0x200, mnemonic='cpuid', reason='unsupported instruction: cpuid'),
