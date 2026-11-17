@@ -10656,3 +10656,39 @@ local/dos-open-source-20261117/check.py; tools/ef2000_wcc.py
 decomp/src/misc_drafts1.c --compiler <pinned-wcc386>
 --output local/dos-open-source-20261117/misc_drafts1.obj;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — Recover CR/LF translating handle writer
+
+Recover write_handle_10f26a (465 original body bytes), previously an unnamed
+blocked runtime entry. Record EAX=handle, EDX=source, EBX=count from the sole
+direct inventory caller f1f5a@f1fef. Preserve saved ECX/ESI/EDI/EBP and treat
+EBX/EDX as scratch. Implement invalid/nonwritable slot errors, append seek,
+binary writes, stack-availability thresholds 0xb0/0x230, 128/512-byte dynamic
+stack buffers and CR insertion before each LF. Keep original carry encoding,
+short-write errno and arithmetic: add the latest output count to the input
+count committed at the preceding complete chunk, including CR-boundary cases.
+Do not replace that with a conventional count of successfully written input.
+Call the original 0x11d695 exhaustion path rather than inventing a return.
+Watcom __alloca avoids adding a second stackavail check or __GRO callback;
+host compilation uses __builtin_alloca.
+
+1134 original ASM versus actual recovered source comparisons pass across
+seven slot patterns, three stack budgets, nine input streams and six seek /
+short-write / write-error modes. Actual lookup, device-query, error and
+errno/address source is linked. Compare EAX, nonstack RAM and actual DOS write
+byte streams; direct-buffer/seek requests retain exact EAX, text-buffer request
+addresses and AX are normalized because stack placement differs. Local host
+shim reconstructs nearby host stack pointers solely to observe those bytes.
+Stack availability is modeled; low-stack fatal behavior, stack RAM/pointers,
+full register/flag ABI, real DOS services, binary identity and gameplay remain
+unproven. Evidence: local/dos-text-write-source-20261117/report.json SHA-256
+ e39bcc0d32df0d14d8515a9e4a712107d525ef77830abe2121337ffdd44ce47b.
+
+Whole misc_drafts1 compiles with zero OpenWatcom warnings/errors. Mark the
+entry compiles with explicit broad-hybrid exclusion, not verified. Tracker:
+3424 compiles, 808 blocked. Commands: pinned-Unicorn Python
+local/dos-text-write-source-20261117/check.py; tools/ef2000_wcc.py
+decomp/src/misc_drafts1.c --compiler <pinned-wcc386>
+--output local/dos-open-source-20261117/text-write-module.obj;
+python3 tools/decomp_status.py check; git diff --check.

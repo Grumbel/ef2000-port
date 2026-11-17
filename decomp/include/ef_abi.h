@@ -4603,6 +4603,8 @@ int32_t stream_printf_bc400(ef_addr32 stream, ef_addr32 fmt, ...);
 int32_t stdout_printf_cd12e(ef_addr32 fmt, ...);
 int32_t open_file_fa485(ef_addr32 name, uint32_t flags, ...);
 int32_t file_size_a7b3c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 name);
+uint32_t write_handle_10f26a(uint32_t handle, ef_addr32 source, uint32_t count);
+void guest_fn_11d695(void); /* 0x11d695 stack exhaustion path */
 int32_t open_shared_fa4a9(ef_addr32 name, uint32_t flags, uint32_t share, uint32_t mode);
 int32_t guest_fn_fa4a9_x(ef_addr32 name, uint32_t oflag, uint32_t shflag, uint32_t pmode); /* 0xfa4a9 cdecl (open/sopen) */
 
@@ -7475,6 +7477,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_cc6c0_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_117a0f_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_112808_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux write_handle_10f26a parm [eax] [edx] [ebx] value [eax] modify [eax ebx edx]
 #pragma aux open_shared_fa4a9 parm caller [] value [eax] modify [eax]
 #pragma aux guest_fn_fa4a9_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dc71b_x parm routine [] modify [eax ebx ecx edx esi edi ebp]

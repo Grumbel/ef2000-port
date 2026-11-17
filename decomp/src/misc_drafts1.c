@@ -2,6 +2,9 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include <stdarg.h>
+#ifdef __WATCOMC__
+#include <malloc.h>
+#endif
 #include <math.h>
 #include <string.h>
 #include "ef_abi.h"
@@ -6385,6 +6388,99 @@ int32_t open_shared_fa4a9(ef_addr32 name, uint32_t flags, uint32_t share, uint32
         slot |= 0x40u;
     store_flagged_value(handle, slot);
     return (int32_t)handle;
+}
+
+/* 0x10f26a, 465 bytes. Register-call write with optional CR/LF expansion.
+ * The short-write result adds output bytes to the last committed INPUT count. */
+uint32_t write_handle_10f26a(uint32_t handle, ef_addr32 source, uint32_t count)
+{
+    uint32_t out[7], flags = lookup_slot_11024e((int32_t)handle);
+    uint32_t request = flags, result, position, available, capacity;
+    uint32_t used = 0u, consumed = 0u, committed = 0u;
+    uint8_t *buffer;
+    if (flags == 0u) {
+        store_through_ebd30(4u);
+        return 0xffffffffu;
+    }
+    if ((flags & 2u) == 0u) {
+        store_through_ebd30(6u);
+        return 0xffffffffu;
+    }
+    if ((flags & 0x80u) != 0u) {
+        run_dos_int_ex(0x21u, (flags & 0xffff0000u) | 0x4202u,
+                       handle, 0u, 0u, out);
+        position = ((out[3] & 0x7fffu) << 16) | (out[0] & 0xffffu) |
+                   (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return (uint32_t)report_dos_error_1101e8(position & 0xffffu);
+        request = out[0];
+    }
+    if ((flags & 0x40u) != 0u) {
+        run_dos_int_ex(0x21u, (request & 0xffff00ffu) | 0x4000u,
+                       handle, count, source, out);
+        result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return (uint32_t)report_dos_error_1101e8(result & 0xffffu);
+        if (result != count)
+            store_through_ebd30(0xcu);
+        return result;
+    }
+    available = stack_used_dcb74();
+    if (available < 0xb0u)
+        guest_fn_11d695();
+    capacity = available < 0x230u ? 0x80u : 0x200u;
+#ifdef __WATCOMC__
+    buffer = (uint8_t *)__alloca(capacity);
+#else
+    buffer = (uint8_t *)__builtin_alloca(capacity);
+#endif
+    while (consumed < count) {
+        if (EF_U8(source) == 0x0au) {
+            buffer[used++] = 0x0du;
+            if (used == capacity) {
+                request = (uint32_t)(uintptr_t)buffer;
+                run_dos_int_ex(0x21u, (request & 0xffff00ffu) | 0x4000u,
+                               handle, capacity, request, out);
+                result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+                if (out[6] != 0u)
+                    return (uint32_t)report_dos_error_1101e8(result & 0xffffu);
+                if (result != capacity) {
+                    store_through_ebd30(0xcu);
+                    return committed + result;
+                }
+                used = 0u;
+                committed = consumed;
+            }
+        }
+        buffer[used++] = EF_U8(source++);
+        ++consumed;
+        if (used == capacity) {
+            request = (uint32_t)(uintptr_t)buffer;
+            run_dos_int_ex(0x21u, (request & 0xffff00ffu) | 0x4000u,
+                           handle, capacity, request, out);
+            result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+            if (out[6] != 0u)
+                return (uint32_t)report_dos_error_1101e8(result & 0xffffu);
+            if (result != capacity) {
+                store_through_ebd30(0xcu);
+                return committed + result;
+            }
+            used = 0u;
+            committed = consumed;
+        }
+    }
+    if (used != 0u) {
+        run_dos_int_ex(0x21u, (consumed & 0xffff00ffu) | 0x4000u,
+                       handle, used, (uint32_t)(uintptr_t)buffer, out);
+        result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return (uint32_t)report_dos_error_1101e8(result & 0xffffu);
+        if (result != used) {
+            store_through_ebd30(0xcu);
+            return committed + result;
+        }
+    }
+    return count;
 }
 
 /* 0x1101be, 30 bytes. DOS IOCTL get device information (int 21h, AX = 0x4400) for HANDLE: true when bit 7 of the device word (a character device) is set. */
