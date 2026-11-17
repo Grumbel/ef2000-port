@@ -11878,3 +11878,12 @@ SHA-256 is
 `0e680fe01f16f3bcf7b0bf5e60c8151bbfabd232aa15f718c0d69580b904a9cd`.
 The entry point only returns. This checks link compatibility of the
 current corpus and does not exercise translated code or host services.
+
+2026-11-18 — Executed a synthetic `mov eax, 42; ret` fixture through
+the generated dispatcher, compiled with OpenWatcom and linked for DOS/4G.
+DOSBox-X ran with SDL dummy video/audio and no DISPLAY. The fixture
+reported status 0, EAX 42, PC 0x200 and ESP 0x304 as expected after
+two instructions. The private fixture, build script and run log are
+in `local/asm-watcom-smoke-20261118/`. This checks the target compiler's
+dispatcher call and return path for one synthetic body. The full corpus
+link check remains separate.
