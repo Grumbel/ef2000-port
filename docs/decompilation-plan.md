@@ -12021,3 +12021,18 @@ OpenWatcom compiler and payload. Linked and original body digests are
 unchanged from the prior reviewed comparisons. Function 0x121f0 still
 matches all 29 bytes and 0xb574 still differs across its 89-byte comparison
 window. The tracker now reports one current exact match and one difference.
+
+2026-11-18 — Completed the 4,022-body boundary-enabled differential smoke
+run with the hardware x87 oracle, `--service-free-paths --scenarios 1
+--jobs 6`. The 43 host units linked successfully. One prepared input per
+body gave 2,092 matches and 1,930 inconclusive results, with no mismatches.
+Of the 699 generated blocked tracker rows, 283 matched and 416 were
+inconclusive. Unmapped reads (1,330) and writes (342) accounted for most
+inconclusive results. Artifacts: `local/asm-service-free-parallel-20261118/`.
+
+Reused that linked library and oracle for the 16 deterministic input
+cases at 0x10848c and 0x118910. Both matched on all 16. A targeted 16-case
+rerun at 0xded86 and 0xed133 reproduced all four prior mismatches at the
+untranslated 0x7f/0x80 callback targets. The one-input run does not include
+those inputs. The targeted report records the payload, host library and
+oracle digests. Tracker states remain unchanged.
