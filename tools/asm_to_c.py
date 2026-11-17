@@ -1319,6 +1319,13 @@ def read_inventory(inventory, image):
                 manifest.get('instruction_normalization') not in
                 (asm_inventory.NORMALIZATION, asm_inventory.PREVIOUS_NORMALIZATION)):
             raise ValueError('invalid normalized inventory provenance')
+    if 'missing_body_addresses' in manifest:
+        omitted = manifest['missing_body_addresses']
+        if (bodies is None or not isinstance(omitted, list) or
+                any(type(address) is not int or not 0 <= address < len(payload)
+                    or address in bodies for address in omitted) or
+                omitted != sorted(set(omitted))):
+            raise ValueError('invalid missing body addresses')
     records = []
     seen = set()
     for entry in manifest['entries']:

@@ -416,6 +416,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                   runtime_sha256=hashlib.sha256(asm_to_c.RUNTIME.encode()).hexdigest(),
                   dispatcher=dict(file='ef_lift_program.c', source_sha256=hashlib.sha256(program.encode()).hexdigest()),
                   syntactically_supported=len(codes), entries=report)
+    if 'missing_body_addresses' in manifest:
+        result['missing_body_addresses'] = manifest['missing_body_addresses']
     result['dispatcher_layout'] = 'pc-shards-v1'
     result['dispatcher_shard_entries'] = shard_entries
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())

@@ -11830,3 +11830,7 @@ with `--body-ranges`. It records omitted tracker addresses in
 exports still require a body for every selected tracker entry. This makes
 the inventory selection from the previous audit reproducible through the
 CLI.
+
+2026-11-18 — Bulk translation reports now carry the validated omission
+list from the inventory manifest. A full run accounted for all 4,294
+tracker entries with 4,281 translation results and 13 missing bodies.
