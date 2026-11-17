@@ -6329,7 +6329,8 @@ uint32_t is_device_handle_1101be(uint32_t handle)
 uint32_t delete_file_fe541(uint32_t name)
 {
     uint32_t out[7];
-    run_dos_int_ex(0x21u, 0x4100u, 0u, 0u, name, out);
+    /* MOV AH,41 preserves AL and the upper half of the filename address. */
+    run_dos_int_ex(0x21u, (name & 0xffff00ffu) | 0x4100u, 0u, 0u, name, out);
     if (out[6] != 0u)
         return (uint32_t)report_dos_error_1101e8(out[0] & 0xffffu);
     return 0u;

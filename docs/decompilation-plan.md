@@ -10595,3 +10595,30 @@ contains 2,924 generated bodies / 517,486 original body bytes (12 bodies and
 Closure remains direct-edge-only; interrupt yields alone implement no services.
 Interactive wiring, original extender fidelity and tracker verification remain
 open; no tracker promotion.
+
+
+### 2026-11-17 — Preserve delete-file DOS request bits
+
+Audit the shared interrupt frontier: 0x2b0 is the generic register-block DOS
+wrapper, not a single service that can safely receive a fabricated response.
+In its neighboring file-service closure, correct handwritten delete_file_fe541:
+original 0xfe544 MOV AH,41 preserves AL and upper EAX from the filename address.
+The prior C sent constant 0x4100. Preserve those bits and retain full EDX=name;
+CF alone selects the actual recovered report_dos_error_1101e8 path. Inspect
+callers ba5c@bad2 and 42e8c@42ea1 through tail alias cbc9b.
+
+64 original ASM versus recovered C comparisons pass for four address patterns,
+both carry outcomes, four returned EAX patterns and two returned EDX patterns.
+Compare return EAX, all RAM except stack scratch, and service request EAX/EDX;
+this is a register-only DOS model, not full register ABI, filesystem services,
+byte-identical recompilation or gameplay evidence. Actual error/errno/address C
+is linked. Report local/dos-delete-source-20261117/report.json SHA-256:
+954718069a52878ab11d41d33fe96f8d4eb636599c10df6eb54c7aa7c6ca77ce.
+
+OpenWatcom compiles the extracted body with -w1 -we without diagnostics.
+Commands: pinned-Unicorn Python local/dos-delete-source-20261117/check.py;
+wcc386 -q -bt=dos -3r -zp1 -za99 -w1 -we -i=decomp/include
+-fo=local/dos-delete-source-20261117/delete.obj
+local/dos-delete-source-20261117/watcom.c;
+python3 tools/decomp_status.py check; git diff --check.
+Tracker state remains compiles; no verified promotion or new service admission.
