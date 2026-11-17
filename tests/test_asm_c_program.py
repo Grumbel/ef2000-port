@@ -590,6 +590,73 @@ ret
             self.assertEqual(state.pc, 0xf00)
             self.assertEqual(state.r[4], 0x804)
 
+    def test_native_x32_service_runner_accounts_for_fuel_and_rejection(self):
+        from tools.x32_allocation import Allocation
+        class NativeAllocation(ctypes.Structure):
+            _fields_ = [(n, ctypes.c_uint32) for n in
+                        ('heap_end', 'stack_end', 'free_bytes', 'minimum_stack',
+                         'heap_ceiling', 'arena_start', 'arena_end')]
+        source = '''.org 0x240
+.type root,@function
+root: mov ax,0x3508
+nop
+int 0x21
+adc eax,0
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root/'out'
+            asm_c_program.generate(directory, out, image, interrupt_boundaries=True)
+            runtime = Path(__file__).resolve().parents[1]/'runtime'
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out), '-I'+str(runtime),
+                            *map(str, sorted(out.glob('*.c'))), str(runtime/'x32.c'),
+                            str(runtime/'asm_x32_service.c'), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'program.so'))
+            run = library.ef_lift_run_services
+            run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
+                            ctypes.c_uint32, ctypes.c_void_p, ctypes.c_void_p]
+            callback = ctypes.cast(library.ef_asm_x32_service, ctypes.c_void_p)
+            for requested in (0x4df001, 0x4e1001, 0x5000000):
+                model = Allocation()
+                allocation = NativeAllocation(model.heap_end, model.stack_end, model.free_bytes,
+                                              model.minimum_stack, model.heap_ceiling, 0, 0)
+                memory = bytearray(4096)
+                memory[:image.stat().st_size] = image.read_bytes()
+                memory[0x800:0x804] = (0xf00).to_bytes(4, 'little')
+                array = (ctypes.c_uint8 * len(memory)).from_buffer(memory)
+                state = asm_c_differential.State(
+                    (ctypes.c_uint32 * 8)(0xabcd0000, requested, 3, 4, 0x800, 6, 7, 8),
+                    0x246, 0x240, 0, array, len(memory))
+                context = ctypes.byref(allocation)
+                self.assertEqual(run(ctypes.byref(state), 2, 0xf00, callback, context), 1)
+                self.assertEqual(state.pc, 0x245)
+                before = bytes(state)
+                self.assertEqual(run(ctypes.byref(state), 0, 0xf00, callback, context), 1)
+                self.assertEqual(bytes(state), before)
+                before_allocation = bytes(allocation)
+                self.assertEqual(run(ctypes.byref(state), 1, 0xf00, None, context), 0x121)
+                self.assertEqual(state.pc, 0x247)
+                state.pc = 0x245
+                self.assertEqual(bytes(state), before)
+                self.assertEqual(bytes(allocation), before_allocation)
+                expected = model.grow_heap(requested, state.flags)
+                status = run(ctypes.byref(state), 1, 0xf00, callback, context)
+                self.assertEqual(state.pc, 0x247)
+                if expected is None:
+                    self.assertEqual(status, 0x122)
+                    state.pc = 0x245
+                    self.assertEqual(bytes(state), before)
+                else:
+                    self.assertEqual(status, 1)
+                    self.assertEqual((state.r[0], state.r[1], state.flags), expected)
+                    self.assertEqual(allocation.heap_end, model.heap_end)
+                    self.assertEqual(allocation.free_bytes, model.free_bytes)
+                    self.assertEqual(run(ctypes.byref(state), 2, 0xf00, callback, context), 0)
+                    self.assertEqual(state.r[4], 0x804)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_interrupt_bridge_matches_original_x32_heap_growth(self):
         from tools.unicorn_backend import serve_startup_int21

@@ -1306,3 +1306,18 @@ This interface cannot service memory writes or selector changes. The existing
 break adjustment through it. Such evidence proves translation relative to
 that service model, not independent correctness of the model. The general
 verification CLI continues to reject boundary-enabled reports.
+
+Native hosts can use `ef_lift_run_services(state, fuel, stop_pc, callback,
+context)` from the generated registry header. The callback receives the
+state, service IP, vector and caller-owned context. Return zero only after
+servicing the request; a nonzero result stops immediately. The runner checks
+pending faults after callbacks and shares one instruction budget across
+all service calls. A missing callback preserves the raw `0x121` yield.
+
+`runtime/asm_x32_service.c` supplies a native callback for the audited
+IP=0x245, AX=0x3508 heap-growth request, using `runtime/x32.c`. Its context
+is an initialized `struct x32_allocation`; the host must have reserved the
+memory represented by that no-swap allocation state. Unsupported requests
+and exhaustion return `0x122`, without inventing an extender error response.
+Compile it with the generated registry include directory. It is not yet
+wired into the interactive game runtime.

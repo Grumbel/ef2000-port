@@ -10087,3 +10087,31 @@ verify the handwritten draft, integrate the runtime bridge, admit general
 interrupts or promote tracker coverage. All 20 methods in
 `tests.test_asm_c_program` pass with Unicorn (18.3 seconds); tracker/diff
 checks pass. No gameplay runs.
+
+### 2026-11-17: native generated-service runner and X-32 heap callback
+
+Add `ef_lift_run_services` to the generated registry API, retaining exact
+instruction-fuel accounting through native callbacks. Nonzero callback
+results and pending faults stop execution; a missing callback retains the
+raw external-service yield. Add `runtime/asm_x32_service.{c,h}` to map the
+audited IP 0x245 / AX 0x3508 request onto existing `x32_heap_grow`, preserving
+all guest fields except returned EAX/ECX/flags. Caller owns initialized
+allocation context and reserved guest RAM. Unsupported/exhausted requests
+return status 0x122, not a fabricated DOS result. Interactive runtime wiring
+and all other service kinds remain pending.
+
+The compiled native-runner fixture checks total fuel across an INT,
+zero-fuel preservation, absent callbacks, native page-rounded results and
+allocation bookkeeping against the Python model, and rejection without
+register corruption. All 21 program tests pass (19.1 seconds); the focused
+native test passes again after adding the missing-callback assertion.
+`local/asm-int21-break-20261117/check_native.py` compiles the real 0x235/0x23b
+pair plus native adapter and allocation implementation with host C and pinned
+Watcom (`-q -bt=dos -3r -za99 -w1 -we`). It compares 48 whole calls with
+original instructions using Python services versus translated C using native
+services: complete guest state/RAM, request/response traces and allocation
+fields match. Native evidence report SHA-256:
+`ce2a3f7371bc014b72b078d87b0595336619ae9a35775449c7b8e3d3ce608a6c`.
+This strengthens translation/bridge evidence but does not independently
+execute the original extender or promote bulk/tracker coverage. Tracker/diff
+checks pass; no gameplay runs.

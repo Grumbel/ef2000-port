@@ -185,6 +185,10 @@ def dispatcher(records, *, shard_entries=2048):
 #define EF_LIFT_REGISTRY_H
 #include "ef_lift_state.h"
 typedef unsigned (*ef_lift_step_function)(ef_lift_state *, uint32_t);
+typedef unsigned (*ef_lift_service_function)(ef_lift_state *, uint32_t, unsigned, void *);
+unsigned ef_lift_run(ef_lift_state *, uint32_t, uint32_t);
+unsigned ef_lift_run_services(ef_lift_state *, uint32_t, uint32_t,
+                              ef_lift_service_function, void *);
 typedef struct {
     uint32_t pc; ef_lift_step_function step;
     uint32_t code_offset; uint8_t length;
@@ -253,6 +257,22 @@ unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
         status = location->step(s, 1);
         /* RET and ordinary completion each consume exactly one shared unit. */
         if (status != 0 && status != 1) return status;
+    }
+    return s->pc == stop_pc ? 0 : 1;
+}
+unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
+                              ef_lift_service_function service, void *context) {
+    unsigned status;
+    if (s->fault) return s->fault;
+    while (fuel--) {
+        status = ef_lift_run(s, 1, stop_pc);
+        if (status == 0x121u && service) {
+            status = service(s, s->pc - 2u, 0x21u, context);
+            if (status) return status;
+            if (s->fault) return s->fault;
+            status = s->pc == stop_pc ? 0 : 1;
+        }
+        if (status != 1) return status;
     }
     return s->pc == stop_pc ? 0 : 1;
 }
