@@ -9512,3 +9512,32 @@ Validation: three focused TranslationTests pass, including the new
 `test_system_transfers_are_not_missing_body_tails`, which checks identical
 rejection with and without a decoded successor and retains the missing-tail
 diagnostic for a NOP. Tracker and diff checks pass. No gameplay run was used.
+
+### 2026-11-17: recover the shading helper's result store and return
+
+`tools/ghidra/EF2000RecoverC6428Tail.java` validates the pinned language and
+payload, exact old/new body, six-byte tail hash, preceding XLAT fallthrough
+and absence of other function owners. It transactionally recovers the MOV
+and RET at 0xc6437..0xc643c, extending shade_lookup_c6428 from 15 to 21
+bytes. No alignment padding or neighboring function is absorbed.
+
+`local/ghidra-shade-tail-20261117` is the latest repaired workspace; the
+fresh export is `local/ghidra-shade-tail-inventory-20261117`. Apply records
+15 to 21 bytes and repeated report records 21 to 21. The complete six
+instruction Ghidra/objdump layouts match. Generated C compiles without
+OpenWatcom diagnostics using `-q -bt=dos -3r -za99 -w1 -we`, and the host
+shared library builds with warnings as errors.
+
+`local/asm-shade-tail-20261117/check.py` / `report.json` records 96 passing
+whole-call comparisons, using the existing captured protected-mode descriptor
+profile, against original execution through the return sentinel. They compare
+all GPRs, flags, PC, selectors and 2MiB RAM. Word inputs 0, 1, 0x7f, 0x80,
+0xff, 0x100, 0x8000 and 0xffff cross offsets 0, 1, 0x7f and 0xff with flag
+images 0x202, 0x602 and 0xad7. This covers low-byte carry/wrap, preserved
+upper EAX, and both direction-flag settings of the initial LODSW. Faults,
+segment boundaries and runtime integration are not covered. Report SHA-256:
+`b83accaec26029e825608e9aefd6fcaedbe43822a5f73b7b8a4f2e9be07d515d`.
+
+Tracker size and evidence notes are corrected, with state unchanged. Bulk
+closure has not been regenerated after this repair. Tracker and diff checks
+pass. No gameplay/UI run was used.
