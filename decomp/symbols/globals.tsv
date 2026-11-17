@@ -520,3 +520,4 @@ addr	size	type	name	evidence	notes
 0x0017d5a8	20	int8_t[20]	g_dos_errno_table	0x11022c loads overlapping dword at index+0x17d5a5 then SAR 24	signed error mapping; original payload only, never copied into source
 0x00484480	4	uint32_t	g_dos_error	0xebd36 address, 0xebe90 store, called by 0x1101e8	low byte of DOS error saved as dword
 0x00484484	4	int32_t	g_errno	0xebd30 address, 0xebe6d store, called by 0x1101e8	translated runtime error code
+0x0017d5bc	4	uint32_t	g_file_creation_permission_mask	fa4a9@fa595 XORs permission argument with this dword	AL bit 7 of XOR selects DOS create attribute 0 versus 1; full dword also remains in EAX request

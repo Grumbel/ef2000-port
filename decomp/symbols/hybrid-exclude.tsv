@@ -801,3 +801,4 @@ addr	reason
 0x000fa332	Original refill returns ESI/EDX and carry, preserving EAX/EBX/ECX. C draft treats EAX/EDX as pointers and faults writing through 0xffffffff during GUI loading; corrected signature requires a register/flag adapter.
 0x000fa1d4	Original bitstream fragment updates AL/ESI/EDX and returns its symbol in a non-EAX register. Pointer-state C prototype is incompatible with the original register-stream ABI; preserve this cluster with 0xfa332 until an adapter exists.
 0x000fa200	Original bitstream fragment updates AL/ESI/EDX and returns its symbol in a non-EAX register. Pointer-state C prototype is incompatible with the original register-stream ABI; preserve this cluster with 0xfa332 until an adapter exists.
+0x000fa4a9	Recovered shared open C passes 220 scoped model-service comparisons; full DOS bridge/register ABI, zero-write guest stack pointer, splicing and replay equivalence remain unverified. Keep original in broad builds.

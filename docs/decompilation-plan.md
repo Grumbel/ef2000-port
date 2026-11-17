@@ -10622,3 +10622,37 @@ wcc386 -q -bt=dos -3r -zp1 -za99 -w1 -we -i=decomp/include
 local/dos-delete-source-20261117/watcom.c;
 python3 tools/decomp_status.py check; git diff --check.
 Tracker state remains compiles; no verified promotion or new service admission.
+
+
+### 2026-11-17 — Recover shared open/create core
+
+Recover open_shared_fa4a9 (453 original body bytes) from original assembly,
+including leading-space trimming, access/share bits, exclusive-open cleanup,
+zero-write truncation, create attributes, created-handle close and reopen,
+original error ordering, device queries and handle-table metadata updates.
+Preserve AND AL,3c without clearing the upper three slot bytes, permission XOR
+before changing AH, carry encoding and reopen EAX high bits from the close.
+Inspect both cdecl callers fa485@fa49e and bc287@bc2fe; record the four stack
+arguments, caller cleanup and saved registers. Name creation-permission mask
+0x17d5bc; default translation mode 0x16062d was already recorded.
+
+220 scoped original ASM versus actual recovered C cases pass. Link actual
+lookup, slot store, device query, error translation and errno/address helpers.
+Cases vary flags, file existence, device status, create/close/reopen/write
+failure, mode, share, permission mask and preexisting slot bits. Compare EAX,
+all RAM except stack scratch, exact service request EAX and service-specific
+DOS input operands. This is a register-only DOS model: ignored service inputs,
+all registers/flags and the zero-write guest stack pointer are not proven.
+No binary identity, real filesystem service or gameplay claim. Report:
+local/dos-open-source-20261117/report.json SHA-256
+353a8e21dd0890302de1e1d7a9ac518503319d97d1f97dcc21b4010edb41a136.
+
+The complete misc_drafts1 module compiles with zero warnings/errors through
+tools/ef2000_wcc.py, as does the extracted body with -w1 -we. Move tracker
+blocked -> compiles, with explicit broad-hybrid exclusion until remaining
+ABI/service and splice/replay evidence exists. Tracker: 3423 compiles,
+809 blocked. Commands: pinned-Unicorn Python
+local/dos-open-source-20261117/check.py; tools/ef2000_wcc.py
+decomp/src/misc_drafts1.c --compiler <pinned-wcc386>
+--output local/dos-open-source-20261117/misc_drafts1.obj;
+python3 tools/decomp_status.py check; git diff --check.

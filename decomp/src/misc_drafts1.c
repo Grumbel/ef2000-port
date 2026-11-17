@@ -6317,6 +6317,76 @@ static void run_dos_int_ex(uint32_t intno, uint32_t eax, uint32_t ebx, uint32_t 
     guest_dos_int_x(intno, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
 }
 
+/* 0xfa4a9, 453 bytes. Cdecl shared open/create core; preserves the original
+ * DOS request encoding, error ordering and partial-byte handle-slot updates. */
+int32_t open_shared_fa4a9(ef_addr32 name, uint32_t flags, uint32_t share, uint32_t mode)
+{
+    uint32_t out[7], access = flags & 0x83u;
+    uint32_t result, slot, request, scratch;
+    uint32_t handle = 0xffffffffu;
+    while (EF_U8(name) == 0x20u)
+        ++name;
+    run_dos_int_ex(0x21u, 0x3d00u | access | (share & 0xffu), 0u, 0u, name, out);
+    result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+    if (out[6] == 0u)
+        handle = result & 0xffffu;
+    if ((flags & 3u) != 0u && handle != 0xffffffffu &&
+        is_device_handle_1101be(handle) == 0u) {
+        if ((flags & 0x400u) != 0u) {
+            run_dos_int_ex(0x21u, 0x3e00u, handle, 0u, 0u, out);
+            store_through_ebd30(7u);
+            return -1;
+        }
+        if ((flags & 0x40u) != 0u) {
+            run_dos_int_ex(0x21u, 0x4000u, handle, 0u,
+                           (uint32_t)(uintptr_t)&scratch, out);
+            result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+            if (out[6] != 0u) {
+                run_dos_int_ex(0x21u, (result & 0xffff00ffu) | 0x3e00u,
+                               handle, 0u, 0u, out);
+                return report_dos_error_1101e8(result & 0xffffu);
+            }
+        }
+    }
+    if (handle == 0xffffffffu) {
+        if ((flags & 0x20u) == 0u || (result & 0xffffu) != 2u)
+            return report_dos_error_1101e8(result & 0xffffu);
+        if (mode == 0u)
+            mode = 0x180u;
+        request = mode ^ EF_U32(0x0017d5bcu);
+        run_dos_int_ex(0x21u, (request & 0xffff00ffu) | 0x3c00u, 0u,
+                       (request & 0x80u) != 0u ? 0u : 1u, name, out);
+        result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return report_dos_error_1101e8(result & 0xffffu);
+        run_dos_int_ex(0x21u, (result & 0xffff00ffu) | 0x3e00u,
+                       result, 0u, 0u, out);
+        result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return report_dos_error_1101e8(result & 0xffffu);
+        request = (result & 0xffff0000u) | 0x3d00u | access | (share & 0xffu);
+        run_dos_int_ex(0x21u, request, 0u, (share & 0xffu) << 8, name, out);
+        result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+        if (out[6] != 0u)
+            return report_dos_error_1101e8(result & 0xffffu);
+        handle = result & 0xffffu;
+    }
+    /* AND AL,3c retains the other three bytes, including existing slot bits. */
+    slot = lookup_slot_11024e((int32_t)handle) & 0xffffff3cu;
+    if (is_device_handle_1101be(handle) != 0u)
+        slot |= 0x2000u;
+    access &= 0x7fu;
+    if (access == 2u) slot |= 3u;
+    if (access == 0u) slot |= 1u;
+    if (access == 1u) slot |= 2u;
+    if ((flags & 0x10u) != 0u) slot |= 0x80u;
+    if ((flags & 0x200u) != 0u ||
+        ((flags & 0x300u) == 0u && EF_U32(0x0016062du) == 0x200u))
+        slot |= 0x40u;
+    store_flagged_value(handle, slot);
+    return (int32_t)handle;
+}
+
 /* 0x1101be, 30 bytes. DOS IOCTL get device information (int 21h, AX = 0x4400) for HANDLE: true when bit 7 of the device word (a character device) is set. */
 uint32_t is_device_handle_1101be(uint32_t handle)
 {
