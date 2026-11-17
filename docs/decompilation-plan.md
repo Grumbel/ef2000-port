@@ -8917,3 +8917,43 @@ and compiles all four generated body/dispatcher units with OpenWatcom without
 diagnostics. Generated sources and original bytes remain ignored local data.
 No manual tracker promotion, gameplay run or whole-corpus correctness claim;
 descriptor reloads and unsupported x87 operations remain open.
+
+### 2026-11-17: refresh bulk C after inline-table recovery
+
+A fresh Ghidra inventory from `local/ghidra-inline-table-20261117` confirms
+0x10e35f owns only its five-byte CALL, with no inline table instructions.
+`local/ghidra-inline-inventory-20261117/normalize.py` exports the same 4,280
+selected entries as the prior bulk snapshot using current tracker metadata
+and the newly exported body ranges. Its normalized inventory manifest SHA-256
+is `7da71a66a886ef80b90371121cdca019d39579274110912a97f5bbe374c08627`.
+
+Regenerating with `tools/asm_c_program.py` produces 4,146 syntactically
+supported bodies and 2,537 bodies closed over direct dependencies, covering
+412,102 original body bytes. There are 1,743 unsupported entries. Compared
+with the ENTER/bit-scan snapshot, five bodies (720 bytes) enter closure:
+0x0ebea3 (65), 0x10e250 (58), 0x10e2f5 (106), 0x10e35f (5), and
+0x120560 (486). None leave closure; 34 previously generated body sources
+change. The translation report SHA-256 is
+`70925408f8fc58276ea2439de6306772e46357379d33b60179cf17b3c71ffdbe`.
+
+`local/asm-c-decimal-count-20261117/check.py` compiles the exact generated
+0x10e250/accessor/helper units with a shared dispatcher, then compares 183
+ring-3 prepared inputs against original execution. Inputs include zero,
+powers of ten and their neighbors through 10^19, and UINT64_MAX-1, with
+initial estimates 0, 9 and 18. All full GPR/flags/2-MiB RAM comparisons pass;
+the report SHA-256 is
+`48df7b0083ea24695d4a6d253dedec4831c4bf87d12a9723863c17f9b5d21127`.
+UINT64_MAX itself is not covered by this evidence. These checks exercise
+the real nested CALL stack effects in a caller; no gameplay runs are used.
+Generated sources remain local, unverified drafts: closure and compilation
+do not establish all-input behavior, dynamic-target coverage or game integration.
+
+The completed `local/asm-c-inline-watcom-20261117/check.py` run compiles all
+2,602 units (2,537 bodies plus 65 dispatcher/support units) with the pinned
+OpenWatcom compiler, `-bt=dos -3r -za99 -w1 -we`: zero failures, zero
+diagnostics and zero missing objects in 112.20 seconds. Its report binds
+compiler, flags, each source/object and the translation report; SHA-256
+`57f1d61d0846c884563f201e1ce5439ee896eaa7a34cffb845e380bfcf4daaa6`.
+This replaces the interrupted compile from the paused turn. It is object
+compilation evidence, not a full target link or a corpus-wide equivalence proof.
+`python3 tools/decomp_status.py check` and `git diff --check` also pass.
