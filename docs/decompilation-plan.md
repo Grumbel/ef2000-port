@@ -12015,3 +12015,9 @@ The split build's OpenWatcom and probe stages remain independent of
 that setting. All 64 generator and lifter tests passed with the initial
 split build. The forced split service probe also passed with two host
 compiler workers.
+
+2026-11-18 — Refreshed both stale byte-identity records with the pinned
+OpenWatcom compiler and payload. Linked and original body digests are
+unchanged from the prior reviewed comparisons. Function 0x121f0 still
+matches all 29 bytes and 0xb574 still differs across its 89-byte comparison
+window. The tracker now reports one current exact match and one difference.
