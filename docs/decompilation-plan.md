@@ -9392,3 +9392,33 @@ patterns and two flag images exercise the recovered XOR/rotate and argument
 loads; called arithmetic, later loops and floating-point results remain
 unverified. Tracker size is corrected from 285 to 468 bytes with no state
 promotion. Tracker and diff checks pass; no gameplay runs were required.
+
+### 2026-11-17: compare complete recovered 0xf0cec with real callees
+
+`local/asm-soft-complete-20261117/check.py` now generates a dispatcher for
+the complete repaired 0xf0cec body and its five transitive callees, 0xee43c,
+0xef97a, 0xef9aa, 0xefbd9 and 0xefdae. Callees execute their generated
+original instructions; there are no helper stubs or early block stops.
+The host shared library builds with warnings as errors. All eight body,
+dispatcher and registry units also compile with OpenWatcom without any
+diagnostics (`-q -bt=dos -3r -za99 -w1 -we`), recorded in `compile.json`.
+
+There are 74 successful whole-call comparisons against original execution,
+including return to the captured caller, all GPRs, flags, selectors and RAM,
+using the existing captured protected-mode descriptor profile. Inputs are
+zero and explicit-integer-bit extended-precision mantissas 0x8000000000000000,
+0xa000000000000000 and 0xffffffffffffffff at biased exponents 0x3ff0,
+0x3ffa, 0x3ffe, 0x3fff, 0x4000 and 0x4003, both signs, with incoming flag
+images 0x202/0xad7. No x87 transcendental substitution is needed: these
+helpers implement their arithmetic in integer instructions. The negative
+cases exceeded the initial instruction budget; increasing it to one million
+let original and C both complete without altering their code or results.
+
+Report SHA-256:
+`cb18166d50f2db7776a279cadc6e61397f3a72375b744bf77e49ab8df666adf1`.
+This is finite input evidence, not exhaustive extended-precision equivalence:
+NaNs, infinities, unsupported encodings, extreme exponents and faults are
+not covered. No runtime splice or golden replay is claimed, and the tracker
+remains blocked/unverified. The result strengthens whole-function evidence
+beyond the preceding six isolated argument-setup comparisons. Tracker and
+diff checks pass; no gameplay/UI run was used.
