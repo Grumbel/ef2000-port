@@ -11173,3 +11173,29 @@ hardware model is supplied and the general verifier still refuses service
 programs without an appropriate driver. No tracker promotions or byte-identity
 claims. Reusable compare API replaces the need for bespoke port tracing in
 future original-body checks.
+
+### 2026-11-17: correct outp ABI and check actual palette source
+
+Audit original 117b0c: save EBX, copy EAX to EBX, replace AL with DL,
+replace EDX with EBX, OUT DX,AL, restore EBX, RET. Previous signature wrongly
+listed EDX preserved. Remove it and explicitly declare EAX/EDX clobbers for
+both canonical outp_117b0c and guest_fn_117b0c alias. Preserve ECX and all other
+GPRs. Direct callers 117bc4 and 117d2a do not consume scratch outputs; they
+preserve outer EDX on their own stacks. This avoids generated call contracts
+assuming a value survives in EDX when the original overwrites it.
+
+Compile game_helpers125.c and misc_drafts1.c with pinned Watcom: zero warnings.
+Compare actual Watcom upload_vga_palette_feec8 body to the original 94-byte
+body, executing the actual original 117b0c helper on the compiled side, with
+port callbacks implementing prior hybrid DAC policy. Six scenarios cover
+identical/all-changed/first-only/last-only/alternating/gapped palette changes.
+Port/width/value traces, saved GPRs, ESP and all RAM except code placement and
+stack scratch match. EAX scratch, flags and stack scratch are excluded; no
+splice/replay, universal match or hardware-fidelity claim. Source remains
+compiles; annotate tracker evidence without promotion. Both before and after
+ABI correction pass. Private report:
+local/palette-watcom-source-20261117/report.json SHA-256
+25db57b6ea31cf30354051b18b94d89af3c4c7651626b61d16c2115aa6d68690.
+Commands: tools/ef2000_wcc.py on both modules with pinned compiler;
+pinned-Unicorn Python local/palette-watcom-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

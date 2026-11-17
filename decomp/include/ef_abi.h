@@ -7696,3 +7696,9 @@ void change_network_socket_33ee8(ef_addr32 widget);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux change_network_socket_33ee8 parm [eax] modify [eax]
 #endif
+
+/* 0x117b0c replaces EDX with the port; it does not preserve the value argument. */
+#ifdef __WATCOMC__
+#pragma aux outp_117b0c parm [eax] [edx] modify [eax edx]
+#pragma aux guest_fn_117b0c parm [eax] [edx] modify [eax edx]
+#endif
