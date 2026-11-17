@@ -9327,3 +9327,37 @@ block comparisons; this does not establish whole-body behavior or callee
 behavior. The tracker size and boundary note are corrected while its
 blocked/unverified state remains. No gameplay run was required.
 `python3 tools/decomp_status.py check` and `git diff --check` pass.
+
+### 2026-11-17: recover the campaign handler's missing tail
+
+`mpClickCampaign` at 0x4fe50 had a valid fallthrough at 0x50069 into a
+1,392-byte unowned region, followed by its existing epilogue at 0x505d9.
+The old orphan decode began at 0x5006a and incorrectly interpreted the
+second byte of XOR as an IN instruction. Correct decoding yields 346
+instructions spanning 0x50069..0x505d8, including the loop backedge from
+0x50136 to 0x50079. This is a boundary repair, not a port-I/O implementation.
+
+`tools/ghidra/EF2000Recover4fe50Tail.java` pins the language, full payload,
+region hash, exact old/repaired bodies and preceding fallthrough; rejects
+other function owners; clears the stale listing; checks continuous decode
+and its instruction count; and transactionally applies or reports the
+contiguous body. Region SHA-256:
+`b4ba93d6a7f640aad94681ec788beb4f7bb30978440f8cab9e9cff04f32d9aa7`.
+The tracker size changes from 546 to 1,938 bytes without state promotion.
+
+The successful apply and repeated report live in
+`local/ghidra-campaign-tail-20261117`. This workspace includes the preceding
+bfcc, kotsAccept and 4c120 repairs and is the latest repaired project.
+`local/ghidra-campaign-tail-inventory-20261117` is its fresh inventory.
+`local/asm-campaign-tail-20261117` records matching Ghidra/objdump layouts
+for all 533 instructions and warning-free compilation of the complete
+mechanical C body with OpenWatcom (`-q -bt=dos -3r -za99 -w1 -we`).
+
+The local `check.py` / `execution.json` compare the recovered campaign-mode
+mapping at 0x50386..0x50450 against the original: inputs 0..80, 0x7fff,
+0x8000 and 0xffff with two flag images, 168 full GPR/flags/PC/selector/2MiB
+RAM comparisons. This does not verify earlier loops or called helpers.
+Eight direct callees are absent from the preceding closed generated set:
+0x4f314, 0xa3dc, 0xa4c84, 0xb1e0, 0xb3168, 0xc1438, 0xe490 and 0xf918.
+Whole-body equivalence and dynamic execution remain unproven. No gameplay
+run or updated bulk-closure count is claimed. Tracker and diff checks pass.
