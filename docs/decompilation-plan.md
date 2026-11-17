@@ -9571,3 +9571,36 @@ The report SHA-256 is
 Tracker size/notes are corrected without state promotion. No updated bulk
 closure, runtime splice or golden replay is claimed. Tracker/diff checks
 pass; no gameplay/UI run was used.
+
+### 2026-11-17: preserve branch-targeted TEST/MOV overlapping instructions
+
+The unresolved count branch at 0xe7d27 is intentional x86 overlap: direct
+branches enter the immediate of TEST AX at 0xe7d7a and 0xe7daf, executing
+MOV EDI,ECX at 0xe7d7c and 0xe7db1. Both paths rejoin immediately after
+the four-byte TEST. The primary Ghidra layout is correct and remains intact.
+
+`asm_inventory.overlapping_test_moves` recognizes only exact four-byte
+66 A9 89 /register encodings with an explicit jump/count-branch target at
+byte two. It independently decodes the two embedded bytes, requiring one
+MOV ending at the same PC, and retains both instruction starts. No arbitrary
+interior decoding or function-range extension is accepted. Normalization v2
+records this change. `asm_to_c.read_inventory` reproduces it from the payload,
+checks the original primary layout, and rejects modified decoded operands.
+Historical v1 inventories retain their original linear decoding and hashes.
+
+`local/asm-overlap-20261117` records the complete 100-instruction original
+body with both added starts, matching primary layout, and diagnostic-free
+OpenWatcom compilation (`-q -bt=dos -3r -za99 -w1 -we`). Host compilation
+uses warnings as errors. Of 72 whole-call original/C comparisons, 36 empty
+or single-character substring cases match full RAM, GPRs, flags, selectors
+and return PC. The other 36 multi-character cases stop at the existing
+unsupported descriptor-profile segment reload at 0xe7d73; they are recorded
+as mismatches, not counted as successful equivalence. This change does not
+relax that segment-model restriction. No whole-body equivalence, runtime
+integration or bulk coverage increase is claimed; tracker state is retained.
+
+Validation: all 12 InventoryTests pass, including overlap provenance,
+operand tampering, negative encodings/targets and historical-v1 reading.
+TranslationTests.test_synthetic_programs_match_registers_flags_and_all_ram
+passes with an added conditional TEST/MOV overlap fixture and randomized
+register/flag inputs. Tracker and diff checks pass. No gameplay run was used.

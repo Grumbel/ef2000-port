@@ -12,6 +12,47 @@ from tools import asm_inventory, asm_to_c
 
 
 class InventoryTests(unittest.TestCase):
+    def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root/'payload.bin'
+            image.write_bytes(bytes.fromhex('740266a989cfc3'))
+            rows = [dict(addr='0x0', size='7', name='overlap', state='unknown',
+                         kind='asm', module='')]
+            bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, 7]],
+                instruction_spans=[[0, 2], [2, 4], [6, 1]])])
+            output = root/'inventory'
+            asm_inventory.export_inventory(image, rows, output, body_ranges=bodies)
+            _, records = asm_to_c.read_inventory(output, image)
+            record = records[0]
+            self.assertEqual([(i['address'], i['mnemonic']) for i in record['instructions']],
+                             [(0, 'je'), (2, 'test'), (4, 'mov'), (6, 'ret')])
+            self.assertEqual(record['size'], 7)
+            self.assertIn('case 0x4u:', asm_to_c.translate(record))
+            record['instructions'][2]['operands'] = 'esi,ecx'
+            (output/'00000000.json').write_text(json.dumps(record))
+            with self.assertRaisesRegex(ValueError, 'instruction decode mismatch'):
+                asm_to_c.read_inventory(output, image)
+
+            # Historical v1 inventories retain their original linear decoding.
+            record['instructions'].pop(2)
+            (output/'00000000.json').write_text(json.dumps(record))
+            manifest_path = output/'manifest.json'
+            manifest = json.loads(manifest_path.read_text())
+            manifest['instruction_normalization'] = asm_inventory.PREVIOUS_NORMALIZATION
+            manifest_path.write_text(json.dumps(manifest))
+            _, previous = asm_to_c.read_inventory(output, image)
+            with self.assertRaisesRegex(asm_to_c.Unsupported, 'unresolved or external branch'):
+                asm_to_c.translate(previous[0])
+
+            # Without an explicit branch to the embedded MOV, keep linear decoding.
+            linear = asm_inventory.decode_window(image, 2, 5)
+            self.assertEqual(asm_inventory.overlapping_test_moves(image, linear), linear)
+            for encoded in ('740166a989cfc3', '740266a9890fc3', '740266a990cfc3'):
+                image.write_bytes(bytes.fromhex(encoded))
+                linear = asm_inventory.decode_window(image, 0, 7)
+                self.assertEqual(asm_inventory.overlapping_test_moves(image, linear), linear)
+
     def test_wait_grouping_preserves_raw_evidence_and_instruction_starts(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

@@ -1230,7 +1230,8 @@ def read_inventory(inventory, image):
     if manifest['schema'] == asm_inventory.SCHEMA:
         bodies, digest = asm_inventory.load_body_ranges(inventory / 'ghidra-body-ranges.json', payload)
         if (digest != manifest.get('body_ranges_sha256') or
-                manifest.get('instruction_normalization') != asm_inventory.NORMALIZATION):
+                manifest.get('instruction_normalization') not in
+                (asm_inventory.NORMALIZATION, asm_inventory.PREVIOUS_NORMALIZATION)):
             raise ValueError('invalid normalized inventory provenance')
     records = []
     seen = set()
@@ -1259,6 +1260,8 @@ def read_inventory(inventory, image):
                     record.get('normalized_ghidra_instruction_spans') != normalized or
                     record.get('ghidra_instruction_layout_matches') != matches):
                 raise ValueError('normalized Ghidra instruction layout mismatch')
+            if matches and manifest.get('instruction_normalization') == asm_inventory.NORMALIZATION:
+                decoded = asm_inventory.overlapping_test_moves(image, decoded)
         if (decoded != record['instructions'] or record['address'] != entry['address'] or
                 record['address'] in seen):
             raise ValueError('instruction decode mismatch')

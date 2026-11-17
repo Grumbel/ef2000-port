@@ -30,6 +30,7 @@ def assemble(root, source):
     subprocess.run(['as', '--32', '-o', str(obj), str(assembly)], check=True, capture_output=True)
     subprocess.run(['objcopy', '-O', 'binary', '-j', '.text', str(obj), str(image)], check=True)
     instructions = asm_inventory.decode_window(image, 0x100, image.stat().st_size - 0x100)
+    instructions = asm_inventory.overlapping_test_moves(image, instructions)
     record = dict(address=0x100, boundary='ghidra-body-ranges',
                   ghidra_instruction_layout_matches=True, overlapping_entries=[],
                   undecodable_addresses=[], ranges=[[0x100, image.stat().st_size]],
@@ -102,6 +103,7 @@ class TranslationTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_synthetic_programs_match_registers_flags_and_all_ram(self):
         sources = [
+            'jz 1f\n.byte 0x66,0xa9\n1: mov edi,ecx\nret',
             'mov ah, bl\nmov al, 0x80\nmovzx edx, ah\nmovsx ecx, al\nret',
             'add eax, edx\nret', 'sub al, dl\nret', 'cmp ax, dx\nret',
             'inc ax\ndec ebx\nret', 'neg al\nret', 'neg eax\nret',

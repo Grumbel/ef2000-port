@@ -24,7 +24,33 @@ except ImportError:
 LINE = re.compile(r'^\s*([0-9a-f]+):\s*((?:[0-9a-f]{2}\s+)+)\s*(.*?)\s*$')
 DIRECT = re.compile(r'^(?:0x)?([0-9a-f]+)(?:\s|$)')
 SCHEMA = 4
-NORMALIZATION = 'x87-wait-opcode-split-v1'
+PREVIOUS_NORMALIZATION = 'x87-wait-opcode-split-v1'
+NORMALIZATION = 'x87-wait-and-test-mov-overlap-v2'
+
+
+def overlapping_test_moves(image, instructions, *, objdump='objdump', runner=subprocess.run):
+    """Decode branch-targeted MOV r32,r32 embedded in TEST AX's immediate.
+
+    Both decodings end at the same PC. No arbitrary interior entry or byte
+    scanning is accepted, and the original TEST remains executable.
+    """
+    targets = {i.get('direct_target') for i in instructions
+               if i['mnemonic'].startswith(('j', 'loop'))}
+    additional = []
+    for insn in instructions:
+        encoded = bytes.fromhex(insn['bytes'])
+        site = insn['address'] + 2
+        if (insn['mnemonic'] != 'test' or len(encoded) != 4 or
+                encoded[:3] != b'\x66\xa9\x89' or encoded[3] < 0xc0 or
+                site not in targets):
+            continue
+        decoded = decode_window(image, site, 2, objdump=objdump, runner=runner)
+        if (len(decoded) != 1 or decoded[0]['address'] != site or
+                decoded[0]['bytes'] != encoded[2:].hex() or
+                decoded[0]['mnemonic'] != 'mov'):
+            raise ValueError('embedded MOV decode mismatch')
+        additional.extend(decoded)
+    return sorted(instructions + additional, key=lambda i: i['address'])
 
 
 def wait_prefix_count(encoded):
@@ -216,6 +242,8 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
         normalized = normalized_layout(layout, payload)
         decoded_layout = [[i['address'], len(bytes.fromhex(i['bytes']))] for i in instructions]
         layout_matches = decoded_layout == normalized if layout is not None else None
+        if layout_matches:
+            instructions = overlapping_test_moves(image, instructions, objdump=objdump, runner=runner)
         record = dict(address=address, size=size, name=row['name'],
                       ghidra_instruction_layout_matches=layout_matches,
                       ghidra_instruction_spans=layout,
