@@ -9422,3 +9422,29 @@ not covered. No runtime splice or golden replay is claimed, and the tracker
 remains blocked/unverified. The result strengthens whole-function evidence
 beyond the preceding six isolated argument-setup comparisons. Tracker and
 diff checks pass; no gameplay/UI run was used.
+
+### 2026-11-17: recover seven omitted terminal returns
+
+Seven remaining first-failure fallthroughs are missing only their terminal
+return. `tools/ghidra/EF2000RecoverReturnTails.java` validates the pinned
+payload/language, each exact previous/repaired body, tail hash, preceding
+fallthrough and absence of other function owners. It transactionally adds
+only the checked RET or RET 4. Existing ranges are preserved, including the
+separate ranges in 0x5086c; intervening data is not absorbed.
+
+The recovered bodies and sizes are 0x2065c: 1,182 to 1,185; 0x34a98: 76 to
+77; 0x363c4: 80 to 81; 0x4d5f0: 100 to 101; 0x4dae8: 100 to 101; 0x5086c:
+273 to 274; and 0x68c18: 124 to 125. The total addition is nine bytes.
+The apply and repeated report evidence is in
+`local/ghidra-return-tails-20261117`. This is the latest repaired workspace,
+including all preceding repairs. Its fresh inventory lives in
+`local/ghidra-return-tails-inventory-20261117`.
+
+`local/asm-return-tails-20261117` records matching Ghidra/objdump instruction
+layouts and diagnostic-free OpenWatcom compilation for all seven complete
+mechanical C bodies, 600 instructions total, using
+`-q -bt=dos -3r -za99 -w1 -we`. Source/object hashes are in `compile.json`.
+This is boundary and compilation evidence, not whole-call differential or
+runtime integration proof. Existing tracker states are retained. No updated
+bulk closure count is claimed; direct-dependency analysis is still needed.
+Tracker and diff checks pass. No gameplay/UI testing was needed.
