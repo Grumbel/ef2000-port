@@ -10820,3 +10820,26 @@ Commands: tools/ef2000_wcc.py decomp/src/session_shutdown.c --compiler
 <pinned-wcc386> --output local/session-shutdown-20261117.obj;
 pinned-Unicorn Python local/session-shutdown-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover network mission name callback 0x34844
+
+Recover 160-byte callback with EAX widget input; original pointer at 0x12b5c0,
+no direct inventory callers. Establish packed widget text field +0x27 with
+compile-time offset check. Call the validator even on empty input; read the
+widget text pointer again after validation and during the leading-class scan.
+Keep byte-wrapped character-table indexing. Preserve the original trailing
+scan starting at the NUL rather than silently fixing whitespace handling.
+
+Watcom compilation clean. Sixteen original/emitted-body scoped comparisons
+match call traces, nonstack RAM, saved registers and ESP with explicit callee
+models. Cases include empty, whitespace, high bytes, length 16/17 and validator
+mutation of the widget text pointer. Uses original character-class table.
+EAX/ECX, flags, stack scratch and actual callees are outside the proof; no
+binary identity or splice/replay claim. Keep explicit hybrid exclusion.
+Evidence local/network-mission-name-source-20261117/report.json SHA-256
+e2bd097a676179835f9ea90f185fd96ad9a50a4300e3d2a778bc988b66d57142.
+Tracker: 3428 compiles, 804 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/network_mission_name.c --compiler <pinned-wcc386>
+--output local/network-mission-name-20261117.obj; pinned-Unicorn Python
+local/network-mission-name-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

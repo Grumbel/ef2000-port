@@ -804,3 +804,4 @@ addr	reason
 0x000fa4a9	Recovered shared open C passes 220 scoped model-service comparisons; full DOS bridge/register ABI, zero-write guest stack pointer, splicing and replay equivalence remain unverified. Keep original in broad builds.
 0x0010f26a	Recovered text/binary writer passes 1134 scoped DOS-model comparisons; guest stack allocation/availability, fatal path, full register ABI, real services and replay equivalence remain unverified. Keep original in broad builds.
 0x000347bc	Manual source with concrete lookup/formatter/show calls compiles; scoped original/Watcom-body comparisons model callees and exclude scratch EAX, flags and stack scratch. Actual callees, integration and replay remain unproven.
+0x00034844	Recovered name callback; scoped emitted-body/ASM comparisons with modeled callees only; actual callee integration and splice/replay pending.

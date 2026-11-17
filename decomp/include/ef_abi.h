@@ -7660,3 +7660,8 @@ void shutdown_menu_session_34d94(void);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux shutdown_menu_session_34d94 modify [eax]
 #endif
+
+void accept_network_mission_name_34844(ef_addr32 widget);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux accept_network_mission_name_34844 parm [eax] modify [eax ecx]
+#endif
