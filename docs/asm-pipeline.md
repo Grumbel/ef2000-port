@@ -1288,9 +1288,10 @@ Reports record the contract and admitted instruction sites under
 `host_service_boundaries`. Direct closure here means closure with required
 external services; it is not standalone execution coverage. The existing
 differential driver rejects these reports until a service-aware driver is
-provided. Vectors other than 21h/31h, prefixed forms and missing continuations remain
-unsupported. The runtime byte guards still check the original instruction
-before yielding. No ABI layout change is needed.
+provided. Unrestricted boundary generation admits vectors 21h and 31h.
+Selecting exact sites with `--interrupt-site` also permits other two-byte
+INT encodings. Prefixed forms and missing continuations remain unsupported.
+The runtime byte guards still check the original instruction before yielding. No ABI layout change is needed.
 
 The low-level `asm_c_differential.compare(..., program=True,
 service_factory=...)` API supports register-only service models. The factory

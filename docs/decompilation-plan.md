@@ -11957,3 +11957,21 @@ syntactically supported bodies from 4,260 to 4,261 and kept the closed
 set at 3,701. The body at 0x10848c now resolves through 0x118910 to
 0x11f7ef, where sixteen INT 06h instructions remain unsupported.
 The bulk report is under `local/asm-x87-save-20261118/`.
+
+2026-11-18 — Extended explicit interrupt-site admission to exact
+two-byte INT encodings. Default admission still selects vectors 21h
+and 31h. The dispatcher yields the selected vector, and the report
+propagates every admitted request through direct dependencies.
+A synthetic INT 06h fixture checks unserviced yield, callback arguments
+and register updates. Unicorn rejects that original instruction in this
+fixture, so the callback check provides generated-side evidence only.
+
+The reviewed 64-way division dispatch contains sixteen distinct INT 06h
+exits. Both previously audited caller sites use table index 15, whose
+case returns without an interrupt. Enabling those sixteen sites plus
+the existing DOS/DPMI and scalar port boundaries increased generation
+from 3,701 to 3,971 bodies. All 270 added bodies (122,571 original
+body bytes) compiled without OpenWatcom diagnostics. The report is
+under `local/asm-int06-boundary-20261118/`. The generated INT 06h exits
+require a host callback if reached. No interrupt handler behavior or
+tracker promotion is established by this compile check.

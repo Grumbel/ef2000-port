@@ -870,6 +870,45 @@ ret
             with self.assertRaisesRegex(ValueError, 'require interrupt boundaries'):
                 asm_c_program.generate(directory, root/'bad', image, interrupt_sites={0x100})
 
+    def test_explicit_interrupt_site_requires_vector_aware_service(self):
+        source = '.type root,@function\nroot: int 6\nret\n.size root, .-root'
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            self.assertFalse(asm_c_program.analyse(records, interrupt_boundaries=True)[2])
+            out = root/'out'
+            report = asm_c_program.generate(directory, out, image,
+                                            interrupt_boundaries=True, interrupt_sites={0x100})
+            self.assertEqual(report['host_service_boundaries']['requests'], [dict(ip=0x100, vector=6)])
+            self.assertEqual(report['entries'][0]['reachable_host_service_sites'], [0x100])
+            subprocess.run(['cc', '-shared', '-fPIC', *map(str, sorted(out.glob('*.c'))),
+                            '-o', str(root/'program.so')], check=True, capture_output=True)
+            library = ctypes.CDLL(str(root/'program.so'))
+            function = library.ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+
+            ram = (ctypes.c_uint8 * 4096)()
+            ram[:len(image.read_bytes())] = image.read_bytes()
+            state = asm_c_differential.State((ctypes.c_uint32 * 8)(), 0x246, 0x100, 0, ram, len(ram))
+            self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 0x106)
+            self.assertEqual(state.pc, 0x102)
+            callback_type = ctypes.CFUNCTYPE(ctypes.c_uint, ctypes.POINTER(asm_c_differential.State),
+                                             ctypes.c_uint32, ctypes.c_uint, ctypes.c_void_p)
+            requests = []
+
+            @callback_type
+            def respond(guest, ip, vector, context):
+                requests.append((ip, vector))
+                guest.contents.r[0] = 42
+                return 0
+
+            state.pc = 0x100
+            run = library.ef_lift_run_services
+            run.argtypes = [*function.argtypes, callback_type, ctypes.c_void_p]
+            self.assertEqual(run(ctypes.byref(state), 1, 0xf00, respond, None), 1)
+            self.assertEqual(requests, [(0x100, 6)])
+            self.assertEqual(state.r[0], 42)
+
     def test_port_requirements_propagate_through_call_cycles(self):
         source = '''.type root,@function
 root: call middle

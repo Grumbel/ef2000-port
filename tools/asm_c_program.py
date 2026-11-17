@@ -72,18 +72,26 @@ def port_service_request(insn):
                 status=0x1000 | (len(encoded) << 8) | opcode)
 
 
+def interrupt_vector(insn):
+    encoded = insn['bytes']
+    if insn['mnemonic'] == 'int' and len(encoded) == 4 and encoded.startswith('cd'):
+        return int(encoded[2:], 16)
+    return None
+
+
 def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
                   interrupt_sites=None, port_boundaries=False, port_sites=None):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
-    if (interrupt_boundaries and mnemonic == 'int' and insn['bytes'] in ('cd21', 'cd31') and
-            (interrupt_sites is None or insn['address'] in interrupt_sites)):
+    vector = interrupt_vector(insn) if interrupt_boundaries else None
+    if vector is not None and (insn['address'] in interrupt_sites if interrupt_sites is not None
+                               else vector in (0x21, 0x31)):
         next_pc = insn['address'] + 2
         if next_pc not in starts:
             raise asm_to_c.Unsupported('unresolved interrupt return continuation')
         # A host-service boundary, not architectural interrupt delivery.
         # No stack frame, flag change or service result is fabricated.
-        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x100 + int(insn['bytes'][2:], 16))
+        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x100 + vector)
     if (port_boundaries and mnemonic in ('in', 'out') and
             (port_sites is None or insn['address'] in port_sites)):
         request = port_service_request(insn)
@@ -238,7 +246,7 @@ def dispatcher(records, *, shard_entries=2048):
 #include "ef_lift_state.h"
 typedef unsigned (*ef_lift_step_function)(ef_lift_state *, uint32_t);
 /* Callback arguments: state, original instruction IP, request, context.
- * INT requests are vectors 0x21/0x31. Port requests encode
+ * INT requests are vectors from the manifest. Port requests encode
  * 0x1000 | (instruction_length << 8) | opcode. Decode the original bytes
  * to distinguish operand-size prefixes and immediate ports; read DX low word
  * for register ports. IN must update only AL/AX/EAX; OUT preserves registers.
@@ -325,7 +333,7 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
     if (s->fault) return s->fault;
     while (fuel--) {
         status = ef_lift_run(s, 1, stop_pc);
-        if ((status == 0x121u || status == 0x131u) && service) {
+        if ((status >= 0x100u && status <= 0x1ffu) && service) {
             status = service(s, s->pc - 2u, status - 0x100u, context);
             if (status) return status;
             if (s->fault) return s->fault;
@@ -349,7 +357,7 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
     """Conservative direct-call closure; request numbers and indirect edges are unknown."""
     sites = {r['address']: {i['address'] for i in r['instructions']
                            if ((i['mnemonic'] in ('in', 'out')) if ports else
-                               (i['mnemonic'] == 'int' and i['bytes'] in ('cd21', 'cd31')))}
+                               (interrupt_vector(i) is not None))}
              for r in records if r['address'] in closed}
     callers = {address: set() for address in closed}
     for address in closed:
@@ -440,13 +448,12 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
         'scalar port sites only; conservative direct-edge closure; dynamic targets and '
         'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
     if interrupt_boundaries:
-        sites = sorted((i['address'], int(i['bytes'][2:], 16))
+        sites = sorted((i['address'], interrupt_vector(i))
                        for r in records if r['address'] in closed
-                       for i in r['instructions'] if i['mnemonic'] == 'int'
-                       and i['bytes'] in ('cd21', 'cd31'))
+                       for i in r['instructions'] if interrupt_vector(i) is not None)
         result['host_service_boundaries'] = dict(
             model='int-service-yield-v2',
-            statuses={'0x21': 0x121, '0x31': 0x131},
+            statuses={f'0x{vector:02x}': 0x100 + vector for vector in sorted({v for _, v in sites})},
             sites=[ip for ip, vector in sites],
             requests=[dict(ip=ip, vector=vector) for ip, vector in sites],
             contract='PC is continuation; service IP is PC-2; vector is status-0x100; host must service request before resuming')
@@ -469,9 +476,9 @@ def main(argv=None):
     parser.add_argument('--workspace', type=Path, default=asm_to_c.ROOT / 'local/ghidra')
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interrupt-boundaries', action='store_true',
-                        help='yield INT 21h/31h to an external host service; does not implement the service')
+                        help='yield INT 21h/31h or explicitly selected INT sites to an external host service')
     parser.add_argument('--interrupt-site', type=lambda value: int(value, 0), action='append',
-                        help='restrict yielded INT 21h/31h sites to these instruction addresses (repeatable)')
+                        help='yield only these exact two-byte INT instruction addresses (repeatable)')
     parser.add_argument('--port-boundaries', action='store_true',
                         help='yield scalar IN/OUT to a host service; does not implement devices')
     parser.add_argument('--port-site', type=lambda value: int(value, 0), action='append',

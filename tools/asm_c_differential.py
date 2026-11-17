@@ -179,7 +179,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         # Selectors, descriptor caches and architectural interrupt delivery remain
         # outside this host-service contract.
         if vector != 0x21 and not vector_services:
-            raise ValueError('host service handler requires vector_services for INT31')
+            raise ValueError(f'host service handler requires vector_services for INT{vector:02X}')
         args = (vector, ip, dict(values)) if vector_services else (ip, dict(values))
         if memory_services:
             before_memory = hashlib.sha256(ram).hexdigest()
@@ -250,13 +250,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
     if original_service is not None:
         def interrupt(engine, vector, _):
-            if vector not in (0x21, 0x31):
-                raise ValueError('unsupported host service vector')
+            ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
+            if ip < 0 or vector not in range(256) or engine.mem_read(ip, 2) != bytes((0xcd, vector)):
+                raise ValueError('unsupported host service instruction')
             values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
-            response = service(original_service, engine.reg_read(x86_const.UC_X86_REG_EIP)-2,
+            response = service(original_service, ip,
                                values, original_events, vector, ram)
             if memory_services:
                 engine.mem_write(0, bytes(ram))
@@ -343,7 +344,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if status in (0x121, 0x131) and translated_service is not None:
+            if 0x100 <= status <= 0x1ff and translated_service is not None:
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
