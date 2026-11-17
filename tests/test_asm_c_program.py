@@ -582,6 +582,17 @@ leaf: ret
         self.assertEqual(asm_c_program.root_blockers(dependencies, {5}, reasons),
                          {1: [3, 4], 2: [3, 4], 3: [3], 4: [4]})
 
+    def test_service_reachability_handles_cycles_and_excludes_unsupported_bodies(self):
+        records = [dict(address=a, instructions=insns) for a, insns in [
+            (1, []), (2, []),
+            (3, [dict(address=30, mnemonic='int', bytes='cd21')]),
+            (4, [dict(address=40, mnemonic='int', bytes='cd31')]),
+            (5, []), (6, [dict(address=60, mnemonic='int', bytes='cd21')])]]
+        dependencies = {1: {2}, 2: {1, 3, 4}, 3: set(), 4: set(), 5: {5}, 6: set()}
+        self.assertEqual(asm_c_program.reachable_service_sites(
+            records, dependencies, {1, 2, 3, 4, 5}),
+            {1: [30, 40], 2: [30, 40], 3: [30], 4: [40], 5: []})
+
     def test_interrupt_sites_admit_only_audited_service_callers(self):
         source = '''.type root,@function
 root: int 0x21
@@ -605,6 +616,7 @@ ret
             self.assertEqual(entries[0x100]['state'], 'generated-unverified')
             self.assertEqual(entries[0x200]['state'], 'unsupported')
             self.assertEqual(report['host_service_boundaries']['sites'], [0x100])
+            self.assertEqual(entries[0x100]['reachable_host_service_sites'], [0x100])
             with self.assertRaisesRegex(ValueError, 'require interrupt boundaries'):
                 asm_c_program.generate(directory, root/'bad', image, interrupt_sites={0x100})
 

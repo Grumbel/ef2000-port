@@ -11019,3 +11019,26 @@ This is adapter-policy evidence, not original DOS equivalence or a bulk
 function promotion; tracker counts remain unchanged. Commands:
 python3 -m unittest tests.test_asm_dos_file_service (PASS);
 python3 tools/decomp_status.py check (4293 functions); git diff --check.
+
+### 2026-11-17: expose transitive service requirements in bulk reports
+
+Add reachable_host_service_sites to each generated function report entry.
+Compute a conservative fixed point over translated direct dependencies,
+including cycles, recording interrupt instruction addresses. Report scope
+explicitly excludes unknown dynamic targets/request numbers and does not
+claim implemented services or equivalence. Existing generated C is unchanged.
+
+Refresh private snapshot local/asm-service-reachability-20261117/report.json
+using the preceding frontier's admitted interrupt sites. SHA-256:
+e07411ebc4fc6d6f84a0beb3f4a7877b7e4f983ad433930e588c86494b02d5fa.
+Of 3032 generated functions, 443 reach admitted service sites through direct
+edges. Of the 399 currently blocked yet generated functions, 90 have these
+service dependencies. The other 309 still need equivalence evidence and may
+have dynamic/backend dependencies; absence of direct service requirements
+is not evidence of completeness. No tracker promotions.
+
+Validation: pinned-Unicorn Python -m unittest tests.test_asm_c_program:
+26 PASS, including recursive service propagation, mixed DOS/DPMI vectors,
+unsupported-body exclusion and emitted report fields. Full original-inventory
+generation succeeds. python3 tools/decomp_status.py check and git diff --check
+pass. No game/UI tests or binary-identity claims.

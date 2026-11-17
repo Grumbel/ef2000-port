@@ -281,6 +281,26 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
 ''' % '\n'.join(chunks)
     return files
 
+def reachable_service_sites(records, dependencies, closed):
+    """Conservative direct-call closure; request numbers and indirect edges are unknown."""
+    sites = {r['address']: {i['address'] for i in r['instructions']
+                           if i['mnemonic'] == 'int' and i['bytes'] in ('cd21', 'cd31')}
+             for r in records if r['address'] in closed}
+    callers = {address: set() for address in closed}
+    for address in closed:
+        for target in dependencies[address]:
+            callers[target].add(address)
+    pending = {address for address, requests in sites.items() if requests}
+    while pending:
+        target = pending.pop()
+        for caller in callers[target]:
+            added = sites[target] - sites[caller]
+            if added:
+                sites[caller].update(added)
+                pending.add(caller)
+    return {address: sorted(requests) for address, requests in sites.items()}
+
+
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
              interrupt_sites=None):
     if interrupt_sites is not None and not interrupt_boundaries:
@@ -291,6 +311,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+    service_sites = reachable_service_sites(records, dependencies, closed)
     report = []
     for record in records:
         address = record['address']
@@ -300,7 +321,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
             if address in dependencies:
                 item['dependencies'] = sorted(dependencies[address])
         if address in closed:
-            item.update(state='generated-unverified', file='ef_lift_%08x.c' % address,
+            item.update(reachable_host_service_sites=service_sites[address],
+                        state='generated-unverified', file='ef_lift_%08x.c' % address,
                         source_sha256=hashlib.sha256(codes[address].encode()).hexdigest(),
                         dependencies=sorted(dependencies[address]),
                         dynamic_transfer_sites=[i['address'] for i in map(legacy_transfer, record['instructions'])
@@ -325,6 +347,9 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
+    result['host_service_reachability_scope'] = (
+        'conservative direct-edge closure; dynamic targets and runtime request numbers unknown; '
+        'reachable sites do not prove service implementation or equivalence')
     if interrupt_boundaries:
         sites = sorted((i['address'], int(i['bytes'][2:], 16))
                        for r in records if r['address'] in closed
