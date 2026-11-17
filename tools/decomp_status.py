@@ -159,6 +159,7 @@ def translation_blockers(rows, report, out=sys.stdout):
         entries[address] = entry
     counts = collections.Counter()
     roots = collections.Counter()
+    service_dependencies = collections.Counter()
     for row in rows:
         if row['state'] != 'blocked':
             continue
@@ -167,11 +168,19 @@ def translation_blockers(rows, report, out=sys.stdout):
                     'generated, unverified' if entry['state'] == 'generated-unverified'
                     else 'excluded by generator')
         counts[category] += 1
+        if entry is not None and entry['state'] == 'generated-unverified':
+            sites = entry.get('reachable_host_service_sites')
+            service_dependencies['unknown' if sites is None else 'present' if sites else 'absent'] += 1
         if entry is not None and entry['state'] != 'generated-unverified':
             roots.update(set(entry.get('root_blockers', [])))
     print('Blocked tracker rows versus supplied translation report:', file=out)
     for category in ('generated, unverified', 'excluded by generator', 'outside inventory'):
         print(f'  {category:<25} {counts[category]:>6,} functions', file=out)
+    print('Generated blocked functions: direct interrupt-service dependencies:', file=out)
+    for key, label in (('present', 'reachable sites'), ('absent', 'no recorded reachable sites'),
+                       ('unknown', 'not measured by report')):
+        print(f'  {label:<29} {service_dependencies[key]:>6,} functions', file=out)
+    print('Direct-edge reachability excludes dynamic targets; it does not prove service support.', file=out)
     print('Root blockers (affected blocked functions; groups overlap):', file=out)
     for address, count in sorted(roots.items(), key=lambda item: (-item[1], item[0]))[:10]:
         reason = entries.get(address, {}).get('reason', 'absent from report')

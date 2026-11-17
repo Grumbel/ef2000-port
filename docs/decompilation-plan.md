@@ -11042,3 +11042,17 @@ Validation: pinned-Unicorn Python -m unittest tests.test_asm_c_program:
 unsupported-body exclusion and emitted report fields. Full original-inventory
 generation succeeds. python3 tools/decomp_status.py check and git diff --check
 pass. No game/UI tests or binary-identity claims.
+
+### 2026-11-17: show generated service dependencies in project status
+
+Extend status --translation-report (also forwarded by nix run .#status) with
+three counts for generated blocked functions: reachable interrupt sites, no
+recorded reachable sites, and unmeasured by older reports. Keep absent evidence
+separate from an explicitly empty site list. Exclude nonblocked tracker rows
+and explain that direct-edge reachability cannot prove service support.
+Document usage in README. The current private reachability snapshot reports
+90/309/0 respectively. No tracker changes or equivalence claims.
+
+Validation: python3 -m unittest tests.test_decomp_status (12 PASS), including
+old-report compatibility and exclusion of nonblocked functions; status against
+local/asm-service-reachability-20261117/report.json; tracker check; diff check.

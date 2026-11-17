@@ -19,7 +19,9 @@ To distinguish tracker-blocked functions that already have generated C from
 remaining generator exclusions, pass a bulk translator report:
 `nix run .#status -- --translation-report /absolute/path/to/report.json`.
 This also ranks shared root blockers by affected blocked functions. Groups
-overlap. The supplied report is a snapshot; this does not validate its freshness,
+overlap. New reports distinguish generated blocked functions with reachable
+interrupt-service sites from those without recorded sites; older reports show
+this as not measured. Reachability follows direct dependencies only. The supplied report is a snapshot; this does not validate its freshness,
 runtime services, or equivalence, and does not change tracker states.
 
 To record a comparison, review the original contiguous body and the compiled

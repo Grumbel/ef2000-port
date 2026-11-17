@@ -169,6 +169,24 @@ class DecompStatusTest(unittest.TestCase):
         with self.assertRaises(decomp_status.TrackerError):
             decomp_status.translation_blockers(rows, report, io.StringIO())
 
+    def test_service_dependency_counts_distinguish_missing_from_empty(self):
+        rows = [decomp_status.new_row(address, 10, '') for address in (1, 2, 3, 4)]
+        for row in rows:
+            row['state'] = 'blocked'
+        rows[3]['state'] = 'compiles'
+        report = {'model': 'flat-x86-program-explicit-state', 'entries': [
+            {'address': 1, 'state': 'generated-unverified', 'reachable_host_service_sites': [99]},
+            {'address': 2, 'state': 'generated-unverified', 'reachable_host_service_sites': []},
+            {'address': 3, 'state': 'generated-unverified'},
+            {'address': 4, 'state': 'generated-unverified', 'reachable_host_service_sites': [99]},
+        ]}
+        out = io.StringIO()
+        decomp_status.translation_blockers(rows, report, out)
+        for label in ('reachable sites', 'no recorded reachable sites', 'not measured by report'):
+            self.assertTrue(any(line.strip().startswith(label) and line.endswith('1 functions')
+                                for line in out.getvalue().splitlines()))
+        self.assertIn('does not prove service support', out.getvalue())
+
     def test_committed_tracker_is_valid(self):
         tracker = ROOT / 'decomp/symbols/functions.tsv'
         if not tracker.exists():
