@@ -10540,3 +10540,28 @@ Extracted read C compiles without diagnostics with wcc386 -q -bt=dos -3r
 The generation snapshot with fa9a8 additionally allowed is
 `local/asm-file-close-services-20261117/report.json`: two additional generated
 bodies over the previous file-service snapshot. No tracker promotions follow.
+
+
+### 2026-11-17 — Compare real read service RAM effects
+
+Extended the standard program differential API with explicit `memory_services`.
+Service handlers receive disposable current-RAM snapshots; validated register
+responses and fixed-size RAM effects commit together. Service traces bind RAM
+before/after hashes in addition to exact register requests/responses, including
+transient differences later overwritten by guest instructions. Selector/cache
+and out-of-RAM mappings remain outside the service API. Existing register-only
+handlers retain their contract.
+
+Pinned Unicorn Python `-m unittest tests.test_asm_c_program`: all 25 tests pass.
+The added regression covers matching memory writes, differing writes hidden by
+later guest overwrites, and both original/translated RAM resize rejection.
+Pinned Unicorn Python `local/asm-dos-read-cluster-20261117/native.py`: six
+standard full-state comparisons pass for the generated six-body read/error/
+store/address cluster with independent real DosDrive instances and mutable
+service RAM. Counts 0/3/20 exercise zero-length, partial and short EOF reads;
+valid/invalid handles exercise success/error. Compared exact service traces,
+RAM, registers, flags and x87 plus overlay/original files. Report SHA-256:
+`f5d762354f5de970e09cef7123d9fcaeee89af4ecb33ded83d8f9d25223cc40f`.
+These probes now include actual read buffer effects under the hybrid DOS policy;
+they do not establish fidelity to the original extender or full integration.
+No tracker promotion.

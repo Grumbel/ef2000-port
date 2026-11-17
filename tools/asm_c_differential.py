@@ -119,12 +119,14 @@ def probes(count, seed):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None):
+            prepared_memory_size=None, memory_services=False):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR
     from unicorn import x86_const
 
     if service_factory is not None and not program:
         raise ValueError('host services require the program dispatcher')
+    if memory_services and service_factory is None:
+        raise ValueError('memory services require a service factory')
     if prepared_memory_size is not None:
         if captured is not None:
             raise ValueError('captured RAM cannot be resized')
@@ -136,17 +138,27 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     translated_service = service_factory() if service_factory else None
     original_events, translated_events = [], []
 
-    def service(handler, ip, values, event_log, vector=0x21):
-        # Register-only services: selectors and memory-changing services need
-        # a richer bridge and are deliberately outside this interface.
+    def service(handler, ip, values, event_log, vector=0x21, ram=None):
+        # RAM is a disposable snapshot: commit only after validating the response.
+        # Selectors, descriptor caches and architectural interrupt delivery remain
+        # outside this host-service contract.
         if vector != 0x21 and not vector_services:
             raise ValueError('host service handler requires vector_services for INT31')
-        response = (handler(vector, ip, dict(values)) if vector_services else
-                    handler(ip, dict(values)))
+        args = (vector, ip, dict(values)) if vector_services else (ip, dict(values))
+        if memory_services:
+            before_memory = hashlib.sha256(ram).hexdigest()
+            expected_size = len(ram)
+            args += (ram,)
+        response = handler(*args)
         if set(response) != set(values) or any(type(v) is not int or not 0 <= v <= 0xffffffff
                                                for v in response.values()):
             raise ValueError('invalid host service register response')
+        if memory_services and len(ram) != expected_size:
+            raise ValueError('host service resized guest RAM')
         event = dict(ip=ip, before=dict(values), after=dict(response))
+        if memory_services:
+            event['memory'] = dict(before_sha256=before_memory,
+                                   after_sha256=hashlib.sha256(ram).hexdigest())
         if vector_services:
             event['vector'] = vector
         event_log.append(event)
@@ -205,8 +217,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+            ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
             response = service(original_service, engine.reg_read(x86_const.UC_X86_REG_EIP)-2,
-                               values, original_events, vector)
+                               values, original_events, vector, ram)
+            if memory_services:
+                engine.mem_write(0, bytes(ram))
             for n, r in zip(service_names, asm_to_c.REGS):
                 engine.reg_write(getattr(x86_const, 'UC_X86_REG_'+r.upper()), response[n])
             engine.reg_write(x86_const.UC_X86_REG_EFLAGS, response['flags'])
@@ -262,9 +277,13 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
-                    response = service(translated_service, state.pc-2, values, translated_events, status-0x100)
+                    ram = bytearray(memory) if memory_services else None
+                    response = service(translated_service, state.pc-2, values, translated_events,
+                                       status-0x100, ram)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C service unavailable: '+str(error)])
+                if memory_services:
+                    memory[:] = ram
                 state.r[:] = [response[n] for n in service_names]
                 state.flags = response['flags']
                 status = 0 if state.pc == sentinel else 1

@@ -1364,3 +1364,17 @@ CF/EAX. Other host failures propagate. This is an adapter to the existing
 runtime service policy, not an implementation of the original DOS extender.
 It is not yet selected by the interactive hybrid command, and does not handle
 open/read, DPMI, segment changes or general interrupt dispatch.
+
+For RAM-changing host services, `asm_c_differential.compare` accepts
+`memory_services=True` alongside `service_factory`. Handlers receive a final
+mutable bytearray argument containing the current mapped guest RAM; the usual
+register response remains required. With `vector_services=True` the signature
+is `(vector, ip, registers, ram)`, otherwise `(ip, registers, ram)`. Each call
+gets a disposable snapshot; register response and unchanged RAM length are
+validated before committing its effects. Resizing RAM rejects the observation.
+The compared service trace includes SHA-256 of RAM before and after each
+request, so later guest overwrites cannot hide different service effects.
+Final RAM, registers, flags and x87 comparisons remain active. This interface
+does not expose selectors, hidden descriptor caches or mappings outside the
+modeled guest RAM, and does not model architectural interrupt entry/return.
+Legacy register-only handlers retain their existing signatures and traces.
