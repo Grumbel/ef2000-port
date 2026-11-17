@@ -10843,3 +10843,34 @@ decomp/src/network_mission_name.c --compiler <pinned-wcc386>
 --output local/network-mission-name-20261117.obj; pinned-Unicorn Python
 local/network-mission-name-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: refresh bulk frontier after intdos file-service recovery
+
+Regenerate the full current body inventory with the previous file-open
+snapshot's interrupt-site set plus 0x2f0 (generic intdos). Current data16 FS
+stores now translate the gateway. This produces 3,032 generated-unverified
+bodies / 544,308 original body bytes, up 108 bodies / 26,822 bytes from the
+previous snapshot. All 108 newly emitted bodies pass host C99 syntax checking
+with implicit function declarations treated as errors. This is generation and
+compilation evidence only; no new equivalence or tracker promotion.
+
+Snapshot: local/asm-intdos-frontier-20261117/report.json, SHA-256
+e1b596044881b4ce896cb31d844476b1a05f5043529f194a1c649e31e25840ad.
+Compilation record: same directory/new-body-compile-report.json, SHA-256
+0a8eef6047753ab05e1b6bba3a7b3f41d70bff14edb8333ac55fe0bee0b47f42.
+Command: tools.asm_c_program.generate(current inventory, fresh output, original
+payload, interrupt_boundaries=True, interrupt_sites=previous sites | {0x2f0});
+cc -std=c99 -Werror=implicit-function-declaration -fsyntax-only -I<output>
+<each newly emitted body>. All generated source remains ignored under local/.
+
+Against the current 804 blocked rows, 401 / 224,556 bytes have generated C,
+393 / 232,935 bytes remain excluded and 10 / 451 bytes are outside inventory.
+Leading overlapping blockers: FCOS 147, FSIN 146, OUT 129, IN 128, FPATAN 125,
+X-32 wrapper 0x11124c 119, delete interrupt 0xfe541 78, 0x11d63f 70,
+writer interrupt 0x10f26a 56, F2XM1 47. Removing the intdos translation barrier
+alone does not close all its callers' other dependencies. Service yields
+remain requests: the runtime gateway accepts only its file-service whitelist;
+other requests still reject. Direct-edge closure does not establish indirect
+coverage, full runtime services or original behavior. This replaces the older
+snapshot for deciding the next shared instruction/service work; tracker states
+remain unchanged.
