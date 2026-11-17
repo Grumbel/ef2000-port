@@ -82,6 +82,8 @@ class AsmCaptureTests(unittest.TestCase):
             'fninit\nfldln2\nfstp tbyte ptr [0x2200]\nfldpi\nfldl2t\nret',
             'enter 16,0\nmov eax,[ebp]\nleave\nret',
             'enter 0,0\nleave\nret',
+            'bsr eax,dword ptr [0x2000]\nbsf dx,ax\nret',
+            'xor eax,eax\nbsr edx,eax\nbsf dx,ax\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

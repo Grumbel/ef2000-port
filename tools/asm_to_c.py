@@ -822,6 +822,21 @@ def instruction_c(insn, starts):
             raise Unsupported('unsupported XLAT addressing')
         code += ['a = ef_read_segment(s, %d, (uint32_t)(s->r[3] + (s->r[0] & 255u)), 8);' % source[3],
                  'if (s->fault) return s->fault;', write(operand('al'), 'a', 8)]
+    elif mnemonic in ('bsf', 'bsr'):
+        arguments = [operand(part) for part in text.split(',')]
+        if len(arguments) != 2:
+            raise Unsupported('unsupported bit scan operands')
+        dst, src = arguments
+        width = width_of(dst)
+        if (dst[0] != 'reg' or width not in (16, 32) or src[0] not in ('reg', 'mem') or
+                width_of(src) not in (None, width)):
+            raise Unsupported('unsupported bit scan widths')
+        code += ['a = %s; if (s->fault) return s->fault;' % read(src, width),
+                 # Undefined flags follow the existing Unicorn oracle policy.
+                 '(void)ef_logic(s, a, %d); if (a) { b = 0;' % width,
+                 'while ((a >>= 1) != 0) ++b;' if mnemonic == 'bsr' else
+                 'while (!(a & 1u)) { a >>= 1; ++b; }',
+                 write(dst, 'b', width), '}']
     elif mnemonic == 'bswap':
         dst = operand(text)
         if dst[0] != 'reg' or width_of(dst) != 32:

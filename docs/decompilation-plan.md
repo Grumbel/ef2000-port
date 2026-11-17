@@ -8691,3 +8691,30 @@ compiled warning-free with OpenWatcom; git diff --check. No gameplay runs.
 The native fixture and comparison are committed as tests/native_enter.c
 and tests/test_asm_enter.py. Bulk regeneration and broader execution remain
 pending, as do descriptor reloads and unsupported x87 arithmetic.
+
+### 2026-11-17 — Translate BSF/BSR and check the original integer conversion
+
+Added 16/32-bit BSF and BSR with register or segmented-memory sources.
+Reads complete before any flag/destination effects; zero sources leave
+the destination unchanged. ZF is architectural; other undefined flags
+follow the existing Unicorn policy (SZP from the source, CF/OF/AF clear).
+This is an explicit oracle convention, not a claim that all hardware
+implements identical undefined flags.
+
+Validation: tests.test_asm_capture and the synthetic full-register,
+flags/all-RAM comparison (5 tests passing), including zero input, partial
+register destinations, aliases and memory operands. Independently
+revalidated and translated original body `0xeff7f` (uint_to_extended),
+then compared nine controlled boundary inputs against original execution
+with ring-3 descriptor state: all passed with no differences. These are
+synthetic initial states around the original body, not gameplay captures.
+The first probe setup omitted table bytes from baseline RAM; aligning
+baseline RAM with the restored descriptor tables resolved its table-only
+mismatch without excluding any memory from comparison.
+
+Reproduction and results remain under
+`local/asm-c-bit-scan-20261117/{check.py,report.json}`. The generated
+original-body unit compiled warning-free with OpenWatcom; git diff --check.
+No gameplay runs and no manual tracker promotion. This removes the known
+BSR instruction blocker; whole-corpus regeneration, descriptor reloads and
+unsupported x87 arithmetic remain pending.
