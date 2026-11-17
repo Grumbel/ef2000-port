@@ -11677,3 +11677,23 @@ Commands: tools/ef2000_wcc.py decomp/src/network_type_callback.c --compiler
 <pinned-wcc386> --output local/network-type-20261117.obj;
 pinned-Unicorn Python local/network-type-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover receive-status callbacks
+
+Recovered 35e68/35e90 (37 bytes each) into network_receive_callbacks.c.
+Confirm EAX widget, six preserved GPRs and real apply/clear/rescale calls.
+The two zero stack words are the 0.0 scale read by 35de0, which uses RET8.
+Callback slots 12b560/12b568, no direct callers. Watcom zero warnings.
+64 scoped compiled-C/original-ASM comparisons PASS with three callees modeled:
+check EAX/EDX/EBX apply arguments, original widget passed to clear, both zero
+stack words, callee cleanup, six saved GPRs, ESP, call traces and 5 MiB RAM
+excluding code placement/stack scratch. Vary widget addresses, saved-register
+values, initial global bytes and callback mutations. Scratch EAX, flags,
+stack contents and actual integration remain unproved. Keep hybrid excluded,
+state compiles. Tracker 3457 compiles / 775 blocked / 453964 blocked bytes.
+Private report local/network-receive-source-20261117/report.json, SHA-256
+66b14ccd5e25d77c45287dcb0841303786d8f6cf540add222a417c3186a8473f.
+Commands: tools/ef2000_wcc.py decomp/src/network_receive_callbacks.c --compiler
+<pinned-wcc386> --output local/network-receive-20261117.obj;
+pinned-Unicorn Python local/network-receive-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

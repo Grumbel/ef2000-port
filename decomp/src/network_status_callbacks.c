@@ -38,23 +38,3 @@ void net_open_initialise_35128(void)
     guest(0x34ea4u, 0u, 0u, 0u);
     guest(0xac7a8u, 0x182f24u, 0u, 0u);
 }
-
-/* 35e68 and 35e90 are distinct named callbacks with identical 37-byte
- * bodies. Both connect the status widget, clear its editable state and
- * forward two zero-valued stack arguments to the RX status routine. */
-static void open_rx_status(ef_addr32 widget)
-{
-    guest(0xa75b4u, widget, 0x182fa8u, 0u);
-    guest(0xa7434u, widget, 0u, 0u);
-    guest(0x35de0u, 0u, 0u, 0u);
-}
-
-void net_open_rx_status_35e68(ef_addr32 widget)
-{
-    open_rx_status(widget);
-}
-
-void net_set_nonentry_flag_35e90(ef_addr32 widget)
-{
-    open_rx_status(widget);
-}

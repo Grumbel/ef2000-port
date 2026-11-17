@@ -7784,3 +7784,8 @@ void refresh_network_controls_33630(void);
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_type_35eb8 parm [eax] modify [eax]
 #endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_open_rx_status_35e68 parm [eax] modify [eax]
+#pragma aux net_set_nonentry_flag_35e90 parm [eax] modify [eax]
+#endif
