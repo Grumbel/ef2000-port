@@ -70,7 +70,7 @@ def binary_register(insn):
 
 
 def stack_operation(mnemonic, text):
-    unary = {'fld1': 0, 'fldz': 1, 'fchs': 3, 'fabs': 4, 'fincstp': 9, 'fdecstp': 10, 'fldl2e': 11, 'fldlg2': 12}
+    unary = {'fld1': 0, 'fldz': 1, 'fchs': 3, 'fabs': 4, 'fincstp': 9, 'fdecstp': 10, 'fldl2e': 11, 'fldlg2': 12, 'fldln2': 13, 'fldpi': 14, 'fldl2t': 15}
     if mnemonic in unary and not text:
         return unary[mnemonic], 0
     register = {'fld': 2, 'fxch': 5, 'fst': 6, 'fstp': 7, 'ffree': 8}
@@ -108,7 +108,8 @@ STACK_RUNTIME = r'''
 enum {
     EF_X87_ONE, EF_X87_ZERO, EF_X87_LOAD, EF_X87_CHS, EF_X87_ABS,
     EF_X87_EXCHANGE, EF_X87_STORE, EF_X87_STORE_POP, EF_X87_FREE,
-    EF_X87_INC_TOP, EF_X87_DEC_TOP, EF_X87_LOG2_E, EF_X87_LOG10_2
+    EF_X87_INC_TOP, EF_X87_DEC_TOP, EF_X87_LOG2_E, EF_X87_LOG10_2,
+    EF_X87_LN_2, EF_X87_PI, EF_X87_LOG2_10
 };
 static unsigned ef_x87_index(ef_lift_state *s, unsigned index) {
     return ((s->x87_status >> 11) + index) & 7u;
@@ -141,7 +142,7 @@ static unsigned ef_x87_stack(ef_lift_state *s, unsigned operation, unsigned argu
     uint32_t indefinite[3] = {0, 0xc0000000u, 0xffffu};
     uint32_t value[3], other[3];
     unsigned top, index, destination, word, empty_top, empty_index;
-    if (operation > EF_X87_LOG10_2 || argument > 7) return 9;
+    if (operation > EF_X87_LOG2_10 || argument > 7) return 9;
     /* Delivery is deferred to the next waiting instruction. Do not pretend
        that the pending #MF has been handled by a register operation. */
     if (s->x87_status & 0x80u) return 8;
@@ -166,9 +167,18 @@ static unsigned ef_x87_stack(ef_lift_state *s, unsigned operation, unsigned argu
                 if (operation == EF_X87_LOG2_E) {
                     value[0] = rounding == 1u || rounding == 3u ? 0x5c17f0bbu : 0x5c17f0bcu;
                     value[1] = 0xb8aa3b29u; value[2] = 0x3fffu;
-                } else {
+                } else if (operation == EF_X87_LOG10_2) {
                     value[0] = rounding == 1u || rounding == 3u ? 0xfbcff798u : 0xfbcff799u;
                     value[1] = 0x9a209a84u; value[2] = 0x3ffdu;
+                } else if (operation == EF_X87_LN_2) {
+                    value[0] = rounding == 1u || rounding == 3u ? 0xd1cf79abu : 0xd1cf79acu;
+                    value[1] = 0xb17217f7u; value[2] = 0x3ffeu;
+                } else if (operation == EF_X87_PI) {
+                    value[0] = rounding == 1u || rounding == 3u ? 0x2168c234u : 0x2168c235u;
+                    value[1] = 0xc90fdaa2u; value[2] = 0x4000u;
+                } else {
+                    value[0] = rounding == 2u ? 0xcd1b8affu : 0xcd1b8afeu;
+                    value[1] = 0xd49a784bu; value[2] = 0x4000u;
                 }
             }
         }

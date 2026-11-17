@@ -8614,3 +8614,23 @@ The two original bodies containing FLDLG2 (`0xfa362`, `0x11d3f0`) also
 contain unsupported FYL2X; the former additionally needs FLDLN2. Neither
 body is claimed newly translatable or verified. Transcendental arithmetic,
 ENTER and descriptor reloads remain open bulk-translation boundaries.
+
+### 2026-11-17 — Complete x87 constant-load translation
+
+Added FLDLN2, FLDPI and FLDL2T to the extended-constant push path and
+native comparison oracle. All seven x87 constant loads now have exact
+encoding checks. The three new significands follow RC without narrowing
+by PC or raising precision exceptions; FLDL2T specifically rounds upward
+only for round-toward-positive, while its nearest value equals its lower
+neighbor. Stack faults and environment updates use the existing machinery.
+
+Validation: tests.test_asm_x87_stack, tests.test_asm_x87_oracle and
+tests.test_asm_capture (12 passing), covering 208,896 raw hardware stack
+comparisons and 3,264 rendered comparisons with varying RC/PC, TOP,
+occupancy and exception masks, plus full-state flat and descriptor-backed
+paths. A generated unit containing all three instructions compiled
+warning-free with OpenWatcom; git diff --check. No gameplay runs.
+This completes the constant-load instruction family, not transcendental
+arithmetic or whole-body coverage: FYL2X, F2XM1, FSCALE and other remaining
+instructions still prevent relevant original bodies from translating.
+ENTER and descriptor reloads remain open as well.
