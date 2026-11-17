@@ -171,22 +171,27 @@ class DecompStatusTest(unittest.TestCase):
         with self.assertRaises(decomp_status.TrackerError):
             decomp_status.translation_blockers(rows, report, io.StringIO())
 
-    def test_service_dependency_counts_distinguish_missing_from_empty(self):
-        rows = [decomp_status.new_row(address, 10, '') for address in (1, 2, 3, 4)]
+    def test_service_dependency_counts_include_ports_and_preserve_unknowns(self):
+        rows = [decomp_status.new_row(address, 10, '') for address in range(1, 7)]
         for row in rows:
             row['state'] = 'blocked'
-        rows[3]['state'] = 'compiles'
+        rows[5]['state'] = 'compiles'
         report = {'model': 'flat-x86-program-explicit-state', 'entries': [
             {'address': 1, 'state': 'generated-unverified', 'reachable_host_service_sites': [99]},
-            {'address': 2, 'state': 'generated-unverified', 'reachable_host_service_sites': []},
-            {'address': 3, 'state': 'generated-unverified'},
-            {'address': 4, 'state': 'generated-unverified', 'reachable_host_service_sites': [99]},
+            {'address': 2, 'state': 'generated-unverified', 'reachable_host_service_sites': [],
+             'reachable_host_port_service_sites': [98]},
+            {'address': 3, 'state': 'generated-unverified', 'reachable_host_service_sites': [],
+             'reachable_host_port_service_sites': []},
+            {'address': 4, 'state': 'generated-unverified', 'reachable_host_service_sites': []},
+            {'address': 5, 'state': 'generated-unverified'},
+            {'address': 6, 'state': 'generated-unverified', 'reachable_host_service_sites': [99]},
         ]}
         out = io.StringIO()
         decomp_status.translation_blockers(rows, report, out)
-        for label in ('reachable sites', 'no recorded reachable sites', 'not measured by report'):
-            self.assertTrue(any(line.strip().startswith(label) and line.endswith('1 functions')
-                                for line in out.getvalue().splitlines()))
+        lines = dict((line.strip().rsplit(None, 2)[0], int(line.split()[-2]))
+                     for line in out.getvalue().splitlines() if line.endswith(' functions'))
+        self.assertEqual(lines, {'reachable sites': 2, 'no recorded reachable sites': 1,
+                                 'incomplete reachability data': 2})
         self.assertIn('does not prove service support', out.getvalue())
 
     def test_committed_tracker_is_valid(self):

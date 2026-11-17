@@ -11996,3 +11996,9 @@ Completed original paths still require a full state match from C.
 The 36 whole-program generator tests include a batch with one passing
 leaf and two inconclusive service paths. This is prepared-state
 evidence and does not change any tracker milestones.
+
+2026-11-18 — Counted both interrupt and scalar port edges when reporting
+generated blocked functions with reachable host service sites. The current
+snapshot identifies 369 with a recorded dependency and 330 with neither
+type recorded. Older reports missing one reachability field cannot establish
+absence. Verified with `python3 -m unittest tests.test_decomp_status`.
