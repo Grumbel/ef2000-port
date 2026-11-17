@@ -9947,3 +9947,44 @@ report SHA-256:
 The second LSL-containing body, `0x10d80b`, still depends on unsupported
 extender calls; no new bulk-closure count, runtime integration or tracker
 promotion is claimed. Tracker and diff checks pass.
+
+### 2026-11-17: refresh ABI-5 bulk translation and exercise the new LSL chain
+
+Fresh generation against the same 4,280-body normalized inventory produces
+`local/asm-c-live-program-20261117`: 4,177 syntactically supported bodies,
+2,589 closed over direct edges, 428,767 original body bytes. Compared with
+the previous 2,587-body report, 0x10d63b and its 119-byte caller 0x10d94f
+are added; no body is removed. The remaining 1,691 bodies have first-failure
+diagnostics of 1,588 untranslated dependencies and 103 unsupported
+instructions. Dynamic target coverage is not established by direct closure.
+Translation report SHA-256:
+`75aeffc8435253566b2b6f58a67c077b231a2538c81cf9f28b9d571dbc6c297f`.
+
+Recomputing the intersection with the current 810 blocked tracker entries
+gives 310 generated-unverified, 457 dependency-excluded, 33 unsupported and
+10 outside this inventory. This corrects the earlier logged intersection
+(307/461/32/10); the old report also intersects the current tracker as
+310/457/33/10. Neither newly admitted body is a blocked tracker row. No
+tracker state is changed based on compilation or generation.
+
+A checked two-body subset in `local/asm-lsl-chain-20261117` generates a
+shared dispatcher for 0x10d94f and 0x10d63b. All 96 captured original/C
+whole calls pass, comparing complete 2-MiB RAM, GPRs, flags, selectors,
+modeled caches and x87 state. Inputs cover requested sizes
+0,1,3,4,4095,4096,0xffffff00,0xfffffffe, two minimum allocation sizes,
+two extender profiles and three heap-global/header cases. The nested LSL
+path executes against live descriptor tables. These samples cover normal
+rounding, overflow paths and the return to the translated caller; they do
+not validate the remaining heap allocator or extender calls.
+Execution report SHA-256:
+`13c7b0e3a518114c2d7bd159252c44229a1f412150325b39fd0e353dcf9970e6`.
+
+`local/asm-live-watcom-20261117/check.py` freshly compiles all 2,656
+translation, dispatcher and registry units against the ABI-5 runtime with
+pinned Watcom. No previous object evidence is reused across the runtime
+change. All units have zero errors and diagnostics; all resulting object
+hashes are rechecked against the report. Compiler report SHA-256:
+`d06f274ddd8b6daec93a3df52234207e8c6435f41b34f9caf27386a64688e992`.
+Tracker/diff checks pass. This establishes bulk compiler coverage and bounded
+whole-call evidence, not byte-identical recompilation, full-program
+equivalence, runtime integration, splice or replay.
