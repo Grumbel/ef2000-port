@@ -9130,3 +9130,31 @@ length, and three additional malformed forms are rejected.
 compilation of the original complete 0x222 helper. This does not implement
 protected-profile descriptor reloads, prove the original helper across all
 selector values, promote a tracker row or refresh whole-corpus counts.
+
+### 2026-11-17: recover the missing loop in body 0xbfcc
+
+The body-hole audit identifies 0xbfff..0xc01a as 28 unowned bytes within
+0xbfcc. The back edge at 0xc026 targets 0xbfff, but Ghidra had decoded the
+first instruction from 0xc000 after a misleading data reference. Original
+bytes decode from 0xbfff into ten instructions ending exactly at 0xc01b;
+two conditional branches skip to the final INC. This is executable loop
+code, not inline data.
+
+`tools/ghidra/EF2000RecoverBfccLoop.java` pins the language, payload and gap
+hashes, accepts only the reviewed old or repaired body, rejects other owners,
+and checks all ten instruction lengths and mnemonics after redisassembly.
+It expands the body from 1,449 to 1,477 bytes. The tracker size and boundary
+note are updated; its blocked/unverified state remains unchanged.
+The disposable `local/ghidra-bfcc-loop-20261117` project records successful
+apply and repeat report runs. Its fresh inventory exports one contiguous
+body with matching instruction layout.
+
+`local/ghidra-bfcc-loop-20261117/check.py` compares the recovered block against
+original execution for both branch skips and the memory-writing path, each
+with two initial flag values: six full GPR/flags/PC/selector/2 MiB RAM
+comparisons pass. The translated block also compiles with OpenWatcom
+`-bt=dos -3r -za99 -w1 -we` without diagnostics. These are block proofs, not
+whole-function verification. The repaired body renders syntactically, while
+untranslated direct dependencies still prevent closed generation. No gameplay
+run or tracker promotion is claimed. Future inventory refreshes should use
+the repaired disposable project rather than the preceding decimal-only copy.
