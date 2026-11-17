@@ -10565,3 +10565,33 @@ RAM, registers, flags and x87 plus overlay/original files. Report SHA-256:
 These probes now include actual read buffer effects under the hybrid DOS policy;
 they do not establish fidelity to the original extender or full integration.
 No tracker promotion.
+
+
+### 2026-11-17 — Generated open/create uses the overlay drive
+
+Audited fa4a9's DOS sites from disassembly and added native dispatch for open
+fa4db/fa5df, create fa5b0, cleanup closes fa518/fa553/fa5c4 and zero-count write
+fa541. Open/create filename bounds and result registers follow the existing
+hybrid bridge. The configured callback carries joystick/digital-sound/CD-music
+options through to DosDrive; the earlier DosDrive-pointer callback remains ABI
+compatible with all options false. This exposes the hybrid policy, including
+its current zero-count write behavior, not a new original-DOS fidelity claim.
+
+`python3 -m unittest tests.test_asm_dos_file_service` passes with warning-clean
+C++17 compilation. Added coverage checks both open sites, create/cleanup/write
+sites, exact state, unterminated filename rejection and configuration options.
+Pinned Unicorn Python `local/asm-dos-open-cluster-20261117/native.py` passes ten
+standard full-state comparisons of nine generated bodies, including actual
+lookup/device/error/slot/store/address helpers and independent real drives.
+Cases cover existing/missing files, flags 0/1/0x21/0x22/0x421, creation/reopen
+and exclusive-open rejection. Compared service register/RAM traces, full final
+state and resulting overlay/original files. Report SHA-256:
+`c1b73905ec590a5e2d4efae30e8e353d8395d1f61bad4150ed570788ebca3891`.
+
+Expanded generation snapshot `local/asm-file-open-services-20261117/report.json`
+contains 2,924 generated bodies / 517,486 original body bytes (12 bodies and
+1,253 bytes beyond the earlier file-service snapshot). Report SHA-256:
+`2f838328a2e88d68114f648aa8912eaf97240c829d2509e2d74cf48ee0fec1dd`.
+Closure remains direct-edge-only; interrupt yields alone implement no services.
+Interactive wiring, original extender fidelity and tracker verification remain
+open; no tracker promotion.

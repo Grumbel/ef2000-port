@@ -1357,7 +1357,8 @@ runtime globals; they do not establish that a probe represents a captured call.
 `runtime/dos_drive.cpp` as C++17 against the generated `ef_lift_state.h`, and
 pass the callback/context to `ef_lift_run_services`. It accepts only INT21 at
 fa973/1103b7 (AH=42 seek), 1103e0 (AH=40 write), fa9a8 (AH=3e close), and 1101c7 (AX=4400 device
-query), fa9a8 (AH=3e close), and 10f0ef (AH=3f read). Unknown site/vector/function/context requests return 0x122 unchanged.
+query), fa9a8/fa518/fa553/fa5c4 (AH=3e close), 10f0ef (AH=3f read),
+fa4db/fa5df (AH=3d open), fa5b0 (AH=3c create), and fa541 (AH=40 write). Unknown site/vector/function/context requests return 0x122 unchanged.
 The callback follows the existing hybrid runtime's flat-address file policy,
 32-bit buffer counts and copy-on-write overlay; numeric DOS errors become
 CF/EAX. Other host failures propagate. This is an adapter to the existing
@@ -1378,3 +1379,9 @@ Final RAM, registers, flags and x87 comparisons remain active. This interface
 does not expose selectors, hidden descriptor caches or mappings outside the
 modeled guest RAM, and does not model architectural interrupt entry/return.
 Legacy register-only handlers retain their existing signatures and traces.
+
+The configured callback `ef_asm_dos_file_service_configured` accepts an
+`EfAsmDosFileContext*` containing the drive and joystick/digital-sound/CD-music
+options used for virtual configuration-file reads. The original callback keeps
+its `DosDrive*` context ABI and defaults those options to false. Open/create
+validate a full 260-byte flat filename window, matching the hybrid bridge.

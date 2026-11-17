@@ -99,4 +99,41 @@ int main(int argc, char **argv)
     assert(std::string(std::istreambuf_iterator<char>(overlay), {}) == "NEWginal");
     std::ifstream original(root / "game/FILE.DAT", std::ios::binary);
     assert(std::string(std::istreambuf_iterator<char>(original), {}) == "original");
+    for (const uint32_t ip : {0xfa4dbu, 0xfa5dfu}) {
+        std::memcpy(ram.data() + 0x300, "FILE.DAT", 9);
+        state.r[0] = 0xabcd3d00; state.r[2] = 0x300; state.flags |= 1u;
+        before = state;
+        assert(ef_asm_dos_file_service(&state, ip, 0x21, &drive) == 0);
+        const auto opened = state.r[0];
+        before.r[0] = opened; before.r[2] = 0; before.flags &= ~1u;
+        assert(std::memcmp(&state, &before, sizeof state) == 0);
+        assert(drive.is_open(opened)); drive.close(opened);
+    }
+    for (const uint32_t ip : {0xfa518u, 0xfa553u, 0xfa5c4u}) {
+        std::memcpy(ram.data() + 0x300, "CREATED.DAT", 12);
+        state.r[0] = 0x3c00; state.r[2] = 0x300; before = state;
+        assert(ef_asm_dos_file_service(&state, 0xfa5b0, 0x21, &drive) == 0);
+        const auto opened = state.r[0]; before.r[0] = opened; before.flags &= ~1u;
+        assert(std::memcmp(&state, &before, sizeof state) == 0);
+        state.r[0] = 0x4000; state.r[1] = 0; state.r[2] = 0x300; state.r[3] = opened;
+        assert(ef_asm_dos_file_service(&state, 0xfa541, 0x21, &drive) == 0);
+        assert(state.r[0] == 0);
+        state.r[0] = 0x3e00;
+        assert(ef_asm_dos_file_service(&state, ip, 0x21, &drive) == 0);
+        assert(!drive.is_open(opened));
+    }
+    ram.fill('X'); state.r[0] = 0x3d00; state.r[2] = 0x300; before = state;
+    assert(ef_asm_dos_file_service(&state, 0xfa4db, 0x21, &drive) == 0);
+    before.r[0] = 3; before.flags |= 1u;
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
+    { std::ofstream file(root / "game/EF2000.CFG"); file << "CONTROL=0\nMUSIC=0,127\n"; }
+    std::memcpy(ram.data() + 0x300, "EF2000.CFG", 11);
+    EfAsmDosFileContext configured{&drive, true, true, true};
+    state.r[0] = 0x3d00; state.r[2] = 0x300;
+    assert(ef_asm_dos_file_service_configured(&state, 0xfa4db, 0x21, &configured) == 0);
+    const auto config = state.r[0]; const auto bytes = drive.read(config, 1024);
+    const std::string text(bytes.begin(), bytes.end());
+    assert(text.find("CONTROL=1") != std::string::npos);
+    assert(text.find("MUSIC=2,127") != std::string::npos);
+    drive.close(config);
 }
