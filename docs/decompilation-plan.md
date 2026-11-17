@@ -8779,3 +8779,36 @@ without promoting their tracker states or claiming whole-body execution.
 Segment POP and far-pointer loads still reject descriptor reloads. Bulk
 regeneration after this change and the remaining x87 operations are still
 needed for reliable bulk translation.
+
+### 2026-11-17 — Check REP comparison flags after a later iteration faults
+
+Investigated the remaining REP flag-rollback question before changing
+translation semantics. An isolated native Linux x86-64 AMD compatibility-mode probe executes
+REPE CMPSB / SCASB with four requested comparisons and a destination whose
+third byte lies on a protected page. Both comparisons complete two
+iterations, then fault with count 2, destination advanced by 2 and source
+advanced by 2 only for CMPS. Starting flags are 0x202; fault flags are
+0x10246, retaining the last successful comparison's arithmetic flags.
+RF is supplied by native exception delivery, outside the explicit model.
+This host does not supply evidence for rolling arithmetic flags back to
+the pre-REP value. No translator behavior was changed on that assumption.
+
+Committed tests/native_rep.c and tests/test_asm_rep_fault.py reproduce this
+native observation and compare it against generated C's modeled RAM-extent
+fault. The generated execution is split across a budget boundary and
+checked for all GPRs, flags (excluding native exception-delivery RF),
+restart PC, count and unchanged full RAM. Validation:
+`python3 -m unittest tests.test_asm_rep_fault -q` (1 test passed, both
+instructions). The initial 32-bit fixture faulted on null DS/ES; explicitly
+loading the Linux user data selector corrected the fixture, and the final
+probe confirms CS=0x23. git diff --check. Native results remain ignored at
+`local/asm-c-rep-flags-20261117/report.json`.
+
+Scope is deliberately limited: the native probe uses 32-bit compatibility
+mode on AMD; the generated paths use the existing flat 32-bit state. It does
+not establish Intel fault policy, protected-mode descriptor-fault ordering,
+or all REP fault cases. The test skips other CPU vendors rather than
+claiming their flags are identical. This adds fault-state evidence, not
+translation counts or tracker promotions. Descriptor reloads, remaining
+x87 instructions and broader target execution still leave reliable bulk
+translation incomplete. No gameplay or UI runs.
