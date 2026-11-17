@@ -8493,3 +8493,15 @@ rerun for the added POPA rejection assertion; tracker check;
 git diff --check. No gameplay or UI runs. ENTER and descriptor reloads
 remain unwired, and broader captured execution is still required for the
 reliable bulk translation goal.
+
+### 2026-11-17 — Preserve RET fault instruction state
+
+Generated near RET now reads its stack operand into a temporary before
+committing PC and ESP. A cached-SS rejection previously assigned the failed
+read's zero result to PC, losing the faulting instruction address. The
+program fixture exercises a RET with a rejecting SS limit and checks that
+GPRs, flags, PC and RAM remain unchanged. Existing direct and indirect CALL
+execution comparisons remain covered. Validation: tests.test_asm_capture
+and tests.test_asm_c_program (13 passing); git diff --check. No gameplay
+runs. This closes a fault-state mismatch, not the remaining descriptor
+reload or ENTER gaps.
