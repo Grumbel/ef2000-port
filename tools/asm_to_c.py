@@ -861,10 +861,15 @@ def instruction_c(insn, starts):
         if (len(arguments) != 2 or any(op[0] != 'imm' for op in arguments) or
                 arguments[0][1] > 65535 or arguments[1][1] > 255 or arguments[1][1] & 31):
             raise Unsupported('unsupported enter nesting or allocation')
-        code += ['ef_write(s, s->r[4] - 4u, 32, s->r[5]);',
+        encoded = bytes.fromhex(insn['bytes'])
+        if encoded != bytes((0xc8, arguments[0][1] & 255, arguments[0][1] >> 8, arguments[1][1])):
+            raise Unsupported('unsupported ENTER encoding/spelling')
+        code += ['a = s->r[4] - 4u; b = a - %du;' % arguments[0][1],
+                 'ef_write_segment(s, 2, a, 32, s->r[5]);',
                  'if (s->fault) return s->fault;',
-                 's->r[4] -= 4u; s->r[5] = s->r[4];',
-                 's->r[4] -= %du;' % arguments[0][1]]
+                 'if (ef_check_segment(s, 2, b, 1, 4)) return s->fault;',
+                 'if (b >= s->memory_size) { s->fault = 3; return 3; }',
+                 's->r[5] = a; s->r[4] = b;']
     elif mnemonic == 'leave' and not text:
         code += ['a = ef_read_segment(s, 2, s->r[5], 32); if (s->fault) return s->fault;',
                  's->r[4] = s->r[5] + 4u; s->r[5] = a;']
@@ -1046,8 +1051,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
         raise Unsupported('entry is not an instruction start')
     starts = local_starts if starts is None else starts
     cases = []
-    unwired = {'enter',
-               'les', 'lds', 'lss', 'lfs', 'lgs'}
+    unwired = {'les', 'lds', 'lss', 'lfs', 'lgs'}
     for i in instructions:
         code = renderer(i, starts)
         # Reject paths whose implicit accesses still use the legacy flat helpers.

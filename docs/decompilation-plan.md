@@ -8663,3 +8663,31 @@ a final-allocation fault, followed by descriptor and RAM validation that
 preserves that ordering. Successful synthetic ENTER comparisons alone are
 insufficient. This audit changes the validation path, not translation
 coverage; reliable bulk translation remains unfinished.
+
+### 2026-11-17 — Translate descriptor-backed ENTER with native fault ordering
+
+Added an isolated Linux x86-64 compatibility-mode probe using a private
+LDT expand-down stack and alternate signal stack. Native ENTER allocation
+faults deliver #SS at ENTER with ESP/EBP unchanged, but retain the completed
+saved-EBP memory write. Boundary allocations 0, 1, 4, 8, 64 and 2,132 are
+compared with generated C after normalizing stack addresses. The probe
+also confirms execution under the compatibility-mode code selector.
+This supplies the fault-ordering evidence missing from Unicorn.
+
+The zero-nesting 32-bit ENTER renderer now writes saved EBP through SS,
+checks the final pointer against SS and modeled RAM, and only then commits
+EBP/ESP. Removed its blanket descriptor rejection and added exact encoding
+checks. Rejection of the initial push leaves RAM unchanged; rejection of
+the final allocation retains the write while preserving registers/PC.
+Nonzero effective nesting and other encodings remain unsupported.
+
+Validation: tests.test_asm_enter, tests.test_asm_capture and
+ tests.test_asm_c_program initially passed together (14 tests). After adding
+successful ENTER/LEAVE capture paths and final-RAM-fault coverage, capture
+and synthetic full-register/flags/RAM comparisons passed; the new RAM case
+initially used invalid selectors for the flat profile, was corrected, and
+the native ENTER suite passed again. A generated ENTER/LEAVE/RET unit
+compiled warning-free with OpenWatcom; git diff --check. No gameplay runs.
+The native fixture and comparison are committed as tests/native_enter.c
+and tests/test_asm_enter.py. Bulk regeneration and broader execution remain
+pending, as do descriptor reloads and unsupported x87 arithmetic.
