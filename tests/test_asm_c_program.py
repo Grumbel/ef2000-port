@@ -11,6 +11,7 @@ import shutil
 import subprocess
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from tools import asm_c_program, asm_c_differential, asm_inventory
 from tests.test_asm_to_c import assemble, unicorn
@@ -1077,8 +1078,14 @@ ret
             out = root / 'out'
             asm_c_program.generate(directory, out, image, interrupt_boundaries=True,
                                    port_boundaries=True)
-            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
-                                               service_free_paths=True)
+            evidence = root / 'evidence'
+            with patch.object(asm_c_differential, 'HOST_UNIT_BYTES', 1):
+                report = asm_c_differential.verify(out, evidence, image, scenarios=1,
+                                                   service_free_paths=True)
+            units = report['host_translation_units_sha256']
+            self.assertGreater(len(units), 1)
+            for name, digest in units.items():
+                self.assertEqual(hashlib.sha256((evidence / name).read_bytes()).hexdigest(), digest)
             self.assertEqual(report['host_service_policy'], 'reject-on-reach')
             entries = {entry['address']: entry for entry in report['entries']}
             self.assertEqual(entries[0x100]['state'], 'probes-pass')

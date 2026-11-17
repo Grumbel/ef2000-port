@@ -12002,3 +12002,10 @@ generated blocked functions with reachable host service sites. The current
 snapshot identifies 369 with a recorded dependency and 330 with neither
 type recorded. Older reports missing one reachability field cannot establish
 absence. Verified with `python3 -m unittest tests.test_decomp_status`.
+
+2026-11-18 — Split host differential compilation into deterministic groups
+of complete generated C sources. The 84 MiB current combined input now
+compiles in roughly 2 MiB units under the same optimization and warning
+flags. Each unit has a recorded digest and a compiler log marker. The
+forced multi-unit synthetic probe exercises cross-unit dispatch and
+service rejection through the linked library.

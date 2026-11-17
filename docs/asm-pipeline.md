@@ -244,10 +244,12 @@ table is generated only under ignored local/; it is not committed. This enforces
 the static-code precondition at runtime rather than assuming it from a decode.
 The standalone per-body lifter still requires static code from its caller.
 
-Host compilation now combines the hash-checked bodies and dispatcher into one
-translation unit, sharing the stateless runtime helpers. Its SHA-256 is recorded
-in the evidence. OpenWatcom continues compiling each body and dispatcher as
-separate objects. Six focused build/program tests pass, including code mutation
+Host compilation groups complete, hash-checked sources into translation units
+of approximately 2 MiB or less and links them into one probe library. A single
+larger source stays intact. Units share the stateless runtime helpers within
+each group, and the report records each unit's SHA-256. OpenWatcom continues
+compiling each body and dispatcher as separate objects. The original single-unit
+guard validation passed six focused build/program tests, including code mutation
 with otherwise identical outputs. The guarded 1,178-body corpus reproduces
 12,410 passes, 6,438 inconclusive outcomes and zero mismatches, with every Watcom
 object warning-free. Artifacts: `local/asm-c-guard-program-20261113` and

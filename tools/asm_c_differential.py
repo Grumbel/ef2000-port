@@ -515,6 +515,52 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
     return results
 
 
+HOST_UNIT_BYTES = 2 * 1024 * 1024
+
+
+def compile_host_library(sources, directory, output, compiler, needs_native, libraries):
+    """Group complete sources to bound the optimizer's working set."""
+    units = []
+    parts = []
+    size = 0
+    for source in sources:
+        part = '#line 1 %s\n%s\n' % (json.dumps(str(source)), source.read_text())
+        part_size = len(part.encode())
+        if parts and size + part_size > HOST_UNIT_BYTES:
+            units.append(''.join(parts))
+            parts, size = [], 0
+        parts.append(part)
+        size += part_size
+    units.append(''.join(parts))
+
+    flags = ['-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra', '-Werror',
+             '-Wno-unused-function', '-I', str(directory)]
+    if needs_native:
+        flags += ['-D_GNU_SOURCE', '-D' + asm_to_c.asm_x87.NATIVE_ENABLE]
+    library = output / 'translations.so'
+    digests = {}
+    objects = []
+    with (output / 'compile.log').open('w') as log:
+        for index, content in enumerate(units):
+            name = 'translations' if len(units) == 1 else f'translations_{index:04d}'
+            unit = output / (name + '.c')
+            obj = output / (name + '.o')
+            data = content.encode()
+            unit.write_bytes(data)
+            digests[unit.name] = hashlib.sha256(data).hexdigest()
+            log.write(f'Compiling {unit.name}\n')
+            log.flush()
+            subprocess.run([compiler, *flags, '-c', str(unit), '-o', str(obj)],
+                           stdout=log, stderr=subprocess.STDOUT, check=True)
+            objects.append(obj)
+        log.write(f'Linking {library.name}\n')
+        log.flush()
+        subprocess.run([compiler, '-shared', '-Wl,-z,defs', *map(str, objects),
+                        *map(str, libraries), '-o', str(library)],
+                       stdout=log, stderr=subprocess.STDOUT, check=True)
+    return library, digests
+
+
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False):
     if x87_oracle not in ('unicorn', 'hardware'):
@@ -619,24 +665,12 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
             if result.returncode or not obj.is_file() or obj.stat().st_size == 0:
                 raise ValueError('OpenWatcom compilation failed: ' + source.name)
             watcom_results[source.stem] = hashlib.sha256(obj.read_bytes()).hexdigest()
-    library = output / 'translations.so'
-    # The runtime has only stateless helpers. One translation unit shares those
-    # helpers instead of reparsing/optimizing them in thousands of processes.
-    # Watcom still compiles every original source as a separate object above.
-    unit = output / 'translations.c'
-    unit.write_text('\n'.join('#line 1 %s\n%s' % (json.dumps(str(source)), source.read_text())
-                              for source in sources))
-    command = [compiler, '-shared', '-fPIC', '-O2', '-std=c99', '-Wall', '-Wextra',
-               '-Werror', '-Wno-unused-function', '-I', str(directory), str(unit), '-o', str(library)]
-    if needs_native:
-        command += ['-D_GNU_SOURCE', '-D' + asm_to_c.asm_x87.NATIVE_ENABLE]
+    libraries = []
     if backend:
-        command += [str(output / 'narrow-backend/narrow.so'), '-Wl,-z,defs']
+        libraries.append(output / 'narrow-backend/narrow.so')
     if binary_backend:
-        command += [str(output / 'binary-backend/binary.so'), '-Wl,-z,defs']
-    result = subprocess.run(command, capture_output=True, text=True)
-    (output / 'compile.log').write_text(result.stdout + result.stderr)
-    result.check_returncode()
+        libraries.append(output / 'binary-backend/binary.so')
+    library, host_units = compile_host_library(sources, directory, output, compiler, needs_native, libraries)
     loaded = ctypes.CDLL(str(library.resolve()))
     comparison_profile = (native_x87.comparison_profile if native_x87 is not None else
                           asm_x87_oracle.unicorn_comparison_profile())
@@ -674,7 +708,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   payload_sha256=manifest['payload_sha256'],
                   translation_report_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
                   library_sha256=hashlib.sha256(library.read_bytes()).hexdigest(),
-                  host_translation_unit_sha256=hashlib.sha256(unit.read_bytes()).hexdigest(),
+                  host_translation_unit_sha256=host_units.get('translations.c'),
+                  host_translation_units_sha256=host_units,
                   dispatcher_watcom_object_sha256=watcom_results.get('ef_lift_program'),
                   dispatcher_support_sha256={e['file']: e['source_sha256'] for e in support},
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
