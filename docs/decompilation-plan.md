@@ -9541,3 +9541,33 @@ segment boundaries and runtime integration are not covered. Report SHA-256:
 Tracker size and evidence notes are corrected, with state unchanged. Bulk
 closure has not been regenerated after this repair. Tracker and diff checks
 pass. No gameplay/UI run was used.
+
+### 2026-11-17: recover the patched-offset loop tail
+
+`tools/ghidra/EF2000RecoverC8c34Tail.java` recovers 32 bytes at
+0xc8c55..0xc8c74 after the preceding JO. It pins payload/language and tail
+hash, validates exact previous/repaired bodies and ownership, and checks all
+ten recovered instruction lengths/mnemonics transactionally. The function
+body grows from 60 to 92 bytes. Its separate 27-byte overflow block at
+0xc454a..0xc4564 is retained; the intervening bytes are not absorbed.
+
+The latest workspace is `local/ghidra-offset-tail-20261117`, containing the
+preceding shading repair as well. Fresh ranges/instructions are exported to
+`local/ghidra-offset-tail-inventory-20261117`. Apply reports 60 to 92 bytes;
+repeat report confirms 92 to 92. The normalized complete 22-instruction body
+has matching Ghidra/objdump layout. In `local/asm-offset-tail-20261117`, its
+mechanical C compiles with OpenWatcom without diagnostics using
+`-q -bt=dos -3r -za99 -w1 -we`; host compilation also uses warnings as errors.
+
+The local check.py/report.json records 36 whole-call comparisons against
+original execution, including GPRs, flags, PC, selectors and complete RAM.
+The normal loop path uses counts 1, 2 and 5, source words 0, 1, 0xffffffff
+and 0x80000000, and incoming flags 0x202, 0x602 and 0xad7. This exercises
+normal backedges and the recovered result stores/return, but not overflow
+branches or their callees. Those direct targets are accepted for generation
+of this isolated body, not claimed to be translated/closed dependencies.
+The report SHA-256 is
+`5858bd35355f58808244b86c8a730a204335be329c19b0613a67d7d8afc7aa56`.
+Tracker size/notes are corrected without state promotion. No updated bulk
+closure, runtime splice or golden replay is claimed. Tracker/diff checks
+pass; no gameplay/UI run was used.
