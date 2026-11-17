@@ -11308,3 +11308,30 @@ Commands: tools/ef2000_wcc.py decomp/src/network_initialization.c --compiler
 <pinned-wcc386> --output local/network-initialization-20261117.obj;
 pinned-Unicorn Python local/network-initialization-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — recover player-window initializer 0x33c64
+
+Recover 346-byte initialize_players_window_33c64 after reading original ASM,
+private pseudo-C and five dword jump-table entries at 33c50. EAX root feeds
+three widget lookups; all six other GPRs pushed/popped; plain RET. Callback
+slot 12b4f0, no direct inventory callers. Reset five related controls before
+reading enable flag; zero clears server/name/type. Modes 0..4 select original
+control operations and labels, including optional control in mode 2. Higher
+unsigned modes skip type display but still update name and server status.
+Keep flag reads after preceding UI calls; do not cache them at entry.
+
+Pinned Watcom compile: zero warnings. 128 scoped original/emitted-body
+comparisons with explicit find/apply/show models pass for modes 0..5/127/255,
+enable/gate/host flags, and callbacks mutating flags. Relocate compiled
+internal jump-table entries and pointer as well as external calls. Compare
+traces, six saved GPRs, ESP and RAM except code placement/stack scratch.
+Actual callees, EAX scratch, flags and stack scratch unproved; no byte
+identity, splice/replay or universal-equivalence claim. Retain hybrid
+exclusion; tracker 3437 compiles / 795 blocked. Private report
+local/network-players-window-source-20261117/report.json SHA-256
+046ce7d3f8fd747426feecbacda66201dda01197185f5f937a656c4e32314be4.
+Commands: tools/ef2000_wcc.py decomp/src/network_players_window.c --compiler
+<pinned-wcc386> --output local/network-players-window-20261117.obj;
+pinned-Unicorn Python local/network-players-window-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
