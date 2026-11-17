@@ -11251,3 +11251,30 @@ Commands: tools/ef2000_wcc.py decomp/src/network_channel_settings.c --compiler
 <pinned-wcc386> --output local/network-channel-settings-20261117.obj;
 pinned-Unicorn Python local/network-channel-settings-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — recover serial status refresh 0x33b5c
+
+Recover 244-byte refresh_serial_status_33b5c after reading original ASM and
+private pseudo-C. EAX root confirmed by two direct call sites 3508f/350c4,
+both passing selected widget and ignoring return, plus callback slot 12b668.
+Original saves EBX/ECX/EDX/ESI; normal callees preserve EDI/EBP; EAX scratch.
+Preserve stage-change formatting into a 64-byte local, pending command/reply
+updates and pending flags retained when pointer is null. Reply scan ignores
+NUL, stopping at CR/ff or 31 bytes; retain original behavior, pointer store
+before lookup, reload after show and final unconditional pointer store.
+
+Pinned Watcom compile: zero warnings. 144 scoped original/emitted-body
+comparisons with formatter/find/show models pass: changed/unchanged stage,
+clear/pending/null command and reply, CR/ff/embedded NUL/overlength text,
+and callbacks mutating the reply pointer. Compare normalized traces (local
+formatted text by content), six saved GPRs, ESP and nonstack RAM excluding
+code placement. EAX scratch, flags, stack scratch and actual callees remain
+unproved; no binary identity, splice/replay or universal-equivalence claim.
+Keep hybrid exclusion; tracker 3435 compiles / 797 blocked. Private report
+local/serial-status-window-source-20261117/report.json SHA-256
+c677a157a7cd326aed8ebf6e64e6e1fe6532e1d9197f550c8712ac58311eb33e.
+Commands: tools/ef2000_wcc.py decomp/src/serial_status_window.c --compiler
+<pinned-wcc386> --output local/serial-status-window-20261117.obj;
+pinned-Unicorn Python local/serial-status-window-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

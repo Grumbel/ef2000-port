@@ -806,3 +806,4 @@ addr	reason
 0x000347bc	Manual source with concrete lookup/formatter/show calls compiles; scoped original/Watcom-body comparisons model callees and exclude scratch EAX, flags and stack scratch. Actual callees, integration and replay remain unproven.
 0x00034844	Recovered name callback; scoped emitted-body/ASM comparisons with modeled callees only; actual callee integration and splice/replay pending.
 0x000344bc	Recovered channel callback; emitted-body comparisons use explicit parser/session models; actual integration and splice/replay pending.
+0x00033b5c	Recovered serial status refresh; scoped emitted-body checks use formatter/find/show models; actual integration and splice/replay pending.

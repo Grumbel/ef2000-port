@@ -7707,3 +7707,8 @@ void change_network_channel_344bc(ef_addr32 widget);
 #ifdef __WATCOMC__
 #pragma aux change_network_channel_344bc parm [eax] modify [eax]
 #endif
+
+void refresh_serial_status_33b5c(ef_addr32 root);
+#ifdef __WATCOMC__
+#pragma aux refresh_serial_status_33b5c parm [eax] modify [eax]
+#endif

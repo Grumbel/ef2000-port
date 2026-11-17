@@ -541,3 +541,10 @@ addr	size	type	name	evidence	notes
 0x00125936	1	uint8_t	g_network_provider_selected	0x34140 original ASM	Set after selected provider name is shown
 0x00195af0	256	uint8_t[]	g_character_class_table	0x344bc/0x33ee8 original ASM	Indexed by byte-wrapped character plus one; masks differ between decimal channel and hexadecimal socket validators.
 0x00182bbc	3	char[]	g_decimal_scan_format	0x344fa cdecl scanner argument	Decimal signed integer conversion format.
+0x0015f686	1	uint8_t	g_serial_connection_stage	0x33b5c original ASM	Index into stage text pointer table; no local bounds check.
+0x0012598c	1	uint8_t	g_serial_displayed_stage	0x33b5c original ASM	Last displayed connection stage.
+0x00125968	4	ef_addr32	g_serial_stage_text_table	0x33b5c original ASM	Base of indexed pointer table; full extent unconfirmed.
+0x0015f68c	4	ef_addr32	g_serial_reply_text	0x33b5c original ASM	Reply pointer reread after UI show callback.
+0x0015f690	4	ef_addr32	g_serial_command_text	0x33b5c original ASM	Pending command text pointer.
+0x0015f694	1	uint8_t	g_serial_command_pending	0x33b5c original ASM	Cleared only when pending and command pointer nonzero.
+0x0015f695	1	uint8_t	g_serial_reply_pending	0x33b5c original ASM	Cleared only when pending and reply pointer nonzero.
