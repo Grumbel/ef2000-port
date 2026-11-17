@@ -35,7 +35,7 @@ class DecodeTests(unittest.TestCase):
             else:
                 result = oracle.decode(bytes.fromhex(encoded), registers)
                 self.assertEqual((result['address'], result['segment']), (address, segment), encoded)
-        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9f2', 'df0c24', 'd9', ''):
+        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9f8', 'df0c24', 'd9', ''):
             with self.assertRaises(oracle.Unavailable, msg=encoded):
                 oracle.decode(bytes.fromhex(encoded), registers)
 
@@ -88,6 +88,28 @@ class OracleTests(unittest.TestCase):
         for encoded in ('d9fe', 'd9ff', 'd9f3'):
             self.assertEqual(oracle.decode(bytes.fromhex(encoded), {})['operation'],
                              int(encoded, 16))
+
+    def test_trigonometric_push_and_range_rejection(self):
+        one = [0, 0x80000000, 0x3fff]
+        out_of_range = [0, 0x80000000, 0x403e]
+        for operation in (0xd9f2, 0xd9fb):
+            for top in range(8):
+                pushed = (top - 1) & 7
+                for operand in ([0, 0, 0], [0, 0, 0x8000], out_of_range):
+                    with self.subTest(operation=operation, top=top, operand=operand):
+                        values = dict(x87_control=0x37f, x87_status=top << 11,
+                                      x87_tag=3 << (2 * pushed), x87_opcode=0,
+                                      x87=[one[:] for _ in range(8)])
+                        values['x87'][top] = operand
+                        result, _, _, _, _, _ = self.native.execute(operation, values, b'', 0)
+                        self.assertEqual(result['x87'][top], operand)
+                        if operand == out_of_range:
+                            self.assertEqual(result['x87_status'] & 0x7fff, (top << 11) | 0x400)
+                            self.assertEqual(result['x87_tag'], values['x87_tag'])
+                        else:
+                            self.assertEqual(result['x87'][pushed], one)
+                            self.assertEqual(result['x87_status'] & 0x7fff, pushed << 11)
+                            self.assertEqual((result['x87_tag'] >> (2 * pushed)) & 3, 0)
 
     def test_native_observation_defers_signals_and_restores_mask(self):
         # Inject a real asynchronous signal inside dispatch. It must arrive
@@ -234,7 +256,7 @@ class OracleTests(unittest.TestCase):
             self.fail('C must not run after an unobserved original execution')
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for source, reason in [('fptan\nret', 'register encoding'),
+            for source, reason in [('fprem\nret', 'register encoding'),
                                    ('.byte 0x66,0xd9,0xe8\nret', 'prefix'),
                                    ('fwait\nret', 'pending'),
                                    ('fld1\nret', 'budget')]:
@@ -247,7 +269,7 @@ class OracleTests(unittest.TestCase):
                 self.assertIn(reason, result['reason'])
         values = dict(x87_control=0x37f, x87_status=0, x87_tag=0xffff, x87_opcode=0,
                       x87=[[0, 0, 0] for _ in range(8)])
-        for operation, data in ((0xd916, b''), (0xd9f2, b'')):
+        for operation, data in ((0xd916, b''), (0xd9f8, b'')):
             with self.assertRaises(oracle.Unavailable):
                 self.native.execute(operation, values, data, 0)
 

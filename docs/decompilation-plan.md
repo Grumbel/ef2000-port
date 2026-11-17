@@ -11893,3 +11893,10 @@ native x87 oracle. All twelve synthetic signed comparison cases now
 match the hardware observation, including the last-opcode field that
 Unicorn left at zero. All nine oracle tests pass with pinned Unicorn
 for the surrounding integer execution.
+
+2026-11-18 — The native x87 oracle accepts the exact FPTAN and FSINCOS
+encodings. Tests observe signed-zero results and the pushed value at all
+eight TOP positions. At 2**63 both instructions leave TOP, tags and the
+operand unchanged and set C2. All ten oracle tests passed with pinned
+Unicorn. These observations are available for future translator
+comparisons. The generator still rejects both instructions.
