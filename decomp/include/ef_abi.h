@@ -7772,3 +7772,7 @@ void refresh_network_controls_33630(void);
 #pragma aux net_start_arcade_34480 parm [] modify [eax]
 #pragma aux net_new_channel_344a0 parm [] modify [eax]
 #endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_open_loops_form_33ad8 parm [eax] modify [eax]
+#endif

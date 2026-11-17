@@ -11614,3 +11614,24 @@ Commands: tools/ef2000_wcc.py decomp/src/network_session_callbacks.c --compiler
 <pinned-wcc386> --output local/network-session-callbacks-20261117.obj;
 pinned-Unicorn Python local/network-session-callbacks-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover modem form initializer
+
+Recovered 33ad8 (129 bytes) into network_init_string.c with real guest calls.
+Confirm EAX root, preserved six GPRs, four ordered find/show pairs, 72-byte
+local and choice sampled after showing the device. Preserve unchecked choice
+and unbounded %s formatting. Callback slot 12b638, no direct callers.
+Watcom zero warnings. 56 scoped compiled-C/original-ASM comparisons PASS:
+seven choice bytes, four fitting strings including 71 bytes, optional choice
+mutations in every modeled callee, and distinct pointers for all 256 table
+indices to check the post-callback load. Three callees modeled. Compare six
+saved GPRs, ESP, normalized call traces and 5 MiB RAM excluding code placement
+and stack scratch. Scratch EAX, flags, stack, overflow and integration remain
+unproved. Keep hybrid excluded, state compiles. Tracker 3453 compiles /
+779 blocked / 454175 blocked body bytes. Private report
+local/network-loops-form-source-20261117/report.json, SHA-256
+9d541aa478878c876eba8e36eb33865cfc11efa4769c67ab9e48217f31365f7c.
+Commands: tools/ef2000_wcc.py decomp/src/network_init_string.c --compiler
+<pinned-wcc386> --output local/network-loops-form-20261117.obj;
+pinned-Unicorn Python local/network-loops-form-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

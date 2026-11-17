@@ -9,25 +9,6 @@ static uint32_t guest(uint32_t entry, uint32_t eax, uint32_t edx, uint32_t ebx)
     return net_ui_guest_call_086(entry, eax, edx, ebx);
 }
 
-/* 33ad8, 129 bytes: populate four named widgets from modem settings and
- * a formatted description selected by byte 15f688. The format hook models
- * the original 72-byte stack scratch buffer. */
-void net_open_loops_form_33ad8(ef_addr32 widget)
-{
-    uint32_t choice, result, text;
-    result = guest(0xa78bcu, widget, 0x182c70u, 0u);
-    guest(0xa7588u, result, 0x15f4fdu, 0u);
-    choice = EF_U8(0x15f688u);
-    text = net_ui_format_option_086(0x182bc0u,
-                                    EF_U32(0x125958u + 4u * choice));
-    result = guest(0xa78bcu, widget, 0x182c78u, 0u);
-    guest(0xa7588u, result, text, 0u);
-    result = guest(0xa78bcu, widget, 0x182c80u, 0u);
-    guest(0xa7588u, result, 0x15f53du, 0u);
-    result = guest(0xa78bcu, widget, 0x182c8cu, 0u);
-    guest(0xa7588u, result, 0x15f57du, 0u);
-}
-
 /* 341d8, 62 bytes: walk 0x21-linked widget nodes, copying the name from
  * consecutive 64-byte DirectPlay rows, starting at 4288f0. The iteration
  * limit is signed, exactly as the original JL comparison. */
