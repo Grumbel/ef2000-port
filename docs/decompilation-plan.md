@@ -11855,3 +11855,14 @@ run (3,603 generated, 678 rejected). The private report
 `root_blocker_impact` by the number of affected entries. The counts
 include the root itself and may overlap because a body can depend on
 several rejected roots. This ranking follows direct edges only.
+
+2026-11-18 — Compiled the complete current bulk corpus in
+`local/asm-root-impact-20261118` using OpenWatcom `wcc386` with
+`-q -bt=dos -3r -za99 -w1 -we` and the generated include directory.
+All 3,703 units (3,603 bodies and 100 dispatcher/support units) produced
+objects with no diagnostics. The private command and per-unit hashes are
+in `local/asm-root-impact-watcom-20261118/{check.py,report.json}`.
+The report SHA-256 is
+`0d113c7caabc44f8ed29b63e582f204b2121c80a956b578c543c42db451c8097`.
+This measures target compilation. Linking, behavior and byte identity
+remain separate checks. The tracker passed validation without changes.
