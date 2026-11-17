@@ -10874,3 +10874,26 @@ other requests still reject. Direct-edge closure does not establish indirect
 coverage, full runtime services or original behavior. This replaces the older
 snapshot for deciding the next shared instruction/service work; tracker states
 remain unchanged.
+
+### 2026-11-17: recover serial settings display 0x337ec
+
+Recover the 156-byte EAX-root callback in serial_settings.c. Confirm input
+from original ASM and callback table pointer at 0x12b628 (no direct inventory
+callers). Locate socket_txt and channel_txt, format socket zero/ffff as ----
+and other words as %04x, then format the unsigned channel byte with %hd.
+Read the socket after both lookups and the channel after the first show.
+Record globals and signature; retain explicit hybrid exclusion.
+
+Watcom compilation clean. Sixty original/emitted-body comparisons match call
+traces/text, complete RAM excluding code placement and stack scratch, saved
+registers and ESP under explicit lookup/formatter/show models. Cover six socket
+values, five channel values including 128/255, and first-show channel mutation.
+Actual callees, scratch EAX, flags and stack scratch are outside this proof;
+no binary identity or splice/replay claim. Report:
+local/serial-settings-source-20261117/report.json SHA-256
+f4236ca08af8577933c09c194d39399c46d2bf81d7239e05d927d939f24ad797.
+Tracker: 3429 compiles, 803 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/serial_settings.c --compiler <pinned-wcc386>
+--output local/serial-settings-20261117.obj; pinned-Unicorn Python
+local/serial-settings-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

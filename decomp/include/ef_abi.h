@@ -7665,3 +7665,8 @@ void accept_network_mission_name_34844(ef_addr32 widget);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux accept_network_mission_name_34844 parm [eax] modify [eax ecx]
 #endif
+
+void show_serial_settings_337ec(ef_addr32 root);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux show_serial_settings_337ec parm [eax] modify [eax]
+#endif

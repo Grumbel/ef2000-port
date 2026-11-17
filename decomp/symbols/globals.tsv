@@ -531,3 +531,5 @@ addr	size	type	name	evidence	notes
 0x0019f35c	4	uint32_t	g_session_first_handle	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
 0x0019f360	4	uint32_t	g_session_second_handle	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
 0x0013579b	17	char[17]	g_network_mission_name	0x34844 original ASM	Destination name; validator accepts at most sixteen source bytes
+0x001357b8	2	uint16_t	g_network_socket_number	0x337ec original ASM	Zero and ffff display as ----, other values use four-digit hex
+0x001357b6	1	uint8_t	g_network_channel_number	0x337ec original ASM	Zero-extended byte formatted as decimal after socket show
