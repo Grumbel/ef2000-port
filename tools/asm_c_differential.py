@@ -128,7 +128,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     addressed accumulator bits; OUT preserves registers/flags. Optional RAM
     effects use the same disposable snapshot rules as interrupt services.
     """
-    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR, UC_HOOK_INSN
+    from unicorn import (Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR, UC_HOOK_INSN,
+                         UC_HOOK_MEM_INVALID, UC_MEM_FETCH_PROT, UC_MEM_FETCH_UNMAPPED,
+                         UC_MEM_READ_PROT, UC_MEM_READ_UNMAPPED, UC_MEM_WRITE_PROT, UC_MEM_WRITE_UNMAPPED)
     from unicorn import x86_const
 
     if (service_factory is not None or port_factory is not None) and not program:
@@ -298,6 +300,20 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 engine.emu_stop()
         cpu.hook_add(UC_HOOK_INSN, port_in, None, 1, 0, x86_const.UC_X86_INS_IN)
         cpu.hook_add(UC_HOOK_INSN, port_out, None, 1, 0, x86_const.UC_X86_INS_OUT)
+    memory_fault = {}
+    memory_access = {
+        UC_MEM_READ_UNMAPPED: ('read', 'unmapped'), UC_MEM_READ_PROT: ('read', 'protected'),
+        UC_MEM_WRITE_UNMAPPED: ('write', 'unmapped'), UC_MEM_WRITE_PROT: ('write', 'protected'),
+        UC_MEM_FETCH_UNMAPPED: ('fetch', 'unmapped'), UC_MEM_FETCH_PROT: ('fetch', 'protected'),
+    }
+
+    def invalid_memory(engine, access, linear, size, _value, _data):
+        kind, cause = memory_access[access]
+        memory_fault.update(access=kind, cause=cause, address=linear, size=size,
+                            pc=engine.reg_read(x86_const.UC_X86_REG_EIP))
+        return False
+
+    cpu.hook_add(UC_HOOK_MEM_INVALID, invalid_memory)
     if phase:
         phase('original')
     try:
@@ -307,7 +323,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     except asm_x87_oracle.Unavailable as error:
         return outcome(state='inconclusive', reason='original native x87 unavailable: '+str(error))
     except UcError as error:
-        return outcome(state='inconclusive', reason='original fault: ' + str(error))
+        detail = {'original_memory_fault': memory_fault} if memory_fault else {}
+        return outcome(state='inconclusive', reason='original fault: ' + str(error), **detail)
     except (ValueError, RuntimeError) as error:
         return outcome(state='inconclusive', reason='original service unavailable: '+str(error))
     if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:

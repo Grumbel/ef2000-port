@@ -576,6 +576,20 @@ class TranslationTests(unittest.TestCase):
         self.assertEqual(report['state'], 'inconclusive')
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_original_memory_fault_identifies_operand_and_instruction(self):
+        registers, flags = next(asm_c_differential.probes(1, 1))
+        for opcode, access in (('a1', 'read'), ('a3', 'write')):
+            with self.subTest(access=access):
+                payload = bytes(256) + bytes.fromhex(opcode + '00000020c3')
+                result = asm_c_differential.compare(
+                    lambda *_: self.fail('translation ran after original fault'),
+                    payload, 0x100, registers, flags)
+                self.assertEqual(result['state'], 'inconclusive')
+                self.assertEqual(result['original_memory_fault'],
+                                 dict(access=access, cause='unmapped', address=0x20000000,
+                                      size=4, pc=0x100))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_generated_artifact_provenance_and_bulk_verifier(self):
         import hashlib
         with tempfile.TemporaryDirectory() as temporary:

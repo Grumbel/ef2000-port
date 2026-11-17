@@ -12036,3 +12036,9 @@ rerun at 0xded86 and 0xed133 reproduced all four prior mismatches at the
 untranslated 0x7f/0x80 callback targets. The one-input run does not include
 those inputs. The targeted report records the payload, host library and
 oracle digests. Tracker states remain unchanged.
+
+2026-11-18 — Differential results now record the original CPU's invalid
+memory access kind, linear address, width and reported PC. The hook leaves
+the fault in place, so the result remains inconclusive and C is not run
+after an original-side fault. Synthetic absolute reads and writes exercise
+the evidence alongside the existing mismatch and service-boundary checks.
