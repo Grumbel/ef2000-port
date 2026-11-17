@@ -595,11 +595,18 @@ def string_instruction_c(mnemonic, text, repeat, pc, next_pc):
     code = []
     if repeat:
         code.append('if (!s->r[1]) { s->pc = 0x%xu; break; }' % next_pc)
-    if mnemonic in ('movs', 'lods', 'cmps'):
+    if mnemonic == 'cmps':
+        # Native AMD compatibility-mode evidence: ES destination access,
+        # including its segment/page checks, precedes the source access.
+        # Stop on the first fault rather than relying on fault overwrites.
+        segment = source_operand[3]
+        code += ['b = ef_read_segment(s, 0, s->r[7], %d); if (s->fault) return s->fault;' % width,
+                 'a = ef_read_segment(s, %d, s->r[6], %d);' % (segment, width)]
+    elif mnemonic in ('movs', 'lods'):
         code.append('a = ef_read_segment(s, %d, s->r[6], %d);' % (source_operand[3], width))
     elif mnemonic in ('stos', 'scas'):
         code.append('a = %s;' % read(accumulator, width))
-    if mnemonic in ('cmps', 'scas'):
+    if mnemonic == 'scas':
         code.append('b = ef_read_segment(s, 0, s->r[7], %d);' % width)
     code.append('if (s->fault) return s->fault;')
     if mnemonic in ('movs', 'stos'):
