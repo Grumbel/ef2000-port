@@ -11549,3 +11549,25 @@ Commands: tools/ef2000_wcc.py decomp/src/network_init_string.c --compiler
 <pinned-wcc386> --output local/network-init-20261117.obj;
 pinned-Unicorn Python local/network-init-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover parity and port callbacks
+
+Recovered 3361c (20 bytes) and 337c4 (37 bytes) into
+network_option_callbacks.c with real guest calls. Neither consumes an input;
+callback slots 12b600/12b5f0, no direct callers. Preserve parity fallthrough
+and port tail jump to shared refresh, shutdown before sampling the port,
+and selector AL store before clearing the session. Watcom zero warnings.
+240 scoped compiled-C/original-ASM comparisons PASS, executing original
+parity counter df2e4 and enabled-index selector e1540, modeling the other
+four callees with optional state mutation. Cover parity wrap, five port
+values including 254/255 and two complementary enabled tables. Compare six
+saved GPRs, ESP, traces and 5 MiB RAM excluding code placement/stack scratch.
+EAX, flags, stack, empty enabled table and integration remain unproved.
+Keep hybrid excluded, state compiles. Tracker 3449 compiles / 783 blocked /
+454449 blocked body bytes. Private report
+local/network-port-parity-source-20261117/report.json, SHA-256
+49d70cec7fef0936215ef541bd33fd53f7e374d74d69a32a1b8e7db3b3433e5d.
+Commands: tools/ef2000_wcc.py decomp/src/network_option_callbacks.c --compiler
+<pinned-wcc386> --output local/network-port-parity-20261117.obj;
+pinned-Unicorn Python local/network-port-parity-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

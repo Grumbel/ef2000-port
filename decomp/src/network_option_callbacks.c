@@ -27,3 +27,23 @@ void net_open_ipx_settings_336f0(void)
     write_settings_file_a2bdc();
     refresh_network_controls_33630();
 }
+
+/* 0x3361c, 20 bytes before falling through to the shared refresh. */
+void net_new_parity_3361c(void)
+{
+    clear_session_34ea4();
+    shutdown_device_a3da0();
+    advance_counter_15f07d();
+    write_settings_file_a2bdc();
+    refresh_network_controls_33630();
+}
+
+/* 0x337c4, 37 bytes. Read the port only after shutting down the device. */
+void net_new_port_337c4(void)
+{
+    shutdown_device_a3da0();
+    EF_U8(0x0013579au) = next_enabled_index(EF_U8(0x0013579au));
+    clear_session_34ea4();
+    write_settings_file_a2bdc();
+    refresh_network_controls_33630();
+}

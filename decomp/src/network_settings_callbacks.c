@@ -41,25 +41,3 @@ void net_new_baud_335c0(ef_addr32 widget)
     notify_network_change();
     refresh_network();
 }
-
-/* 3361c, 20 bytes before the shared 33630 tail: no local return. */
-void net_new_parity_3361c(ef_addr32 widget)
-{
-    guest(0x34ea4u, widget, 0u, 0u);
-    guest(0xa3da0u, 0u, 0u, 0u);
-    guest(0xdf2e4u, 0u, 0u, 0u);
-    notify_network_change();
-    refresh_network();
-}
-
-/* 337c4, 37 bytes: zero-extended byte sent to e1540, whose AL is saved. */
-void net_new_port_337c4(ef_addr32 widget)
-{
-    uint32_t port;
-    guest(0xa3da0u, widget, 0u, 0u);
-    port = guest(0xe1540u, EF_U8(0x13579au), 0u, 0u);
-    EF_U8(0x13579au) = (uint8_t)port;
-    guest(0x34ea4u, port, 0u, 0u);
-    notify_network_change();
-    refresh_network();
-}
