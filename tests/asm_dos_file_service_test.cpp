@@ -142,7 +142,7 @@ int main(int argc, char **argv)
     state.r[0] = 0x4400;
     assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
     assert(state.r[0] == 2);
-    for (const unsigned request : {0x252bu, 0x3508u, 0x4401u, 0x6800u}) {
+    for (const unsigned request : {0x252bu, 0x3508u, 0x4401u, 0x6900u}) {
         state.r[0] = request; before = state;
         const auto memory_before = ram;
         assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0x122);
@@ -150,6 +150,32 @@ int main(int argc, char **argv)
         assert(ram == memory_before);
         assert(drive.seek(gateway_handle, 0, 1) == 3);
     }
+    // Flush publishes the overlay without closing or moving the handle.
+    // Check console handles, invalid handles, high BX bits and both CF inputs.
+    for (const uint16_t h : {uint16_t(0), uint16_t(1), uint16_t(2),
+                             uint16_t(gateway_handle), uint16_t(0xffff)}) {
+        for (const uint32_t flags : {0xad6u, 0xad7u}) {
+            state.r[0] = 0xabcd68ff; state.r[3] = 0xbeef0000u | h;
+            state.flags = flags; before = state;
+            const auto memory_before = ram;
+            assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+            before.flags = (flags & ~1u) | (h == 0xffff);
+            if (h == 0xffff) before.r[0] = 6;
+            assert(std::memcmp(&state, &before, sizeof state) == 0);
+            assert(ram == memory_before);
+            assert(drive.is_open(gateway_handle));
+            assert(drive.seek(gateway_handle, 0, 1) == 3);
+        }
+    }
+    {
+        std::ifstream flushed(root / "overlay/EF2000/GATEWAY.DAT", std::ios::binary);
+        assert(std::string(std::istreambuf_iterator<char>(flushed), {}) == "DOS");
+    }
+    // AH=68 is accepted only at the generic gateway.
+    state.r[0] = 0x6800; before = state;
+    assert(ef_asm_dos_file_service(&state, 0xfa9a8, 0x21, &drive) == 0x122);
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
+    state.r[3] = gateway_handle;
     state.r[0] = 0x3e00;
     assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
     assert(!drive.is_open(gateway_handle));

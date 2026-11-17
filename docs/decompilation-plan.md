@@ -11002,3 +11002,20 @@ decomp/src/network_socket_settings.c --compiler <pinned-wcc386>
 --output local/network-socket-settings-20261117.obj; pinned-Unicorn Python
 local/network-socket-settings-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: close generated intdos file-flush service gap
+
+Allow DOS AH=68h at the existing 0x2f0 intdos gateway in the generated-state
+file adapter. Match runtime/unicorn_cpp.cpp's hybrid policy: low-word BX
+selects the handle, console handles 0..2 succeed, successful flush preserves
+EAX, invalid handles return error 6 with CF, and other flags/registers/RAM
+remain unchanged. Flush uses the existing copy-on-write DosDrive implementation;
+original assets remain untouched. No additional interrupt sites are admitted.
+
+The real-drive C++ test checks five handles and both incoming CF states,
+full state/RAM preservation, overlay contents before close, preserved file
+position and open-handle lifetime, and rejection at a different interrupt site.
+This is adapter-policy evidence, not original DOS equivalence or a bulk
+function promotion; tracker counts remain unchanged. Commands:
+python3 -m unittest tests.test_asm_dos_file_service (PASS);
+python3 tools/decomp_status.py check (4293 functions); git diff --check.

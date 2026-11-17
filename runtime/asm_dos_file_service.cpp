@@ -14,7 +14,7 @@ static unsigned serve(ef_lift_state *guest, uint32_t ip, unsigned vector,
     // file services implemented below, never arbitrary extender requests.
     const bool intdos_file = ip == 0x2f0u &&
         (ah == 0x3cu || ah == 0x3du || ah == 0x3eu || ah == 0x3fu ||
-         ah == 0x40u || ah == 0x42u || ax == 0x4400u);
+         ah == 0x40u || ah == 0x42u || ah == 0x68u || ax == 0x4400u);
     if (!(intdos_file || (ip == 0xfa973u && ah == 0x42u) ||
           (ip == 0x1103b7u && ah == 0x42u) ||
           ((ip == 0x1103e0u || ip == 0xfa541u) && ah == 0x40u) ||
@@ -63,6 +63,10 @@ static unsigned serve(ef_lift_state *guest, uint32_t ip, unsigned vector,
             const std::vector<uint8_t> bytes(guest->memory + address,
                                             guest->memory + address + count);
             guest->r[0] = drive.write(handle, bytes);
+        } else if (ah == 0x68u) {
+            // Match the hybrid bridge: console handles succeed, successful
+            // flush preserves the complete EAX request, and the file stays open.
+            if (handle > 2) drive.flush(handle);
         } else if (ah == 0x3eu) {
             drive.close(handle);
             guest->r[0] = 0x3e01u;
