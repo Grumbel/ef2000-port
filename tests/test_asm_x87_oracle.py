@@ -193,6 +193,19 @@ class OracleTests(unittest.TestCase):
                 self.assertEqual(result['state'], 'pass', result)
                 self.assertTrue(result['original_x87']['operations'])
 
+    def test_signed_integer_comparison_matches_native_state(self):
+        for width, values in (('word', (-32768, 0, 32767)),
+                              ('dword', (-2147483648, 0, 2147483647))):
+            for mnemonic in ('ficom', 'ficomp'):
+                for value in values:
+                    with self.subTest(width=width, mnemonic=mnemonic, value=value):
+                        with tempfile.TemporaryDirectory() as temporary:
+                            payload, function = self.compiled(Path(temporary),
+                                f'mov {width} ptr [0x300100], {value}\nfldz\n'
+                                f'{mnemonic} {width} ptr [0x300100]\nret')
+                            result = self.compare(function, payload)
+                            self.assertEqual(result['state'], 'pass', result)
+
     def test_hardware_result_does_not_waive_any_compared_state(self):
         with tempfile.TemporaryDirectory() as temporary:
             payload, function = self.compiled(Path(temporary), 'fld1\nfstp tbyte ptr [0x300200]\nfnstsw ax\nret')

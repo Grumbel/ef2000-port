@@ -11887,3 +11887,9 @@ two instructions. The private fixture, build script and run log are
 in `local/asm-watcom-smoke-20261118/`. This checks the target compiler's
 dispatcher call and return path for one synthetic body. The full corpus
 link check remains separate.
+
+2026-11-18 — Added FICOM and FICOMP memory forms to the independent
+native x87 oracle. All twelve synthetic signed comparison cases now
+match the hardware observation, including the last-opcode field that
+Unicorn left at zero. All nine oracle tests pass with pinned Unicorn
+for the surrounding integer execution.

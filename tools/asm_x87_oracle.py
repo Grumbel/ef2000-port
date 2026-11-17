@@ -37,6 +37,9 @@ MEMORY.update({(0xdf, 2): (2, True, False), (0xdf, 3): (2, True, False),
                (0xdb, 2): (4, True, False), (0xdb, 3): (4, True, False), (0xdf, 7): (8, True, False)})
 MEMORY.update({(opcode, group): (width, False, False)
                for opcode, width in ((0xd8, 4), (0xdc, 8)) for group in range(8)})
+MEMORY.update({(opcode, group): (width, False, False)
+               for opcode, width in ((0xda, 4), (0xde, 2)) for group in (2, 3)})
+
 
 
 class Unavailable(ValueError):
