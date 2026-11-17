@@ -49,9 +49,16 @@ def legacy_transfer(insn):
     return dict(insn, mnemonic='jmp', operands=text)
 
 
-def instruction_c(insn, starts, *, consuming_targets=frozenset()):
+def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
+    if interrupt_boundaries and mnemonic == 'int' and insn['bytes'] == 'cd21':
+        next_pc = insn['address'] + 2
+        if next_pc not in starts:
+            raise asm_to_c.Unsupported('unresolved interrupt return continuation')
+        # A host-service boundary, not architectural interrupt delivery.
+        # No stack frame, flag change or service result is fabricated.
+        return 's->pc = 0x%xu; return 0x121u;' % next_pc
     indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
     if mnemonic != 'call' and not indirect:
         return asm_to_c.instruction_c(insn, starts)
@@ -81,7 +88,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset()):
     return ' '.join(code)
 
 
-def analyse(records):
+def analyse(records, *, interrupt_boundaries=False):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -113,7 +120,8 @@ def analyse(records):
                 ret['mnemonic'] == 'ret' and ret['bytes'] == 'c3' and
                 not ret['operands']):
             consuming_targets.add(record['address'])
-    renderer = partial(instruction_c, consuming_targets=consuming_targets)
+    renderer = partial(instruction_c, consuming_targets=consuming_targets,
+                       interrupt_boundaries=interrupt_boundaries)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -251,9 +259,9 @@ unsigned ef_lift_run(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc) {
 ''' % '\n'.join(chunks)
     return files
 
-def generate(inventory, output, image, *, shard_entries=2048):
+def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False):
     manifest, records = asm_to_c.read_inventory(inventory, image)
-    codes, dependencies, closed, reasons = analyse(records)
+    codes, dependencies, closed, reasons = analyse(records, interrupt_boundaries=interrupt_boundaries)
     blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
@@ -291,6 +299,12 @@ def generate(inventory, output, image, *, shard_entries=2048):
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
+    if interrupt_boundaries:
+        result['host_service_boundaries'] = dict(
+            model='int21-yield-v1', status=0x121,
+            sites=sorted(i['address'] for r in records if r['address'] in closed
+                         for i in r['instructions'] if i['mnemonic'] == 'int' and i['bytes'] == 'cd21'),
+            contract='PC is continuation; service IP is PC-2; host must service INT 21h before resuming')
     asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
@@ -301,13 +315,16 @@ def main(argv=None):
     parser.add_argument('--inventory', type=Path, required=True)
     parser.add_argument('--workspace', type=Path, default=asm_to_c.ROOT / 'local/ghidra')
     parser.add_argument('--output', type=Path, required=True)
+    parser.add_argument('--interrupt-boundaries', action='store_true',
+                        help='yield INT 21h to an external host service; does not implement the service')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
         if not output.is_relative_to(asm_to_c.ROOT / 'local'):
             raise ValueError('generated ASM-derived C must stay under ignored local/')
         workspace = asm_to_c.asm_inventory.ghidra_ef2000.validated_workspace(args.workspace)
-        report = generate(args.inventory, output, workspace / 'payload.bin')
+        report = generate(args.inventory, output, workspace / 'payload.bin',
+                          interrupt_boundaries=args.interrupt_boundaries)
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')

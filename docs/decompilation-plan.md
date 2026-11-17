@@ -10038,3 +10038,25 @@ Validation: pinned `wcc386 -q -bt=dos -3r -zp1 -za99 -w1 -we
 passes with zero diagnostics; tracker and diff checks pass. An initial
 compile without the required `-zp1` failed existing world-grid layout
 assertions; the repository flags resolve those errors. No gameplay runs.
+
+### 2026-11-17: add an explicit opt-in INT 21h host-service boundary
+
+The high-impact interrupt roots need access to existing stateful runtime
+services, rather than fabricated DOS results in generated instruction code.
+Add `--interrupt-boundaries` to bulk generation. Exact CD21 instructions
+with known continuations yield dispatcher status 0x121 after advancing PC,
+preserving all other guest state. The host must apply the real service
+response before resuming; this is not architectural interrupt delivery.
+Default translation continues rejecting INT. Reports enumerate service
+sites and contract. The ordinary differential driver rejects these reports
+because it has no service-aware oracle/bridge yet. Tracker states and bulk
+coverage are unchanged; runtime integration remains unfinished.
+
+Validation: three focused program tests pass (interrupt state preservation
+and host-CF resume, ordinary dependency exclusion and cyclic root tracking).
+The new compiled fixture compares the entire state structure except the
+specified PC transition and all guest RAM at the boundary, then observes
+host-returned CF through the next ADC and returns through the original
+stack. All three generated fixture units compile with pinned Watcom
+`-q -bt=dos -3r -za99 -w1 -we`. Tracker and diff checks pass. No gameplay
+runs or original-game equivalence claim.

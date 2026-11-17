@@ -1271,3 +1271,22 @@ manifest and support object digests independently checked. This is prepared-
 state boundary proof, not native ABI/captured-game/replay verification. The new
 tracker row remains unknown/asm/unverified. Services/traps, other ISA, reviewed
 dynamic targets, captured callers and full-game integration remain active.
+
+### External INT 21h service boundary (experimental)
+
+`asm_c_program.py --interrupt-boundaries` accepts the exact unprefixed
+`CD 21` encoding as an external service boundary. It does not implement x86
+interrupt delivery or DOS/X-32 services. Default generation still rejects it.
+The generated dispatcher returns `0x121` with PC advanced by two and all
+other guest state unchanged. The host must handle vector 0x21 using service
+IP `PC-2`, update the shared guest registers/flags/RAM and any affected
+selector caches, then resume at the continuation. There is no fabricated
+interrupt stack frame. Do not resume an unserviced request.
+
+Reports record the contract and admitted instruction sites under
+`host_service_boundaries`. Direct closure here means closure with required
+external services; it is not standalone execution coverage. The existing
+differential driver rejects these reports until a service-aware driver is
+provided. Other vectors, prefixed forms and missing continuations remain
+unsupported. The runtime byte guards still check the original instruction
+before yielding. No ABI layout change is needed.

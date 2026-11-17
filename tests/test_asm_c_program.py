@@ -547,6 +547,49 @@ leaf: ret
         self.assertEqual(asm_c_program.root_blockers(dependencies, {5}, reasons),
                          {1: [3, 4], 2: [3, 4], 3: [3], 4: [4]})
 
+    def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
+        source = '''.type root,@function
+root: int 0x21
+adc eax,0
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            self.assertFalse(asm_c_program.analyse(records)[2])
+            out = root / 'out'
+            report = asm_c_program.generate(directory, out, image, interrupt_boundaries=True)
+            self.assertEqual(report['host_service_boundaries']['sites'], [0x100])
+            with self.assertRaisesRegex(ValueError, 'service-aware'):
+                asm_c_differential.verify(out, root/'evidence', image, scenarios=1)
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, sorted(out.glob('*.c'))), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            function = ctypes.CDLL(str(root/'program.so')).ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                 ctypes.c_uint32, ctypes.c_uint32]
+            memory = bytearray(4096)
+            memory[:image.stat().st_size] = image.read_bytes()
+            memory[0x800:0x804] = (0xf00).to_bytes(4, 'little')
+            array = (ctypes.c_uint8 * len(memory)).from_buffer(memory)
+            state = asm_c_differential.State((ctypes.c_uint32 * 8)(0x3508, 2, 3, 4, 0x800, 6, 7, 8),
+                                             0x246, 0x100, 0, array, len(memory))
+            before = bytes(state)
+            before_memory = bytes(memory)
+            self.assertEqual(function(ctypes.byref(state), 100, 0xf00), 0x121)
+            self.assertEqual(state.pc, 0x102)
+            state.pc = 0x100
+            self.assertEqual(bytes(state), before)
+            self.assertEqual(bytes(memory), before_memory)
+            state.pc = 0x102
+            # Model a host response; the following ADC must consume its CF.
+            state.r[0] = 41
+            state.flags |= 1
+            self.assertEqual(function(ctypes.byref(state), 100, 0xf00), 0)
+            self.assertEqual(state.r[0], 42)
+            self.assertEqual(state.pc, 0xf00)
+            self.assertEqual(state.r[4], 0x804)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_instruction_budget_is_shared_across_calls_and_can_resume(self):
         source = '''.type root,@function
