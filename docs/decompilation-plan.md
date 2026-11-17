@@ -11716,3 +11716,23 @@ Commands: tools/ef2000_wcc.py decomp/src/network_dialog_callbacks.c --compiler
 <pinned-wcc386> --output local/network-dialog-20261117.obj;
 pinned-Unicorn Python local/network-dialog-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover network refresh and initialization callbacks
+
+Replace the final host guest-call probes in network_status_callbacks.c:
+349ec (23 bytes) stores the named widget lookup before refreshing the list;
+35128 (27 bytes) sets the session byte before close/clear/pending-name calls.
+Callback slots 12b4f8/12b5e0; original callee ABIs preserve six saved GPRs.
+Watcom zero warnings; 128 scoped compiled-C/original-ASM comparisons PASS,
+with five callees modeled. Check lookup arguments, null/non-null result
+stored before refresh, session byte before device close, pending-name EAX,
+six saved GPRs, ESP, traces and 5 MiB RAM excluding code placement/stack.
+Vary initial globals, widget address, saved registers and callback mutation.
+Scratch EAX, flags, stack and integration remain unproved. Keep compiles,
+hybrid excluded. Tracker 3461 compiles / 771 blocked / 453882 blocked bytes.
+Private report local/network-status-source-20261117/report.json SHA-256
+a361de54988432aa28a9a495d4af245e8603544f5af95034c39f91d43e56aff5.
+Commands: tools/ef2000_wcc.py decomp/src/network_status_callbacks.c --compiler
+<pinned-wcc386> --output local/network-status-20261117.obj;
+pinned-Unicorn Python local/network-status-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
