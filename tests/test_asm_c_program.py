@@ -576,6 +576,29 @@ leaf: ret
             self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
             self.assertEqual(sum(e['state'] == 'generated-unverified' for e in result['entries']), 1)
 
+    def test_conditional_fallthrough_requires_adjacent_body(self):
+        source = """.type root,@function
+root: jz leaf
+.size root, .-root
+.type adjacent,@function
+adjacent: cpuid
+ret
+.size adjacent, .-adjacent
+.org 0x200
+.type leaf,@function
+leaf: ret
+.size leaf, .-leaf"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            report = asm_c_program.generate(directory, root / 'out', image)
+            entries = {entry['address']: entry for entry in report['entries']}
+            adjacent = next(address for address in entries if 0x100 < address < 0x200)
+            self.assertEqual(entries[0x100]['dependencies'], [adjacent, 0x200])
+            self.assertEqual(entries[0x100]['root_blockers'], [adjacent])
+            self.assertEqual(entries[0x100]['state'], 'unsupported')
+            self.assertEqual(entries[0x200]['state'], 'generated-unverified')
+
     def test_reports_failures_after_first_unsupported_instruction(self):
         source = '''.type root,@function
 root: call bad
