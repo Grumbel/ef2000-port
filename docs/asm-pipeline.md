@@ -1290,8 +1290,12 @@ external services; it is not standalone execution coverage. The existing
 differential driver rejects these reports until a service-aware driver is
 provided. Unrestricted boundary generation admits vectors 21h and 31h.
 Selecting exact sites with `--interrupt-site` also permits other two-byte
-INT encodings. Prefixed forms and missing continuations remain unsupported.
-The runtime byte guards still check the original instruction before yielding. No ABI layout change is needed.
+INT encodings and the one-byte INT3 encoding. INT3 yields status `0x203`
+with the architectural continuation at `PC` and callback IP at `PC-1`.
+An undecoded INT3 continuation remains unavailable to the dispatcher.
+The host must stop or redirect execution when servicing such a request.
+Prefixed forms remain unsupported. The runtime byte guards still check
+the original instruction before yielding. No ABI layout change is needed.
 
 The low-level `asm_c_differential.compare(..., program=True,
 service_factory=...)` API supports register-only service models. The factory

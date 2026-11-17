@@ -11975,3 +11975,16 @@ body bytes) compiled without OpenWatcom diagnostics. The report is
 under `local/asm-int06-boundary-20261118/`. The generated INT 06h exits
 require a host callback if reached. No interrupt handler behavior or
 tracker promotion is established by this compile check.
+
+2026-11-18 — Enabled explicitly selected one-byte INT3 sites to yield
+vector 3 with an encoding-specific status and the correct callback IP.
+Synthetic checks cover return to a decoded continuation and rejection
+when the architectural continuation has no generated location. The
+whole-program generator suite passed all 35 tests. No bytes beyond
+the three selected breakpoint sites in 0xfa02c and 0x1204b6 were
+claimed as code by this change. With the existing DOS/DPMI, INT 06h
+and port selections, the bulk report now contains 4,022 generated
+bodies and 259 rejections. All 51 added bodies (22,196 original body
+bytes) and the dispatcher compiled without OpenWatcom diagnostics.
+The evidence is under `local/asm-int3-boundary-20261118/`. Actual
+guest breakpoint-handler behavior remains unverified.

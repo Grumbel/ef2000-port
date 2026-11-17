@@ -252,7 +252,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         def interrupt(engine, vector, _):
             ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
             if ip < 0 or vector not in range(256) or engine.mem_read(ip, 2) != bytes((0xcd, vector)):
-                raise ValueError('unsupported host service instruction')
+                ip += 1
+                if ip < 0 or vector != 3 or engine.mem_read(ip, 1) != b'\xcc':
+                    raise ValueError('unsupported host service instruction')
             values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
@@ -344,13 +346,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if 0x100 <= status <= 0x1ff and translated_service is not None:
+            if (0x100 <= status <= 0x1ff or status == 0x203) and translated_service is not None:
+                length = 1 if status == 0x203 else 2
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
                     ram = bytearray(memory) if memory_services else None
-                    response = service(translated_service, state.pc-2, values, translated_events,
-                                       status-0x100, ram)
+                    response = service(translated_service, state.pc-length, values, translated_events,
+                                       status & 0xff, ram)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C service unavailable: '+str(error)])
                 if memory_services:

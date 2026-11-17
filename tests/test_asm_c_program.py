@@ -909,6 +909,43 @@ ret
             self.assertEqual(requests, [(0x100, 6)])
             self.assertEqual(state.r[0], 42)
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_explicit_breakpoint_yields_single_byte_continuation(self):
+        for tail in ('ret', ''):
+            with self.subTest(tail=tail), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                source = f'.type root,@function\nroot: int3\n{tail}\n.size root, .-root'
+                image, directory, records = inventory(root, source)
+                self.assertFalse(asm_c_program.analyse(records, interrupt_boundaries=True)[2])
+                out = root/'out'
+                report = asm_c_program.generate(directory, out, image,
+                    interrupt_boundaries=True, interrupt_sites={0x100})
+                self.assertEqual(report['host_service_boundaries']['requests'],
+                                 [dict(ip=0x100, vector=3, length=1, status=0x203)])
+                subprocess.run(['cc', '-shared', '-fPIC', *map(str, sorted(out.glob('*.c'))),
+                               '-o', str(root/'program.so')], check=True, capture_output=True)
+                library = ctypes.CDLL(str(root/'program.so'))
+                function = library.ef_lift_run
+                function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
+                ram = (ctypes.c_uint8 * 4096)()
+                ram[:len(image.read_bytes())] = image.read_bytes()
+                state = asm_c_differential.State((ctypes.c_uint32 * 8)(), 0x246, 0x100, 0, ram, len(ram))
+                self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 0x203)
+                self.assertEqual(state.pc, 0x101)
+                if not tail:
+                    self.assertEqual(function(ctypes.byref(state), 1, 0xf00), 2)
+                    continue
+
+                def respond(vector, ip, values):
+                    self.assertEqual((vector, ip), (3, 0x100))
+                    values['ax'] = 42
+                    return values
+
+                result = asm_c_differential.compare(function, image.read_bytes(), 0x100,
+                    [1, 2, 3, 4, 0x300000, 6, 7, 8], 0x246, program=True,
+                    service_factory=lambda: respond, vector_services=True)
+                self.assertEqual(result['state'], 'pass', result)
+
     def test_port_requirements_propagate_through_call_cycles(self):
         source = '''.type root,@function
 root: call middle

@@ -74,6 +74,8 @@ def port_service_request(insn):
 
 def interrupt_vector(insn):
     encoded = insn['bytes']
+    if insn['mnemonic'] == 'int3' and encoded == 'cc':
+        return 3
     if insn['mnemonic'] == 'int' and len(encoded) == 4 and encoded.startswith('cd'):
         return int(encoded[2:], 16)
     return None
@@ -86,12 +88,13 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
     vector = interrupt_vector(insn) if interrupt_boundaries else None
     if vector is not None and (insn['address'] in interrupt_sites if interrupt_sites is not None
                                else vector in (0x21, 0x31)):
-        next_pc = insn['address'] + 2
-        if next_pc not in starts:
+        breakpoint = mnemonic == 'int3'
+        next_pc = insn['address'] + (1 if breakpoint else 2)
+        if not breakpoint and next_pc not in starts:
             raise asm_to_c.Unsupported('unresolved interrupt return continuation')
         # A host-service boundary, not architectural interrupt delivery.
         # No stack frame, flag change or service result is fabricated.
-        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x100 + vector)
+        return 's->pc = 0x%xu; return 0x%xu;' % (next_pc, 0x203 if breakpoint else 0x100 + vector)
     if (port_boundaries and mnemonic in ('in', 'out') and
             (port_sites is None or insn['address'] in port_sites)):
         request = port_service_request(insn)
@@ -333,8 +336,9 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
     if (s->fault) return s->fault;
     while (fuel--) {
         status = ef_lift_run(s, 1, stop_pc);
-        if ((status >= 0x100u && status <= 0x1ffu) && service) {
-            status = service(s, s->pc - 2u, status - 0x100u, context);
+        if (((status >= 0x100u && status <= 0x1ffu) || status == 0x203u) && service) {
+            unsigned length = status == 0x203u ? 1u : 2u;
+            status = service(s, s->pc - length, status & 0xffu, context);
             if (status) return status;
             if (s->fault) return s->fault;
             status = s->pc == stop_pc ? 0 : 1;
@@ -448,15 +452,17 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
         'scalar port sites only; conservative direct-edge closure; dynamic targets and '
         'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
     if interrupt_boundaries:
-        sites = sorted((i['address'], interrupt_vector(i))
+        sites = sorted((i['address'], interrupt_vector(i), i['mnemonic'] == 'int3')
                        for r in records if r['address'] in closed
                        for i in r['instructions'] if interrupt_vector(i) is not None)
         result['host_service_boundaries'] = dict(
             model='int-service-yield-v2',
-            statuses={f'0x{vector:02x}': 0x100 + vector for vector in sorted({v for _, v in sites})},
-            sites=[ip for ip, vector in sites],
-            requests=[dict(ip=ip, vector=vector) for ip, vector in sites],
-            contract='PC is continuation; service IP is PC-2; vector is status-0x100; host must service request before resuming')
+            statuses={f'0x{vector:02x}': 0x100 + vector for vector in sorted({v for _, v, trap in sites if not trap})},
+            sites=[ip for ip, _, _ in sites],
+            requests=[dict(ip=ip, vector=vector, length=1, status=0x203) if trap
+                      else dict(ip=ip, vector=vector) for ip, vector, trap in sites],
+            contract='PC is continuation; service IP is PC-encoding length; vector is low status byte; '
+                     'host must service request before resuming; INT3 may lack a decoded continuation')
     if port_boundaries:
         result['host_port_service_boundaries'] = dict(
             model='scalar-port-service-yield-v1',
@@ -478,7 +484,7 @@ def main(argv=None):
     parser.add_argument('--interrupt-boundaries', action='store_true',
                         help='yield INT 21h/31h or explicitly selected INT sites to an external host service')
     parser.add_argument('--interrupt-site', type=lambda value: int(value, 0), action='append',
-                        help='yield only these exact two-byte INT instruction addresses (repeatable)')
+                        help='yield only these exact INT or INT3 instruction addresses (repeatable)')
     parser.add_argument('--port-boundaries', action='store_true',
                         help='yield scalar IN/OUT to a host service; does not implement devices')
     parser.add_argument('--port-site', type=lambda value: int(value, 0), action='append',
