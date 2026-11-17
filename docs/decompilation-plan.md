@@ -10270,3 +10270,29 @@ outside this evidence. Reproducer: local/heap-mode1-source-20261117/check.py;
 report.json SHA-256:
 d2efd036867dbb5e8e4635a320796017173a58bbdc4af46b5503211a18d8a980.
 Tracker/diff checks pass. No gameplay runs.
+
+### 2026-11-17: recover alternate heap-growth caller C
+
+Add decomp/src/heap_grow_alternate.c for 0x10d75c and its shared epilogue.
+Recover enable/break guards, size alignment, mode-1 backing allocation versus
+the explicit EAX80004800 extended service, both size deductions, underflow
+and minimum-size checks, insertion, allocated-bit marking, heap counters and
+release-to-free-list call. Keep the extended service as an unresolved semantic
+boundary; its pointer result is not ordinary DOS AH48. Record the single direct
+caller 10d80b@10d82f and original preserved registers; name the growth-enable
+global. The existing normal-growth source can now reference a recovered caller,
+but platform services and exact guest register/flag ABI remain pending.
+
+Pinned Watcom -q -bt=dos -3r -zp1 -za99 -w1 -we -i=decomp/include
+compiles without diagnostics. Focused original-Unicorn/source-host comparisons
+pass 384 cases: modes 1/9, six sizes (8,12,60,64,68,4096), allocation
+success/failure, enabled/disabled/break-sentinel/alignment-failure guards,
+and empty/head/tail/middle insertion configurations. Both sides run their real
+heap insertion routines; alignment, backing allocation and final free have
+explicit matching stubs. Compare return value, RAM except original stack
+scratch, and ordered boundary-call arguments. This proves caller behavior
+relative to those stubs, not the complete allocator chain, actual alignment,
+free logic, extender services or register/flag ABI. The tracker stays blocked.
+Reproducer: local/heap-alternate-source-20261117/check.py; report.json SHA-256
+d64b9ee12b3455dda355be709cc33de8fd7cadf1f066c35b97ae80fecebf95f8.
+Tracker/diff checks pass. No gameplay runs.

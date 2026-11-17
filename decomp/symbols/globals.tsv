@@ -515,3 +515,4 @@ addr	size	type	name	evidence	notes
 0x00121e8e	2	uint16_t	g_map_zoom_mode	0xa974	16-bit one-minus toggle; non-Boolean values retained
 0x00121e95	1	uint8_t	g_target_view_mode	0xb574	stores 2 on first mismatch, 1 on second mismatch, 0 on both equal; same compared strings
 0x004ddee8	4	uint32_t	g_heap_dos_reservation_size	0x10d6d7..0x10d703 tests upper bits, caps to 0xfffff, converts to paragraphs	Mode-1 fallback temporary DOS allocation size; initialized value and other writers pending
+0x0017e5dc	4	uint32_t	g_heap_growth_enabled	0x10d762 and 0x10d835 reject zero before heap growth	Nonzero permits backing allocation; initialization and other writers pending

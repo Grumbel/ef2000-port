@@ -22,4 +22,12 @@ void ef_heap_release_dos(uint32_t selector); /* ES restored afterward */
 /* INT31 AX0006: combine returned CX:DX even if service carry is set. */
 ef_addr32 ef_heap_selector_base(uint32_t selector);
 
+/* INT21 full EAX=0x80004800, EBX=size; returned EAX is a pointer.
+ * Its extender-specific implementation is still unrecovered. */
+typedef struct ef_heap_extended_result {
+    ef_addr32 address;
+    uint32_t carry;
+} ef_heap_extended_result;
+void ef_heap_allocate_extended(uint32_t size, ef_heap_extended_result *result);
+
 #endif
