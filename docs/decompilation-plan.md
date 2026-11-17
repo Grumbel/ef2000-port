@@ -10976,3 +10976,29 @@ Tracker: 3432 compiles, 800 blocked. Commands: tools/ef2000_wcc.py on
 network_service_open.c and runtime_helpers28.c with pinned compiler;
 pinned-Unicorn Python local/network-service-open-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover socket change callback 0x33ee8
+
+Recover 208-byte EAX-widget callback (table pointer 0x12b590; no direct
+inventory callers). Validate at most four characters using byte-wrapped
+character-class indices, reject empty input, then invoke cdecl scanner %x.
+Preserve low-byte scanner-result comparison and full-width zero/ffff/current
+socket checks before the 16-bit store. Values above ffff remain accepted
+and truncate exactly as originally; retain clear-session/shutdown/store/write
+ordering and unconditional network refresh. Reuse asserted widget text offset.
+
+Watcom clean. In 252 original/emitted-body scoped comparisons, explicit
+parser/session models match traces, saved registers, ESP and RAM except code
+placement/stack scratch. Cover seven text patterns (including invalid fifth
+character and high byte), six parsed values through ffffffff, scanner results
+0/1/101 and two current sockets. Parser results deliberately vary independently
+of text to check body control flow; this does not validate the actual scanner.
+Actual callees, EAX scratch, flags and stack scratch unproved; no binary
+identity or splice/replay claim. Retain exclusion. Report:
+local/network-socket-settings-source-20261117/report.json SHA-256
+da848a68fd347eee3dbc2942434cc222b4ddd4488e4d8594a6bf933b3ae5364d.
+Tracker: 3433 compiles, 799 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/network_socket_settings.c --compiler <pinned-wcc386>
+--output local/network-socket-settings-20261117.obj; pinned-Unicorn Python
+local/network-socket-settings-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

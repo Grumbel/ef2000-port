@@ -7691,3 +7691,8 @@ void open_network_service_34140(ef_addr32 selection);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_e1744 parm [eax] value [al] modify [eax ecx edx]
 #endif
+
+void change_network_socket_33ee8(ef_addr32 widget);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux change_network_socket_33ee8 parm [eax] modify [eax]
+#endif
