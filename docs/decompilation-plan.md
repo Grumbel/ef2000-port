@@ -9634,3 +9634,38 @@ flags, faults or DF=1 for the handwritten draft.
 wcc386> --output local/asm-shade-tail-20261117/misc_drafts1.obj` compiles the
 entire production module with zero warnings/errors after the ABI correction.
 Tracker and diff checks pass. No gameplay run, splice or replay is claimed.
+
+### 2026-11-17: refresh bulk closure after shading, offset and overlap repairs
+
+Fresh normalization of the same 4,280 selected tracker addresses against
+`local/ghidra-offset-tail-inventory-20261117/body-ranges.json`, including the
+validated TEST/MOV overlap decoding, produces
+`local/asm-latest-body-inventory-20261117`. Bulk generation in
+`local/asm-c-latest-program-20261117` supports 4,175 bodies syntactically and
+closes 2,587 bodies over direct edges, covering 428,570 original body bytes.
+Compared with the preceding 2,582-body result, the added bodies are 0xc3364,
+0xc6370, 0xc6428, 0xc8c34 and 0xe7d27; none are removed. Dynamic targets
+remain outside this closure proof. The translation report SHA-256 is
+`a4c013d5bf5a09aa0b7a9c97ce42598617c2eeb56623c27ceb7ce60b946086d4`.
+
+The remaining 1,693 excluded bodies have first-failure diagnostics of 1,588
+untranslated direct dependencies and 105 unsupported instructions. No
+missing-fallthrough or count-branch diagnostic remains in this inventory.
+These categories describe generator diagnostics, not equivalence results.
+In particular, e7d27 still lacks descriptor-table segment reload semantics
+for its multi-character path, as recorded above.
+
+Intersecting this fresh report with the 810 blocked tracker entries gives
+307 generated-unverified, 461 excluded by direct dependencies, 32 rejected
+by unsupported instructions and 10 not selected into this inventory.
+Thus the tracker label does not mean that all 810 functions currently fail
+C generation. No tracker promotion is justified by this compilation report.
+
+`python3 local/asm-latest-watcom-20261117/check.py` verifies 2,654 translation,
+dispatcher and registry units against the pinned Watcom compiler: 2,567
+unchanged units reuse checked source/compiler/object hashes and the identical
+state header; 87 units compile anew. All have zero errors and diagnostics.
+Compiler report SHA-256:
+`9bfd2c00c2a0d8b75151866918b73bf7ed665eb47df20dbfb00261feadf45395`.
+This refresh measures generation and compiler coverage only; it supplies no
+new full-state equivalence, gameplay, splice or replay evidence.
