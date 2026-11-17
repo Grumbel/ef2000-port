@@ -11172,12 +11172,15 @@ void register_locked_ranges_117ace(void)
 uint32_t close_handle_fa9a0(uint32_t handle)
 {
     uint32_t out[7];
-    run_dos_int_ex(0x21u, 0x3e00u, handle, 0u, handle, out);
-    if ((out[0] & 0x80000000u) == 0u && out[6] == 0u) {
-        store_flagged_value(handle, 0u);
+    /* MOV AH,3e preserves AL and the upper half of the incoming handle. */
+    run_dos_int_ex(0x21u, (handle & 0xffff00ffu) | 0x3e00u,
+                   handle, 0u, handle, out);
+    /* RCL/ROR replaces bit 31 with CF; the returned EAX sign is discarded. */
+    if (out[6] == 0u) {
+        store_flagged_value(out[3], 0u);
         return 0u;
     }
-    guest_fn_ebe6d(4u);
+    store_through_ebd30(4u);
     return 0xffffffffu;
 }
 

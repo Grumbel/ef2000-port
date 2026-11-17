@@ -12,6 +12,7 @@ extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
     if (!((ip == 0xfa973u && ah == 0x42u) ||
           (ip == 0x1103b7u && ah == 0x42u) ||
           (ip == 0x1103e0u && ah == 0x40u) ||
+          (ip == 0xfa9a8u && ah == 0x3eu) ||
           (ip == 0x1101c7u && ax == 0x4400u))) return 0x122u;
 
     auto& drive = *static_cast<ef2000::DosDrive*>(context);
@@ -30,6 +31,9 @@ extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
             const std::vector<uint8_t> bytes(guest->memory + address,
                                             guest->memory + address + count);
             guest->r[0] = drive.write(handle, bytes);
+        } else if (ah == 0x3eu) {
+            drive.close(handle);
+            guest->r[0] = 0x3e01u;
         } else {
             if (handle > 2 && !drive.is_open(handle)) throw unsigned(6);
             const uint32_t device = handle <= 2 ? 0x80d3u : 2u;

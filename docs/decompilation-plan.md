@@ -10488,3 +10488,29 @@ exact service traces and final overlay/original files match. Report SHA-256:
 `32a4f79388b20d5c53119c24f2216394c2848abac9ef4efe545fba573e0fd9e8`.
 The callback remains opt-in for the native runner, not interactive hybrid wiring;
 tracker states and original-service fidelity claims remain unchanged.
+
+
+### 2026-11-17 — Correct recovered DOS close and connect its service
+
+Disassembly of fa9a0 shows MOV AH,3e retaining the rest of the handle in EAX,
+RCL/ROR replacing the returned sign bit with CF, and success using returned
+EDX as the slot index. Corrected the existing C draft accordingly; a successful
+service return with bit 31 set is no longer mistaken for failure. The failure
+path now invokes the recovered errno store (value 4) directly. Call sites
+bc4da@bc524 and the 115984 tail entry were inspected. Original EBX/EDX saves
+and existing signature remain unchanged; arbitrary service clobbers of other
+registers are not covered by a full-ABI claim.
+
+Added fa9a8/AH=3e support to the native DOS file callback using DosDrive.close.
+The focused regression `python3 -m unittest tests.test_asm_dos_file_service`
+passes, including successful close/overlay persistence and repeated-close CF/6.
+The extracted recovered close compiles with wcc386 -bt=dos -3r -zp1 -za99
+-w1 -we without diagnostics. Pinned Unicorn Python running
+`local/dos-close-source-20261117/check.py` passes 64 original/recovered-source
+comparisons across high handle bits, CF, sign-bit service results and changed
+returned EDX. Actual recovered slot/errno/address helpers are included; only DOS
+register responses are modeled. Compared EAX return, RAM except stack scratch,
+and request EAX/EBX/EDX. Report SHA-256:
+`8a147649f109d02ebb97bc84bdcf13ef470c427b6974405d9ed8e5f85ba5de43`.
+Full ABI, original extender services and integration remain unverified; tracker
+states are unchanged.

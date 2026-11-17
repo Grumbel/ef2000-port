@@ -66,7 +66,16 @@ int main(int argc, char **argv)
     assert(ef_asm_dos_file_service(&state, 0x123, 0x21, &drive) == 0x122);
     assert(std::memcmp(&state, &before, sizeof state) == 0);
     assert(drive.seek(handle, 0, 1) == 8);
-    drive.close(handle);
+    state.r[0] = 0xabcd3e00; state.r[3] = handle;
+    before = state;
+    assert(ef_asm_dos_file_service(&state, 0xfa9a8, 0x21, &drive) == 0);
+    before.r[0] = 0x3e01; before.flags &= ~1u;
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
+    assert(!drive.is_open(handle));
+    state.r[0] = 0x3e00; before = state;
+    assert(ef_asm_dos_file_service(&state, 0xfa9a8, 0x21, &drive) == 0);
+    before.r[0] = 6; before.flags |= 1u;
+    assert(std::memcmp(&state, &before, sizeof state) == 0);
     std::ifstream overlay(root / "overlay/EF2000/FILE.DAT", std::ios::binary);
     assert(std::string(std::istreambuf_iterator<char>(overlay), {}) == "NEWginal");
     std::ifstream original(root / "game/FILE.DAT", std::ios::binary);
