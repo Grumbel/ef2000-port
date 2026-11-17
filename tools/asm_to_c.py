@@ -702,7 +702,13 @@ def instruction_c(insn, starts):
             segment, opcode = asm_x87.memory_encoding(insn, encoding, group)
         except ValueError as error:
             raise Unsupported(str(error)) from error
-        code += ['b = %s;' % op[1],
+        if segment != op[3]:
+            raise Unsupported('x87 decoded segment mismatch')
+        storing = narrow_store or integer_store or mnemonic == 'fstp'
+        kind = (4 if storing else 3) if segment == 2 else (1 if storing else 0)
+        code += ['if (s->x87_status & 0x80u) return 8;',
+                 'b = %s;' % op[1],
+                 'if (ef_check_segment(s, %d, b, %d, %d)) return s->fault;' % (segment, width_of(op)//8, kind),
                  'a = %s; if (a) return a;' % helper,
                  's->x87_ip = 0x%xu; s->x87_cs = s->segment[1]; s->x87_opcode = 0x%xu;' %
                  (insn['address'], opcode),
@@ -1032,10 +1038,7 @@ def translate(record, *, starts=None, renderer=instruction_c):
     for i in instructions:
         code = renderer(i, starts)
         # Reject paths whose implicit accesses still use the legacy flat helpers.
-        x87_flat_memory = (i['mnemonic'].startswith('f') and
-                           i['mnemonic'] not in ('fnstcw', 'fnstsw', 'fldcw') and
-                           'ptr ' in i['operands'].lower())
-        if i['mnemonic'] in unwired or x87_flat_memory:
+        if i['mnemonic'] in unwired:
             code = 'if (s->segment_profile) return 7; ' + code
         fetch = 'if (ef_check_segment(s, 1, 0x%xu, %du, 2)) return s->fault; ' % (
             i['address'], len(bytes.fromhex(i['bytes'])))

@@ -8453,3 +8453,24 @@ fixture retains rejection of FLD tbyte memory in descriptor mode.
 Validation: tests.test_asm_capture and tests.test_asm_c_program in the matching
 Nix Python/Unicorn environment; tracker check; git diff --check. No gameplay
 or UI runs; reliable bulk translation remains incomplete.
+
+### 2026-11-17 — Translate descriptor-backed x87 memory operands
+
+Generated x87 memory operations now check the full decoded operand extent
+and access kind against its cached segment before invoking the existing
+floating-point helper. Stores require write permission; SS accesses retain
+stack checks. Encoded and decoded segment disagreement is rejected. The
+existing pending-x87-exception check precedes the descriptor check. Removed
+the remaining blanket x87 memory rejection; the helpers' RAM extent checks,
+conversion behavior and x87 environment updates remain unchanged.
+
+Captured-state comparisons against the native x87 oracle cover extended
+loads/stores, integer and real loads with extended stores, and an FS source
+override. Rejected extended reads and writes preserve GPRs, flags, RAM,
+physical x87 registers and x87 environment fields. Validation:
+tests.test_asm_capture, tests.test_asm_c_program and tests.test_asm_x87_memory
+in the matching Nix Python/Unicorn environment; tracker check;
+git diff --check. No gameplay or UI runs. This enables existing supported
+x87 instruction forms, not arbitrary x87 instructions or exception delivery.
+Descriptor reloads, compound stack operations and broader captured-path
+coverage still keep the reliable bulk translation goal open.

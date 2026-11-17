@@ -73,7 +73,10 @@ class AsmCaptureTests(unittest.TestCase):
             'mov esi,0\nmov edi,0\nmov ecx,0\nrep movsd\nret',
             'fninit\nfld1\nfchs\nfabs\nfldz\nfxch st(1)\nfstp st(1)\nfnstsw ax\nret',
             'fninit\nfnstcw word ptr [0x2000]\nfldcw word ptr [0x2000]\nfnclex\nfwait\nret',
-            'fld tbyte ptr [0x2000]\nret',  # Memory helper still uses flat accesses.
+            'fld tbyte ptr [0x2000]\nret',
+            'fninit\nfild word ptr [0x2000]\nfstp tbyte ptr [0x2200]\nret',
+            'fninit\nfld dword ptr [0x2000]\nfstp tbyte ptr [0x2200]\nret',
+            'fninit\nfld tbyte ptr fs:[0x2000]\nfstp tbyte ptr [0x2200]\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -88,7 +91,7 @@ class AsmCaptureTests(unittest.TestCase):
                     regs = dict(capture.registers, eip=0x100, ebp=0x2100)
                     tables = copy.deepcopy(capture.table_context)
                     # Non-null FS for the explicit override load.
-                    if number in (4, 8, 24):
+                    if number in (4, 8, 24, 31):
                         regs['fs'] = 7
                         tables['descriptors']['fs'] = tables['descriptors']['ds']
                     # Execute-only CS permits instruction fetch, not data loads.
@@ -114,12 +117,12 @@ class AsmCaptureTests(unittest.TestCase):
                         native, _ = asm_x87_oracle.build(root/('native%d' % number))
                     result = asm_c_differential.isolated_probes(function, b'', 0x100, 1, 100, False,
                                                                native_x87=native, captured=capture)[0]
-                    if number in (6, 28):
+                    if number == 6:
                         self.assertEqual(result['state'], 'mismatch')
                         self.assertIn('C status 7', result['differences'][0])
                     else:
                         self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 7, 10, 14, 15, 16, 17):
+                    if number in (0, 7, 10, 14, 15, 16, 17, 28, 29):
                         # Test the generated access path, not only the helper:
                         # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
@@ -138,6 +141,12 @@ class AsmCaptureTests(unittest.TestCase):
                             state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
                         if number == 10:
                             state.segment_cache[2].limit = regs['esp'] - 4
+                        if number in (28, 29):
+                            # Reject before x87 stack/status or memory changes.
+                            state.segment_cache[3].limit = 0x2000 if number == 28 else 0x2200
+                            if number == 29:
+                                state.pc = next(i['address'] for i in record['instructions']
+                                                if i['mnemonic'] == 'fstp')
                         if number == 17:
                             # A failing REP iteration must not consume its count.
                             state.pc = next(i['address'] for i in record['instructions']
@@ -159,11 +168,13 @@ class AsmCaptureTests(unittest.TestCase):
                             # Skip the setup MOVs to isolate fault atomicity.
                             state.pc = record['instructions'][2]['address']
                             state.r[3], state.r[0] = 0x2000, 0x12340000
+                        x87_before = (bytes(state.x87), tuple(getattr(state, n) for n in asm_c_differential.X87_FIELDS))
                         before = (list(state.r), state.flags, bytes(ram))
                         expected_fault = 3 if number == 16 else 7
                         self.assertEqual(function(ctypes.byref(state), 100), expected_fault)
                         self.assertEqual(state.fault, expected_fault)
                         self.assertEqual((list(state.r), state.flags, bytes(ram)), before)
+                        self.assertEqual((bytes(state.x87), tuple(getattr(state, n) for n in asm_c_differential.X87_FIELDS)), x87_before)
 
     @unittest.skipUnless(shutil.which('cc') and shutil.which('objdump'), 'requires C compiler and objdump')
     def test_captured_input_reaches_generated_c_without_flattening_selectors(self):
