@@ -10296,3 +10296,15 @@ free logic, extender services or register/flag ABI. The tracker stays blocked.
 Reproducer: local/heap-alternate-source-20261117/check.py; report.json SHA-256
 d64b9ee12b3455dda355be709cc33de8fd7cadf1f066c35b97ae80fecebf95f8.
 Tracker/diff checks pass. No gameplay runs.
+
+### 2026-11-17 — Explain blocked rows using a translation snapshot
+
+Status accepts `--translation-report` to cross-reference blocked tracker rows
+with generated-unverified, excluded and absent inventory entries, then ranks
+shared root blockers by unique affected rows. Overlapping root groups are
+explicit; no tracker promotion or freshness/equivalence claim is made. The
+current heap-service snapshot yields 368 generated, 432 excluded and 10 absent
+blocked rows. `python3 -m unittest tests.test_decomp_status` passes 11 tests,
+including overlapping dependencies, duplicate roots, missing inventory entries
+and rejection of duplicate report addresses. Tracker and diff checks pass.
+No gameplay runs.

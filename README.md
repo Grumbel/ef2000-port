@@ -15,6 +15,13 @@ reported separately. Byte comparisons distinguish exact, different, not
 comparable, not measured, and stale evidence. Only current strict matches count;
 compiler differences do not imply incorrect behavior.
 
+To distinguish tracker-blocked functions that already have generated C from
+remaining generator exclusions, pass a bulk translator report:
+`nix run .#status -- --translation-report /absolute/path/to/report.json`.
+This also ranks shared root blockers by affected blocked functions. Groups
+overlap. The supplied report is a snapshot; this does not validate its freshness,
+runtime services, or equivalence, and does not change tracker states.
+
 To record a comparison, review the original contiguous body and the compiled
 extent (excluding alignment padding), then run:
 

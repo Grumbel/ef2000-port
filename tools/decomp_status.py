@@ -20,6 +20,7 @@ Commands:
 import argparse
 import collections
 import csv
+import json
 import os
 from pathlib import Path
 import re
@@ -146,7 +147,40 @@ def summary(rows, out=sys.stdout):
         print(f'recovered or excluded: {100.0 * done / total_bytes:.1f}% of bytes', file=out)
 
 
-def status(rows, out=sys.stdout, recompilation=None, root=ROOT):
+def translation_blockers(rows, report, out=sys.stdout):
+    """Cross-reference recorded generation results; never promote tracker evidence."""
+    if report.get('model') != 'flat-x86-program-explicit-state':
+        raise TrackerError('translation report has an unsupported model')
+    entries = {}
+    for entry in report['entries']:
+        address = entry['address']
+        if address in entries:
+            raise TrackerError(f'duplicate translation entry: {format_addr(address)}')
+        entries[address] = entry
+    counts = collections.Counter()
+    roots = collections.Counter()
+    for row in rows:
+        if row['state'] != 'blocked':
+            continue
+        entry = entries.get(parse_addr(row['addr']))
+        category = ('outside inventory' if entry is None else
+                    'generated, unverified' if entry['state'] == 'generated-unverified'
+                    else 'excluded by generator')
+        counts[category] += 1
+        if entry is not None and entry['state'] != 'generated-unverified':
+            roots.update(set(entry.get('root_blockers', [])))
+    print('Blocked tracker rows versus supplied translation report:', file=out)
+    for category in ('generated, unverified', 'excluded by generator', 'outside inventory'):
+        print(f'  {category:<25} {counts[category]:>6,} functions', file=out)
+    print('Root blockers (affected blocked functions; groups overlap):', file=out)
+    for address, count in sorted(roots.items(), key=lambda item: (-item[1], item[0]))[:10]:
+        reason = entries.get(address, {}).get('reason', 'absent from report')
+        print(f'  {format_addr(address)} {count:>6,}  {reason}', file=out)
+    print('Supplied report is a snapshot; source freshness, services and equivalence '
+          'are not validated here. Tracker states are unchanged.', file=out)
+
+
+def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None):
     """Report recorded evidence, without treating compilation as equivalence."""
     total = len(rows)
     total_bytes = sum(int(row['size']) for row in rows)
@@ -187,6 +221,8 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT):
         print(f'  {state:<18} {counts[state]:>8,} functions {sizes[state]:>10,} body bytes', file=out)
     print('Stale evidence is excluded from matches; a difference is not a behavioral failure.', file=out)
     print('No recompilation or game tests run here.', file=out)
+    if translation is not None:
+        translation_blockers(rows, translation, out)
 
 
 def read_calls(path):
@@ -305,6 +341,8 @@ def main(argv=None):
     status_parser = sub.add_parser('status')
     status_parser.add_argument('--recompilation', type=Path,
                                help='override the committed byte-comparison report')
+    status_parser.add_argument('--translation-report', type=Path,
+                               help='cross-reference a bulk translator report snapshot')
     next_parser = sub.add_parser('next')
     next_parser.add_argument('--module')
     next_parser.add_argument('--limit', type=int, default=10)
@@ -324,7 +362,9 @@ def main(argv=None):
             return 0
         rows = read_tracker(args.tracker)
         if args.command == 'status':
-            status(rows, recompilation=args.recompilation)
+            translation = (json.loads(args.translation_report.read_text())
+                           if args.translation_report else None)
+            status(rows, recompilation=args.recompilation, translation=translation)
         elif args.command == 'summary':
             summary(rows)
         elif args.command == 'next':

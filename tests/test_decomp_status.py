@@ -145,6 +145,30 @@ class DecompStatusTest(unittest.TestCase):
         decomp_status.status([], empty)
         self.assertIn('0.0%', empty.getvalue())
 
+    def test_translation_blockers_overlap_and_missing_inventory(self):
+        rows = [decomp_status.new_row(address, 10, '')
+                for address in (0x100, 0x200, 0x300, 0x400)]
+        for row in rows:
+            row['state'] = 'blocked'
+        report = {'model': 'flat-x86-program-explicit-state', 'entries': [
+            {'address': 0x100, 'state': 'generated-unverified'},
+            {'address': 0x200, 'state': 'unsupported', 'root_blockers': [0x500, 0x500]},
+            {'address': 0x300, 'state': 'unsupported', 'root_blockers': [0x500, 0x600]},
+            {'address': 0x500, 'state': 'unsupported', 'reason': 'unsupported instruction: int'},
+            {'address': 0x600, 'state': 'unsupported', 'reason': 'unsupported instruction: fsin'},
+        ]}
+        out = io.StringIO()
+        decomp_status.translation_blockers(rows, report, out)
+        lines = out.getvalue().splitlines()
+        self.assertTrue(any('generated, unverified' in line and '1 functions' in line for line in lines))
+        self.assertTrue(any('excluded by generator' in line and '2 functions' in line for line in lines))
+        self.assertTrue(any('outside inventory' in line and '1 functions' in line for line in lines))
+        self.assertTrue(any('0x00000500' in line and '2  unsupported' in line for line in lines))
+        self.assertEqual([row['state'] for row in rows], ['blocked'] * 4)
+        report['entries'].append(report['entries'][0])
+        with self.assertRaises(decomp_status.TrackerError):
+            decomp_status.translation_blockers(rows, report, io.StringIO())
+
     def test_committed_tracker_is_valid(self):
         tracker = ROOT / 'decomp/symbols/functions.tsv'
         if not tracker.exists():
