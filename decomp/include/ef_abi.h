@@ -951,6 +951,10 @@ void guest_fn_e30e0(uint32_t mode, int32_t x, int32_t y, uint32_t extra); /* 0xe
 void guest_fn_de4b0(void); /* 0xde4b0 */
 void guest_fn_de3b4(int32_t value); /* 0xde3b4 EAX tail */
 ef_addr32 guest_fn_b3f58(int32_t index); /* 0xb3f58 EAX -> EAX */
+void refresh_menu_name_list_347bc(ef_addr32 root);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux refresh_menu_name_list_347bc parm [eax] modify [eax]
+#endif
 ef_addr32 copy_blocks_e9a24(uint32_t count, ef_addr32 source, ef_addr32 destination);
 void guest_fn_e9a24(uint32_t a, uint32_t b, uint32_t c); /* 0xe9a24 stack, callee cleanup */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)

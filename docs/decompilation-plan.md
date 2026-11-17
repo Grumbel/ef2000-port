@@ -10763,3 +10763,38 @@ Commands: tools/ef2000_wcc.py decomp/src/block_copy.c --compiler <pinned-wcc386>
 --output local/block-copy-20261117.obj; pinned-Unicorn Python
 local/block-copy-source-20261117/check.py; python3 tools/decomp_status.py check;
 git diff --check.
+
+
+### 2026-11-17 — Recover menu name-list updater
+
+Recover refresh_menu_name_list_347bc (136 original bytes), formerly an
+unattempted blocked menu entry. The sole direct inventory caller is
+345e8@3475b: load EAX=root from [ESI+0x51], ignore returned scratch EAX.
+The body saves EBX/ECX/EDX/ESI; audited lookup/format/show callees preserve
+EDI/EBP. Record the signature and explicit EAX-only clobber pragma.
+
+Call the existing recovered checked widget lookup, variadic formatter and
+text/show helpers with their concrete guest ABIs. Format the identifier at
+0x1357c0 into a 16-byte local buffer, then visit up to four following widgets
+using optional values at 0x13577c. Zero values produce empty text. Preserve
+next-link reads after every show, including the final one, so callback-driven
+list changes remain visible. Record both globals and a partial packed widget
+layout with compile-time proof of the +0x21 sibling field.
+
+Whole module compiles with zero Watcom warnings/errors. In 336 scoped cases,
+run original ASM and the actual relocated Watcom body against identical
+explicit lookup/formatter/show ABI models. Vary chain length 1..7, eight zero
+patterns, three identifier bit patterns and callback mutation. Match call
+traces/text, preserved registers, ESP and complete RAM except code placement
+and stack scratch. This proves body ordering under those models, not the
+actual widget/formatter callees. Scratch EAX, flags and stack scratch are not
+compared; no gameplay, binary identity or splice/replay claim. Evidence:
+local/menu-name-list-source-20261117/report.json SHA-256
+634a572c7de829962d50e8e118e155eb6bdee4f62805a3b25e1950000fdf48e6.
+
+Move blocked -> compiles, keeping an explicit broad-hybrid exclusion.
+Tracker: 3426 compiles, 806 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/menu_name_list.c --compiler <pinned-wcc386>
+--output local/menu-name-list-20261117.obj; pinned-Unicorn Python
+local/menu-name-list-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
