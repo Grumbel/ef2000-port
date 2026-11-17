@@ -11866,3 +11866,15 @@ The report SHA-256 is
 `0d113c7caabc44f8ed29b63e582f204b2121c80a956b578c543c42db451c8097`.
 This measures target compilation. Linking, behavior and byte identity
 remain separate checks. The tracker passed validation without changes.
+
+2026-11-18 — Linked all 3,703 bulk Watcom objects in one DOS/4G
+link check with a minimal C entry point, both x87 adapters and 237
+SoftFloat objects. Rebuilt SoftFloat from the pinned archive because
+the cached build predates the current provenance profile. OpenWatcom
+`wlink @link.lnk` resolved every symbol without diagnostics. The map
+contains the generated dispatcher and x87 adapters. Private reproduction
+and output are in `local/asm-watcom-link-20261118/`. The executable
+SHA-256 is
+`0e680fe01f16f3bcf7b0bf5e60c8151bbfabd232aa15f718c0d69580b904a9cd`.
+The entry point only returns. This checks link compatibility of the
+current corpus and does not exercise translated code or host services.
