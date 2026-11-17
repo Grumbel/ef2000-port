@@ -11841,3 +11841,12 @@ comparison helpers. Twelve synthetic cases cover both widths and pop
 forms at each signed extreme and zero. Unicorn agrees on the compared
 state except FOP, which it leaves zero for these instructions. This
 instruction support does not resolve the error body's table ownership.
+
+2026-11-18 — Reran bulk generation with integer comparison support,
+using `local/asm-bulk-cli-20261117` with both host boundary options.
+The only changed instruction audit is at 0x11d695. Nine FICOM diagnostics
+disappeared from its table data, while INS, ARPL, two branch diagnostics
+and INT3 remain. All 4,281 per-entry generation states match the previous
+run (3,603 generated, 678 rejected). The private report
+`local/asm-ficom-bulk-20261118/report.json` has SHA-256
+`233c50461ab751e3d6c65e6068b6576550725c13bdb6e645528131ec23c615d8`.
