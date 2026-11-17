@@ -6,6 +6,7 @@
 // and is never linked into the program.
 #include "dos_drive.hpp"
 #include "vga_dac.hpp"
+#include "vga_retrace.hpp"
 #include "dos_clock.hpp"
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
@@ -1412,7 +1413,7 @@ public:
             check(uc_reg_read(cpu_, UC_X86_REG_EIP, &ip), "read instruction pointer");
             // Keep intermittent 3DAh reads fresh across emulation slices in
             // both instruction-timed diagnostics and real-time mode.
-            vga_reads_until_check_ = 1;
+            vga_retrace_.start_slice();
             const auto guest_started = performance_.profile ? std::chrono::steady_clock::now() :
                                        std::chrono::steady_clock::time_point{};
             if (realtime) {
@@ -1784,9 +1785,7 @@ private:
     uint64_t fast_copy_calls_{}, fast_copy_bytes_{}, fast_copy_skipped_{};
     uint64_t fast_copy_vga_calls_{}, fast_copy_vga_bytes_{};
     std::vector<uint8_t> fast_copy_buffer_;
-    unsigned vga_reads_until_check_{1};
-    uint32_t vga_status_{};
-    uint64_t guest_vga_samples_{};
+    ef2000::VgaRetrace vga_retrace_;
     StartupWindow* active_window_{};
     std::unique_ptr<ef2000::WavCapture> wav_capture_;
     std::unique_ptr<ef2000::WavCapture> cd_wav_capture_;
@@ -3281,18 +3280,14 @@ private:
             // The original VGA/SB16 code can poll vertical retrace in tight
             // loops. Avoid the monotonic-clock query and modulo on most INs.
             // Always sample the first read in each emulation slice.
-            if (--vga_reads_until_check_ == 0) {
+            return vga_retrace_.read(performance_.vga_clock_check, [this] {
                 if (performance_.profile) ++perf_stats_.vga_clock_checks;
-                vga_reads_until_check_ = performance_.vga_clock_check;
-                // Replay mode advances a synthetic retrace clock on each
-                // sampled status read. Interactive mode follows host time.
-                const auto ns = guest_vga_clock_ ?
-                    static_cast<int64_t>(guest_vga_samples_++ * 100000) :
+                // Replay advances the same sampled synthetic clock; interactive
+                // mode reads the host clock only when the cached status expires.
+                return guest_vga_clock_ ? vga_retrace_.next_guest_time_ns() :
                     std::chrono::duration_cast<std::chrono::nanoseconds>(
                         std::chrono::steady_clock::now().time_since_epoch()).count();
-                vga_status_ = ns % 16666667 >= 15000000 ? 8 : 0;
-            }
-            return vga_status_;
+            });
         }
         if (port == 0x64) return keyboard_ack_ || keyboard_pending() ? 1 : 0;
         if (port == 0x60) {

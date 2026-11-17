@@ -11119,3 +11119,34 @@ Also pass tests.test_asm_dos_file_service, tracker check and diff check.
 Hybrid runtime passes c++ -std=c++17 -Wall -Wextra -Werror -fsyntax-only with
 installed Unicorn/OpenSSL includes (non-SDL configuration). No desktop/UI tests.
 Tracker unchanged; palette adapter does not implement retrace/keyboard/gameport.
+
+### 2026-11-17: share sampled retrace clock with generated execution
+
+Extract the hybrid's sampled/cached 3da retrace policy into VgaRetrace and use
+it in Machine::port_in, preserving per-slice first-read sampling, profiling
+clock counts, host-clock sampling and the replay clock's 100000-ns increments.
+Add ef_asm_vga_retrace_service for scalar IN from 3da. Preserve high EAX bits
+for AL/AX inputs, all other guest state and RAM. Caller selects sampling interval
+and clock, and controls slice resets explicitly. Reject unknown requests and
+zero intervals unchanged. Extract scalar request validation into a common
+header used by DAC and retrace adapters, keeping DAC behavior unchanged.
+
+Native tests cover 4800 reads across intervals 1/4/4096, every accumulator
+width, slice reset, host-clock caching, the 15000000 threshold and 16666667
+period, and rejection without clock advancement. Existing generated palette
+loop still passes. Commands: pinned-Unicorn Python -m unittest
+tests.test_asm_vga_port_service (2 PASS); non-SDL hybrid c++ syntax check with
+-Wall -Wextra -Werror; tracker check; diff check.
+
+Private original-body comparison additionally generates the actual 49-byte
+polling routine at dc2e0 from validated inventory and runs its emitted C with
+the actual native retrace adapter. In 36 cases (intervals 1/4/64, six initial
+sample phases, two flag sets), original Unicorn execution under the preceding
+hybrid clock policy matches all GPRs, flags, PC, full RAM including stack, and
+input traces. No scratch exclusions. Report:
+local/asm-retrace-original-20261117/report.json SHA-256
+a6e7cacc09603e3b591de8b9b7fb24e5ff6561502d7b46df776d5b03c81b316b.
+Command: pinned-Unicorn Python local/asm-retrace-original-20261117/check.py.
+This establishes the sampled hybrid policy for this body, not real-device
+fidelity, all initial states, replay/splice evidence or byte identity. Tracker
+unchanged. Keyboard/gameport and other unsupported ports still reject.

@@ -20,7 +20,8 @@ class VgaPortServiceTests(unittest.TestCase):
             subprocess.run(['c++', '-std=c++17', '-O2', '-Wall', '-Wextra', '-Werror',
                             '-Wno-unused-function', '-I'+str(root), '-I'+str(source/'runtime'),
                             str(source/'tests/asm_vga_port_service_test.cpp'),
-                            str(source/'runtime/asm_vga_port_service.cpp'), '-o', str(binary)], check=True)
+                            str(source/'runtime/asm_vga_port_service.cpp'),
+                            str(source/'runtime/asm_vga_retrace_service.cpp'), '-o', str(binary)], check=True)
             subprocess.run([str(binary)], check=True)
 
     @unittest.skipUnless(all(shutil.which(t) for t in ('as', 'objcopy', 'nm', 'cc')),
