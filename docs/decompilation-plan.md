@@ -11757,3 +11757,22 @@ Commands: pinned-Unicorn Python -m unittest tests.test_asm_c_program;
 asm_c_program.generate(local/asm-latest-body-inventory-20261117,
 local/asm-all-failures-20261117, local/ghidra-offset-tail-20261117/payload.bin,
 interrupt_boundaries=True, port_boundaries=True); git diff --check.
+
+### 2026-11-17: identify data pollution and missing dispatch-helper ownership
+
+Read original ASM and pseudo-C for 11d695. The 444-byte claimed body includes
+part of a 256-entry pointer table, consumed by byte dispatcher 11db3e in
+unowned helper 11dab0. All 256 distinct targets lie in 11db46..11e2fa.
+Thus the nine hidden FICOM sites, INS and ARPL are data-decoding noise here.
+Read-only Ghidra body-hole and flow-gap audits both report zero; neither
+validates bytes already misclassified as code. Record findings and replace
+the vague runtime-signature blocker in functions.tsv with concrete boundary
+evidence. Preserve size/state: 11d258 can return after debugger hook 1204b6
+returns nonzero, so blindly trimming to the 15-byte error call would invent
+termination behavior. Next boundary work must recover helper 11dab0 and its
+table while retaining an explicit debugger/termination contract. Full bulk
+translation is not established by the current inventory or generated count.
+Commands: ghidra_ef2000.py audit-body-holes 0x11d695 / audit-flow-gaps
+--workspace local/ghidra-offset-tail-20261117 --analyze-headless
+local/ghidra-headless-private-20261114, with private output reports;
+objdump original ranges; python3 tools/decomp_status.py check; git diff --check.

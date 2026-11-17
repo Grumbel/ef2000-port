@@ -1054,3 +1054,32 @@ heuristic recoveries.
 The function inventory seeds the decompilation tracker
 `decomp/symbols/functions.tsv` (`tools/decomp_status.py seed`), which
 holds only addresses, sizes, names and recovery states.
+
+## 2026-11-17: error-body pollution by an unowned byte-dispatch table
+
+The claimed 444-byte body at `0x11d695` includes pointer-table data.
+The first 15 bytes load the error message and exit code and call `0x11d258`.
+Twelve zero bytes follow. The table occupies `0x11d6b0..0x11dab0`
+(end exclusive): 256 distinct 32-bit targets, all within
+`0x11db46..0x11e2fa` inclusive. The real instruction at `0x11db3e`
+indexes this table with ESI, zero-extended from an input byte. The helper
+prologue starts at `0x11dab0`, outside all bodies in the current inventory.
+The nine apparent FICOM sites and the INS/ARPL/INT3 failures in the claimed
+error body are table bytes, not evidence that those operations need lifting
+for this body. Recover this helper and its table boundaries before treating
+its dynamic targets as covered by bulk translation.
+
+Do not simply trim the error body and declare its call nonreturning.
+`0x11d258` calls debugger hook `0x1204b6`; a nonzero return bypasses fatal
+exit `0x1e9` and returns to the caller. With the debugger enabled, the hook
+executes INT3 and can return one after debugger continuation. The original
+error path can therefore fall into zero padding under that contract. A
+faithful replacement needs an explicit debugger/termination boundary rather
+than an invented RET or silent nonreturn assumption.
+
+Read-only Ghidra 12.1.4 audits on the private offset-tail project reported
+zero body holes and zero short flow gaps. These audits inspect gaps; they do
+not establish that all bytes already claimed as instructions are code.
+Private reports: `local/11d695-body-holes-20261117.tsv` and
+`local/11d695-flow-gaps-20261117.tsv`. Keep the tracker size and blocked
+state unchanged until a reviewed repair also handles the returning path.
