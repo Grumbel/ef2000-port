@@ -158,6 +158,7 @@ def translation_blockers(rows, report, out=sys.stdout):
             raise TrackerError(f'duplicate translation entry: {format_addr(address)}')
         entries[address] = entry
     counts = collections.Counter()
+    sizes = collections.Counter()
     roots = collections.Counter()
     service_dependencies = collections.Counter()
     for row in rows:
@@ -168,6 +169,7 @@ def translation_blockers(rows, report, out=sys.stdout):
                     'generated, unverified' if entry['state'] == 'generated-unverified'
                     else 'excluded by generator')
         counts[category] += 1
+        sizes[category] += int(row['size'])
         if entry is not None and entry['state'] == 'generated-unverified':
             sites = entry.get('reachable_host_service_sites')
             service_dependencies['unknown' if sites is None else 'present' if sites else 'absent'] += 1
@@ -175,7 +177,8 @@ def translation_blockers(rows, report, out=sys.stdout):
             roots.update(set(entry.get('root_blockers', [])))
     print('Blocked tracker rows versus supplied translation report:', file=out)
     for category in ('generated, unverified', 'excluded by generator', 'outside inventory'):
-        print(f'  {category:<25} {counts[category]:>6,} functions', file=out)
+        print(f'  {category:<25} {counts[category]:>6,} functions '
+              f'{sizes[category]:>10,} body bytes', file=out)
     print('Generated blocked functions: direct interrupt-service dependencies:', file=out)
     for key, label in (('present', 'reachable sites'), ('absent', 'no recorded reachable sites'),
                        ('unknown', 'not measured by report')):

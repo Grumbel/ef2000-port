@@ -163,6 +163,8 @@ class DecompStatusTest(unittest.TestCase):
         self.assertTrue(any('generated, unverified' in line and '1 functions' in line for line in lines))
         self.assertTrue(any('excluded by generator' in line and '2 functions' in line for line in lines))
         self.assertTrue(any('outside inventory' in line and '1 functions' in line for line in lines))
+        self.assertTrue(any('excluded by generator' in line and line.endswith('20 body bytes')
+                            for line in lines))
         self.assertTrue(any('0x00000500' in line and '2  unsupported' in line for line in lines))
         self.assertEqual([row['state'] for row in rows], ['blocked'] * 4)
         report['entries'].append(report['entries'][0])
