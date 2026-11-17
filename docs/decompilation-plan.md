@@ -11199,3 +11199,28 @@ local/palette-watcom-source-20261117/report.json SHA-256
 Commands: tools/ef2000_wcc.py on both modules with pinned compiler;
 pinned-Unicorn Python local/palette-watcom-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — transitive scalar port service requirements
+
+Generated entries now record reachable_host_port_service_sites separately from
+interrupt requirements, using the same fixed-point direct-edge closure through
+recursive call cycles. Unsupported bodies have no requirement certificate;
+dynamic targets and runtime DX port values remain unknown. Empty interrupt
+requirements alone must not be interpreted as absence of host services.
+
+All 30 tests in tests.test_asm_c_program pass with pinned Unicorn, including
+recursive port dependency propagation, isolated service-free entries and
+site restrictions excluding unsupported callees. Tracker validation and
+ git diff --check pass. No tracker promotion or device-equivalence claim.
+
+Private full-inventory report local/asm-port-reachability-20261117/report.json
+SHA-256 47f0fa3a4a672f68932e729b5c7908f2e2a574d20272e3a20b756822089ed756:
+3599 generated entries / 656290 body bytes, 248 with reachable port sites.
+This run admits ALL INT 21h/31h sites as external service boundaries; its
+larger count is not a gain over the prior restricted-service frontier and
+does not mean those services are implemented. Generated bodies remain unverified.
+Commands: tools/asm_c_program.py --inventory local/asm-latest-body-inventory-20261117
+--workspace local/ghidra-offset-tail-20261117 --output local/asm-port-reachability-20261117
+--interrupt-boundaries --port-boundaries; pinned-Unicorn Python -m unittest
+tests.test_asm_c_program; python3 tools/decomp_status.py check; git diff --check.

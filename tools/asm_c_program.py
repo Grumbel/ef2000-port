@@ -327,10 +327,11 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
 ''' % '\n'.join(chunks)
     return files
 
-def reachable_service_sites(records, dependencies, closed):
+def reachable_service_sites(records, dependencies, closed, *, ports=False):
     """Conservative direct-call closure; request numbers and indirect edges are unknown."""
     sites = {r['address']: {i['address'] for i in r['instructions']
-                           if i['mnemonic'] == 'int' and i['bytes'] in ('cd21', 'cd31')}
+                           if ((i['mnemonic'] in ('in', 'out')) if ports else
+                               (i['mnemonic'] == 'int' and i['bytes'] in ('cd21', 'cd31')))}
              for r in records if r['address'] in closed}
     callers = {address: set() for address in closed}
     for address in closed:
@@ -361,6 +362,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
     service_sites = reachable_service_sites(records, dependencies, closed)
+    port_service_sites = reachable_service_sites(records, dependencies, closed, ports=True)
     report = []
     for record in records:
         address = record['address']
@@ -371,6 +373,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                 item['dependencies'] = sorted(dependencies[address])
         if address in closed:
             item.update(reachable_host_service_sites=service_sites[address],
+                        reachable_host_port_service_sites=port_service_sites[address],
                         state='generated-unverified', file='ef_lift_%08x.c' % address,
                         source_sha256=hashlib.sha256(codes[address].encode()).hexdigest(),
                         dependencies=sorted(dependencies[address]),
@@ -399,6 +402,9 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['host_service_reachability_scope'] = (
         'interrupt sites only; conservative direct-edge closure; dynamic targets and runtime request numbers unknown; '
         'reachable sites do not prove service implementation or equivalence')
+    result['host_port_service_reachability_scope'] = (
+        'scalar port sites only; conservative direct-edge closure; dynamic targets and '
+        'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
     if interrupt_boundaries:
         sites = sorted((i['address'], int(i['bytes'][2:], 16))
                        for r in records if r['address'] in closed

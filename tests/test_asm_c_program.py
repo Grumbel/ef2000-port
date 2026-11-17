@@ -793,6 +793,43 @@ ret
             with self.assertRaisesRegex(ValueError, 'require interrupt boundaries'):
                 asm_c_program.generate(directory, root/'bad', image, interrupt_sites={0x100})
 
+    def test_port_requirements_propagate_through_call_cycles(self):
+        source = '''.type root,@function
+root: call middle
+ret
+.size root, .-root
+.org 0x200
+.type middle,@function
+middle: call root
+call device
+ret
+.size middle, .-middle
+.org 0x300
+.type device,@function
+device: in al,dx
+out 0x80,al
+ret
+.size device, .-device
+.org 0x400
+.type isolated,@function
+isolated: ret
+.size isolated, .-isolated'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            report = asm_c_program.generate(directory, root/'out', image, port_boundaries=True)
+            entries = {e['address']: e for e in report['entries']}
+            for address in (0x100, 0x200, 0x300):
+                self.assertEqual(entries[address]['reachable_host_port_service_sites'], [0x300, 0x301])
+                self.assertEqual(entries[address]['reachable_host_service_sites'], [])
+            self.assertEqual(entries[0x400]['reachable_host_port_service_sites'], [])
+            restricted = asm_c_program.generate(directory, root/'restricted', image,
+                                                port_boundaries=True, port_sites={0x300})
+            for entry in restricted['entries']:
+                if entry['address'] != 0x400:
+                    self.assertEqual(entry['state'], 'unsupported')
+                    self.assertNotIn('reachable_host_port_service_sites', entry)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_mixed_dos_dpmi_boundaries_preserve_vector_and_shared_fuel(self):
         source = """.type root,@function
