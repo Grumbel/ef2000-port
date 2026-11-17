@@ -8518,3 +8518,31 @@ flags, PC and all RAM. Existing captured successful calls and returns and
 SS-fault cases remain covered. Validation: tests.test_asm_capture and
 tests.test_asm_c_program (13 passing); git diff --check. No gameplay runs.
 Descriptor reloads and ENTER remain pending.
+
+### 2026-11-17 — Rebuild bulk C after x87, register-stack and RET changes
+
+Regenerated `local/asm-c-ret-x87-program-20261117/` from the unchanged
+pinned dispatch/return inventory: 4,143 syntactically supported bodies,
+2,528 dependency-closed generated bodies and 1,752 unsupported entries.
+Compared with the segment/stack/string corpus, 2,444 generated sources
+changed; 276 bodies lost 4,922 blanket descriptor rejections. The latter
+counts are recorded in its `descriptor-guard-delta.json`; they measure
+removed guards, not newly verified functions.
+
+The complete 44,202,684-byte aggregate compiled as host C99 with
+`-Wall -Wextra -Werror` and no diagnostics. Replayed the existing pinned
+`0x604` EFCAP002 capture against this library: full-state comparison
+passed with no differences. That captured path executed no x87 operations;
+the focused x87 fixtures remain the evidence for those instructions.
+The `ef_lift_00000604.c` entry unit also compiled warning-free with
+OpenWatcom; this was not a full Watcom corpus rebuild.
+
+Reproduction and hashes are in
+`local/asm-c-ret-x87-capture-20261117/{check.py,report.json}`. Translation
+report SHA-256: `475a9bfb18cf336f2a2151631c604825cb59484320588bbedc097a50569e95c1`;
+compiled library SHA-256:
+`b2459267f86b7ef46f483a7bd54f2620603648d0033deecd7a4a040e5c59a036`.
+Generated sources, executable data and captures remain ignored and no
+manual function was promoted. No gameplay runs. Broader captured paths,
+ENTER and descriptor reloads still stand between this evidence and
+reliable bulk translation.
