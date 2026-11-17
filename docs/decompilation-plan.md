@@ -11427,3 +11427,34 @@ Commands: tools/ef2000_wcc.py decomp/src/network_service_window.c --compiler
 <pinned-wcc386> --output local/network-service-window-20261117.obj;
 pinned-Unicorn Python local/network-service-window-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17 — Recover credits resource loader
+
+Recover 371b0 (161 bytes) in credits_window.c. Disassembly establishes EAX
+widget, saved EBX/ECX/EDX and callee-preserved ESI/EDI/EBP. No direct inventory
+callers; callback pointer 12b550. Build a 144-byte local path, query size via
+132ab4, report zero via cdecl error hook 132a74, allocate size+16 modulo 2^32
+only if global 19f36c is null, load via 132ab8 and test only AL, then redraw
+and wrap using a fresh global-pointer read. Error callbacks may return:
+default eb2c0 saves/restores EDX, with ECX preserved by its callees; do not
+turn reports into early exits. Record the three newly identified globals.
+
+Warning-free Watcom compilation. Private actual emitted-body versus ASM
+checker passes 256 cases: eight sizes (including zero, arena boundary and
+wraparound), existing/absent buffer, four full-EAX load results, optional
+query/redraw pointer mutation and empty/nonempty path prefix. Execute the
+original path builder and its string/lowercase helpers, original arena
+allocator/zeroing helper, and original default error handler with counter
+initialized to 5 (its output branch stays disabled). File size/load and
+redraw/wrap calls are modeled. Compare normalized call traces, six saved
+GPRs, ESP and 5 MiB RAM except code placement and stack scratch. Scratch EAX,
+flags, stack, error formatting/output, real file/UI services and splice/replay
+remain unproved; this is not a Mitarbeiter crash-fix claim. Retain hybrid
+exclusion, mark compiles. Tracker: 3440 compiles / 792 blocked / 455063
+blocked body bytes. Private report:
+local/credits-window-source-20261117/report.json, SHA-256
+1bae50b3f598f8bb1d166cefeb06e0e36bed523b36ec43dfc53821aacad30449.
+Commands: tools/ef2000_wcc.py decomp/src/credits_window.c --compiler
+<pinned-wcc386> --output local/credits-window-20261117.obj;
+pinned-Unicorn Python local/credits-window-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

@@ -554,3 +554,6 @@ addr	size	type	name	evidence	notes
 0x00125937	1	char[]	g_network_provider_display_name	0x3396c original ASM	String shown when provider-selected flag is set; only first-byte extent recorded.
 0x00125902	1	uint8_t	g_network_service_clear_gate	0x3396c original ASM	Nonzero suppresses final inactive nonhost field clearing; semantic name provisional.
 0x0019f566	2	char[]	g_network_session_title	0x3396c original ASM	Host title receives uppercase trimmed name plus suffix; inactive path writes empty-string word; only minimum two-byte extent known.
+0x0019f36c	4	ef_addr32	g_credits_text_buffer	0x371b0 original ASM	Cached allocation for credits file; allocated only when null and reloaded after UI redraw.
+0x00132ab4	4	ef_addr32	g_resource_size_hook	0x371b0 original ASM	EAX path -> EAX size; initial target 9cb20; failure is zero.
+0x00132ab8	4	ef_addr32	g_resource_load_hook	0x371b0 original ASM	EAX path/EDX buffer -> AL success; initial target 9cbc4.

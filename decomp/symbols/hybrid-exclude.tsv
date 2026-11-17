@@ -811,3 +811,4 @@ addr	reason
 0x00033c64	Recovered player-window initializer; scoped comparisons use explicit find/apply/show models; integration and splice/replay pending.
 0x000345e8	Recovered loop-number handler; scoped comparisons use parser/session/dialog models including returning error callback; integration and splice/replay pending.
 0x0003396c	Recovered service-window initializer; scoped checks retain original string helpers but model widgets/formatter; integration and splice/replay pending.
+0x000371b0	Recovered credits loader; scoped checks model file hooks and UI with original path/allocator/returning-error branch; integration and splice/replay pending.

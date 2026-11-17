@@ -7732,3 +7732,8 @@ void initialize_network_service_window_3396c(ef_addr32 root);
 #ifdef __WATCOMC__
 #pragma aux initialize_network_service_window_3396c parm [eax] modify [eax]
 #endif
+
+void load_credits_window_371b0(ef_addr32 widget);
+#ifdef __WATCOMC__
+#pragma aux load_credits_window_371b0 parm [eax] modify [eax]
+#endif
