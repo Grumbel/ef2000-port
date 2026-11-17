@@ -8546,3 +8546,29 @@ Generated sources, executable data and captures remain ignored and no
 manual function was promoted. No gameplay runs. Broader captured paths,
 ENTER and descriptor reloads still stand between this evidence and
 reliable bulk translation.
+
+### 2026-11-17 — Compile the complete refreshed corpus with Watcom
+
+Closed the target-compiler coverage gap from the preceding bulk rebuild.
+Compiled every generated body and every dispatcher/support C unit from
+`local/asm-c-ret-x87-program-20261117/` with OpenWatcom: 2,592 objects
+(2,528 bodies plus 64 dispatcher/support units), zero failures, zero
+diagnostics and no missing objects. Flags were
+`-q -bt=dos -3r -za99 -w1 -we`, with the corpus include directory.
+The sequential build took 126 seconds. This proves compilation only;
+it does not establish a complete target link, byte identity, or behavioral
+coverage of every generated function.
+
+Reproduction and per-source/per-object hashes are in
+`local/asm-c-ret-x87-watcom-20261117/{check.py,report.json}`.
+Report SHA-256:
+`cb757e6b673d6a2bd4e67056bd6a2e11cd0984c71276ca3a0e4a118f87806c10`.
+It pins the translation report and compiler executable as well as flags.
+All generated sources and objects remain ignored. Validation also included
+`git diff --check`; no gameplay or new captures.
+
+Existing EFCAP002 capture discovery identified `0xdcb96` as a useful next
+coverage target: its current translation is blocked by unsupported FLDL2E.
+Other retained snapshots mostly lack descriptor context, target excluded
+interrupt helpers, or contain relocated hybrid addresses. Broader captured
+execution, ENTER and descriptor reloads remain open.
