@@ -70,7 +70,7 @@ def binary_register(insn):
 
 
 def stack_operation(mnemonic, text):
-    unary = {'fld1': 0, 'fldz': 1, 'fchs': 3, 'fabs': 4, 'fincstp': 9, 'fdecstp': 10, 'fldl2e': 11}
+    unary = {'fld1': 0, 'fldz': 1, 'fchs': 3, 'fabs': 4, 'fincstp': 9, 'fdecstp': 10, 'fldl2e': 11, 'fldlg2': 12}
     if mnemonic in unary and not text:
         return unary[mnemonic], 0
     register = {'fld': 2, 'fxch': 5, 'fst': 6, 'fstp': 7, 'ffree': 8}
@@ -108,7 +108,7 @@ STACK_RUNTIME = r'''
 enum {
     EF_X87_ONE, EF_X87_ZERO, EF_X87_LOAD, EF_X87_CHS, EF_X87_ABS,
     EF_X87_EXCHANGE, EF_X87_STORE, EF_X87_STORE_POP, EF_X87_FREE,
-    EF_X87_INC_TOP, EF_X87_DEC_TOP, EF_X87_LOG2_E
+    EF_X87_INC_TOP, EF_X87_DEC_TOP, EF_X87_LOG2_E, EF_X87_LOG10_2
 };
 static unsigned ef_x87_index(ef_lift_state *s, unsigned index) {
     return ((s->x87_status >> 11) + index) & 7u;
@@ -141,12 +141,12 @@ static unsigned ef_x87_stack(ef_lift_state *s, unsigned operation, unsigned argu
     uint32_t indefinite[3] = {0, 0xc0000000u, 0xffffu};
     uint32_t value[3], other[3];
     unsigned top, index, destination, word, empty_top, empty_index;
-    if (operation > EF_X87_LOG2_E || argument > 7) return 9;
+    if (operation > EF_X87_LOG10_2 || argument > 7) return 9;
     /* Delivery is deferred to the next waiting instruction. Do not pretend
        that the pending #MF has been handled by a register operation. */
     if (s->x87_status & 0x80u) return 8;
     top = ef_x87_index(s, 0); index = ef_x87_index(s, argument);
-    if (operation <= EF_X87_LOAD || operation == EF_X87_LOG2_E) {
+    if (operation <= EF_X87_LOAD || operation >= EF_X87_LOG2_E) {
         destination = (top + 7u) & 7u;
         if (operation == EF_X87_LOAD && ef_x87_empty(s, index)) {
             if (!ef_x87_stack_fault(s, 0)) return 0;
@@ -159,12 +159,17 @@ static unsigned ef_x87_stack(ef_lift_state *s, unsigned operation, unsigned argu
             for (word = 0; word < 3; ++word)
                 value[word] = operation == EF_X87_LOAD ? s->x87[index][word] : 0;
             if (operation == EF_X87_ONE) { value[1] = 0x80000000u; value[2] = 0x3fffu; }
-            if (operation == EF_X87_LOG2_E) {
+            if (operation >= EF_X87_LOG2_E) {
                 /* The constant is rounded to extended precision using RC;
                    precision control and the precision exception are ignored. */
                 unsigned rounding = (s->x87_control >> 10) & 3u;
-                value[0] = rounding == 1u || rounding == 3u ? 0x5c17f0bbu : 0x5c17f0bcu;
-                value[1] = 0xb8aa3b29u; value[2] = 0x3fffu;
+                if (operation == EF_X87_LOG2_E) {
+                    value[0] = rounding == 1u || rounding == 3u ? 0x5c17f0bbu : 0x5c17f0bcu;
+                    value[1] = 0xb8aa3b29u; value[2] = 0x3fffu;
+                } else {
+                    value[0] = rounding == 1u || rounding == 3u ? 0xfbcff798u : 0xfbcff799u;
+                    value[1] = 0x9a209a84u; value[2] = 0x3ffdu;
+                }
             }
         }
         ef_x87_put(s, destination, value);

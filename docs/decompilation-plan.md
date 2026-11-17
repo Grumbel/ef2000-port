@@ -8596,3 +8596,21 @@ Reading the complete `0xdcb96` body also exposed F2XM1 and FSCALE after
 FLDL2E. Thus that retained EFCAP002 capture is not unlocked by this change,
 and no claim of a newly verified original function is made. The preceding
 full-corpus compile evidence applies to its pinned pre-FLDL2E sources.
+
+### 2026-11-17 — Translate the x87 FLDLG2 constant load
+
+Added FLDLG2 using the shared extended-constant push path, with D9 EC
+encoding validation. Its log10(2) significand follows rounding control
+without precision narrowing or a precision exception. The hardware stack
+suite now checks 196,608 raw and 3,072 rendered cases, varying rounding,
+precision, TOP, occupancy and stack-fault masking. Added flat and
+cached-descriptor constant-store comparisons with full x87 environment
+checks through the native original-execution oracle.
+
+Validation: tests.test_asm_x87_stack, tests.test_asm_x87_oracle and
+tests.test_asm_capture (12 passing); generated FLDLG2/RET unit compiled
+warning-free with OpenWatcom; git diff --check. No gameplay runs.
+The two original bodies containing FLDLG2 (`0xfa362`, `0x11d3f0`) also
+contain unsupported FYL2X; the former additionally needs FLDLN2. Neither
+body is claimed newly translatable or verified. Transcendental arithmetic,
+ENTER and descriptor reloads remain open bulk-translation boundaries.

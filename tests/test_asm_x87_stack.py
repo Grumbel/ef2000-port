@@ -23,7 +23,7 @@ from tests.native_x87 import call_without_context_switch
 class X87StackTests(unittest.TestCase):
     def test_raw_stack_effects_against_hardware(self):
         operations = [('fld1', 0, 0), ('fldz', 1, 0), ('fchs', 3, 0), ('fabs', 4, 0),
-                      ('fincstp', 9, 0), ('fdecstp', 10, 0), ('fldl2e', 11, 0)]
+                      ('fincstp', 9, 0), ('fdecstp', 10, 0), ('fldl2e', 11, 0), ('fldlg2', 12, 0)]
         for mnemonic, operation in [('fld', 2), ('fxch', 5), ('fst', 6), ('fstp', 7), ('ffree', 8)]:
             operations += [(mnemonic + ' st(%d)' % index, operation, index) for index in range(8)]
         with tempfile.TemporaryDirectory() as temporary:
@@ -149,8 +149,8 @@ class X87StackTests(unittest.TestCase):
                                 self.assertEqual((rendered.flags, rendered.pc, rendered.r[4]),
                                                  (0xad7, 0xf00, 0x804), context)
                                 rendered_cases += 1
-            self.assertEqual(cases, 192512)
-            self.assertEqual(rendered_cases, 3008)
+            self.assertEqual(cases, 196608)
+            self.assertEqual(rendered_cases, 3072)
             # Waiting operations may not consume or silently clear pending #MF.
             state.x87_status = 0x80c1
             previous = bytes(state)
