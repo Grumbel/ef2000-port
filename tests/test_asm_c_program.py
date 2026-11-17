@@ -547,6 +547,32 @@ leaf: ret
         self.assertEqual(asm_c_program.root_blockers(dependencies, {5}, reasons),
                          {1: [3, 4], 2: [3, 4], 3: [3], 4: [4]})
 
+    def test_interrupt_sites_admit_only_audited_service_callers(self):
+        source = '''.type root,@function
+root: int 0x21
+ret
+.size root, .-root
+.org 0x200
+.type other,@function
+other: int 0x21
+ret
+.size other, .-other'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            self.assertEqual(asm_c_program.analyse(records, interrupt_boundaries=True)[2],
+                             {0x100, 0x200})
+            self.assertEqual(asm_c_program.analyse(records, interrupt_boundaries=True,
+                                                  interrupt_sites=frozenset())[2], set())
+            report = asm_c_program.generate(directory, root/'out', image,
+                                            interrupt_boundaries=True, interrupt_sites={0x100})
+            entries = {e['address']: e for e in report['entries']}
+            self.assertEqual(entries[0x100]['state'], 'generated-unverified')
+            self.assertEqual(entries[0x200]['state'], 'unsupported')
+            self.assertEqual(report['host_service_boundaries']['sites'], [0x100])
+            with self.assertRaisesRegex(ValueError, 'require interrupt boundaries'):
+                asm_c_program.generate(directory, root/'bad', image, interrupt_sites={0x100})
+
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function
 root: int 0x21

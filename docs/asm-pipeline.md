@@ -1321,3 +1321,11 @@ memory represented by that no-swap allocation state. Unsupported requests
 and exhaustion return `0x122`, without inventing an extender error response.
 Compile it with the generated registry include directory. It is not yet
 wired into the interactive game runtime.
+
+Use `--interrupt-site 0x245` together with `--interrupt-boundaries` to limit
+admission to the audited native heap callback. Repeat the site option only
+for additional services the host actually supports. Without a restriction,
+experimental boundary generation accepts all otherwise-supported INT21
+sites and therefore can require services the native callback does not supply.
+The report's admitted service-site list remains the authority for host
+requirements; call-graph admission alone does not prove service coverage.

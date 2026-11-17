@@ -10115,3 +10115,30 @@ fields match. Native evidence report SHA-256:
 This strengthens translation/bridge evidence but does not independently
 execute the original extender or promote bulk/tracker coverage. Tracker/diff
 checks pass; no gameplay runs.
+
+### 2026-11-17: restrict bulk service admission to audited interrupt sites
+
+Add repeatable `--interrupt-site` restrictions to experimental boundary
+translation, so a host implementing only IP 0x245 does not admit arbitrary
+INT21 callers. An empty API site set admits none; supplying sites without
+boundary mode is rejected. Reports list only admitted service sites.
+A focused regression verifies unrestricted versus restricted admission,
+empty restrictions and invalid option combinations. The native runner test
+also passes; tracker/diff checks pass.
+
+Fresh generation with `--interrupt-boundaries --interrupt-site 0x245` produces
+2591 generated-unverified bodies / 428817 original body bytes, adding only
+0x235 (6 bytes) and 0x23b (44 bytes) to the prior default 2589-body result.
+The remaining 1689 entries are excluded. This is external-service-dependent
+coverage, not standalone coverage or a tracker promotion. In particular,
+large caller chains still encounter alternate allocation and other unsupported
+services; the previously measured root impact was not a prediction that one
+service would admit those callers. The report requires exactly site 0x245.
+
+Artifacts: `local/asm-c-native-heap-program-20261117/report.json`, SHA-256
+`7e229388f2718fb06ba521b6d0af059bf97a1b1fb4d6edbd1abe1c060621ff74`.
+Pinned Watcom `-q -bt=dos -3r -za99 -w1 -we` compiles the two new bodies,
+dispatcher, all 66 registry units, native adapter and allocation implementation
+(71 units total) with no diagnostics. Previously unchanged translation bodies
+are not recompiled. Earlier whole-wrapper evidence remains relevant to the
+audited service path; this run adds no gameplay or universal equivalence claim.

@@ -49,10 +49,12 @@ def legacy_transfer(insn):
     return dict(insn, mnemonic='jmp', operands=text)
 
 
-def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False):
+def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
+                  interrupt_sites=None):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
-    if interrupt_boundaries and mnemonic == 'int' and insn['bytes'] == 'cd21':
+    if (interrupt_boundaries and mnemonic == 'int' and insn['bytes'] == 'cd21' and
+            (interrupt_sites is None or insn['address'] in interrupt_sites)):
         next_pc = insn['address'] + 2
         if next_pc not in starts:
             raise asm_to_c.Unsupported('unresolved interrupt return continuation')
@@ -88,7 +90,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
     return ' '.join(code)
 
 
-def analyse(records, *, interrupt_boundaries=False):
+def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -121,7 +123,7 @@ def analyse(records, *, interrupt_boundaries=False):
                 not ret['operands']):
             consuming_targets.add(record['address'])
     renderer = partial(instruction_c, consuming_targets=consuming_targets,
-                       interrupt_boundaries=interrupt_boundaries)
+                       interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -279,9 +281,13 @@ unsigned ef_lift_run_services(ef_lift_state *s, uint32_t fuel, uint32_t stop_pc,
 ''' % '\n'.join(chunks)
     return files
 
-def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False):
+def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
+             interrupt_sites=None):
+    if interrupt_sites is not None and not interrupt_boundaries:
+        raise ValueError('interrupt sites require interrupt boundaries')
     manifest, records = asm_to_c.read_inventory(inventory, image)
-    codes, dependencies, closed, reasons = analyse(records, interrupt_boundaries=interrupt_boundaries)
+    codes, dependencies, closed, reasons = analyse(records, interrupt_boundaries=interrupt_boundaries,
+                                                  interrupt_sites=interrupt_sites)
     blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
@@ -337,6 +343,8 @@ def main(argv=None):
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--interrupt-boundaries', action='store_true',
                         help='yield INT 21h to an external host service; does not implement the service')
+    parser.add_argument('--interrupt-site', type=lambda value: int(value, 0), action='append',
+                        help='restrict yielded INT 21h sites to these instruction addresses (repeatable)')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -344,7 +352,8 @@ def main(argv=None):
             raise ValueError('generated ASM-derived C must stay under ignored local/')
         workspace = asm_to_c.asm_inventory.ghidra_ef2000.validated_workspace(args.workspace)
         report = generate(args.inventory, output, workspace / 'payload.bin',
-                          interrupt_boundaries=args.interrupt_boundaries)
+                          interrupt_boundaries=args.interrupt_boundaries,
+                          interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site))
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')
