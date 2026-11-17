@@ -7789,3 +7789,8 @@ void refresh_network_controls_33630(void);
 #pragma aux net_open_rx_status_35e68 parm [eax] modify [eax]
 #pragma aux net_set_nonentry_flag_35e90 parm [eax] modify [eax]
 #endif
+
+#ifdef __WATCOMC__
+#pragma aux net_new_end_string_345d4 parm [] modify [eax];
+#pragma aux net_open_loops_347ac parm [eax] modify [eax];
+#endif

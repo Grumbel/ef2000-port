@@ -9,20 +9,6 @@ static uint32_t guest(uint32_t entry, uint32_t eax, uint32_t edx, uint32_t ebx)
     return net_ui_guest_call_086(entry, eax, edx, ebx);
 }
 
-/* 345d4, 19 bytes: false shares 345d2 RET in the previous function;
- * true tail-jumps to a4d90 with the modem-ending dialog name. */
-void net_new_end_string_345d4(void)
-{
-    if (EF_U8(0x13578cu) != 0u)
-        guest(0xa4d90u, 0x182e10u, 0u, 0u);
-}
-
-/* 347ac, 13 bytes: AH is discarded, only zero-extended widget ID remains. */
-void net_open_loops_347ac(ef_addr32 widget)
-{
-    guest(0xa4b80u, EF_U8(widget + 0x10u), 0u, 0u);
-}
-
 /* 349ec, 23 bytes: retain resolved widget and refresh network loop UI. */
 void net_main_loop_349ec(ef_addr32 widget)
 {

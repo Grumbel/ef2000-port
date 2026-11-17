@@ -11697,3 +11697,22 @@ Commands: tools/ef2000_wcc.py decomp/src/network_receive_callbacks.c --compiler
 <pinned-wcc386> --output local/network-receive-20261117.obj;
 pinned-Unicorn Python local/network-receive-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover modem dialog callbacks
+
+Recovered 345d4 (19 bytes) and 347ac (13 bytes) into
+network_dialog_callbacks.c, replacing host guest-call probes with real calls.
+Confirm callback slots 12b640/12b5b0, conditional shared RET and zero-extended
+widget ID at +10; add layout assertion. Watcom zero warnings.
+128 scoped compiled-C/original-ASM comparisons PASS, with apply/close callees
+modeled; vary initialization 0/1/128/255, widget address, ID 0/255, saved
+registers and callback mutation. Compare six saved GPRs, ESP, traces and
+5 MiB RAM excluding code placement and stack scratch. EAX, flags, stack and
+integration remain unproved; keep compiles and hybrid excluded.
+Tracker 3459 compiles / 773 blocked / 453932 blocked bytes.
+Private report local/network-dialog-source-20261117/report.json SHA-256
+37081bccf50509826849e86af0751a6cf7702dfcce1145eba37710ce2f50065a.
+Commands: tools/ef2000_wcc.py decomp/src/network_dialog_callbacks.c --compiler
+<pinned-wcc386> --output local/network-dialog-20261117.obj;
+pinned-Unicorn Python local/network-dialog-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
