@@ -35,7 +35,7 @@ class DecodeTests(unittest.TestCase):
             else:
                 result = oracle.decode(bytes.fromhex(encoded), registers)
                 self.assertEqual((result['address'], result['segment']), (address, segment), encoded)
-        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9fe', 'df0c24', 'd9', ''):
+        for encoded in ('66d900', '67d900', 'f3d900', '26d9e8', 'd9f2', 'df0c24', 'd9', ''):
             with self.assertRaises(oracle.Unavailable, msg=encoded):
                 oracle.decode(bytes.fromhex(encoded), registers)
 
@@ -53,6 +53,41 @@ class OracleTests(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         cls.temporary.cleanup()
+
+    def test_trigonometric_raw_results_range_and_stack_effects(self):
+        # Exact architectural identities, independent of translator helpers.
+        one = [0, 0x80000000, 0x3fff]
+        for top in range(8):
+            for negative in (0, 0x8000):
+                for operation, expected in ((0xd9fe, [0, 0, negative]),
+                                            (0xd9ff, one)):
+                    values = dict(x87_control=0x37f, x87_status=top << 11,
+                                  x87_tag=0, x87_opcode=0x321, x87=[one[:] for _ in range(8)])
+                    values['x87'][top] = [0, 0, negative]
+                    result, data, ax, _, _, _ = self.native.execute(operation, values, b'', 0x12345678)
+                    self.assertEqual(result['x87'][top], expected)
+                    self.assertEqual(result['x87_status'] & 0x7fff, top << 11)
+                    self.assertEqual((data, ax), (b'', 0x12345678))
+                    self.assertEqual(result['x87_control'], values['x87_control'])
+                    self.assertEqual((result['x87_tag'] >> (2*top)) & 3,
+                                     1 if operation == 0xd9fe else 0)
+                # FPATAN computes atan2(ST1, ST0), writes ST1 and pops ST0.
+                values['x87'][top] = one[:]
+                values['x87'][(top+1) & 7] = [0, 0, negative]
+                result, _, _, _, _, _ = self.native.execute(0xd9f3, values, b'', 0)
+                self.assertEqual(result['x87'][(top+1) & 7], [0, 0, negative])
+                self.assertEqual((result['x87_status'] >> 11) & 7, (top+1) & 7)
+                self.assertEqual((result['x87_tag'] >> (2*top)) & 3, 3)
+            for operation in (0xd9fe, 0xd9ff):
+                # |ST0| >= 2**63 is left unchanged and sets C2.
+                values['x87'][top] = [0, 0x80000000, 0x403e]
+                values['x87_status'] = top << 11
+                result, _, _, _, _, _ = self.native.execute(operation, values, b'', 0)
+                self.assertEqual(result['x87'][top], values['x87'][top])
+                self.assertEqual(result['x87_status'] & 0x7fff, (top << 11) | 0x400)
+        for encoded in ('d9fe', 'd9ff', 'd9f3'):
+            self.assertEqual(oracle.decode(bytes.fromhex(encoded), {})['operation'],
+                             int(encoded, 16))
 
     def test_native_observation_defers_signals_and_restores_mask(self):
         # Inject a real asynchronous signal inside dispatch. It must arrive
@@ -186,7 +221,7 @@ class OracleTests(unittest.TestCase):
             self.fail('C must not run after an unobserved original execution')
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            for source, reason in [('fsin\nret', 'register encoding'),
+            for source, reason in [('fptan\nret', 'register encoding'),
                                    ('.byte 0x66,0xd9,0xe8\nret', 'prefix'),
                                    ('fwait\nret', 'pending'),
                                    ('fld1\nret', 'budget')]:
@@ -199,7 +234,7 @@ class OracleTests(unittest.TestCase):
                 self.assertIn(reason, result['reason'])
         values = dict(x87_control=0x37f, x87_status=0, x87_tag=0xffff, x87_opcode=0,
                       x87=[[0, 0, 0] for _ in range(8)])
-        for operation, data in ((0xd916, b''), (0xd9fe, b'')):
+        for operation, data in ((0xd916, b''), (0xd9f2, b'')):
             with self.assertRaises(oracle.Unavailable):
                 self.native.execute(operation, values, data, 0)
 

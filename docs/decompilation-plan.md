@@ -10448,3 +10448,19 @@ fcos b45a2 (147), fsin b45ac (146), out feec8 (131), in dc2e0 (130), fpatan
 dc1e9 (125), interrupt 11124c (119). Service yields expose boundaries; they do
 not implement them. Reliable bulk translation still requires those contracts,
 unsupported instruction semantics, dynamic-target coverage and equivalence evidence.
+
+
+### 2026-11-17 — Native observations for trigonometric blockers
+
+The independent original-execution x87 oracle now accepts exact D9 FE (FSIN),
+D9 FF (FCOS) and D9 F3 (FPATAN) register encodings. Its existing hardware
+FSAVE/FRSTOR execution, pending-exception rejection, uninterrupted-observation
+guard and strict state comparison remain in use. No host libm approximation
+or translator helper is involved. Unsupported FPTAN remains rejected.
+
+Validation: pinned Unicorn Python `-m unittest tests.test_asm_x87_oracle`, all
+eight tests pass. New raw-state checks cover both signed zeros, all eight TOP
+positions, FPATAN result placement/pop/tag effects, and FSIN/FCOS range rejection
+at 2**63 with unchanged operand and C2 set. This enables independent observations
+for the three large trigonometric dependency roots; it does not implement their
+C semantics, establish general transcendental equivalence or promote tracker rows.
