@@ -11807,3 +11807,19 @@ pinned-Unicorn Python local/byte-dispatch-source-20261117/check.py;
 pinned-wcc386 -bt=dos -3r -zp1 -fpi87 -fp3 -ob -ot -s -wx -za99
 -i=<generated directory> -fo=local/byte-dispatch-generated-20261117.obj
 <generated ef_lift_0011dab0.c>; decomp_status.py check; git diff --check.
+
+2026-11-17 — Reran bulk generation against the refreshed body map after
+recovering the byte-mask dispatcher. The input is the intersection of
+`functions.tsv` and the payload-bound Ghidra body map. Both host boundary
+options were enabled. The private report
+`local/asm-full-byte-dispatch-c-20261117/report.json` has SHA-256
+`9c3196645acf059145a6b4d3ea00f625a0689ff683fe4c2e98cb0c9464af3a66`.
+Of 4,281 entries, 3,603 generated C and 678 were rejected. The dispatcher
+was the only entry whose result changed.
+
+Of the 772 entries marked blocked in the source tracker, 535 (279,176
+bytes) generated C, 227 (176,414 bytes) were rejected, and 10 (451 bytes)
+had no entry in the body map. Across the full generator input, the largest
+overlapping dependency groups reach FSIN (325 entries), FCOS (324),
+FPATAN (298), or the polluted error body at 0x11d695 (159). Generation
+provides no additional compilation, behavioral, or byte match evidence.
