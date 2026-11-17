@@ -9448,3 +9448,46 @@ This is boundary and compilation evidence, not whole-call differential or
 runtime integration proof. Existing tracker states are retained. No updated
 bulk closure count is claimed; direct-dependency analysis is still needed.
 Tracker and diff checks pass. No gameplay/UI testing was needed.
+
+### 2026-11-17: refresh bulk closure after recovered function tails
+
+Regenerated all 4,280 selected bodies from the latest repaired workspace,
+`local/ghidra-return-tails-20261117`, using its fresh body-range inventory.
+`local/asm-c-repaired-watcom-20261117/normalize.py` records the selection and
+normalization; `local/asm-repaired-body-inventory-20261117` contains the
+normalized inventory. The same original payload hash remains pinned.
+
+`python3 tools/asm_c_program.py --inventory
+local/asm-repaired-body-inventory-20261117 --workspace
+local/ghidra-return-tails-20261117 --output
+local/asm-c-repaired-program-20261117` now reports 4,172 syntactically
+supported bodies and 2,582 generated-unverified bodies closed over translated
+direct dependencies, covering 427,968 original body bytes. This adds ten
+bodies and 4,453 bytes to the preceding bulk result, with no removals:
+0x2065c, 0x21e04, 0x426a4, 0x4bef0, 0x4bf1c, 0x4c120, 0x68c18,
+0x69354, 0x69374 and 0xf0cec. Boundary repairs therefore unlock callers as
+well as repaired functions. Indirect-target coverage is not established.
+Translation report SHA-256:
+`e85ec524fa1b2836786da73d701c88e25ba8e5aead4bc68efc0e8be1f900c471`.
+
+`python3 local/asm-c-repaired-watcom-20261117/check.py` records clean
+OpenWatcom evidence for all 2,649 body/dispatcher/support units, using
+`-q -bt=dos -3r -za99 -w1 -we`. Of these, 2,567 unchanged units reuse the
+complete prior build after checking compiler, source, shared state header
+and object hashes; 82 units compile anew. There are zero failures and zero
+diagnostics. Compilation report SHA-256:
+`36d8514bb347d8691c1190efce6f6ad6f76e111239258658396d5ed0ed431c60`.
+
+The remaining 1,698 excluded bodies have first-failure reasons: 1,590 direct
+dependency closure failures, 101 unsupported instructions, six fallthroughs
+outside their bodies and one unresolved count branch/fallthrough. The six
+remaining fallthrough entries are 0xc6428, 0xc8c34, 0xfa02c, 0xfcc01,
+0xfcc6f and 0x1204b6; the overlap/count case is 0xe7d27. These are distinct
+from the six historical fallthrough cases in the blocked tracker subset,
+which were repaired. Highest immediate unsupported-callee fan-in remains
+0xb45ac FSIN (55 callers) and 0xb45a2 FCOS (52 callers); these counts are
+not transitive reachability or unique additional-function predictions.
+
+This refresh establishes generation, direct closure and compilation, not
+byte-identical output, general behavioral equivalence, runtime splicing or
+golden replay. Tracker states are unchanged. No gameplay/UI runs were used.
