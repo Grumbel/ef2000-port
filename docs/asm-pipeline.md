@@ -1343,3 +1343,11 @@ This enables modeling DPMI allocation/release boundaries, but implements no
 DPMI service itself. The existing native X-32 callback still accepts only its
 audited INT21 request. Selector/memory-changing services still require a
 richer comparison bridge before their effects can be verified.
+
+Prepared differential probes can pass `prepared_memory_size=0x500000` to
+`asm_c_differential.compare` when runtime globals lie beyond the default 4 MiB
+fixture. The explicit size must be page aligned, between 4 and 256 MiB.
+Captured RAM cannot be resized through this option. Payloads and return-stack
+slots must fit the prepared mapping; the stop address and deterministic scratch
+region retain their usual locations. Larger mappings enable evidence for more
+runtime globals; they do not establish that a probe represents a captured call.

@@ -10401,3 +10401,20 @@ ABI or actual DOS-service equivalence. No tracker promotion or gameplay runs.
 Reproducer: local/dos-file-cluster-20261117/check.py; report SHA-256
 806fce07c6c8446dfdc1434c0918b87540e1727f0c5928941b1bf33f60d2c9f3.
 Tracker and diff checks pass.
+
+### 2026-11-17 — Extend prepared RAM for generated runtime checks
+
+The standard generated-C differential fixture mapped 4 MiB, excluding the
+error globals at 0x484480/0x484484. Add explicit prepared_memory_size (default
+unchanged), page aligned from 4 to 256 MiB; reject capture resizing, oversized
+payloads and an unmapped return stack. This enables full-state comparisons of
+the generated runtime cluster instead of relying only on host-C semantic checks.
+All 24 tests in tests.test_asm_c_program pass with pinned Unicorn, including
+high-global writes and invalid fixture sizes. Five generated bodies (1101e8,
+ebe6d, ebe90, ebd30, ebd36) pass 64 standard differential cases with 5 MiB RAM,
+four version settings and sixteen error inputs. No service stubs are needed;
+the standard harness compares registers, flags, RAM and x87 state. This remains
+prepared-input evidence, not trace coverage or splice/replay verification.
+Reproducer: local/asm-dos-error-cluster-20261117/check.py; report SHA-256
+6b18ee7a3ad2a3f5ec8a0f0d2746af6be06e11cb494b543307ef65b25475f722.
+No tracker promotion or gameplay runs. Tracker and diff checks pass.

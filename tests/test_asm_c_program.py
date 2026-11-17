@@ -48,6 +48,36 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_prepared_ram_covers_high_runtime_globals(self):
+        source = '''.type root,@function
+root: mov DWORD PTR [0x484480],eax
+inc DWORD PTR [0x484484]
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root/'out'
+            asm_c_program.generate(directory, out, image)
+            subprocess.run(['cc', '-O2', '-shared', '-fPIC', '-I'+str(out),
+                            *map(str, out.glob('*.c')), '-o', str(root/'program.so')],
+                           check=True, capture_output=True)
+            function = ctypes.CDLL(str(root/'program.so')).ef_lift_run
+            function.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                                 ctypes.c_uint32, ctypes.c_uint32]
+            args = (function, image.read_bytes(), 0x100,
+                    [5, 2, 3, 4, 0x300000, 6, 7, 8], 0x246)
+            self.assertEqual(asm_c_differential.compare(*args, program=True,
+                             prepared_memory_size=0x500000)['state'], 'pass')
+            self.assertEqual(asm_c_differential.compare(*args, program=True)['state'],
+                             'inconclusive')
+            for size in (0, 0x3ff000, 0x400001, 0x10001000, True):
+                with self.assertRaises(ValueError):
+                    asm_c_differential.compare(*args, prepared_memory_size=size)
+            with self.assertRaisesRegex(ValueError, 'payload exceeds'):
+                asm_c_differential.compare(function, bytes(0x400001), *args[2:])
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_address16_wraps_offsets_and_preserves_register_high_halves(self):
         from dataclasses import replace
         from tests.test_asm_capture import fixture

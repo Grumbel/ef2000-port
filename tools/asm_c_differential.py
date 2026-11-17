@@ -118,12 +118,19 @@ def probes(count, seed):
 
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
-            initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False):
+            initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
+            prepared_memory_size=None):
     from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR
     from unicorn import x86_const
 
     if service_factory is not None and not program:
         raise ValueError('host services require the program dispatcher')
+    if prepared_memory_size is not None:
+        if captured is not None:
+            raise ValueError('captured RAM cannot be resized')
+        if (type(prepared_memory_size) is not int or prepared_memory_size < 0x400000 or
+                prepared_memory_size > 0x10000000 or prepared_memory_size % 0x1000):
+            raise ValueError('prepared RAM must be page aligned, between 4 and 256 MiB')
     service_names = ('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')
     original_service = service_factory() if service_factory else None
     translated_service = service_factory() if service_factory else None
@@ -146,12 +153,16 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         return response
 
     if captured is None:
-        memory_size, sentinel = 0x400000, 0x3ff000
+        memory_size, sentinel = prepared_memory_size or 0x400000, 0x3ff000
+        if len(payload) > memory_size:
+            raise ValueError('payload exceeds prepared RAM')
         memory = bytearray(memory_size)
         memory[:len(payload)] = payload
         # Prepared probes intentionally use deterministic scratch objects.
         memory[0x300000:0x302000] = bytes(range(256)) * 32
         stack = registers[4]
+        if not 0 <= stack <= memory_size - 4:
+            raise ValueError('prepared return stack lies outside RAM')
         memory[stack:stack+4] = sentinel.to_bytes(4, 'little')
         cpu = Uc(UC_ARCH_X86, UC_MODE_32)
         cpu.mem_map(0, memory_size)
