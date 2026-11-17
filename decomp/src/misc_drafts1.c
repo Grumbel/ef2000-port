@@ -3494,10 +3494,11 @@ uint32_t lseek_fa95f(uint32_t handle, uint32_t offset, uint32_t whence)
     uint32_t out[7];
     uint8_t sregs[12];
     segread_9be0d((uint32_t)(uintptr_t)sregs);
-    in[0] = 0x4200u | (whence & 0xffu);
+    /* MOV AH,42 preserves the upper half of the incoming whence. */
+    in[0] = (whence & 0xffff00ffu) | 0x4200u;
     in[1] = handle;
     in[2] = offset >> 16;
-    in[3] = offset & 0xffffu;
+    in[3] = offset;
     in[4] = 0u;
     in[5] = 0u;
     in[6] = 0u;

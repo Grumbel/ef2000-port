@@ -10327,3 +10327,20 @@ behavior are not validated. No tracker promotion and no gameplay runs.
 Reproducer: local/dos-write-source-20261117/check.py; report SHA-256
 6ed01c81cd8ea3837043402c90f8a713ed3da73bdb09fff29f5522212f2cbf51.
 Tracker validation and git diff --check pass.
+
+### 2026-11-17 — Preserve seek interrupt request registers
+
+Correct the existing 0xfa95f draft to retain the upper half of whence in
+EAX while replacing AH with 42, and pass the full offset through EDX alongside
+ECX=offset>>16. The previous draft narrowed both unnecessarily. Disassembly
+and callers bc4da@bc518/f2183@f21d9 also correct the signature record: EBX/EDX
+are scratch, ECX/EDI saved and ESI/EBP untouched. The extracted function
+compiles without diagnostics using Watcom -bt=dos -3r -zp1 -za99 -w1 -we.
+108 original-Unicorn/source-host comparisons pass for return EAX, exact four
+interrupt request registers and error-helper arguments: three offsets, three
+whence values including upper bits, both carry values, three returned EAX
+patterns and two returned EDX patterns. Explicit service/helper stubs and
+intercepted host pointer marshalling; actual DOS, full ABI and RAM are unverified.
+Reproducer: local/dos-seek-source-20261117/check.py; report SHA-256
+03465964b1f4e2ef173af602269e12f71954f52cc5d8a859fd34aa58a47e3119.
+Tracker and diff checks pass. No tracker promotion or gameplay runs.
