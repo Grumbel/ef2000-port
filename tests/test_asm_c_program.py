@@ -48,6 +48,36 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_inline_data_continuation_consumed_by_pop_ret(self):
+        for body, supported in [('pop edi\nret', True),
+                                ('pop esp\nret', False),
+                                ('nop\nret', False),
+                                ('pop edi\nret 4', False)]:
+            source = '''.type root,@function
+root: call accessor
+.size root, .-root
+.byte 0x0f,0x0b,0xcc,0xff
+.org 0x200
+.type accessor,@function
+accessor: %s
+.size accessor, .-accessor''' % body
+            with self.subTest(body=body), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, records = inventory(root, source)
+                codes, _, closed, reasons = asm_c_program.analyse(records)
+                self.assertEqual(0x100 in closed, supported, reasons)
+                if supported:
+                    # Keep the actual CALL write and POP/RET operations: replacing
+                    # these with a constant assignment loses observable stack RAM.
+                    self.assertIn('0x105u', codes[0x100])
+                    out = root/'out'
+                    asm_c_program.generate(directory, out, image)
+                    report = asm_c_differential.verify(
+                        out, root/'evidence', image, scenarios=8)
+                    entry = next(e for e in report['entries'] if e['address'] == 0x100)
+                    self.assertEqual(entry['counts'], {'pass': 8}, entry)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_descriptor_calls_preserve_target_and_stack_order(self):
         from dataclasses import replace
         from tests.test_asm_capture import fixture

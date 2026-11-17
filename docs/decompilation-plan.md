@@ -8896,3 +8896,24 @@ Use `report` with `-readOnly` to roll back the proposed metadata changes.
 This repairs a real inventory boundary; descriptor reloads, unsupported
 x87 arithmetic and broader execution still leave reliable bulk translation
 incomplete.
+
+### 2026-11-17: translate CALL continuations consumed as data
+
+The shared-PC composer now permits an absent CALL continuation only when its
+translated direct target is exactly canonical `POP r32; RET`, excluding ESP.
+The proof checks decoded operands, bytes, adjacency and instruction ownership;
+normal direct dependency closure still requires the helper to translate.
+The generated code retains the nested CALL write, POP and RET rather than
+folding the accessor to a constant and losing observable stack RAM.
+
+`tests.test_asm_c_program` covers the inline-data continuation, with eight
+full-state original/C comparisons from its caller, and rejects POP ESP,
+NOP/RET and RET-immediate variants. The helper requires a nested call frame,
+so ordinary isolated helper probes are not evidence for that ABI.
+`local/asm-c-inline-accessor-20261117/check.py` independently decodes the
+repaired original 0x10e35f (5 bytes) and 0x10e414 (2 bytes), verifies three
+ring-3 captured states against the original with full GPR/flags/RAM comparison,
+and compiles all four generated body/dispatcher units with OpenWatcom without
+diagnostics. Generated sources and original bytes remain ignored local data.
+No manual tracker promotion, gameplay run or whole-corpus correctness claim;
+descriptor reloads and unsupported x87 operations remain open.

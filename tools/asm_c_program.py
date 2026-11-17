@@ -16,6 +16,7 @@ import argparse
 from collections import Counter
 import hashlib
 import json
+from functools import partial
 from pathlib import Path
 
 try:
@@ -27,13 +28,14 @@ except ImportError:
 MODEL = 'flat-x86-program-explicit-state'
 
 
-def instruction_c(insn, starts):
+def instruction_c(insn, starts, *, consuming_targets=frozenset()):
     mnemonic = insn['mnemonic']
     indirect = mnemonic in ('call', 'jmp') and 'direct_target' not in insn
     if mnemonic != 'call' and not indirect:
         return asm_to_c.instruction_c(insn, starts)
     next_pc = insn['address'] + len(bytes.fromhex(insn['bytes']))
-    if mnemonic == 'call' and next_pc not in starts:
+    if (mnemonic == 'call' and next_pc not in starts and
+            insn.get('direct_target') not in consuming_targets):
         raise asm_to_c.Unsupported('unresolved direct call or return continuation')
     if indirect:
         target = asm_to_c.operand(insn['operands'])
@@ -67,11 +69,34 @@ def analyse(records):
                 raise ValueError('overlapping instruction ownership')
             owners[insn['address']] = record['address']
     starts = set(owners)
+    # A canonical POP r32; RET consumes the nested CALL continuation as data
+    # and returns through the caller's outer stack slot. Require both exact
+    # encodings and instruction ownership; never guess this from a symbol or
+    # a Ghidra flow override. ESP is excluded because POP ESP replaces the
+    # stack pointer rather than simply consuming the continuation.
+    consuming_targets = set()
+    for record in records:
+        instructions = record['instructions']
+        if len(instructions) != 2:
+            continue
+        pop, ret = instructions
+        encoded = bytes.fromhex(pop['bytes'])
+        if (pop['address'] == record['address'] and
+                owners.get(pop['address']) == record['address'] and
+                owners.get(ret['address']) == record['address'] and
+                len(encoded) == 1 and 0x58 <= encoded[0] <= 0x5f and
+                encoded[0] != 0x5c and pop['mnemonic'] == 'pop' and
+                pop['operands'].lower() == asm_to_c.REGS[encoded[0]-0x58] and
+                ret['address'] == pop['address'] + 1 and
+                ret['mnemonic'] == 'ret' and ret['bytes'] == 'c3' and
+                not ret['operands']):
+            consuming_targets.add(record['address'])
+    renderer = partial(instruction_c, consuming_targets=consuming_targets)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
         try:
-            codes[address] = asm_to_c.translate(record, starts=starts, renderer=instruction_c)
+            codes[address] = asm_to_c.translate(record, starts=starts, renderer=renderer)
         except asm_to_c.Unsupported as error:
             reasons[address] = str(error)
             continue
