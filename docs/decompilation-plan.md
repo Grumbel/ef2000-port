@@ -10921,3 +10921,27 @@ decomp/src/modem_settings.c --compiler <pinned-wcc386>
 --output local/modem-settings-20261117.obj; pinned-Unicorn Python
 local/modem-settings-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover network service list 0x340a4
+
+Recover the 153-byte EAX-root callback (pointer slot 0x12bb80; no direct
+inventory callers). Populate linked rows from 65-byte name slots beginning
+0x428cf8. Re-read signed count each iteration and next link after every show,
+including the last. Preserve the unchecked list traversal, 16-bit content
+height and signed 16-bit variable dialog height; counts >=5 select the fixed
+size and enable child controls. Add asserted widget content-height offset
++0x67 and record count global/signature. Keep hybrid exclusion.
+
+Watcom clean. Twenty-one original/emitted-body comparisons under explicit
+lookup/show/resize/toggle models match call traces, saved registers, ESP and
+all RAM except code placement/stack scratch. Cover counts 0/1/4/5/6 and two
+negative patterns, plus first-show changes to count and sibling link. Actual
+callees, EAX scratch, flags and stack scratch remain unproved; no binary
+identity or splice/replay claim. Report:
+local/network-service-list-source-20261117/report.json SHA-256
+6c5b09ca755549472cf814d68115e07a64b6b681e6aaec2c64a79e61b1f74068.
+Tracker: 3431 compiles, 801 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/network_service_list.c --compiler <pinned-wcc386>
+--output local/network-service-list-20261117.obj; pinned-Unicorn Python
+local/network-service-list-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

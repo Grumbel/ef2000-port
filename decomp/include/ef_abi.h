@@ -7675,3 +7675,8 @@ void show_modem_settings_33888(ef_addr32 root);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux show_modem_settings_33888 parm [eax] modify [eax]
 #endif
+
+void show_network_service_list_340a4(ef_addr32 root);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux show_network_service_list_340a4 parm [eax] modify [eax]
+#endif

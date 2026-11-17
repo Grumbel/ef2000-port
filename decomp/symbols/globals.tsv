@@ -536,3 +536,4 @@ addr	size	type	name	evidence	notes
 0x0015f07f	1	uint8_t	g_serial_port_index	0x33888 original ASM	Zero-extended then incremented to format port number
 0x0015f099	1	uint8_t	g_serial_fifo_mode	0x33888 original ASM	Indexes mode text; zero disables FIFO length display
 0x0015f09a	1	uint8_t	g_serial_fifo_length_index	0x33888 original ASM	Indexes dword table at 335b0 without bounds check
+0x00428cf4	4	int32_t	g_network_service_count	0x340a4 original ASM	Signed iteration count; low word also determines content height
