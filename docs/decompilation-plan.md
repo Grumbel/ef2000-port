@@ -11593,3 +11593,24 @@ Commands: tools/ef2000_wcc.py decomp/src/network_settings_callbacks.c --compiler
 <pinned-wcc386> --output local/network-baud-20261117.obj;
 pinned-Unicorn Python local/network-baud-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover arcade start and channel callbacks
+
+Recovered 34480 (29 bytes) and 344a0 (27 bytes) into
+network_session_callbacks.c with real guest calls. Confirm no arguments,
+six preserved GPRs and callback slots 12b580/12b598; no direct callers.
+Preserve socket word store before initialization, host-byte XOR after clear,
+and channel tail jump to shared refresh. Watcom zero warnings.
+192 scoped compiled-C/original-ASM comparisons PASS: four host-byte values
+including fe/ff, three socket words, adjacent-byte sentinels and optional
+mutations by five modeled callees. Compare call traces, six saved GPRs,
+ESP and 5 MiB RAM excluding code placement/stack scratch. Scratch EAX,
+flags, stack and actual callee integration remain unproved. Keep hybrid
+excluded, state compiles. Tracker 3452 compiles / 780 blocked / 454304
+blocked body bytes. Private report
+local/network-session-callbacks-source-20261117/report.json, SHA-256
+ea5780f39707f10f425500d0413d8909dba501ae00b110c1d1f5fc7838d04fe1.
+Commands: tools/ef2000_wcc.py decomp/src/network_session_callbacks.c --compiler
+<pinned-wcc386> --output local/network-session-callbacks-20261117.obj;
+pinned-Unicorn Python local/network-session-callbacks-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

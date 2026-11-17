@@ -7767,3 +7767,8 @@ void refresh_network_controls_33630(void);
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_baud_335c0 parm [eax] modify [eax]
 #endif
+
+#if defined(__WATCOMC__) && defined(__386__)
+#pragma aux net_start_arcade_34480 parm [] modify [eax]
+#pragma aux net_new_channel_344a0 parm [] modify [eax]
+#endif

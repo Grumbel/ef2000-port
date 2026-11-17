@@ -42,25 +42,6 @@ void net_directplay_game_selected_341d8(ef_addr32 widget)
     }
 }
 
-/* 34480, 29 bytes: reset server socket before the arcade game starts. */
-void net_start_arcade_34480(void)
-{
-    EF_U16(0x1357b8u) = 0u;
-    guest(0x34bccu, 0u, 0u, 0u);
-    guest(0xa2bdcu, 0u, 0u, 0u);
-    guest(0x33630u, 0u, 0u, 0u);
-}
-
-/* 344a0, 27 bytes: invert the active network channel flag. */
-void net_new_channel_344a0(void)
-{
-    guest(0xa3da0u, 0u, 0u, 0u);
-    guest(0x34ea4u, 0u, 0u, 0u);
-    EF_U8(0x1357c8u) ^= 1u;
-    guest(0xa2bdcu, 0u, 0u, 0u);
-    guest(0x33630u, 0u, 0u, 0u);
-}
-
 /* 345d4, 19 bytes: false shares 345d2 RET in the previous function;
  * true tail-jumps to a4d90 with the modem-ending dialog name. */
 void net_new_end_string_345d4(void)
