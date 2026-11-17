@@ -721,11 +721,13 @@ def instruction_c(insn, starts):
         if not parts:
             raise Unsupported('unsupported data16 spelling')
         mnemonic, text = parts[0], parts[1] if len(parts) > 1 else ''
-        # A checked CS override may accompany the ignored operand-size prefix
-        # on a memory segment MOV. Keep the textual override for operand().
+        # A checked segment override may accompany the operand-size prefix
+        # on a memory segment MOV. Keep it for permission and address checks.
         segment_encoding = encoded
-        cs_override = encoded[:2] == b'\x66\x2e'
-        if cs_override:
+        overrides = {0x26: 'es', 0x2e: 'cs', 0x36: 'ss',
+                     0x3e: 'ds', 0x64: 'fs', 0x65: 'gs'}
+        override = overrides.get(encoded[1]) if len(encoded) > 1 and encoded[0] == 0x66 else None
+        if override:
             segment_encoding = encoded[:1] + encoded[2:]
         if encoded == b'\x66\xf3\xa4' and mnemonic == 'rep':
             # Operand size has no effect on MOVSB; address size remains 32.
@@ -741,7 +743,7 @@ def instruction_c(insn, starts):
             if (seg[0] != 'seg' or seg[1] != ((segment_encoding[2] >> 3) & 7) or
                     mem[0] != 'mem' or width_of(mem) != 16 or
                     (segment_encoding[1] == 0x8e and seg[1] == 1) or
-                    (cs_override and 'cs:' not in text)):
+                    (override and override + ':' not in text)):
                 raise Unsupported('unsupported data16 segment MOV operands')
         else:
             raise Unsupported('unsupported data16 encoding/spelling')

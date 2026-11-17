@@ -10692,3 +10692,38 @@ local/dos-text-write-source-20261117/check.py; tools/ef2000_wcc.py
 decomp/src/misc_drafts1.c --compiler <pinned-wcc386>
 --output local/dos-open-source-20261117/text-write-module.obj;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — Translate the generic intdos file-service path
+
+The original 0x2b0 register-block gateway needs more than an INT boundary:
+its 0x30e/0x312 stores use operand-size plus FS prefixes (66 64 8c).
+Extend checked segment-MOV prefix handling to retain explicit segment overrides,
+including FS, rather than dropping the memory access segment. Reject mismatched
+textual overrides. Cover both original store forms in synthetic ASM/C comparisons,
+including descriptor-backed FS accesses with a valid captured FS cache.
+
+Admit the existing native file-service policies at gateway interrupt site 0x2f0:
+create, open, close, read, write, seek and IOCTL 4400 only. Other requests remain
+rejected without state or filesystem changes. Do not fabricate success for
+extender requests such as 252b/3508. This is the current hybrid DosDrive policy,
+not a claim of complete original DOS behavior (zero-byte writes still follow
+that policy). Keep the hand-written intdos draft and hybrid exclusion unchanged.
+
+Both original gateway functions (0x2b0, 0x9be0d) now generate C. Forty-two local
+original ASM versus generated C comparisons pass: seven admitted requests with
+valid/invalid handles and separate/identical/overlapping input-output blocks,
+using independent real copy-on-write drives. Compare
+registers, flags, supported x87 state, complete prepared RAM including stack
+scratch, exact service traces and overlay output; source files stay unchanged.
+The output carry word at +0x18 remains untouched because the actual gateway
+runs on both sides. Evidence: local/asm-intdos-files-20261117/native-report.json,
+SHA-256 27573e6026c64a9836411651f796fa1837d1a10b9a35dd27e21a7b683af091c4.
+This proves the scoped gateway translation under that service adapter, not all
+193 dependent blocked functions, arbitrary services or gameplay. Tracker states
+remain unchanged. All 28 targeted automated checks pass. Commands: pinned-Unicorn Python
+local/asm-intdos-files-20261117/native.py;
+python3 -m unittest tests.test_asm_dos_file_service;
+pinned-Unicorn unittest tests.test_asm_c_program.ProgramTests.test_data16_and_register_segment_prefixes;
+python3 -m unittest tests.test_asm_to_c.TranslationTests.test_data16_aliases_reject_unsupported_encodings;
+python3 tools/decomp_status.py check; git diff --check.

@@ -122,6 +122,42 @@ int main(int argc, char **argv)
         assert(ef_asm_dos_file_service(&state, ip, 0x21, &drive) == 0);
         assert(!drive.is_open(opened));
     }
+    // The generic intdos site has the same file policy, but cannot accept
+    // arbitrary requests merely because they arrived through this gateway.
+    std::memcpy(ram.data() + 0x300, "GATEWAY.DAT", 12);
+    state.r[0] = 0x3c00; state.r[2] = 0x300;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    const auto gateway_handle = state.r[0];
+    state.r[0] = 0x4000; state.r[1] = 3; state.r[2] = 0x400;
+    state.r[3] = gateway_handle;
+    std::memcpy(ram.data() + 0x400, "DOS", 3);
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(state.r[0] == 3);
+    state.r[0] = 0x4200; state.r[1] = state.r[2] = 0;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(state.r[0] == 0);
+    state.r[0] = 0x3f00; state.r[1] = 3; state.r[2] = 0x500;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(state.r[0] == 3 && std::memcmp(ram.data() + 0x500, "DOS", 3) == 0);
+    state.r[0] = 0x4400;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(state.r[0] == 2);
+    for (const unsigned request : {0x252bu, 0x3508u, 0x4401u, 0x6800u}) {
+        state.r[0] = request; before = state;
+        const auto memory_before = ram;
+        assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0x122);
+        assert(std::memcmp(&state, &before, sizeof state) == 0);
+        assert(ram == memory_before);
+        assert(drive.seek(gateway_handle, 0, 1) == 3);
+    }
+    state.r[0] = 0x3e00;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(!drive.is_open(gateway_handle));
+    std::memcpy(ram.data() + 0x300, "GATEWAY.DAT", 12);
+    state.r[0] = 0x3d00; state.r[2] = 0x300;
+    assert(ef_asm_dos_file_service(&state, 0x2f0, 0x21, &drive) == 0);
+    assert(drive.read(state.r[0], 3) == std::vector<uint8_t>({'D', 'O', 'S'}));
+    drive.close(state.r[0]);
     ram.fill('X'); state.r[0] = 0x3d00; state.r[2] = 0x300; before = state;
     assert(ef_asm_dos_file_service(&state, 0xfa4db, 0x21, &drive) == 0);
     before.r[0] = 3; before.flags |= 1u;

@@ -6,7 +6,9 @@
 
 // Context is an ef2000::DosDrive*. Uses the hybrid runtime's flat-address DOS
 // file policy and copy-on-write overlay. Unknown sites/requests return 0x122
-// without changing guest state. Exceptions other than numeric DOS errors escape
+// without changing guest state. The generic intdos site (0x2f0) accepts only
+// these implemented file services; other DOS/extender requests still reject.
+// Exceptions other than numeric DOS errors escape
 // to the host caller, as they do in the hybrid interpreter.
 extern "C" unsigned ef_asm_dos_file_service(ef_lift_state *guest, uint32_t ip,
                                            unsigned vector, void *context);

@@ -124,6 +124,8 @@ ret
         sources = [
             '.byte 0x66,0x8c,0x05\n.long 0x2000\nret',
             '.byte 0x66,0x8c,0x1d\n.long 0x2000\nret',
+            'mov eax,0x2000\n.byte 0x66,0x64,0x8c,0x00\nret',
+            'mov eax,0x2000\n.byte 0x66,0x64,0x8c,0x58,0x06\nret',
             'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\n.byte 0x66\nrep movsb\nret',
             '.byte 0x3e\nmov ecx,0x12345678\nret',
             '.byte 0x2e,0x8b,0xc0\nret',
@@ -141,11 +143,14 @@ ret
                 function.argtypes = [ctypes.POINTER(asm_c_differential.State),
                                      ctypes.c_uint32, ctypes.c_uint32]
                 capture = fixture()
+                context = dict(capture.table_context)
+                context['descriptors'] = dict(context['descriptors'], fs=context['descriptors']['ds'])
                 ram = bytearray(capture.guest_ram)
                 ram[:image.stat().st_size] = image.read_bytes()
                 ram[0x2000:0x2008] = b'abcdefgh'
                 capture = replace(capture, address=0x100,
-                                  registers=dict(capture.registers, eip=0x100), guest_ram=bytes(ram))
+                                  registers=dict(capture.registers, eip=0x100, fs=7),
+                                  table_context=context, guest_ram=bytes(ram))
                 result = asm_c_differential.isolated_probes(
                     function, b'', 0x100, 1, 100, True, captured=capture)[0]
                 self.assertEqual(result['state'], 'pass', result)

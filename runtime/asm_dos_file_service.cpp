@@ -10,7 +10,12 @@ static unsigned serve(ef_lift_state *guest, uint32_t ip, unsigned vector,
     if (!guest || !context || !context->drive || vector != 0x21u) return 0x122u;
     const uint16_t ax = guest->r[0] & 0xffffu;
     const unsigned ah = ax >> 8;
-    if (!((ip == 0xfa973u && ah == 0x42u) ||
+    // intdos loads the request from its caller's register block. Admit only
+    // file services implemented below, never arbitrary extender requests.
+    const bool intdos_file = ip == 0x2f0u &&
+        (ah == 0x3cu || ah == 0x3du || ah == 0x3eu || ah == 0x3fu ||
+         ah == 0x40u || ah == 0x42u || ax == 0x4400u);
+    if (!(intdos_file || (ip == 0xfa973u && ah == 0x42u) ||
           (ip == 0x1103b7u && ah == 0x42u) ||
           ((ip == 0x1103e0u || ip == 0xfa541u) && ah == 0x40u) ||
           ((ip == 0xfa9a8u || ip == 0xfa518u || ip == 0xfa553u ||

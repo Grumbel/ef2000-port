@@ -381,7 +381,9 @@ class TranslationTests(unittest.TestCase):
                               ('6690', ''), ('6690', 'nop'),
                               ('662e8e18', 'mov ds,WORD PTR [eax]'),
                               ('662e8e18', 'mov ds,WORD PTR ds:[eax]'),
-                              ('662e8e08', 'mov cs,WORD PTR cs:[eax]')]:
+                              ('662e8e08', 'mov cs,WORD PTR cs:[eax]'),
+                              ('66648c00', 'mov WORD PTR ds:[eax],es'),
+                              ('66648c00', 'mov WORD PTR [eax],es')]:
             with self.subTest(encoded=encoded, text=text), self.assertRaises(asm_to_c.Unsupported):
                 asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
                                           mnemonic='data16', operands=text),
