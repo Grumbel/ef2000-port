@@ -10344,3 +10344,22 @@ intercepted host pointer marshalling; actual DOS, full ABI and RAM are unverifie
 Reproducer: local/dos-seek-source-20261117/check.py; report SHA-256
 03465964b1f4e2ef173af602269e12f71954f52cc5d8a859fd34aa58a47e3119.
 Tracker and diff checks pass. No tracker promotion or gameplay runs.
+
+### 2026-11-17 — Validate the DOS error translator cluster
+
+Rename the misleading translate_key_1101e8 to report_dos_error_1101e8 in
+source, declarations, callers and symbol records. It stores the low DOS error
+byte at 0x484480 and the mapped runtime errno at 0x484484, then returns -1.
+Name those globals, the signed-byte mapping table and version control byte.
+No original table contents are copied into committed source. The existing
+translator logic needs no semantic correction. Actual recovered store and
+address helpers run on both sides of 1040 original-Unicorn/source-host
+comparisons: all 256 byte codes plus four extended codes, four version values,
+and a synthetic table exercising signed bytes. Return EAX and RAM match except
+guest stack scratch; no service/helper behavior is stubbed. Host pointer
+access and the existing guest_fn aliases are adapted in the local harness.
+Full register/flag ABI and splice/replay remain unverified; tracker unchanged.
+Watcom -bt=dos -3r -zp1 -za99 -w1 -we compiles key_helpers1.c cleanly.
+Reproducer: local/dos-error-source-20261117/check.py; report SHA-256
+1af0188f5437d2fa440e251ef69cfb07bd42648a6a2bc2aa0226e20233565e0e.
+Tracker and diff checks pass. No gameplay runs.

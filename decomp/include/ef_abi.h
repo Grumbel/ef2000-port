@@ -4777,7 +4777,7 @@ uint32_t guest_fn_b3c04_x(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX, returns E
 void fill_rect_ceccc(uint32_t colour, int32_t x0, int32_t y0, int32_t x1, int32_t y1);
 
 /* key_helpers1.c */
-int32_t translate_key_1101e8(uint32_t code);
+int32_t report_dos_error_1101e8(uint32_t code);
 
 
 

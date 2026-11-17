@@ -5,10 +5,10 @@
 #include "ef_globals.h"
 #include "ef_mem.h"
 
-/* Key code translation. */
+/* DOS error translation. */
 
-/* 0x1101e8, 102 bytes. Store a key code, then translate it (via a table at 0x17d5a8 for plain keys, or its high byte for extended codes) and store the result. Always returns -1. */
-int32_t translate_key_1101e8(uint32_t code)
+/* 0x1101e8, 102 bytes. Store the low DOS error byte at 0x484480, translate through the signed-byte table at 0x17d5a8 (or use the high byte for extended errors), then store errno at 0x484484. Always returns -1. */
+int32_t report_dos_error_1101e8(uint32_t code)
 {
     uint8_t lo = (uint8_t)code;
     uint8_t idx = lo;

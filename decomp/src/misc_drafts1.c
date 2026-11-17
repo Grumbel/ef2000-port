@@ -6331,7 +6331,7 @@ uint32_t delete_file_fe541(uint32_t name)
     uint32_t out[7];
     run_dos_int_ex(0x21u, 0x4100u, 0u, 0u, name, out);
     if (out[6] != 0u)
-        return (uint32_t)translate_key_1101e8(out[0] & 0xffffu);
+        return (uint32_t)report_dos_error_1101e8(out[0] & 0xffffu);
     return 0u;
 }
 
@@ -6341,7 +6341,7 @@ uint32_t dos_read_10f0e8(uint32_t handle, uint32_t buffer, uint32_t count)
     uint32_t out[7];
     run_dos_int_ex(0x21u, 0x3f00u, handle, count, buffer, out);
     if (out[6] != 0u)
-        return (uint32_t)translate_key_1101e8(out[0] & 0xffffu);
+        return (uint32_t)report_dos_error_1101e8(out[0] & 0xffffu);
     return out[0];
 }
 
@@ -20816,7 +20816,7 @@ int32_t translate_key_if_1101e3(uint32_t code, uint32_t flag)
     if (flag == 0u) {
         return (int32_t)code;
     }
-    return translate_key_1101e8(code);
+    return report_dos_error_1101e8(code);
 }
 
 /* 0xc46bc, 60 bytes. Patch the three self-modified origin immediates at 0xc4756/0xc475c/0xc4762 from the dwords at 0x1590b4/0x1590b8/0x1590bc, then run 0xc4654 with the dwords 0x1590b0, 0x1590ac, 0x1590a8 (all registers preserved). */
@@ -23901,7 +23901,7 @@ uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count)
 	if ((flags & 0x40u) != 0u) {
 		run_dos_int_ex(0x21u, 0x3f00u, handle, count, buffer, out);
 		if (out[6] != 0u)
-			return (uint32_t)translate_key_1101e8((int32_t)(out[0] & 0xffffu));
+			return (uint32_t)report_dos_error_1101e8((int32_t)(out[0] & 0xffffu));
 		return out[0];
 	}
 	total = 0u;
@@ -23914,7 +23914,7 @@ uint32_t dos_read_115871(uint32_t handle, uint32_t buffer, uint32_t count)
 		uint32_t end;
 		run_dos_int_ex(0x21u, 0x3f00u, handle, count, cursor, out);
 		if (out[6] != 0u)
-			return (uint32_t)translate_key_1101e8((int32_t)(out[0] & 0xffffu));
+			return (uint32_t)report_dos_error_1101e8((int32_t)(out[0] & 0xffffu));
 		n = out[0];
 		if (n == 0u)
 			return total;

@@ -516,3 +516,7 @@ addr	size	type	name	evidence	notes
 0x00121e95	1	uint8_t	g_target_view_mode	0xb574	stores 2 on first mismatch, 1 on second mismatch, 0 on both equal; same compared strings
 0x004ddee8	4	uint32_t	g_heap_dos_reservation_size	0x10d6d7..0x10d703 tests upper bits, caps to 0xfffff, converts to paragraphs	Mode-1 fallback temporary DOS allocation size; initialized value and other writers pending
 0x0017e5dc	4	uint32_t	g_heap_growth_enabled	0x10d762 and 0x10d835 reject zero before heap growth	Nonzero permits backing allocation; initialization and other writers pending
+0x00132a67	1	uint8_t	g_dos_error_version	0x1101ff compares against 3	version byte controlling DOS error remapping
+0x0017d5a8	20	int8_t[20]	g_dos_errno_table	0x11022c loads overlapping dword at index+0x17d5a5 then SAR 24	signed error mapping; original payload only, never copied into source
+0x00484480	4	uint32_t	g_dos_error	0xebd36 address, 0xebe90 store, called by 0x1101e8	low byte of DOS error saved as dword
+0x00484484	4	int32_t	g_errno	0xebd30 address, 0xebe6d store, called by 0x1101e8	translated runtime error code
