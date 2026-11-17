@@ -7655,3 +7655,8 @@ void draw_widget_frame_a5ca4(ef_addr32 widget);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux count_event_9aa78 parm [edx] modify [eax]
 #endif
+
+void shutdown_menu_session_34d94(void);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux shutdown_menu_session_34d94 modify [eax]
+#endif

@@ -523,3 +523,10 @@ addr	size	type	name	evidence	notes
 0x0017d5bc	4	uint32_t	g_file_creation_permission_mask	fa4a9@fa595 XORs permission argument with this dword	AL bit 7 of XOR selects DOS create attribute 0 versus 1; full dword also remains in EAX request
 0x0013577c	16	uint32_t[4]	g_menu_name_values	347bc@34804 loads four dwords, 34821 skips formatting zero	optional hexadecimal values for following name-list widgets
 0x001357c0	4	uint32_t	g_menu_name_identifier	347bc@347cd passes dword to formatter	first name-list widget value
+0x0019f5ae	1	uint8_t	g_session_activity_flag	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f59c	1	uint8_t	g_session_shutdown_requested	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f59e	1	uint8_t	g_session_first_handle_owned	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f5a3	1	uint8_t	g_session_second_handle_owned	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f59b	1	uint8_t	g_session_state_byte	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f35c	4	uint32_t	g_session_first_handle	0x34d94 original ASM	Session shutdown accesses; provisional semantic name
+0x0019f360	4	uint32_t	g_session_second_handle	0x34d94 original ASM	Session shutdown accesses; provisional semantic name

@@ -10798,3 +10798,25 @@ decomp/src/menu_name_list.c --compiler <pinned-wcc386>
 --output local/menu-name-list-20261117.obj; pinned-Unicorn Python
 local/menu-name-list-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover session shutdown 0x34d94
+
+Recover the 131-byte menu session shutdown in session_shutdown.c. Inspect
+original ASM and both direct callers (34f79, 352c7): no consumed arguments,
+return ignored. Preserve ownership-flag clearing before each stack-argument
+close and re-read the second flag and handle after the first close. Record
+signature and globals. Retain the hybrid exclusion.
+
+Whole-module Watcom compilation has zero warnings/errors. In 64 scoped cases,
+original ASM and emitted Watcom code match call traces, nonstack RAM, preserved
+registers and ESP under explicit callee ABI models. Cover both device flags,
+both ownership flags, and first-close mutations of the second flag/handle.
+Models preserve registers and do not execute actual callees. EAX scratch,
+flags and stack scratch excluded; no binary identity or splice/replay claim.
+Evidence local/session-shutdown-source-20261117/report.json SHA-256
+53fc149141a369db03f33370cab3f7411011de1de6fad83966ba65071c26c0a6.
+Move blocked -> compiles: 3427 compiles, 805 blocked.
+Commands: tools/ef2000_wcc.py decomp/src/session_shutdown.c --compiler
+<pinned-wcc386> --output local/session-shutdown-20261117.obj;
+pinned-Unicorn Python local/session-shutdown-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

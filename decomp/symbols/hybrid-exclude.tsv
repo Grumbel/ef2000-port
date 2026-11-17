@@ -120,7 +120,7 @@ addr	reason
 0x000347ac	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000349ec	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00034bcc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x00034d94	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x00034d94	Recovered session shutdown; scoped Watcom-body/ASM comparisons use modeled callees; actual callee integration and splice/replay pending.
 0x00035128	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00035e68	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00035e90	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
