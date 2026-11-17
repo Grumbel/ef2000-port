@@ -594,7 +594,7 @@ class TranslationTests(unittest.TestCase):
         import hashlib
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
-            image, record = assemble(root, 'ret')
+            image, record = assemble(root, 'mov eax, DWORD PTR [0x41eed8]\nret')
             inventory = root / 'inventory'
             inventory.mkdir()
             (inventory / 'entry.json').write_text(json.dumps(record))
@@ -604,7 +604,11 @@ class TranslationTests(unittest.TestCase):
                 entries=[dict(address=0x100, file='entry.json')])))
             directory = root / 'translations'
             asm_to_c.generate(inventory, directory, image)
-            report = asm_c_differential.verify(directory, root / 'evidence', image, scenarios=2)
+            default = asm_c_differential.verify(directory, root / 'default', image, scenarios=1)
+            self.assertEqual(default['entries'][0]['state'], 'inconclusive')
+            report = asm_c_differential.verify(directory, root / 'evidence', image,
+                                               scenarios=2, prepared_memory_size=0x500000)
+            self.assertEqual(report['prepared_memory_size'], 0x500000)
             self.assertEqual(report['entries'][0]['state'], 'probes-pass')
             self.assertEqual(report['entries'][0]['counts'], {'pass': 2})
             with (directory / 'ef_lift_00000100.c').open('a') as stream:

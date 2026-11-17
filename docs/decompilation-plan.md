@@ -12042,3 +12042,13 @@ memory access kind, linear address, width and reported PC. The hook leaves
 the fault in place, so the result remains inconclusive and C is not run
 after an original-side fault. Synthetic absolute reads and writes exercise
 the evidence alongside the existing mismatch and service-boundary checks.
+
+2026-11-18 — Added `--prepared-memory-size` to the bulk differential
+verifier and recorded the selected RAM size in the report. Captured inputs
+keep their recorded RAM. In a diagnostic sample of 100 entries with no
+completed 4 MiB probes, 92 first inputs hit an invalid-memory hook. Retrying
+the same inputs with a 5 MiB prepared image gave 17 passes, 80 inconclusive
+and three mismatches. Dispatcher PCs 0x13a50, 0x12f18 and 0x1c53c are absent
+from all ranges in the current inventory and need boundary review. Sample
+reports: `local/asm-service-free-parallel-20261118/blocked-fault-sample*.json`.
+The additional RAM is zero-filled and does not model initialized game state.

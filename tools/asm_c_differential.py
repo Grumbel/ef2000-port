@@ -118,6 +118,12 @@ def probes(count, seed):
         yield registers, flags
 
 
+def validate_prepared_memory_size(size):
+    if size is not None and (type(size) is not int or not 0x400000 <= size <= 0x10000000
+                             or size % 0x1000):
+        raise ValueError('prepared RAM must be page aligned, between 4 and 256 MiB')
+
+
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None):
@@ -137,12 +143,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         raise ValueError('host services require the program dispatcher')
     if memory_services and service_factory is None and port_factory is None:
         raise ValueError('memory services require a service factory')
-    if prepared_memory_size is not None:
-        if captured is not None:
-            raise ValueError('captured RAM cannot be resized')
-        if (type(prepared_memory_size) is not int or prepared_memory_size < 0x400000 or
-                prepared_memory_size > 0x10000000 or prepared_memory_size % 0x1000):
-            raise ValueError('prepared RAM must be page aligned, between 4 and 256 MiB')
+    validate_prepared_memory_size(prepared_memory_size)
+    if captured is not None and prepared_memory_size is not None:
+        raise ValueError('captured RAM cannot be resized')
     service_names = ('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')
     original_service = service_factory() if service_factory else None
     translated_service = service_factory() if service_factory else None
@@ -464,7 +467,7 @@ def reject_host_service(*args):
 
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
-                    captured=None, *, reject_services=False):
+                    captured=None, *, reject_services=False, prepared_memory_size=None):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -487,6 +490,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  phase=lambda stage: sender.send(('phase', index, stage)),
                                  service_factory=(lambda: reject_host_service) if reject_services else None,
                                  vector_services=reject_services,
+                                 prepared_memory_size=prepared_memory_size,
                                  port_factory=(lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
@@ -591,7 +595,9 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1):
+           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
+           prepared_memory_size=None):
+    validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
     payload = image.read_bytes()
@@ -713,7 +719,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
         results = isolated_probes(function, payload, address, scenarios, budget, program,
-                                  native_x87=native_x87, reject_services=reject_services)
+                                  native_x87=native_x87, reject_services=reject_services,
+                                  prepared_memory_size=prepared_memory_size)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
@@ -744,6 +751,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
+                  prepared_memory_size=prepared_memory_size or 0x400000,
                   host_service_policy='reject-on-reach' if reject_services else 'no-boundaries',
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
@@ -772,6 +780,8 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
+                        help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
@@ -787,7 +797,8 @@ def main(argv=None):
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
-                        service_free_paths=args.service_free_paths, jobs=args.jobs)
+                        service_free_paths=args.service_free_paths, jobs=args.jobs,
+                        prepared_memory_size=args.prepared_memory_size)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
