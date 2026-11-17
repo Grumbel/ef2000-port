@@ -8812,3 +8812,36 @@ claiming their flags are identical. This adds fault-state evidence, not
 translation counts or tracker promotions. Descriptor reloads, remaining
 x87 instructions and broader target execution still leave reliable bulk
 translation incomplete. No gameplay or UI runs.
+
+### 2026-11-17 — Translate AAM and compare the original decimal formatter
+
+Added canonical AAM imm8 translation with exact opcode/immediate checks.
+AL is divided by the encoded base, AH receives the quotient and AL the
+remainder, preserving upper EAX. SZP come from the resulting AL; undefined
+CF/OF/AF follow the existing Unicorn zero policy rather than a universal
+hardware claim. A zero base reports divide fault 5 before changing GPRs,
+flags or PC. Prefixes and mismatched encoded/spelled bases are rejected.
+
+Validation: the focused scalar grid passed 14,339 cases (every AL value
+for bases 1, 2, 3, 10, 16, 24 and 255, eight CF/AF/OF input combinations,
+plus three zero-base faults). The encoding-rejection test and
+tests.test_asm_c_program passed together (10 tests). git diff --check.
+
+Read the original disassembly and independently revalidated the pinned
+106-byte body `0x10e2f5` (u64_to_digits) through read_inventory. Its two
+base-10 AAM sites are now translated. Full GPR/flags/RAM comparisons against
+the original body passed for 13 integer boundaries, from zero through
+UINT64_MAX, each with 1, 4, 8, 16 and 20 requested digits (65 cases).
+These use controlled ring-3 initial states, not gameplay captures. The
+generated original-body unit compiled warning-free with OpenWatcom.
+Reproduction, generated sources and results remain ignored under
+`local/asm-c-aam-20261117/{check.py,report.json}`; report SHA-256:
+`19f621902a073bac6062516c7081853fff28c401a987ee61fafaede6a91e62f6`.
+
+The apparent DAA and base-24 AAM sites in inventory body `0x10e35f` are
+inside an inline numeric table following CALL, not evidence that those
+instructions execute. DAA was left unsupported; the table/body boundary
+still needs a separate flow audit. No manual tracker promotion or gameplay
+runs. Whole-corpus regeneration after this and segment PUSH remains
+pending, as do descriptor reloads and unsupported x87 arithmetic; reliable
+bulk translation remains incomplete.

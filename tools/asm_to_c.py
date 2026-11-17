@@ -957,6 +957,19 @@ def instruction_c(insn, starts):
                  'result = ef_double_shift(s, a, b, %s, %d, %d);' %
                  (read(count, 32), width, mnemonic == 'shrd'),
                  write(dst, 'result', width)]
+    elif mnemonic == 'aam':
+        base = operand(text)
+        encoded = bytes.fromhex(insn['bytes'])
+        if (base[0] != 'imm' or len(encoded) != 2 or encoded[0] != 0xd4 or
+                base[1] != encoded[1]):
+            raise Unsupported('AAM encoding/spelling mismatch')
+        code += ['b = %s; if (s->fault) return s->fault;' % read(base, 8),
+                 'if (!b) { s->fault = 5; return 5; }',
+                 'a = s->r[0] & 255u;',
+                 'result = (a/b)*256u + a%b;',
+                 # CF/OF/AF are undefined; retain the flat oracle's zero policy.
+                 '(void)ef_logic(s, result, 8);',
+                 write(operand('ax'), 'result', 16)]
     elif mnemonic in ('div', 'idiv'):
         divisor = operand(text)
         width = width_of(divisor)

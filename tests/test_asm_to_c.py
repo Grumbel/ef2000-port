@@ -262,6 +262,25 @@ class TranslationTests(unittest.TestCase):
                     cpu.mem_map(0, len(memory))
                     cpu.mem_write(0, bytes(memory))
 
+    def test_aam_rejects_mismatched_encoding(self):
+        for encoded, operand in (('d40a', '0x18'), ('d40a', 'al'),
+                                 ('66d40a', '0xa'), ('d50a', '0xa'), ('d4', '0xa')):
+            with self.subTest(encoded=encoded, operand=operand):
+                with self.assertRaisesRegex(asm_to_c.Unsupported, 'AAM encoding'):
+                    asm_to_c.instruction_c(dict(address=0x100, bytes=encoded,
+                                              mnemonic='aam', operands=operand),
+                                          {0x100, 0x100+len(bytes.fromhex(encoded))})
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_aam_values_bases_flags_and_zero_base_fault(self):
+        flags = [0x202 | carry | auxiliary | overflow
+                 for carry in (0, 1) for auxiliary in (0, 16) for overflow in (0, 0x800)]
+        for base in (1, 2, 3, 10, 16, 24, 255):
+            self.scalar_grid('aam %d' % base, ((0x1234ab00 | value, 0, f)
+                                             for value in range(256) for f in flags))
+        self.scalar_grid('aam 0', ((0x1234ab00 | value, 0, 0xad7)
+                                   for value in (0, 1, 255)), allow_faults=True)
+
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_flag_transfers_all_ah_values_and_arithmetic_flags(self):
         positions = (0, 2, 4, 6, 7, 11)
