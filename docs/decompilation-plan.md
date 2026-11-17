@@ -9697,3 +9697,28 @@ Watcom using `-q -bt=dos -3r -za99 -w1 -we` with zero diagnostics.
 The runtime header hash changes; the preceding bulk report remains historical
 and is not evidence of compilation against this new header. No tracker
 promotion, runtime splice or gameplay/replay result is claimed.
+
+### 2026-11-17: use checked stack reads for segment POP
+
+Segment POP previously rejected every descriptor-profile context and read
+through the legacy flat helper. The translator now validates the exact
+segment POP encoding, reads its 16-bit selector through the current SS
+cache, invokes the segment loader, and advances ESP only on success.
+Operand-size 32 advances ESP by four; operand-size 16 advances it by two.
+Null data selectors use the preceding verified loader implementation;
+non-null descriptor-table loads and null SS remain unsupported.
+
+The capture regression now exercises MOV plus both POP operand sizes for
+ES, DS, FS and GS with all four null-selector RPL values: 48 original/C
+full-state comparisons. The 32-bit stack values include nonzero upper halves
+to check selector truncation. All cases also check cache invalidation and
+subsequent access rejection. The 32 POP cases additionally reject an invalid
+SS extent without changing registers, selectors, caches, flags or RAM, and
+accept a two-byte readable selector at the SS upper limit while advancing
+ESP according to operand size. An independent one-instruction Unicorn
+probe in `local/asm-null-pop-20261117/oracle_width.py` confirms the 32-bit POP DS
+selector read succeeds with only two bytes inside the SS limit.
+
+The generated mixed-operand fixture in `local/asm-null-pop-20261117/lift.c`
+compiles with pinned Watcom using `-q -bt=dos -3r -za99 -w1 -we`, with zero
+diagnostics. No tracker promotion, runtime splice or gameplay run is claimed.

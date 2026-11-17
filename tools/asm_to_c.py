@@ -1003,7 +1003,7 @@ def instruction_c(insn, starts):
         if text or insn['bytes'] != ('60' if mnemonic == 'pusha' else '61'):
             raise Unsupported('unsupported PUSHA/POPA encoding/spelling')
         code.append('a = ef_stack_all(s, %d); if (a) return a;' % (mnemonic == 'popa'))
-    elif mnemonic in ('push', 'pushw', 'pop'):
+    elif mnemonic in ('push', 'pushw', 'pop', 'popw'):
         op = operand(text)
         if op[0] == 'seg' and mnemonic in ('push', 'pushw'):
             width = 16 if mnemonic == 'pushw' else 32
@@ -1015,11 +1015,14 @@ def instruction_c(insn, starts):
             code += ['a = %s;' % read(op, 16),
                      'b = ef_stack_store(s, 2, s->r[4] - %du, %d, a); if (b) return b;' % (width//8, width),
                      's->r[4] -= %du;' % (width//8)]
-        elif op[0] == 'seg' and mnemonic == 'pop' and op[1] != 1:
-            code += ['if (s->segment_profile) return 7;',
-                     'a = ef_read(s, s->r[4], 32); if (s->fault) return s->fault;',
+        elif op[0] == 'seg' and mnemonic in ('pop', 'popw') and op[1] != 1:
+            width = 16 if mnemonic == 'popw' else 32
+            opcode = ('07', '', '17', '1f', '0fa1', '0fa9')[op[1]]
+            if insn['bytes'] != ('66' if width == 16 else '') + opcode:
+                raise Unsupported('segment POP encoding/spelling mismatch')
+            code += ['a = ef_read_segment(s, 2, s->r[4], 16); if (s->fault) return s->fault;',
                      'ef_load_segment(s, %d, a);' % op[1],
-                     'if (s->fault) return s->fault; s->r[4] += 4u;']
+                     'if (s->fault) return s->fault; s->r[4] += %du;' % (width//8)]
         elif mnemonic in ('push', 'pushw') and op[0] in ('reg', 'mem', 'imm'):
             width = scalar_stack_width(insn, op)
             code += ['a = %s; if (s->fault) return s->fault;' % read(op, width),

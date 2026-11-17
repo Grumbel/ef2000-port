@@ -243,56 +243,83 @@ class AsmCaptureTests(unittest.TestCase):
                 if segment in ('cs', 'ss'):
                     continue
                 for selector in range(4):
-                    with self.subTest(segment=segment, selector=selector):
-                        image, record = assemble(root, 'mov eax,%d\nmov %s,ax\nret' %
-                                                 (selector, segment))
-                        capture = fixture()
-                        ram = bytearray(capture.guest_ram)
-                        ram[:image.stat().st_size] = image.read_bytes()
-                        regs = dict(capture.registers, eip=0x100)
-                        tables = copy.deepcopy(capture.table_context)
-                        regs[segment] = 7
-                        tables['descriptors'][segment] = tables['descriptors']['ds']
-                        capture = replace(capture, address=0x100, registers=regs,
-                                          guest_ram=bytes(ram), table_context=tables)
-                        (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
-                        (root/'lift.c').write_text(asm_to_c.translate(record) + '''
-unsigned null_read(ef_lift_state *s, unsigned segment) {
-    (void)ef_read_segment(s, segment, 0x2000u, 32);
-    return s->fault;
-}
-''')
-                        library_path = root/('null%d_%d.so' % (index, selector))
-                        subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99',
-                                        '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
-                                        str(root/'lift.c'), '-o', str(library_path)],
-                                       check=True, capture_output=True)
-                        library = ctypes.CDLL(str(library_path))
-                        function = library.ef_lift_00000100
-                        function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
-                        function.restype = ctypes.c_uint
-                        result = asm_c_differential.isolated_probes(
-                            function, b'', 0x100, 1, 100, False, captured=capture)[0]
-                        self.assertEqual(result['state'], 'pass', result)
-                        memory = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
-                        state = asm_c_differential.State(
-                            (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
-                            regs['eflags'], 0x100, 0, memory, len(ram))
-                        state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
-                        state.segment_profile = 1
-                        for n, name in enumerate(asm_to_c.SEGMENTS):
-                            state.segment_cache[n] = asm_c_differential.Segment(
-                                *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
-                        self.assertEqual(function(ctypes.byref(state), 100), 0)
-                        cache = state.segment_cache[index]
-                        self.assertEqual((cache.selector, cache.base, cache.limit,
-                                          cache.access, cache.flags), (selector, 0, 0, 0, 0))
-                        null_read = library.null_read
-                        null_read.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint]
-                        null_read.restype = ctypes.c_uint
-                        before = (list(state.r), state.flags, bytes(memory))
-                        self.assertEqual(null_read(ctypes.byref(state), index), 7)
-                        self.assertEqual((list(state.r), state.flags, bytes(memory)), before)
+                    for form in ('mov', 'pop', 'popw'):
+                        with self.subTest(segment=segment, selector=selector, form=form):
+                            source = ('mov eax,%d\nmov %s,ax\nret' % (selector, segment) if form == 'mov' else
+                                      '%s %d\n%s %s\nret' %
+                                      ('pushw' if form == 'popw' else 'push',
+                                       selector if form == 'popw' else selector | 0xabcd0000, form, segment))
+                            image, record = assemble(root, source)
+                            capture = fixture()
+                            ram = bytearray(capture.guest_ram)
+                            ram[:image.stat().st_size] = image.read_bytes()
+                            regs = dict(capture.registers, eip=0x100)
+                            tables = copy.deepcopy(capture.table_context)
+                            regs[segment] = 7
+                            tables['descriptors'][segment] = tables['descriptors']['ds']
+                            capture = replace(capture, address=0x100, registers=regs,
+                                              guest_ram=bytes(ram), table_context=tables)
+                            (root/'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
+                            (root/'lift.c').write_text(asm_to_c.translate(record) + '''
+    unsigned null_read(ef_lift_state *s, unsigned segment) {
+        (void)ef_read_segment(s, segment, 0x2000u, 32);
+        return s->fault;
+    }
+    ''')
+                            library_path = root/('null%d_%d_%s.so' % (index, selector, form))
+                            subprocess.run(['cc', '-shared', '-fPIC', '-O2', '-std=c99',
+                                            '-Wall', '-Wextra', '-Werror', '-Wno-unused-function',
+                                            str(root/'lift.c'), '-o', str(library_path)],
+                                           check=True, capture_output=True)
+                            library = ctypes.CDLL(str(library_path))
+                            function = library.ef_lift_00000100
+                            function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32]
+                            function.restype = ctypes.c_uint
+                            result = asm_c_differential.isolated_probes(
+                                function, b'', 0x100, 1, 100, False, captured=capture)[0]
+                            self.assertEqual(result['state'], 'pass', result)
+                            memory = (ctypes.c_uint8 * len(ram)).from_buffer(ram)
+                            state = asm_c_differential.State(
+                                (ctypes.c_uint32 * 8)(*[regs[n] for n in asm_to_c.REGS]),
+                                regs['eflags'], 0x100, 0, memory, len(ram))
+                            state.segment[:] = [regs[n] for n in asm_to_c.SEGMENTS]
+                            state.segment_profile = 1
+                            for n, name in enumerate(asm_to_c.SEGMENTS):
+                                state.segment_cache[n] = asm_c_differential.Segment(
+                                    *asm_segments.descriptor(regs[name], tables['descriptors'][name]))
+                            self.assertEqual(function(ctypes.byref(state), 100), 0)
+                            cache = state.segment_cache[index]
+                            self.assertEqual((cache.selector, cache.base, cache.limit,
+                                              cache.access, cache.flags), (selector, 0, 0, 0, 0))
+                            null_read = library.null_read
+                            null_read.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint]
+                            null_read.restype = ctypes.c_uint
+                            before = (list(state.r), state.flags, bytes(memory))
+                            self.assertEqual(null_read(ctypes.byref(state), index), 7)
+                            self.assertEqual((list(state.r), state.flags, bytes(memory)), before)
+                            if form != 'mov':
+                                # A bad stack extent must fault before changing
+                                # the selector/cache or advancing ESP.
+                                state.fault = 0
+                                state.pc = next(i['address'] for i in record['instructions']
+                                                if i['mnemonic'] in ('pop', 'popw'))
+                                state.r[4] = regs['esp']
+                                state.segment_cache[2].limit = regs['esp']
+                                before = (list(state.r), list(state.segment), state.flags,
+                                          bytes(state.segment_cache), bytes(memory))
+                                self.assertEqual(function(ctypes.byref(state), 1), 7)
+                                self.assertEqual((list(state.r), list(state.segment), state.flags,
+                                                  bytes(state.segment_cache), bytes(memory)), before)
+                                # Only the selector word is fetched, even
+                                # when POP advances the 32-bit stack by four.
+                                state.fault = 0
+                                state.segment_cache[2].access = 0xf3
+                                state.segment_cache[2].limit = regs['esp'] + 1
+                                memory[regs['esp']] = selector
+                                memory[regs['esp'] + 1] = 0
+                                self.assertEqual(function(ctypes.byref(state), 1), 1)
+                                self.assertEqual(state.r[4], regs['esp'] + (2 if form == 'popw' else 4))
+                                self.assertEqual(state.segment[index], selector)
 
     def test_restore_privilege_memory_tables_and_physical_x87(self):
         from unicorn import UcError, x86_const
