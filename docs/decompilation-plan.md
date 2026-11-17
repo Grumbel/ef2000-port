@@ -9604,3 +9604,33 @@ operand tampering, negative encodings/targets and historical-v1 reading.
 TranslationTests.test_synthetic_programs_match_registers_flags_and_all_ram
 passes with an added conditional TEST/MOV overlap fixture and randomized
 register/flag inputs. Tracker and diff checks pass. No gameplay run was used.
+
+### 2026-11-17: restore the shading draft's recovered memory effect
+
+The existing handwritten shade_lookup_c6428 draft omitted the store recovered
+in the preceding boundary repair. `decomp/src/misc_drafts1.c` now stores the
+translated byte to guest 0x15908a before returning it. Its comment and probe
+extent now use the complete 21-byte body and explicitly limit this interface
+to DF=0, without original register/flag clobber compatibility.
+
+Inspection also invalidates the historical confirmed signature: the original
+reads ESI, not EAX, and writes AX, ESI and EBX. signatures.tsv records those
+instruction-level observations and the unverified caller/wrapper ABI. The
+tracker entry is returned to drafted/unverified; a successfully compiled
+pointer-based C draft must not imply a confirmed original register ABI.
+The emitted ABI header now omits the old incorrect one-output pragma for this
+function; no runtime replacement is installed.
+
+`local/asm-shade-tail-20261117/draft.py` extracts the production C function
+and compiles it with the production memory header for a bounded host mapping.
+All 64 original/C comparisons pass for return AL, updated ESI and complete
+RAM, including the restored result store: eight input words, four shade
+index offsets and two incoming flag images, all with DF clear. This is
+narrower evidence than the separately generated explicit-state C's 96
+full-state comparisons; it does not validate other registers, arithmetic
+flags, faults or DF=1 for the handwritten draft.
+
+`python3 tools/ef2000_wcc.py decomp/src/misc_drafts1.c --compiler <pinned
+wcc386> --output local/asm-shade-tail-20261117/misc_drafts1.obj` compiles the
+entire production module with zero warnings/errors after the ABI correction.
+Tracker and diff checks pass. No gameplay run, splice or replay is claimed.
