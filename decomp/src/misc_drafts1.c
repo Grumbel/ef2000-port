@@ -3504,7 +3504,7 @@ uint32_t lseek_fa95f(uint32_t handle, uint32_t offset, uint32_t whence)
     in[6] = 0u;
     guest_dos_int_x(0x21u, (uint32_t)(uintptr_t)in, (uint32_t)(uintptr_t)out, (uint32_t)(uintptr_t)sregs);
     if (out[6] != 0u) {
-        guest_fn_1101e8_x(out[0] & 0xffffu);
+        (void)report_dos_error_1101e8(out[0] & 0xffffu);
         return 0xffffffffu;
     }
     return ((out[3] & 0xffffu) << 16) | (out[0] & 0xffffu);
@@ -23762,7 +23762,7 @@ uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count)
 		position = ((out[3] & 0x7fffu) << 16) |
 		           (out[0] & 0xffffu) | (out[6] ? 0x80000000u : 0u);
 		if ((position & 0x80000000u) != 0u) {
-			guest_fn_1101e8_x(position & 0xffffu);
+			(void)report_dos_error_1101e8(position & 0xffffu);
 			return 0xffffffffu;
 		}
 	}
@@ -23770,11 +23770,11 @@ uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count)
 	/* The 32-bit RCL/ROR pair replaces EAX bit 31 with carry. */
 	out[0] = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
 	if ((out[0] & 0x80000000u) != 0u) {
-		guest_fn_1101e8_x(out[0] & 0xffffu);
+		(void)report_dos_error_1101e8(out[0] & 0xffffu);
 		return 0xffffffffu;
 	}
 	if (out[0] != count)
-		guest_fn_ebe6d(0xcu);
+		store_through_ebd30(0xcu);
 	return out[0];
 }
 

@@ -10363,3 +10363,23 @@ Watcom -bt=dos -3r -zp1 -za99 -w1 -we compiles key_helpers1.c cleanly.
 Reproducer: local/dos-error-source-20261117/check.py; report SHA-256
 1af0188f5437d2fa440e251ef69cfb07bd42648a6a2bc2aa0226e20233565e0e.
 Tracker and diff checks pass. No gameplay runs.
+
+### 2026-11-17 — Connect file wrappers to recovered error helpers
+
+Replace unresolved 1101e8 aliases in seek 0xfa95f and write 0x110393 with
+report_dos_error_1101e8, and use recovered store_through_ebd30 for the write
+short-count errno update. This connects those error paths to recovered C.
+The extracted seek/write functions compile cleanly with Watcom -bt=dos -3r
+-zp1 -za99 -w1 -we (the marshalling helper has an external declaration).
+Connected original-Unicorn/source-host comparisons pass 108 seek cases and
+96 write cases, using real recovered error translation, error stores and
+address helpers on both sides. Return EAX, RAM excluding guest stack scratch,
+and service traces match. Only DOS interrupts and write slot lookup are
+stubbed; seek host pointer marshalling is intercepted. This strengthens the
+previous wrapper-only evidence but does not validate full ABI, actual services
+or splice/replay. No tracker promotion or gameplay runs.
+Reproducers: local/dos-seek-cluster-20261117/check.py and
+local/dos-write-cluster-20261117/check.py. Report SHA-256 respectively:
+ffe865d1413bc96940e0e4d97f5847146da2ba4242596c05e20660deab09ca19,
+47a360783be88ad2c48213c8fec4c943725eed0b50f1e35decd1db1e4794fad3.
+Tracker and diff checks pass.
