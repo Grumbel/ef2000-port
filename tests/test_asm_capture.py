@@ -62,6 +62,15 @@ class AsmCaptureTests(unittest.TestCase):
             'push eax\npop dword ptr ds:[0x2000]\nret',
             'push ebp\nmov ebp,esp\nsub esp,16\nleave\nret',
             'push ebp\nmov ebp,esp\nleave\nret',
+            'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\nrep movsb\nret',
+            'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\nrep movsd\nret',
+            'mov edi,0x2200\nmov ecx,4\nrep stosw\nret',
+            'mov esi,0x2000\nlodsd\nret',
+            'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\nrepe cmpsb\nret',
+            'mov edi,0x2200\nmov ecx,4\nrepne scasb\nret',
+            'mov esi,0x2003\nmov edi,0x2203\nmov ecx,4\nstd\nrep movsb\ncld\nret',
+            'mov esi,0x2000\nmov edi,0x2200\nmov ecx,4\nfs rep movsb\nret',
+            'mov esi,0\nmov edi,0\nmov ecx,0\nrep movsd\nret',
         ]
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -76,7 +85,7 @@ class AsmCaptureTests(unittest.TestCase):
                     regs = dict(capture.registers, eip=0x100, ebp=0x2100)
                     tables = copy.deepcopy(capture.table_context)
                     # Non-null FS for the explicit override load.
-                    if number in (4, 8):
+                    if number in (4, 8, 24):
                         regs['fs'] = 7
                         tables['descriptors']['fs'] = tables['descriptors']['ds']
                     # Execute-only CS permits instruction fetch, not data loads.
@@ -104,7 +113,7 @@ class AsmCaptureTests(unittest.TestCase):
                         self.assertIn('C status 7', result['differences'][0])
                     else:
                         self.assertEqual(result['state'], 'pass', result)
-                    if number in (0, 7, 10, 14, 15, 16):
+                    if number in (0, 7, 10, 14, 15, 16, 17):
                         # Test the generated access path, not only the helper:
                         # A scalar, XLAT or stack access outside its limit must stop before
                         # changing EAX, flags, or any RAM.
@@ -123,6 +132,12 @@ class AsmCaptureTests(unittest.TestCase):
                             state.segment_cache[3].limit = 0x2002 if number == 0 else 0x2000
                         if number == 10:
                             state.segment_cache[2].limit = regs['esp'] - 4
+                        if number == 17:
+                            # A failing REP iteration must not consume its count.
+                            state.pc = next(i['address'] for i in record['instructions']
+                                            if i['mnemonic'] == 'rep')
+                            state.r[6], state.r[7], state.r[1] = 0x2000, 0x2200, 4
+                            state.segment_cache[3].limit = 0x2000
                         if number in (15, 16):
                             # Isolate LEAVE with a failing saved-frame read.
                             state.pc = next(i['address'] for i in record['instructions']

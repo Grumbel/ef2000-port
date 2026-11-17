@@ -8384,3 +8384,23 @@ extent reject without changing registers, flags or RAM. Validation:
 tests.test_asm_capture and tests.test_asm_c_program in the matching Nix
 Python/Unicorn environment; tracker check; git diff --check. No gameplay
 or UI runs; the reliable bulk translation goal remains open.
+
+### 2026-11-17 — Translate descriptor-backed string accesses
+
+MOVS/CMPS/LODS now retain the decoded source segment, including overrides;
+MOVS/STOS/CMPS/SCAS use ES for their destination access. Generated memory
+reads/writes go through the cached descriptor helpers, removing the blanket
+descriptor-mode string/REP rejection. Non-ES destination metadata is rejected.
+The accepted 32-bit addressing forms, REP step budgeting, DF direction,
+comparison termination, and zero-count no-access behavior remain unchanged.
+
+Synthetic captured-state comparisons cover byte/dword copies, word fills,
+loads, REPE comparisons, REPNE scans, backward copies, FS source overrides,
+and zero-count copies with otherwise invalid offsets. A first-iteration
+source-limit failure preserves registers (including ECX/ESI/EDI), flags and
+RAM. This does not claim exception-delivery or later-iteration REP fault
+rollback equivalence. Validation: tests.test_asm_capture,
+tests.test_asm_c_program and the synthetic instruction comparison matrix in
+tests.test_asm_to_c; tracker check; git diff --check. No gameplay or UI runs.
+ENTER, PUSHA/POPA, far loads, WAIT/x87 and descriptor reloads remain unwired;
+reliable bulk translation remains incomplete.

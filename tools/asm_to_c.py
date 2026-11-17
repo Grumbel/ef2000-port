@@ -571,18 +571,22 @@ def string_instruction_c(mnemonic, text, repeat, pc, next_pc):
     }
     if not valid.get(mnemonic):
         raise Unsupported('unsupported string addressing')
+    destination_operand = first if mnemonic in ('movs', 'stos') else second
+    if mnemonic != 'lods' and destination_operand[3] != SEGMENTS.index('es'):
+        raise Unsupported('string destination must use ES')
+    source_operand = first if mnemonic == 'cmps' else second
     code = []
     if repeat:
         code.append('if (!s->r[1]) { s->pc = 0x%xu; break; }' % next_pc)
     if mnemonic in ('movs', 'lods', 'cmps'):
-        code.append('a = ef_read(s, s->r[6], %d);' % width)
+        code.append('a = ef_read_segment(s, %d, s->r[6], %d);' % (source_operand[3], width))
     elif mnemonic in ('stos', 'scas'):
         code.append('a = %s;' % read(accumulator, width))
     if mnemonic in ('cmps', 'scas'):
-        code.append('b = ef_read(s, s->r[7], %d);' % width)
+        code.append('b = ef_read_segment(s, 0, s->r[7], %d);' % width)
     code.append('if (s->fault) return s->fault;')
     if mnemonic in ('movs', 'stos'):
-        code += ['ef_write(s, s->r[7], %d, a);' % width, 'if (s->fault) return s->fault;']
+        code += ['ef_write_segment(s, 0, s->r[7], %d, a);' % width, 'if (s->fault) return s->fault;']
     elif mnemonic == 'lods':
         code.append(write(accumulator, 'a', width))
     else:
@@ -1024,7 +1028,6 @@ def translate(record, *, starts=None, renderer=instruction_c):
     starts = local_starts if starts is None else starts
     cases = []
     unwired = {'pusha', 'popa', 'enter',
-               'movs', 'cmps', 'stos', 'lods', 'scas', 'rep', 'repz', 'repnz',
                'les', 'lds', 'lss', 'lfs', 'lgs', 'wait'}
     for i in instructions:
         code = renderer(i, starts)
