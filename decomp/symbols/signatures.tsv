@@ -3522,3 +3522,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00034d94	shutdown_menu_session_34d94			ebx,ecx,edx,esi,edi,ebp	0	Original 131-byte body saves EBX/ECX/EDX; callees preserve ESI/EDI/EBP; callers 34f30@34f79 and 3527c@352c7 ignore EAX; close a7990 takes one stack argument with RET4.
 0x00034844	accept_network_mission_name_34844	EAX:ef_addr32		ebx,edx,esi,edi,ebp	0	Original ASM reads EAX+27; saves EBX/EDX/ESI; callees preserve EDI/EBP; callback pointer 12b5c0, no direct inventory callers; EAX/ECX scratch.
 0x000337ec	show_serial_settings_337ec	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 156-byte body saves EBX/ECX/EDX; callees preserve ESI/EDI/EBP; callback pointer 12b628; no direct inventory callers; EAX scratch.
+0x00033888	show_modem_settings_33888	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 228-byte body saves EBX/ECX/EDX; callees preserve ESI/EDI/EBP; callback pointer 12b630; no direct inventory callers; EAX scratch.

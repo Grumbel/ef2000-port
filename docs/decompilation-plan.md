@@ -10897,3 +10897,27 @@ decomp/src/serial_settings.c --compiler <pinned-wcc386>
 --output local/serial-settings-20261117.obj; pinned-Unicorn Python
 local/serial-settings-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: recover modem settings display 0x33888
+
+Recover the 228-byte EAX-root callback in modem_settings.c. Inspect original
+ASM, callback pointer at 0x12b630 and baud helper 0xdf2b0 preservation (no direct
+inventory callers). Display port index+1 without byte wrap, rate, FIFO mode
+text and selected FIFO length or static '-'. Preserve formatting before each
+lookup and re-read FIFO mode/index after the final lookup; do not add index
+bounds checks absent from the original. Record globals and signature.
+
+Clean Watcom compile. In 162 original/emitted-body scoped comparisons, match
+traces/text, saved registers, ESP and complete RAM except code placement and
+stack scratch. Explicit callee models cover three port values including 255,
+three FIFO modes, three length indices, rates 0/9600/-1 and lookup mutation
+that toggles FIFO enabled state and changes length index. Actual callees,
+scratch EAX, flags and stack scratch remain outside the proof; no binary
+identity or splice/replay claim. Retain hybrid exclusion. Evidence:
+local/modem-settings-source-20261117/report.json SHA-256
+7851611c2290d3a7417b7c46a866cb2a1c20b3adaa62e50288e778e5579e8c99.
+Tracker: 3430 compiles, 802 blocked. Commands: tools/ef2000_wcc.py
+decomp/src/modem_settings.c --compiler <pinned-wcc386>
+--output local/modem-settings-20261117.obj; pinned-Unicorn Python
+local/modem-settings-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

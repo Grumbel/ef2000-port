@@ -533,3 +533,6 @@ addr	size	type	name	evidence	notes
 0x0013579b	17	char[17]	g_network_mission_name	0x34844 original ASM	Destination name; validator accepts at most sixteen source bytes
 0x001357b8	2	uint16_t	g_network_socket_number	0x337ec original ASM	Zero and ffff display as ----, other values use four-digit hex
 0x001357b6	1	uint8_t	g_network_channel_number	0x337ec original ASM	Zero-extended byte formatted as decimal after socket show
+0x0015f07f	1	uint8_t	g_serial_port_index	0x33888 original ASM	Zero-extended then incremented to format port number
+0x0015f099	1	uint8_t	g_serial_fifo_mode	0x33888 original ASM	Indexes mode text; zero disables FIFO length display
+0x0015f09a	1	uint8_t	g_serial_fifo_length_index	0x33888 original ASM	Indexes dword table at 335b0 without bounds check
