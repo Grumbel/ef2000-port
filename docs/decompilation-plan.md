@@ -12097,3 +12097,12 @@ sharded dispatchers also record whether that PC is in the generated
 instruction registry. Prepared and captured probes retain the original
 mismatch classification. The synthetic indirect-call regression checks
 that a stop at an excluded function is reported as unregistered.
+
+2026-11-18 — Traced the original first prepared input for each of 0x1d318
+and 0x5331c with 5 MiB RAM. Both complete after entering 0xd6960 and taking
+its early return via 0xd6b70. Neither executes 0xd66c2 or reaches a host
+service. Translated execution stops at the callback entry because direct
+dependency closure excludes it. The blocker is STI at 0xd6745 in
+0xd66c2, on the path that polls game port 0x201. Updated both tracker
+notes with the specific dependency and preserved their states. Trace
+evidence: `local/ghidra-callback-leaf-20261118/joystick-callback-paths.json`.
