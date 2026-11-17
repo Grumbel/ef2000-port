@@ -23755,16 +23755,22 @@ uint32_t dos_write_110393(uint32_t handle, uint32_t buffer, uint32_t count)
 	uint32_t out[7];
 	uint32_t flags = lookup_slot_11024e((int32_t)handle);
 	if ((flags & 0x80u) != 0u) {
+		uint32_t position;
 		run_dos_int_ex(0x21u, 0x4202u, handle, 0u, 0u, out);
-		if (out[6] != 0u) {
-			guest_fn_1101e8_x(out[0] & 0xffffu);
-			return out[0];
+		/* RCL/ROR DX moves carry into position bit 31, dropping DX bit 15. */
+		position = ((out[3] & 0x7fffu) << 16) |
+		           (out[0] & 0xffffu) | (out[6] ? 0x80000000u : 0u);
+		if ((position & 0x80000000u) != 0u) {
+			guest_fn_1101e8_x(position & 0xffffu);
+			return 0xffffffffu;
 		}
 	}
 	run_dos_int_ex(0x21u, 0x4000u, handle, count, buffer, out);
-	if (out[6] != 0u) {
+	/* The 32-bit RCL/ROR pair replaces EAX bit 31 with carry. */
+	out[0] = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
+	if ((out[0] & 0x80000000u) != 0u) {
 		guest_fn_1101e8_x(out[0] & 0xffffu);
-		return out[0];
+		return 0xffffffffu;
 	}
 	if (out[0] != count)
 		guest_fn_ebe6d(0xcu);

@@ -10308,3 +10308,22 @@ blocked rows. `python3 -m unittest tests.test_decomp_status` passes 11 tests,
 including overlapping dependencies, duplicate roots, missing inventory entries
 and rejection of duplicate report addresses. Tracker and diff checks pass.
 No gameplay runs.
+
+### 2026-11-17 — repair DOS write error translation
+
+Auditing high-impact interrupt roots found a semantic mismatch in the existing
+0x110393 C draft: both seek and write errors returned the raw service value
+instead of the ffffffff returned through 0x1101e8. Preserve the original RCL/ROR
+encoding too: write EAX bit31 is replaced by carry. Correct the ABI record:
+EBX and EDX are scratch; ECX/ESI/EDI/EBP are preserved. The original preserves
+EDX across its error translation and short-write notification helpers.
+The corrected function, extracted with declarations and a compile-only service
+stub, compiles without diagnostics with Watcom -bt=dos -3r -zp1 -za99 -w1 -we.
+96 original-Unicorn/source-host comparisons pass for return EAX and ordered
+semantic boundary/helper calls, covering append/no-append, seek/write carry,
+zero/error/exact-count/high-bit returns and three DX patterns. Services and
+helpers are explicit matching stubs; full register/flag ABI, RAM and actual DOS
+behavior are not validated. No tracker promotion and no gameplay runs.
+Reproducer: local/dos-write-source-20261117/check.py; report SHA-256
+6ed01c81cd8ea3837043402c90f8a713ed3da73bdb09fff29f5522212f2cbf51.
+Tracker validation and git diff --check pass.
