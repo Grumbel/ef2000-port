@@ -12009,3 +12009,9 @@ compiles in roughly 2 MiB units under the same optimization and warning
 flags. Each unit has a recorded digest and a compiler log marker. The
 forced multi-unit synthetic probe exercises cross-unit dispatch and
 service rejection through the linked library.
+
+2026-11-18 — Added optional parallel host compilation via `--jobs`.
+The split build's OpenWatcom and probe stages remain independent of
+that setting. All 64 generator and lifter tests passed with the initial
+split build. The forced split service probe also passed with two host
+compiler workers.

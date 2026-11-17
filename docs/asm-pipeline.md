@@ -247,7 +247,8 @@ The standalone per-body lifter still requires static code from its caller.
 Host compilation groups complete, hash-checked sources into translation units
 of approximately 2 MiB or less and links them into one probe library. A single
 larger source stays intact. Units share the stateless runtime helpers within
-each group, and the report records each unit's SHA-256. OpenWatcom continues
+each group, and the report records each unit's SHA-256. Use `--jobs N` to
+compile independent host units concurrently. OpenWatcom continues
 compiling each body and dispatcher as separate objects. The original single-unit
 guard validation passed six focused build/program tests, including code mutation
 with otherwise identical outputs. The guarded 1,178-body corpus reproduces

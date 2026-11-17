@@ -1081,7 +1081,7 @@ ret
             evidence = root / 'evidence'
             with patch.object(asm_c_differential, 'HOST_UNIT_BYTES', 1):
                 report = asm_c_differential.verify(out, evidence, image, scenarios=1,
-                                                   service_free_paths=True)
+                                                   service_free_paths=True, jobs=2)
             units = report['host_translation_units_sha256']
             self.assertGreater(len(units), 1)
             for name, digest in units.items():

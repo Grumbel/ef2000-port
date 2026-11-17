@@ -12,6 +12,7 @@ artifacts and proprietary RAM remain under ignored local/.
 
 import argparse
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor
 import ctypes
 import hashlib
 import json
@@ -518,7 +519,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
 HOST_UNIT_BYTES = 2 * 1024 * 1024
 
 
-def compile_host_library(sources, directory, output, compiler, needs_native, libraries):
+def compile_host_library(sources, directory, output, compiler, needs_native, libraries, jobs):
     """Group complete sources to bound the optimizer's working set."""
     units = []
     parts = []
@@ -539,19 +540,30 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
         flags += ['-D_GNU_SOURCE', '-D' + asm_to_c.asm_x87.NATIVE_ENABLE]
     library = output / 'translations.so'
     digests = {}
+    written_units = []
+    for index, content in enumerate(units):
+        name = 'translations' if len(units) == 1 else f'translations_{index:04d}'
+        unit = output / (name + '.c')
+        data = content.encode()
+        unit.write_bytes(data)
+        digests[unit.name] = hashlib.sha256(data).hexdigest()
+        written_units.append(unit)
+
+    def compile_unit(unit):
+        obj = unit.with_suffix('.o')
+        log_path = unit.with_suffix('.log')
+        with log_path.open('w') as log:
+            result = subprocess.run([compiler, *flags, '-c', str(unit), '-o', str(obj)],
+                                    stdout=log, stderr=subprocess.STDOUT)
+        return unit, obj, log_path, result
+
     objects = []
-    with (output / 'compile.log').open('w') as log:
-        for index, content in enumerate(units):
-            name = 'translations' if len(units) == 1 else f'translations_{index:04d}'
-            unit = output / (name + '.c')
-            obj = output / (name + '.o')
-            data = content.encode()
-            unit.write_bytes(data)
-            digests[unit.name] = hashlib.sha256(data).hexdigest()
-            log.write(f'Compiling {unit.name}\n')
+    with (output / 'compile.log').open('w') as log, ThreadPoolExecutor(max_workers=jobs) as pool:
+        for unit, obj, log_path, result in pool.map(compile_unit, written_units):
+            log.write(f'Compiled {unit.name} (exit {result.returncode})\n')
+            log.write(log_path.read_text(errors='replace'))
             log.flush()
-            subprocess.run([compiler, *flags, '-c', str(unit), '-o', str(obj)],
-                           stdout=log, stderr=subprocess.STDOUT, check=True)
+            result.check_returncode()
             objects.append(obj)
         log.write(f'Linking {library.name}\n')
         log.flush()
@@ -562,7 +574,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
-           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False):
+           watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1):
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
     payload = image.read_bytes()
@@ -581,8 +593,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if (manifest.get('model') not in ('flat-x86-explicit-state', 'flat-x86-program-explicit-state') or
             manifest.get('payload_sha256') != hashlib.sha256(payload).hexdigest()):
         raise ValueError('translation payload provenance mismatch')
-    if scenarios < 1 or budget < 1:
-        raise ValueError('scenarios and budget must be positive')
+    if scenarios < 1 or budget < 1 or jobs < 1:
+        raise ValueError('scenarios, budget and jobs must be positive')
     runtime = directory / 'ef_lift_state.h'
     if manifest.get('runtime_sha256') != hashlib.sha256(runtime.read_bytes()).hexdigest():
         raise ValueError('translation runtime digest mismatch')
@@ -670,7 +682,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         libraries.append(output / 'narrow-backend/narrow.so')
     if binary_backend:
         libraries.append(output / 'binary-backend/binary.so')
-    library, host_units = compile_host_library(sources, directory, output, compiler, needs_native, libraries)
+    library, host_units = compile_host_library(sources, directory, output, compiler, needs_native, libraries, jobs)
     loaded = ctypes.CDLL(str(library.resolve()))
     comparison_profile = (native_x87.comparison_profile if native_x87 is not None else
                           asm_x87_oracle.unicorn_comparison_profile())
@@ -743,6 +755,7 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--budget', type=int, default=10000)
     parser.add_argument('--capture', type=Path, action='append', default=[],
@@ -757,7 +770,7 @@ def main(argv=None):
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
-                        service_free_paths=args.service_free_paths)
+                        service_free_paths=args.service_free_paths, jobs=args.jobs)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
