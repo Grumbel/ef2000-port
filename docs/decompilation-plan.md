@@ -11094,3 +11094,28 @@ this is syntactic coverage with explicit service obligations, not verification.
 Tracker unchanged. Commands: pinned-Unicorn Python -m unittest
 tests.test_asm_c_program; full inventory generate(..., port_boundaries=True);
 new-body syntax checks; python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17: share VGA DAC policy with generated port execution
+
+Extract the hybrid's existing 3c8/3c9 DAC write behavior into runtime/vga_dac.hpp
+and use it from Machine::port_out. Preserve AL index selection, six-bit data
+masking, 768-component wrap and advance-after-successful-store ordering.
+Add an explicit generated-state port service adapter that validates the request
+encoding, continuation, port and palette bounds before changing anything.
+Accept only scalar OUT to 3c8/3c9; reject IN, other ports, malformed requests and
+invalid spans with 0x122 unchanged. The caller supplies the mapped palette
+address: hybrid DOS palette storage is outside payload RAM, so do not silently
+substitute a payload address. Generated callers must wire this adapter explicitly.
+
+Pinned-Unicorn Python -m unittest tests.test_asm_vga_port_service: 2 PASS.
+Native C++ checks cover 780 writes and all accumulator widths, mask/wrap,
+register/flag preservation, high DX/AX bits, invalid spans/continuations/requests
+and failed-store cursor preservation. An emitted-C 780-component loop using the
+actual adapter matches original instruction execution under the prior hybrid
+DAC policy in all GPRs, flags and full RAM. This is shared-policy evidence,
+not real VGA hardware fidelity, replay verification or function promotion.
+
+Also pass tests.test_asm_dos_file_service, tracker check and diff check.
+Hybrid runtime passes c++ -std=c++17 -Wall -Wextra -Werror -fsyntax-only with
+installed Unicorn/OpenSSL includes (non-SDL configuration). No desktop/UI tests.
+Tracker unchanged; palette adapter does not implement retrace/keyboard/gameport.

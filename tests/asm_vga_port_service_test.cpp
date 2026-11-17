@@ -1,0 +1,77 @@
+// SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
+// SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
+#include "asm_vga_port_service.hpp"
+#include <array>
+#include <cassert>
+#include <cstring>
+
+int main()
+{
+    std::array<uint8_t, 4096> ram{};
+    ef_lift_state state{};
+    state.memory = ram.data(); state.memory_size = ram.size();
+    state.flags = 0xad7;
+    for (unsigned i = 0; i < 8; ++i) state.r[i] = 0xaabb0000u + i;
+    EfAsmVgaPortContext context{{}, 0x800};
+    auto send = [&](uint16_t port, uint32_t value, unsigned width) {
+        state.r[0] = value; state.r[2] = 0xbeef0000u | port;
+        ram[0x100] = width == 16 ? 0x66 : width == 8 ? 0xee : 0xef;
+        ram[0x101] = 0xef;
+        const unsigned length = width == 16 ? 2 : 1;
+        state.pc = 0x100 + length;
+        const auto before = state;
+        assert(ef_asm_vga_port_service(&state, 0x100,
+               0x1000 | (length << 8) | (width == 8 ? 0xee : 0xef), &context) == 0);
+        assert(std::memcmp(&state, &before, sizeof state) == 0);
+    };
+    // All palette entries, six-bit masking, word/dword forms, and wrap to zero.
+    send(0x3c8, 0xdead00ff, 8);
+    auto expected = ram;
+    unsigned cursor = 765;
+    for (unsigned i = 0; i < 780; ++i) {
+        const unsigned width = i % 3 == 0 ? 8 : i % 3 == 1 ? 16 : 32;
+        send(0x3c9, 0xface0000u | i, width);
+        expected[0x100] = ram[0x100]; expected[0x101] = ram[0x101];
+        expected[0x800 + cursor] = i & 63;
+        cursor = (cursor + 1) % 768;
+        assert(ram == expected);
+        assert(context.dac.cursor() == cursor);
+    }
+    // Cursor selection uses only AL, independent of OUT's accumulator width.
+    for (unsigned width : {8u, 16u, 32u}) {
+        send(0x3c8, 0xffff0102, width);
+        assert(context.dac.cursor() == 6);
+    }
+    auto reject = [&](unsigned request, uint32_t ip, void* configured) {
+        auto before = state;
+        const auto bytes = ram;
+        const auto cursor_before = context.dac.cursor();
+        assert(ef_asm_vga_port_service(&state, ip, request, configured) == 0x122);
+        assert(std::memcmp(&state, &before, sizeof state) == 0);
+        assert(ram == bytes);
+        assert(context.dac.cursor() == cursor_before);
+    };
+    state.pc = 0x101; ram[0x100] = 0xee; state.r[2] = 0x3c9;
+    reject(0x11ee, 0x100, nullptr);
+    reject(0x21, 0x100, &context);
+    reject(0x11ec, 0x100, &context); // IN has no implementation here.
+    reject(0x12ee, 0x100, &context); // Incorrect encoded length.
+    reject(0x11ef, 0x100, &context); // Opcode mismatch.
+    reject(0x11ee, 0xffffffff, &context);
+    state.pc = 0x102;
+    reject(0x11ee, 0x100, &context); // Wrong continuation.
+    state.pc = 0x101; state.r[2] = 0x201;
+    reject(0x11ee, 0x100, &context);
+    state.r[2] = 0x3c9; context.palette_address = 0xffffffff;
+    reject(0x11ee, 0x100, &context);
+    context.palette_address = ram.size() - 6; // Cursor 6 is just out of bounds.
+    reject(0x11ee, 0x100, &context);
+    // Immediate OUT ports cannot address 3c8/3c9.
+    ram[0x100] = 0xe6; ram[0x101] = 0xc9; state.pc = 0x102;
+    reject(0x12e6, 0x100, &context);
+    // A failed backing-store callback does not advance the shared DAC.
+    ef2000::VgaDac dac;
+    try { dac.write(0x3c9, 1, [](uint32_t, uint8_t) { throw 1; }); }
+    catch (int) {}
+    assert(dac.cursor() == 0);
+}

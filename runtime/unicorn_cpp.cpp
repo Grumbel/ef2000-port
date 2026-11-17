@@ -5,6 +5,7 @@
 // calls stop explicitly; the proprietary executable is only read at runtime
 // and is never linked into the program.
 #include "dos_drive.hpp"
+#include "vga_dac.hpp"
 #include "dos_clock.hpp"
 #include "bios_disk.hpp"
 #include "gamepad_profile.hpp"
@@ -1805,7 +1806,7 @@ private:
     std::set<int> keys_pressed_;
     std::deque<uint8_t> scan_queue_;
     std::deque<uint16_t> bios_keys_;
-    uint32_t vga_dac_cursor_{};
+    ef2000::VgaDac vga_dac_;
     uint32_t irq_return_sp_{}, irq_resume_ip_{};
     uc_hook eoi_hook_{};
     std::vector<uc_hook> capture_hooks_;
@@ -3334,12 +3335,9 @@ private:
             return;
         }
         if (port == 0x60) { keyboard_ack_ = true; return; }
-        if (port == 0x3c8) { vga_dac_cursor_ = (value & 255) * 3; return; }
-        if (port == 0x3c9) {
-            write_value<uint8_t>(DOS_BASE + 0xf1000 + vga_dac_cursor_, value & 63);
-            vga_dac_cursor_ = (vga_dac_cursor_ + 1) % 768;
-            return;
-        }
+        if (vga_dac_.write(port, value, [this](uint32_t index, uint8_t component) {
+                write_value<uint8_t>(DOS_BASE + 0xf1000 + index, component);
+            })) return;
         if (port == 0x201) { charge_joystick(); return; }
         if (port == 0x61) return;
         char message[80];
