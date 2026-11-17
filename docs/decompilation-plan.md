@@ -10383,3 +10383,21 @@ local/dos-write-cluster-20261117/check.py. Report SHA-256 respectively:
 ffe865d1413bc96940e0e4d97f5847146da2ba4242596c05e20660deab09ca19,
 47a360783be88ad2c48213c8fec4c943725eed0b50f1e35decd1db1e4794fad3.
 Tracker and diff checks pass.
+
+### 2026-11-17 — Connect file-slot lookup and device query
+
+Use is_device_handle_1101be directly from lookup_slot_11024e instead of its
+unresolved guest alias. The extracted lookup compiles with Watcom -bt=dos -3r
+-zp1 -za99 -w1 -we without diagnostics. The connected write cluster now executes
+recovered lookup, device query, error translation, stores and address helpers;
+only DOS services remain stubbed. 128 original-Unicorn/source-host comparisons
+pass for return EAX, RAM excluding stack scratch and semantic service traces.
+Cases cover append/no-append, seek/write carry, four result values and four
+DX device-word patterns including character-device bit 7. IOCTL comparison
+includes operation and handle, excluding ECX/EDX: the C query initializes
+those registers whereas the original retains scratch values, and the modeled
+service ignores them. Thus this is service-relative evidence, not full register
+ABI or actual DOS-service equivalence. No tracker promotion or gameplay runs.
+Reproducer: local/dos-file-cluster-20261117/check.py; report SHA-256
+806fce07c6c8446dfdc1434c0918b87540e1727f0c5928941b1bf33f60d2c9f3.
+Tracker and diff checks pass.

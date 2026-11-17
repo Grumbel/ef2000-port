@@ -137,7 +137,7 @@ uint32_t lookup_slot_11024e(int32_t index)
         table = EF_U32(0x0017d614u);
         if (!(EF_U8(table + (uint32_t)index * 4u + 1u) & 0x40u)) {
             EF_U8(table + (uint32_t)index * 4u + 1u) |= 0x40u;
-            if (guest_fn_1101be((uint32_t)index) != 0) {
+            if (is_device_handle_1101be((uint32_t)index) != 0) {
                 table = EF_U32(0x0017d614u);
                 EF_U8(table + (uint32_t)index * 4u + 1u) |= 0x20u;
             }
