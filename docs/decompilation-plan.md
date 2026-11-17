@@ -11397,3 +11397,33 @@ tools/asm_c_program.py --inventory local/asm-latest-body-inventory-20261117
 Regression validation: pinned-Unicorn Python -m unittest
 tests.test_asm_to_c tests.test_asm_c_program: 58/58 PASS; focused CLI
 suite: 3/3 PASS. No original-function equivalence promotion.
+
+### 2026-11-17 — Recover network service window initialization
+
+Recover 3396c (361 bytes) as network_service_window.c. EAX supplies the root;
+all six other general registers are saved/restored. Callback pointer 12bb78
+is the only payload pointer occurrence and no direct inventory callers were
+found. The disassembly establishes three root/name lookups, a separate named
+dialog lookup, selected-provider display, host-title creation and widget
+position updates. Preserve sign-extension of AX on each classification scan
+iteration (including backward wrap at 32768), byte-wrapped classification
+index, uppercase/append call order, and flag reads after preceding callbacks.
+The final inactive nonhost branch clears the title with the original word
+store. Existing widget struct assertion covers text pointer offset 27.
+
+Watcom compilation is warning-free. Private checker executes actual emitted
+Watcom code versus original ASM in 129 cases: provider/host/session/gate and
+callback-mutation combinations, empty/ordinary/leading-space/high-byte names,
+and a 32768-space signed-index wrap case. Both sides execute original strcpy
+9d749, uppercase a4421 and strcat 9ca57; only widget operations and the literal
+formatter are modeled. Compare normalized traces, six saved GPRs, ESP and
+whole 5 MiB RAM excluding code placement and stack scratch. Scratch EAX,
+flags, stack contents, malformed overflowing titles, real UI integration and
+splice/replay remain unproved. State compiles, retain hybrid exclusion.
+Tracker: 3439 compiles / 793 blocked (455224 blocked body bytes).
+Private report local/network-service-window-source-20261117/report.json,
+SHA-256 80922ae3301de9fa8951cea4e7d0444db1926be2c3d3ae20f9fa06d73f5981a8.
+Commands: tools/ef2000_wcc.py decomp/src/network_service_window.c --compiler
+<pinned-wcc386> --output local/network-service-window-20261117.obj;
+pinned-Unicorn Python local/network-service-window-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

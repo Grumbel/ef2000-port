@@ -551,3 +551,6 @@ addr	size	type	name	evidence	notes
 0x0013579a	1	uint8_t	g_network_driver_mode	0x34bcc original ASM	Mode 3 requires data-file check before communication initialization.
 0x001357bc	4	uint32_t	g_selected_network_loop	0x34bcc original ASM	Status 14 removes matching four-entry values then reloads this after settings write for error display.
 0x001357ba	1	uint8_t	g_network_player_fields_enabled	0x33c64 original ASM	Zero clears server/name/type fields after resetting related controls; semantic name provisional.
+0x00125937	1	char[]	g_network_provider_display_name	0x3396c original ASM	String shown when provider-selected flag is set; only first-byte extent recorded.
+0x00125902	1	uint8_t	g_network_service_clear_gate	0x3396c original ASM	Nonzero suppresses final inactive nonhost field clearing; semantic name provisional.
+0x0019f566	2	char[]	g_network_session_title	0x3396c original ASM	Host title receives uppercase trimmed name plus suffix; inactive path writes empty-string word; only minimum two-byte extent known.

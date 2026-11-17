@@ -7727,3 +7727,8 @@ void change_network_loop_345e8(ef_addr32 widget);
 #ifdef __WATCOMC__
 #pragma aux change_network_loop_345e8 parm [eax] modify [eax]
 #endif
+
+void initialize_network_service_window_3396c(ef_addr32 root);
+#ifdef __WATCOMC__
+#pragma aux initialize_network_service_window_3396c parm [eax] modify [eax]
+#endif
