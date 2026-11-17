@@ -11278,3 +11278,33 @@ Commands: tools/ef2000_wcc.py decomp/src/serial_status_window.c --compiler
 <pinned-wcc386> --output local/serial-status-window-20261117.obj;
 pinned-Unicorn Python local/serial-status-window-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — recover network initialization dispatcher 0x34bcc
+
+Recover 215-byte initialize_network_dialog_34bcc after reading original ASM
+and private pseudo-C. No inputs: EAX overwritten before use; saves EBX/ECX/EDX,
+normal callees preserve ESI/EDI/EBP. Sole direct inventory caller 3448c and
+callback table pointer 12b5d8; return ignored. Mode 3 checks files first;
+initialize-comms AL 0 sets session flag and refreshes; 22 refreshes; 14 removes
+all matching four-entry values, compacts, writes settings and displays loop
+error; remaining statuses dispatch dialog state. Reload selected value after
+settings before formatting. Error dialog lookup returns EAX root and preserves
+EDX name / EBX local-text address for apply_to_widget; express all arguments
+explicitly with confirmed helper signatures.
+
+Pinned Watcom compile: zero warnings. 2048 scoped original/emitted-body
+comparisons pass with explicit callee models: all 256 status bytes, mode 2/3,
+file-check success/failure, selected zero/nonzero with duplicate table entries.
+Models mutate selection during initialization, compaction and settings write
+to check reload timing. Compare call traces (local formatted text by content),
+six saved GPRs, ESP and RAM except code placement/stack scratch. Actual callees,
+EAX scratch, flags and stack scratch remain unproved. No binary identity,
+splice/replay or universal equivalence claim; retain hybrid exclusion.
+Tracker: 3436 compiles / 796 blocked. Private report
+local/network-initialization-source-20261117/report.json SHA-256
+ae47ea07fc951e9e27f7905f30310b2a07007bb2d0597da10594d691e4b57fe0.
+Commands: tools/ef2000_wcc.py decomp/src/network_initialization.c --compiler
+<pinned-wcc386> --output local/network-initialization-20261117.obj;
+pinned-Unicorn Python local/network-initialization-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

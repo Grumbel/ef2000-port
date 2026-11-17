@@ -548,3 +548,5 @@ addr	size	type	name	evidence	notes
 0x0015f690	4	ef_addr32	g_serial_command_text	0x33b5c original ASM	Pending command text pointer.
 0x0015f694	1	uint8_t	g_serial_command_pending	0x33b5c original ASM	Cleared only when pending and command pointer nonzero.
 0x0015f695	1	uint8_t	g_serial_reply_pending	0x33b5c original ASM	Cleared only when pending and reply pointer nonzero.
+0x0013579a	1	uint8_t	g_network_driver_mode	0x34bcc original ASM	Mode 3 requires data-file check before communication initialization.
+0x001357bc	4	uint32_t	g_selected_network_loop	0x34bcc original ASM	Status 14 removes matching four-entry values then reloads this after settings write for error display.

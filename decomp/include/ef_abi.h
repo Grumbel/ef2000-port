@@ -7712,3 +7712,8 @@ void refresh_serial_status_33b5c(ef_addr32 root);
 #ifdef __WATCOMC__
 #pragma aux refresh_serial_status_33b5c parm [eax] modify [eax]
 #endif
+
+void initialize_network_dialog_34bcc(void);
+#ifdef __WATCOMC__
+#pragma aux initialize_network_dialog_34bcc modify [eax]
+#endif
