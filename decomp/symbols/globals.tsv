@@ -539,3 +539,5 @@ addr	size	type	name	evidence	notes
 0x00428cf4	4	int32_t	g_network_service_count	0x340a4 original ASM	Signed iteration count; low word also determines content height
 0x00428cf0	4	uint32_t	g_selected_network_service	0x34140 original ASM	Parsed one-based number minus one, unchecked index into 65-byte name slots
 0x00125936	1	uint8_t	g_network_provider_selected	0x34140 original ASM	Set after selected provider name is shown
+0x00195af0	256	uint8_t[]	g_character_class_table	0x344bc/0x33ee8 original ASM	Indexed by byte-wrapped character plus one; masks differ between decimal channel and hexadecimal socket validators.
+0x00182bbc	3	char[]	g_decimal_scan_format	0x344fa cdecl scanner argument	Decimal signed integer conversion format.

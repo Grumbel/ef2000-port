@@ -11224,3 +11224,30 @@ Commands: tools/asm_c_program.py --inventory local/asm-latest-body-inventory-202
 --workspace local/ghidra-offset-tail-20261117 --output local/asm-port-reachability-20261117
 --interrupt-boundaries --port-boundaries; pinned-Unicorn Python -m unittest
 tests.test_asm_c_program; python3 tools/decomp_status.py check; git diff --check.
+
+
+### 2026-11-17 — recover network channel callback 0x344bc
+
+Recover 206-byte EAX-widget callback change_network_channel_344bc, registered
+at table slot 0x12b5a0 with no direct inventory callers. Original ASM and
+private pseudo-C read; original is authoritative. Saves EBX/ECX/EDX/ESI,
+normal callees preserve EDI/EBP, EAX scratch. Reuse asserted widget text offset.
+Validate at most three characters via byte-wrapped class index and mask 0x22;
+reject empty input, test scanner AL for success, require signed parsed value
+1..255 and difference from current channel. Preserve clear-session, shutdown,
+byte store, settings write order and unconditional network refresh.
+
+Pinned Watcom compile: zero warnings. 432 original/emitted-body comparisons
+with explicit parser/session models match call traces, six saved GPRs, ESP,
+and RAM excluding code placement and stack scratch. Cover empty/valid/invalid
+and high-byte text, ignored fourth character, signed range extremes, scanner
+results 0/1/101 and current channel 1/255. Actual scanner and device callees,
+EAX scratch, flags and stack scratch remain unproved; no byte identity,
+splice/replay or universal equivalence claim. Keep hybrid exclusion. Tracker:
+3434 compiles, 798 blocked. Private report
+local/network-channel-settings-source-20261117/report.json SHA-256
+72ff9dc06ce22175d579d1b438eeabbe04accb3b31e62b0a250355606d04d321.
+Commands: tools/ef2000_wcc.py decomp/src/network_channel_settings.c --compiler
+<pinned-wcc386> --output local/network-channel-settings-20261117.obj;
+pinned-Unicorn Python local/network-channel-settings-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.

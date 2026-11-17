@@ -7702,3 +7702,8 @@ void change_network_socket_33ee8(ef_addr32 widget);
 #pragma aux outp_117b0c parm [eax] [edx] modify [eax edx]
 #pragma aux guest_fn_117b0c parm [eax] [edx] modify [eax edx]
 #endif
+
+void change_network_channel_344bc(ef_addr32 widget);
+#ifdef __WATCOMC__
+#pragma aux change_network_channel_344bc parm [eax] modify [eax]
+#endif
