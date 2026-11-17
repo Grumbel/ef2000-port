@@ -242,6 +242,38 @@ class OracleTests(unittest.TestCase):
                 self.assertEqual(result['state'], 'pass', result)
                 self.assertTrue(result['original_x87']['operations'])
 
+    def test_save_and_restore_full_state(self):
+        from tests.test_asm_c_x87 import seeded_x87
+        sequences = ('fnsave [0x300100]\nret',
+                     'fnsave [0x300100]\nfldz\nfrstor [0x300100]\nret')
+        for source in sequences:
+            with self.subTest(source=source), tempfile.TemporaryDirectory() as temporary:
+                payload, function = self.compiled(Path(temporary), source)
+                for top in range(8):
+                    for control, sticky in ((0x37f, 0x21), (0x37e, 0x8081)):
+                        initial = dict(seeded_x87(), x87_control=control,
+                                       x87_status=(top << 11) | 0x4500 | sticky,
+                                       x87_tag=0xffe4)
+                        initial['x87'] = [[0, 0, 0x8000], [0, 0x80000000, 0x3fff],
+                                          [1, 0xc0000000, 0x7fff]] + [[i, 0, 0] for i in range(5)]
+                        result = self.compare(function, payload, initial_x87=initial)
+                        self.assertEqual(result['state'], 'pass', result)
+
+    def test_restore_normalizes_raw_image_and_preserves_empty_payloads(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            payload, function = self.compiled(Path(temporary), 'frstor [0x2000]\nret')
+            registers = [[0, 0, 0x8000], [0, 0x80000000, 0x3fff],
+                         [1, 0xc0000000, 0x7fff], [1, 0, 0],
+                         [0, 0x80000000, 0], [0, 0, 0x3fff],
+                         [1, 0, 0x1234], [0, 0, 0]]
+            for top in range(8):
+                for control in (0xffff, 0x37e):
+                    image = oracle.pack(dict(x87_control=control,
+                                             x87_status=(top << 11) | 0xc781,
+                                             x87_tag=0xc000, x87_opcode=0x321, x87=registers))
+                    result = self.compare(function, payload.ljust(0x2000, b'\0') + image)
+                    self.assertEqual(result['state'], 'pass', result)
+
     def test_signed_integer_comparison_matches_native_state(self):
         for width, values in (('word', (-32768, 0, 32767)),
                               ('dword', (-2147483648, 0, 2147483647))):

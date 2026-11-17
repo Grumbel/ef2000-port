@@ -663,6 +663,94 @@ static unsigned ef_x87_compare_memory(ef_lift_state *s, uint32_t address, unsign
 }
 '''
 
+ENVIRONMENT_RUNTIME = r'''
+/* FSAVE uses little-endian words and stores ST(0)..ST(7) in logical order. */
+static void ef_x87_image_put(uint8_t *p, uint32_t value, unsigned width) {
+    unsigned byte;
+    for (byte = 0; byte < width; ++byte) p[byte] = (uint8_t)(value >> (byte * 8));
+}
+static uint32_t ef_x87_image_get(const uint8_t *p, unsigned width) {
+    uint32_t value = 0;
+    unsigned byte;
+    for (byte = 0; byte < width; ++byte) value |= (uint32_t)p[byte] << (byte * 8);
+    return value;
+}
+
+static void ef_x87_init(ef_lift_state *s) {
+    s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;
+    s->x87_ip = 0; s->x87_cs = 0; s->x87_dp = 0; s->x87_ds = 0; s->x87_opcode = 0;
+}
+
+static void ef_x87_store_image_registers(ef_lift_state *s, uint8_t *image) {
+    unsigned logical;
+    for (logical = 0; logical < 8; ++logical) {
+        uint8_t *slot = image + 28 + 10 * logical;
+        const uint32_t *value = s->x87[ef_x87_index(s, logical)];
+        ef_x87_image_put(slot, value[0], 4);
+        ef_x87_image_put(slot + 4, value[1], 4);
+        ef_x87_image_put(slot + 8, value[2], 2);
+    }
+}
+
+static void ef_x87_load_image_registers(ef_lift_state *s, const uint8_t *image) {
+    unsigned logical;
+    for (logical = 0; logical < 8; ++logical) {
+        const uint8_t *slot = image + 28 + 10 * logical;
+        uint32_t *value = s->x87[ef_x87_index(s, logical)];
+        value[0] = ef_x87_image_get(slot, 4);
+        value[1] = ef_x87_image_get(slot + 4, 4);
+        value[2] = ef_x87_image_get(slot + 8, 2);
+    }
+}
+
+static unsigned ef_x87_environment(ef_lift_state *s, uint32_t address,
+                                   unsigned segment, unsigned save) {
+    uint8_t *image;
+    unsigned i, tag;
+    if (!save && ((s->x87_status & 0x80u) || (s->x87_status & ~s->x87_control & 0x3fu))) return 8;
+    if (ef_check_segment(s, segment, address, 108, segment == 2 ? 3 + save : save))
+        return s->fault;
+    if (s->memory_size < 108 || address > s->memory_size - 108) {
+        s->fault = 3;
+        return 3;
+    }
+    image = s->memory + address;
+    if (save) {
+        ef_x87_image_put(image, s->x87_control | 0xffff0000u, 4);
+        ef_x87_image_put(image + 4, s->x87_status | 0xffff0000u, 4);
+        ef_x87_image_put(image + 8, s->x87_tag | 0xffff0000u, 4);
+        ef_x87_image_put(image + 12, s->x87_ip, 4);
+        ef_x87_image_put(image + 16, s->x87_cs, 2);
+        ef_x87_image_put(image + 18, s->x87_opcode & 0x7ffu, 2);
+        ef_x87_image_put(image + 20, s->x87_dp, 4);
+        ef_x87_image_put(image + 24, s->x87_ds | 0xffff0000u, 4);
+        ef_x87_store_image_registers(s, image);
+        ef_x87_init(s);
+    } else {
+        s->x87_control = (ef_x87_image_get(image, 2) & 0x1f3fu) | 0x40u;
+        s->x87_status = ef_x87_image_get(image + 4, 2) & 0x7f7fu;
+        if (s->x87_status & ~s->x87_control & 0x3fu) s->x87_status |= 0x8080u;
+        s->x87_tag = ef_x87_image_get(image + 8, 2);
+        s->x87_ip = ef_x87_image_get(image + 12, 4);
+        s->x87_cs = ef_x87_image_get(image + 16, 2);
+        s->x87_opcode = ef_x87_image_get(image + 18, 2) & 0x7ffu;
+        s->x87_dp = ef_x87_image_get(image + 20, 4);
+        s->x87_ds = ef_x87_image_get(image + 24, 2);
+        ef_x87_load_image_registers(s, image);
+        /* Restoring a nonempty register reconstructs its value class. */
+        for (i = 0; i < 8; ++i) {
+            tag = (s->x87_tag >> (2 * i)) & 3u;
+            if (tag != 3u) {
+                s->x87_tag &= ~(3u << (2 * i));
+                s->x87_tag |= ef_x87_classify(s->x87[i]) << (2 * i);
+            }
+        }
+    }
+    return 0;
+}
+'''
+
+
 NATIVE_BACKEND = 'native-x87-register-v1'
 NATIVE_DEFINE = '#define EF_LIFT_NEEDS_NATIVE_X87 1\n'
 NATIVE_ENABLE = 'EF_LIFT_ENABLE_NATIVE_X87'
@@ -706,25 +794,11 @@ def native_runtime():
 #error EF_LIFT_ENABLE_NATIVE_X87 requires GNU Linux x86 or OpenWatcom 386
 #endif
 
-/* FSAVE uses little-endian words and stores ST(0)..ST(7) in logical order. */
-static void ef_x87_image_put(uint8_t *p, uint32_t value, unsigned width) {
-    unsigned byte;
-    for (byte = 0; byte < width; ++byte) p[byte] = (uint8_t)(value >> (byte * 8));
-}
-static uint32_t ef_x87_image_get(const uint8_t *p, unsigned width) {
-    uint32_t value = 0;
-    unsigned byte;
-    for (byte = 0; byte < width; ++byte) value |= (uint32_t)p[byte] << (byte * 8);
-    return value;
-}
 #endif
 
 static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
 #if defined(EF_LIFT_ENABLE_NATIVE_X87)
     uint8_t saved[108], image[108] = {0};
-    uint8_t *slot;
-    uint32_t *value;
-    unsigned logical;
 #if defined(__linux__)
     sigset_t blocked, original;
     struct rusage before, after;
@@ -735,13 +809,7 @@ static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
     ef_x87_image_put(image + 4, s->x87_status, 2);
     ef_x87_image_put(image + 8, s->x87_tag, 2);
     ef_x87_image_put(image + 18, s->x87_opcode, 2);
-    for (logical = 0; logical < 8; ++logical) {
-        slot = image + 28 + 10 * logical;
-        value = s->x87[ef_x87_index(s, logical)];
-        ef_x87_image_put(slot, value[0], 4);
-        ef_x87_image_put(slot + 4, value[1], 4);
-        ef_x87_image_put(slot + 8, value[2], 2);
-    }
+    ef_x87_store_image_registers(s, image);
 #if defined(__linux__)
     /* Signal return and preemption can lose hardware x87 metadata on AMD. */
     if (sigfillset(&blocked) || sigprocmask(SIG_BLOCK, &blocked, &original)) return 9;
@@ -766,13 +834,7 @@ static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
     s->x87_status = ef_x87_image_get(image + 4, 2);
     s->x87_tag = ef_x87_image_get(image + 8, 2);
     s->x87_opcode = ef_x87_image_get(image + 18, 2) & 0x7ffu;
-    for (logical = 0; logical < 8; ++logical) {
-        slot = image + 28 + 10 * logical;
-        value = s->x87[ef_x87_index(s, logical)];
-        value[0] = ef_x87_image_get(slot, 4);
-        value[1] = ef_x87_image_get(slot + 4, 4);
-        value[2] = ef_x87_image_get(slot + 8, 2);
-    }
+    ef_x87_load_image_registers(s, image);
     return 0;
 #else
     (void)s;

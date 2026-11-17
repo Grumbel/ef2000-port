@@ -11944,3 +11944,16 @@ modes. All twelve oracle tests passed. Bulk generation now yields
 entries (5,368 body bytes) compiled without OpenWatcom diagnostics.
 The report is under `local/asm-fscale-20261118/`. The largest
 remaining x87 root body contains both FNSAVE and FRSTOR.
+
+2026-11-18 — Added pure-C FNSAVE and FRSTOR for the 32-bit
+108-byte protected-mode image. Native differential checks compare
+the image bytes, full x87 state, and surrounding RAM across all
+TOP positions, including pending exceptions on the nonwaiting
+save and raw restore images with inconsistent tags. The oracle
+and whole-program generator suites passed all 47 tests. A synthetic
+save/restore fixture with an enabled native register operation
+compiled without OpenWatcom diagnostics. Bulk generation increased
+syntactically supported bodies from 4,260 to 4,261 and kept the closed
+set at 3,701. The body at 0x10848c now resolves through 0x118910 to
+0x11f7ef, where sixteen INT 06h instructions remain unsupported.
+The bulk report is under `local/asm-x87-save-20261118/`.

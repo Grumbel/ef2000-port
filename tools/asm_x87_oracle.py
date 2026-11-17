@@ -25,12 +25,16 @@ SEGMENTS = ('ES', 'CS', 'SS', 'DS', 'FS', 'GS')
 FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',
               x87_ip='FIP', x87_cs='FCS', x87_dp='FDP', x87_ds='FDS', x87_opcode='FOP')
 PREFIXES = {0x26: 'ES', 0x2e: 'CS', 0x36: 'SS', 0x3e: 'DS', 0x64: 'FS', 0x65: 'GS'}
+SAVE = 0xdd36
+RESTORE = 0xdd26
+
 # (opcode, ModRM group): (operand bytes, may write operand, nonwaiting).
 MEMORY = {(0xd9, 0): (4, False, False), (0xd9, 2): (4, True, False),
           (0xd9, 3): (4, True, False), (0xd9, 5): (2, False, False),
           (0xd9, 7): (2, True, True), (0xdd, 0): (8, False, False),
           (0xdd, 2): (8, True, False), (0xdd, 3): (8, True, False),
-          (0xdd, 7): (2, True, True), (0xdb, 0): (4, False, False),
+          (0xdd, 7): (2, True, True), (0xdd, 6): (108, True, True),
+          (0xdd, 4): (108, False, False), (0xdb, 0): (4, False, False),
           (0xdb, 5): (10, False, False), (0xdb, 7): (10, True, False),
           (0xdf, 0): (2, False, False), (0xdf, 5): (8, False, False)}
 MEMORY.update({(0xdf, 2): (2, True, False), (0xdf, 3): (2, True, False),
@@ -188,13 +192,16 @@ def restore(cpu, values):
         cpu.reg_write(getattr(x, 'UC_X86_REG_'+name), values[field])
 
 
-def pack(values):
+def pack(values, *, guest_pointers=False):
     state = bytearray(108)
     for offset, key in ((0, 'x87_control'), (4, 'x87_status'), (8, 'x87_tag')):
         struct.pack_into('<H', state, offset, values[key])
     # Distinct relocation sentinels identify unchanged metadata, independently
     # of guest pointers/selectors and the native operation's actual address.
     struct.pack_into('<IHHIH', state, 12, 0xdecaf001, 0x1234, values['x87_opcode'], 0xdecaf002, 0x5678)
+    if guest_pointers:
+        struct.pack_into('<IHHIH', state, 12, values['x87_ip'], values['x87_cs'],
+                         values['x87_opcode'], values['x87_dp'], values['x87_ds'])
     top = (values['x87_status'] >> 11) & 7
     for logical in range(8):
         low, high, exp = values['x87'][(top+logical) & 7]
@@ -261,7 +268,7 @@ class Native:
         if not nonwaiting and (values['x87_status'] & 0x80 or
                                values['x87_status'] & ~values['x87_control'] & 0x3f):
             raise Unavailable('pending original x87 exception delivery')
-        initial = pack(values)
+        initial = pack(values, guest_pointers=operation == SAVE)
         input_ = (ctypes.c_uint8*108).from_buffer(initial)
         out = (ctypes.c_uint8*108)()
         operand = (ctypes.c_uint8*len(data)).from_buffer_copy(data) if data else (ctypes.c_uint8*1)()
@@ -330,9 +337,14 @@ class Binding:
         data = bytes(cpu.mem_read(op['address'], op['width'])) if 'address' in op else b''
         result, written, ax, native_pc, native_dp, retries = self.native.execute(op['operation'], values, data, registers['EAX'])
         self.interrupted += retries
-        if op['operation'] == 0xdbe3:
+        if op['operation'] in (0xdbe3, SAVE):
             if any(result[key] for key in ('x87_ip', 'x87_cs', 'x87_opcode', 'x87_dp', 'x87_ds')):
-                raise Unavailable('unexpected native FNINIT environment')
+                raise Unavailable('unexpected reset x87 environment')
+        elif op['operation'] == RESTORE:
+            ip, cs, fop, dp, ds = struct.unpack_from('<IHHIH', data, 12)
+            if (result['x87_ip'], result['x87_cs'], result['x87_opcode'],
+                    result['x87_dp'], result['x87_ds']) != (ip, cs, fop & 0x7ff, dp, ds):
+                raise Unavailable('unexpected native restored x87 environment')
         else:
             if result['x87_ip'] == 0xdecaf001 and result['x87_cs'] == 0x1234:
                 result.update(x87_ip=values['x87_ip'], x87_cs=values['x87_cs'])

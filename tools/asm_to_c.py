@@ -411,7 +411,7 @@ static void ef_divide(ef_lift_state *s, uint32_t divisor, unsigned width,
 #endif
 '''
 RUNTIME = RUNTIME.replace('\n#endif\n', '\n' + asm_x87.STACK_RUNTIME + asm_x87.MEMORY80_RUNTIME +
-                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.ROUND_RUNTIME + asm_x87.COMPARE_RUNTIME + '\n#endif\n')
+                          asm_x87.REAL_LOAD_RUNTIME + asm_x87.INTEGER_LOAD_RUNTIME + asm_x87.INTEGER_STORE_RUNTIME + asm_x87.ROUND_RUNTIME + asm_x87.COMPARE_RUNTIME + asm_x87.ENVIRONMENT_RUNTIME + '\n#endif\n')
 RUNTIME += asm_x87.NARROW_RUNTIME + asm_x87.BINARY_RUNTIME + asm_x87.native_runtime()
 
 
@@ -911,10 +911,20 @@ def instruction_c(insn, starts):
         if insn['bytes'] != '9b':
             raise Unsupported('unsupported WAIT encoding')
         code.append('if (s->x87_status & 0x80u) return 8;')
+    elif mnemonic in ('fnsave', 'frstor'):
+        op = operand(text)
+        save = mnemonic == 'fnsave'
+        try:
+            segment, _ = asm_x87.memory_encoding(insn, 0xdd, 6 if save else 4)
+        except ValueError as error:
+            raise Unsupported(str(error)) from error
+        if op[0] != 'mem' or width_of(op) is not None or op[3] != segment:
+            raise Unsupported('unsupported x87 environment operand')
+        code.append('a = ef_x87_environment(s, %s, %d, %d); if (a) return a;' %
+                    (op[1], segment, save))
     elif mnemonic == 'fninit' and not text:
         # FNINIT marks registers empty but preserves their physical contents.
-        code += ['s->x87_control = 0x37fu; s->x87_status = 0; s->x87_tag = 0xffffu;',
-                 's->x87_ip = 0; s->x87_cs = 0; s->x87_dp = 0; s->x87_ds = 0; s->x87_opcode = 0;']
+        code.append('ef_x87_init(s);')
     elif mnemonic == 'fnclex' and not text:
         code.append('s->x87_status &= 0x7f00u;')
     elif mnemonic in ('fnstcw', 'fnstsw', 'fldcw'):
