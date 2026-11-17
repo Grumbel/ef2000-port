@@ -9883,3 +9883,30 @@ The combined `tests.test_asm_capture`, `tests.test_asm_segments` and
 also run through the public differential comparison path (eight whole calls).
 A separate original-only regression reloads selector 7 and subsequently
 changes its descriptor, checking that the observer retains the loaded cache.
+
+### 2026-11-17: extend captured whole-call evidence to six segment-using leaves
+
+Regenerated complete explicit-state bodies for strcat 0x9ca57, strlen
+0xb1b8b, memcpy 0xdc832, memcmp 0xed115, far strnlen 0xed542 and memmove
+0x109e6f from the normalized latest body inventory. All six compile with
+pinned Watcom (`-q -bt=dos -3r -za99 -w1 -we`) without diagnostics.
+`local/asm-segment-cluster-20261117/check.py` compares 36 captured whole calls
+per body against original execution: 216 pass, zero mismatches or
+inconclusive results in the final report. The comparisons include complete
+2-MiB RAM, GPRs, flags, selectors, observed modeled caches and x87 state.
+
+The input grid uses counts 0,1,2,3,4,7,8,15,31 and four buffer/flag variants.
+Copy/move cases include overlapping buffers in both directions; strcat uses
+separate buffers with four alignments. Far strnlen loads selector 7 and
+includes termination before its bound. DF is clear on entry; memmove's
+backward path executes STD and restores CLD. These are bounded samples,
+not universal equivalence or coverage of exceptional inputs. An exploratory
+strcat grid with overlapping buffers exhausted the original instruction
+budget in 17 cases and was inconclusive; the final grid replaces those with
+separate-buffer alignment cases, without treating the earlier runs as passes.
+
+The final report records source/object hashes for all six bodies. SHA-256:
+`00e149ad461921becb5a9a9679a05fbbb5513db75cb70f5f54881e6450529207`.
+Tracker validation and diff checks pass. This adds evidence for generated
+whole bodies, not for the existing handwritten drafts or byte-identical
+recompilation. No tracker promotion, runtime integration or replay is claimed.
