@@ -11910,3 +11910,16 @@ diagnostics are among the eight observed transcendental and remainder
 instructions. This is a prioritization figure from the reported root
 reasons. It does not predict how many bodies will generate after those
 instructions are implemented.
+
+2026-11-18 — Prototyped an isolated FSIN operation using a 108-byte
+x87 save image. The host build matched the native oracle for control,
+status, tags and all eight raw registers in 160 cases across all TOP
+positions and rounding modes. OpenWatcom compiled the equivalent
+pragma with zero diagnostics and wdis confirmed the 32-bit FNSAVE,
+FRSTOR, FSIN, FNSAVE, FRSTOR sequence. A synthetic DOS/4G signed-zero
+fixture ran in DOSBox-X with SDL dummy drivers and returned the expected
+control, status, tag and sign bytes. Private reproduction is in
+`local/x87-native-prototype/`. Both implementations use the executing
+CPU or emulator's x87 semantics. Generator integration still needs an
+explicit target contract, pending-exception handling and tests for host
+state isolation and guest instruction metadata.
