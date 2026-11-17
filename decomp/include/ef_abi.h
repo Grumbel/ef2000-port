@@ -7737,3 +7737,8 @@ void load_credits_window_371b0(ef_addr32 widget);
 #ifdef __WATCOMC__
 #pragma aux load_credits_window_371b0 parm [eax] modify [eax]
 #endif
+
+void refresh_network_controls_33630(void);
+#ifdef __WATCOMC__
+#pragma aux refresh_network_controls_33630 parm [] modify [eax]
+#endif

@@ -11458,3 +11458,32 @@ Commands: tools/ef2000_wcc.py decomp/src/credits_window.c --compiler
 <pinned-wcc386> --output local/credits-window-20261117.obj;
 pinned-Unicorn Python local/credits-window-source-20261117/check.py;
 python3 tools/decomp_status.py check; git diff --check.
+
+### 2026-11-17 — Recover shared network control refresh
+
+Recover 33630 as network_controls.c, including its separate 33dbe..33e78
+range (328 total body bytes). The old boundary-split blocker is resolved
+against the existing independently decoded two-range inventory. No register
+inputs; save/restore EBX/ECX/EDX, with other GPRs preserved by callees. Audit
+34480@34496 and 33e78@33e8e callers (the latter retains ECX dialog); inventory
+has 17 direct call/tail sites. All selection flags are computed before
+refresh_all_widgets_a4c84 and apply/status calls. Preserve signed upper-half
+1357ae interpretation (int16 at 1357b0), exact positive/negative threshold
+branches and original callback ordering. Reuse existing named globals.
+
+Warning-free Watcom compile. Scoped actual emitted-body versus original
+noncontiguous ASM comparison: 384 PASS across four binary globals, six
+signed counts (-32768,-1,0,1,2,32767), two irrelevant low-half patterns and
+callbacks optionally changing every input global. A first comparison exposed
+an inverted primary-control condition in the draft; corrected to match the
+authoritative branches before retaining evidence. Compare traces, six saved
+GPRs, ESP and 5 MiB RAM excluding code placement and stack scratch. Widget
+refresh/apply/status callees are modeled; scratch EAX, flags, stack and real
+integration/splice/replay are unproved. Keep hybrid excluded, state compiles.
+Tracker: 3441 compiles / 791 blocked / 454735 blocked body bytes.
+Private report local/network-controls-source-20261117/report.json, SHA-256
+a64cce7587f62e757bf5b34d40ea79f5a3315f473b1f2dceb2282e006f0fda7a.
+Commands: tools/ef2000_wcc.py decomp/src/network_controls.c --compiler
+<pinned-wcc386> --output local/network-controls-20261117.obj;
+pinned-Unicorn Python local/network-controls-source-20261117/check.py;
+python3 tools/decomp_status.py check; git diff --check.
