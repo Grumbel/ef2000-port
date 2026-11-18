@@ -13410,3 +13410,9 @@ The sweep exercises one path from each entry, so paths requiring
 different pointers or runtime state need additional evidence. See
 bulk-gameport-bios-full.jsonl and bulk-gameport-bios-direct-video-mode.jsonl
 under local/ghidra-group-followup-20261118.
+
+A 500,000-instruction replay of the 76 budget stops produced 14 more
+complete matches. Of the remaining 62 cases, 56 still exhaust the
+original budget, five reach unmapped memory, and one reaches an x87
+encoding the original oracle does not model. See
+bulk-gameport-bios-budget-replay.jsonl in the same local directory.
