@@ -14925,3 +14925,26 @@ Run the local probe with
 The report `bulk-cpu-boundaries-list-count-cohort.json` retains the
 fixtures, machine-state comparisons and service transcripts. SHA-256
 `2b52a06d577d34d98cf0d07de1f0eb1346da3832467209b74a9d8e6fa33c2672`.
+
+#### Verify bulk relationship lookup with initialized group records
+
+Eight default probes faulted at 0xcc1b5 because the relationship-list
+head did not point to an initialized record. A prepared list with one
+group and a signed relationship-byte array gives 13 matches through
+return across ten entries in the 4,363-entry candidate.
+
+The lookup at 0xcc1ac matches for a negative byte, a neutral byte,
+a reserved index and a missing group. The fixture also exercises
+filtered counting (0xb0850), the two x87 ratio checks (0xb0c34 and
+0xb0c9c), and relationship-driven map writes (0xcb3c4 and 0xcb55c).
+The group processors at 0xc03b4 and 0xc0624 match after the
+relationship test succeeds and the kind or coordinate gate rejects
+the record. Both folds from the preceding batch (0xc02ec and 0xc0534)
+also reach those processors and return identically. Full processing
+after the kind and coordinate checks and in-game replays remain pending.
+
+Run the local probe with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-relationship-cohort.py`.
+The report `bulk-cpu-boundaries-relationship-cohort.json` retains the
+inputs and outcomes. SHA-256
+`af5ece74effccd13233a4eef31cfe843839c7145ac0f411fcfbf18c329d710ea`.
