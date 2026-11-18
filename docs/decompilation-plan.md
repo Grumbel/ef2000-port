@@ -14291,3 +14291,19 @@ because the latched count stays fixed.
 The complete prepared-match total reaches 3,902 of 4,354 generated
 entries. See replay-bulk-gameport-bios-pit-latch.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare positive PIT-backed delays
+
+Nine prepared probes at 0xe1110, 0xe1130 and 0xe115c match through
+return for delays 1, 3 and 7. The fixture prepares the PIT clock
+callback's initialized state and advances its BIOS tick cell every
+one, two or three clock reads. Both sides execute the original clock
+algorithm with deterministic PIT latch values. Each probe records the
+same number of clock calls and two channel-zero reads per call.
+The 0xe115c cases complete the trailing wait that exceeded the budget
+with a fixed clock.
+
+The complete prepared-match total reaches 3,903 of 4,354 generated
+entries. The fixture leaves real-time timer delivery untested. See
+replay-bulk-gameport-bios-pit-progress.py and its JSONL output under
+local/ghidra-group-followup-20261118.
