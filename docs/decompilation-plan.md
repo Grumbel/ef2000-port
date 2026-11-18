@@ -14215,3 +14215,17 @@ This extends coverage for an already matched entry. The complete-match
 total stays at 3,890 of 4,354 generated entries. See
 replay-bulk-gameport-bios-decode-multiblock.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare VFX1 orientation updates
+
+The default probes for 0xd9ba0, 0x93e58 and 0x94000 send AX=0x0070 to
+the mouse driver because the device prefix is zero. With the VFX1 prefix
+0x6000 and BX=0x0301, the existing real-mode VFX1 model handles the
+request. Each entry matches through return for zero angles, mixed
+signed angles and 16-bit edge values. The X-32 service records confirm
+one request per execution with the fixture angles returned in BX/CX/DX.
+
+These probes raise the complete-match total to 3,893 of 4,354 generated
+entries. See replay-bulk-gameport-bios-vfx-orientation.py and its JSONL
+output under local/ghidra-group-followup-20261118. Physical headset
+behavior remains unverified.
