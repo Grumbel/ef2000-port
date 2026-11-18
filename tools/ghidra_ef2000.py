@@ -376,7 +376,7 @@ def recover_observed_leaves(args):
     with output.open(newline='') as stream:
         rows = list(csv.DictReader(stream, delimiter='\t'))
     expected = {'0x000a432f', '0x000e300f', '0x000c64d0', '0x000c5e65', '0x0001c53c', '0x000df244',
-                '0x000d83b8', '0x000d849c', '0x000d8168'}
+                '0x000d83b8', '0x000d849c', '0x000d8168', '0x000fa804'}
     if ({row['entry'] for row in rows} != expected or len(rows) != len(expected) or
             any(row['result'] not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
         raise ValueError('invalid observed-leaf report')

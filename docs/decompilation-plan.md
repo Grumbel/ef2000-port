@@ -12163,3 +12163,13 @@ matched the first prepared input at 0xd8168. The translated caller at
 0xd8fd8 advanced to the next observed entry, 0xd8220. Its original path
 uses shared code and needs a separate boundary review. All 47 wrapper
 tests passed. Artifacts: `local/ghidra-position-prefix-20261118/`.
+
+2026-11-18 — Recovered the 17-byte stream formatter callback at 0xfa804.
+The guarded recipe checks the ECX literal at 0xfa856 in 0xfa815 and the
+direct call at 0xfa80b to the existing 0x10f43b entry, with return to
+0xfa810. Audit, apply and repeat apply succeeded on a disposable project.
+The fresh Ghidra export contains 4,287 functions. All 56 scoped bodies
+compiled with OpenWatcom. Forty first prepared probes matched and 16
+were inconclusive. The five callers that previously stopped at
+0xfa804 now match on those inputs. All 47 wrapper tests passed.
+Artifacts are under `local/ghidra-format-stream-20261118/`.
