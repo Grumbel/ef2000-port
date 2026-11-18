@@ -13393,3 +13393,20 @@ A fresh local generation applies the union of the reviewed interrupt
 and port sites from bulk-bios-mode-c and bulk-gameport-c to the
 gameport inventory. It emits 4,353 bodies, two more than the gameport
 build. The combined build is staged for differential verification.
+
+### 2026-11-18 — Complete the combined prepared sweep
+
+The combined BIOS and gameport build compared one prepared scenario
+per generated entry with a 100,000-instruction budget. Of 4,353 entries,
+3,753 matched through completion and 600 were inconclusive. All six
+stops at 0xfe700 from the previous build now pass. The two added entries
+are 0xfe700 and 0xfe710. The default scenario passes 0xfe700 but supplies
+an unsupported mode zero to 0xfe710. Two direct replays set the first
+stack argument at 0x3f0004 to 0x03 and 0x13 and both match through return.
+
+The largest remaining groups are 352 unmapped reads, 76 original
+instruction budget stops, 36 unmapped writes, and 10 unmapped fetches.
+The sweep exercises one path from each entry, so paths requiring
+different pointers or runtime state need additional evidence. See
+bulk-gameport-bios-full.jsonl and bulk-gameport-bios-direct-video-mode.jsonl
+under local/ghidra-group-followup-20261118.
