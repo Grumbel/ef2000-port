@@ -14082,3 +14082,18 @@ The prepared-match total is now 3,887 of 4,354 generated entries.
 See replay-bulk-gameport-bios-stat-row.py and its JSONL output under
 local/ghidra-group-followup-20261118. The full rerun is in progress
 in bulk-timer-full.jsonl.
+
+### 2026-11-18 — Compare visible statistics glyphs and right-edge clipping
+
+The linked bulk timer build matches through return for the
+one-bit glyph blitter at 0xcf7c4 and for selected and unselected
+statistics rows at 0x275e0 that draw a visible label through it.
+Nine prepared probes cover five- and nine-pixel glyph widths,
+two scanlines, and right-edge clipping at column 317. The selected
+row also exercises the label shadow. The probes use synthetic
+glyphs and a bounded 320×200 scratch surface.
+
+Both entries already had complete matches, so the total stays
+at 3,887 of 4,354 generated entries. See
+replay-bulk-gameport-bios-stat-glyph.py and its JSONL output
+under local/ghidra-group-followup-20261118.
