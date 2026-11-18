@@ -14845,3 +14845,24 @@ need to be repeated with the callback registered.
 The baseline follow-up report `bulk-cpu-boundaries-scanner-float.json`
 records the inputs and stops. SHA-256
 `1618ed409bd998c7009d497e3a5b18f7c3d8913316ba62ee908b89ed9666e9c1`.
+
+The rebuilt 4,363-entry candidate adds both bodies with the hashes of
+all 4,361 previous C units unchanged. OpenWatcom 2.0 beta compiles
+both new units with zero warnings and errors using
+`-bt=dos -3r -za99 -w1 -we`. The linked differential comparison now
+matches all six scanner assignments through return, including
+`%f %s`, `%lf`, `%Lf` and `%hf` through the cdecl wrapper. Direct
+comparisons also match the initializer and the callback with zero,
+negative zero, a finite fraction, a subnormal-scale input, overflow
+and invalid text. This establishes prepared-path matches for the
+expanded registry. The original game patch and replays remain to be
+verified for these additions.
+
+The local overlay `bulk-scanner-float-overlay.json` has SHA-256
+`3729a23d9500e39b7a9cce180b3e88d535b76b4d74e67dfd2f230809aa1c85bc`.
+The candidate manifest `bulk-scanner-float-c/report.json` has SHA-256
+`a26e3dd4fc0bcc480a82a4646016b42308279f40f226ba00f93a9623188a8b00`.
+The grouped verifier report `bulk-scanner-float-diff/report.json` has
+SHA-256 `7e0418c2f463ee9a07e9bc190c41930cb646c8b5c061788270dc1b79aad03a5d`.
+The direct probe report `bulk-cpu-boundaries-scanner-float-callbacks.json`
+has SHA-256 `cf51978bf07f0a2f2d192dd8c2f600de6c883be2364542bac33da50518454d29`.
