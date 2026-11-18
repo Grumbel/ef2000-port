@@ -12630,3 +12630,16 @@ match. The generic standalone prepared input reaches a different
 unmodeled INT 21h request. No tracker states changed. Audit and
 comparison artifacts: `bulk-residency-audit.json` and
 `bulk-residency-diff/` under `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — Reproduced the sole mismatch in the last full bulk sweep.
+The original path from 0xf2800 executes both CPUID sites in 0xf2819,
+requesting leaves 0 and 1 at 0xf285f and 0xf2892. The trace records
+all four result registers and unchanged flags across each instruction.
+The translated path stops at the missing entry 0xf2819. An independent
+single-instruction Unicorn probe with the trace's CPU model explicitly
+selected (model 19) reproduced the four result registers for both leaves
+with the trace ECX value and with ECX set to 0, 1, and 0xffffffff. This
+provides inputs for a CPU-model boundary in the verifier. The bulk
+translator still needs that boundary. Local trace and reproduction script:
+`local/ghidra-group-followup-20261118/cpuid-trace.json` and
+`local/ghidra-group-followup-20261118/trace-cpuid.py`.
