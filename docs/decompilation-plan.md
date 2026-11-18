@@ -13302,3 +13302,16 @@ The local VBE release build also passed all four scoped probes
 (0xd1da8, 0x9c398, 0xfc440, and 0xfc534) with the audited callback
 boundaries. See bulk-gameport-replay.jsonl and bulk-vbe-release-diff/report.json
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Locate the missing file callback in the gameport probe
+
+In the prepared 0x82cec probe, the original and translated runs agree
+through the first visit to 0x9cf74, including service transcripts.
+The callback is present in the symbol tracker and absent from the
+generated registry. Its direct dependency at 0x9cf2c is also absent.
+
+The boundary audit accepts the dependency at [0x9cf2c, 0x9cf74) and
+the callback at [0x9cf74, 0x9cfa2). The latter excludes the two alignment
+bytes counted by the tracker. The local overlay includes both ranges.
+See bulk-gameport-prefix.jsonl and verify-gameport-candidate.py under
+local/ghidra-group-followup-20261118.
