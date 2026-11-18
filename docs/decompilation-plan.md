@@ -12567,3 +12567,22 @@ growth beyond mapped RAM. This replay reused the recorded host library,
 the hardware x87 oracle and the original 5 MiB prepared inputs.
 The filtered results and the parent report digest are in
 `local/ghidra-group-followup-20261118/heap-stop-replay.json`.
+
+2026-11-18 — Ran the full prepared differential for the 4,339-body
+expanded build with the X-32 heap, DOS console and PIT fixtures, the
+recorded STI stops, and the hardware x87 oracle. With one probe per
+body and 5 MiB prepared RAM, 3,451 matched (707,981 original body
+bytes), 887 were inconclusive, and one mismatched. The mismatch is the
+untranslated CPUID target at 0xf2819 reached from 0xf2800. Among the
+757 generated blocked tracker bodies, 593 matched (348,767 bytes)
+and 164 were inconclusive. The remaining inconclusive blocked probes
+include 87 original faults, 52 host-service stops, and 25 instruction
+budget stops. The most frequent identified service stops across all
+bodies are DOS open at 0x1f5 (54), X-32 real-mode calls at 0x977 (31),
+and DOS open at 0xfa4db with AX=3d00h (28). Report:
+`local/ghidra-group-followup-20261118/bulk-extra-heap-full-diff/report.json`.
+
+The paired status app now prints blocked body bytes for each comparison
+state and groups inconclusive blocked functions by their stop reasons.
+The 13 status tests passed and the Nix app was exercised with a paired
+comparison snapshot.
