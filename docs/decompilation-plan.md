@@ -14007,3 +14007,21 @@ cases stop at the checkpoint with the countdown still positive.
 The prepared-match total through return stays at 3,885. See
 replay-bulk-gameport-bios-timer-wait.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Check timer wait boundaries and callback coverage
+
+Entry 0xe2988 matches through return for delays 0, -1, and
+INT32_MIN with a preset positive countdown. These probes confirm the
+signed immediate-return branch and the replacement of the previous
+countdown. This entry already passed in the baseline.
+
+The registered callback at 0xe28c4 is absent from the current function
+inventory. The original returned on three prepared counter states,
+including rollover and a countdown of zero. The generated dispatcher
+stopped immediately at the callback entry in all three cases. Adding
+that entry to the inventory and delivering timer callbacks during wait
+loops are both required for complete positive-delay comparisons.
+
+The prepared-match total stays at 3,885 of 4,353 entries. See
+replay-bulk-gameport-bios-timer-callback.py and its JSONL output
+under local/ghidra-group-followup-20261118.
