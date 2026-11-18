@@ -580,7 +580,14 @@ ret
 .org 0x400
 .type leaf,@function
 leaf: ret
-.size leaf, .-leaf'''
+.size leaf, .-leaf
+.org 0x500
+.type guarded,@function
+guarded: xor eax,eax
+jz done
+call unsupported
+done: ret
+.size guarded, .-guarded'''
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, records = inventory(root, source)
@@ -593,9 +600,21 @@ leaf: ret
             self.assertIn('unsupported instruction', reasons[0x300])
             result = asm_c_program.generate(directory, root / 'out', image)
             entries = {e['address']: e for e in result['entries']}
-            for address in (0x100, 0x200, 0x300):
+            for address in (0x100, 0x200, 0x300, 0x500):
                 self.assertEqual(entries[address]['root_blockers'], [0x300])
             self.assertNotIn('root_blockers', entries[0x400])
+            partial = asm_c_program.generate(directory, root / 'partial', image,
+                                             allow_partial_closure=True)
+            entries = {e['address']: e for e in partial['entries']}
+            self.assertTrue(entries[0x500]['incomplete_direct_closure'])
+            self.assertEqual(entries[0x500]['root_blockers'], [0x300])
+            self.assertEqual(entries[0x300]['state'], 'unsupported')
+            compared = asm_c_differential.verify(root / 'partial', root / 'evidence', image,
+                                                 scenarios=1, addresses=[0x100, 0x500])
+            entries = {e['address']: e for e in compared['entries']}
+            self.assertEqual(entries[0x500]['state'], 'probes-pass')
+            self.assertEqual(entries[0x100]['state'], 'mismatch')
+            self.assertEqual(entries[0x100]['probes'][0]['translated_stop']['pc'], 0x300)
             self.assertFalse((root / 'out/ef_lift_00000100.c').exists())
             self.assertEqual(sum(e['state'] == 'generated-unverified' for e in result['entries']), 1)
 

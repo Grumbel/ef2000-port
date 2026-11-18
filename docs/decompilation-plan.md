@@ -12473,3 +12473,18 @@ at 0xeddc3 and 0x10e7b5, both with unsupported interrupt sites and
 CR0 accesses. Reports: `bulk-exit-complete-diff/report.json` and
 `bulk-exit-sound-boundary-diff/report.json` under
 `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — Added opt-in `--allow-partial-closure` to the program
+generator. It emits complete, supported bodies even when their direct
+dependency closure is incomplete. The dispatcher still stops at an
+untranslated PC. Generation reports retain the strict root blockers
+and identify the affected emitted bodies. The status report counts
+those bodies among generated blocked entries and keeps their root
+blockers visible. The default generator remains strict.
+
+The 4,349-body exit inventory emits 4,327 bodies in this mode, including
+232 with incomplete direct closure. Of the blocked tracker entries, 52
+have this marker and nine are still excluded by the generator. The
+synthetic regression covers a branch that avoids an untranslated
+callee and verifies that a call into that callee still stops at its PC.
+All 38 program tests and 13 tracker tests passed.

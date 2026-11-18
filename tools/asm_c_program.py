@@ -371,7 +371,7 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
              for r in records if r['address'] in closed}
     callers = {address: set() for address in closed}
     for address in closed:
-        for target in dependencies[address]:
+        for target in dependencies[address] & closed:
             callers[target].add(address)
     pending = {address for address, requests in sites.items() if requests}
     while pending:
@@ -385,7 +385,8 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
 
 
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
-             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=()):
+             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(),
+             allow_partial_closure=False):
     if port_sites is not None and not port_boundaries:
         raise ValueError('port sites require port boundaries')
     if interrupt_sites is not None and not interrupt_boundaries:
@@ -404,10 +405,11 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                                                   port_boundaries=port_boundaries, port_sites=port_sites,
                                                   sti_stop_sites=sti_stop_sites)
     blockers = root_blockers(dependencies, closed, reasons)
+    emitted = set(codes) if allow_partial_closure else closed
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
-    service_sites = reachable_service_sites(records, dependencies, closed)
-    port_service_sites = reachable_service_sites(records, dependencies, closed, ports=True)
+    service_sites = reachable_service_sites(records, dependencies, emitted)
+    port_service_sites = reachable_service_sites(records, dependencies, emitted, ports=True)
     report = []
     for record in records:
         address = record['address']
@@ -418,7 +420,10 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                 item['instruction_failures'] = failure_details[address]
             if address in dependencies:
                 item['dependencies'] = sorted(dependencies[address])
-        if address in closed:
+        if address in emitted:
+            item.pop('reason')
+            if address not in closed:
+                item['incomplete_direct_closure'] = True
             item.update(reachable_host_service_sites=service_sites[address],
                         reachable_host_port_service_sites=port_service_sites[address],
                         state='generated-unverified', file='ef_lift_%08x.c' % address,
@@ -431,7 +436,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                         body_bytes=sum(end-start for start, end in record['ranges']))
             (output / item['file']).write_text(codes[address])
         report.append(item)
-    files = dispatcher([r for r in records if r['address'] in closed], shard_entries=shard_entries)
+    files = dispatcher([r for r in records if r['address'] in emitted], shard_entries=shard_entries)
     for name, code in files.items():
         (output / name).write_text(code)
     program = files['ef_lift_program.c']
@@ -455,6 +460,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['dispatcher_support'] = [dict(file=name, source_sha256=hashlib.sha256(code.encode()).hexdigest())
                                     for name, code in sorted(files.items()) if name != 'ef_lift_program.c']
     result['closure_scope'] = 'direct-edges-only; dynamic targets require runtime coverage'
+    if allow_partial_closure:
+        result['closure_scope'] = 'partial-direct-closure; dispatcher stops at untranslated PCs'
     result['instruction_failure_scope'] = (
         'all renderer rejections in established root bodies; body-layout failures excluded; '
         'not an execution, equivalence or indirect-target coverage proof')
@@ -468,7 +475,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
         result['sti_stop_sites'] = sorted(sti_stop_sites)
     if interrupt_boundaries:
         sites = sorted((i['address'], interrupt_vector(i), i['mnemonic'] == 'int3')
-                       for r in records if r['address'] in closed
+                       for r in records if r['address'] in emitted
                        for i in r['instructions'] if interrupt_vector(i) is not None)
         result['host_service_boundaries'] = dict(
             model='int-service-yield-v2',
@@ -481,12 +488,12 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     if port_boundaries:
         result['host_port_service_boundaries'] = dict(
             model='scalar-port-service-yield-v1',
-            requests=[port_service_request(i) for r in records if r['address'] in closed
+            requests=[port_service_request(i) for r in records if r['address'] in emitted
                       for i in r['instructions'] if i['mnemonic'] in ('in', 'out')],
             contract='PC is continuation; callback IP is PC-length; request is yield status; '
                      'host must implement IN accumulator update or OUT device effect; '
                      'no architectural privilege checks or device behavior are implemented')
-    asm_to_c.bind_backends(result, [codes[a] for a in sorted(closed)])
+    asm_to_c.bind_backends(result, [codes[a] for a in sorted(emitted)])
     (output / 'report.json').write_text(json.dumps(result, indent=2) + '\n')
     return result
 
@@ -506,6 +513,8 @@ def main(argv=None):
                         help='restrict yielded IN/OUT instruction addresses (repeatable)')
     parser.add_argument('--sti-stop-site', type=lambda value: int(value, 0), action='append', default=[],
                         help='stop before an explicit STI, leaving PC and flags unchanged (repeatable)')
+    parser.add_argument('--allow-partial-closure', action='store_true',
+                        help='emit supported bodies even when some direct dependencies are untranslated')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -517,7 +526,8 @@ def main(argv=None):
                           interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site),
                           port_boundaries=args.port_boundaries,
                           port_sites=None if args.port_site is None else frozenset(args.port_site),
-                          sti_stop_sites=args.sti_stop_site)
+                          sti_stop_sites=args.sti_stop_site,
+                          allow_partial_closure=args.allow_partial_closure)
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')

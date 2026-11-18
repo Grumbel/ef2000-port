@@ -153,7 +153,8 @@ class DecompStatusTest(unittest.TestCase):
         for row in rows:
             row['state'] = 'blocked'
         report = {'model': 'flat-x86-program-explicit-state', 'entries': [
-            {'address': 0x100, 'state': 'generated-unverified'},
+            {'address': 0x100, 'state': 'generated-unverified', 'incomplete_direct_closure': True,
+             'root_blockers': [0x600]},
             {'address': 0x200, 'state': 'unsupported', 'root_blockers': [0x500, 0x500]},
             {'address': 0x300, 'state': 'unsupported', 'root_blockers': [0x500, 0x600]},
             {'address': 0x500, 'state': 'unsupported', 'reason': 'unsupported instruction: int'},
@@ -168,6 +169,8 @@ class DecompStatusTest(unittest.TestCase):
         self.assertTrue(any('excluded by generator' in line and line.endswith('20 body bytes')
                             for line in lines))
         self.assertTrue(any('0x00000500' in line and '2  unsupported' in line for line in lines))
+        self.assertTrue(any('0x00000600' in line and '2  unsupported' in line for line in lines))
+        self.assertTrue(any('have untranslated direct dependencies' in line for line in lines))
         self.assertEqual([row['state'] for row in rows], ['blocked'] * 4)
         report['entries'].append(report['entries'][0])
         with self.assertRaises(decomp_status.TrackerError):
