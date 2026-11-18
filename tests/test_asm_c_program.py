@@ -1091,13 +1091,25 @@ mov ebx,1
 mov ecx,4
 mov edx,0x300000
 int 0x21
+mov al,0x34
+out 0x43,al
+mov al,0
+out 0x40,al
+out 0x40,al
 ret
 .size dos, .-dos
 .org 0x300
 .type device,@function
 device: in al,0x61
 ret
-.size device, .-device"""
+.size device, .-device
+.org 0x400
+.type terminate,@function
+terminate: mov ax,0x4c07
+int 0x21
+inc eax
+ret
+.size terminate, .-terminate"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1125,8 +1137,10 @@ ret
             self.assertEqual(entries[0x300]['probes'][0]['original_service_stop'],
                              dict(kind='port', ip=0x300, direction='in', port=0x61, width=8))
             console_report = asm_c_differential.verify(
-                out, root / 'console', image, scenarios=1, service_free_paths=True, dos_console=True)
-            self.assertEqual(console_report['host_service_policy'], 'dos-console-prepared-only')
+                out, root / 'console', image, scenarios=1, service_free_paths=True,
+                dos_console=True, pit_writes=True)
+            self.assertEqual(console_report['host_service_policy'], 'dos-console-and-exit-prepared-only')
+            self.assertEqual(console_report['pit_write_policy'], 'transcript-prepared-only')
             console_entries = {entry['address']: entry for entry in console_report['entries']}
             self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
             self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
@@ -1134,6 +1148,12 @@ ret
             self.assertEqual(events['original'], events['translated'])
             self.assertEqual(events['original'][0]['output_sha256'],
                              hashlib.sha256(bytes(range(4))).hexdigest())
+            ports = console_entries[0x200]['probes'][0]['port_services']
+            self.assertEqual(ports['original'], ports['translated'])
+            self.assertEqual([event['request']['port'] for event in ports['original']], [0x43, 0x40, 0x40])
+            self.assertEqual(console_entries[0x400]['state'], 'probes-pass', console_entries[0x400])
+            self.assertEqual(console_entries[0x400]['probes'][0]['dos_exit'],
+                             dict(original=dict(ip=0x404, code=7), translated=dict(ip=0x404, code=7)))
 
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function

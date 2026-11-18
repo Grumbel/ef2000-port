@@ -12407,3 +12407,19 @@ output digest. All 38 C program translator tests passed.
 Reports: `bulk-dos-write-requests.json` and
 `bulk-dos-console-replay.json` under
 `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — The prepared verifier can now compare byte writes to
+PIT channel zero with `--pit-writes`. It records commands and data
+writes without scheduling timer events. The DOS fixture also compares
+INT 21h AH=4Ch process termination, including the exit code, final PC
+and guest state. All 38 program tests passed, including a synthetic
+console and PIT transcript and a separate termination case.
+
+With both fixtures, the 467 prepared inputs recorded three PIT writes
+each on the original path and exited at 0x220 with code 255. The linked
+bulk C stopped with dispatcher status 2 at 0xeb3d0 on 466 probes and
+at 0xdbf2c on one. Neither address is an entry in the paired translation
+report. This turns an inconclusive service stop into an actionable
+coverage discrepancy. The evidence applies to these prepared exit
+paths. Reports: `bulk-pit-write-replay.json` and
+`bulk-pit-exit-replay.json` under `local/ghidra-group-followup-20261118/`.

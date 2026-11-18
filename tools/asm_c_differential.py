@@ -156,6 +156,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_port = port_factory() if port_factory else None
     translated_port = port_factory() if port_factory else None
     original_ports, translated_ports = [], []
+    original_exit = None
+    translated_exit = None
 
     def console_service(ip, values, vector, ds, read, events):
         offset, count = values['dx'], values['cx']
@@ -258,6 +260,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
+        if original_exit is not None or translated_exit is not None:
+            fields['dos_exit'] = dict(original=original_exit, translated=translated_exit)
         if binding is not None:
             fields['original_x87'] = binding.evidence()
         if service_factory is not None or dos_console:
@@ -271,6 +275,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     rejected_service = {}
     if original_service is not None or dos_console:
         def interrupt(engine, vector, _):
+            nonlocal original_exit
             ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
             if ip < 0 or vector not in range(256) or engine.mem_read(ip, 2) != bytes((0xcd, vector)):
                 ip += 1
@@ -279,6 +284,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+            if dos_console and vector == 0x21 and ((values['ax'] >> 8) & 0xff) == 0x4c:
+                original_exit = dict(ip=ip, code=values['ax'] & 0xff)
+                engine.emu_stop()
+                return
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
             try:
                 if dos_console:
@@ -374,7 +383,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        **detail)
     if stopped_at is not None:
         return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
-    if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
+    if original_exit is None and cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
         return outcome(state='inconclusive', reason='original instruction budget exhausted')
     if reloads is not None:
         reloads.finish()
@@ -413,6 +422,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             status = function(ctypes.byref(state), 1, sentinel)
             if (0x100 <= status <= 0x1ff or status == 0x203) and (translated_service is not None or dos_console):
                 length = 1 if status == 0x203 else 2
+                if dos_console and status == 0x121 and ((state.r[0] >> 8) & 0xff) == 0x4c:
+                    translated_exit = dict(ip=state.pc-length, code=state.r[0] & 0xff)
+                    status = 0
+                    break
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
@@ -494,8 +507,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         original = cpu.reg_read(getattr(x86_const, 'UC_X86_REG_' + name.upper()))
         if actual != original:
             differences.append('%s: C=0x%x x86=0x%x' % (name, actual, original))
-    if state.pc != sentinel:
-        differences.append('return PC')
+    if original_exit != translated_exit:
+        differences.append('DOS exit boundary')
+    if state.pc != cpu.reg_read(x86_const.UC_X86_REG_EIP):
+        differences.append('final PC')
     expected_fpu = capture_x87(cpu)
     for field in X87_FIELDS:
         if getattr(state, field) != expected_fpu[field]:
@@ -518,9 +533,18 @@ def reject_host_service(*args):
     raise ValueError('probe reached an unmodeled host service')
 
 
+def pit_write_service(request, registers):
+    """Observe channel-zero programming writes without scheduling ticks."""
+    port, command = request['port'], registers['ax'] & 0xff
+    if request['direction'] == 'out' and request['width'] == 8:
+        if port == 0x40 or (port == 0x43 and command in (0x34, 0x36)):
+            return registers
+    return reject_host_service()
+
+
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(),
-                    dos_console=False):
+                    dos_console=False, pit_writes=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -547,7 +571,8 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites,
                                  dos_console=dos_console,
-                                 port_factory=(lambda: reject_host_service) if reject_services else None)
+                                 port_factory=(lambda: pit_write_service) if pit_writes else
+                                 (lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
             sender.send(('error', -1, repr(error)))
@@ -652,7 +677,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None, addresses=(), dos_console=False):
+           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -665,6 +690,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
     if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS console fixture requires --service-free-paths and interrupt boundaries')
+    if pit_writes and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
+        raise ValueError('PIT write fixture requires --service-free-paths and port boundaries')
     sti_stop_sites = manifest.get('sti_stop_sites', [])
     if (not isinstance(sti_stop_sites, list) or
             any(type(pc) is not int or not 0 <= pc < len(payload) or payload[pc] != 0xfb
@@ -798,7 +825,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites,
-                                  dos_console=dos_console)
+                                  dos_console=dos_console, pit_writes=pit_writes)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -834,7 +861,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_memory_size=prepared_memory_size or 0x400000,
-                  host_service_policy=('dos-console-prepared-only' if dos_console else
+                  pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
+                  host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
                                        'reject-on-reach' if reject_services else 'no-boundaries'),
                   sti_stop_sites=sti_stop_sites,
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
@@ -864,8 +892,10 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--pit-writes', action='store_true',
+                        help='with --service-free-paths, compare channel-zero PIT writes on prepared probes')
     parser.add_argument('--dos-console', action='store_true',
-                        help='with --service-free-paths, model console writes on prepared probes')
+                        help='with --service-free-paths, model DOS console writes and exit on prepared probes')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
@@ -886,6 +916,7 @@ def main(argv=None):
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
                         service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
+                        pit_writes=args.pit_writes,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
