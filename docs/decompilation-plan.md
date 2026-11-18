@@ -13697,3 +13697,19 @@ compared through return.
 The channel owner replay still reports six complete matches and
 two inconclusive cases. The synthetic software interrupt boundary
 test passed. The prepared-match total remains 3,838.
+
+### 2026-11-18 — Verify bounded table initialization loops
+
+Five entries that exhausted a 500,000-instruction budget matched
+through return after initializing their loop inputs. Entries
+0x58d64, 0x7632c and 0x767f4 used one or three four-byte records
+followed by the 0xff sentinel. Entries 0xc39f0 and 0xfc39c used
+counts of one and three and a stride of 17. The latter loop uses
+the x86 LOOP instruction, so an initial count of zero does not
+represent an empty table.
+
+All ten probes passed and the prepared-match total is now
+3,843 of 4,353 entries. See
+replay-bulk-gameport-bios-bounded-table-loops.py and
+bulk-gameport-bios-bounded-table-loops.jsonl under
+local/ghidra-group-followup-20261118.
