@@ -13787,3 +13787,19 @@ flag at 0x4859de. All twelve isolated differential probes passed.
 The prepared-match total is now 3,855 of 4,353 entries. See
 replay-bulk-gameport-bios-parser-lines.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify token and record parsing paths
+
+Eight probes matched the original through return across four
+entries that exhausted the baseline instruction budget. Entry
+0xf2cd0 covered leading separators and comma or carriage-return
+termination. Entry 0xf2e74 read four numeric fields and a name.
+Entry 0xf314c read one or two numeric pairs followed by END.
+The first token after each pair is both the sentinel candidate
+and, when it differs from END, the first number of the next pair.
+Entry 0xf3b58 used an existing name token and parsed positive and
+negative decimal values.
+
+The prepared-match total is now 3,859 of 4,353 entries. See
+replay-bulk-gameport-bios-parser-records.py and its JSONL output
+under local/ghidra-group-followup-20261118.
