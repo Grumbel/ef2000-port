@@ -14874,3 +14874,30 @@ into 0x17d49c, which is the slot used by the scanner at 0x108d4e.
 A clean Ghidra 12.1.4 import and inventory export reproduced both
 half-open body ranges and all 16 instruction boundaries against
 independent objdump decoding.
+
+#### Verify bulk cleanup paths with an initialized heap
+
+Nine default probes previously faulted while reading the allocation header
+at 0x1104c7. The failing calls passed unprepared pointers to the allocator
+and had no owning heap at 0x16464c. The follow-up sets up that pointer,
+the current heap at 0x164650, the free-list sentinel, and a contiguous
+run of allocated blocks with size headers and an end marker. Record
+fields and list links follow the original cleanup disassembly.
+
+The 4,363-entry candidate matches through return for nested object
+release (0xb1740), object arrays (0xb17d4), linked records and nodes
+(0xb188c, 0xb18b8), packed records and their list (0xb1918, 0xb1974),
+buffered-record clearing (0x117ea8), and five packed records with
+owned buffers (0x11c06c). A direct ownership lookup and free at 0xfa9d2
+also matches. Record-range cleanup at 0xd6ffc matches through return
+with the X-32 residency fixture enabled. Both sides request INT 21h
+AX=0x252b, BX=0x0061 and get the same carry-set response before
+continuing cleanup. Successful residency operations and game replays
+are outside this comparison.
+
+Run the local probe with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-heap-release-fixtures.py`.
+The report `bulk-cpu-boundaries-heap-release-fixtures.json` includes the
+prepared registers and RAM, outcome and host-service transcript for
+each of the ten probes. SHA-256
+`0ff8adbc8354ab722f0042d2e69e44bd1af3a3e96c90359c6308296977b14561`.
