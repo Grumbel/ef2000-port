@@ -82,9 +82,14 @@ def interrupt_vector(insn):
 
 
 def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
-                  interrupt_sites=None, port_boundaries=False, port_sites=None):
+                  interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=()):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
+    if insn['address'] in sti_stop_sites:
+        if mnemonic != 'sti' or insn['bytes'] != 'fb' or insn['operands']:
+            raise asm_to_c.Unsupported('STI stop encoding/spelling mismatch')
+        # Resume requires an external CPU implementation of STI and its interrupt shadow.
+        return 'return 0x204u;'
     vector = interrupt_vector(insn) if interrupt_boundaries else None
     if vector is not None and (insn['address'] in interrupt_sites if interrupt_sites is not None
                                else vector in (0x21, 0x31)):
@@ -132,7 +137,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
 
 
 def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
-            port_boundaries=False, port_sites=None, failure_details=None):
+            port_boundaries=False, port_sites=None, failure_details=None, sti_stop_sites=()):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -166,7 +171,8 @@ def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
             consuming_targets.add(record['address'])
     renderer = partial(instruction_c, consuming_targets=consuming_targets,
                        interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites,
-                       port_boundaries=port_boundaries, port_sites=port_sites)
+                       port_boundaries=port_boundaries, port_sites=port_sites,
+                       sti_stop_sites=sti_stop_sites)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -379,17 +385,24 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
 
 
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
-             interrupt_sites=None, port_boundaries=False, port_sites=None):
+             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=()):
     if port_sites is not None and not port_boundaries:
         raise ValueError('port sites require port boundaries')
     if interrupt_sites is not None and not interrupt_boundaries:
         raise ValueError('interrupt sites require interrupt boundaries')
     manifest, records = asm_to_c.read_inventory(inventory, image)
+    sti_stop_sites = frozenset(sti_stop_sites)
+    valid_sti = {i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
+                 for i in r['instructions'] if i['mnemonic'] == 'sti' and i['bytes'] == 'fb'
+                 and not i['operands']} if sti_stop_sites else set()
+    if sti_stop_sites - valid_sti:
+        raise ValueError('STI stop sites must be reviewed STI instruction starts')
     failure_details = {}
     codes, dependencies, closed, reasons = analyse(records, failure_details=failure_details,
                                                   interrupt_boundaries=interrupt_boundaries,
                                                   interrupt_sites=interrupt_sites,
-                                                  port_boundaries=port_boundaries, port_sites=port_sites)
+                                                  port_boundaries=port_boundaries, port_sites=port_sites,
+                                                  sti_stop_sites=sti_stop_sites)
     blockers = root_blockers(dependencies, closed, reasons)
     output.mkdir(parents=True, exist_ok=False)
     (output / 'ef_lift_state.h').write_text(asm_to_c.RUNTIME)
@@ -451,6 +464,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['host_port_service_reachability_scope'] = (
         'scalar port sites only; conservative direct-edge closure; dynamic targets and '
         'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
+    if sti_stop_sites:
+        result['sti_stop_sites'] = sorted(sti_stop_sites)
     if interrupt_boundaries:
         sites = sorted((i['address'], interrupt_vector(i), i['mnemonic'] == 'int3')
                        for r in records if r['address'] in closed
@@ -489,6 +504,8 @@ def main(argv=None):
                         help='yield scalar IN/OUT to a host service; does not implement devices')
     parser.add_argument('--port-site', type=lambda value: int(value, 0), action='append',
                         help='restrict yielded IN/OUT instruction addresses (repeatable)')
+    parser.add_argument('--sti-stop-site', type=lambda value: int(value, 0), action='append', default=[],
+                        help='stop before an explicit STI, leaving PC and flags unchanged (repeatable)')
     args = parser.parse_args(argv)
     try:
         output = args.output.resolve()
@@ -499,7 +516,8 @@ def main(argv=None):
                           interrupt_boundaries=args.interrupt_boundaries,
                           interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site),
                           port_boundaries=args.port_boundaries,
-                          port_sites=None if args.port_site is None else frozenset(args.port_site))
+                          port_sites=None if args.port_site is None else frozenset(args.port_site),
+                          sti_stop_sites=args.sti_stop_site)
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')

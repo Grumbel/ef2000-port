@@ -126,7 +126,7 @@ def validate_prepared_memory_size(size):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None, memory_services=False, port_factory=None):
+            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=()):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -134,7 +134,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     addressed accumulator bits; OUT preserves registers/flags. Optional RAM
     effects use the same disposable snapshot rules as interrupt services.
     """
-    from unicorn import (Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_INTR, UC_HOOK_INSN,
+    from unicorn import (Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_CODE, UC_HOOK_INTR, UC_HOOK_INSN,
                          UC_HOOK_MEM_INVALID, UC_MEM_FETCH_PROT, UC_MEM_FETCH_UNMAPPED,
                          UC_MEM_READ_PROT, UC_MEM_READ_UNMAPPED, UC_MEM_WRITE_PROT, UC_MEM_WRITE_UNMAPPED)
     from unicorn import x86_const
@@ -317,6 +317,15 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         return False
 
     cpu.hook_add(UC_HOOK_MEM_INVALID, invalid_memory)
+    stopped_at = None
+
+    def stop_at_sti(engine, pc, size, _data):
+        nonlocal stopped_at
+        stopped_at = pc
+        engine.emu_stop()
+
+    for pc in sti_stop_sites:
+        cpu.hook_add(UC_HOOK_CODE, stop_at_sti, begin=pc, end=pc)
     if phase:
         phase('original')
     try:
@@ -330,6 +339,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         return outcome(state='inconclusive', reason='original fault: ' + str(error), **detail)
     except (ValueError, RuntimeError) as error:
         return outcome(state='inconclusive', reason='original service unavailable: '+str(error))
+    if stopped_at is not None:
+        return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
     if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
         return outcome(state='inconclusive', reason='original instruction budget exhausted')
     if reloads is not None:
@@ -413,7 +424,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 break
     if status:
         reason = {7: 'unsupported segment profile',
-                  8: 'pending x87 exception delivery unsupported'}.get(status, 'budget/pc/memory/divide')
+                  8: 'pending x87 exception delivery unsupported',
+                  0x204: 'STI stop'}.get(status, 'budget/pc/memory/divide')
         return outcome(state='mismatch', translated_stop=dict(status=status, pc=state.pc, fault=state.fault),
                        differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
@@ -468,7 +480,7 @@ def reject_host_service(*args):
 
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
-                    captured=None, *, reject_services=False, prepared_memory_size=None):
+                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=()):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -492,6 +504,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  service_factory=(lambda: reject_host_service) if reject_services else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
+                                 sti_stop_sites=sti_stop_sites,
                                  port_factory=(lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
@@ -608,6 +621,13 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    sti_stop_sites = manifest.get('sti_stop_sites', [])
+    if (not isinstance(sti_stop_sites, list) or
+            any(type(pc) is not int or not 0 <= pc < len(payload) or payload[pc] != 0xfb
+                for pc in sti_stop_sites)):
+        raise ValueError('invalid STI stop sites')
+    if sti_stop_sites and (not program or not service_free_paths):
+        raise ValueError('STI stops require a boundary-aware program comparison')
     reject_services = bool(manifest.get('host_service_boundaries') or
                            manifest.get('host_port_service_boundaries'))
     if reject_services and not program:
@@ -733,7 +753,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.restype = ctypes.c_uint
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
-                                  prepared_memory_size=prepared_memory_size)
+                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -751,7 +771,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
         result = isolated_probes(function, payload, captured.address, 1, budget, program,
-                                 native_x87=native_x87, captured=captured, reject_services=reject_services)[0]
+                                 native_x87=native_x87, captured=captured, reject_services=reject_services,
+                                 sti_stop_sites=sti_stop_sites)[0]
         record_registry_membership(result)
         capture_results.append(dict(file=str(path), capture_sha256=digest,
                                     address=captured.address, sequence=captured.sequence,
@@ -769,6 +790,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_memory_size=prepared_memory_size or 0x400000,
                   host_service_policy='reject-on-reach' if reject_services else 'no-boundaries',
+                  sti_stop_sites=sti_stop_sites,
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
                                          if captured_inputs else {},
