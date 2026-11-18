@@ -12920,3 +12920,18 @@ million instructions, the original has completed 487 and 470
 polling pairs respectively and both probes are still inconclusive.
 Local evidence is in `raster-vga-status-replay.json` and
 `raster-vga-status-long.json`.
+
+Both graphics probes repeatedly request mouse position and motion
+between retraces. An experimental button press and release at the
+default mouse position did not make either function terminate within
+500,000 instructions. The local `raster-mouse-click-experiment.json`
+records that run. This does not establish the input required to exit.
+
+Compared the idle prepared paths at a bounded checkpoint immediately
+before the 64th visit to the VGA status read at 0xdc2ee. The local
+replay stops both engines at that boundary and compares state with
+the existing differential comparator. The two prefixes match,
+including 126 port events each and 196 and 206 host service events
+respectively. This verifies the observed prefixes only. Complete
+probes remain inconclusive. See local `raster-prefix-check.json`
+and `raster-prefix-64.json`.
