@@ -50,6 +50,30 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_x32_vector_fixture_reports_remapped_irq_base(self):
+        source = """.type root,@function
+root: mov eax,0xabcd250c
+mov ebx,0x1234ffff
+stc
+int 0x21
+ret
+.size root, .-root"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            asm_c_program.generate(directory, root/'out', image, interrupt_boundaries=True)
+            report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=1,
+                                               service_free_paths=True, x32_vectors=True)
+            probe, = report['entries'][0]['probes']
+            self.assertEqual(probe['state'], 'pass', probe)
+            events = probe['host_services']
+            self.assertEqual(events['original'], events['translated'])
+            event, = events['original']
+            self.assertEqual(event['after']['ax'], 0xabcd7008)
+            self.assertEqual(event['after']['bx'], 0x12340000)
+            self.assertEqual(event['after']['flags'], event['before']['flags'] & ~1)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_prepared_fixtures_select_entries_and_supply_individual_inputs(self):
         source = """.type first,@function
 first: mov eax,DWORD PTR [eax]

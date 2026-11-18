@@ -14374,3 +14374,20 @@ that verification run. Run the five scripted responses with
 `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/replay-dpmi-presence.py`.
 The resulting dpmi-presence-results.jsonl has SHA-256
 3994c3de0b2923e145ec2a3e86da56340a2de57e1d0111e6193fcdfdfc835da1.
+
+### 2026-11-18 — Reuse the X-32 IRQ-base query in differential probes
+
+The 195-byte vector installer at 0x120ad0 queries INT 21h AX=250Ch
+at 0x120b13 before it computes the target IRQ vector from AH. The
+prepared X-32 vector fixture now forwards this request to VectorState,
+which supplies the same 7008h bases, BX low-word clearing and carry
+clearing as the Unicorn runtime. The synthetic generated-program
+regression checks both sides' interrupt traces and the exact response,
+including preservation of the upper register halves.
+
+This makes the service available once the installer can execute as C.
+The original path for [0x132a5e] below 3 executes SIDT at 0x120b4b,
+loads ES=0x60 and reads and updates the live IDT through that
+selector. The other path skips SIDT and uses paired vector installation.
+The body still requires the SIDT and descriptor context before whole-body
+generation and comparison.

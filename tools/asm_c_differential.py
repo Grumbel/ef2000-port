@@ -241,7 +241,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         if vector == 0x21 and 0x3501 <= (values['ax'] & 0xffff) <= 0x3505:
             raise ValueError('X-32 selector service requires a descriptor-aware probe')
         if x32_vectors and vector == 0x21 and values['ax'] & 0xffff in (
-                0x2502, 0x2503, 0x2504, 0x2505, 0x2506, 0x2507):
+                0x2502, 0x2503, 0x2504, 0x2505, 0x2506, 0x2507, 0x250c):
             response = vector_tables[side].service(dict(values, ds=ds))
             response.pop('ds')
             if 'es' in response and response['es'] not in (8, 16, 24):
