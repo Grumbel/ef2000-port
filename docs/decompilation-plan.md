@@ -12808,3 +12808,18 @@ remain unverified. The build emits 4,344 bodies. The local command
 is `verify-threaded-continuation.py` and the report is
 `bulk-threaded-continuation-diff/report.json`. The inventory suite
 and both dispatcher tests for indirect targets passed (23 tests).
+
+Reused the compiled threaded-continuation library for all 68 original
+empty-drive probes under the same default preparation. It preserves all
+16 earlier passes and turns 42 of the 43 earlier mismatches into passes.
+The nine inconclusive probes retain their original stop categories.
+The remaining mismatch is 0x27fec at the instruction-byte guard.
+A separate replay on the same library with initialized scratch raster
+state still passes with 40,921 matching instruction addresses. This
+keeps the default and raster-prepared results distinguishable.
+
+The remaining original-side stops are three DOS create requests,
+two DOS console writes with a null buffer and nonzero count, three
+instruction-budget stops, and one unmapped read. Local evidence is
+`dos-empty-drive-threaded-regression.json` and
+`prepared-raster-threaded-regression.json`.
