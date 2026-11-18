@@ -1098,6 +1098,38 @@ ret
             self.assertEqual(run(ctypes.byref(state), 2, 0xf00, callback, None), 0)
             self.assertEqual((state.r[3], state.r[4]), (42, 0x804))
 
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_cpuid_boundaries_resume_with_matching_cpu_model(self):
+        source = """
+.intel_syntax noprefix
+.code32
+.org 0x100
+.type identify,@function
+identify:
+    xor eax,eax
+    cpuid
+    mov eax,1
+    cpuid
+    ret
+.size identify, .-identify
+"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root / 'out'
+            sites = (0x102, 0x109)
+            asm_c_program.generate(directory, out, image, cpuid_sites=sites)
+            report = asm_c_differential.verify(out, root / 'evidence', image,
+                                               scenarios=1, service_free_paths=True)
+            entry, = report['entries']
+            self.assertEqual(entry['state'], 'probes-pass', entry)
+            trace = entry['probes'][0]['cpuid']
+            self.assertEqual(trace['original'], trace['translated'])
+            self.assertEqual([(event['ip'], event['eax']) for event in trace['original']],
+                             list(zip(sites, (0, 1))))
+            with self.assertRaisesRegex(ValueError, 'reviewed CPUID'):
+                asm_c_program.generate(directory, root / 'bad', image, cpuid_sites=(0x103,))
+
     def test_differential_checks_paths_without_servicing_boundaries(self):
         source = """.type leaf,@function
 leaf: inc eax

@@ -12643,3 +12643,17 @@ provides inputs for a CPU-model boundary in the verifier. The bulk
 translator still needs that boundary. Local trace and reproduction script:
 `local/ghidra-group-followup-20261118/cpuid-trace.json` and
 `local/ghidra-group-followup-20261118/trace-cpuid.py`.
+
+2026-11-18 — Added opt-in CPUID yields at reviewed instruction starts.
+The prepared verifier executes CPUID in a separate Unicorn CPU configured
+with the original probe's CPU model, resumes C with the four result
+registers, and compares the leaf request trace alongside the existing
+register, flag and memory checks. Captured inputs and live runtime
+dispatch still lack a CPUID profile contract.
+
+With `--cpuid-site 0xf285f --cpuid-site 0xf2892`, the bulk generator
+emitted 4,341 bodies. Scoped host comparisons at 0xf2800 and 0xf2819
+both passed on one prepared input each. The first was the sole mismatch
+in the preceding full comparison. All 39 program tests passed.
+Artifacts are in `local/ghidra-group-followup-20261118/bulk-cpuid-diff/`.
+No tracker states changed.

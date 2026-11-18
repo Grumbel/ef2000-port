@@ -127,7 +127,7 @@ def validate_prepared_memory_size(size):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(),
+            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
@@ -145,6 +145,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         raise ValueError('host services require the program dispatcher')
     if memory_services and service_factory is None and port_factory is None:
         raise ValueError('memory services require a service factory')
+    if cpuid_sites and (not program or captured is not None):
+        raise ValueError('CPUID boundaries require prepared program probes')
+    original_cpuid, translated_cpuid = [], []
+    cpuid_cpu = None
     prepared_services = dos_console or x32_heap or dos_invalid_open or x32_residency
     if prepared_services and (not program or captured is not None or service_factory is not None):
         raise ValueError('Interrupt fixtures require prepared program probes and no custom interrupt handler')
@@ -307,6 +311,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
+        if cpuid_sites and (original_cpuid or translated_cpuid):
+            fields['cpuid'] = dict(cpu_model=cpu.ctl_get_cpu_model(),
+                                   original=original_cpuid, translated=translated_cpuid)
         if original_exit is not None or translated_exit is not None:
             fields['dos_exit'] = dict(original=original_exit, translated=translated_exit)
         if binding is not None:
@@ -413,6 +420,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
 
     for pc in sti_stop_sites:
         cpu.hook_add(UC_HOOK_CODE, stop_at_sti, begin=pc, end=pc)
+    def record_cpuid(engine, pc, _size, _data):
+        original_cpuid.append(dict(ip=pc, eax=engine.reg_read(x86_const.UC_X86_REG_EAX),
+                                   ecx=engine.reg_read(x86_const.UC_X86_REG_ECX)))
+
+    for pc in cpuid_sites:
+        cpu.hook_add(UC_HOOK_CODE, record_cpuid, begin=pc, end=pc)
     if phase:
         phase('original')
     try:
@@ -460,7 +473,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
-    if translated_service is None and translated_port is None and not prepared_services:
+    if translated_service is None and translated_port is None and not prepared_services and not cpuid_sites:
         status = (function(ctypes.byref(state), budget, sentinel) if program else
                   function(ctypes.byref(state), budget))
     else:
@@ -519,18 +532,43 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 state.r[:] = [response[n] for n in service_names]
                 state.flags = response['flags']
                 status = 0 if state.pc == sentinel else 1
+            if status == 0x205 and cpuid_sites:
+                ip = state.pc - 2
+                if ip not in cpuid_sites or memory[ip:state.pc] != b'\x0f\xa2':
+                    return outcome(state='mismatch', differences=['invalid C CPUID boundary'])
+                # Execute the opcode in a separate CPU with the original probe's model.
+                # Guest memory, flags and registers outside the four outputs stay in C.
+                if cpuid_cpu is None:
+                    cpuid_cpu = Uc(UC_ARCH_X86, UC_MODE_32)
+                    cpuid_cpu.ctl_set_cpu_model(cpu.ctl_get_cpu_model())
+                    cpuid_cpu.mem_map(0x1000, 0x1000)
+                    cpuid_cpu.mem_write(0x1000, b'\x0f\xa2')
+                eax, ecx = state.r[:2]
+                translated_cpuid.append(dict(ip=ip, eax=eax, ecx=ecx))
+                registers_cpuid = (x86_const.UC_X86_REG_EAX, x86_const.UC_X86_REG_ECX,
+                                   x86_const.UC_X86_REG_EDX, x86_const.UC_X86_REG_EBX)
+                for register, value in zip(registers_cpuid[:2], (eax, ecx)):
+                    cpuid_cpu.reg_write(register, value)
+                try:
+                    cpuid_cpu.emu_start(0x1000, 0x1002, count=1)
+                except UcError as error:
+                    return outcome(state='mismatch', differences=['C CPUID unavailable: '+str(error)])
+                state.r[:4] = [cpuid_cpu.reg_read(register) for register in registers_cpuid]
+                status = 0 if state.pc == sentinel else 1
             if status != 1:
                 break
     if status:
         reason = {7: 'unsupported segment profile',
                   8: 'pending x87 exception delivery unsupported',
-                  0x204: 'STI stop'}.get(status, 'budget/pc/memory/divide')
+                  0x204: 'STI stop', 0x205: 'CPUID boundary'}.get(status, 'budget/pc/memory/divide')
         return outcome(state='mismatch', translated_stop=dict(status=status, pc=state.pc, fault=state.fault),
                        differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
     if phase:
         phase('comparison')
     differences = []
+    if original_cpuid != translated_cpuid:
+        differences.append('CPUID request trace')
     if original_ports != translated_ports:
         differences.append('port service request/response trace')
     if original_events != translated_events:
@@ -590,7 +628,7 @@ def pit_write_service(request, registers):
 
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
-                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(),
+                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, x32_heap=False,
                     dos_invalid_open=False, x32_residency=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
@@ -617,7 +655,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
-                                 sti_stop_sites=sti_stop_sites,
+                                 sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency,
                                  port_factory=(lambda: pit_write_service) if pit_writes else
@@ -757,6 +795,14 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('invalid STI stop sites')
     if sti_stop_sites and (not program or not service_free_paths):
         raise ValueError('STI stops require a boundary-aware program comparison')
+    cpuid_sites = manifest.get('cpuid_sites', [])
+    if (not isinstance(cpuid_sites, list) or
+            any(type(pc) is not int or not 0 <= pc < len(payload) - 1
+                or payload[pc:pc+2] != b'\x0f\xa2' for pc in cpuid_sites) or
+            len(cpuid_sites) != len(set(cpuid_sites))):
+        raise ValueError('invalid CPUID boundary sites')
+    if cpuid_sites and (not program or not service_free_paths or captures):
+        raise ValueError('CPUID boundaries require prepared --service-free-paths program probes')
     reject_services = bool(manifest.get('host_service_boundaries') or
                            manifest.get('host_port_service_boundaries'))
     if reject_services and not program:
@@ -882,7 +928,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.restype = ctypes.c_uint
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
-                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites,
+                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency)
         for result in results:
@@ -928,7 +974,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
                                        'reject-on-reach' if reject_services else 'no-boundaries'),
-                  sti_stop_sites=sti_stop_sites,
+                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
                                          if captured_inputs else {},
