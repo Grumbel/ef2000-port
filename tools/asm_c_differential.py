@@ -254,6 +254,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
+    rejected_service = {}
     if original_service is not None:
         def interrupt(engine, vector, _):
             ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
@@ -265,8 +266,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                       for n, r in zip(service_names, asm_to_c.REGS)}
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
-            response = service(original_service, ip,
-                               values, original_events, vector, ram)
+            try:
+                response = service(original_service, ip, values, original_events, vector, ram)
+            except (ValueError, RuntimeError):
+                rejected_service.update(kind='interrupt', ip=ip, vector=vector,
+                                        ax=values['ax'] & 0xffff)
+                raise
             if memory_services:
                 engine.mem_write(0, bytes(ram))
             for n, r in zip(service_names, asm_to_c.REGS):
@@ -282,7 +287,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             request = dict(ip=engine.reg_read(x86_const.UC_X86_REG_EIP),
                            direction='out' if output else 'in', port=port, width=size*8)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
-            response = port_service(original_port, request, values, original_ports, ram)
+            try:
+                response = port_service(original_port, request, values, original_ports, ram)
+            except (ValueError, RuntimeError):
+                rejected_service.update(kind='port', **request)
+                raise
             if memory_services:
                 engine.mem_write(0, bytes(ram))
             return response['ax'] & ((1 << (size*8))-1)
@@ -338,7 +347,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         detail = {'original_memory_fault': memory_fault} if memory_fault else {}
         return outcome(state='inconclusive', reason='original fault: ' + str(error), **detail)
     except (ValueError, RuntimeError) as error:
-        return outcome(state='inconclusive', reason='original service unavailable: '+str(error))
+        detail = {'original_service_stop': rejected_service} if rejected_service else {}
+        return outcome(state='inconclusive', reason='original service unavailable: '+str(error),
+                       **detail)
     if stopped_at is not None:
         return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
     if cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:

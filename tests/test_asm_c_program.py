@@ -1114,6 +1114,12 @@ ret
             for address in (0x200, 0x300):
                 self.assertEqual(entries[address]['state'], 'inconclusive')
                 self.assertIn('unmodeled host service', entries[address]['probes'][0]['reason'])
+            interrupt_stop = entries[0x200]['probes'][0]['original_service_stop']
+            registers, _ = next(asm_c_differential.probes(1, 0x200))
+            self.assertEqual(interrupt_stop, dict(kind='interrupt', ip=0x200, vector=0x21,
+                                                  ax=registers[0] & 0xffff))
+            self.assertEqual(entries[0x300]['probes'][0]['original_service_stop'],
+                             dict(kind='port', ip=0x300, direction='in', port=0x61, width=8))
 
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function
