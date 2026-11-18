@@ -12423,3 +12423,15 @@ report. This turns an inconclusive service stop into an actionable
 coverage discrepancy. The evidence applies to these prepared exit
 paths. Reports: `bulk-pit-write-replay.json` and
 `bulk-pit-exit-replay.json` under `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — Added `asm_inventory.py --trace-entry` to audit a
+selected observed gap with the same boundary and callee checks used for
+table targets. Two prepared original traces (0x628 and 0xda5cc) with
+the DOS and PIT fixtures confirmed both missing entries. At 0xeb3d0,
+the scan found 41 instructions in a contiguous 120-byte body. Its
+unresolved direct callee at 0x10e248 jumps backward into the separate
+unowned DOS wrapper at 0x10e223. At 0xdbf2c, the four-instruction scan
+found an unresolved indirect call at 0xdbf31, which targeted 0xeb2c0
+on the recorded input. Neither candidate was added to the overlay.
+All 17 inventory tests passed. Reports: `bulk-exit-traces.json` and
+`bulk-exit-audit.json` under `local/ghidra-group-followup-20261118/`.

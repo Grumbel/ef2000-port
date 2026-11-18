@@ -102,6 +102,10 @@ class InventoryTests(unittest.TestCase):
             complete = audit(payload, 2)
             self.assertEqual([body['candidate_callees'] for body in complete], [[6], [12], []])
             self.assertEqual([body['blockers'] for body in complete], [[], [], []])
+            observed = asm_inventory.audit_table_bodies(
+                image, payload, {}, [], max_bytes=32, max_callees=2,
+                objdump='objdump', observed_entries=[0])
+            self.assertEqual(observed, [dict(complete[0], origin='observed-gap'), *complete[1:]])
             base = self.write_bodies(image.parent, image, [])
             overlay = image.parent / 'overlay.json'
             evidence = dict(candidate_bodies=complete, trace_sha256='trace',

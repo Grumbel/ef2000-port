@@ -348,7 +348,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
 
 
 def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
-                       max_callees=0):
+                       max_callees=0, observed_entries=()):
     if max_bytes <= 0:
         raise ValueError('candidate scan limit must be positive')
     if max_callees < 0:
@@ -357,7 +357,10 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
     for body in bodies.values():
         for start, end in body['ranges']:
             owned[start:end] = b'\x01' * (end - start)
-    roots = {match['target'] for table in tables for match in table['matches']}
+    table_roots = {match['target'] for table in tables for match in table['matches']}
+    roots = table_roots | set(observed_entries)
+    if any(not 0 <= entry < len(payload) for entry in roots):
+        raise ValueError('candidate entry lies outside the payload')
     candidates = set(roots)
     windows = {}
     while True:
@@ -380,7 +383,7 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
         if not extra:
             break
         candidates.update(sorted(extra)[:remaining])
-    if max_callees:
+    if max_callees or observed_entries:
         # Resolve leaves first, so a cycle or a rejected callee cannot certify its callers.
         accepted = set(bodies)
         while True:
@@ -391,7 +394,9 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
                 break
             accepted.update(ready)
         for body in report:
-            body['origin'] = 'table' if body['entry'] in roots else 'direct-call'
+            entry = body['entry']
+            body['origin'] = ('table' if entry in table_roots else
+                              'observed-gap' if entry in roots else 'direct-call')
             body['candidate_callees'] = sorted({
                 edge['target'] for edge in body['blockers']
                 if edge.get('kind') == 'call' and edge['target'] in candidates
@@ -547,7 +552,9 @@ def main(argv=None):
                         type=lambda value: int(value, 0), metavar=('SOURCE', 'BASE', 'STOP', 'STRIDE'),
                         help='check observed destinations against bounded 32-bit pointer slots')
     parser.add_argument('--trace-body-limit', type=int,
-                        help='statically audit matched table targets, scanning at most this many bytes each')
+                        help='statically audit selected trace targets, scanning at most this many bytes each')
+    parser.add_argument('--trace-entry', action='append', type=lambda value: int(value, 0), default=[],
+                        help='statically audit this observed gap target; repeatable')
     parser.add_argument('--trace-callee-limit', type=int,
                         help='also audit up to this many uncovered direct callees')
     parser.add_argument('--candidate-overlay', type=Path,
@@ -559,10 +566,12 @@ def main(argv=None):
         parser.error('--include-untracked-bodies requires a bulk body-range inventory')
     if args.trace_callee_limit is not None and args.trace_body_limit is None:
         parser.error('--trace-callee-limit requires --trace-body-limit')
-    if args.trace_body_limit is not None and not args.trace_table:
-        parser.error('--trace-body-limit requires --trace-table')
-    if args.trace_table and not args.trace_gaps:
-        parser.error('--trace-table requires --trace-gaps')
+    if args.trace_body_limit is not None and not (args.trace_table or args.trace_entry):
+        parser.error('--trace-body-limit requires --trace-table or --trace-entry')
+    if (args.trace_table or args.trace_entry) and not args.trace_gaps:
+        parser.error('--trace-table and --trace-entry require --trace-gaps')
+    if args.trace_entry and args.trace_body_limit is None:
+        parser.error('--trace-entry requires --trace-body-limit')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
         parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
@@ -582,11 +591,14 @@ def main(argv=None):
             payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
             report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps, tables=args.trace_table)
             if args.trace_body_limit is not None:
+                missing = set(args.trace_entry) - {gap['target'] for gap in report['entries']}
+                if missing:
+                    raise ValueError(f'candidate entries absent from observed gap targets: {sorted(missing)}')
                 report['candidate_bodies'] = audit_table_bodies(
                     workspace / ghidra_ef2000.IMAGE_NAME, payload,
-                    load_body_ranges(args.body_ranges, payload)[0], report['tables'],
+                    load_body_ranges(args.body_ranges, payload)[0], report.get('tables', []),
                     max_bytes=args.trace_body_limit, objdump=args.objdump,
-                    max_callees=args.trace_callee_limit or 0)
+                    max_callees=args.trace_callee_limit or 0, observed_entries=args.trace_entry)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')
