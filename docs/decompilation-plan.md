@@ -12265,3 +12265,14 @@ this scope. The tracker and Ghidra project were left intact.
 A follow-up using the same linked library matched all 592 prepared
 probes across the 37 candidates. Evidence is under
 `local/ghidra-group-followup-20261118/candidate-diff/`.
+
+2026-11-18 — Audited the missing direct-call chain from 0x13854 through
+0x136d4 to 0x85e74, starting with the leaf. All three candidate bodies
+passed the contiguous static control-flow and ownership checks. A
+disposable body overlay generated C and compiled 218 bodies with
+OpenWatcom. Each of the three new candidates matched its first prepared
+input. The caller at 0x12160 advanced to the next uncovered table target,
+0x13ff0. The scope returned 174 passes, 41 inconclusive inputs and three
+mismatches, including the two earlier formatter stops. This is candidate
+evidence. The authoritative body export and tracker were unchanged.
+Report: `local/ghidra-group-followup-20261118/dependency-diff/report.json`.
