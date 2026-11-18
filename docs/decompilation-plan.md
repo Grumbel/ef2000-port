@@ -14619,3 +14619,25 @@ journal SHA-256 is
 The earlier candidate's separate sweep was also interrupted, with 3,578
 matches and 548 inconclusive results in 4,126 records. Keep that evidence
 with its own candidate. Neither interrupted sweep produced a final report.
+
+#### Prepare list inputs for three ABI 6 entries
+
+The default zeroed registers send the list-count routine at 0xbc5d0
+through address zero, where it reads the first executable dword as a
+list pointer. The default keyboard classifier at 0xcc1ac likewise needs
+a pointer to a list head in EBX. These faults occur on the original side.
+
+The 4,361-entry candidate matched all registers, flags, and RAM through
+normal return in six focused probes. Use a head slot at 0x240000, nodes
+at 0x240020 and 0x240040 linked through offset 4, and a zero tail link.
+At 0xbc5d0 pass the slot in EAX and probe both a null head and the
+two-node chain. At 0xbc5e8 pass the same slot and indices 1 and 2 in
+EDX to cover a hit and the end of the chain. At 0xcc1ac pass the slot in
+EBX and key 4 in EDX. Set node ID bytes at offset 0xb to 76 and 77.
+Use EAX=77 with the second node's pointer at offset 0xc set to
+0x240060 and byte 4 of that table set to 0x80. Use EAX=78 to cover
+an unsuccessful traversal. The separate local evidence is
+`bulk-cpu-boundaries-list-fixtures.json`, SHA-256
+`26587451a68ef5b70ea8191649bf0b500040339c6594677258487f3af3fbcab0`.
+These prepared inputs cover the three entries directly. Their callers
+still need their own valid object and global state.
