@@ -13894,3 +13894,19 @@ require modeling their error callback after the fade.
 The prepared-match total is now 3,876 of 4,353 entries. See
 replay-bulk-gameport-bios-planar-copy.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare palette-fade callers up to the error callback
+
+The 500,000-instruction baseline stopped inside the palette
+update for 0xac7c8 and its caller 0x84aec. Both entries now
+match through the end of the fade and up to the indirect call
+at 0xac7db with a 2,000,000-instruction budget and the existing
+VGA models. Four prepared probes passed at this checkpoint,
+covering both a black palette and patterned six-bit components.
+The comparison includes the callback arguments already on the
+guest stack and the ordered VGA accesses during the fade.
+
+The callback at 0x132a74 remains outside this comparison. The
+prepared-match total through return stays at 3,876. See
+replay-bulk-gameport-bios-fade-error-prefix.py and its JSONL
+output under local/ghidra-group-followup-20261118.
