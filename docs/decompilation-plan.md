@@ -13880,3 +13880,17 @@ matched through return.
 The prepared-match total is now 3,875 of 4,353 entries. See
 replay-bulk-gameport-bios-transparent-blits.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify planar raster copies with bounded dimensions
+
+Entry 0xc38cc exhausted the baseline budget in the strided
+byte copy loop. Supplying explicit surface dimensions at
+0x15b744 and 0x15b748 and a separate source and destination
+produced complete matches for 4×1 and 12×3 surfaces. The
+latter case exercises multiple bytes per plane and multiple
+scanlines. The palette-fade callers 0xac7c8 and 0x84aec still
+require modeling their error callback after the fade.
+
+The prepared-match total is now 3,876 of 4,353 entries. See
+replay-bulk-gameport-bios-planar-copy.py and its JSONL output
+under local/ghidra-group-followup-20261118.
