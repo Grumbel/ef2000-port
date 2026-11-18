@@ -14355,3 +14355,22 @@ cache and selector values above. For the two uncached inputs use
 --checkpoint 0x11cdc2 1 and --checkpoint 0x11cde8 1, respectively.
 Reports are under local/ghidra-group-followup-20261118 in
 bulk-dpmi-query-c, dpmi-query-c and dpmi-query-diff-*.
+
+### 2026-11-18 — Compare uncached DPMI presence through return
+
+Five uncached 0x11cda5 probes match the original through return with
+scripted register-only interrupt responses. With the selector byte
+clear, exercise INT 2Fh reporting absent, followed in separate probes
+by INT 2Fh reporting present and INT 31h returning either a nonzero or
+zero version. With the selector byte set, exercise both version
+responses through INT 31h alone. Each pair agrees on final guest state,
+RAM, and the exact interrupt request and response sequence. The
+responses are test inputs. Launcher and real DPMI service behavior
+remain unverified.
+
+The focused DPMI program also compiles with Open Watcom 1.9 through
+asm_c_differential --watcom, and the cached positive probe passes in
+that verification run. Run the five scripted responses with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/replay-dpmi-presence.py`.
+The resulting dpmi-presence-results.jsonl has SHA-256
+3994c3de0b2923e145ec2a3e86da56340a2de57e1d0111e6193fcdfdfc835da1.
