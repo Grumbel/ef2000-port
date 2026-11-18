@@ -12320,3 +12320,20 @@ matched their first prepared inputs. Across the scope, 407 matched,
 registry (four at 0x9d794 and two at 0xfa804). No tracker or Ghidra
 ownership changes were made.
 Report: `local/ghidra-group-followup-20261118/guarded-shared-tail-diff/report.json`.
+
+2026-11-18 — Added repeatable `--address` selection to the differential
+verifier. It validates requested entries and keeps the full translation
+registry linked, so prepared probes can target selected callers while
+retaining indirect callees. Extending the scope to 519 generated bodies
+registered 0x9d794 and 0xfa804. A 16-input replay per selected entry
+cleared those stops and revealed two more known entries missing from
+the scope, 0x9d778 and its shared return at 0x9d77c.
+Including both entries brought the host-linked scope to 521 bodies.
+The seven selected callers then yielded 98 matches, 14 inconclusive
+inputs and zero mismatches across 112 inputs. Inconclusive inputs
+reached original-side memory faults or unmodeled host services.
+The 519-body run also built OpenWatcom objects. The 521-body follow-up
+used host C for the differential comparison. These overlays leave
+the authoritative tracker and function ownership intact.
+Reports: `local/ghidra-group-followup-20261118/callback-closure-diff/report.json`
+and `local/ghidra-group-followup-20261118/callback-shared-ret-diff/report.json`.
