@@ -74,6 +74,32 @@ class InventoryTests(unittest.TestCase):
         self.assertEqual(accepted['tail_targets'], [8])
         self.assertEqual(rejected['blockers'][0]['kind'], 'tail-jump')
 
+    def test_indirect_tail_requires_an_observed_in_image_destination(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root / 'payload.bin'
+            payload = bytes.fromhex('ffe090c3c3')
+            image.write_bytes(payload)
+            body_ranges = self.write_bodies(root, image, [
+                dict(address=2, ranges=[[2, 4]], instruction_spans=[[2, 1], [3, 1]])])
+            trace = root / 'trace.json'
+            trace.write_text(json.dumps(dict(payload_sha256=hashlib.sha256(payload).hexdigest(),
+                                             entries=[dict(root=0, trace=[0, 3]),
+                                                      dict(root=0, trace=[0, 4])])))
+            audit = asm_inventory.audit_trace_gaps(payload, body_ranges, trace, indirect_tail_sites=[0])
+            bodies, _ = asm_inventory.load_body_ranges(body_ranges, payload)
+            options = dict(max_bytes=8, objdump='objdump', observed_entries=[0])
+            ordinary, = asm_inventory.audit_table_bodies(image, payload, bodies, [], **options)
+            self.assertTrue(ordinary['blockers'])
+            admitted, = asm_inventory.audit_table_bodies(
+                image, payload, bodies, [], indirect_tails=audit['observed_indirect_tails'], **options)
+            self.assertEqual(admitted['observed_indirect_tails'], {0: [3, 4]})
+            self.assertEqual(admitted['blockers'], [])
+            for destinations in ([], [-1], [5]):
+                with self.subTest(destinations=destinations), self.assertRaises(ValueError):
+                    asm_inventory.audit_table_bodies(
+                        image, payload, bodies, [], indirect_tails={0: destinations}, **options)
+
     def test_candidate_audit_rejects_bypassed_or_invalid_jump_table_guards(self):
         with tempfile.TemporaryDirectory() as temporary:
             image = Path(temporary) / 'payload.bin'

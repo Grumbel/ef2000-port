@@ -193,7 +193,7 @@ def load_body_ranges(path, payload):
     return bodies, hashlib.sha256(source).hexdigest()
 
 
-def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=()):
+def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=(), indirect_tail_sites=()):
     """Group observed entries into runs of PCs absent from the reviewed layout."""
     bodies, body_digest = load_body_ranges(body_ranges, payload)
     source = trace_path.read_bytes()
@@ -207,6 +207,7 @@ def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=()):
     owned = {pc for body in bodies.values()
              for pc, _ in normalized_layout(body['instruction_spans'], payload)}
     gaps = {}
+    tail_targets = {site: set() for site in indirect_tail_sites}
     for entry in document['entries']:
         if not isinstance(entry, dict) or type(entry.get('root')) is not int or not isinstance(entry.get('trace'), list):
             raise ValueError('invalid trace entry')
@@ -217,6 +218,8 @@ def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=()):
             pc = step[0] if isinstance(step, list) and len(step) == 2 else step
             if type(pc) is not int or not 0 <= pc <= 0xffffffff:
                 raise ValueError('invalid trace PC')
+            if previous in tail_targets:
+                tail_targets[previous].add(pc)
             if pc >= len(payload) or pc in owned:
                 gap = None
             else:
@@ -237,6 +240,9 @@ def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=()):
                   trace_sha256=hashlib.sha256(source).hexdigest(), entries=entries)
     if tables:
         report['tables'] = [audit_trace_table(payload, entries, *table) for table in tables]
+    if tail_targets:
+        report['observed_indirect_tails'] = {site: sorted(targets)
+                                             for site, targets in tail_targets.items()}
     return report
 
 
@@ -292,7 +298,8 @@ def guarded_jump_tables(instructions, edges, entry, stop, payload):
 
 
 def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None,
-                         interrupt_sites=(), indirect_call_sites=(), known_instruction_starts=()):
+                         interrupt_sites=(), indirect_call_sites=(), known_instruction_starts=(),
+                         indirect_tails=None):
     """Follow local static edges and require reviewed external entry points."""
     decoded = {insn['address']: insn for insn in instructions}
     edges = {}
@@ -307,6 +314,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
     returns = set()
     tail_targets = set()
     dynamic_calls = set()
+    dynamic_tails = {}
     blockers = []
     while pending:
         pc = pending.pop()
@@ -341,6 +349,10 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
                 used_tables.append(tables[pc])
                 pending.extend(tables[pc]['targets'])
                 continue
+            if (kind == 'jump' and target is None and indirect_tails and pc in indirect_tails
+                    and insn['mnemonic'] == 'jmp'):
+                dynamic_tails[pc] = indirect_tails[pc]
+                continue
             if kind == 'jump' and target is not None and insn['mnemonic'] == 'jmp':
                 tail_targets.add(target)
                 if target in known_entries or target in known_instruction_starts:
@@ -350,7 +362,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
         if not edges.get(pc) and pc not in returns:
             blockers.append(dict(site=pc, reason='unsupported terminal instruction'))
     spans.sort()
-    if not returns and not tail_targets:
+    if not returns and not tail_targets and not dynamic_tails:
         blockers.append(dict(site=entry, reason='no reachable near return'))
     if any(left[1] != right[0] for left, right in zip(spans, spans[1:])):
         blockers.append(dict(site=entry, reason='reachable instruction spans are disjoint'))
@@ -362,11 +374,14 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
         result['tail_targets'] = sorted(tail_targets)
     if dynamic_calls:
         result['dynamic_call_sites'] = sorted(dynamic_calls)
+    if dynamic_tails:
+        result['observed_indirect_tails'] = dynamic_tails
     return result
 
 
 def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
-                       max_callees=0, observed_entries=(), interrupt_sites=(), indirect_call_sites=()):
+                       max_callees=0, observed_entries=(), interrupt_sites=(), indirect_call_sites=(),
+                       indirect_tails=None):
     if max_bytes <= 0:
         raise ValueError('candidate scan limit must be positive')
     if max_callees < 0:
@@ -383,6 +398,12 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
     # Tail jumps can enter an existing body at an interior instruction.
     known_starts = {pc for body in bodies.values() if body.get('instruction_spans') is not None
                     for pc, _ in normalized_layout(body['instruction_spans'], payload)}
+    for site, targets in (indirect_tails or {}).items():
+        if (not 0 <= site < len(payload) - 1 or payload[site] != 0xff
+                or payload[site + 1] & 0x38 != 0x20):
+            raise ValueError('candidate indirect tail site must point to a near indirect JMP')
+        if not targets or any(not 0 <= target < len(payload) for target in targets):
+            raise ValueError('candidate indirect tail requires observed in-image destinations')
     table_roots = {match['target'] for table in tables for match in table['matches']}
     roots = table_roots | set(observed_entries)
     if any(not 0 <= entry < len(payload) for entry in roots):
@@ -400,7 +421,8 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
             report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies,
                                                payload=payload, interrupt_sites=interrupt_sites,
                                                indirect_call_sites=indirect_call_sites,
-                                               known_instruction_starts=known_starts))
+                                               known_instruction_starts=known_starts,
+                                               indirect_tails=indirect_tails))
         remaining = max_callees - (len(candidates) - len(roots))
         if not remaining:
             break
@@ -529,7 +551,7 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
 
 
 def candidate_overlay(image, body_ranges, audit, output, *, objdump):
-    """Write a disposable inventory input with statically accepted candidates."""
+    """Write a disposable inventory input with audited candidates."""
     payload = image.read_bytes()
     bodies, digest = load_body_ranges(body_ranges, payload)
     if (audit['body_ranges_sha256'] != digest
@@ -552,6 +574,8 @@ def candidate_overlay(image, body_ranges, audit, output, *, objdump):
         if cursor != end or len(spans) != candidate['instruction_count']:
             raise ValueError(f'candidate disassembly differs at {entry:#x}')
         bodies[entry] = dict(address=entry, ranges=[[entry, end]], instruction_spans=spans)
+        if 'observed_indirect_tails' in candidate:
+            bodies[entry]['observed_indirect_tails'] = candidate['observed_indirect_tails']
         added.append(entry)
     overlay = dict(schema=1, boundary='ghidra-body-ranges',
                    payload_sha256=audit['payload_sha256'], base_body_ranges_sha256=digest,
@@ -587,10 +611,12 @@ def main(argv=None):
                         default=[], help='admit a reviewed two-byte INT during the candidate audit')
     parser.add_argument('--trace-indirect-call-site', action='append', type=lambda value: int(value, 0),
                         default=[], help='admit a reviewed near indirect CALL with a local continuation')
+    parser.add_argument('--trace-indirect-tail-site', action='append', type=lambda value: int(value, 0),
+                        default=[], help='admit a near indirect JMP with observed in-image destinations')
     parser.add_argument('--trace-callee-limit', type=int,
                         help='also audit up to this many uncovered direct call or tail-jump targets')
     parser.add_argument('--candidate-overlay', type=Path,
-                        help='write body ranges with statically accepted trace candidates')
+                        help='write body ranges with audited trace candidates')
     args = parser.parse_args(argv)
     if args.candidate_overlay and args.trace_body_limit is None:
         parser.error('--candidate-overlay requires --trace-body-limit')
@@ -608,6 +634,8 @@ def main(argv=None):
         parser.error('--trace-interrupt-site requires --trace-body-limit')
     if args.trace_indirect_call_site and args.trace_body_limit is None:
         parser.error('--trace-indirect-call-site requires --trace-body-limit')
+    if args.trace_indirect_tail_site and args.trace_body_limit is None:
+        parser.error('--trace-indirect-tail-site requires --trace-body-limit')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
         parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
@@ -625,7 +653,8 @@ def main(argv=None):
         workspace = ghidra_ef2000.validated_workspace(args.workspace)
         if args.trace_gaps:
             payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
-            report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps, tables=args.trace_table)
+            report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps, tables=args.trace_table,
+                                      indirect_tail_sites=args.trace_indirect_tail_site)
             if args.trace_body_limit is not None:
                 missing = set(args.trace_entry) - {gap['target'] for gap in report['entries']}
                 if missing:
@@ -639,7 +668,8 @@ def main(argv=None):
                     load_body_ranges(args.body_ranges, payload)[0], report.get('tables', []),
                     max_bytes=args.trace_body_limit, objdump=args.objdump,
                     max_callees=args.trace_callee_limit or 0, observed_entries=args.trace_entry,
-                    interrupt_sites=args.trace_interrupt_site, indirect_call_sites=args.trace_indirect_call_site)
+                    interrupt_sites=args.trace_interrupt_site, indirect_call_sites=args.trace_indirect_call_site,
+                    indirect_tails=report.get('observed_indirect_tails'))
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

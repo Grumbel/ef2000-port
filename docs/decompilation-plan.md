@@ -12769,3 +12769,19 @@ and the differential verifier reports a pass. The local
 `prepared-raster-divergence-trace.json` record this synthetic case.
 This setup has not been checked against a captured call or used
 for a full sweep.
+
+The candidate inventory audit accepts an explicitly requested near
+indirect tail jump if the payload-bound trace records an in-image
+destination. The overlay retains the observed destinations. They
+do not establish a complete target set or change runtime dispatch.
+The 21 inventory tests passed, including rejection of missing or
+out-of-image trace destinations.
+
+The threaded handler at 0xc7e38 now passes the body audit with 58
+instructions and the observed tail transfer from 0xc7f04 to 0xc63e4.
+That destination is also absent from the inventory. The original
+empty-drive traces enter it and call 0xc6370, then exit through DOS
+before either of its later indirect sites executes. Static review
+still finds an indirect call at 0xc63f3 and an indirect tail at
+0xc6401, so this destination needs separate evidence before its
+entire body can be admitted.
