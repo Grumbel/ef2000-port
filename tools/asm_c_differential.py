@@ -151,7 +151,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     effects use the same disposable snapshot rules as interrupt services.
     """
     from unicorn import (Uc, UC_ARCH_X86, UC_MODE_32, UcError, UC_HOOK_CODE, UC_HOOK_INTR, UC_HOOK_INSN,
-                         UC_HOOK_MEM_INVALID, UC_MEM_FETCH_PROT, UC_MEM_FETCH_UNMAPPED,
+                         UC_HOOK_MEM_INVALID, UC_ERR_INSN_INVALID, UC_MEM_FETCH_PROT, UC_MEM_FETCH_UNMAPPED,
                          UC_MEM_READ_PROT, UC_MEM_READ_UNMAPPED, UC_MEM_WRITE_PROT, UC_MEM_WRITE_UNMAPPED)
     from unicorn import x86_const
 
@@ -635,6 +635,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        **detail)
     except UcError as error:
         detail = {'original_memory_fault': memory_fault} if memory_fault else {}
+        if error.errno == UC_ERR_INSN_INVALID:
+            pc = cpu.reg_read(x86_const.UC_X86_REG_EIP)
+            instruction_fault = dict(pc=pc)
+            if pc < memory_size:
+                size = min(15, memory_size - pc)
+                instruction_fault['live_window'] = cpu.mem_read(pc, size).hex()
+                instruction_fault['initial_window'] = memory[pc:pc + size].hex()
+            detail['original_instruction_fault'] = instruction_fault
         return outcome(state='inconclusive', reason='original fault: ' + str(error), **detail)
     except (ValueError, RuntimeError) as error:
         detail = {'original_service_stop': rejected_service} if rejected_service else {}

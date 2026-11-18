@@ -576,6 +576,21 @@ class TranslationTests(unittest.TestCase):
         self.assertEqual(report['state'], 'inconclusive')
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_original_invalid_instruction_reports_live_and_initial_bytes(self):
+        # Write UD2 over the NOPs, then jump to the modified bytes.
+        instructions = bytes.fromhex('66c7050b0100000f0beb009090c3')
+        payload = bytes(256) + instructions
+        registers, flags = next(asm_c_differential.probes(1, 1))
+        result = asm_c_differential.compare(
+            lambda *_: self.fail('translation ran after original fault'),
+            payload, 0x100, registers, flags)
+        self.assertEqual(result['state'], 'inconclusive')
+        fault = result['original_instruction_fault']
+        self.assertEqual(fault['pc'], 0x10b)
+        self.assertTrue(fault['live_window'].startswith('0f0bc3'))
+        self.assertTrue(fault['initial_window'].startswith('9090c3'))
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_original_memory_fault_identifies_operand_and_instruction(self):
         registers, flags = next(asm_c_differential.probes(1, 1))
         for opcode, access in (('a1', 'read'), ('a3', 'write')):

@@ -13078,3 +13078,16 @@ the port with the DAC disabled. Ten match with the DAC enabled, including
 full palette uploads. 0x284ec and 0xa9aa8 progress to original-side
 invalid instructions. The paired results are in
 local/ghidra-group-followup-20261118/vga-dac-current-replay.json.
+
+### 2026-11-18 — Diagnose invalid instructions in the original probe
+
+The differential report records the original fault PC and the first
+15 bytes of live and initial RAM at that address, bounded by mapped RAM.
+A synthetic self-modifying UD2 probe confirms that the windows differ
+and that the original-side fault remains inconclusive.
+
+The VGA DAC replays for 0x284ec and 0xa9aa8 now both identify PC 0x14.
+Local traces show the indirect call at 0xc3f38 using the unset graphics
+dispatch slot at 0x41f3d0 and reaching address zero. Earlier writes had
+changed the bytes at 0x14 to 0xff. See local/ghidra-group-followup-20261118/
+vga-dac-invalid-instruction-trace.json and the corresponding replay.
