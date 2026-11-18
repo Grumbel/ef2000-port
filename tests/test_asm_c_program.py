@@ -446,6 +446,26 @@ ret
                                 for p in report['entries'][0]['probes']))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_patched_imul_and_accumulator_add_immediates_match(self):
+        source = '''.type root,@function
+root: mov ecx, 3
+mov dword ptr [full+2], 0x19
+mov byte ptr [short_imm+2], 0xfb
+mov word ptr [bias+2], 0x1234
+full: .byte 0x69, 0xc1, 0x78, 0x56, 0x34, 0x12
+short_imm: .byte 0x6b, 0xc0, 0x03
+bias: .byte 0x66, 0x05, 0x78, 0x56
+ret
+.size root, .-root'''
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            out = root / 'out'
+            asm_c_program.generate(directory, out, image)
+            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=16)
+            self.assertEqual(report['entries'][0]['counts'], {'pass': 16}, report['entries'][0]['probes'][0])
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_composed_call_frames_tail_jumps_and_recursion_match_all_ram(self):
         programs = [
             '''.type root,@function

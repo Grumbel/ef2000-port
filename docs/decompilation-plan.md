@@ -12119,3 +12119,15 @@ inconclusive because the original read through an unmapped EDX pointer.
 All 47 Ghidra wrapper tests passed. Evidence is under
 `local/ghidra-scan-unget-20261118/`. Caller paths still need comparison
 with the regenerated bulk dispatcher.
+
+2026-11-18 — The prepared input at 0xd8fd8 previously stopped at
+the code guard at 0xdc5b4. The original has writes into the immediate
+fields of register IMUL and accumulator ADD, including 0xdc5b6 and
+0xdc606. The lifter now reads those reviewed encoding forms from guest
+memory at execution time and retains the guard for the fixed bytes.
+A synthetic fixture patches full and signed-byte IMUL immediates and
+a word accumulator bias, matching on all 16 probes. The 10-body direct
+closure builds with OpenWatcom. Its first 5 MiB probe at 0xd8fd8 now
+continues to the uncovered dynamic target 0xd83b8. The other nine
+entries match on their first input. Evidence is under
+`local/ghidra-scan-unget-20261118/immediate-diff/`.

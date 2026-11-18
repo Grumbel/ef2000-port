@@ -575,16 +575,29 @@ def condition_c(mnemonic):
 def mutable_immediate(insn):
     """Prove a data suffix has a fixed operation, register and encoded width."""
     if insn['mnemonic'] not in ('mov', 'add', 'or', 'adc', 'sbb', 'and', 'sub', 'xor', 'cmp',
-                                 'rol', 'ror', 'rcl', 'rcr', 'shl', 'shr', 'sar'):
+                                 'rol', 'ror', 'rcl', 'rcr', 'shl', 'shr', 'sar', 'imul'):
         return None
     arguments = [operand(part) for part in insn['operands'].split(',')]
-    if len(arguments) != 2 or arguments[0][0] != 'reg' or arguments[1][0] != 'imm':
+    count = 3 if insn['mnemonic'] == 'imul' else 2
+    if len(arguments) != count or arguments[0][0] != 'reg' or arguments[-1][0] != 'imm':
         return None
     encoded = bytes.fromhex(insn['bytes'])
     prefix = 1 if encoded[0] == 0x66 else 0
     opcode = encoded[prefix]
     signed = False
-    if 0xb0 <= opcode <= 0xb7 and insn['mnemonic'] == 'mov':
+    if opcode in (0x69, 0x6b) and insn['mnemonic'] == 'imul' and len(encoded) >= prefix+3:
+        modrm = encoded[prefix+1]
+        bits = 16 if prefix else 32
+        if modrm & 0xc0 != 0xc0 or arguments[1] != ('reg', modrm & 7, bits, 0):
+            return None
+        expected = ('reg', (modrm >> 3) & 7, bits, 0)
+        offset, width = prefix+2, bits if opcode == 0x69 else 8
+        signed = opcode == 0x6b
+    elif opcode in (0x04, 0x05) and insn['mnemonic'] == 'add':
+        bits = 8 if opcode == 0x04 else 16 if prefix else 32
+        expected = ('reg', 0, bits, 0)
+        offset, width = prefix+1, bits
+    elif 0xb0 <= opcode <= 0xb7 and insn['mnemonic'] == 'mov':
         index = opcode - 0xb0
         expected = ('reg', index % 4, 8, 8 if index >= 4 else 0)
         offset, width = prefix+1, 8
@@ -612,7 +625,7 @@ def mutable_immediate(insn):
     value = int.from_bytes(encoded[offset:], 'little')
     if signed and value & 0x80:
         value -= 256
-    if value & ((1 << expected[2])-1) != arguments[1][1] & ((1 << expected[2])-1):
+    if value & ((1 << expected[2])-1) != arguments[-1][1] & ((1 << expected[2])-1):
         return None
     return offset, width, signed
 
@@ -1210,7 +1223,7 @@ def instruction_c(insn, starts):
             if (len(arguments) == 3 and right[0] != 'imm') or any(
                     width_of(op) not in (None, width) for op in (left, right)):
                 raise Unsupported('unsupported multiply source widths')
-        code += ['a = %s; b = %s;' % (read(left, width), read(right, width)),
+        code += ['a = %s; b = %s;' % (read(left, width), immediate_expression(insn) or read(right, width)),
                  'if (s->fault) return s->fault;',
                  'product = ef_multiply(s, a, b, %d, %d);' % (width, mnemonic == 'imul')]
         if len(arguments) == 1 and width == 8:
