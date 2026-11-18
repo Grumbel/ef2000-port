@@ -576,14 +576,16 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 else:
                     response = service(original_service, ip, values, original_events, vector, ram)
             except (ValueError, RuntimeError):
+                ds = engine.reg_read(x86_const.UC_X86_REG_DS)
+                es = engine.reg_read(x86_const.UC_X86_REG_ES)
                 rejected_service.update(kind='interrupt', ip=ip, vector=vector,
-                                        ax=values['ax'] & 0xffff)
+                                        ax=values['ax'] & 0xffff, ds=ds, es=es,
+                                        registers=values)
                 if vector == 0x21 and (values['ax'] >> 8) & 0xff == 0x40:
                     rejected_service['write_request'] = dict(
                         handle=values['bx'] & 0xffff, count=values['cx'], offset=values['dx'],
-                        ds=engine.reg_read(x86_const.UC_X86_REG_DS))
+                        ds=ds)
                 if captured is None and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
-                    ds = engine.reg_read(x86_const.UC_X86_REG_DS)
                     offset = values['dx']
                     request = dict(ds=ds, offset=offset, bx=values['bx'], cx=values['cx'])
                     if ds in (16, 24) and 0x260 < offset <= memory_size - 18:
@@ -614,6 +616,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                                         original_dac, engine.mem_write)
             except (ValueError, RuntimeError):
                 rejected_service.update(kind='port', **request)
+                if output:
+                    rejected_service['value'] = values['ax'] & ((1 << (size*8))-1)
                 raise
             if memory_services:
                 engine.mem_write(0, bytes(ram))

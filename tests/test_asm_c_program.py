@@ -1162,6 +1162,12 @@ ret
 device: in al,0x61
 ret
 .size device, .-device
+.org 0x310
+.type device_write,@function
+device_write: mov al,0x42
+out 0x61,al
+ret
+.size device_write, .-device_write
 .org 0x400
 .type terminate,@function
 terminate: mov ax,0x4c07
@@ -1292,10 +1298,15 @@ ret
                 self.assertIn('unmodeled host service', entries[address]['probes'][0]['reason'])
             interrupt_stop = entries[0x200]['probes'][0]['original_service_stop']
             self.assertEqual(interrupt_stop, dict(
-                kind='interrupt', ip=0x213, vector=0x21, ax=0x4000,
+                kind='interrupt', ip=0x213, vector=0x21, ax=0x4000, ds=16, es=16,
+                registers=dict(ax=0x4000, bx=1, cx=4, dx=0x300000,
+                               sp=0x3f0000, bp=0, si=0, di=0, flags=0x247),
                 write_request=dict(handle=1, count=4, offset=0x300000, ds=16)))
             self.assertEqual(entries[0x300]['probes'][0]['original_service_stop'],
                              dict(kind='port', ip=0x300, direction='in', port=0x61, width=8))
+            self.assertEqual(entries[0x310]['probes'][0]['original_service_stop'],
+                             dict(kind='port', ip=0x312, direction='out', port=0x61,
+                                  width=8, value=0x42))
             console_report = asm_c_differential.verify(
                 out, root / 'console', image, scenarios=1, service_free_paths=True,
                 dos_console=True, pit_writes=True, dos_invalid_open=True)

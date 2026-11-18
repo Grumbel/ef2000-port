@@ -13272,3 +13272,16 @@ dependencies it reaches through 0x584..0x601 and 0x9c03b..0x9c1a1
 call at 0x5bd. A local build includes all three candidates for the next
 full comparison. See local/ghidra-group-followup-20261118/
 bulk-cleanup-diff/report.json and bulk-vbe-release-prefix.jsonl.
+
+### 2026-11-18 — Verify the legacy BIOS paths and record rejected service arguments
+
+The regenerated library admits INT 10h at 0xfe705, 0xfe71a and 0xfe71e.
+All six legacy video probes now match through completion with the
+prepared fixtures. See local/ghidra-group-followup-20261118/
+bulk-bios-mode-diff/report.json.
+
+Rejected original interrupts now report the full input general-purpose
+registers and flags, plus DS and ES. Rejected port writes report the
+width-limited output value. The existing synthetic service-boundary
+test checks both additions. These fields distinguish unsupported
+operations that share a DOS function number or I/O port.
