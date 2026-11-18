@@ -13006,3 +13006,22 @@ OpenWatcom compiled misc_drafts1.c with zero warnings. The rebuilt
 hybrid replay passed both Helsinki acceptance dialogs and rendered
 the cockpit. Evidence: local/early-game-regressions-9R5aDI/
 helsinki-fixed and helsinki-recheck.
+
+The quick-combat comparison used automatic input selection (keyboard)
+and an eight-second Left hold on private Xvfb. An initial shorter
+sequence survived without establishing equivalent flight progression.
+After eight seconds of pre-input flight, the hybrid faulted in
+0xcd258 during the hold. The stack and linked listing placed the
+prior resource lookup in 0xcd150, which had omitted the EAX name
+argument shown at 0xcd15a. The failed lookup left the default cursor
+in place and the progress table unavailable to the subsequent read.
+Use the existing keyed lookup with name address 0x18f560.
+
+OpenWatcom compiled engine_helpers.c with zero warnings and its
+listing confirms the EAX load. The rebuilt hybrid received the same
+185 Left make codes and one break as the original comparison. Both
+reached the Game Over screen with an identical captured window image.
+See local/early-game-regressions-9R5aDI/{quick-delayed,quick-original,
+quick-entry-fixed,engine_helpers.lst}. A local diagnostic trap at the
+original null-code entry was present in the quick-combat replays and
+did not fire in the corrected run.

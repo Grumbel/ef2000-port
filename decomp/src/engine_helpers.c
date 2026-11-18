@@ -75,13 +75,13 @@ uint32_t pick_variant_cc894(uint8_t code)
     return ((guest_fn_a45b3() & 0xffffu) % 2u) + 1u;
 }
 
-/* 0xcd150, 113 bytes. */
+/* 0xcd150, 113 bytes. Open a numbered entry in the progress resource. */
 uint8_t open_entry_cd150(int16_t number)
 {
     uint32_t table;
     uint32_t entry;
     EF_U32(0x0015b628u) = 0x0015b624u;
-    table = guest_fn_a1a40();
+    table = guest_fn_a1a40_key(0x0018f560u);
     if (table == 0)
         return 0;
     entry = guest_fn_a1a90((int32_t)number, table);
