@@ -1255,7 +1255,7 @@ ret
 .type vbe_mode_info,@function
 vbe_mode_info: mov eax,0x2511
 mov edx,0xe00
-mov ecx,0x101
+mov ecx,dword ptr [0x300000]
 mov edi,0x120
 int 0x21
 movzx esi,word ptr [0x05000230]
@@ -1325,7 +1325,9 @@ ret
             self.assertEqual(request['after']['dx'], 0x87654321)
             vbe_report = asm_c_differential.verify(
                 out, root / 'vbe', image, scenarios=1, service_free_paths=True,
-                x32_vbe=True, prepared_memory_size=0x5100000, addresses=[0xd00])
+                x32_vbe=True, prepared_memory_size=0x5100000, addresses=[0xd00],
+                prepared_u32=[(0x300000, 0x101)])
+            self.assertEqual(vbe_report['prepared_u32'], [dict(address=0x300000, value=0x101)])
             vbe_probe = vbe_report['entries'][0]['probes'][0]
             self.assertEqual(vbe_probe['state'], 'pass', vbe_probe)
             vbe_events = vbe_probe['host_services']

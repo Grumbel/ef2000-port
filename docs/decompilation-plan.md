@@ -12965,3 +12965,17 @@ and 0xfc6c8. The path at 0xd1d40 passed its previous service stop
 and exhausted the original budget even at 100,000 instructions.
 The local evidence is in `x32-vbe-replay.json`,
 `x32-vbe-aperture-control.json` and `x32-vbe-budget-replay.json`.
+
+`--prepared-u32 ADDRESS VALUE` initializes a little-endian data word
+in both engines for prepared program probes. The report records the
+writes alongside the unmodified payload digest.
+
+The largest shared memory fault in the full CPUID comparison was the
+BIOS tick pointer retained from the native address space. The timer
+initialization at 0xfe56d adds 0x46c to the DOS base at 0x120cc6.
+Using `--prepared-u32 0x120cc6 0x05000000` applies the same base as
+the Unicorn runtime. Of 38 selected entries with the stale tick
+pointer fault, 27 matched on one prepared input and 11 remain
+inconclusive. All 38 were inconclusive in the control with identical
+RAM size and service options. See local `bios-tick-replay.json` and
+`bios-tick-control.json`.

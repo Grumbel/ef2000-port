@@ -133,7 +133,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
-            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
+            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=()):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -171,6 +171,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     dos_end = dos_base + real_mode.MEMORY_SIZE
     if x32_vbe and (prepared_memory_size or 0) < dos_end:
         raise ValueError('X-32 VBE fixture requires prepared RAM covering the DOS aperture')
+    if prepared_u32 and (not program or captured is not None):
+        raise ValueError('initial RAM writes require prepared program probes')
     if captured is not None and prepared_memory_size is not None:
         raise ValueError('captured RAM cannot be resized')
     service_names = ('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')
@@ -414,6 +416,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         stack = registers[4]
         if not 0 <= stack <= memory_size - 4:
             raise ValueError('prepared return stack lies outside RAM')
+        for offset, value in prepared_u32:
+            if not 0 <= offset <= memory_size - 4 or not 0 <= value <= 0xffffffff:
+                raise ValueError('initial u32 write is outside prepared RAM or value range')
+            if offset < stack + 4 and stack < offset + 4:
+                raise ValueError('initial u32 write overlaps the probe return stack')
+            struct.pack_into('<I', memory, offset, value)
         memory[stack:stack+4] = sentinel.to_bytes(4, 'little')
         cpu = Uc(UC_ARCH_X86, UC_MODE_32)
         cpu.mem_map(0, memory_size)
@@ -824,7 +832,7 @@ def vga_status_service(pit_writes=False):
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=()):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -850,6 +858,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
+                                 prepared_u32=prepared_u32,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
                                  x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
@@ -961,7 +970,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=()):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -972,6 +981,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    if prepared_u32 and (not program or not service_free_paths or captures):
+        raise ValueError('initial RAM writes require --service-free-paths and prepared program probes')
     if checkpoint is not None and (not program or not service_free_paths or captures or not addresses):
         raise ValueError('checkpoint requires prepared program probes and explicit entry addresses')
     if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
@@ -1139,7 +1150,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint)
+                                  checkpoint=checkpoint, prepared_u32=prepared_u32)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -1177,6 +1188,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_checkpoint=dict(pc=checkpoint[0], visits=checkpoint[1]) if checkpoint else None,
                   prepared_memory_size=prepared_memory_size or 0x400000,
+                  prepared_u32=[dict(address=offset, value=value) for offset, value in prepared_u32],
                   x32_heap_policy='prepared-only' if x32_heap else 'disabled',
                   x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
                                         if x32_heap else None,
@@ -1238,6 +1250,9 @@ def main(argv=None):
                         help='with --service-free-paths, model deterministic DOS open buffer errors')
     parser.add_argument('--x32-residency', action='store_true',
                         help='with --service-free-paths, model X-32 lock and unlock on prepared RAM')
+    parser.add_argument('--prepared-u32', type=lambda value: int(value, 0), nargs=2,
+                        action='append', default=[], metavar=('ADDRESS', 'VALUE'),
+                        help='initialize a little-endian u32 in prepared guest RAM')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
@@ -1264,7 +1279,7 @@ def main(argv=None):
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
-                        checkpoint=args.checkpoint)
+                        checkpoint=args.checkpoint, prepared_u32=args.prepared_u32)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
