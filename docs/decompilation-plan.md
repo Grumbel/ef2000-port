@@ -12859,3 +12859,19 @@ budget. See local `profile-dos-budget.json`,
 `dos-long-path-replay.json`, and `dos-eight-million-replay.json`.
 Original-side budget stops now report the next guest PC and the
 configured budget. The synthetic single-instruction probe checks both.
+
+Replayed the other three default-budget stops from the empty-drive
+cohort at 500,000 instructions. 0x7e8c0 passes with matching DOS exit
+code 255. 0x278c0 and 0x28224 both reach the indirect graphics call
+at 0xc3f38 with a zero value in dispatch slot 0x41f3d0, and enter
+address zero. The existing scratch framebuffer fixture alone leaves
+this call unresolved. Setting the dispatch slot to the memcpy target
+observed in startup (0xe9a24) exposes an unmapped destination. With
+the aperture base at 0x120cc6 initialized to map the destination to
+scratch RAM at 0x360000, both paths progress to an unsupported native
+x87 register encoding in the original oracle. They remain inconclusive.
+The extra dispatch and aperture initialization also changes the path
+of 0x27fec, which passes under the earlier raster-only preparation.
+Local evidence is in `dos-other-budget-replay.json`,
+`raster-neighbors-replay.json`, `raster-dispatch-replay.json`, and
+`raster-dispatch-aperture-replay.json`.
