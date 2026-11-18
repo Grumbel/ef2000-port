@@ -12907,3 +12907,16 @@ results with this fixture. With saved-framebuffer preparation,
 0x278c0 and 0x28224 advance from the mouse request to the unmodeled
 VGA status port read at 0xdc2ee (port 0x3da). See local
 `x32-mouse-replay.json` and `raster-x32-mouse-replay.json`.
+
+The opt-in `--vga-status-reads` probe fixture uses the runtime VGA
+status model with a deterministic clock alternating between active
+display and retrace. Each side starts at the same phase and advances
+its clock on each byte read of port 0x3da. The synthetic comparison
+verifies readings 0 and 8, preservation of the upper accumulator
+bits, and matching port transcripts. The runtime retrace boundary
+test also passes. With the saved framebuffer and idle mouse,
+0x278c0 and 0x28224 progress beyond the VGA service stop. At two
+million instructions, the original has completed 487 and 470
+polling pairs respectively and both probes are still inconclusive.
+Local evidence is in `raster-vga-status-replay.json` and
+`raster-vga-status-long.json`.

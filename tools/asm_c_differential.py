@@ -750,9 +750,28 @@ def pit_write_service(request, registers):
     return reject_host_service()
 
 
+def vga_status_service(pit_writes=False):
+    """Use a deterministic read-driven clock for the runtime retrace model."""
+    from itertools import cycle
+    try:
+        from .unicorn_backend import VgaStatus
+    except ImportError:
+        from unicorn_backend import VgaStatus
+
+    clock = cycle((0, 15000000))
+    status = VgaStatus(clock=lambda: next(clock))
+
+    def handle(request, registers):
+        if request['direction'] == 'in' and request['port'] == 0x3da and request['width'] == 8:
+            return dict(registers, ax=(registers['ax'] & ~0xff) | status.read())
+        return pit_write_service(request, registers) if pit_writes else reject_host_service()
+
+    return handle
+
+
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
-                    dos_console=False, pit_writes=False, x32_heap=False,
+                    dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
                     dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
@@ -781,7 +800,8 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
-                                 port_factory=(lambda: pit_write_service) if pit_writes else
+                                 port_factory=(lambda: vga_status_service(pit_writes)) if vga_status_reads else
+                                 (lambda: pit_write_service) if pit_writes else
                                  (lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
@@ -887,7 +907,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False,
+           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
            x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
@@ -913,6 +933,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('DOS open fixtures require --service-free-paths and interrupt boundaries')
     if pit_writes and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
         raise ValueError('PIT write fixture requires --service-free-paths and port boundaries')
+    if vga_status_reads and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
+        raise ValueError('VGA status fixture requires --service-free-paths and port boundaries')
     sti_stop_sites = manifest.get('sti_stop_sites', [])
     if (not isinstance(sti_stop_sites, list) or
             any(type(pc) is not int or not 0 <= pc < len(payload) or payload[pc] != 0xfb
@@ -1054,7 +1076,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
-                                  dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes,
+                                  dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse)
         for result in results:
             record_registry_membership(result)
@@ -1098,6 +1120,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   dos_empty_drive_policy='create-open-write-close-seek-device-info' if dos_empty_drive else 'disabled',
                   dos_invalid_open_policy='prepared-only' if dos_invalid_open else 'disabled',
+                  vga_status_policy='alternating-retrace-prepared-only' if vga_status_reads else 'disabled',
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
                                        'reject-on-reach' if reject_services else 'no-boundaries'),
@@ -1129,6 +1152,8 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--vga-status-reads', action='store_true',
+                        help='compare VGA status reads using deterministic retrace phase')
     parser.add_argument('--pit-writes', action='store_true',
                         help='with --service-free-paths, compare channel-zero PIT writes on prepared probes')
     parser.add_argument('--dos-console', action='store_true',
@@ -1163,7 +1188,7 @@ def main(argv=None):
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
                         service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
-                        pit_writes=args.pit_writes, x32_heap=args.x32_heap,
+                        pit_writes=args.pit_writes, vga_status_reads=args.vga_status_reads, x32_heap=args.x32_heap,
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address)

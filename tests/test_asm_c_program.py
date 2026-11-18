@@ -1222,7 +1222,15 @@ ret
 .size real_mode_call, .-real_mode_call
 .org 0x900
 .short 0x33,1,2,3,4
-.long 0xb,0x12345678"""
+.long 0xb,0x12345678
+.org 0xa00
+.type retrace,@function
+retrace: mov edx,0x3da
+mov eax,0x12345678
+in al,dx
+in al,dx
+ret
+.size retrace, .-retrace"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1271,6 +1279,15 @@ ret
             event = mouse_events['original'][0]
             self.assertEqual(event['after']['dx'], 0x12340000)
             self.assertEqual(bytes.fromhex(event['frame_after'])[-4:], b'\x00\x004\x12')
+            vga_report = asm_c_differential.verify(
+                out, root / 'vga', image, scenarios=1, service_free_paths=True,
+                vga_status_reads=True, addresses=[0xa00])
+            vga_probe = vga_report['entries'][0]['probes'][0]
+            self.assertEqual(vga_probe['state'], 'pass', vga_probe)
+            vga_events = vga_probe['port_services']
+            self.assertEqual(vga_events['original'], vga_events['translated'])
+            self.assertEqual([e['after']['ax'] for e in vga_events['original']],
+                             [0x12345600, 0x12345608])
             self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
             self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
             events = console_entries[0x200]['probes'][0]['host_services']
