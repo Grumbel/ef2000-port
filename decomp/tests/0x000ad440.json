@@ -1,1 +1,19 @@
-{"address":"0x000ad440","function_size":81,"max_instructions":180000,"cases":[{"name":"drafted_probe","registers":{"eax":"0x00001000","edx":"0x00001000"},"memory":[]}]}
+{
+  "address": "0x000ad440",
+  "function_size": 81,
+  "cases": [
+    {
+      "name": "forward_the_built_path_to_the_resource_size_callback",
+      "registers": {"eax": "0x240020", "edx": "0x240030"},
+      "memory": [
+        {"address": "0x132aa8", "hex": "40002400"},
+        {"address": "0x132ab4", "hex": "00002400"},
+        {"address": "0x15f930", "hex": "01"},
+        {"address": "0x240000", "hex": "8b00a35000240031c0c3"},
+        {"address": "0x240020", "hex": "6e6f727761792e74726700"},
+        {"address": "0x240030", "hex": "ffffffff"},
+        {"address": "0x240040", "hex": "2e00"}
+      ]
+    }
+  ]
+}

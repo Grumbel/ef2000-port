@@ -19,7 +19,7 @@ static void call_c4654_stack3(uint32_t first, uint32_t second, uint32_t third);
  * AX=0 and AX=-1 are explicit missing-key sentinels. */
 int16_t scene_lookup_named_word(int32_t key)
 {
-    ef_addr32 group = find_scene_named_group(0x18ab30, key);
+    int32_t group = lookup_name_value_a1a40(0x18ab30);
     int16_t low_key = (int16_t)key;
     if (group != 0 && low_key != 0 && low_key != -1) {
         ef_addr32 entry = find_scene_named_entry(low_key, group);

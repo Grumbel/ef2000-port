@@ -221,22 +221,22 @@ void copy_table_entry_to_record(int16_t index)
 
 /* 0x3cd24, 26 bytes. When 0x3ccec returns a nonzero object run 0x3cc94 and
  * 0xe2af4(object); returns that result, else 0. */
-uint32_t activate_object_3cc94(void)
+uint32_t activate_object_3cc94(ef_addr32 name)
 {
-    uint32_t object = guest_fn_3ccec();
+    uint32_t object = duplicate_string_3ccec(name);
     if (object == 0)
         return 0;
-    guest_fn_3cc94();
+    plot_trail_3cc94(object);
     return guest_fn_e2af4(object);
 }
 
 /* 0x3cd40, 31 bytes. As 0x3cd24 with 0x3cb2c, returning dword 0x1a2e98. */
-uint32_t activate_object_3cb2c(void)
+uint32_t activate_object_3cb2c(ef_addr32 name)
 {
-    uint32_t object = guest_fn_3ccec();
+    uint32_t object = duplicate_string_3ccec(name);
     if (object == 0)
         return 0;
-    guest_fn_3cb2c();
+    load_placement_script_3cb2c(object);
     guest_fn_e2af4(object);
     return EF_U32(0x001a2e98u);
 }

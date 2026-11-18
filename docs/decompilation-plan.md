@@ -14559,3 +14559,44 @@ All 11 focused units compile with OpenWatcom 1.9 using
 `wcc386 -bt=dos -3r -za99 -w1 -we`. Run
 `python -m unittest tests.test_asm_c_program` with Unicorn 2.1.4 for
 the synthetic regression covering all four encodings.
+
+### 2026-11-18 — Correct the German campaign resource and allocator calls
+
+The reported hybrid fault at 0x03044da2 was in the compiled
+`sort_nodes_by_order_e6848`. Its input list head was null after the
+campaign initializer called 0xad440 to load `norway.trg`. The previous
+compiled 0xad440 pushed the path on the stack for 0x3cd40, whose original
+takes it in EAX. Correct the EAX parameter on both placement wrappers
+(0x3cd24 and 0x3cd40), then call the typed resource loader and consumers
+with their original inputs. At 0xad440, the original changes DL and all
+three reviewed callers overwrite EDX after the call.
+
+`tools.func_differential 0xad440 --flat-segments --spec
+decomp/tests/0x000ad440.json` observes the path through a prepared size
+callback. The reported build delivered byte 0x01 instead of the first path
+byte 0x2e. The corrected hybrid patch matches the original fixture.
+
+With the path forwarded, campaign creation reached the allocator failure
+`cg malloc failed`. A private diagnostic stop on the error path at
+0xcc71e exposed the return into the compiled placement loader at
+0x03062e12. The stack had four leading zeros before the intended size 0x38
+and the format pointer. Hybrid linking resolves this variadic function
+to original 0xcc6c0, which expects size and format in its first two stack
+slots. Use the exact stack-call declarations at both recovered callers
+that previously supplied four dummy arguments.
+
+The three-argument declaration also needs an explicit caller-clean stack
+ABI. For example, the original at 0xcceb7 and 0xccefc pushes all three
+arguments to 0xcc6c0, while the previous compiler output loaded them into
+registers. The linked campaign code now pushes the original values.
+
+The campaign next exposed a second argument on the alias for 0xa1a40.
+The original accepts only the name in EAX. The compiled 0x3c730 pushed
+the extra value, then its epilogue consumed the wrong return address.
+Use the existing one-argument name lookup at all three alias callers.
+
+The relinked German hybrid reached the campaign map and populated
+the mission list on private Xvfb. The session used the Nix native64
+runtime, OpenWatcom-built objects, and a disposable overlay. The
+run loaded the German Norway placement script and proceeded through the
+campaign, navigation, mission and briefing data with no guest fault.

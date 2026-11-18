@@ -3784,7 +3784,7 @@ void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size)
 void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z)
 {
     int16_t k = (int16_t)key;
-    uint32_t group = find_scene_named_group(0x00190c7cu, (int32_t)x);
+    uint32_t group = (uint32_t)lookup_name_value_a1a40(0x00190c7cu);
     uint32_t entry;
     uint32_t verts;
     uint32_t base;
@@ -10855,7 +10855,7 @@ void open_resource_by_name_ad440(ef_addr32 name, ef_addr32 out)
     (void)strcat_9ca57(p, name);
     if (EF_U8(0x0015f930u) == 0u)
         guest_fn_e4188();
-    h = guest_fn_3cd40_x(p);
+    h = activate_object_3cb2c(p);
     EF_U32(out) = h;
     if (EF_U8(0x0015f930u) == 0u)
         reset_engine_e4264();
@@ -19352,7 +19352,7 @@ void load_placement_script_3cb2c(ef_addr32 text)
 		return;
 	do {
 		cur = parse_table_line_3c994(cur);
-		rec = alloc_zeroed_cc6c0(0u, 0u, 0u, 0u, 0x38u, 0x001837c8u);
+		rec = guest_fn_cc6c0_x(0x38u, 0x001837c8u);
 		EF_U32(0x001264c8u) = rec;
 		list_insert_head(rec, 0x001a2e98u, 0x001a2e94u);
 		EF_U32(rec + 0xcu) = alloc_checked_cc744(EF_U32(0x001a2e88u));

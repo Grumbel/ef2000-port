@@ -131,10 +131,10 @@ void register_string_3c6c0(ef_addr32 text)
 /* 0x3c730, 56 bytes. Find a named entry in the scene or abort. */
 ef_addr32 find_entry_or_abort_3c730(ef_addr32 name, int16_t page)
 {
-    ef_addr32 group = find_scene_named_group(name, (int32_t)page);
+    int32_t key = lookup_name_value_a1a40(name);
 
-    if (group != 0) {
-        ef_addr32 entry = find_scene_named_entry(page, group);
+    if (key != 0) {
+        ef_addr32 entry = find_page_pair_a1a90(page, key);
 
         if (entry != 0)
             return entry;

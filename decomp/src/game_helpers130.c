@@ -597,7 +597,7 @@ ef_addr32 build_object_records_b9c68(uint8_t mode, uint8_t slot, uint8_t flag)
     int16_t i;
     uint32_t edx2;
 
-    buf = alloc_zeroed_cc6c0(0u, 0u, 0u, 0u, count * 25u, 0x0018eb3cu, 0x19u);
+    buf = guest_fn_cc6c0_z(count * 25u, 0x0018eb3cu, 0x19u);
     EF_U16(0x001a4b9cu) = (uint16_t)EF_U8(0x001a55a0u);
     for (i = 0; i < (int16_t)EF_U8(0x001a55a0u); i++) {
         ef_addr32 rec = buf + (uint32_t)((int32_t)i * 25);

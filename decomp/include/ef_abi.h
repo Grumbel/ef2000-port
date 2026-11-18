@@ -603,7 +603,6 @@ void clear_scene_event_counters(void); /* 0x91c20 */
 void record_scene_event(int32_t packed_event); /* 0x91c48, EAX */
 
 /* Calls into original game/runtime; independent implementations not recovered. */
-ef_addr32 find_scene_named_group(ef_addr32 name, int32_t key); /* 0xa1a40, EAX/full EDX */
 ef_addr32 find_scene_named_entry(int16_t key, ef_addr32 group); /* 0xa1a90, EAX/EDX */
 int32_t evaluate_scene_metric(int32_t initial, ef_addr32 right, ef_addr32 left); /* 0x7b16c, EAX/EDX/EBX */
 void configure_scene_angles(int16_t z, int16_t y, int16_t x); /* 0xc4654, stack args */
@@ -807,8 +806,8 @@ void install_callback_53ecc(void); /* 0x3918c */
 uint8_t grid_row_state_allowed(int16_t cell); /* 0x3bd28 AX -> AL */
 uint32_t forward_value_1a2e78(void); /* 0x3c434 */
 void copy_table_entry_to_record(int16_t index); /* 0x3c768 AX */
-uint32_t activate_object_3cc94(void); /* 0x3cd24 */
-uint32_t activate_object_3cb2c(void); /* 0x3cd40 */
+uint32_t activate_object_3cc94(ef_addr32 name); /* 0x3cd24 */
+uint32_t activate_object_3cb2c(ef_addr32 name); /* 0x3cd40 */
 void fill_random_offsets(void); /* 0x3ce04 */
 void run_reset_sequence_3dcb0(void); /* 0x3dcb0 */
 void reset_world_state_410d0(void); /* 0x410d0 */
@@ -823,9 +822,6 @@ uint32_t guest_fn_32c04(uint32_t table); /* 0x32c04 EAX tail */
 void guest_fn_a41c8(void); /* 0xa41c8 */
 uint32_t guest_fn_e2af4(uint32_t value); /* 0xe2af4 EAX */
 ef_addr32 guest_table_entry_3c730(ef_addr32 table, int32_t index); /* 0x3c730 EAX/EDX -> EAX */
-uint32_t guest_fn_3ccec(void); /* 0x3ccec -> EAX */
-void guest_fn_3cc94(void); /* 0x3cc94 */
-void guest_fn_3cb2c(void); /* 0x3cb2c */
 uint32_t guest_fn_e2fdb(void); /* 0xe2fdb -> EAX */
 void guest_fn_394e0(void); /* 0x394e0 */
 void guest_fn_8846c(void); /* 0x8846c */
@@ -6007,7 +6003,6 @@ ef_addr32 find_group_node_b4aec(ef_addr32 a, ef_addr32 b, uint32_t group, ef_add
 void open_resource_by_name_ad440(ef_addr32 name, ef_addr32 out);
 uint32_t write_page_record_a1d50(void);
 void select_page_a1d00(uint32_t id);
-uint32_t guest_fn_3cd40_x(ef_addr32 name); /* 0x3cd40 EAX -> EAX */
 
 uint32_t mktime_f118d(ef_addr32 tm);
 uint32_t get_time_seconds_a4574(ef_addr32 out);
@@ -7481,6 +7476,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_cf7c4_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_1123a4_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_cc6c0_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_cc6c0_z parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_117a0f_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_112808_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux write_handle_10f26a parm [eax] [edx] [ebx] value [eax] modify [eax ebx edx]
