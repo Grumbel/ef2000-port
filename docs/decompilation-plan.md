@@ -12131,3 +12131,11 @@ closure builds with OpenWatcom. Its first 5 MiB probe at 0xd8fd8 now
 continues to the uncovered dynamic target 0xd83b8. The other nine
 entries match on their first input. Evidence is under
 `local/ghidra-scan-unget-20261118/immediate-diff/`.
+
+2026-11-18 — The rebuilt dispatcher contains the 0xdf244 scanner leaf.
+Retested the same first prepared 5 MiB input at each of the 29 callers
+that previously stopped at this PC. All 29 match with the hardware x87
+oracle. The targeted evidence in
+`local/ghidra-scan-unget-20261118/affected-callers.json` records the
+prior report, updated manifest, executable library, oracle and payload
+digests. This build predates the IMUL and ADD immediate changes above.
