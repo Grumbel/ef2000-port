@@ -12382,3 +12382,13 @@ instruction. All 815 DOS INT 21h stops were replayed with AX evidence.
 The largest groups by AH were 40h (467), 35h (183), 25h (61) and
 3Dh (56). Reports: `bulk-service-stops.json` and `bulk-dos-stops.json`
 under `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — Grouping the 815 DOS stops by instruction address showed
+that all 467 AH=40h stops come from one INT 21h at 0x10e230. The wrapper
+loads DS from CX before the interrupt and branches on carry afterward.
+The existing runtime file bridge does not admit this site. A verifier
+fixture needs to account for the selector, write buffer and handle
+state at this boundary before supplying a response. Another 167 of the
+183 AH=35h stops share 0x245, and 51 of the 56 AH=3Dh stops share
+0x1f5. These are counts of first stops on prepared inputs. Additional
+service calls may surface once those boundaries are modeled.
