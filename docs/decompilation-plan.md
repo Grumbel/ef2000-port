@@ -13727,3 +13727,18 @@ paths, including the cleanup loop at 0xd6ffc.
 The prepared-match total is now 3,845 of 4,353 entries. See
 replay-bulk-gameport-bios-scan-terminators.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify wraparound slot selection
+
+Entry 0x8600c previously exhausted the instruction budget. Its
+current slot comes from the signed byte at record offset 0x1d7.
+The scan wraps at 20 and terminates when it reaches the current
+slot again. A prepared record returned by 0x7489c starts at slot
+19 and exercises a hit at slot 0, a hit at slot 2 after skipping
+empty slots, and a full scan with no hit. All three cases matched
+the generated C through return using the isolated differential
+verifier.
+
+The prepared-match total is now 3,846 of 4,353 entries. See
+replay-bulk-gameport-bios-slot-wrap.py and its JSONL output under
+local/ghidra-group-followup-20261118.
