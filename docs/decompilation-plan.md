@@ -13526,3 +13526,22 @@ are bulk-list-empty-prepared-fixtures.json and
 bulk-list-two-node-prepared-fixtures.json. The individual run outcomes
 are in bulk-gameport-bios-list-inputs.jsonl and
 bulk-gameport-bios-list-caller-inputs.jsonl.
+
+### 2026-11-18 — Finish prepared comparisons for the allocator release group
+
+Prepared a heap with 0x500-byte chunks to accommodate the five-record
+array used by 0x11c06c. Replayed that entry with two owned child
+allocations, 0xb1918 with two owned fields, 0xb1974 with a linked list
+and an owned field, 0xd6ffc with a terminated record array and a
+four-byte owned range, and 0x117ea8 with one owned field. All five
+matched at the previously faulting allocator instruction 0x1104c7
+and through return in separate runs. All nine entries in the
+original fault group now have at least one complete prepared match.
+The bulk total is 3,810 of 4,353.
+
+See bulk-cleanup-followup-prepared-fixtures.json,
+bulk-gameport-bios-cleanup-followup.jsonl and
+bulk-gameport-bios-cleanup-followup-checkpoints.jsonl under
+local/ghidra-group-followup-20261118. Replay with
+replay-bulk-gameport-bios-cleanup-followup.py and
+replay-bulk-gameport-bios-cleanup-followup-checkpoints.py.
