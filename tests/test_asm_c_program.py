@@ -50,6 +50,43 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_prepared_fixtures_select_entries_and_supply_individual_inputs(self):
+        source = """.type first,@function
+first: mov eax,DWORD PTR [eax]
+mov eax,DWORD PTR [eax]
+ret
+.size first, .-first
+.type second,@function
+second: mov ebx,DWORD PTR [ebx]
+mov ebx,DWORD PTR [ebx]
+ret
+.size second, .-second
+.type other,@function
+other: ret
+.size other, .-other"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            asm_c_program.generate(directory, root/'out', image)
+            first, second = [record['address'] for record in records[:2]]
+            rows = [
+                dict(address=first, registers={'eax': 0x310000}, words=[[0x310000, 0x320000]]),
+                dict(address=second, registers={'ebx': 0x330000}, words=[[0x330000, 0x340000]]),
+            ]
+            fixture = root/'inputs.json'
+            fixture.write_text(json.dumps(rows))
+            report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=1,
+                                               service_free_paths=True, prepared_fixtures=fixture)
+            for entry, row in zip(report['entries'], rows, strict=True):
+                self.assertEqual(entry['address'], row['address'])
+                self.assertEqual(entry['counts'], {'pass': 1}, entry)
+                self.assertEqual(entry['prepared_fixture'],
+                                 {key: row[key] for key in ('registers', 'words')})
+            fixture.write_text(json.dumps([*rows, rows[0]]))
+            with self.assertRaisesRegex(ValueError, 'duplicate prepared fixture entry address'):
+                asm_c_differential.load_prepared_fixtures(fixture)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_prepared_ram_covers_high_runtime_globals(self):
         source = '''.type root,@function
 root: mov DWORD PTR [0x484480],eax

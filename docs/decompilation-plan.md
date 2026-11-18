@@ -13416,3 +13416,34 @@ complete matches. Of the remaining 62 cases, 56 still exhaust the
 original budget, five reach unmapped memory, and one reaches an x87
 encoding the original oracle does not model. See
 bulk-gameport-bios-budget-replay.jsonl in the same local directory.
+
+### 2026-11-18 — Replay different prepared objects in one bulk verifier build
+
+`asm_c_differential.py --service-free-paths --prepared-fixtures FILE`
+takes a JSON list. Each row has an integer `address`, a `registers`
+object mapping general-purpose register names to u32 values, and a
+`words` array of `[address, value]` u32 pairs. The file selects the
+entries to probe while the dispatcher retains all generated bodies.
+Per-entry words are applied after common `--prepared-u32` settings, and
+the report records each entry's fixture alongside its result.
+
+Four default failures at allocator release instruction 0x1104c7 now
+match through return with prepared heap state. Entry 0xb1740 releases
+an owned field, 0xb17d4 releases a nested allocation, and 0xb188c and
+0xb18b8 each traverse and release two linked nodes. See
+bulk-gameport-bios-cleanup-inputs.jsonl and bulk-cleanup-prepared-fixtures.json
+under local/ghidra-group-followup-20261118.
+
+The combined sweep recorded instruction context for 335 unmapped reads
+and 36 unmapped writes. For each case, replayed with a checkpoint at
+the fault PC and visit 100,000 to count visits without stopping early.
+Each replay reproduced its recorded fault. A second replay compared at
+the actual fault visit. 362 entries matched there, including cases
+whose fault came on visit 38. In the other nine, C stopped before the
+original fault PC. All nine matched at the earlier control-transfer
+destination where C stopped (0x0, 0x235, 0x1d9eb, or 0x132a30).
+These comparisons establish prefix agreement and leave the full paths
+inconclusive. Seventeen other unmapped reads lacked a recorded fault
+address and were outside this replay. See
+bulk-gameport-bios-data-fault-prefixes.jsonl and
+bulk-gameport-bios-all-bad-targets.jsonl under the same local directory.

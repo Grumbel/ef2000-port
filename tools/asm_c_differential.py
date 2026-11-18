@@ -948,6 +948,29 @@ def prepared_register_overrides(items):
     return overrides
 
 
+def load_prepared_fixtures(path):
+    """Read per-entry register and little-endian RAM inputs from a JSON file."""
+    rows = json.loads(path.read_bytes())
+    if not isinstance(rows, list) or not rows:
+        raise ValueError('prepared fixture file must contain a nonempty list')
+    fixtures = {}
+    for row in rows:
+        if not isinstance(row, dict) or set(row) != {'address', 'registers', 'words'}:
+            raise ValueError('each prepared fixture requires address, registers and words')
+        address, registers, words = row['address'], row['registers'], row['words']
+        if type(address) is not int or not 0 <= address <= 0xffffffff or address in fixtures:
+            raise ValueError('invalid or duplicate prepared fixture entry address')
+        if not isinstance(registers, dict):
+            raise ValueError('prepared fixture registers must be an object')
+        if not isinstance(words, list) or any(
+                not isinstance(pair, list) or len(pair) != 2 or
+                any(type(item) is not int or not 0 <= item <= 0xffffffff for item in pair)
+                for pair in words):
+            raise ValueError('prepared fixture words must be a list of u32 address/value pairs')
+        fixtures[address] = prepared_register_overrides(registers.items()), words
+    return fixtures
+
+
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False, x32_heap=False,
@@ -1094,7 +1117,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False, prepared_registers=()):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False, prepared_registers=(), prepared_fixtures=None):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -1108,6 +1131,14 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if prepared_raster:
         prepared_u32 = (*prepared_raster_u32(), *prepared_u32)
     prepared_registers = prepared_register_overrides(prepared_registers)
+    fixtures = {}
+    if prepared_fixtures is not None:
+        if not program or not service_free_paths or captures or prepared_registers:
+            raise ValueError('prepared fixtures require service-free program probes without captures or global register overrides')
+        fixtures = load_prepared_fixtures(prepared_fixtures)
+        if addresses and set(addresses) != fixtures.keys():
+            raise ValueError('explicit addresses must match the fixture entries')
+        addresses = tuple(fixtures)
     if prepared_registers and (not program or captures or not addresses):
         raise ValueError('register overrides require prepared program probes and explicit entry addresses')
     if prepared_u32 and (not program or not service_free_paths or captures):
@@ -1286,6 +1317,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
+        entry_registers, entry_words = fixtures.get(address, (prepared_registers, ()))
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
@@ -1293,8 +1325,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
-                                  prepared_registers=prepared_registers.items())
+                                  checkpoint=checkpoint, prepared_u32=(*prepared_u32, *entry_words),
+                                  dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
+                                  prepared_registers=entry_registers.items())
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -1303,6 +1336,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                             state='mismatch' if counts['mismatch'] else
                             'probes-pass' if counts['pass'] == scenarios else
                             'prefix-pass' if counts['prefix-pass'] == scenarios else 'inconclusive'))
+        if fixtures:
+            entries[-1]['prepared_fixture'] = dict(registers=entry_registers, words=entry_words)
         with progress.open('a') as stream:
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
@@ -1424,6 +1459,8 @@ def main(argv=None):
     parser.add_argument('--prepared-u32', type=lambda value: int(value, 0), nargs=2,
                         action='append', default=[], metavar=('ADDRESS', 'VALUE'),
                         help='initialize a little-endian u32 in prepared guest RAM')
+    parser.add_argument('--prepared-fixtures', type=Path,
+                        help='JSON list of entry addresses with individual registers and RAM words')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
@@ -1453,7 +1490,8 @@ def main(argv=None):
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
                         checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster,
                         vga_dac=args.vga_dac, x32_vectors=args.x32_vectors,
-                        prepared_registers=[(name, int(value, 0)) for name, value in args.prepared_register])
+                        prepared_registers=[(name, int(value, 0)) for name, value in args.prepared_register],
+                        prepared_fixtures=args.prepared_fixtures)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
