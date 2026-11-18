@@ -14040,3 +14040,16 @@ comparison. The previous 4,353-entry bulk build is unchanged.
 
 The overlay, focused diff report, and replay-timer-callback-focused.py
 are under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Include the timer callback in bulk C generation
+
+The local bulk timer overlay adds the reviewed 0xe28c4 range to
+the gameport inventory and regenerates with the combined BIOS and
+gameport service boundaries. The resulting inventory has 4,361
+entries, of which 4,354 emit C and seven remain unsupported.
+No previous entry changed generation state. All 4,353 previous
+function C files are byte-for-byte identical, with changes to the
+registry files for the new entry.
+
+See rebuild-bulk-timer.py, bulk-timer-overlay.json, and
+bulk-timer-c/report.json under local/ghidra-group-followup-20261118.
