@@ -13568,3 +13568,21 @@ under local/ghidra-group-followup-20261118. The separate eleven-entry
 group at 0x1112a4 needs initialized AIL driver records and reaches
 an INT 21h AX=2511h call with a real-mode vector of 0x66. The current
 prepared real-mode fixtures cover mouse, CD and VBE requests.
+
+### 2026-11-18 — Check the protected-mode sound driver call frame
+
+Entry 0x11124c matched at 0x1112b7, immediately before INT 21h,
+with an initialized driver record and commands 0x300 and 0x301.
+The first case used null register buffers. The second supplied input
+and output buffers and produced CX=0x1234 and frame EDX=0x5678.
+Both requests select real-mode vector 0x66 and pass BX=2 from the
+driver record. The full probes stop at the unsupported fixture.
+
+The Unicorn runtime dispatches installed real-mode vectors through
+the original 16-bit handler using conventional DOS RAM. To extend
+verification past this boundary, capture the installed vector and
+driver memory with the request, or reproduce the driver initialization
+in a prepared probe. These checks leave the complete-match count
+unchanged. See replay-bulk-gameport-bios-ail-checkpoints.py and
+replay-bulk-gameport-bios-ail-requests.py and their JSONL output in
+local/ghidra-group-followup-20261118.
