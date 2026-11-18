@@ -12731,3 +12731,16 @@ fixture. Thirty-seven now match. Five still reach untranslated
 needs a guest-memory write trace before the translated body can
 claim coverage. The local build and report are
 `bulk-zero-dispatch-c/` and `bulk-zero-dispatch-diff/report.json`.
+
+The follow-up memory-write trace for 0x27fec records a guest byte
+store at 0xdeb72 into 0x1e0 before control reaches 0x1df. This changes
+the ModR/M byte of the registered instruction and changes its operand
+from a register to a memory destination. The original executes the
+modified instruction. The generated C and original reach 0x1df with
+matching PC, general registers, and flags, then the C dispatch byte
+guard stops execution. Keep the guard active for this case. Coverage
+requires either a prepared input that avoids writing into code, with
+evidence that it represents a valid call, or explicit handling of
+modified instructions. The local trace is
+`code-guard-divergence-trace.json`, obtained with
+`trace-code-guard.py` against the existing empty-drive build.
