@@ -23,6 +23,7 @@ import resource
 import struct
 import subprocess
 import tempfile
+from types import SimpleNamespace
 
 try:
     from . import asm_to_c, asm_softfloat, asm_x87_oracle, real_mode, unicorn_backend, unicorn_files, x32_allocation
@@ -141,7 +142,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
-            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False):
+            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -172,6 +173,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                          or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock)
     if prepared_services and (not program or captured is not None or service_factory is not None):
         raise ValueError('Interrupt fixtures require prepared program probes and no custom interrupt handler')
+    if vga_dac and (not program or captured is not None or port_factory is None or memory_services
+                    or (prepared_memory_size or 0) < unicorn_backend.DOS_BASE + real_mode.MEMORY_SIZE):
+        raise ValueError('VGA DAC fixture requires prepared program probes, a port handler and DOS aperture RAM')
     if x32_heap and (prepared_memory_size or 0) < x32_allocation.Allocation.minimum_stack:
         raise ValueError('X-32 heap fixture requires prepared RAM covering the initial heap and stack floor')
     validate_prepared_memory_size(prepared_memory_size)
@@ -190,6 +194,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_port = port_factory() if port_factory else None
     translated_port = port_factory() if port_factory else None
     original_ports, translated_ports = [], []
+    original_dac = unicorn_backend.VgaDac() if vga_dac else None
+    translated_dac = unicorn_backend.VgaDac() if vga_dac else None
     original_exit = None
     translated_exit = None
 
@@ -374,7 +380,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                            output_sha256=hashlib.sha256(read(offset, count)).hexdigest()))
         return response
 
-    def port_service(handler, request, values, event_log, ram=None):
+    def port_service(handler, request, values, event_log, ram=None, dac=None, write=None):
+        if (dac is not None and request['direction'] == 'out' and request['width'] == 8
+                and request['port'] in (0x3c8, 0x3c9)):
+            dac.write(SimpleNamespace(mem_write=write), request['port'], values['ax'])
+            event_log.append(dict(request=request, before=dict(values), after=dict(values)))
+            return values
         args = (dict(request), dict(values))
         if memory_services:
             before_memory = hashlib.sha256(ram).hexdigest()
@@ -558,7 +569,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                            direction='out' if output else 'in', port=port, width=size*8)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
             try:
-                response = port_service(original_port, request, values, original_ports, ram)
+                response = port_service(original_port, request, values, original_ports, ram,
+                                        original_dac, engine.mem_write)
             except (ValueError, RuntimeError):
                 rejected_service.update(kind='port', **request)
                 raise
@@ -723,7 +735,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                                    port=encoded[-1] if immediate else state.r[2] & 0xffff,
                                    width=(16 if word else 32) if opcode & 1 else 8)
                     ram = bytearray(memory) if memory_services else None
-                    response = port_service(translated_port, request, values, translated_ports, ram)
+                    response = port_service(translated_port, request, values, translated_ports, ram,
+                                            translated_dac, write_translated)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C port service unavailable: '+str(error)])
                 if memory_services:
@@ -853,7 +866,7 @@ def vga_status_service(pit_writes=False):
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -879,13 +892,13 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
-                                 prepared_u32=prepared_u32, dos_clock=dos_clock,
+                                 prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
                                  x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
                                  port_factory=(lambda: vga_status_service(pit_writes)) if vga_status_reads else
                                  (lambda: pit_write_service) if pit_writes else
-                                 (lambda: reject_host_service) if reject_services else None)
+                                 (lambda: reject_host_service) if reject_services or vga_dac else None)
                 sender.send(('result', index, result))
         except Exception as error:
             sender.send(('error', -1, repr(error)))
@@ -991,7 +1004,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -1029,6 +1042,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('DOS open fixtures require --service-free-paths and interrupt boundaries')
     if pit_writes and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
         raise ValueError('PIT write fixture requires --service-free-paths and port boundaries')
+    if vga_dac and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths
+                    or (prepared_memory_size or 0) < unicorn_backend.DOS_BASE + real_mode.MEMORY_SIZE):
+        raise ValueError('VGA DAC fixture requires --service-free-paths, port boundaries and DOS aperture RAM')
     if vga_status_reads and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
         raise ValueError('VGA status fixture requires --service-free-paths and port boundaries')
     sti_stop_sites = manifest.get('sti_stop_sites', [])
@@ -1175,7 +1191,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock)
+                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -1226,6 +1242,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dos_clock_step_centiseconds=1 if dos_clock else None,
                   dos_empty_drive_policy='create-open-write-close-seek-device-info' if dos_empty_drive else 'disabled',
                   dos_invalid_open_policy='prepared-only' if dos_invalid_open else 'disabled',
+                  vga_dac_policy='dos-palette-aperture-prepared-only' if vga_dac else 'disabled',
                   vga_status_policy='alternating-retrace-prepared-only' if vga_status_reads else 'disabled',
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
@@ -1258,6 +1275,8 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--vga-dac', action='store_true',
+                        help='compare VGA palette writes with separate DAC state and prepared DOS aperture RAM')
     parser.add_argument('--vga-status-reads', action='store_true',
                         help='compare VGA status reads using deterministic retrace phase')
     parser.add_argument('--pit-writes', action='store_true',
@@ -1311,7 +1330,8 @@ def main(argv=None):
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
-                        checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster)
+                        checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster,
+                        vga_dac=args.vga_dac)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:

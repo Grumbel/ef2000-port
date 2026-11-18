@@ -13063,3 +13063,18 @@ budget reproduced the status 6 mismatch at 0x1df with default RAM and
 matched with the scratch raster enabled. The two adjacent probes at
 0x278c0 and 0x28224 remain inconclusive with original-side memory faults.
 See local/ghidra-group-followup-20261118/prepared-raster-current-replay.json.
+
+### 2026-11-18 — Compare VGA palette writes during prepared probes
+
+`--vga-dac --prepared-memory-size 0x5100000` uses separate runtime VGA
+DAC instances for the original and translated executions. Byte writes to
+ports 0x3c8 and 0x3c9 update each side's DOS palette aperture. The
+verifier compares both the port transcript and final guest RAM.
+
+In the full 4,344-entry sweep, 12 original probes stopped at the first
+palette port write at 0xfeedc. At the same 100,000-instruction budget,
+DOS aperture, scratch raster, and other fixtures, all 12 still stop at
+the port with the DAC disabled. Ten match with the DAC enabled, including
+full palette uploads. 0x284ec and 0xa9aa8 progress to original-side
+invalid instructions. The paired results are in
+local/ghidra-group-followup-20261118/vga-dac-current-replay.json.
