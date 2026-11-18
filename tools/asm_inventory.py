@@ -263,11 +263,42 @@ def audit_trace_table(payload, gaps, source, base, stop, stride):
 
 
 
-def audit_candidate_body(instructions, entry, stop, owned, known_entries):
+def guarded_jump_tables(instructions, edges, entry, stop, payload):
+    """Recognize CMP AL,imm8; JA rel32; AND EAX,255; JMP CS:[EAX*4+disp32]."""
+    decoded = {insn['address']: bytes.fromhex(insn['bytes']) for insn in instructions}
+    incoming = {edge['target'] for edge in edges if edge['kind'] != 'fallthrough'}
+    incoming.add(entry)
+    tables = {}
+    for site, jump in decoded.items():
+        if len(jump) != 8 or not jump.startswith(b'\x2e\xff\x24\x85'):
+            continue
+        compare = decoded.get(site - 13, b'')
+        guard = decoded.get(site - 11, b'')
+        if (len(compare) != 2 or compare[0] != 0x3c
+                or len(guard) != 6 or not guard.startswith(b'\x0f\x87')
+                or decoded.get(site - 5) != b'\x25\xff\x00\x00\x00'):
+            continue
+        base = int.from_bytes(jump[4:], 'little')
+        end = base + 4 * (compare[1] + 1)
+        if not (end <= len(payload) and (end <= entry or base >= stop)):
+            continue
+        targets = [int.from_bytes(payload[slot:slot + 4], 'little')
+                   for slot in range(base, end, 4)]
+        if all(entry <= target < stop and target in decoded for target in targets):
+            tables[site] = dict(site=site, base=base, targets=targets)
+            incoming.update(targets)
+    return {site: table for site, table in tables.items()
+            if not incoming.intersection((site - 11, site - 5, site))}
+
+
+def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None):
     """Follow local static edges and require known external callees."""
     decoded = {insn['address']: insn for insn in instructions}
     edges = {}
-    for edge in control_flow_report(instructions)['edges']:
+    flow = control_flow_report(instructions)['edges']
+    tables = guarded_jump_tables(instructions, flow, entry, stop, payload) if payload else {}
+    used_tables = []
+    for edge in flow:
         edges.setdefault(edge['site'], []).append(edge)
     pending = [entry]
     visited = set()
@@ -297,6 +328,10 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries):
             if kind in ('jump', 'fallthrough') and target in decoded:
                 pending.append(target)
                 continue
+            if kind == 'jump' and target is None and pc in tables:
+                used_tables.append(tables[pc])
+                pending.extend(tables[pc]['targets'])
+                continue
             blockers.append(dict(site=pc, kind=kind, target=target, reason=edge['status']))
         if not edges.get(pc) and pc not in returns:
             blockers.append(dict(site=pc, reason='unsupported terminal instruction'))
@@ -305,8 +340,11 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries):
         blockers.append(dict(site=entry, reason='no reachable near return'))
     if any(left[1] != right[0] for left, right in zip(spans, spans[1:])):
         blockers.append(dict(site=entry, reason='reachable instruction spans are disjoint'))
-    return dict(entry=entry, scan_stop=stop, end_exclusive=max((end for _, end in spans), default=None),
-                instruction_count=len(spans), return_sites=sorted(returns), blockers=blockers)
+    result = dict(entry=entry, scan_stop=stop, end_exclusive=max((end for _, end in spans), default=None),
+                  instruction_count=len(spans), return_sites=sorted(returns), blockers=blockers)
+    if used_tables:
+        result['guarded_jump_tables'] = sorted(used_tables, key=lambda table: table['site'])
+    return result
 
 
 def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
@@ -330,7 +368,8 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
             key = entry, stop
             if key not in windows:
                 windows[key] = decode_window(image, entry, stop - entry, objdump=objdump)
-            report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies))
+            report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies,
+                                               payload=payload))
         remaining = max_callees - (len(candidates) - len(roots))
         if not remaining:
             break

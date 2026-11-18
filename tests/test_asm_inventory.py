@@ -62,6 +62,28 @@ class InventoryTests(unittest.TestCase):
         report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, {16})
         self.assertIn('owned boundary', report['blockers'][0]['reason'])
 
+    def test_candidate_audit_rejects_bypassed_or_invalid_jump_table_guards(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            image = Path(temporary) / 'payload.bin'
+            # Two table slots precede the body at 8. The JA and second
+            # table slot both reach the second RET.
+            table = bytes.fromhex('1d000000 1e000000')
+            code = bytes.fromhex('3c01 0f870e000000 25ff000000 2eff248500000000 c3c3')
+
+            def audit(data):
+                image.write_bytes(data)
+                instructions = asm_inventory.decode_window(image, 8, len(data) - 8)
+                return asm_inventory.audit_candidate_body(
+                    instructions, 8, len(data), bytearray(len(data)), set(), payload=data)
+
+            valid = audit(table + code)
+            self.assertEqual(valid['blockers'], [])
+            self.assertEqual(valid['guarded_jump_tables'][0]['targets'], [29, 30])
+            bypass = table + code[:4] + bytes.fromhex('05000000') + code[8:]
+            self.assertTrue(audit(bypass)['blockers'])
+            invalid_slot = bytes.fromhex('1c000000') + table[4:] + code
+            self.assertTrue(audit(invalid_slot)['blockers'])
+
     def test_table_audit_requires_a_resolved_direct_call_chain(self):
         with tempfile.TemporaryDirectory() as temporary:
             image = Path(temporary) / 'payload.bin'

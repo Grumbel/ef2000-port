@@ -12298,3 +12298,15 @@ and the bodies at 0x85a24 and 0x85a60 clear direct-call blockers for two
 other candidates. Four table bodies still need indirect-flow or range
 evidence. These are candidates for review.
 Report: `local/ghidra-group-followup-20261118/trace-table-callees.json`.
+
+2026-11-18 — The candidate audit recognizes a guarded 32-bit absolute
+jump table when CMP AL and an unsigned JA bound the index, AND zeroes
+the upper EAX bits and the jump uses CS:[EAX*4+disp32]. It requires
+each payload slot to target a decoded instruction in the candidate and
+rejects control-flow edges that bypass the guard. The four remaining
+dispatch candidates each use four slots. Following those edges makes
+all 42 table bodies and four additional callees contiguous and clears
+their static blockers. This evidence covers the original payload slot
+values in the flat address model. The generated dispatcher still reads
+guest memory at runtime.
+Report: `local/ghidra-group-followup-20261118/trace-table-guarded.json`.
