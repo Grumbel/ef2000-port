@@ -12345,3 +12345,13 @@ Bulk inventory with `--include-untracked-bodies --skip-missing-bodies`
 then imports those bodies alongside the baseline. The recorded trace
 added 46 candidates to the 4,296-body export, yielding 4,342 inventory
 entries. Thirteen tracker rows had no body in that inventory.
+Two audit runs produced identical overlay files. The bulk generator
+emitted 4,083 bodies, including all 46 candidates, and excluded 259.
+The full host comparison with one prepared input per emitted body
+returned 2,700 matches, 1,381 inconclusive results and two mismatches.
+All 46 candidates matched. Twelve of the previous 14 mismatches passed.
+The two remaining callers (0x1d318 and 0x5331c) stop at the same
+unregistered 0xd6960 entry. Among the 699 generated tracker-blocked
+functions, 388 matched and 311 were inconclusive. The authoritative
+tracker and strict byte-comparison evidence remain unchanged.
+Report: `local/ghidra-group-followup-20261118/bulk-candidate-diff/report.json`.
