@@ -46,6 +46,7 @@ def build_patch(executable, object_dir, output):
               report['functions_redirected'], report['redirect_bytes'],
               report['arena_bytes'], report['linked_modules'],
               report['object_modules']), file=sys.stderr)
+    return report
 
 
 def main(argv=None):

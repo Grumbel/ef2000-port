@@ -12,14 +12,22 @@ framebuffer and selected guest-RAM comparisons. It does not compare full RAM.
 import argparse
 import hashlib
 import json
+import os
 from pathlib import Path
 import re
+import shutil
+import signal
 import subprocess
+import sys
+import time
 
 try:
+    from . import decomp_app, extract_image
     from .efpatch import decode as decode_patch
     from .highscores_differential import load_image
 except ImportError:
+    import decomp_app
+    import extract_image
     from efpatch import decode as decode_patch
     from highscores_differential import load_image
 
@@ -355,7 +363,229 @@ def run_suite(runner, executable, game_dir, cd_dir, patches, cases, output,
     return summary
 
 
+# Relative motion after the first click is intentional. The game grabs
+# the pointer and uses relative motion to navigate its 640-wide menus.
+REGRESSION_CASES = {
+    'main-menu': ('german', 30),
+    'quick-fight-flight': ('german', 100),
+    'english-quick-combat': ('english', 100),
+    'german-campaign-map': ('german', 45),
+    'mitarbeiter': ('german', 35),
+    'multiplayer': ('german', 35),
+}
+
+
+def run_native_regression_case(runner, executable, output, name, extras=()):
+    """Run inside the X server created by the regression command."""
+    seconds = REGRESSION_CASES[name][1]
+    command = [runner, executable, '--backend', 'native64', '--geometry', '640x480',
+               '--seconds', str(seconds), '--no-save', '--sound', 'off',
+               '--controls', 'keyboard', '--joystick', 'off', '--output', output / 'run']
+    for option in ('state', 'config', 'cache', 'user-data'):
+        command.extend([f'--{option}-dir', output / option])
+    command.extend(extras)
+    log = output / 'game.log'
+    env = dict(os.environ, SDL_VIDEODRIVER='x11', SDL_AUDIODRIVER='dummy')
+    with log.open('w') as stream:
+        game = subprocess.Popen(command, stdout=stream, stderr=subprocess.STDOUT,
+                                env=env, start_new_session=True)
+
+    def wait_for(marker, timeout):
+        deadline = time.monotonic() + timeout
+        while game.poll() is None and time.monotonic() < deadline:
+            if marker in log.read_text(errors='replace'):
+                return
+            time.sleep(0.2)
+        raise ValueError(f'expected {marker!r}, launcher exit={game.poll()}')
+
+    def input_event(*args):
+        if game.poll() is not None:
+            raise ValueError(f'launcher exited during navigation ({game.returncode})')
+        subprocess.run(['xdotool', *map(str, args)], check=True, timeout=5)
+
+    def click():
+        input_event('mousedown', 1, 'sleep', 0.2, 'mouseup', 1)
+
+    try:
+        wait_for('game: menu (', 25)
+        tree = subprocess.check_output(['xwininfo', '-root', '-tree'], text=True, timeout=5)
+        (output / 'windows.log').write_text(tree)
+        windows = re.findall(r'^\s+(0x[0-9a-f]+) "EF2000 ', tree, re.M)
+        if len(windows) != 1:
+            raise ValueError(f'expected a single EF2000 window, found {len(windows)}')
+        window, = windows
+        input_event('windowfocus', '--sync', window)
+
+        def capture(label):
+            if game.poll() is not None:
+                raise ValueError(f'launcher exited before {label} ({game.returncode})')
+            frame = output / f'{label}.png'
+            subprocess.run(['import', '-window', window, str(frame)], check=True, timeout=5)
+            return frame
+
+        def screen_text(frame):
+            return subprocess.check_output(
+                ['tesseract', str(frame), 'stdout', '--psm', '11'],
+                text=True, stderr=subprocess.DEVNULL, timeout=10).lower()
+
+        input_event('mousemove', '--window', window, 320, 240)
+        title = subprocess.check_output(['xdotool', 'getwindowname', window],
+                                        text=True, timeout=5)
+        if 'click to capture mouse' in title:
+            click()
+            for _ in range(20):
+                title = subprocess.check_output(['xdotool', 'getwindowname', window],
+                                                text=True, timeout=5)
+                if 'hold Esc' in title:
+                    break
+                time.sleep(0.2)
+            else:
+                raise ValueError('launcher did not capture the mouse')
+
+        menu_label = 'combat' if name == 'english-quick-combat' else 'gefecht'
+        for attempt in range(3):
+            time.sleep(2)
+            words = screen_text(capture(f'menu-{attempt}'))
+            if menu_label in words:
+                break
+            click()
+        else:
+            raise ValueError(f'expected {menu_label!r} in the main menu')
+        if name in ('quick-fight-flight', 'english-quick-combat'):
+            input_event('mousemove_relative', '--', -160, -90, 'sleep', 1)
+            input_event('keydown', 'Return', 'sleep', 0.2, 'keyup', 'Return',
+                        'sleep', 3, 'keydown', 'Return', 'sleep', 0.2, 'keyup', 'Return')
+            time.sleep(4)
+            capture('mission-setup')
+            if 'game: mission data=' not in log.read_text(errors='replace'):
+                input_event('mousemove_relative', '--', -30, 200, 'sleep', 1)
+                click()
+            wait_for('game: mission data=', 12)
+            wait_for('game: flight (', 35)
+            time.sleep(4)
+        elif name == 'german-campaign-map':
+            input_event('mousemove_relative', '--', -50, -40, 'sleep', 1)
+            click()
+            time.sleep(4)
+            input_event('mousemove_relative', '--', 125, 40, 'sleep', 1)
+            click()
+            wait_for('game: navigation data=', 15)
+            time.sleep(2)
+        elif name == 'mitarbeiter':
+            input_event('mousemove_relative', '--', 40, 50, 'sleep', 1)
+            click()
+            time.sleep(3)
+        elif name == 'multiplayer':
+            input_event('mousemove_relative', '--', 5, 20, 'sleep', 1)
+            click()
+            time.sleep(3)
+
+        frame = capture('checkpoint')
+        expected_text = {
+            'mitarbeiter': ('mitarbeiter', 'andrew'),
+            'german-campaign-map': ('fliegen',),
+            'multiplayer': ('hauptmen', 'einstellungen'),
+        }.get(name, ())
+        if expected_text:
+            words = screen_text(frame)
+            (output / 'screen.txt').write_text(words)
+            for expected in expected_text:
+                if expected not in words:
+                    raise ValueError(f'expected {expected!r} in checkpoint text')
+
+        exit_code = game.wait(timeout=seconds + 15)
+        report = json.loads((output / 'run' / 'report.json').read_text())
+        if report['status'] != 'time_limit' or report['faults'] or exit_code not in (0, 27):
+            raise ValueError(f'expected native time limit, got {report["status"]} '
+                             f'(launcher exit={exit_code})')
+    finally:
+        if game.poll() is None:
+            os.killpg(game.pid, signal.SIGKILL)
+            game.wait()
+
+
+def run_private_native_case(launcher, executable, output, name, extras=()):
+    """Run a native case on a fresh Xvfb and return the replay exit status."""
+    dependencies = ['xvfb-run', 'xdotool', 'xwininfo', 'import', 'tesseract']
+    for tool in dependencies:
+        if not shutil.which(tool):
+            raise ValueError(f'{tool} is required')
+    output.mkdir(parents=True, exist_ok=False)
+    env = dict(os.environ)
+    env.pop('DISPLAY', None)
+    env.pop('XAUTHORITY', None)
+    # Only the child launched by xvfb-run queries windows or injects input.
+    # It inherits the private server's DISPLAY and XAUTHORITY.
+    script = (
+        'import sys; from pathlib import Path; sys.path.insert(0, sys.argv[1]); '
+        'from replay_suite import run_native_regression_case; '
+        'run_native_regression_case(Path(sys.argv[2]), Path(sys.argv[3]), '
+        'Path(sys.argv[4]), sys.argv[5], sys.argv[6:])')
+    with (output / 'replay.log').open('w') as log:
+        result = subprocess.run(
+            ['xvfb-run', '-a', '-s', '-screen 0 1280x1024x24',
+             '-e', str(output / 'xvfb.log'), sys.executable, '-c', script,
+             str(Path(__file__).resolve().parent), str(launcher.resolve()),
+             str(executable.resolve()), str(output), name, *extras],
+            env=env, stdout=log, stderr=subprocess.STDOUT, check=False)
+    return result.returncode
+
+
+def regression_main(argv):
+    parser = argparse.ArgumentParser(
+        prog='replay_suite.py hybrid-regression',
+        description='Run the rev 5 hybrid scenarios on private Xvfb displays.')
+    parser.add_argument('--launcher', required=True, type=Path,
+                        help='native ef2000 launcher')
+    parser.add_argument('--objects', required=True, type=Path,
+                        help='compiled OpenWatcom objects under test')
+    parser.add_argument('--german', required=True, type=Path, help='German TACTCOM game directory')
+    parser.add_argument('--english', required=True, type=Path, help='English DOS game directory')
+    parser.add_argument('--output', required=True, type=Path, help='new results directory')
+    parser.add_argument('--case', choices=REGRESSION_CASES, action='append',
+                        help='run only the specified case (repeatable)')
+    args = parser.parse_args(argv)
+    try:
+        output = args.output.resolve()
+        games = {'german': args.german.resolve(), 'english': args.english.resolve()}
+        if any(output == root or root in output.parents for root in games.values()):
+            raise ValueError('output must be outside original game data')
+        output.mkdir(parents=True)
+    except (OSError, ValueError) as error:
+        parser.error(str(error))
+
+    chosen = args.case or REGRESSION_CASES
+    supported = {'german': extract_image.SUPPORTED_SHA256, 'english': extract_image.ENGLISH_SHA256}
+    failed = False
+    patches = {}
+    for name in dict.fromkeys(chosen):
+        language, _ = REGRESSION_CASES[name]
+        case_output = output / name
+        try:
+            exe = games[language] / '_EF2000.EXE'
+            if hashlib.sha256(exe.read_bytes()).hexdigest() != supported[language]:
+                raise ValueError(f'unsupported {language} executable: {exe}')
+            if language not in patches:
+                patch = output / f'{language}.efpatch'
+                report = decomp_app.build_patch(exe, args.objects, patch)
+                (output / f'{language}.link.json').write_text(json.dumps(report, indent=2) + '\n')
+                patches[language] = patch
+            result = run_private_native_case(args.launcher, exe, case_output, name,
+                                             ['--patch', str(patches[language])])
+            if result:
+                raise ValueError(f'replay exited {result}; see {case_output}')
+        except (OSError, ValueError) as error:
+            failed = True
+            print(f'FAIL {name} ({error})', flush=True)
+        else:
+            print(f'PASS {name}', flush=True)
+    return int(failed)
+
+
 def main(argv=None):
+    argv = sys.argv[1:] if argv is None else argv
+    if argv[:1] == ['hybrid-regression']:
+        return regression_main(argv[1:])
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--executable', type=Path, required=True, help='SHA-pinned _EF2000.EXE')
     parser.add_argument('--runner', type=Path, required=True,

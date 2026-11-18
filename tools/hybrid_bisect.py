@@ -126,6 +126,26 @@ def frame_failure_signature(result, baseline, frame):
     return ('frame-mismatch', geometry)
 
 
+def run_native_trial(args, executable, output, patch=None):
+    extras = []
+    if patch:
+        extras.extend(['--patch', str(patch)])
+    exit_code = replay_suite.run_private_native_case(
+        args.runner, executable, output, args.case, extras)
+    report_path = output / 'run' / 'report.json'
+    if not report_path.is_file():
+        return False, None, [f'native replay stopped before writing {report_path}']
+    report = json.loads(report_path.read_text())
+    status = {'status': report['status'], 'ip': 0}
+    if report['faults']:
+        fault = report['faults'][0]
+        status['ip'] = fault['IP']
+        status['fault'] = {'type': fault['TRAP'], 'address': fault['CR2'],
+                           'size': 0, 'code': fault['ERROR']}
+    failures = [f'{report["status"]}; see {output}'] if exit_code else []
+    return not failures, {'status': status}, failures
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--image', type=Path, default=ROOT / 'local/initial-image/payload.bin')
@@ -133,8 +153,11 @@ def main(argv=None):
     parser.add_argument('--runner', type=Path, required=True)
     parser.add_argument('--game-dir', type=Path)
     parser.add_argument('--cd-dir', type=Path)
-    parser.add_argument('--manifest', type=Path, required=True)
-    parser.add_argument('--case', default='main-menu', help='manifest case to use as oracle')
+    oracle = parser.add_mutually_exclusive_group(required=True)
+    oracle.add_argument('--manifest', type=Path)
+    oracle.add_argument('--native', action='store_true',
+                        help='use a German native64 case from the hybrid regression set')
+    parser.add_argument('--case', default='main-menu', help='replay case to use as oracle')
     parser.add_argument('--output', type=Path, required=True,
                         help='new ignored local/ directory; never overwritten')
     parser.add_argument('--timeout', type=int, default=300)
@@ -142,7 +165,8 @@ def main(argv=None):
                         default=ROOT / 'decomp/symbols/hybrid-exclude.tsv',
                         help='persistent TSV of entries to keep original')
     parser.add_argument('--keep', action='append', default=[],
-                        help='entry that must remain patched and hit (repeatable, default 0xe7835)')
+                        help='entry to keep patched (repeatable). Unicorn trials also require a hit '
+                             '(Unicorn default 0xe7835)')
     parser.add_argument('--trace-address', action='append', default=[],
                         help='guest address whose execution count defines the target symptom')
     parser.add_argument('--exclude-address', action='append', default=[],
@@ -170,28 +194,43 @@ def main(argv=None):
             raise ValueError('timeout and max-rounds must be positive')
         if not 0 <= args.frame_diff_limit <= 1:
             raise ValueError('frame-diff-limit must be between 0 and 1')
-        for path, label in ((args.image, 'payload'), (args.executable, 'executable'),
+        if args.native and (replay_suite.REGRESSION_CASES.get(args.case, ('',))[0] != 'german'
+                            or args.match == 'frame' or args.trace_address
+                            or args.game_dir or args.cd_dir):
+            raise ValueError('native trials require a German regression case, crash or exact '
+                             'matching, and use the executable directory for game data')
+        image = None if args.native else args.image
+        for path, label in ((image, 'payload'), (args.executable, 'executable'),
                             (args.runner, 'runner'), (args.manifest, 'manifest')):
-            if not path.is_file():
+            if path is not None and not path.is_file():
                 raise ValueError(f'{label} does not exist: {path}')
         output = args.output.resolve()
         if output.exists():
             raise ValueError('output already exists (refusing overwrite)')
-        output.mkdir(parents=True)
         game_dir = (args.game_dir or args.executable.parent).resolve()
         cd_dir = args.cd_dir.resolve() if args.cd_dir else None
         if not game_dir.is_dir() or (cd_dir and not cd_dir.is_dir()):
             raise ValueError('game-dir or cd-dir does not exist')
-        if output == game_dir or game_dir in output.parents or output == args.executable.parent.resolve():
+        roots = [game_dir, args.executable.resolve().parent]
+        if cd_dir:
+            roots.append(cd_dir)
+        if any(output == root or root in output.parents for root in roots):
             raise ValueError('output must stay outside original game data')
 
-        objects, selected = hybrid_link.load_objects(
-            args.hand_objects or [ROOT / 'local/hybrid/obj'], args.mechanical_dir,
-            args.mechanical_report or args.mechanical_dir / 'report.tsv')
+        output.mkdir(parents=True)
+        if args.native:
+            objects = [(path, 'hand') for directory in
+                       (args.hand_objects or [ROOT / 'local/hybrid/obj'])
+                       for path in sorted(directory.glob('*.obj'))]
+            selected = {}
+        else:
+            objects, selected = hybrid_link.load_objects(
+                args.hand_objects or [ROOT / 'local/hybrid/obj'], args.mechanical_dir,
+                args.mechanical_report or args.mechanical_dir / 'report.tsv')
         functions = hybrid_link.read_tsv(args.functions)
         globals_ = hybrid_link.read_tsv(args.globals)
         signatures = hybrid_link.read_tsv(ROOT / 'decomp/symbols/signatures.tsv')
-        source = args.image.read_bytes()
+        source = load_image(executable=args.executable) if args.native else image.read_bytes()
         aliases = hybrid_link.load_abi_aliases(args.abi_header)
         variadic_names = hybrid_link.load_variadic_names(args.abi_header)
         persistent_excludes = hybrid_link.load_exclusions(args.exclude_list, len(source))
@@ -211,51 +250,58 @@ def main(argv=None):
         initial_addresses = {address for address, _ in initial_writes
                              if address < len(source)}
 
-        keep = {int(value, 0) for value in (args.keep or ['0xe7835'])}
-        manifest = json.loads(args.manifest.read_text())
-        manifest_case = next((item for item in manifest.get('cases', [])
-                              if item.get('name') == args.case), None)
-        if manifest_case is None:
-            raise ValueError(f'manifest has no case named {args.case!r}')
-        # Keep only the requested canaries in this case. During resumed or
-        # focused bisection, other original must_hit entries may already be
-        # deliberately demoted and must not invalidate the reduced patch set.
-        manifest_case['must_hit'] = ['0x%x' % address for address in sorted(keep)]
-        cases = replay_suite.validate_manifest(manifest, initial_addresses, ())
-        case = next((item for item in cases if item['name'] == args.case), None)
-        if case is None:
-            raise ValueError(f'manifest has no case named {args.case!r}')
-
+        default_keep = [] if args.native else ['0xe7835']
+        keep = {int(value, 0) for value in (args.keep or default_keep)}
         trace_addresses = sorted({int(value, 0) for value in args.trace_address})
-        case['trace_addresses'] = trace_addresses
+        if args.native:
+            passed, baseline, failures = run_native_trial(
+                args, args.executable, output / 'baseline')
+            if not passed:
+                raise ValueError(f'native original baseline failed: {failures[0]}')
+        else:
+            manifest = json.loads(args.manifest.read_text())
+            manifest_case = next((item for item in manifest.get('cases', [])
+                                  if item.get('name') == args.case), None)
+            if manifest_case is None:
+                raise ValueError(f'manifest has no case named {args.case!r}')
+            # Keep only the requested canaries in this case. During resumed or
+            # focused bisection, other original must_hit entries may already be
+            # deliberately demoted and must not invalidate the reduced patch set.
+            manifest_case['must_hit'] = ['0x%x' % address for address in sorted(keep)]
+            cases = replay_suite.validate_manifest(manifest, initial_addresses, ())
+            case = next((item for item in cases if item['name'] == args.case), None)
+            if case is None:
+                raise ValueError(f'manifest has no case named {args.case!r}')
 
-        replay_runner = args.runner.resolve()
-        if case['arguments']:
-            xvfb = shutil.which('xvfb-run')
-            if not xvfb:
-                raise ValueError('xvfb-run is required for replay cases that inject input')
-            wrapper = output / 'private-xvfb-runner'
-            wrapper.write_text(
-                '#!/bin/sh\n'
-                'out=$(mktemp) || exit 125\n'
-                'err=$(mktemp) || { rm -f "$out"; exit 125; }\n'
-                '%s -a %s "$@" >"$out" 2>"$err"\n'
-                'result=$?\n'
-                'cat "$out"\n'
-                'cat "$err" >&2\n'
-                'if grep -q "^status=" "$out"; then result=0; fi\n'
-                'rm -f "$out" "$err"\n'
-                'exit "$result"\n' %
-                (shlex.quote(xvfb), shlex.quote(str(args.runner.resolve()))))
-            wrapper.chmod(0o755)
-            replay_runner = wrapper
-        baseline_case = dict(case)
-        baseline_case.pop('must_hit', None)
-        baseline_case.pop('patch_addresses', None)
-        baseline_case['patch_addresses'] = set()
-        baseline = replay_suite.run_one(
-            replay_runner, args.executable.resolve(), game_dir, cd_dir, [], baseline_case,
-            output / 'baseline', args.timeout, 'off')
+            case['trace_addresses'] = trace_addresses
+
+            replay_runner = args.runner.resolve()
+            if case['arguments']:
+                xvfb = shutil.which('xvfb-run')
+                if not xvfb:
+                    raise ValueError('xvfb-run is required for replay cases that inject input')
+                wrapper = output / 'private-xvfb-runner'
+                wrapper.write_text(
+                    '#!/bin/sh\n'
+                    'out=$(mktemp) || exit 125\n'
+                    'err=$(mktemp) || { rm -f "$out"; exit 125; }\n'
+                    '%s -a %s "$@" >"$out" 2>"$err"\n'
+                    'result=$?\n'
+                    'cat "$out"\n'
+                    'cat "$err" >&2\n'
+                    'if grep -q "^status=" "$out"; then result=0; fi\n'
+                    'rm -f "$out" "$err"\n'
+                    'exit "$result"\n' %
+                    (shlex.quote(xvfb), shlex.quote(str(args.runner.resolve()))))
+                wrapper.chmod(0o755)
+                replay_runner = wrapper
+            baseline_case = dict(case)
+            baseline_case.pop('must_hit', None)
+            baseline_case.pop('patch_addresses', None)
+            baseline_case['patch_addresses'] = set()
+            baseline = replay_suite.run_one(
+                replay_runner, args.executable.resolve(), game_dir, cd_dir, [], baseline_case,
+                output / 'baseline', args.timeout, 'off')
 
         trial_log = []
         run_number = 0
@@ -277,33 +323,38 @@ def main(argv=None):
                 explicit_excludes=excluded_map, signatures=signatures,
                 variadic_names=variadic_names)
             patch_path.write_bytes(blob)
-            writes = decode_patch(blob, source, hybrid_link.GUEST_SIZE)
-            addresses = {address for address, _ in writes if address < len(source)}
-            must_hit = sorted(keep & addresses)
-            if not must_hit:
-                raise ValueError('no --keep entry remains patched; choose a valid canary')
-            trial_case = dict(case, allow_no_framebuffer=True, must_hit=must_hit,
-                              patch_addresses=set(must_hit))
-            try:
-                result = replay_suite.run_one(
-                    replay_runner, args.executable.resolve(), game_dir, cd_dir, [patch_path],
-                    trial_case, output / f'trial-{run_number:02d}', args.timeout, 'off')
-                failures = replay_suite.differences(baseline, result)
-                if args.match == 'frame':
-                    failures = [] if result['status']['status'] == baseline['status']['status'] \
-                        else [f"status: {baseline['status']['status']} != {result['status']['status']}"]
-                    difference = frame_difference(
-                        output / 'baseline' / 'frame.ppm',
-                        output / f'trial-{run_number:02d}' / 'frame.ppm')
-                    if difference > args.frame_diff_limit:
-                        failures.append(f'framebuffer differs in {difference:.4%} of pixels')
-                missing_hits = [address for address in must_hit
-                                if result['patch_hits'].get(f'0x{address:x}', 0) == 0]
-                failures.extend(f'canary 0x{address:x} was not hit'
-                                for address in missing_hits)
-            except (OSError, ValueError) as error:
-                result = None
-                failures = [str(error)]
+            trial_output = output / f'trial-{run_number:02d}'
+            if args.native:
+                _, result, failures = run_native_trial(args, args.executable, trial_output,
+                                                       patch_path)
+            else:
+                writes = decode_patch(blob, source, hybrid_link.GUEST_SIZE)
+                addresses = {address for address, _ in writes if address < len(source)}
+                must_hit = sorted(keep & addresses)
+                if not must_hit:
+                    raise ValueError('no --keep entry remains patched; choose a valid canary')
+                trial_case = dict(case, allow_no_framebuffer=True, must_hit=must_hit,
+                                  patch_addresses=set(must_hit))
+                try:
+                    result = replay_suite.run_one(
+                        replay_runner, args.executable.resolve(), game_dir, cd_dir, [patch_path],
+                        trial_case, output / f'trial-{run_number:02d}', args.timeout, 'off')
+                    failures = replay_suite.differences(baseline, result)
+                    if args.match == 'frame':
+                        failures = [] if result['status']['status'] == baseline['status']['status'] \
+                            else [f"status: {baseline['status']['status']} != {result['status']['status']}"]
+                        difference = frame_difference(
+                            output / 'baseline' / 'frame.ppm',
+                            output / f'trial-{run_number:02d}' / 'frame.ppm')
+                        if difference > args.frame_diff_limit:
+                            failures.append(f'framebuffer differs in {difference:.4%} of pixels')
+                    missing_hits = [address for address in must_hit
+                                    if result['patch_hits'].get(f'0x{address:x}', 0) == 0]
+                    failures.extend(f'canary 0x{address:x} was not hit'
+                                    for address in missing_hits)
+                except (OSError, ValueError) as error:
+                    result = None
+                    failures = [str(error)]
             passed = not failures
             trial_log.append({'trial': run_number,
                               'excluded_file': exclude_path.name,
@@ -340,7 +391,10 @@ def main(argv=None):
         initial_pass, initial_result, _ = trial(set())
         if initial_pass:
             raise ValueError('complete hybrid passes this replay case; no culprit to bisect')
-        if match_mode[0] == 'crash' and crash_class(initial_result, baseline) is None:
+        abnormal_stop = crash_class(initial_result, baseline)
+        if args.native and abnormal_stop is None:
+            raise ValueError('initial native failure has no abnormal guest stop to bisect')
+        if match_mode[0] == 'crash' and abnormal_stop is None:
             print('initial failure is not an abnormal stop; using exact matching')
             match_mode[0] = 'exact'
         target_signature = match_signature(initial_result)
