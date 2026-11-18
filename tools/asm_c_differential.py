@@ -937,16 +937,30 @@ def prepared_port_service(pit_writes=False, vga_status_reads=False, gameport_dis
     return handle
 
 
+def prepared_register_overrides(items):
+    overrides = {}
+    for name, value in items:
+        if name not in asm_to_c.REGS or name == 'esp' or name in overrides:
+            raise ValueError(f'invalid or duplicate prepared register {name!r}')
+        if type(value) is not int or not 0 <= value <= 0xffffffff:
+            raise ValueError(f'prepared register {name} requires a u32 value')
+        overrides[name] = value
+    return overrides
+
+
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False, prepared_registers=()):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
     probes are explicitly inconclusive. fork keeps the compiled library and
     payload immutable in the parent and avoids serializing ctypes pointers.
     """
+    overrides = prepared_register_overrides(prepared_registers)
+    if overrides and (not program or captured is not None):
+        raise ValueError('register overrides require prepared program probes')
     if captured is not None:
         scenarios = 1
     context = multiprocessing.get_context('fork')
@@ -957,6 +971,8 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
             resource.setrlimit(resource.RLIMIT_CORE, (0, 0))
             inputs = probes(scenarios, address) if captured is None else [([], 0)]
             for index, (registers, flags) in enumerate(inputs):
+                for name, value in overrides.items():
+                    registers[asm_to_c.REGS.index(name)] = value
                 sender.send(('phase', index, 'setup'))
                 result = compare(function, payload, address, registers, flags, budget=budget,
                                  program=program, native_x87=native_x87, captured=captured,
@@ -1078,7 +1094,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False, prepared_registers=()):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -1091,6 +1107,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
     if prepared_raster:
         prepared_u32 = (*prepared_raster_u32(), *prepared_u32)
+    prepared_registers = prepared_register_overrides(prepared_registers)
+    if prepared_registers and (not program or captures or not addresses):
+        raise ValueError('register overrides require prepared program probes and explicit entry addresses')
     if prepared_u32 and (not program or not service_free_paths or captures):
         raise ValueError('initial RAM writes require --service-free-paths and prepared program probes')
     if checkpoint is not None and (not program or not service_free_paths or captures or not addresses):
@@ -1274,7 +1293,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors)
+                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
+                                  prepared_registers=prepared_registers.items())
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -1313,6 +1333,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   prepared_checkpoint=dict(pc=checkpoint[0], visits=checkpoint[1]) if checkpoint else None,
                   prepared_memory_size=prepared_memory_size or 0x400000,
                   prepared_raster='320x200-scratch' if prepared_raster else None,
+                  prepared_registers=prepared_registers,
                   prepared_u32=[dict(address=offset, value=value) for offset, value in prepared_u32],
                   dos_conventional_policy='prepared-aperture-only'
                   if x32_heap and (prepared_memory_size or 0) >= unicorn_backend.DOS_BASE + real_mode.MEMORY_SIZE
@@ -1397,6 +1418,9 @@ def main(argv=None):
                         help='with --service-free-paths, model X-32 lock and unlock on prepared RAM')
     parser.add_argument('--prepared-raster', action='store_true',
                         help='initialize scratch buffers and row offsets for a 320x200 raster')
+    parser.add_argument('--prepared-register', nargs=2, action='append', default=[],
+                        metavar=('REGISTER', 'VALUE'),
+                        help='override an initial general-purpose register other than ESP')
     parser.add_argument('--prepared-u32', type=lambda value: int(value, 0), nargs=2,
                         action='append', default=[], metavar=('ADDRESS', 'VALUE'),
                         help='initialize a little-endian u32 in prepared guest RAM')
@@ -1428,7 +1452,8 @@ def main(argv=None):
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
                         checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster,
-                        vga_dac=args.vga_dac, x32_vectors=args.x32_vectors)
+                        vga_dac=args.vga_dac, x32_vectors=args.x32_vectors,
+                        prepared_registers=[(name, int(value, 0)) for name, value in args.prepared_register])
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:

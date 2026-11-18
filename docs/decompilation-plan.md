@@ -13365,3 +13365,17 @@ flags, and segment selectors, plus the write value for accesses up to
 eight bytes. These fields help identify the missing input pointers or
 segment setup. See bulk-memory-fault-prefix.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Supply pointer inputs to prepared program probes
+
+For explicit entries, `--prepared-register REGISTER VALUE` overrides
+an initial general-purpose register other than ESP. This can be combined
+with `--prepared-u32` to build valid input objects in scratch RAM. The
+report records the register overrides.
+
+The bulk default initializes EAX and EBX to zero on the first scenario.
+Two list helpers dereferenced those pointers into image bytes and later
+faulted. Prepared two-node lists produce complete matches at 0xbc5d0
+and 0xcc1ac, including traversal to a second node. See
+bulk-prepared-list-controls.jsonl under local/ghidra-group-followup-20261118.
+The callers of these helpers need their own valid input state.
