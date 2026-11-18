@@ -13379,3 +13379,17 @@ faulted. Prepared two-node lists produce complete matches at 0xbc5d0
 and 0xcc1ac, including traversal to a second node. See
 bulk-prepared-list-controls.jsonl under local/ghidra-group-followup-20261118.
 The callers of these helpers need their own valid input state.
+
+### 2026-11-18 — Combine the reviewed BIOS and gameport boundaries
+
+The prepared sweep of the gameport build exposed a C stop at 0xfe700
+from entry 0x39204. Increasing the instruction budget tenfold still
+stopped at the same PC. With the previously reviewed BIOS interrupt
+sites enabled, the same 100,000-instruction probe matches through DOS
+exit 255 on both sides. See bulk-bios-mode-39204-replay.jsonl under
+local/ghidra-group-followup-20261118.
+
+A fresh local generation applies the union of the reviewed interrupt
+and port sites from bulk-bios-mode-c and bulk-gameport-c to the
+gameport inventory. It emits 4,353 bodies, two more than the gameport
+build. The combined build is staged for differential verification.
