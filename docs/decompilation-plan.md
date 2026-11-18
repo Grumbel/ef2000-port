@@ -13634,3 +13634,18 @@ complete prepared match. Replay with
 replay-bulk-gameport-bios-null-terminated-lists.py and see
 bulk-gameport-bios-null-terminated-lists.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Identify divide exceptions in the list caller probes
+
+The verifier now records the vector, EIP, registers and bounded
+instruction window when Unicorn invokes the interrupt hook without
+a recognized software interrupt encoding. The three previously
+unidentified stops in 0xb7d4c and 0xb8510 are vector-zero divide
+exceptions at 0xb5599 with ESI=0. Initializing the selected node's
+divisor at offset 0x1e moves the two hit cases to a second divide
+exception at 0xb55bd. Those paths still need valid divisor inputs
+for the later call. The other thirteen probes still match through
+return, leaving the prepared-match total at 3,834.
+
+Replay with replay-bulk-gameport-bios-null-terminated-lists.py.
+The synthetic interrupt boundary test also passed.

@@ -563,10 +563,18 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if original_service is not None or prepared_services:
         def interrupt(engine, vector, _):
             nonlocal original_exit
-            ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
-            if ip < 0 or vector not in range(256) or engine.mem_read(ip, 2) != bytes((0xcd, vector)):
-                ip += 1
-                if ip < 0 or vector != 3 or engine.mem_read(ip, 1) != b'\xcc':
+            eip = engine.reg_read(x86_const.UC_X86_REG_EIP)
+            ip = eip - 2
+            if not (2 <= eip <= memory_size and 0 <= vector < 256
+                    and engine.mem_read(ip, 2) == bytes((0xcd, vector))):
+                ip = eip - 1
+                if not (1 <= eip <= memory_size and vector == 3
+                        and engine.mem_read(ip, 1) == b'\xcc'):
+                    rejected_service.update(kind='unrecognized_interrupt', eip=eip,
+                                            vector=vector, registers=original_registers(engine))
+                    if eip < memory_size:
+                        size = min(15, memory_size - eip)
+                        rejected_service['window_at_eip'] = engine.mem_read(eip, size).hex()
                     raise ValueError('unsupported host service instruction')
             values = original_registers(engine)
             if dos_console and vector == 0x21 and ((values['ax'] >> 8) & 0xff) == 0x4c:
