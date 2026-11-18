@@ -174,7 +174,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     drive_directory = None
     drives = {}
 
-    def prepared_service(ip, values, vector, ds, read, events, heap, side):
+    def write_translated(offset, data):
+        memory[offset:offset + len(data)] = data
+
+    def prepared_service(ip, values, vector, ds, read, write, events, heap, side):
         nonlocal drive_directory
         if heap is not None and vector == 0x21 and ip == 0x245 and values['ax'] & 0xffff == 0x3508:
             rounded = (values['cx'] + 0xfff) & 0xfffff000
@@ -203,7 +206,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         ah = (values['ax'] >> 8) & 0xff
         handle = values['bx'] & 0xffff
         if (dos_empty_drive and vector == 0x21
-                and (ah in (0x3c, 0x3d, 0x3e, 0x42) or ah == 0x40 and handle > 2
+                and (ah in (0x3c, 0x3d, 0x3e, 0x3f, 0x42, 0x68) or ah == 0x40 and handle > 2
                      or values['ax'] & 0xffff == 0x4400)):
             if drive_directory is None:
                 drive_directory = tempfile.TemporaryDirectory(prefix='ef-probe-drive-')
@@ -232,6 +235,17 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 elif ah == 0x3e:
                     drive.close(handle)
                     value = 0x3e01
+                elif ah == 0x3f:
+                    if not 0x260 < offset < 0x4000000 or count > 0x4000000 - offset:
+                        raise unicorn_files.DosFileError(5)
+                    if ds not in (16, 24) or offset >= memory_size or count > memory_size - offset:
+                        raise ValueError('DOS read requires a valid flat buffer')
+                    data = drive.read(handle, count)
+                    if data:
+                        write(offset, data)
+                    event['input_sha256'] = hashlib.sha256(data).hexdigest()
+                    response['cx'] = response['dx'] = 0
+                    value = len(data)
                 elif ah == 0x42:
                     displacement = ctypes.c_int32(((count & 0xffff) << 16) | (offset & 0xffff)).value
                     position = drive.seek(handle, displacement, values['ax'] & 0xff)
@@ -242,6 +256,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                         raise unicorn_files.DosFileError(6)
                     value = 0x80d3 if handle <= 2 else 2
                     response['dx'] = (response['dx'] & 0xffff0000) | value
+                elif ah == 0x68:
+                    if handle > 2:
+                        drive.flush(handle)
+                    value = values['ax']
                 else:
                     if (ds not in (16, 24) or not 0x260 < offset < memory_size
                             or count > min(65536, memory_size - offset)):
@@ -408,8 +426,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             try:
                 if prepared_services:
                     ds = engine.reg_read(x86_const.UC_X86_REG_DS)
-                    response = prepared_service(ip, values, vector, ds, engine.mem_read, original_events,
-                                                original_heap, 'original')
+                    response = prepared_service(ip, values, vector, ds, engine.mem_read, engine.mem_write,
+                                                original_events, original_heap, 'original')
                 else:
                     response = service(original_service, ip, values, original_events, vector, ram)
             except (ValueError, RuntimeError):
@@ -557,6 +575,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                         response = prepared_service(state.pc-length, values, status & 0xff,
                                                    state.segment[asm_to_c.SEGMENTS.index('ds')],
                                                    lambda offset, count: memory[offset:offset+count],
+                                                   write_translated,
                                                    translated_events, translated_heap, 'translated')
                     else:
                         response = service(translated_service, state.pc-length, values, translated_events,

@@ -1192,6 +1192,8 @@ mov eax,0x4000
 mov edx,0x680
 mov ecx,4
 int 0x21
+mov eax,0x6800
+int 0x21
 mov eax,0x4201
 xor ecx,ecx
 xor edx,edx
@@ -1201,6 +1203,12 @@ int 0x21
 mov eax,0x3d00
 mov edx,0x680
 int 0x21
+mov ebx,eax
+mov eax,0x3f00
+mov edx,0x300000
+mov ecx,8
+int 0x21
+mov esi,dword ptr [0x300000]
 ret
 .size write_file, .-write_file"""
         with tempfile.TemporaryDirectory() as temporary:
@@ -1261,9 +1269,12 @@ ret
             write_events = write_entry['probes'][0]['host_services']
             self.assertEqual(write_events['original'], write_events['translated'])
             self.assertEqual([event['after']['ax'] for event in write_events['original']],
-                             [5, 2, 4, 4, 0x3e01, 5])
+                             [5, 2, 4, 0x6800, 4, 0x3e01, 5, 4])
             self.assertEqual(write_events['original'][2]['output_sha256'],
                              hashlib.sha256(b'EXAM').hexdigest())
+            read_event = write_events['original'][-1]
+            self.assertEqual(read_event['input_sha256'], hashlib.sha256(b'EXAM').hexdigest())
+            self.assertEqual((read_event['after']['cx'], read_event['after']['dx']), (0, 0))
 
         self.assertEqual(console_report['dos_invalid_open_policy'], 'prepared-only')
         self.assertEqual(console_entries[0x500]['state'], 'probes-pass')

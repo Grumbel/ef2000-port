@@ -12839,3 +12839,11 @@ service transcripts. 0xac57c still reaches the instruction limit
 after writing to its disposable file. See the local
 `dos-stateful-drive-threaded-regression.json` and
 `dos-stateful-drive-budget-replay.json`.
+
+The empty-drive fixture now also handles DOS read and flush. Reads
+copy returned bytes into each side's guest RAM and compare the read
+content hashes and register responses. The synthetic file lifecycle
+test reads eight requested bytes from a four-byte file and compares
+the loaded value after the short read. The 68-probe replay preserves
+58 passes, nine inconclusive results and the known raster mismatch.
+See local `dos-read-flush-regression.json`.
