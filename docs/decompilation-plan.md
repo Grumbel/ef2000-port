@@ -14202,3 +14202,16 @@ and release integration remain unverified.
 The complete-match total is now 3,890 of 4,354 generated entries.
 See replay-bulk-gameport-bios-decode-stream.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare compressed-stream block transitions
+
+Two prepared streams at 0x10da50 each decode two blocks with distinct
+literal pairs. Both executions match through return without a DOS exit.
+A checkpoint on the second visit to 0x10da85 confirms the transition to
+the second block. Separate checkpoints at 0x10dafb and 0x10db07 confirm
+checksum acceptance for 0x2a13 and rejection for zero, respectively.
+
+This extends coverage for an already matched entry. The complete-match
+total stays at 3,890 of 4,354 generated entries. See
+replay-bulk-gameport-bios-decode-multiblock.py and its JSONL output under
+local/ghidra-group-followup-20261118.
