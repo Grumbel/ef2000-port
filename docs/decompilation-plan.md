@@ -13469,3 +13469,20 @@ bulk-gameport-bios-x87-snapshot-faults.jsonl,
 bulk-gameport-bios-x87-snapshot-prefixes.jsonl and
 bulk-gameport-bios-x87-coordinate-inputs.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify x87 paths with initialized object tables
+
+Replayed six entries (0x1d7a4, 0x1d844, 0x1d8e8, 0x1d954,
+0x1db08 and 0x1dc20) with a prepared object and a two-record,
+25-byte-stride table. The object selects the second record, with
+signed coordinates, and supplies nonzero position and motion fields.
+Replayed 0x11ac3c and 0x11acb0 with an initialized 2×2×2 double
+table. All eight matched through return, bringing the number of
+entries with at least one complete prepared match to 3,780 of 4,353.
+
+The local directory local/ghidra-group-followup-20261118 contains
+bulk-x87-object-prepared-fixtures.json and
+bulk-gameport-bios-x87-object-inputs.jsonl. Replay with
+replay-bulk-gameport-bios-x87-objects.py in that directory, or pass
+the fixtures to the bulk differential CLI with the same common
+prepared memory and host service settings as the baseline.
