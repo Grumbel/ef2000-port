@@ -13755,3 +13755,17 @@ successive appends.
 The prepared-match total is now 3,848 of 4,353 entries. See
 replay-bulk-gameport-bios-string-heap-inputs.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify first conventional heap block insertion
+
+Entry 0x9c03b previously exhausted the instruction budget in
+0x9bfe3 while deriving the block header from its packed segment
+and offset argument. For an empty list and segment 0x1000, offset
+0x0100 exercises the direct subtraction of the eight-byte header.
+Offset 0xfffc also stays within the segment and checks insertion
+near the end of the offset range. Both cases matched the generated
+C through return with conventional memory mapped at 0x05000000.
+
+The prepared-match total is now 3,849 of 4,353 entries. See
+replay-bulk-gameport-bios-string-heap-inputs.py and its JSONL output
+under local/ghidra-group-followup-20261118.
