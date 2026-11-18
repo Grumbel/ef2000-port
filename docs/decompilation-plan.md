@@ -14901,3 +14901,27 @@ The report `bulk-cpu-boundaries-heap-release-fixtures.json` includes the
 prepared registers and RAM, outcome and host-service transcript for
 each of the ten probes. SHA-256
 `0ff8adbc8354ab722f0042d2e69e44bd1af3a3e96c90359c6308296977b14561`.
+
+#### Verify the bulk list-count callers with linked records
+
+Nine default probes previously stopped at 0xbc5d9 after reading an
+unprepared list head. Twelve probes against the 4,363-entry candidate
+match through return with initialized heads and links. They cover empty
+and three-node counts (0xbc5d0), heading-only output (0xb1c34, 0xb3038,
+0xb3648), and a nonempty node dump (0xb3648). The four dump probes
+compare the DOS stdout payload as part of the service transcript.
+
+The dispatch loop (0xbeebc) walks three entries with an empty source
+list. The two folds and the object loop (0xc02ec, 0xc0534, 0xc1034)
+walk a three-node list whose IDs miss the requested indices. The weighted
+list routine (0xcbff0) allocates and releases its accumulator using an
+initialized free list. It matches both with and without a negative
+relationship byte. The negative byte selects the x87 distance and
+threshold comparison. Successful fold and object dispatch, broader
+weighted-list inputs, and game replay coverage remain pending.
+
+Run the local probe with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-list-count-cohort.py`.
+The report `bulk-cpu-boundaries-list-count-cohort.json` retains the
+fixtures, machine-state comparisons and service transcripts. SHA-256
+`2b52a06d577d34d98cf0d07de1f0eb1346da3832467209b74a9d8e6fa33c2672`.
