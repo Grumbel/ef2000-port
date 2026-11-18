@@ -12251,3 +12251,17 @@ traces, 37 of 42 distinct targets have contiguous candidates with no
 reported blockers. Five need further review. The audit leaves function
 ownership unchanged. All 15 inventory tests passed.
 Report: `local/ghidra-group-followup-20261118/trace-table-bodies.json`.
+
+2026-11-18 — Evaluated the 37 contiguous table candidates as a disposable
+overlay of the payload-bound body export. The overlay supplied only
+candidate bounds and re-decoded instruction spans. The 213-body scope
+included known direct dependencies and bodies reached in the recorded
+callers. All 213 bodies generated C and compiled with OpenWatcom. All 37
+candidate first inputs matched. Caller 0x13950, previously stopped at
+0x135cc, now matches its first prepared input. Caller 0x12160 reaches
+0x13854, which needs recovery of direct callee 0x136d4. The other two
+mismatches stop at the known formatter callback 0xfa804, omitted from
+this scope. The tracker and Ghidra project were left intact.
+A follow-up using the same linked library matched all 592 prepared
+probes across the 37 candidates. Evidence is under
+`local/ghidra-group-followup-20261118/candidate-diff/`.
