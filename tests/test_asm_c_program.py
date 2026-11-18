@@ -8,6 +8,7 @@ import hashlib
 import json
 from pathlib import Path
 import shutil
+import struct
 import subprocess
 import tempfile
 import unittest
@@ -1249,7 +1250,20 @@ ret
 .long 0x1500,0x12345678
 .org 0xc20
 .short 0x2f,1,2,3,4
-.long 0x1510,0x87654321"""
+.long 0x1510,0x87654321
+.org 0xd00
+.type vbe_mode_info,@function
+vbe_mode_info: mov eax,0x2511
+mov edx,0xe00
+mov ecx,0x101
+mov edi,0x120
+int 0x21
+movzx esi,word ptr [0x05000230]
+ret
+.size vbe_mode_info, .-vbe_mode_info
+.org 0xe00
+.short 0x10,0,0x10,0,0
+.long 0x4f01,0"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1309,6 +1323,21 @@ ret
             self.assertEqual(detection['after']['bx'], 0)
             self.assertEqual(request['after']['bx'], 0x5678)
             self.assertEqual(request['after']['dx'], 0x87654321)
+            vbe_report = asm_c_differential.verify(
+                out, root / 'vbe', image, scenarios=1, service_free_paths=True,
+                x32_vbe=True, prepared_memory_size=0x5100000, addresses=[0xd00])
+            vbe_probe = vbe_report['entries'][0]['probes'][0]
+            self.assertEqual(vbe_probe['state'], 'pass', vbe_probe)
+            vbe_events = vbe_probe['host_services']
+            self.assertEqual(vbe_events['original'], vbe_events['translated'])
+            event = vbe_events['original'][0]
+            self.assertEqual(event['after']['ax'], 0x004f)
+            dos_memory = bytearray(0x100000)
+            struct.pack_into('<HBB4H', dos_memory, 0x220, 0x1b, 7, 0, 64, 64, 0xa000, 0)
+            struct.pack_into('<3H', dos_memory, 0x230, 640, 640, 480)
+            dos_memory[0x236:0x23e] = bytes((8, 16, 1, 8, 1, 4, 64, 2))
+            self.assertEqual(event['dos_memory']['after_sha256'],
+                             hashlib.sha256(dos_memory).hexdigest())
             vga_report = asm_c_differential.verify(
                 out, root / 'vga', image, scenarios=1, service_free_paths=True,
                 vga_status_reads=True, addresses=[0xa00])

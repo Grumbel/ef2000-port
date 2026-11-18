@@ -12953,3 +12953,15 @@ with the idle mouse fixture and no CD increased full prepared-probe
 matches from 10 to 17, with 14 inconclusive. The new matches are
 0xddc88, 0xddce8, 0xddd48, 0xdde80, 0xde12c, 0xde2d8 and 0xde4b0.
 See local `x32-no-cd-replay.json`.
+
+Use `--x32-vbe` with `--service-free-paths` and
+`--prepared-memory-size 0x5100000` to compare prepared X-32 VBE
+mode-info and scanline calls through the runtime handler. Conventional
+memory uses the runtime's linear DOS aperture at 0x05000000. The
+verifier records before/after DOS RAM hashes for each VBE request.
+At the same RAM size, enabling VBE increased the 31-entry cohort
+from 17 to 20 matching probes. The additions are 0xfc478, 0xfc600
+and 0xfc6c8. The path at 0xd1d40 passed its previous service stop
+and exhausted the original budget even at 100,000 instructions.
+The local evidence is in `x32-vbe-replay.json`,
+`x32-vbe-aperture-control.json` and `x32-vbe-budget-replay.json`.

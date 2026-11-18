@@ -25,12 +25,13 @@ import subprocess
 import tempfile
 
 try:
-    from . import asm_to_c, asm_softfloat, asm_x87_oracle, real_mode, unicorn_files, x32_allocation
+    from . import asm_to_c, asm_softfloat, asm_x87_oracle, real_mode, unicorn_backend, unicorn_files, x32_allocation
 except ImportError:
     import asm_to_c
     import asm_softfloat
     import asm_x87_oracle
     import real_mode
+    import unicorn_backend
     import unicorn_files
     import x32_allocation
 
@@ -131,7 +132,8 @@ def validate_prepared_memory_size(size):
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
-            dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, checkpoint=None):
+            dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
+            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -158,12 +160,17 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_visits = translated_visits = 0
     original_cpuid, translated_cpuid = [], []
     cpuid_cpu = None
-    prepared_services = dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd
+    prepared_services = (dos_console or x32_heap or dos_invalid_open or x32_residency
+                         or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe)
     if prepared_services and (not program or captured is not None or service_factory is not None):
         raise ValueError('Interrupt fixtures require prepared program probes and no custom interrupt handler')
     if x32_heap and (prepared_memory_size or 0) < x32_allocation.Allocation.minimum_stack:
         raise ValueError('X-32 heap fixture requires prepared RAM covering the initial heap and stack floor')
     validate_prepared_memory_size(prepared_memory_size)
+    dos_base = unicorn_backend.DOS_BASE
+    dos_end = dos_base + real_mode.MEMORY_SIZE
+    if x32_vbe and (prepared_memory_size or 0) < dos_end:
+        raise ValueError('X-32 VBE fixture requires prepared RAM covering the DOS aperture')
     if captured is not None and prepared_memory_size is not None:
         raise ValueError('captured RAM cannot be resized')
     service_names = ('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')
@@ -211,7 +218,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 raise ValueError('X-32 residency query is outside the lock/unlock fixture')
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
-        if (x32_mouse or x32_no_cd) and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
+        if (x32_mouse or x32_no_cd or x32_vbe) and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
             offset = values['dx']
             if ds not in (16, 24) or not 0x260 < offset <= memory_size - 18:
                 raise ValueError('invalid X-32 real-mode frame')
@@ -219,23 +226,34 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             number, rm_ds, es, fs, gs, ax, dx = struct.unpack('<5H2I', frame)
             mouse_request = x32_mouse and number == 0x33
             cd_request = x32_no_cd and number == 0x2f and ax & 0xffff in (0x1500, 0x1510)
-            if not (mouse_request or cd_request):
+            vbe_request = x32_vbe and number == 0x10 and ax & 0xffff in (0x4f01, 0x4f06)
+            if not (mouse_request or cd_request or vbe_request):
                 raise ValueError('X-32 request is outside the prepared real-mode fixtures')
             if side not in real_mode_handlers:
                 real_mode_handlers[side] = real_mode.RealMode()
             request = [real_mode.MAGIC, 0, ax, values['bx'], values['cx'], dx,
                        values['si'], values['di'], rm_ds, es, fs, gs, values['flags'], number]
-            packet, _ = real_mode_handlers[side].execute(real_mode.PACKET.pack(*request), b'', b'')
+            conventional = bytes(read(dos_base, real_mode.MEMORY_SIZE)) if vbe_request else b''
+            packet, updated_dos = real_mode_handlers[side].execute(
+                real_mode.PACKET.pack(*request), b'', conventional)
             result = real_mode.PACKET.unpack(packet)
             updated = bytearray(frame)
             struct.pack_into('<4H', updated, 2, *result[8:12])
             struct.pack_into('<I', updated, 14, result[5])
-            write(offset, bytes(updated))
             response = dict(values)
             response.update(zip(('ax', 'bx', 'cx', 'dx', 'si', 'di'), result[2:8]))
             response['flags'] = (values['flags'] & ~0x8d5) | (result[12] & 0x8d5)
-            events.append(dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response,
-                               frame_before=frame.hex(), frame_after=updated.hex()))
+            event = dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response,
+                         frame_before=frame.hex(), frame_after=updated.hex())
+            if vbe_request:
+                if len(updated_dos) != real_mode.MEMORY_SIZE:
+                    raise ValueError('invalid VBE DOS memory size')
+                if updated_dos != conventional:
+                    write(dos_base, updated_dos)
+                event['dos_memory'] = dict(before_sha256=hashlib.sha256(conventional).hexdigest(),
+                                           after_sha256=hashlib.sha256(updated_dos).hexdigest())
+            write(offset, bytes(updated))
+            events.append(event)
             return response
         ah = (values['ax'] >> 8) & 0xff
         handle = values['bx'] & 0xffff
@@ -806,7 +824,7 @@ def vga_status_service(pit_writes=False):
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, checkpoint=None):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -828,12 +846,13 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)),
                                  service_factory=(lambda: reject_host_service)
-                                 if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd) else None,
+                                 if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
                                  dos_console=dos_console, x32_heap=x32_heap,
-                                 dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse, x32_no_cd=x32_no_cd,
+                                 dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
+                                 x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
                                  port_factory=(lambda: vga_status_service(pit_writes)) if vga_status_reads else
                                  (lambda: pit_write_service) if pit_writes else
                                  (lambda: reject_host_service) if reject_services else None)
@@ -942,7 +961,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, checkpoint=None):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -967,6 +986,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('X-32 mouse fixture requires --service-free-paths and interrupt boundaries')
     if x32_no_cd and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('X-32 no-CD fixture requires --service-free-paths and interrupt boundaries')
+    if x32_vbe and (not program or not manifest.get('host_service_boundaries') or not service_free_paths
+                    or (prepared_memory_size or 0) < unicorn_backend.DOS_BASE + real_mode.MEMORY_SIZE):
+        raise ValueError('X-32 VBE fixture requires --service-free-paths, interrupt boundaries and DOS aperture RAM')
     if (dos_invalid_open or dos_empty_drive) and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS open fixtures require --service-free-paths and interrupt boundaries')
     if pit_writes and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
@@ -1115,7 +1137,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
-                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse, x32_no_cd=x32_no_cd,
+                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
+                                  x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
                                   checkpoint=checkpoint)
         for result in results:
             record_registry_membership(result)
@@ -1160,6 +1183,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_residency_policy='prepared-only' if x32_residency else 'disabled',
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   x32_no_cd_policy='no-cd-prepared-only' if x32_no_cd else 'disabled',
+                  x32_vbe_policy='mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
                   dos_empty_drive_policy='create-open-write-close-seek-device-info' if dos_empty_drive else 'disabled',
                   dos_invalid_open_policy='prepared-only' if dos_invalid_open else 'disabled',
                   vga_status_policy='alternating-retrace-prepared-only' if vga_status_reads else 'disabled',
@@ -1206,6 +1230,8 @@ def main(argv=None):
                         help='compare X-32 mouse calls with separate idle mouse state')
     parser.add_argument('--x32-no-cd', action='store_true',
                         help='compare X-32 MSCDEX requests with CD support absent')
+    parser.add_argument('--x32-vbe', action='store_true',
+                        help='compare X-32 VBE mode-info and scanline requests against prepared DOS RAM')
     parser.add_argument('--dos-empty-drive', action='store_true',
                         help='compare DOS file requests against separate disposable empty drives')
     parser.add_argument('--dos-invalid-open', action='store_true',
@@ -1236,7 +1262,7 @@ def main(argv=None):
                         service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
                         pit_writes=args.pit_writes, vga_status_reads=args.vga_status_reads, x32_heap=args.x32_heap,
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
-                        dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd,
+                        dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
                         checkpoint=args.checkpoint)
         counts = Counter(e['state'] for e in report['entries'])
