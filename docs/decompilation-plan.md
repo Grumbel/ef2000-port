@@ -13769,3 +13769,21 @@ C through return with conventional memory mapped at 0x05000000.
 The prepared-match total is now 3,849 of 4,353 entries. See
 replay-bulk-gameport-bios-string-heap-inputs.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify parser calls with delimited input
+
+Six entries that exhausted the instruction budget stop in the
+token scanner at 0xf2cd0. The scanner consumes characters after
+skipping leading separators and ends tokens at a delimiter.
+A zero byte does not end a token, so the zero-filled buffer in
+the baseline probe does not model a line of input.
+
+Entries 0xf2dfc, 0xf2e54, 0xf2fbc, 0xf35d8, 0xf3b1c and
+0xf3b40 matched through return with a comma-delimited line and
+a parenthesized line containing a signed first token. The two
+0xf2fbc cases also exercised both values of the record format
+flag at 0x4859de. All twelve isolated differential probes passed.
+
+The prepared-match total is now 3,855 of 4,353 entries. See
+replay-bulk-gameport-bios-parser-lines.py and its JSONL output
+under local/ghidra-group-followup-20261118.
