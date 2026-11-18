@@ -14796,3 +14796,30 @@ The local `bulk-cpu-boundaries-audio-driver-prefix.json` report records
 the exact inputs and results for twelve checkpoint probes and one
 normal return against the 4,361-entry linked candidate. SHA-256
 `51f041177a95002945e71d66044a57548173fe79277e3043aad5a9e5b02b3072`.
+
+#### Compare scanner branches with original string callbacks
+
+Sixteen prepared probes matched through return across nine scanner
+entries on the linked 4,361-entry candidate. Direct scanner inputs use
+the original reader at 0xdf21b and unreader at 0xdf244, the addresses
+installed by the original string wrapper at 0xdf248. The scanner record
+has those pointers at +0 and +4, a NUL-terminated input pointer at +8,
+the width at +0xc and flags at +0x10. Its variadic cursor points to a
+separate array of destination pointers. For 0x108a17, EBX points to the
+slot containing the format cursor after the opening bracket.
+
+The probes cover whitespace and EOF (0x1087cd), fixed-width characters
+and empty input (0x108802), bounded and whitespace-delimited strings
+(0x108888), positive and negated character sets (0x108a17), floating
+token recognition with assignment suppressed (0x108afd), signed integer
+and decimal rejection (0x108ddb), and format-literal match and rejection
+(0x1084d3). The register wrapper 0xdf248 matches on hexadecimal plus
+fixed-width characters and the cdecl wrapper 0xdf26f matches on signed
+decimal plus string. Floating-point assignment via 0xdf26f remains
+inconclusive. Under this prepared state the original reaches INT 21h
+AX=0x3d01 with IP 0x1f5. The prepared audit does not establish the
+floating-point runtime initialization required for that path.
+
+The local report `bulk-cpu-boundaries-scanner-fixtures.json` retains
+inputs and results, including the inconclusive probe. SHA-256
+`2eca470c9486bf9eff868bd84f2add079e7bcbae64511d0371c877a3fdd90cff`.
