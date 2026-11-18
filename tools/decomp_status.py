@@ -218,15 +218,35 @@ def differential_summary(rows, translation_path, differential_path):
     generated = {entry['address']: entry for entry in translation['entries']
                  if entry['state'] == 'generated-unverified'}
     results = {}
+    stops = {}
+    stop_prefixes = (
+        ('original service unavailable:', 'host service'),
+        ('original fault:', 'original guest fault'),
+        ('original instruction budget exhausted', 'instruction budget'),
+        ('original reached STI stop', 'STI boundary'),
+    )
     for entry in differential['entries']:
         address, state = entry['address'], entry['state']
         if (address in results or address not in generated
                 or state not in ('probes-pass', 'inconclusive', 'mismatch')):
             raise TrackerError(f'invalid differential entry at {format_addr(address)}')
         results[address] = state
-    blocked = collections.Counter(results.get(address, 'unmeasured')
-                                  for row in rows if row['state'] == 'blocked'
-                                  if (address := parse_addr(row['addr'])) in generated)
+        if state == 'inconclusive':
+            reasons = (probe.get('reason', '') for probe in entry.get('probes', [])
+                       if probe.get('state') == 'inconclusive')
+            stops[address] = {next((label for prefix, label in stop_prefixes
+                                    if reason.startswith(prefix)), 'other')
+                              for reason in reasons} or {'other'}
+    blocked = collections.Counter()
+    blocked_sizes = collections.Counter()
+    blocked_stops = collections.Counter()
+    for row in rows:
+        address = parse_addr(row['addr'])
+        if row['state'] == 'blocked' and address in generated:
+            state = results.get(address, 'unmeasured')
+            blocked[state] += 1
+            blocked_sizes[state] += int(row['size'])
+            blocked_stops.update(stops.get(address, ()))
     counts = collections.Counter()
     sizes = collections.Counter()
     missing_sizes = set()
@@ -238,7 +258,8 @@ def differential_summary(rows, translation_path, differential_path):
             sizes[state] += size
         else:
             missing_sizes.add(state)
-    return translation, dict(blocked=blocked, counts=counts, sizes=sizes, missing_sizes=missing_sizes)
+    return translation, dict(blocked=blocked, blocked_sizes=blocked_sizes, blocked_stops=blocked_stops,
+                             counts=counts, sizes=sizes, missing_sizes=missing_sizes)
 
 
 def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None,
@@ -295,7 +316,13 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None
                   f'{size:>10} body bytes', file=out)
         print('Prepared differential inputs for generated blocked functions:', file=out)
         for state in states:
-            print(f"  {state:<18} {differential['blocked'][state]:>8,} functions", file=out)
+            print(f"  {state:<18} {differential['blocked'][state]:>8,} functions "
+                  f"{differential['blocked_sizes'][state]:>10,} body bytes", file=out)
+        if differential['blocked_stops']:
+            print('Inconclusive blocked functions by stop reason (groups may overlap):', file=out)
+            for reason, count in sorted(differential['blocked_stops'].items(),
+                                        key=lambda item: (-item[1], item[0])):
+                print(f'  {reason:<22} {count:>8,} functions', file=out)
 
 
 def read_calls(path):

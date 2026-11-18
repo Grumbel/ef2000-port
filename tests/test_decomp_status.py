@@ -180,7 +180,7 @@ class DecompStatusTest(unittest.TestCase):
             decomp_status.translation_blockers(rows, report, io.StringIO())
 
     def test_differential_summary_requires_matching_generation_snapshot(self):
-        rows = [decomp_status.new_row(address, 10, '') for address in (1, 2)]
+        rows = [decomp_status.new_row(address, 10, '') for address in (1, 2, 4)]
         for row in rows:
             row['state'] = 'blocked'
         with tempfile.TemporaryDirectory() as directory:
@@ -188,16 +188,23 @@ class DecompStatusTest(unittest.TestCase):
             generation = write(root / 'generation.json', json.dumps(dict(
                 payload_sha256='payload', entries=[
                     dict(address=address, state='generated-unverified', body_bytes=address * 10)
-                    for address in (1, 2, 3)
+                    for address in (1, 2, 3, 4)
                 ])))
             differential = write(root / 'differential.json', json.dumps(dict(
                 payload_sha256='payload',
                 translation_report_sha256=hashlib.sha256(generation.read_bytes()).hexdigest(),
-                entries=[dict(address=1, state='probes-pass'), dict(address=3, state='probes-pass')])))
+                entries=[dict(address=1, state='probes-pass'), dict(address=3, state='probes-pass'),
+                         dict(address=4, state='inconclusive', probes=[
+                             dict(state='inconclusive', reason='original fault: example'),
+                             dict(state='inconclusive', reason='original fault: second example'),
+                             dict(state='inconclusive', reason='original service unavailable: example'),
+                         ])])))
             _, summary = decomp_status.differential_summary(rows, generation, differential)
-            self.assertEqual(summary['blocked'], {'probes-pass': 1, 'unmeasured': 1})
-            self.assertEqual(summary['counts'], {'probes-pass': 2, 'unmeasured': 1})
-            self.assertEqual(summary['sizes'], {'probes-pass': 40, 'unmeasured': 20})
+            self.assertEqual(summary['blocked'], {'probes-pass': 1, 'inconclusive': 1, 'unmeasured': 1})
+            self.assertEqual(summary['counts'], {'probes-pass': 2, 'inconclusive': 1, 'unmeasured': 1})
+            self.assertEqual(summary['sizes'], {'probes-pass': 40, 'inconclusive': 40, 'unmeasured': 20})
+            self.assertEqual(summary['blocked_sizes']['inconclusive'], 10)
+            self.assertEqual(summary['blocked_stops'], {'original guest fault': 1, 'host service': 1})
             output = io.StringIO()
             decomp_status.status(rows, output, differential=summary)
             self.assertRegex(output.getvalue(), r'probes-pass\s+2 functions\s+40 body bytes')
