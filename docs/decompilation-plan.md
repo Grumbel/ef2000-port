@@ -14670,3 +14670,29 @@ covers the next 250 entries after the interrupted prefix. It contains
 240 matches, 10 inconclusive probes and no mismatches for the same
 candidate and prepared profile. The final report SHA-256 is
 `4bb3d25ffe4d6c696c4eb3be2e3d4c61173d3105ee11e10a6b97100d1eb1a14a`.
+
+#### Compare legacy arithmetic through return and divide faults
+
+An intercepted vector 0 at an unprefixed DIV or IDIV can now yield a
+prefix match. The verifier requires the C divide-fault status at the
+same PC, then compares RAM, x87, general and segment registers, flags
+and service traces. Explicit software INT 0 still goes through service
+dispatch. Exception delivery remains outside this evidence.
+
+Two zero-divisor inputs (0xfddb0 and 0x833a0) initially reported
+EFLAGS 0xa47 in Unicorn's exception callback and 0x246 in C. A
+separate checkpoint before each IDIV matched. The verifier now retries
+a flags-only discrepancy with an instruction hook at the fault PC.
+It compares the flags observed before the last visit to the faulting
+instruction and retains both readings in the report. DIV and IDIV do
+not update guest flags on a divide fault.
+
+Using the 4,361-entry linked candidate, eight prepared cases matched
+through return across 0xfddb0, 0x833a0, 0xcbcc5 and 0xcbd0f. Cases
+covered signed multiply/divide, a wide product, positive and negative
+saturation, decimal zero, hexadecimal UINT32_MAX and decimal INT32_MIN.
+Seven default-state probes matched up to a divide fault at their
+respective PCs (entries 0xfddb0, 0x833a0, 0x83a40, 0xcbcc5, 0xcbd0f,
+0x102228 and 0x6f48). The local evidence
+`bulk-cpu-boundaries-arithmetic-fixtures.json` has SHA-256
+`446e7a817ceb0d7ed28703bea36978ffdff72cd69587d74f0cd4a021d65bda24`.

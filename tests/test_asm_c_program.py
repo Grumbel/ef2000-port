@@ -98,6 +98,46 @@ safe: ret
             self.assertEqual(probe['state'], 'prefix-pass', probe)
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_divide_fault_compares_state_before_exception_delivery(self):
+        source = """.type root,@function
+root: push eax
+imul edx
+idiv ebx
+pop ecx
+int 0x21
+ret
+.size root, .-root
+.org 0x200
+.type software_interrupt,@function
+software_interrupt: int 0
+div ebx
+ret
+.size software_interrupt, .-software_interrupt"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            out = root/'out'
+            interrupts = [i['address'] for record in records for i in record['instructions']
+                          if i['mnemonic'] == 'int']
+            asm_c_program.generate(directory, out, image, interrupt_boundaries=True,
+                                   interrupt_sites=interrupts)
+            report = asm_c_differential.verify(out, root/'evidence', image,
+                                               scenarios=1, service_free_paths=True)
+            probes = {entry['address']: entry['probes'][0] for entry in report['entries']}
+            root_entry = next(record for record in records if record['address'] != 0x200)
+            probe = probes[root_entry['address']]
+            pc, = [i['address'] for i in root_entry['instructions'] if i['mnemonic'] == 'idiv']
+            self.assertEqual(probe['state'], 'prefix-pass', probe)
+            fault = probe['original_divide_fault']
+            self.assertEqual((fault['pc'], fault['vector']), (pc, 0))
+            self.assertIn('pre_instruction_flags', fault)
+            self.assertEqual(probe['differences'], [])
+            software = probes[0x200]
+            self.assertEqual(software['state'], 'inconclusive', software)
+            self.assertEqual(software['original_service_stop']['ip'], 0x200)
+            self.assertNotIn('original_divide_fault', software)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_sidt_stores_six_bytes_from_prepared_idtr(self):
         source = """.type root,@function
 root: sidt [esp-7]

@@ -4,10 +4,10 @@
 
 """Compare generated explicit-state C with original x86 using deterministic probes.
 
-Reports evidence per probe, never claims universal equivalence. Original faults
-and fuel exhaustion are inconclusive, not passing tests. A C failure after the
-original returns is a mismatch. All generated
-artifacts and proprietary RAM remain under ignored local/.
+Reports evidence per probe, never claims universal equivalence. Reviewed
+divide faults can establish a prefix match. Other original faults and fuel
+exhaustion are inconclusive. A C failure after the original returns is a
+mismatch. Generated artifacts and proprietary RAM remain under ignored local/.
 """
 
 import argparse
@@ -15,6 +15,7 @@ from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import ctypes
 from datetime import datetime, timedelta, timezone
+from functools import partial
 import hashlib
 import json
 import multiprocessing
@@ -146,7 +147,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(), cpu_stop_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
-            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
+            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False,
+            observe_divide_pc=None):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -561,7 +563,16 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     for name, value in zip(asm_to_c.REGS, registers):
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
+    pre_divide_flags = None
+
+    def observe_divide(engine, _pc, _size, _data):
+        nonlocal pre_divide_flags
+        pre_divide_flags = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+
+    if observe_divide_pc is not None:
+        cpu.hook_add(UC_HOOK_CODE, observe_divide, begin=observe_divide_pc, end=observe_divide_pc)
     rejected_service = {}
+    original_divide_fault = None
 
     def original_registers(engine):
         values = {name: engine.reg_read(getattr(x86_const, 'UC_X86_REG_' + reg.upper()))
@@ -571,7 +582,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
 
     if original_service is not None or prepared_services:
         def interrupt(engine, vector, _):
-            nonlocal original_exit
+            nonlocal original_exit, original_divide_fault
             eip = engine.reg_read(x86_const.UC_X86_REG_EIP)
             ip = eip - 2
             if not (2 <= eip <= memory_size and 0 <= vector < 256
@@ -579,6 +590,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 ip = eip - 1
                 if not (1 <= eip <= memory_size and vector == 3
                         and engine.mem_read(ip, 1) == b'\xcc'):
+                    if program and checkpoint is None and vector == 0 and 0 <= eip <= memory_size - 2:
+                        opcode, modrm = engine.mem_read(eip, 2)
+                        if opcode in (0xf6, 0xf7) and ((modrm >> 3) & 7) in (6, 7):
+                            original_divide_fault = dict(pc=eip, vector=vector)
+                            engine.emu_stop()
+                            return
                     rejected_service.update(kind='unrecognized_interrupt', eip=eip,
                                             vector=vector, registers=original_registers(engine))
                     if eip < memory_size:
@@ -742,7 +759,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        original_sti_stop=dict(pc=stopped_at))
     if checkpoint is not None and original_visits != visits:
         return outcome(state='inconclusive', reason='original did not reach requested checkpoint')
-    if checkpoint is None and original_exit is None:
+    if checkpoint is None and original_exit is None and original_divide_fault is None:
         next_pc = cpu.reg_read(x86_const.UC_X86_REG_EIP)
         if next_pc != sentinel:
             return outcome(state='inconclusive', reason='original instruction budget exhausted',
@@ -873,7 +890,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if checkpoint is not None and translated_visits != visits:
         return outcome(state='mismatch', differences=['C did not reach requested checkpoint'],
                        translated_stop=dict(status=status, pc=state.pc, fault=state.fault))
-    if status:
+    if original_divide_fault is not None:
+        if status != 5 or state.fault != 5 or state.pc != original_divide_fault['pc']:
+            return outcome(state='mismatch', original_divide_fault=original_divide_fault,
+                           translated_stop=dict(status=status, pc=state.pc, fault=state.fault),
+                           differences=['C did not stop at the original divide fault'])
+    elif status:
         reason = {6: 'guest instruction bytes differ from translated code',
                   7: 'unsupported segment profile',
                   8: 'pending x87 exception delivery unsupported',
@@ -924,15 +946,23 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     for index, words in enumerate(state.x87):
         if list(words) != expected_fpu['x87'][index]:
             differences.append('x87 physical FP%d raw-80 value' % index)
-    if state.flags != cpu.reg_read(x86_const.UC_X86_REG_EFLAGS):
-        differences.append('flags: C=0x%x x86=0x%x' %
-                           (state.flags, cpu.reg_read(x86_const.UC_X86_REG_EFLAGS)))
+    expected_flags = cpu.reg_read(x86_const.UC_X86_REG_EFLAGS)
+    if (original_divide_fault is not None and original_divide_fault['pc'] == observe_divide_pc
+            and pre_divide_flags is not None):
+        # Unicorn can expose different lazy flags after the #DE callback.
+        # DIV/IDIV fault without writing flags, so compare the last visit's entry flags.
+        original_divide_fault.update(exception_flags=expected_flags, pre_instruction_flags=pre_divide_flags)
+        expected_flags = pre_divide_flags
+    if state.flags != expected_flags:
+        differences.append('flags: C=0x%x x86=0x%x' % (state.flags, expected_flags))
     original_ram = bytes(cpu.mem_read(0, memory_size))
     if memory != original_ram:
         first = next(i for i, (a, b) in enumerate(zip(memory, original_ram)) if a != b)
         differences.append('RAM first mismatch at 0x%x' % first)
-    match = 'prefix-pass' if checkpoint is not None else 'pass'
-    return outcome(state='mismatch' if differences else match, differences=differences)
+    match = 'prefix-pass' if checkpoint is not None or original_divide_fault is not None else 'pass'
+    fault_detail = (dict(original_divide_fault=original_divide_fault)
+                    if original_divide_fault is not None else {})
+    return outcome(state='mismatch' if differences else match, differences=differences, **fault_detail)
 
 
 def reject_host_service(*args):
@@ -1034,7 +1064,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                 for name, value in overrides.items():
                     registers[asm_to_c.REGS.index(name)] = value
                 sender.send(('phase', index, 'setup'))
-                result = compare(function, payload, address, registers, flags, budget=budget,
+                compare_probe = partial(compare, function, payload, address, registers, flags, budget=budget,
                                  program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)),
                                  service_factory=(lambda: reject_host_service)
@@ -1049,6 +1079,14 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  port_factory=(lambda: prepared_port_service(pit_writes, vga_status_reads, gameport_disconnected, keyboard_idle))
                                  if pit_writes or vga_status_reads or gameport_disconnected or keyboard_idle else
                                  (lambda: reject_host_service) if reject_services or vga_dac else None)
+                result = compare_probe()
+                divide_fault = result.get('original_divide_fault')
+                if (divide_fault and len(result['differences']) == 1
+                        and result['differences'][0].startswith('flags:')):
+                    retry = compare_probe(observe_divide_pc=divide_fault['pc'])
+                    observed = retry.get('original_divide_fault', {})
+                    if observed.get('pc') == divide_fault['pc'] and 'pre_instruction_flags' in observed:
+                        result = retry
                 sender.send(('result', index, result))
         except Exception as error:
             sender.send(('error', -1, repr(error)))
@@ -1458,6 +1496,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
                                          if captured_inputs else {},
+                  divide_fault_policy='unprefixed-div-idiv-prefix-with-pre-instruction-flags-retry',
                   process_isolation='fork-per-entry-with-phase-reporting',
                   state_abi=asm_to_c.STATE_ABI, segment_profile='zero-base-selectors-0..3-8-16-24',
                   x87_comparison='all physical raw-80 registers and environment; known oracle gaps remain',
