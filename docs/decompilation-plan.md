@@ -13924,3 +13924,16 @@ palette upload callback at 0x17d61c was unset in all probes.
 The prepared-match total is now 3,878 of 4,353 entries. See
 replay-bulk-gameport-bios-palette-packets.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare patterned raster lines and running checksums
+
+Entries 0x10d040 and 0x10dc1d exhausted the baseline budget. With
+prepared endpoints and row offsets, 0x10d040 matched through return
+for a point and for shallow and steep lines drawn in both directions.
+All line probes used an alternating bit pattern. With a readable
+source and positive pair count, 0x10dc1d matched through return for
+2-, 7-, and 16-byte inputs, including the odd-byte tail.
+
+The prepared-match total is now 3,880 of 4,353 entries. See
+replay-bulk-gameport-bios-line-checksum.py and its JSONL output under
+local/ghidra-group-followup-20261118.
