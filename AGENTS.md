@@ -62,8 +62,8 @@
   `LicenseRef-EF2000-Derived`; GPL files use
   `GPL-3.0-or-later WITH GPL-3.0-linking-exception`.
 - Never push, publish, or force-push; the owner does that.
-- `docs/decompilation-plan.md` sets the work order. `TODO.md` "Next work"
-  items are maintenance background unless the plan references them.
+- `docs/decompilation-plan-rev5.md` sets the work order. `TODO.md` "Next
+  work" items are maintenance background unless rev 5 references them.
 
 ## UI verification
 
