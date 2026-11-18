@@ -1178,7 +1178,31 @@ int 0x21
 ret
 .size named_open, .-named_open
 .org 0x680
-.asciz "EXAMPLE.TXT" """
+.asciz "EXAMPLE.TXT"
+.org 0x700
+.type write_file,@function
+write_file: mov eax,0x3c00
+mov edx,0x680
+xor ecx,ecx
+int 0x21
+mov ebx,eax
+mov eax,0x4400
+int 0x21
+mov eax,0x4000
+mov edx,0x680
+mov ecx,4
+int 0x21
+mov eax,0x4201
+xor ecx,ecx
+xor edx,edx
+int 0x21
+mov eax,0x3e00
+int 0x21
+mov eax,0x3d00
+mov edx,0x680
+int 0x21
+ret
+.size write_file, .-write_file"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1226,13 +1250,20 @@ ret
 
             empty_drive_report = asm_c_differential.verify(
                 out, root / 'empty-drive', image, scenarios=1,
-                service_free_paths=True, dos_empty_drive=True, addresses=[0x600])
-            entry, = empty_drive_report['entries']
+                service_free_paths=True, dos_empty_drive=True, addresses=[0x600, 0x700])
+            entry, write_entry = empty_drive_report['entries']
             self.assertEqual(entry['state'], 'probes-pass', entry)
             events = entry['probes'][0]['host_services']
             self.assertEqual(events['original'], events['translated'])
             self.assertEqual(events['original'][0]['after']['ax'], 2)
             self.assertEqual(events['original'][0]['after']['flags'] & 1, 1)
+            self.assertEqual(write_entry['state'], 'probes-pass', write_entry)
+            write_events = write_entry['probes'][0]['host_services']
+            self.assertEqual(write_events['original'], write_events['translated'])
+            self.assertEqual([event['after']['ax'] for event in write_events['original']],
+                             [5, 2, 4, 4, 0x3e01, 5])
+            self.assertEqual(write_events['original'][2]['output_sha256'],
+                             hashlib.sha256(b'EXAM').hexdigest())
 
         self.assertEqual(console_report['dos_invalid_open_policy'], 'prepared-only')
         self.assertEqual(console_entries[0x500]['state'], 'probes-pass')

@@ -12823,3 +12823,19 @@ two DOS console writes with a null buffer and nonzero count, three
 instruction-budget stops, and one unmapped read. Local evidence is
 `dos-empty-drive-threaded-regression.json` and
 `prepared-raster-threaded-regression.json`.
+
+The prepared DOS empty-drive fixture now keeps separate disposable
+file state for the original and translated execution. It reuses
+DosFiles for create, open, write, seek and close, and uses the
+runtime's device-info response. The transcripts compare filename
+and write-content hashes as well as register responses. A synthetic
+create, device-info, write, seek, close and reopen sequence passed.
+
+At the default 10,000-instruction budget, the 68-probe cohort keeps
+58 passes, nine inconclusive probes and the known raster mismatch.
+Three former DOS create stops now run to the instruction limit.
+At 500,000 instructions, 0x34ca4 and 0x84b14 pass with matching file
+service transcripts. 0xac57c still reaches the instruction limit
+after writing to its disposable file. See the local
+`dos-stateful-drive-threaded-regression.json` and
+`dos-stateful-drive-budget-replay.json`.

@@ -171,8 +171,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
 
     original_heap = x32_allocation.Allocation() if x32_heap else None
     translated_heap = x32_allocation.Allocation() if x32_heap else None
+    drive_directory = None
+    drives = {}
 
-    def prepared_service(ip, values, vector, ds, read, events, heap):
+    def prepared_service(ip, values, vector, ds, read, events, heap, side):
+        nonlocal drive_directory
         if heap is not None and vector == 0x21 and ip == 0x245 and values['ax'] & 0xffff == 0x3508:
             rounded = (values['cx'] + 0xfff) & 0xfffff000
             if rounded > memory_size:
@@ -197,7 +200,61 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 raise ValueError('X-32 residency query is outside the lock/unlock fixture')
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
-        if (dos_invalid_open or dos_empty_drive) and vector == 0x21 and (values['ax'] >> 8) & 0xff == 0x3d:
+        ah = (values['ax'] >> 8) & 0xff
+        handle = values['bx'] & 0xffff
+        if (dos_empty_drive and vector == 0x21
+                and (ah in (0x3c, 0x3d, 0x3e, 0x42) or ah == 0x40 and handle > 2
+                     or values['ax'] & 0xffff == 0x4400)):
+            if drive_directory is None:
+                drive_directory = tempfile.TemporaryDirectory(prefix='ef-probe-drive-')
+                root = Path(drive_directory.name)
+                drives.update({name: unicorn_files.DosFiles(root / 'assets', overlay_root=root / name)
+                               for name in ('original', 'translated')})
+            drive = drives[side]
+            response = dict(values)
+            event = dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response)
+            offset, count = values['dx'], values['cx']
+            try:
+                if ah in (0x3c, 0x3d):
+                    if ds not in (16, 24):
+                        raise ValueError('DOS filename requires a flat data segment')
+                    if not 0x260 < offset < 0x4000000 - 260:
+                        raise unicorn_files.DosFileError(3)
+                    if offset >= memory_size - 260:
+                        raise ValueError('DOS filename window exceeds prepared RAM')
+                    name, terminator, _ = bytes(read(offset, 260)).partition(b'\0')
+                    if not terminator:
+                        raise unicorn_files.DosFileError(3)
+                    event['filename_sha256'] = hashlib.sha256(name).hexdigest()
+                    filename = name.decode('latin1')
+                    value = drive.create(filename) if ah == 0x3c else drive.open(filename, values['ax'] & 3)
+                    response['dx'] = 0
+                elif ah == 0x3e:
+                    drive.close(handle)
+                    value = 0x3e01
+                elif ah == 0x42:
+                    displacement = ctypes.c_int32(((count & 0xffff) << 16) | (offset & 0xffff)).value
+                    position = drive.seek(handle, displacement, values['ax'] & 0xff)
+                    value = position & 0xffff
+                    response['dx'] = (offset & 0xffff0000) | ((position >> 16) & 0xffff)
+                elif ah == 0x44:
+                    if handle > 2 and handle not in drive.handles:
+                        raise unicorn_files.DosFileError(6)
+                    value = 0x80d3 if handle <= 2 else 2
+                    response['dx'] = (response['dx'] & 0xffff0000) | value
+                else:
+                    if (ds not in (16, 24) or not 0x260 < offset < memory_size
+                            or count > min(65536, memory_size - offset)):
+                        raise ValueError('DOS write requires a valid flat buffer')
+                    data = bytes(read(offset, count))
+                    event['output_sha256'] = hashlib.sha256(data).hexdigest()
+                    value = drive.write(handle, data)
+                response.update(ax=value, flags=values['flags'] & ~1)
+            except unicorn_files.DosFileError as failure:
+                response.update(ax=failure.code, flags=values['flags'] | 1)
+            events.append(event)
+            return response
+        if dos_invalid_open and vector == 0x21 and ah == 0x3d:
             if ds not in (16, 24):
                 raise ValueError('DOS open requires a flat data segment')
             offset = values['dx']
@@ -207,18 +264,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                     raise ValueError('DOS filename window exceeds prepared RAM')
                 name, terminator, _ = bytes(read(offset, 260)).partition(b'\0')
                 malformed = not name or any(not 32 <= byte <= 126 for byte in name)
-                if terminator and dos_empty_drive:
-                    # Supply an empty asset root and enable a separate, empty overlay.
-                    with tempfile.TemporaryDirectory(prefix='ef-probe-drive-') as directory:
-                        root = Path(directory)
-                        drive = unicorn_files.DosFiles(root, overlay_root=root / 'overlay')
-                        try:
-                            drive.open(name.decode('latin1'), values['ax'] & 3)
-                        except unicorn_files.DosFileError as failure:
-                            error = failure.code
-                        else:
-                            raise ValueError('DOS empty drive unexpectedly returned a handle')
-                elif terminator and (values['ax'] & 3 or not malformed):
+                if terminator and (values['ax'] & 3 or not malformed):
                     raise ValueError('DOS open requires filesystem state')
             response = dict(values, ax=error, flags=values['flags'] | 1)
             events.append(dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response))
@@ -325,6 +371,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
+        if drive_directory is not None:
+            drive_directory.cleanup()
         if cpuid_sites and (original_cpuid or translated_cpuid):
             fields['cpuid'] = dict(cpu_model=cpu.ctl_get_cpu_model(),
                                    original=original_cpuid, translated=translated_cpuid)
@@ -360,7 +408,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             try:
                 if prepared_services:
                     ds = engine.reg_read(x86_const.UC_X86_REG_DS)
-                    response = prepared_service(ip, values, vector, ds, engine.mem_read, original_events, original_heap)
+                    response = prepared_service(ip, values, vector, ds, engine.mem_read, original_events,
+                                                original_heap, 'original')
                 else:
                     response = service(original_service, ip, values, original_events, vector, ram)
             except (ValueError, RuntimeError):
@@ -508,7 +557,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                         response = prepared_service(state.pc-length, values, status & 0xff,
                                                    state.segment[asm_to_c.SEGMENTS.index('ds')],
                                                    lambda offset, count: memory[offset:offset+count],
-                                                   translated_events, translated_heap)
+                                                   translated_events, translated_heap, 'translated')
                     else:
                         response = service(translated_service, state.pc-length, values, translated_events,
                                            status & 0xff, ram)
@@ -985,7 +1034,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
                                         if x32_heap else None,
                   x32_residency_policy='prepared-only' if x32_residency else 'disabled',
-                  dos_empty_drive_policy='open-only' if dos_empty_drive else 'disabled',
+                  dos_empty_drive_policy='create-open-write-close-seek-device-info' if dos_empty_drive else 'disabled',
                   dos_invalid_open_policy='prepared-only' if dos_invalid_open else 'disabled',
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
@@ -1025,7 +1074,7 @@ def main(argv=None):
     parser.add_argument('--x32-heap', action='store_true',
                         help='with --service-free-paths, model X-32 heap growth on prepared probes')
     parser.add_argument('--dos-empty-drive', action='store_true',
-                        help='compare DOS open failures against empty prepared asset and overlay roots')
+                        help='compare DOS file requests against separate disposable empty drives')
     parser.add_argument('--dos-invalid-open', action='store_true',
                         help='with --service-free-paths, model deterministic DOS open buffer errors')
     parser.add_argument('--x32-residency', action='store_true',
