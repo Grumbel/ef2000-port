@@ -13866,3 +13866,17 @@ All ten isolated probes matched through return using three
 and four vertices. The prepared-match total is now 3,872 of
 4,353 entries. See replay-bulk-gameport-bios-raster-counts.py
 and its JSONL output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify transparent blits with positive dimensions
+
+Entries 0xcd82c, 0xcd957 and 0xcd9a6 exhausted the baseline
+instruction budget with zero dimensions. The inner byte loops
+in the first two and the row loop in all three execute before
+checking their counters. Prepared one-row and three-row inputs
+with mixed zero and nonzero pixels over a prefilled destination
+exercised both transparent skips and writes. All six probes
+matched through return.
+
+The prepared-match total is now 3,875 of 4,353 entries. See
+replay-bulk-gameport-bios-transparent-blits.py and its JSONL output
+under local/ghidra-group-followup-20261118.
