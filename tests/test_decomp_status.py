@@ -3,7 +3,9 @@
 
 """Asset-free tests for the decompilation tracker; all inputs are synthetic."""
 
+import hashlib
 import io
+import json
 from pathlib import Path
 import sys
 import tempfile
@@ -173,6 +175,26 @@ class DecompStatusTest(unittest.TestCase):
         report['entries'] = [{'address': 0x100, 'state': 'match'}]
         with self.assertRaisesRegex(decomp_status.TrackerError, 'C generation report'):
             decomp_status.translation_blockers(rows, report, io.StringIO())
+
+    def test_differential_summary_requires_matching_generation_snapshot(self):
+        rows = [decomp_status.new_row(address, 10, '') for address in (1, 2)]
+        for row in rows:
+            row['state'] = 'blocked'
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            generation = write(root / 'generation.json', json.dumps(dict(
+                payload_sha256='payload', entries=[
+                    dict(address=address, state='generated-unverified') for address in (1, 2)
+                ])))
+            differential = write(root / 'differential.json', json.dumps(dict(
+                payload_sha256='payload',
+                translation_report_sha256=hashlib.sha256(generation.read_bytes()).hexdigest(),
+                entries=[dict(address=1, state='probes-pass')])))
+            _, counts = decomp_status.differential_summary(rows, generation, differential)
+            self.assertEqual(counts, {'probes-pass': 1, 'unmeasured': 1})
+            generation.write_text(generation.read_text() + '\n')
+            with self.assertRaisesRegex(decomp_status.TrackerError, 'does not match'):
+                decomp_status.differential_summary(rows, generation, differential)
 
     def test_service_dependency_counts_include_ports_and_preserve_unknowns(self):
         rows = [decomp_status.new_row(address, 10, '') for address in range(1, 7)]

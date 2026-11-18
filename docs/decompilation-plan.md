@@ -12276,3 +12276,15 @@ input. The caller at 0x12160 advanced to the next uncovered table target,
 mismatches, including the two earlier formatter stops. This is candidate
 evidence. The authoritative body export and tracker were unchanged.
 Report: `local/ghidra-group-followup-20261118/dependency-diff/report.json`.
+
+2026-11-18 — Status can pair a generation report with a differential
+report using the generation file and payload digests. The bulk pair in
+`local/ghidra-scan-unget-20261118/` reports 384 probe passes, 311
+inconclusive, and four mismatches among generated blocked entries.
+Rechecked 0x11d695 with zero-byte disassembly enabled. The debugger
+continuation after INT3 returns EAX=1, then the error helper returns to
+0x11d6a4. Six ADD instructions decoded from the zero bytes lead to CLI
+at 0x11d6b0, the first byte of the pointer table. The ordinary error
+path calls DOS termination through 0x1e9 instead. A boundary correction
+needs to preserve the debugger continuation before generation can claim
+coverage of this body.

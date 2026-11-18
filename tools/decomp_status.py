@@ -20,6 +20,7 @@ Commands:
 import argparse
 import collections
 import csv
+import hashlib
 import json
 import os
 from pathlib import Path
@@ -200,7 +201,31 @@ def translation_blockers(rows, report, out=sys.stdout):
           'are not validated here. Tracker states are unchanged.', file=out)
 
 
-def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None):
+def differential_summary(rows, translation_path, differential_path):
+    """Validate report pairing and summarize coverage of generated blocked bodies."""
+    source = translation_path.read_bytes()
+    translation = json.loads(source)
+    differential = json.loads(differential_path.read_bytes())
+    if (differential.get('translation_report_sha256') != hashlib.sha256(source).hexdigest()
+            or differential.get('payload_sha256') != translation.get('payload_sha256')):
+        raise TrackerError('differential report does not match the supplied generation report')
+    generated = {entry['address'] for entry in translation['entries']
+                 if entry['state'] == 'generated-unverified'}
+    results = {}
+    for entry in differential['entries']:
+        address, state = entry['address'], entry['state']
+        if (address in results or address not in generated
+                or state not in ('probes-pass', 'inconclusive', 'mismatch')):
+            raise TrackerError(f'invalid differential entry at {format_addr(address)}')
+        results[address] = state
+    counts = collections.Counter(results.get(address, 'unmeasured')
+                                 for row in rows if row['state'] == 'blocked'
+                                 if (address := parse_addr(row['addr'])) in generated)
+    return translation, counts
+
+
+def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None,
+           differential=None):
     """Report recorded evidence, without treating compilation as equivalence."""
     total = len(rows)
     total_bytes = sum(int(row['size']) for row in rows)
@@ -243,6 +268,10 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None
     print('No recompilation or game tests run here.', file=out)
     if translation is not None:
         translation_blockers(rows, translation, out)
+    if differential is not None:
+        print('Prepared differential inputs for generated blocked functions:', file=out)
+        for state in ('probes-pass', 'inconclusive', 'mismatch', 'unmeasured'):
+            print(f'  {state:<18} {differential[state]:>8,} functions', file=out)
 
 
 def read_calls(path):
@@ -363,6 +392,8 @@ def main(argv=None):
                                help='override the committed byte-comparison report')
     status_parser.add_argument('--translation-report', type=Path,
                                help='cross-reference a bulk translator report snapshot')
+    status_parser.add_argument('--differential-report', type=Path,
+                               help='summarize probes paired with --translation-report')
     next_parser = sub.add_parser('next')
     next_parser.add_argument('--module')
     next_parser.add_argument('--limit', type=int, default=10)
@@ -372,6 +403,8 @@ def main(argv=None):
                              default=DEFAULT_WORKSPACE / 'full-export/calls.tsv')
     sub.add_parser('check')
     args = parser.parse_args(argv)
+    if args.command == 'status' and args.differential_report and not args.translation_report:
+        parser.error('--differential-report requires --translation-report')
     try:
         if args.command == 'seed':
             added, updated, missing = seed(args.tracker, args.functions)
@@ -382,9 +415,15 @@ def main(argv=None):
             return 0
         rows = read_tracker(args.tracker)
         if args.command == 'status':
-            translation = (json.loads(args.translation_report.read_text())
-                           if args.translation_report else None)
-            status(rows, recompilation=args.recompilation, translation=translation)
+            differential = None
+            if args.differential_report:
+                translation, differential = differential_summary(
+                    rows, args.translation_report, args.differential_report)
+            else:
+                translation = (json.loads(args.translation_report.read_text())
+                               if args.translation_report else None)
+            status(rows, recompilation=args.recompilation, translation=translation,
+                   differential=differential)
         elif args.command == 'summary':
             summary(rows)
         elif args.command == 'next':

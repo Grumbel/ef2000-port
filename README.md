@@ -18,6 +18,9 @@ compiler differences do not imply incorrect behavior.
 To distinguish tracker-blocked functions that already have generated C from
 remaining generator exclusions, pass a bulk translator report:
 `nix run .#status -- --translation-report /absolute/path/to/report.json`.
+Add `--differential-report /absolute/path/to/differential/report.json` to
+count prepared probe outcomes for generated blocked functions. The differential
+report must come from the same generation snapshot.
 This also ranks shared root blockers by affected blocked functions. Groups
 overlap. New reports distinguish generated blocked functions with reachable
 interrupt-service sites from those without recorded sites; older reports show
