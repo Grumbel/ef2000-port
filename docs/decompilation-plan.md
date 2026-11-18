@@ -14097,3 +14097,18 @@ Both entries already had complete matches, so the total stays
 at 3,887 of 4,354 generated entries. See
 replay-bulk-gameport-bios-stat-glyph.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare formatted statistics rows
+
+The selected-row branch at 0x275e0 with a clear record flag
+formats five values using the original E%ld format. Two
+prepared probes against the linked bulk timer build matched
+through return, covering zero and values up to five digits.
+The scratch font maps the label and formatted characters to
+one visible synthetic glyph, so these probes exercise the
+positioning and draw calls without requiring original assets
+beyond the executable payload.
+
+The total stays at 3,887 of 4,354 generated entries. See
+replay-bulk-gameport-bios-stat-format.py and its JSONL output under
+local/ghidra-group-followup-20261118.
