@@ -14138,3 +14138,14 @@ The 320×200 comparison and occupied-slot retries remain open.
 The complete-match total is now 3,888 of 4,354 generated entries.
 See replay-bulk-gameport-bios-save-small.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare full-size screenshot encoding
+
+Entry 0xac57c matches through return with a patterned 320×200 surface
+and the empty DOS drive model. Raising the instruction budget from
+2 million to 12 million lets the comparison cover all scanlines and
+the DOS write payload hashes. Occupied-slot retries remain open.
+
+The complete-match total stays at 3,888 of 4,354 generated entries.
+See replay-bulk-gameport-bios-save-full.py and its JSONL output
+under local/ghidra-group-followup-20261118.
