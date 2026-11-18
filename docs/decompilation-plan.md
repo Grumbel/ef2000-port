@@ -14277,3 +14277,17 @@ entries. The fixture controls callback delivery and PIT reads. Real-time
 IRQ scheduling and release integration remain unverified. See
 replay-bulk-gameport-bios-timer-delivery.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare PIT latch consumers
+
+A prepared channel-zero latch fixture returns the low and high bytes
+of counts 0, 0x1234 and 0xffff. The previously inconclusive entries
+0x7e7e0, 0xe1110 and 0xe1130 match through return for all three counts.
+The latter two use a zero delay with the original PIT clock callback.
+Entry 0x7eccc matches through DOS exit 255 for all three counts.
+Entry 0xe115c reaches its final three-tick wait and exhausts the budget
+because the latched count stays fixed.
+
+The complete prepared-match total reaches 3,902 of 4,354 generated
+entries. See replay-bulk-gameport-bios-pit-latch.py and its JSONL output
+under local/ghidra-group-followup-20261118.
