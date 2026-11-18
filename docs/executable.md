@@ -8,6 +8,41 @@ The installed German README describes Tactcom. This identifies the installation'
 documentation; the exact executable release still needs independent confirmation.
 Machine-readable observations are in [executable-baseline.json](executable-baseline.json).
 
+## English release comparison
+
+The English installation at `../EF2000-rdeprera/` supplies a 1,682,129-byte
+`_EF2000.EXE` with SHA-256
+`ff245c9f812d4113c4a2a8fe60fb9a0e45687bc6ae73c19e4c23c32bccd2ec49`.
+Both executables decode as B23X / FlashTek X-32, with payload file offset
+`0x54a1` and protected-mode entry at payload offset `0x86`. Only 20 bytes
+before the payload differ. The English payload ends at `0x195630` and its
+BSS ends at `0x4dd970`. Both boundaries are `0x980` lower than in German.
+
+Of the English payload's 1,660,464 bytes, 1,401,941 (84.4%) match at the
+same offset. In the local German bulk inventory
+(`local/ghidra-group-followup-20261118/bulk-gameport-inventory`),
+1,265 of 4,360 entries with instruction spans have identical bytes across
+their full span at the same offset. Of 278,920 unique instruction spans,
+36,567 differ. In 31,614 of those spans, only the trailing four bytes
+change and their little-endian value decreases by `0x980`. These counts
+use the German boundaries for both payloads and provide candidates for
+operand and control-flow review.
+
+| Reference | German address | English address |
+| --- | ---: | ---: |
+| Append spatial slot entry | `0x263ec` | `0x263ec` |
+| Spatial slot array used at `0x26412` | `0x19b2e0` | `0x19a960` |
+| Spatial slot count used at `0x26404` | `0x19b376` | `0x19a9f6` |
+| Current high score loaded at `0x43e2` | `0x1970a0` | `0x196720` |
+| Difficulty loaded at `0x43dd` | `0x121e44` | `0x121e44` |
+
+The English launcher currently uses DOSBox-X. The native extractor and
+hybrid linker pin the German executable and payload, and the hybrid
+symbols and compiled objects use German addresses. A native English
+profile needs verified function and global mappings, including direct
+addresses compiled into the recovered objects. A uniform translation
+would also move operands such as the unchanged difficulty reference.
+
 ## Verified observations
 
 - `EF2000.BAT` sets `DID=.` and `quick_flag=1`, then runs `_ef2000.exe gui`.
