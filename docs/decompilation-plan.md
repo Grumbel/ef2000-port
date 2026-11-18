@@ -13351,3 +13351,17 @@ addresses. The sites are 0xcd42b (3), 0x110f34 (7), 0x1110bd (6),
 enable. Future reports expose the stop PC as `original_sti_stop.pc`
 for selecting these checkpoints without parsing diagnostic prose.
 See bulk-sti-prefix.jsonl under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare state at common prepared memory faults
+
+Replayed the 43 cases associated with the five most frequent memory
+fault PCs in the previous prepared sweep (0x1112a4, 0x1104c7, 0xbc5d9,
+0xcc1b5, and 0x1d9e9). All match at the first visit to the recorded
+instruction. This establishes prefix agreement. Calls that fault on
+a later visit still need a checkpoint on that visit or valid inputs.
+
+Memory-fault reports now include the original general-purpose registers,
+flags, and segment selectors, plus the write value for accesses up to
+eight bytes. These fields help identify the missing input pointers or
+segment setup. See bulk-memory-fault-prefix.jsonl under
+local/ghidra-group-followup-20261118.

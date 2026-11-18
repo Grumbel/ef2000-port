@@ -553,6 +553,13 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
     rejected_service = {}
+
+    def original_registers(engine):
+        values = {name: engine.reg_read(getattr(x86_const, 'UC_X86_REG_' + reg.upper()))
+                  for name, reg in zip(service_names, asm_to_c.REGS)}
+        values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+        return values
+
     if original_service is not None or prepared_services:
         def interrupt(engine, vector, _):
             nonlocal original_exit
@@ -561,9 +568,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 ip += 1
                 if ip < 0 or vector != 3 or engine.mem_read(ip, 1) != b'\xcc':
                     raise ValueError('unsupported host service instruction')
-            values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
-                      for n, r in zip(service_names, asm_to_c.REGS)}
-            values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+            values = original_registers(engine)
             if dos_console and vector == 0x21 and ((values['ax'] >> 8) & 0xff) == 0x4c:
                 original_exit = dict(ip=ip, code=values['ax'] & 0xff)
                 engine.emu_stop()
@@ -606,9 +611,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     port_errors = []
     if original_port is not None:
         def original_port_request(engine, port, size, output):
-            values = {n: engine.reg_read(getattr(x86_const, 'UC_X86_REG_'+r.upper()))
-                      for n, r in zip(service_names, asm_to_c.REGS)}
-            values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
+            values = original_registers(engine)
             request = dict(ip=engine.reg_read(x86_const.UC_X86_REG_EIP),
                            direction='out' if output else 'in', port=port, width=size*8)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
@@ -647,10 +650,15 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         UC_MEM_FETCH_UNMAPPED: ('fetch', 'unmapped'), UC_MEM_FETCH_PROT: ('fetch', 'protected'),
     }
 
-    def invalid_memory(engine, access, linear, size, _value, _data):
+    def invalid_memory(engine, access, linear, size, value, _data):
         kind, cause = memory_access[access]
         memory_fault.update(access=kind, cause=cause, address=linear, size=size,
-                            pc=engine.reg_read(x86_const.UC_X86_REG_EIP))
+                            pc=engine.reg_read(x86_const.UC_X86_REG_EIP),
+                            registers=original_registers(engine),
+                            segments={reg: engine.reg_read(getattr(x86_const, 'UC_X86_REG_' + reg.upper()))
+                                      for reg in asm_to_c.SEGMENTS})
+        if kind == 'write' and size <= 8:
+            memory_fault['value'] = value & ((1 << (size * 8)) - 1)
         return False
 
     cpu.hook_add(UC_HOOK_MEM_INVALID, invalid_memory)
