@@ -597,7 +597,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None):
+           prepared_memory_size=None, addresses=()):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -623,6 +623,12 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('runtime_sha256') != hashlib.sha256(runtime.read_bytes()).hexdigest():
         raise ValueError('translation runtime digest mismatch')
     generated = [e for e in manifest['entries'] if e['state'] == 'generated-unverified']
+    generated_addresses = {e['address'] for e in generated}
+    requested = set(addresses)
+    missing = requested - generated_addresses
+    if missing:
+        raise ValueError('no generated translation at ' + ', '.join(map(hex, sorted(missing))))
+    probe_entries = [e for e in generated if not requested or e['address'] in requested]
     support = manifest.get('dispatcher_support', [])
     registered_pcs = None
     if program and manifest.get('dispatcher_layout') == 'pc-shards-v1':
@@ -678,7 +684,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     for path in captures:
         blob = Path(path).read_bytes()
         captured = call_capture.decode(blob, payload)
-        if captured.address not in {e['address'] for e in generated}:
+        if captured.address not in generated_addresses:
             raise ValueError('capture entry has no generated translation')
         captured_inputs.append((Path(path), hashlib.sha256(blob).hexdigest(), captured))
     output.mkdir(parents=True, exist_ok=False)
@@ -720,9 +726,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
 
     entries = []
     progress = output / 'progress.jsonl'
-    for entry in manifest['entries']:
-        if entry['state'] != 'generated-unverified':
-            continue
+    for entry in probe_entries:
         address = entry['address']
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
@@ -740,7 +744,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         with progress.open('a') as stream:
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
-            print('Compared %d/%d entries' % (len(entries), len(generated)), flush=True)
+            print('Compared %d/%d entries' % (len(entries), len(probe_entries)), flush=True)
     capture_results = []
     for path, digest, captured in captured_inputs:
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % captured.address)
@@ -796,6 +800,8 @@ def main(argv=None):
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
     parser.add_argument('--scenarios', type=int, default=16)
+    parser.add_argument('--address', type=lambda value: int(value, 0), action='append', default=[],
+                        help='probe only this entry; repeatable, with all generated C linked')
     parser.add_argument('--budget', type=int, default=10000)
     parser.add_argument('--capture', type=Path, action='append', default=[],
                         help='also compare an original EFCAP002 call input; repeatable')
@@ -810,7 +816,7 @@ def main(argv=None):
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
                         service_free_paths=args.service_free_paths, jobs=args.jobs,
-                        prepared_memory_size=args.prepared_memory_size)
+                        prepared_memory_size=args.prepared_memory_size, addresses=args.address)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:

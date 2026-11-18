@@ -1334,7 +1334,12 @@ ret
             image, directory, records = inventory(root, source)
             out = root / 'out'
             manifest = asm_c_program.generate(directory, out, image, shard_entries=2)
-            asm_c_differential.verify(out, root / 'evidence', image, scenarios=1)
+            with self.assertRaisesRegex(ValueError, 'no generated translation at 0x201'):
+                asm_c_differential.verify(out, root / 'missing', image, addresses=[0x201])
+            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
+                                                  addresses=[0x100])
+            self.assertEqual([(e['address'], e['state']) for e in report['entries']],
+                             [(0x100, 'probes-pass')])
             function = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run
             function.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32, ctypes.c_uint32]
             memory = bytearray(4096)
