@@ -14112,3 +14112,17 @@ beyond the executable payload.
 The total stays at 3,887 of 4,354 generated entries. See
 replay-bulk-gameport-bios-stat-format.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare screenshot slot selection to the encoder handoff
+
+With the empty DOS drive model, entry 0xac57c matches through the
+call to the screenshot encoder at 0xd1c54 for starting slots 0, 9,
+and 32767. The checkpoint includes the formatted filename and
+the encoder arguments. Even with prepared 320×200 dimensions,
+the full probe exhausts the original budget inside the encoder.
+Occupied-slot retries and complete encoder runs remain unverified
+by these fixtures.
+
+The complete-match total stays at 3,887 of 4,354 generated entries.
+See replay-bulk-gameport-bios-save-slot-prefix.py and its JSONL
+output under local/ghidra-group-followup-20261118.
