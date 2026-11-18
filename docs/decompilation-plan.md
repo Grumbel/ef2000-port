@@ -13618,3 +13618,19 @@ of 4,353 entries with at least one complete prepared match.
 Replay with replay-bulk-gameport-bios-record-fields.py and see
 bulk-gameport-bios-record-fields.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify null-terminated list searches and callers
+
+With initialized two-node lists, 0xcc22c, 0xb0954, 0xb686c,
+0xf8b14, 0xb55c8 and 0xb80ac matched through return under both
+prepared variants. The variants change whether the second node
+satisfies the lookup, with subsequent branches depending on the
+caller's remaining inputs. Entry 0xb8510 matched on the miss
+path. Its hit path and both 0xb7d4c probes stopped when the
+original reached an unsupported host service instruction.
+
+The bulk total is now 3,834 of 4,353 entries with at least one
+complete prepared match. Replay with
+replay-bulk-gameport-bios-null-terminated-lists.py and see
+bulk-gameport-bios-null-terminated-lists.jsonl under
+local/ghidra-group-followup-20261118.
