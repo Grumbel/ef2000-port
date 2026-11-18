@@ -14641,3 +14641,26 @@ an unsuccessful traversal. The separate local evidence is
 `26587451a68ef5b70ea8191649bf0b500040339c6594677258487f3af3fbcab0`.
 These prepared inputs cover the three entries directly. Their callers
 still need their own valid object and global state.
+
+#### Compare eight callers with initialized empty lists
+
+The same ABI 6 candidate matched through normal return for eight
+additional entries with a null head stored at 0x240000. Supply the
+slot address as follows.
+
+| Entries | Where to pass 0x240000 |
+| --- | --- |
+| 0xbeebc, 0xc1034, 0xb0850 | EBX |
+| 0xc02ec, 0xc0534 | EDX |
+| 0xcb55c | EAX |
+| 0xb0c9c | EBX and ECX |
+| 0xb0c34 | EBX, ECX and the first stack argument (0x3f0004) |
+
+The last two wrappers initially faulted even with the primary list
+initialized. They pass ECX as the head slot to 0xb0718 or 0xb07b4.
+The 0xb0c34 wrapper also forwards its stack argument as a third list
+reference to 0xb0b00. The fixtures cover the empty-list branches.
+Nonempty object and score processing remains unverified for these
+callers. The local evidence `bulk-cpu-boundaries-list-callers.json`
+includes both failed input preparations and the eight matches
+(SHA-256 `f58b1900271e2b3f0216434025cc34bac480de4e06a8139048728f35cf6ae804`).
