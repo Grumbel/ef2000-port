@@ -11,3 +11,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-19  A1  add the six-case private Xvfb hybrid regression command and native bisector oracle  no tracker change  no readability change  :/^tools: add the native hybrid regression suite$
 2026-11-19  A2  restore Multiplayer by correcting the decoded-key latch ABI and confirm Mitarbeiter  tracker counts unchanged  unnamed -3  :/^decomp: restore the Multiplayer latch ABI$
 2026-11-19  B1  recover twenty GUI callback jumps as direct C calls  blocked -20 (100 bytes), compiles +20, hybrid-candidates +20  no readability change  :/^decomp: recover twenty GUI callback thunks$
+2026-11-19  B1  recover seventeen GUI jumps, two quit callbacks and the debrief redraw route  blocked -20 (163 bytes), compiles +20, hybrid-candidates +20  literal -4, named globals +3  :/^decomp: recover more GUI callback routes$

@@ -567,3 +567,6 @@ addr	size	type	name	evidence	notes
 0x00429210	4	int32_t	g_directplay_row_count	341d8 signed CMP/SETL each loop	Reloaded after each display callback
 0x004288f0	64	char[]	g_directplay_first_row	341d8 starts row pointer here, advances 64 bytes	Minimum observed first-row extent; overall capacity unestablished
 0x0019f320	4	ef_addr32	g_network_loop_widget	0x349ec original ASM	Lookup result retained before refresh_list_widget_348e4
+0x00121e98	2	uint16_t	g_debrief_group	c838 and c868	current group index compared as a signed word
+0x00189b78	5	char[5]	g_quit_confirmation_name	84ac4	widget name used by the quit confirmation callback
+0x00189b5c	1	char[1]	g_quit_notice_text	84aec	message argument passed when saving settings and quitting

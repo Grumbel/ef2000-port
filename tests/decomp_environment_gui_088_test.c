@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception */
 
 #include "ef_abi.h"
+#include "ef_globals.h"
 #include "ef_mem.h"
 
 #include <assert.h>
@@ -12,7 +13,10 @@
 static uint8_t ram[0x500000];
 struct Call { uint32_t target, eax, edx, ebx; };
 static struct Call calls[40];
-static unsigned call_count, report_count, compare_count;
+static unsigned call_count, report_count, compare_count, rebuild_count;
+static uint16_t rebuilt_group;
+uint16_t g_debrief_group;
+int16_t g_match_group_count;
 static uint32_t compare_results[2];
 static ef_addr32 report_source;
 static uint32_t report_format, report_sink;
@@ -49,11 +53,47 @@ uint32_t gui_guest_call_088(uint32_t entry, uint32_t eax, uint32_t edx,
     return 0xdeadbeefu;
 }
 
+int32_t parse_int(ef_addr32 text)
+{
+    return (int32_t)gui_guest_call_088(0x9d4cdu, text, 0, 0);
+}
+
+int32_t guest_strcmp(ef_addr32 first, ef_addr32 second)
+{
+    return (int32_t)gui_guest_call_088(0xa4380u, first, second, 0);
+}
+
+ef_addr32 find_named_or_abort_a46cc(ef_addr32 name)
+{
+    return gui_guest_call_088(0xa46ccu, name, 0, 0);
+}
+
+void show_widget_a7588(ef_addr32 widget, ef_addr32 text)
+{
+    gui_guest_call_088(0xa7588u, widget, text, 0);
+}
+
+void set_session_text_7c4fc(ef_addr32 name, uint32_t target)
+{
+    gui_guest_call_088(0x7c4fcu, name, target, 0);
+}
+
+void redraw_item_a5ef8(uint32_t id)
+{
+    gui_guest_call_088(0xa5ef8u, id, 0, 0);
+}
+
+void rebuild_page_c868(void)
+{
+    ++rebuild_count;
+    rebuilt_group = g_debrief_group;
+}
+
 static void reset(void)
 {
     memset(ram, 0, sizeof(ram));
     memset(calls, 0, sizeof(calls));
-    call_count = report_count = compare_count = 0u;
+    call_count = report_count = compare_count = rebuild_count = 0u;
     compare_results[0] = compare_results[1] = 0u;
     EF_U8(0x360u) = 0xabu;
 }
@@ -167,7 +207,7 @@ static void test_difficulty_and_target(void)
     /* Store at 0x121e46 *overlaps* the high word of 0x121e44, so the
      * original row uses the freshly parsed 0x1234, not old 0xfffe. */
     check_call(2, 0x7c4fcu, 0x700u + 0x28u + 4659u * 76u, 0x350u);
-    check_call(3, 0xa5ef8u, 0xabu, 0x350u);
+    check_call(3, 0xa5ef8u, 0xabu, 0u);
 
     reset();
     compare_results[0] = 1u;
@@ -235,18 +275,17 @@ static void test_pilots(void)
 static void test_debrief_and_size(void)
 {
     reset();
-    EF_U16(0x121e98u) = 1u;
-    EF_U16(0x1a53c0u) = 3u;
+    g_debrief_group = 1u;
+    g_match_group_count = 3;
     gui_show_debrief_c838();
-    assert(EF_U16(0x121e98u) == 2u);
+    assert(g_debrief_group == 2u && rebuilt_group == 2u);
     gui_show_debrief_c838();
-    assert(EF_U16(0x121e98u) == 0u);
-    assert(call_count == 2u);
-    check_call(0, 0xc868u, 0u, 0u);
-    EF_U16(0x121e98u) = 0x7fffu;
-    EF_U16(0x1a53c0u) = 0x8000u;
+    assert(g_debrief_group == 0u);
+    assert(rebuild_count == 2u && rebuilt_group == 0u);
+    g_debrief_group = 0x7fffu;
+    g_match_group_count = (int16_t)0x8000u;
     gui_show_debrief_c838();
-    assert(EF_U16(0x121e98u) == 0u); /* signed >= */
+    assert(g_debrief_group == 0u); /* signed >= */
 
     EF_U16(0x1a365eu) = 0x9876u;
     EF_U16(0x1a3660u) = 0x1234u;

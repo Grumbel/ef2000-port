@@ -2,8 +2,24 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
-#include "ef_mem.h"
+#include "ef_globals.h"
 
+/* 0xc838, 48 bytes. Advance the signed group selection, wrap it at
+ * the group count, and redraw the debrief page. */
+void gui_show_debrief_c838(void)
+{
+    uint16_t next = (uint16_t)(g_debrief_group + 1u);
+    int16_t count = g_match_group_count;
+
+    g_debrief_group = next;
+    if ((int16_t)next >= count)
+        g_debrief_group = 0u;
+    rebuild_page_c868();
+}
+
+#ifdef EF_DECOMP_HOST_TEST
+
+#include "ef_mem.h"
 /* Direct original addresses are kept at each unresolved guest-call boundary.
  * Only locally written registers are authoritative. This host-only hook is
  * not the x86 ABI and guest differential verification remains pending. */
@@ -78,19 +94,10 @@ void gui_save_conflict_bf24(ef_addr32 widget)
     click_pilot(widget, 0xc9u, 3u, 0x18090cu, 0x180934u);
 }
 
-/* 0xc838 (48 bytes): signed word comparison after 32-bit INC EDX. */
-void gui_show_debrief_c838(void)
-{
-    uint16_t next = (uint16_t)(EF_U16(0x121e98u) + 1u);
-    EF_U16(0x121e98u) = next;
-    if ((int16_t)next >= EF_S16(0x1a53c0u))
-        EF_U16(0x121e98u) = 0u;
-    guest(0xc868u, 0u, 0u, 0u);
-}
-
 /* 0xca40 (25 bytes): width/height pair copied in reverse address order. */
 void gui_alter_size_ca40(void)
 {
     EF_U16(0x1a4ba2u) = EF_U16(0x1a365eu);
     EF_U16(0x1a4ba0u) = EF_U16(0x1a3660u);
 }
+#endif

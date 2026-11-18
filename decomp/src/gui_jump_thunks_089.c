@@ -2,11 +2,26 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
+#include "ef_globals.h"
 #include "ef_ui_thunks_089.h"
 
 /* A five-byte JMP inherits its target's ABI. Use the named target and
  * the same input and return types, then check that OpenWatcom emits just
  * one tail jump to it. Keep ABI and tracker entries in step with the C. */
+
+/* 0x84ac4, 15 bytes. Activate the confirmation widget and redraw it. */
+void QuitEF2000Yes(void)
+{
+    ef_addr32 widget = apply_a4cb4_a4d90((ef_addr32)(uintptr_t)g_quit_confirmation_name);
+    redraw_widget_ac9a0(widget);
+}
+
+/* 0x84aec, 15 bytes. Save the settings before reporting the quit message. */
+void QuitEF2000No(void)
+{
+    rewrite_settings_830b8();
+    report_fatal_ac7c8((ef_addr32)(uintptr_t)g_quit_notice_text);
+}
 
 /* 0x84afc, 5 bytes. */
 void guiClosedownHelp(void)
@@ -98,6 +113,12 @@ void gpwClickCampaign(void)
     reset_name_record_40e20();
 }
 
+/* 0x84b74, 5 bytes. */
+void InitPickMiss(void)
+{
+    setup_dialog_41028();
+}
+
 /* 0x84b7c, 5 bytes. */
 void InitSim2(void)
 {
@@ -128,6 +149,102 @@ void InitArcade2(void)
     select_entry_4bf8();
 }
 
+/* 0x84bc4, 5 bytes. */
+void arcNextDifficulty(void)
+{
+    enter_hiscore_screen_4e14();
+}
+
+/* 0x84bf4, 5 bytes. */
+void gpwTestClicked(void)
+{
+    finish_trace_c594();
+}
+
+/* 0x84bfc, 5 bytes. */
+void gpwClickTimeAdjust(void)
+{
+    apply_two_a4b80_b544();
+}
+
+/* 0x84c04, 5 bytes. */
+void gpwCloseDebrief(void)
+{
+    refresh_status_widgets_d550();
+}
+
+/* 0x84c0c, 5 bytes. */
+void gpwNextFLight(void)
+{
+    emit_and_advance_d628();
+}
+
+/* 0x84c1c, 5 bytes. */
+void QuitEF2000(void)
+{
+    update_panel_pages_42e8c();
+}
+
+/* 0x84c2c, 5 bytes. */
+void sumaircraftgraph(void)
+{
+    draw_box_rows_99ee4();
+}
+
+/* 0x84c34, 5 bytes. */
+void sumgroundgraph(void)
+{
+    draw_box_rows_99fe0();
+}
+
+/* 0x84c3c, 5 bytes. */
+void sumstaticgraph(void)
+{
+    draw_box_rows_9a0dc();
+}
+
+/* 0x84c44, 5 bytes. */
+void sumgenbar(void)
+{
+    draw_box_rows_9a1d8();
+}
+
+/* 0x84c54, 5 bytes. */
+void sumgencamp(void)
+{
+    draw_hud_frame_9bba4();
+}
+
+/* 0x84c5c, 5 bytes. */
+void openservicesell(void)
+{
+    update_item_dialog_34298();
+}
+
+/* 0x84c64, 5 bytes. */
+void entergamename(void)
+{
+    show_notice_34390();
+}
+
+/* 0x84c6c, 5 bytes. */
+void simrecallmiss(void)
+{
+    toggle_named_widget_7bc00();
+}
+
+/* 0x84c74, 5 bytes. */
+void gpwUpdateTime(void)
+{
+    bind_page_widgets_42f7c();
+}
+
+/* 0x84c7c, 5 bytes. */
+void InitCustom(void)
+{
+    update_flight_options_widgets_7e2a8();
+}
+
 #ifdef EF_DECOMP_HOST_TEST
 /* Every original five-byte body is a JMP rel32. A host-only adapter models
  * this as a guest tail call with the incoming register tuple unchanged.
@@ -148,21 +265,4 @@ const ef_ui_jump_entry_089 ef_ui_jump_table_089[] = {
 const unsigned ef_ui_jump_table_size_089 =
     (unsigned)(sizeof(ef_ui_jump_table_089) / sizeof(ef_ui_jump_table_089[0]));
 
-/* QuitEF2000Yes 0x84ac4 (15 bytes): guest 0xa4d90(0x189b78), then
- * terminal JMP 0xac9a0. No first-call EAX value reaches the second call. */
-ef_ui_regs_089 ef_ui_quit_yes_84ac4(ef_ui_regs_089 registers)
-{
-    registers.eax = 0x189b78u;
-    registers = ef_ui_jump_guest_089(0xa4d90u, registers);
-    return ef_ui_jump_guest_089(0xac9a0u, registers);
-}
-
-/* QuitEF2000No 0x84aec (15 bytes): guest 0x830b8; then load EAX and
- * terminal JMP 0xac7c8. */
-ef_ui_regs_089 ef_ui_quit_no_84aec(ef_ui_regs_089 registers)
-{
-    registers = ef_ui_jump_guest_089(0x830b8u, registers);
-    registers.eax = 0x189b5cu;
-    return ef_ui_jump_guest_089(0xac7c8u, registers);
-}
 #endif

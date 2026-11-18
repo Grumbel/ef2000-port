@@ -1008,6 +1008,8 @@
             ${source}/decomp/src/environment_normal.c \
             ${source}/decomp/src/environment_mode_flags.c \
             ${source}/decomp/src/gui_callbacks_088.c \
+            ${source}/decomp/src/difficulty_zoom.c \
+            ${source}/decomp/src/target_close.c \
             -o work/environment_gui_088_host_test
           work/environment_gui_088_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \

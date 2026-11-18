@@ -224,4 +224,9 @@ extern uint16_t g_ui_component_enabled; /* 0x0012b4a6 */
 extern uint8_t g_ui_component_latch; /* 0x001fcc43 */
 extern uint8_t g_ui_active_record_scan_latch; /* 0x0012d7b3 */
 
+extern uint16_t g_debrief_group;       /* 0x00121e98 */
+extern int16_t g_match_group_count;    /* 0x001a53c0 */
+extern const char g_quit_confirmation_name[5]; /* 0x00189b78 */
+extern const char g_quit_notice_text[1];       /* 0x00189b5c */
+
 #endif

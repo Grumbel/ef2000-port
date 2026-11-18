@@ -3574,3 +3574,23 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00084b9c	gpwSimTypeSelected		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x7ccd0; inherits target signature (call_b1a10_1379bc).
 0x00084bac	gpwContinueArcade			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x4738; inherits target signature (reset_menu_state_4738).
 0x00084bb4	InitArcade2			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x4bf8; inherits target signature (select_entry_4bf8).
+0x0000c838	gui_show_debrief_c838			ebx,ecx,edx,esi,edi,ebp	0	Signed word increment and compare, then direct redraw call to 0xc868. Original pushes EBX/ECX/EDX; no caller input.
+0x00084ac4	QuitEF2000Yes			ebx,ecx,edx,esi,edi,ebp	0	Original EAX widget name, CALL 0xa4d90, then JMP 0xac9a0 using returned EAX. Callback table slot 0x12b988.
+0x00084aec	QuitEF2000No			ebx,ecx,edx,esi,edi,ebp	0	Original CALL 0x830b8, load EAX message, then JMP 0xac7c8. Callback table slot 0x12b990.
+0x00084b74	InitPickMiss			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x41028; direct C tail call to setup_dialog_41028. OpenWatcom emits a single JMP to the named target.
+0x00084bc4	arcNextDifficulty			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x4e14; direct C tail call to enter_hiscore_screen_4e14. OpenWatcom emits a single JMP to the named target.
+0x00084bf4	gpwTestClicked			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xc594; direct C tail call to finish_trace_c594. OpenWatcom emits a single JMP to the named target.
+0x00084bfc	gpwClickTimeAdjust			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xb544; direct C tail call to apply_two_a4b80_b544. OpenWatcom emits a single JMP to the named target.
+0x00084c04	gpwCloseDebrief			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xd550; direct C tail call to refresh_status_widgets_d550. OpenWatcom emits a single JMP to the named target.
+0x00084c0c	gpwNextFLight			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xd628; direct C tail call to emit_and_advance_d628. OpenWatcom emits a single JMP to the named target.
+0x00084c1c	QuitEF2000			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x42e8c; direct C tail call to update_panel_pages_42e8c. OpenWatcom emits a single JMP to the named target.
+0x00084c2c	sumaircraftgraph			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x99ee4; direct C tail call to draw_box_rows_99ee4. OpenWatcom emits a single JMP to the named target.
+0x00084c34	sumgroundgraph			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x99fe0; direct C tail call to draw_box_rows_99fe0. OpenWatcom emits a single JMP to the named target.
+0x00084c3c	sumstaticgraph			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x9a0dc; direct C tail call to draw_box_rows_9a0dc. OpenWatcom emits a single JMP to the named target.
+0x00084c44	sumgenbar			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x9a1d8; direct C tail call to draw_box_rows_9a1d8. OpenWatcom emits a single JMP to the named target.
+0x00084c54	sumgencamp			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x9bba4; direct C tail call to draw_hud_frame_9bba4. OpenWatcom emits a single JMP to the named target.
+0x00084c5c	openservicesell			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x34298; direct C tail call to update_item_dialog_34298. OpenWatcom emits a single JMP to the named target.
+0x00084c64	entergamename			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x34390; direct C tail call to show_notice_34390. OpenWatcom emits a single JMP to the named target.
+0x00084c6c	simrecallmiss			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7bc00; direct C tail call to toggle_named_widget_7bc00. OpenWatcom emits a single JMP to the named target.
+0x00084c74	gpwUpdateTime			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x42f7c; direct C tail call to bind_page_widgets_42f7c. OpenWatcom emits a single JMP to the named target.
+0x00084c7c	InitCustom			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7e2a8; direct C tail call to update_flight_options_widgets_7e2a8. OpenWatcom emits a single JMP to the named target.
