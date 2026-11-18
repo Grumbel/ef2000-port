@@ -13992,3 +13992,18 @@ table. Other stream opcodes are outside these probes.
 The prepared-match total is now 3,885 of 4,353 entries. See
 replay-bulk-gameport-bios-vertex-dispatch.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare timer wait callers before asynchronous ticks
+
+Entries 0x7e5a0, 0x7e670, and 0x7e758 each match through the
+fourth visit to the polling loop at 0xe2996. The wait routine
+at 0xe2988 initializes the countdown itself. The timer callback
+at 0xe28c4 increments two tick counters and decrements that
+countdown. Initialization at 0xe28e8 registers the callback and
+sets its rate to 50 Hz. The isolated comparison currently delivers
+no scheduled callback while the guest is polling, so the prepared
+cases stop at the checkpoint with the countdown still positive.
+
+The prepared-match total through return stays at 3,885. See
+replay-bulk-gameport-bios-timer-wait.py and its JSONL output
+under local/ghidra-group-followup-20261118.
