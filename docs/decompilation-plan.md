@@ -14866,3 +14866,11 @@ The grouped verifier report `bulk-scanner-float-diff/report.json` has
 SHA-256 `7e0418c2f463ee9a07e9bc190c41930cb646c8b5c061788270dc1b79aad03a5d`.
 The direct probe report `bulk-cpu-boundaries-scanner-float-callbacks.json`
 has SHA-256 `cf51978bf07f0a2f2d192dd8c2f600de6c883be2364542bac33da50518454d29`.
+
+New Ghidra imports seed the initializer at 0xedba8 and decimal store
+callback at 0x10e6dd. The initializer pointer is in the Watcom init
+table at 0x195a98. The initializer writes the decimal callback address
+into 0x17d49c, which is the slot used by the scanner at 0x108d4e.
+A clean Ghidra 12.1.4 import and inventory export reproduced both
+half-open body ranges and all 16 instruction boundaries against
+independent objdump decoding.

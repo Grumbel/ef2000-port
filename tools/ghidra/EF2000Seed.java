@@ -41,6 +41,11 @@ public class EF2000Seed extends GhidraScript {
         seedFunction(0x8b274, "candidate_game_main");
         seedFunction(0xe9a24, "original_memcpy");
 
+        // The Watcom init table calls the installer, which supplies the
+        // indirect decimal conversion callback used by scanf.
+        seedFunction(0xedba8, "install_float_callbacks");
+        seedFunction(0x10e6dd, "store_decimal_double");
+
         seedData(0x132a28, "x32_stack_size");
         seedData(0x132a2c, "dynend");
         seedData(0x132a30, "curbrk");
