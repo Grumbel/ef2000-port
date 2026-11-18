@@ -13204,3 +13204,17 @@ under the prepared fixtures. Two advanced to a VBE controller-information
 request (AX=4F00h through the X-32 real-mode bridge), and two reached
 zero-paragraph allocations, which the shared model rejects. See
 local/ghidra-group-followup-20261118/bulk-x32-memory-replay-verified.jsonl.
+
+### 2026-11-18 — Compare VBE controller-information requests
+
+The opt-in X-32 VBE fixture now routes AX=4F00h through the existing
+BIOS model, with the same DOS-memory transcript and final RAM comparison
+as the mode-info and scanline calls.
+
+Both probes previously stopped by this request now complete on the
+original side. Entry 0xfc534 matches, including the controller-info
+write and subsequent mode-info requests. Entry 0xd1da8 exposes a new
+translation stop, C status 2 at 0x9c398 after the original completed.
+The two zero-paragraph allocation cases remain unsupported by the
+shared runtime models. See local/ghidra-group-followup-20261118/
+bulk-vbe-controller-replay.jsonl.

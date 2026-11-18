@@ -266,7 +266,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             number, rm_ds, es, fs, gs, ax, dx = struct.unpack('<5H2I', frame)
             mouse_request = x32_mouse and number == 0x33
             cd_request = x32_no_cd and number == 0x2f and ax & 0xffff in (0x1500, 0x1510)
-            vbe_request = x32_vbe and number == 0x10 and ax & 0xffff in (0x4f01, 0x4f06)
+            vbe_request = x32_vbe and number == 0x10 and ax & 0xffff in (0x4f00, 0x4f01, 0x4f06)
             if not (mouse_request or cd_request or vbe_request):
                 raise ValueError('X-32 request is outside the prepared real-mode fixtures')
             if side not in real_mode_handlers:
@@ -1274,7 +1274,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_residency_policy='prepared-only' if x32_residency else 'disabled',
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   x32_no_cd_policy='no-cd-prepared-only' if x32_no_cd else 'disabled',
-                  x32_vbe_policy='mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
+                  x32_vbe_policy='controller-info-mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
                   x32_vector_policy='flat-prepared-only' if x32_vectors else 'disabled',
                   dos_clock_date='2026-11-18' if dos_clock else None,
                   dos_clock_sample='12:34:56.78Z' if dos_clock else None,
@@ -1329,7 +1329,7 @@ def main(argv=None):
     parser.add_argument('--x32-no-cd', action='store_true',
                         help='compare X-32 MSCDEX requests with CD support absent')
     parser.add_argument('--x32-vbe', action='store_true',
-                        help='compare X-32 VBE mode-info and scanline requests against prepared DOS RAM')
+                        help='compare X-32 VBE controller-info, mode-info and scanline requests against prepared DOS RAM')
     parser.add_argument('--x32-vectors', action='store_true',
                         help='compare X-32 interrupt vector queries and updates with separate flat tables')
     parser.add_argument('--dos-clock', action='store_true',
