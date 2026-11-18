@@ -13218,3 +13218,19 @@ translation stop, C status 2 at 0x9c398 after the original completed.
 The two zero-paragraph allocation cases remain unsupported by the
 shared runtime models. See local/ghidra-group-followup-20261118/
 bulk-vbe-controller-replay.jsonl.
+
+### 2026-11-18 — Audit the VBE path's cleanup callback boundary
+
+A prepared checkpoint replay of 0xd1da8 matches registers, guest RAM,
+and service transcripts on the first visit to 0x9c398. The target is
+installed in 0x160788 by 0x9c3cf. It runs the registered cleanup stack
+in reverse order through the near indirect call at 0x9c3c4.
+
+The payload-pinned boundary audit accepts 20 instructions in the
+unowned 55-byte span [0x9c398, 0x9c3cf), ending with the return at
+0x9c3ce. The audit explicitly admits the indirect callback site.
+The local overlay adds this span for a full-path comparison. The
+checkpoint result covers execution up to the callback's entry.
+
+See local/ghidra-group-followup-20261118/bulk-vbe-cleanup-prefix.jsonl
+and verify-cleanup-candidate.py in the same directory.
