@@ -6,6 +6,7 @@
 decomp/src/hiscore.c
 decomp/src/runtime_helpers25.c
 decomp/src/math_string.c
+decomp/src/ascii_case.c
 decomp/src/entity_helpers2.c
 decomp/src/game_helpers28.c
 decomp/src/game_helpers120.c

@@ -4,7 +4,6 @@
 """Asset-free checks for independently supplied OpenWatcom objects."""
 
 from contextlib import redirect_stderr
-import hashlib
 import io
 import os
 from pathlib import Path
@@ -32,7 +31,7 @@ class DecompAppTests(unittest.TestCase):
                           arena_bytes=32, linked_modules=1, object_modules=1)
             with patch.object(decomp_app, 'ROOT', root), \
                     patch.object(decomp_app.extract_image, 'extract',
-                                 return_value=(None, {'payload.bin': bytes(16)})), \
+                                 return_value=({'source_sha256': 'german'}, {'payload.bin': bytes(16)})), \
                     patch.object(decomp_app.hybrid_link, 'read_tsv', return_value=[]), \
                     patch.object(decomp_app.hybrid_link, 'load_exclusions', return_value={}), \
                     patch.object(decomp_app.hybrid_link, 'link',
@@ -74,33 +73,24 @@ class DecompAppTests(unittest.TestCase):
                     str(game), '--launcher', '/bin/ef2000']), 0)
             self.assertEqual(build.call_args.args[:2], (game, objects))
 
-    def test_english_build_uses_a_disposable_dosbox_copy(self):
+    def test_english_patch_builder_selects_english_linking(self):
         with tempfile.TemporaryDirectory() as directory:
-            game = Path(directory)
-            executable = b'english fixture'
-            (game / '_EF2000.EXE').write_bytes(executable)
-            (game / 'DID.DAT').write_bytes(b'assets')
-            (game / '.git').mkdir()
-
-            def run(command, *, cwd):
-                self.assertEqual(command[0], '/bin/dosbox-x')
-                self.assertEqual(command[-2:], ['-time-limit', '3'])
-                copy = cwd / 'drive' / 'EF2000'
-                self.assertEqual((copy / '_EF2000.EXE').read_bytes(), executable)
-                self.assertFalse((copy / '.git').exists())
-                (copy / 'DID.DAT').write_bytes(b'changed')
-                return 7
-
-            with patch.dict(os.environ, {}, clear=True), \
-                    patch.object(decomp_app.extract_image, 'ENGLISH_SHA256', hashlib.sha256(executable).hexdigest()), \
-                    patch.object(decomp_app, 'build_patch') as build, \
-                    patch.object(decomp_app.subprocess, 'call', side_effect=run), \
+            game = Path(directory) / '_EF2000.EXE'
+            game.touch()
+            (game.parent / 'ascii_case.obj').touch()
+            output = game.with_suffix('.efpatch')
+            report = dict(functions_redirected=2, redirect_bytes=10,
+                          arena_bytes=32, linked_modules=1, object_modules=1)
+            manifest = {'source_sha256': decomp_app.extract_image.ENGLISH_SHA256}
+            with patch.object(decomp_app.extract_image, 'extract',
+                              return_value=(manifest, {'payload.bin': bytes(16)})) as extract, \
+                    patch.object(decomp_app.hybrid_link, 'link',
+                                 return_value=(b'patch', report)) as link, \
                     redirect_stderr(io.StringIO()):
-                result = decomp_app.main([str(game), '--launcher', '/bin/false',
-                                          '--dosbox', '/bin/dosbox-x', '--', '-time-limit', '3'])
-            self.assertEqual(result, 7)
-            build.assert_not_called()
-            self.assertEqual((game / 'DID.DAT').read_bytes(), b'assets')
+                decomp_app.build_patch(game, game.parent, output)
+            self.assertTrue(extract.call_args.kwargs['allow_english'])
+            self.assertTrue(link.call_args.kwargs['allow_english'])
+            self.assertEqual(output.read_bytes(), b'patch')
 
     def test_missing_object_directory_has_actionable_error(self):
         error = io.StringIO()

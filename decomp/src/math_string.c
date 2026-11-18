@@ -34,14 +34,6 @@ void halve_pair_to_fit16(ef_addr32 first, ef_addr32 second)
     } while (a < -0x8000 || a > 0x7fff || b < -0x8000 || b > 0x7fff);
 }
 
-/* 0xddbc8, 14 bytes. Signed 'a'..'z' to uppercase. */
-int32_t to_upper_ascii(int32_t c)
-{
-    if (c >= 0x61 && c <= 0x7a)
-        c -= 0x20;
-    return c;
-}
-
 /* 0xdec00, 21 bytes. Byte at dword 0x15b754 + EDX + dword 0x163200[EBX] = AL. */
 void plot_byte(uint8_t value, uint32_t x, uint32_t y)
 {

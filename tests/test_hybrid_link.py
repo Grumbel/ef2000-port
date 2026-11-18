@@ -41,6 +41,59 @@ class AbiAliasTests(unittest.TestCase):
         self.assertEqual(aliases['emit_command_packet'], 0xa3f74)
 
 
+class EnglishLinkTests(unittest.TestCase):
+    def test_english_redirects_only_the_checked_relocation_free_leaves(self):
+        leaves = hybrid_link.ENGLISH_LEAVES
+        bodies = (b'\x90' * 13 + b'\xc3', b'\x40' * 13 + b'\xc3')
+        code = b''.join(bodies)
+        image = bytearray(max(leaves) + len(bodies[-1]))
+        functions = []
+        signatures = []
+        module = Module(segments=[None, Segment('text', 'CODE', len(code), 1, True)])
+        module.segments[1].data[:] = code
+        offset = 0
+        for (address, name), body in zip(leaves.items(), bodies, strict=True):
+            image[address:address + len(body)] = body
+            module.publics.append(Public(name + '_', 1, offset))
+            offset += len(body)
+            functions.append(dict(addr=hex(address), size=str(len(body)), name=name,
+                                  state='verified', sig_status='confirmed'))
+            signatures.append(dict(addr=hex(address), stack_bytes='0',
+                                   preserved='', outputs='EAX:int32_t'))
+        image = bytes(image)
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'ascii_case.obj'
+            path.touch()
+            objects = [(path, 'hand'), (path.with_name('german.obj'), 'hand')]
+            with patch.object(hybrid_link, 'read_module', return_value=module) as parse, \
+                    patch.object(hybrid_link, 'ENGLISH_IMAGE_SHA256',
+                                 hashlib.sha256(image).hexdigest()):
+                with self.assertRaisesRegex(ValueError, 'SHA-256'):
+                    hybrid_link.link(objects, functions, [], {}, image, {},
+                                     signatures=signatures)
+                blob, report = hybrid_link.link(objects, functions, [], {}, image, {},
+                                                 signatures=signatures, allow_english=True)
+                parse.assert_called_once()
+                self.assertEqual(report['abi_trampolines'], 0)
+                writes = dict(efpatch.decode(blob, image, hybrid_link.GUEST_SIZE))
+                self.assertEqual(set(writes), {*leaves, hybrid_link.DEFAULT_ARENA})
+                self.assertEqual(writes[hybrid_link.DEFAULT_ARENA], code)
+                target = hybrid_link.DEFAULT_ARENA
+                for address, body in zip(leaves, bodies, strict=True):
+                    self.assertEqual(writes[address][0], 0xe9)
+                    self.assertEqual(address + 5 + struct.unpack_from('<i', writes[address], 1)[0],
+                                     target)
+                    target += len(body)
+                module.segments[1].data[0] ^= 1
+                with self.assertRaisesRegex(ValueError, 'differs from the original'):
+                    hybrid_link.link(objects, functions, [], {}, image, {},
+                                     signatures=signatures, allow_english=True)
+                module.fixups.append(Fixup(1, 0, 9, 'self', 5, None, 0, 1, 0))
+                with self.assertRaisesRegex(ValueError, 'relocation-free'):
+                    hybrid_link.link(objects, functions, [], {}, image, {},
+                                     signatures=signatures, allow_english=True)
+
+
 class SignatureExclusionTests(unittest.TestCase):
     def test_variadic_entry_keeps_the_complete_caller_argument_frame(self):
         try:

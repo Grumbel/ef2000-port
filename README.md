@@ -157,7 +157,7 @@ In particular:
 | [tfx3view / tfxdat](https://github.com/Grumbel/tfx3view) | Existing DID archive extraction and 3D geometry viewer; distinct from the menu/mission scripts. |
 | [EFUTIL discussion](https://simhq.net/forum/ubbthreads.php/topics/3835020/re-ef2000-reloaded), [ReViVe](https://www.combatsim.com/memb123/archive/htm/htm_arc2/evolute.htm), [Strategic Commander](https://simhq.net/forum/ubbthreads.php/topics/3458818/3) | Legacy campaign aircraft-swapping, restoration and scenario editing tools. **EFUTIL is not a mission extractor.** |
 | [EF2000 Reloaded](https://simhq.net/forum/ubbthreads.php/topics/3830314/all/EF2000_Reloaded) and [3Dfx installation notes](https://www.tales-from-darkenedroom.com/post/ef2000-updated-part-3-ef2000-reloaded-dosbox) | Specialized DOSBox Voodoo emulation for DOS **GFX+**; the statically linked graphics library prevents straightforward Glide-wrapper interception. |
-| [rdeprera/EF2000](https://github.com/rdeprera/EF2000) | Another DOS v2.0 TACTCOM installation to compare, **not yet confirmed to be English**; its executable and some archive members differ from our German reference. |
+| [rdeprera/EF2000](https://github.com/rdeprera/EF2000) | English DOS v2.0 TACTCOM installation. Its executable and some archive members differ from the German release. |
 
 Our German installation already includes **plain-text** `MISSION.CFG`
 (746 mission blocks), `NAVIG.NAV` (1,118 navigation records), and campaign
@@ -266,10 +266,12 @@ The English DOS build from `EF2000-rdeprera` is also accepted by the launcher.
 NIXPKGS_ALLOW_UNFREE=1 nix run --impure .#ef2000-hybrid -- ../EF2000-rdeprera/
 ```
 
-The launcher recognizes the English executable by SHA-256 and runs it in
-DOSBox-X. The recovered C patches are specific to the German TACTCOM
-executable. The English session uses a temporary copy of the installation,
-and settings or saves written during that session are discarded on exit.
+The hybrid launcher recognizes the English executable by SHA-256 and runs
+it in the native64 runtime with recovered OpenWatcom C. The initial English
+patch set covers the two ASCII case helpers, whose compiled bodies match
+the English executable byte for byte. The rest of the English game uses its
+original code. The native app runs the original English executable without
+the hybrid patch.
 
 `apps.default`/`apps.ef2000` remain native aliases; `apps.ef2000-unicorn` is
 the C++ frontend, `apps.ef2000-unicorn-py` is the deprecated Python frontend, and

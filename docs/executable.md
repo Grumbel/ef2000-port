@@ -44,10 +44,18 @@ Watcom command, program, PSP, environment and extender-selector globals
 are `0x97c` lower in English. The VGA selector and base fields at
 `0x120cc4` and `0x120cc6` retain their addresses.
 
-The hybrid launcher uses DOSBox-X for English. Applying recovered C
-patches requires verified English function and global mappings, including
-direct addresses compiled into the recovered objects. Some addresses,
-such as the difficulty reference above, are shared across editions.
+The hybrid launcher links an English-payload-bound patch for the two
+ASCII case helpers at `0xddbc8` and `0xe7835`. Both have the same
+entry address, register ABI, and instruction bytes across editions.
+Their dedicated OpenWatcom object is relocation-free. The linker checks
+the compiled bodies against the English payload before redirecting the
+two entries. The rest of the English executable runs with its original
+code in the same native64 runtime.
+Both Nix apps reached the English main menu, Quick Combat setup, and
+the Mission 01 cockpit on private Xvfb displays. Holding Left for four
+seconds banked the aircraft in both apps. An isolated differential comparison
+executed both redirects and matched the original general-purpose registers,
+EFLAGS, stack pointer, and return address for 261 inputs per helper.
 
 ## Verified observations
 

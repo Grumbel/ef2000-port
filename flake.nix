@@ -412,7 +412,7 @@
             -Idecomp/include -Iruntime tests/decomp_startup_test.c \
             runtime/decomp_image.c runtime/decomp_startup.c runtime/decomp_files.c \
             decomp/src/runtime_helpers25.c decomp/src/runtime_helpers19.c \
-            decomp/src/runtime_helpers17.c decomp/src/math_string.c \
+            decomp/src/runtime_helpers17.c decomp/src/math_string.c decomp/src/ascii_case.c \
             decomp/src/entity_helpers2.c decomp/src/game_helpers28.c \
             decomp/src/game_helpers120.c decomp/src/game_helpers129.c \
             decomp/src/runtime_helpers6.c \
@@ -570,7 +570,7 @@
           set -- "$EF2000_GAME_DIR" "$@"
         fi
         exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
-          --launcher ${package}/bin/ef2000 --dosbox ${pkgs.dosbox-x}/bin/dosbox-x "$@"
+          --launcher ${package}/bin/ef2000 "$@"
       '';
       dosDecompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp-watcom" ''
         set -euo pipefail

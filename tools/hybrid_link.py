@@ -36,6 +36,9 @@ DEFAULT_ARENA = 0x3000000
 STACK_TOP = 0x3FFF000
 BSS_END = 0x4DE2F0
 IMAGE_SHA256 = '3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb'
+ENGLISH_IMAGE_SHA256 = '83db9908009f7866885a9f2e170b808620dadf22ca5e5bedcd8a762a7b29c979'
+# Reviewed position-independent leaves with the same entry and ABI in both editions.
+ENGLISH_LEAVES = {0x0ddbc8: 'to_upper_ascii', 0x0e7835: 'to_lower_ascii'}
 ABI_HEADER = ROOT / 'decomp/include/ef_abi.h'
 MAX_PATCH_BYTES = 16 * 1024 * 1024
 MAX_PATCH_WRITES = 4096
@@ -146,7 +149,16 @@ def load_objects(hand_dirs, mechanical_dir, report_path):
 
 def link(objects, functions, globals_, mechanical_selected, image,
          abi_aliases, arena_base=DEFAULT_ARENA, explicit_excludes=None,
-         signatures=None, variadic_names=()):
+         signatures=None, variadic_names=(), *, allow_english=False):
+    digest = hashlib.sha256(image).digest()
+    english = allow_english and digest.hex() == ENGLISH_IMAGE_SHA256
+    if digest.hex() != IMAGE_SHA256 and not english:
+        raise OMFError('input payload SHA-256 is not a supported EF2000 image')
+    if english:
+        objects = [(path, origin) for path, origin in objects
+                   if path.name == 'ascii_case.obj' and origin == 'hand']
+        functions = [row for row in functions
+                     if ENGLISH_LEAVES.get(int(row['addr'], 16)) == row['name']]
     explicit_excludes = explicit_excludes or {}
     function_by_addr = {int(row['addr'], 16): row for row in functions}
     signature_by_addr = {int(row['addr'], 16): row for row in signatures or []}
@@ -170,6 +182,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
     public_definitions = {}
     for path, origin in objects:
         module = read_module(path.read_bytes())
+        if english and module.fixups:
+            raise OMFError('English ASCII case object must be relocation-free')
         code_segments = [index for index, segment in enumerate(module.segments)
                          if index and segment.cls.upper() == 'CODE']
         if len(code_segments) != 1:
@@ -199,6 +213,13 @@ def link(objects, functions, globals_, mechanical_selected, image,
             if address in explicit_excludes:
                 continue
             if origin == 'hand' and eligible:
+                if english:
+                    size = int(row['size'])
+                    segment = module.segments[public.segment]
+                    end = public.offset + size
+                    if (public.segment != record['code'] or end > segment.size or
+                            size != 14 or segment.data[public.offset:end] != image[address:address+size]):
+                        raise OMFError(f'English recovered body at {address:#x} differs from the original')
                 hand_entry_candidates.setdefault(address, []).append((record, public))
             elif origin == 'mechanical' and address in mechanical_selected:
                 mech_entry_candidates.setdefault(address, []).append((record, public))
@@ -297,6 +318,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
                 signature_skip_reasons[address] = 'variadic entry requires the native C stack/result ABI'
                 continue
             variadic_direct.append(address)
+            continue
+        if english:
             continue
         if outputs:
             output_reg = outputs[0].split(':', 1)[0].lower()
@@ -485,6 +508,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
         patch_writes.append((address, b'\xe9' + (displacement & 0xffffffff).to_bytes(4, 'little')))
         redirect_count += 1
 
+    if english and {address for address, _ in patch_writes} != set(ENGLISH_LEAVES):
+        raise OMFError('English hybrid requires both verified ASCII case routines')
     patch_writes.append((arena_base, bytes(arena)))
     if len(patch_writes) > MAX_PATCH_WRITES:
         raise OMFError('hybrid needs %d patch writes; limit is %d' %
@@ -502,9 +527,6 @@ def link(objects, functions, globals_, mechanical_selected, image,
         # On the pinned target the initialized payload ends at 0x195fb0,
         # below BSS, so an arena above BSS is disjoint from source bytes.
         raise OMFError('unexpected initialized payload size 0x%x' % payload_size)
-    digest = hashlib.sha256(image).digest()
-    if digest.hex() != IMAGE_SHA256:
-        raise OMFError('input payload SHA-256 is not the pinned EF2000 image')
     blob = bytearray(HEADER.pack(MAGIC, digest, len(patch_writes)))
     for offset, data in patch_writes:
         blob.extend(ENTRY.pack(offset, len(data)))
