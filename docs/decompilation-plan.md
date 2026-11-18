@@ -12207,3 +12207,19 @@ bodies matched their first prepared inputs. The original failing callers
 now stop at later uncovered entries: 0x13e14 from 0x6460 and 0x1303c
 from 0x12160. The scoped run counted 62 matches, 21 inconclusive probes
 and two mismatches. Evidence is under `local/ghidra-group-dispatch-20261118/`.
+
+2026-11-18 — Recovered four further indexed group callbacks at 0x1303c,
+0x13510, 0x13d8c and 0x13e14, plus the direct callee at 0x1f910.
+Original execution traces identify the indexed CALL and corroborate
+the payload table slots. Recovery requires each exact slot and an
+allowlist of existing direct callees. All five boundaries survived
+audit, apply and repeat apply on a disposable project. The new Ghidra
+inventory contains 4,296 functions. All 47 wrapper tests passed.
+All 97 scoped bodies compiled with OpenWatcom. The five new bodies and
+the previously failing callers 0x6460 and 0x1f878 match their first
+prepared inputs. Callers 0x12160 and 0x13950 reach further table entries
+at 0x130a0 and 0x135cc. Three other mismatches stop at the known callback
+0xe300f, which this scope omitted. Tracing 0x12160 identifies dozens of
+additional targets from the same table, giving a basis for auditing
+more than one callback at a time. Evidence: `local/ghidra-group-followup-20261118/`
+and `local/ghidra-group-dispatch-20261118/next-dispatch-traces.json`.
