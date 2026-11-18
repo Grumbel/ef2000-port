@@ -1261,6 +1261,16 @@ ret
                              dict(ds=16, offset=0x900, bx=0, cx=0,
                                   frame=dict(vector=0x33, ds=1, es=2, fs=3, gs=4,
                                              ax=0xb, dx=0x12345678)))
+            mouse_report = asm_c_differential.verify(
+                out, root / 'mouse', image, scenarios=1, service_free_paths=True,
+                x32_mouse=True, addresses=[0x800])
+            mouse_probe = mouse_report['entries'][0]['probes'][0]
+            self.assertEqual(mouse_probe['state'], 'pass', mouse_probe)
+            mouse_events = mouse_probe['host_services']
+            self.assertEqual(mouse_events['original'], mouse_events['translated'])
+            event = mouse_events['original'][0]
+            self.assertEqual(event['after']['dx'], 0x12340000)
+            self.assertEqual(bytes.fromhex(event['frame_after'])[-4:], b'\x00\x004\x12')
             self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
             self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
             events = console_entries[0x200]['probes'][0]['host_services']

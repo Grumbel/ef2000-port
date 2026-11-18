@@ -12896,3 +12896,14 @@ frame. The runtime already implements the common mouse requests
 using per-instance input state. The cohort includes VBE and CD
 requests that require their own state. See the local
 `x32-request-cohort.json` and `raster-saved-framebuffer-replay.json`.
+
+The opt-in `--x32-mouse` prepared fixture gives the original and C
+probes separate idle mouse state using the runtime mouse handler.
+It compares the X-32 frame before and after each request and the
+returned registers. The synthetic motion request passes and checks
+the frame writeback, including preservation of the upper DX word.
+The 31-request cohort gives ten matching probes and 21 inconclusive
+results with this fixture. With saved-framebuffer preparation,
+0x278c0 and 0x28224 advance from the mouse request to the unmodeled
+VGA status port read at 0xdc2ee (port 0x3da). See local
+`x32-mouse-replay.json` and `raster-x32-mouse-replay.json`.
