@@ -12355,3 +12355,14 @@ unregistered 0xd6960 entry. Among the 699 generated tracker-blocked
 functions, 388 matched and 311 were inconclusive. The authoritative
 tracker and strict byte-comparison evidence remain unchanged.
 Report: `local/ghidra-group-followup-20261118/bulk-candidate-diff/report.json`.
+
+2026-11-18 — Added an explicit stop before a reviewed STI at a specified
+PC. Generated C returns status 0x204 at that PC with flags intact. The
+verifier labels original inputs reaching the site inconclusive. Applied
+at 0xd6745, the bulk overlay generated 4,088 bodies, five more than the
+prior run. With that full registry linked, 0x1d318, 0x5331c and 0xd6960
+each matched all 16 prepared inputs. All 16 inputs to 0xd66c2 reached
+unmodeled port I/O in the original before STI and stayed inconclusive.
+The replay used host C and the hardware x87 oracle. Tracker states and
+strict recompilation evidence are unchanged.
+Report: `local/ghidra-group-followup-20261118/bulk-sti-diff/report.json`.
