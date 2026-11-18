@@ -218,9 +218,21 @@ other: ret
                 self.assertEqual(entry['counts'], {'pass': 1}, entry)
                 self.assertEqual(entry['prepared_fixture'],
                                  {key: row[key] for key in ('registers', 'words')})
-            fixture.write_text(json.dumps([*rows, rows[0]]))
-            with self.assertRaisesRegex(ValueError, 'duplicate prepared fixture entry address'):
-                asm_c_differential.load_prepared_fixtures(fixture)
+            alternate = dict(address=first, registers={'eax': 0x350000},
+                             words=[[0x350000, 0xffffffff]])
+            fixture.write_text(json.dumps([*rows, alternate]))
+            report = asm_c_differential.verify(root/'out', root/'multiple', image, scenarios=1,
+                                               service_free_paths=True, prepared_fixtures=fixture)
+            first_entry, second_entry = report['entries']
+            self.assertEqual(first_entry['address'], first)
+            self.assertEqual(first_entry['counts'], {'pass': 1, 'inconclusive': 1}, first_entry)
+            self.assertEqual(first_entry['state'], 'inconclusive')
+            self.assertEqual([probe['fixture_index'] for probe in first_entry['probes']], [0, 1])
+            self.assertEqual(first_entry['prepared_fixtures'],
+                             [{key: row[key] for key in ('registers', 'words')}
+                              for row in (rows[0], alternate)])
+            self.assertEqual(second_entry['address'], second)
+            self.assertEqual(second_entry['counts'], {'pass': 1})
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_prepared_ram_covers_high_runtime_globals(self):

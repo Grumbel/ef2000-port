@@ -1025,8 +1025,8 @@ def load_prepared_fixtures(path):
         if not isinstance(row, dict) or set(row) != {'address', 'registers', 'words'}:
             raise ValueError('each prepared fixture requires address, registers and words')
         address, registers, words = row['address'], row['registers'], row['words']
-        if type(address) is not int or not 0 <= address <= 0xffffffff or address in fixtures:
-            raise ValueError('invalid or duplicate prepared fixture entry address')
+        if type(address) is not int or not 0 <= address <= 0xffffffff:
+            raise ValueError('invalid prepared fixture entry address')
         if not isinstance(registers, dict):
             raise ValueError('prepared fixture registers must be an object')
         if not isinstance(words, list) or any(
@@ -1034,7 +1034,7 @@ def load_prepared_fixtures(path):
                 any(type(item) is not int or not 0 <= item <= 0xffffffff for item in pair)
                 for pair in words):
             raise ValueError('prepared fixture words must be a list of u32 address/value pairs')
-        fixtures[address] = prepared_register_overrides(registers.items()), words
+        fixtures.setdefault(address, []).append((prepared_register_overrides(registers.items()), words))
     return fixtures
 
 
@@ -1415,27 +1415,38 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function = getattr(loaded, 'ef_lift_run' if program else 'ef_lift_%08x' % address)
         function.argtypes = [ctypes.POINTER(State), ctypes.c_uint32] + ([ctypes.c_uint32] if program else [])
         function.restype = ctypes.c_uint
-        entry_registers, entry_words = fixtures.get(address, (prepared_registers, ()))
-        results = isolated_probes(function, payload, address, scenarios, budget, program,
-                                  native_x87=native_x87, reject_services=reject_services,
-                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites, cpu_stop_sites=cpu_stop_sites,
-                                  dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
-                                  gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
-                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
-                                  x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint, prepared_u32=(*prepared_u32, *entry_words),
-                                  dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
-                                  prepared_registers=entry_registers.items())
+        cases = fixtures.get(address, [(prepared_registers, ())])
+        results = []
+        for case_index, (entry_registers, entry_words) in enumerate(cases):
+            case_results = isolated_probes(function, payload, address, scenarios, budget, program,
+                                      native_x87=native_x87, reject_services=reject_services,
+                                      prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites, cpu_stop_sites=cpu_stop_sites,
+                                      dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
+                                      gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
+                                      dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
+                                      x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
+                                      checkpoint=checkpoint, prepared_u32=(*prepared_u32, *entry_words),
+                                      dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
+                                      prepared_registers=entry_registers.items())
+            if len(cases) > 1:
+                for result in case_results:
+                    result['fixture_index'] = case_index
+            results.extend(case_results)
+        expected_probes = scenarios * len(cases)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
                             state='mismatch' if counts['mismatch'] else
-                            'probes-pass' if counts['pass'] == scenarios else
-                            'prefix-pass' if counts['prefix-pass'] == scenarios else 'inconclusive'))
+                            'probes-pass' if counts['pass'] == expected_probes else
+                            'prefix-pass' if counts['prefix-pass'] == expected_probes else 'inconclusive'))
         if fixtures:
-            entries[-1]['prepared_fixture'] = dict(registers=entry_registers, words=entry_words)
+            fixture_inputs = [dict(registers=registers, words=words) for registers, words in cases]
+            if len(fixture_inputs) == 1:
+                entries[-1]['prepared_fixture'] = fixture_inputs[0]
+            else:
+                entries[-1]['prepared_fixtures'] = fixture_inputs
         with progress.open('a') as stream:
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
@@ -1560,7 +1571,7 @@ def main(argv=None):
                         action='append', default=[], metavar=('ADDRESS', 'VALUE'),
                         help='initialize a little-endian u32 in prepared guest RAM')
     parser.add_argument('--prepared-fixtures', type=Path,
-                        help='JSON list of entry addresses with individual registers and RAM words')
+                        help='JSON list of entry addresses with registers and RAM words, allowing multiple cases per entry')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')

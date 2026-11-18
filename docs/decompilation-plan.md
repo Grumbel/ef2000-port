@@ -14752,3 +14752,14 @@ snapshot matching this candidate's payload and entry inventory.
 The original 0x604 snapshot still matches through return. Its separate
 local report `bulk-cpu-boundaries-retained-captures.jsonl` has SHA-256
 `4a33290bc0c08166dd6ddc71bb25dcfb9aba62869cb7b3c922ab369f297523b8`.
+
+#### Group prepared branch inputs in a single verifier run
+
+A prepared fixture file may repeat an entry address. The verifier compiles
+and links the candidate once, tests each row in fresh guest state, and emits
+one report entry per address. For an address with multiple rows, its
+`prepared_fixtures` array lists the inputs in file order and each probe's
+zero-based `fixture_index` identifies its row. `--scenarios` applies to
+each row. A mismatch in any row determines the entry verdict, and an
+inconclusive row prevents an all-pass verdict. Reports for addresses with
+one row retain `prepared_fixture`.
