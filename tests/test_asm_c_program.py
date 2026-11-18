@@ -1275,6 +1275,12 @@ ret
             read_event = write_events['original'][-1]
             self.assertEqual(read_event['input_sha256'], hashlib.sha256(b'EXAM').hexdigest())
             self.assertEqual((read_event['after']['cx'], read_event['after']['dx']), (0, 0))
+            short_report = asm_c_differential.verify(
+                out, root / 'short-budget', image, scenarios=1, budget=1,
+                service_free_paths=True, dos_empty_drive=True, addresses=[0x700])
+            short_probe = short_report['entries'][0]['probes'][0]
+            self.assertEqual(short_probe['state'], 'inconclusive')
+            self.assertEqual(short_probe['original_budget_stop'], dict(pc=0x705, budget=1))
 
         self.assertEqual(console_report['dos_invalid_open_policy'], 'prepared-only')
         self.assertEqual(console_entries[0x500]['state'], 'probes-pass')

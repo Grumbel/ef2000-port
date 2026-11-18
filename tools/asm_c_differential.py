@@ -524,8 +524,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        **detail)
     if stopped_at is not None:
         return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
-    if original_exit is None and cpu.reg_read(x86_const.UC_X86_REG_EIP) != sentinel:
-        return outcome(state='inconclusive', reason='original instruction budget exhausted')
+    if original_exit is None:
+        next_pc = cpu.reg_read(x86_const.UC_X86_REG_EIP)
+        if next_pc != sentinel:
+            return outcome(state='inconclusive', reason='original instruction budget exhausted',
+                           original_budget_stop=dict(pc=next_pc, budget=budget))
     if reloads is not None:
         reloads.finish()
     native_memory = (ctypes.c_uint8 * memory_size).from_buffer(memory)

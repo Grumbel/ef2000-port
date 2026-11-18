@@ -12847,3 +12847,15 @@ test reads eight requested bytes from a four-byte file and compares
 the loaded value after the short read. The 68-probe replay preserves
 58 passes, nine inconclusive results and the known raster mismatch.
 See local `dos-read-flush-regression.json`.
+
+The 0xac57c empty-drive probe processes a 320 by 200 image. At a
+500,000-instruction budget the most frequently visited address was
+0xd1b9e (4,800 visits), in the pixel loop bounded by the image width.
+The original was still issuing 4 KiB writes at a five-million-instruction
+budget. At eight million, the same prepared probe passes with 36
+matching DOS service events and no reported state differences. This
+uses the existing translated library and does not increase the default
+budget. See local `profile-dos-budget.json`,
+`dos-long-path-replay.json`, and `dos-eight-million-replay.json`.
+Original-side budget stops now report the next guest PC and the
+configured budget. The synthetic single-instruction probe checks both.
