@@ -13191,3 +13191,16 @@ Of the 24 entries whose first service stop was one of these operations,
 13 matched under the prepared fixtures. Nine advanced to an STI
 boundary and two advanced to another unsupported service. See
 local/ghidra-group-followup-20261118/bulk-x32-vector-replay.jsonl.
+
+### 2026-11-18 — Compare X-32 heap queries and DOS paragraph allocations
+
+The prepared heap fixture now delegates X-32 AX=350Bh to the startup
+heap query model. With the DOS aperture mapped it also compares AH=48h
+using independent conventional-memory allocators. Both services record
+requests and responses in the interrupt transcript.
+
+Six of the ten entries selected by those first service stops matched
+under the prepared fixtures. Two advanced to a VBE controller-information
+request (AX=4F00h through the X-32 real-mode bridge), and two reached
+zero-paragraph allocations, which the shared model rejects. See
+local/ghidra-group-followup-20261118/bulk-x32-memory-replay-verified.jsonl.

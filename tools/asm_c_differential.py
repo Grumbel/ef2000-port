@@ -202,6 +202,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
 
     original_heap = x32_allocation.Allocation() if x32_heap else None
     translated_heap = x32_allocation.Allocation() if x32_heap else None
+    conventional_allocators = {}
+    if x32_heap and (prepared_memory_size or 0) >= dos_end:
+        conventional_allocators = {side: unicorn_backend.ConventionalMemory()
+                                   for side in ('original', 'translated')}
     drive_directory = None
     drives = {}
     real_mode_handlers = {}
@@ -223,6 +227,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 raise ValueError('X-32 heap request exhausted the allocator')
             ax, cx, flags = grown
             response = dict(values, ax=ax, cx=cx, flags=flags)
+            events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
+            return response
+        if heap is not None and vector == 0x21 and values['ax'] & 0xffff == 0x350b:
+            response = unicorn_backend.serve_startup_int21(ip, values, allocation=heap)
+            events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
+            return response
+        if conventional_allocators and vector == 0x21 and (values['ax'] >> 8) & 0xff == 0x48:
+            response = conventional_allocators[side].allocate(values)
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
         if x32_vectors and vector == 0x21 and values['ax'] & 0xffff in (
@@ -1253,6 +1265,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   prepared_memory_size=prepared_memory_size or 0x400000,
                   prepared_raster='320x200-scratch' if prepared_raster else None,
                   prepared_u32=[dict(address=offset, value=value) for offset, value in prepared_u32],
+                  dos_conventional_policy='prepared-aperture-only'
+                  if x32_heap and (prepared_memory_size or 0) >= unicorn_backend.DOS_BASE + real_mode.MEMORY_SIZE
+                  else 'disabled',
                   x32_heap_policy='prepared-only' if x32_heap else 'disabled',
                   x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
                                         if x32_heap else None,
@@ -1308,7 +1323,7 @@ def main(argv=None):
     parser.add_argument('--dos-console', action='store_true',
                         help='with --service-free-paths, model DOS console writes and exit on prepared probes')
     parser.add_argument('--x32-heap', action='store_true',
-                        help='with --service-free-paths, model X-32 heap growth on prepared probes')
+                        help='with --service-free-paths, model X-32 heap requests and DOS paragraph allocation with mapped DOS RAM')
     parser.add_argument('--x32-mouse', action='store_true',
                         help='compare X-32 mouse calls with separate idle mouse state')
     parser.add_argument('--x32-no-cd', action='store_true',
