@@ -593,8 +593,9 @@ def mutable_immediate(insn):
         expected = ('reg', (modrm >> 3) & 7, bits, 0)
         offset, width = prefix+2, bits if opcode == 0x69 else 8
         signed = opcode == 0x6b
-    elif opcode in (0x04, 0x05) and insn['mnemonic'] == 'add':
-        bits = 8 if opcode == 0x04 else 16 if prefix else 32
+    elif ((opcode in (0x04, 0x05) and insn['mnemonic'] == 'add') or
+          (opcode in (0x2c, 0x2d) and insn['mnemonic'] == 'sub')):
+        bits = 8 if not opcode & 1 else 16 if prefix else 32
         expected = ('reg', 0, bits, 0)
         offset, width = prefix+1, bits
     elif 0xb0 <= opcode <= 0xb7 and insn['mnemonic'] == 'mov':

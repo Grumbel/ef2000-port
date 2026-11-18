@@ -13113,3 +13113,19 @@ results attached to their respective prepared inputs.
 
 See local/ghidra-group-followup-20261118/
 raster-current-dispatch-{replay,prefix}.json.
+
+### 2026-11-18 — Read the live accumulator SUB immediate in generated C
+
+The prepared replay of 0x843b0, 0x844b0, 0x84544 and 0x845c0 exposed
+the camera-origin writes already observed in the native hybrid. The
+bulk dispatch guard stopped at 0xc4755 because the accumulator form
+of SUB was missing from its mutable-immediate decoder. The decoder now
+recognizes opcodes 0x2c and 0x2d, using the same live immediate read and
+fixed-byte checks as accumulator ADD. The following two camera-origin
+SUB instructions already use the supported 0x81 register encoding.
+
+Synthetic translated-vs-original comparisons cover patched 8-, 16-,
+and 32-bit accumulator operands. The existing opcode-change test still
+rejects modified opcode bytes. The four original entries are queued
+for a new generated-C comparison. The existing hybrid redirect
+exclusion at 0xc4755 stays in place.

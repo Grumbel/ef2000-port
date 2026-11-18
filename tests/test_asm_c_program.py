@@ -448,15 +448,21 @@ ret
                                 for p in report['entries'][0]['probes']))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
-    def test_patched_imul_and_accumulator_add_immediates_match(self):
+    def test_patched_imul_and_accumulator_arithmetic_immediates_match(self):
         source = '''.type root,@function
 root: mov ecx, 3
 mov dword ptr [full+2], 0x19
 mov byte ptr [short_imm+2], 0xfb
 mov word ptr [bias+2], 0x1234
+mov dword ptr [origin+1], 0x80000004
+mov word ptr [origin16+2], 0x8005
+mov byte ptr [origin8+1], 0x80
 full: .byte 0x69, 0xc1, 0x78, 0x56, 0x34, 0x12
 short_imm: .byte 0x6b, 0xc0, 0x03
 bias: .byte 0x66, 0x05, 0x78, 0x56
+origin: .byte 0x2d, 0x78, 0x56, 0x34, 0x12
+origin16: .byte 0x66, 0x2d, 0x78, 0x56
+origin8: .byte 0x2c, 0x78
 ret
 .size root, .-root'''
         with tempfile.TemporaryDirectory() as temporary:
