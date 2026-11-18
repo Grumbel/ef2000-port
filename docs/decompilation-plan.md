@@ -13507,3 +13507,22 @@ bulk-gameport-bios-x87-caller-inputs.jsonl in
 local/ghidra-group-followup-20261118. The corresponding replay
 scripts are replay-bulk-gameport-bios-x87-caller-checkpoints.py and
 replay-bulk-gameport-bios-x87-callers.py.
+
+### 2026-11-18 — Verify two linked-list fault groups with prepared arguments
+
+The default zero-register probe left nine entries at the list count
+instruction 0xbc5d9 and eight at the lookup instruction 0xcc1b5.
+Disassembly identified the register carrying each list header and
+the additional register or stack arguments used by the callers.
+With initialized list headers and caller inputs, all 17 entries
+matched through return with both an empty primary list and a
+two-node primary list. The total with at least one complete prepared
+comparison is 3,805 of 4,353 entries.
+
+In local/ghidra-group-followup-20261118, the replay scripts are
+replay-bulk-gameport-bios-lists.py and
+replay-bulk-gameport-bios-list-callers.py. The combined passing inputs
+are bulk-list-empty-prepared-fixtures.json and
+bulk-list-two-node-prepared-fixtures.json. The individual run outcomes
+are in bulk-gameport-bios-list-inputs.jsonl and
+bulk-gameport-bios-list-caller-inputs.jsonl.
