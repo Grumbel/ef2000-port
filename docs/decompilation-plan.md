@@ -12795,3 +12795,16 @@ full probes remain mismatches. Local evidence is in
 `bulk-threaded-body-diff/report.json` and
 `threaded-body-replay-trace.json`, produced by
 `verify-threaded-body.py` and `trace-threaded-body-replay.py`.
+
+An experimental inventory adds the contiguous nine-instruction body
+at 0xc63e4 through 0xc6407 exclusive. This is a local overlay with
+unresolved dynamic closure. It includes the indirect call and tail
+in the body, and the generator reports both as dynamic transfers.
+The existing dispatcher guards instruction bytes and stops at any
+missing target. All five empty-drive replays pass end to end with
+this overlay, with matching DOS exit status through the call at
+0xc63ec. The probes never reach 0xc63f3 or 0xc6401, whose destinations
+remain unverified. The build emits 4,344 bodies. The local command
+is `verify-threaded-continuation.py` and the report is
+`bulk-threaded-continuation-diff/report.json`. The inventory suite
+and both dispatcher tests for indirect targets passed (23 tests).
