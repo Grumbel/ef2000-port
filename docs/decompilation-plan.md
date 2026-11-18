@@ -13850,3 +13850,19 @@ as guest state.
 The prepared-match total is now 3,867 of 4,353 entries. See
 replay-bulk-gameport-bios-palette-fades.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify packed vertex loops with nonzero counts
+
+Five entries previously exhausted the instruction budget in
+the vertex conversion loops at 0xc48dc and 0xc4a98. The loops
+execute the first iteration before checking termination, so a
+zero count in the baseline does not describe an empty polygon.
+Entries 0xc48dc and 0xc8c78 take a register count and coordinate
+pointer. The 0xc49c4 entry reads a packed count, byte attributes
+and coordinate pairs. Wrappers 0xd7c40 and 0xd7cb8 read their
+counted coordinate data from 0x420e80.
+
+All ten isolated probes matched through return using three
+and four vertices. The prepared-match total is now 3,872 of
+4,353 entries. See replay-bulk-gameport-bios-raster-counts.py
+and its JSONL output under local/ghidra-group-followup-20261118.
