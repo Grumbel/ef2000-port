@@ -160,16 +160,17 @@ uint8_t start_device_a41dc(void)
 /* 0xa4cb4, 217 bytes. Activate widget slot idx: run its callback and queue it for redraw. */
 void activate_widget_a4cb4(uint16_t index)
 {
-    ef_addr32 widget;
+    ef_addr32 widget, on_open;
 
     if (index == 0 || index > EF_U16(0x0041eed8u))
         return;
     if ((EF_U8(EF_U32(0x0041edfcu + (uint32_t)index * 4u) + 0x3bu) & 4u) != 0)
         return;
-    guest_fn_a4a94(0);
+    guest_fn_a4a94(index);
     widget = EF_U32(0x0041edfcu + (uint32_t)index * 4u);
-    if (EF_U32(widget + 0xb9u) != 0)
-        ((void (*)(void))EF_U32(widget + 0xb9u))();
+    on_open = EF_U32(widget + 0xb9u);
+    if (on_open != 0)
+        guest_callptr_eax_x(on_open, widget);
     guest_fn_a499c(index);
     if (EF_U8(EF_U32(0x0041edfcu + (uint32_t)index * 4u) + 0xc1u) == 1) {
         uint16_t count;

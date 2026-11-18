@@ -12979,3 +12979,19 @@ pointer fault, 27 matched on one prepared input and 11 remain
 inconclusive. All 38 were inconclusive in the control with identical
 RAM size and service options. See local `bios-tick-replay.json` and
 `bios-tick-control.json`.
+
+### 2026-11-18 — Repair widget activation callbacks
+
+The native Mitarbeiter sequence reproduced the layout-allocation error and
+secondary teardown fault. The original credits callback capture at 0x371b0
+received the widget in EAX. The faulty hybrid passed the address of its
+on-open callback field, which yielded a zero widget width and exhausted the
+arena without advancing over the first glyph. At original 0xa4ceb, EAX is
+the widget slot index. At 0xa4d01, EAX is the reloaded widget pointer.
+The C activation now supplies both arguments using the existing guest
+call interfaces. No change to allocator or formatter behavior.
+
+OpenWatcom compiled game_helpers51.c with zero warnings. Relinking that
+object into the same hybrid and replaying the click on private Xvfb
+displayed the full Mitarbeiter panel. The baseline and corrected runs
+and original entry capture are under local/early-game-regressions-9R5aDI/.
