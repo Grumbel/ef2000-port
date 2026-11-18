@@ -13965,3 +13965,16 @@ the callers' VBE mode selection.
 The prepared-match total is now 3,883 of 4,353 entries. See
 replay-bulk-gameport-bios-video-init.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare glyph metrics from bitmap runs
+
+Entry 0xe17f8 exhausted its baseline budget while looking for an
+occupied bitmap column. Prepared probes now match through return
+on an empty glyph list, one glyph, and three glyphs with distinct
+widths and intervening blank columns. The comparisons cover both
+default table writes and the per-glyph span and row metrics.
+The populated cases use one font bank and one occupied bitmap row.
+
+The prepared-match total is now 3,884 of 4,353 entries. See
+replay-bulk-gameport-bios-glyph-runs.py and its JSONL output under
+local/ghidra-group-followup-20261118.
