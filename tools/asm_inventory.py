@@ -2,7 +2,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Export reproducible ASM windows or Ghidra body ranges under local/.
+"""Export reproducible ASM inventories or audit observed boundary gaps under local/.
 
 Tracker sizes are not verified function extents. This is a decoding inventory,
 not a control-flow recovery pass or evidence that decoded bytes are code.
@@ -192,6 +192,50 @@ def load_body_ranges(path, payload):
     return bodies, hashlib.sha256(source).hexdigest()
 
 
+def audit_trace_gaps(payload, body_ranges, trace_path):
+    """Group observed entries into runs of PCs absent from the reviewed layout."""
+    bodies, body_digest = load_body_ranges(body_ranges, payload)
+    source = trace_path.read_bytes()
+    document = json.loads(source)
+    payload_digest = hashlib.sha256(payload).hexdigest()
+    if (not isinstance(document, dict) or document.get('payload_sha256') != payload_digest or
+            not isinstance(document.get('entries'), list)):
+        raise ValueError('invalid or mismatched trace provenance')
+    if any(body.get('instruction_spans') is None for body in bodies.values()):
+        raise ValueError('trace audit requires instruction spans for every body')
+    owned = {pc for body in bodies.values()
+             for pc, _ in normalized_layout(body['instruction_spans'], payload)}
+    gaps = {}
+    for entry in document['entries']:
+        if not isinstance(entry, dict) or type(entry.get('root')) is not int or not isinstance(entry.get('trace'), list):
+            raise ValueError('invalid trace entry')
+        root = entry['root']
+        previous = None
+        gap = None
+        for step in entry['trace']:
+            pc = step[0] if isinstance(step, list) and len(step) == 2 else step
+            if type(pc) is not int or not 0 <= pc <= 0xffffffff:
+                raise ValueError('invalid trace PC')
+            if pc >= len(payload) or pc in owned:
+                gap = None
+            else:
+                if gap is None:
+                    key = (previous, pc)
+                    if key not in gaps:
+                        gaps[key] = dict(source=previous, target=pc, hits=0, roots=set(), observed_pcs=set())
+                    gap = gaps[key]
+                    gap['hits'] += 1
+                    gap['roots'].add(root)
+                gap['observed_pcs'].add(pc)
+            previous = pc if pc < len(payload) else None
+    entries = sorted(gaps.values(), key=lambda gap: (gap['target'], gap['source'] if gap['source'] is not None else -1))
+    for gap in entries:
+        gap['roots'] = sorted(gap['roots'])
+        gap['observed_pcs'] = sorted(gap['observed_pcs'])
+    return dict(schema=1, payload_sha256=payload_digest, body_ranges_sha256=body_digest,
+                trace_sha256=hashlib.sha256(source).hexdigest(), entries=entries)
+
+
 def export_inventory(image, rows, output, *, objdump='objdump', runner=subprocess.run,
                      body_ranges=None, skip_missing_bodies=False):
     """Caller supplies a validated payload. Never change tracker recovery states."""
@@ -296,7 +340,10 @@ def main(argv=None):
     parser.add_argument('--body-ranges', type=Path, help='payload-bound Ghidra body-ranges.json')
     parser.add_argument('--skip-missing-bodies', action='store_true',
                         help='omit tracker entries without Ghidra bodies and list them in the manifest')
+    parser.add_argument('--trace-gaps', type=Path, help='audit a payload-bound execution trace against --body-ranges')
     args = parser.parse_args(argv)
+    if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
+        parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
         parser.error('--skip-missing-bodies requires --body-ranges and a bulk selection')
     try:
@@ -304,6 +351,14 @@ def main(argv=None):
         if not output.is_relative_to(ghidra_ef2000.ROOT / 'local'):
             raise ValueError('original ASM exports must stay under the ignored local/ directory')
         workspace = ghidra_ef2000.validated_workspace(args.workspace)
+        if args.trace_gaps:
+            payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
+            report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps)
+            with output.open('x') as stream:
+                json.dump(report, stream, indent=2)
+                stream.write('\n')
+            print(f'Audited {len(report["entries"])} observed gap edges to {output}')
+            return
         rows = decomp_status.read_tracker(args.tracker)
         if args.address:
             requested = set(args.address)

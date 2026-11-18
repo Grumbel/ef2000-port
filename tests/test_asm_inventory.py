@@ -12,6 +12,30 @@ from tools import asm_inventory, asm_to_c
 
 
 class InventoryTests(unittest.TestCase):
+    def test_trace_gaps_group_runs_and_ignore_out_of_image_markers(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image = root/'payload.bin'
+            payload = bytes.fromhex('9bd9e8c390909090')
+            image.write_bytes(payload)
+            bodies = self.write_bodies(root, image, [dict(address=0, ranges=[[0, 4]],
+                instruction_spans=[[0, 3], [3, 1]])])
+            trace = root/'trace.json'
+            document = dict(payload_sha256=hashlib.sha256(payload).hexdigest(), entries=[
+                dict(root=0, trace=[[0, 1], [1, 2], [4, 1], [5, 1], [3, 1], [99, 1]]),
+                dict(root=1, trace=[1, 4, 6, 99, 7]),
+            ])
+            trace.write_text(json.dumps(document))
+            result = asm_inventory.audit_trace_gaps(payload, bodies, trace)
+            self.assertEqual(result['entries'], [
+                dict(source=1, target=4, hits=2, roots=[0, 1], observed_pcs=[4, 5, 6]),
+                dict(source=None, target=7, hits=1, roots=[1], observed_pcs=[7]),
+            ])
+            document['payload_sha256'] = 'invalid'
+            trace.write_text(json.dumps(document))
+            with self.assertRaisesRegex(ValueError, 'trace provenance'):
+                asm_inventory.audit_trace_gaps(payload, bodies, trace)
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

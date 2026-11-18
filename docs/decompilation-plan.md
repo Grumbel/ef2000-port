@@ -12223,3 +12223,14 @@ at 0x130a0 and 0x135cc. Three other mismatches stop at the known callback
 additional targets from the same table, giving a basis for auditing
 more than one callback at a time. Evidence: `local/ghidra-group-followup-20261118/`
 and `local/ghidra-group-dispatch-20261118/next-dispatch-traces.json`.
+
+2026-11-18 — Added `asm_inventory.py --trace-gaps` to batch observed
+missing instruction entries against a payload-bound Ghidra body export.
+The report hashes both inputs, normalizes split WAIT instructions and
+groups consecutive uncovered PCs by the observed incoming edge. It
+records candidates for review without inferring body extents from
+prepared-input execution. All 13 inventory tests passed. Comparing
+four recorded group dispatch traces against the 4,296-body inventory
+finds 50 incoming edges to 49 distinct uncovered entries. The indexed
+CALL at 0x12188 accounts for 42 edges, which can now be reviewed as one
+table. Report: `local/ghidra-group-followup-20261118/trace-gap-audit.json`.
