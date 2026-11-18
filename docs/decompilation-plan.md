@@ -13234,3 +13234,26 @@ checkpoint result covers execution up to the callback's entry.
 
 See local/ghidra-group-followup-20261118/bulk-vbe-cleanup-prefix.jsonl
 and verify-cleanup-candidate.py in the same directory.
+
+### 2026-11-18 — Compare legacy BIOS video-mode operations
+
+The combined replay of the 124 prepared entries with a recorded
+service-stop request produced 34 matches, 89 inconclusive probes, and
+one mismatch at the missing cleanup entry. This includes matches from
+the individual DOS date, vector, allocator, and VBE fixture replays.
+
+Six entries stopped at the legacy INT 10h video-mode query. The
+prepared VBE fixture now handles that query and mode changes to
+0x03 and 0x13 through the existing BIOS model. Mode changes compare
+DOS memory writes as well as the interrupt transcript.
+
+All six entries then complete on the original side. With the existing
+generated library they match through the first visit to 0xfe700.
+The full C runs stop there because the library omitted its INT 10h
+site at 0xfe705. The related mode-setting function 0xfe710 also has
+two omitted sites at 0xfe71a and 0xfe71e. A new build admits these
+three sites for a full comparison.
+
+See local/ghidra-group-followup-20261118/
+bulk-service-stops-current-replay.jsonl, bulk-bios-mode-change-replay.jsonl,
+and bulk-bios-mode-prefix.jsonl.

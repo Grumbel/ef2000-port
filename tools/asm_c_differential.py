@@ -258,6 +258,25 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 raise ValueError('X-32 residency query is outside the lock/unlock fixture')
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
+        video_ax = values['ax'] & 0xffff
+        if x32_vbe and vector == 0x10 and (video_ax >> 8 == 0x0f or video_ax & 0xff7f in (3, 0x13)):
+            if side not in real_mode_handlers:
+                real_mode_handlers[side] = real_mode.RealMode()
+            request = [real_mode.MAGIC, 0, values['ax'], values['bx'], values['cx'],
+                       values['dx'], values['si'], values['di'], 0, 0, 0, 0,
+                       values['flags'], vector]
+            conventional = bytes(read(dos_base, real_mode.MEMORY_SIZE)) if video_ax >> 8 == 0 else b''
+            packet, updated_dos = real_mode_handlers[side].video(request, conventional)
+            result = real_mode.PACKET.unpack(packet)
+            response = dict(values, ax=result[2], bx=result[3])
+            event = dict(ip=ip, vector=vector, before=dict(values), after=response)
+            if conventional:
+                if updated_dos != conventional:
+                    write(dos_base, updated_dos)
+                event['dos_memory'] = dict(before_sha256=hashlib.sha256(conventional).hexdigest(),
+                                           after_sha256=hashlib.sha256(updated_dos).hexdigest())
+            events.append(event)
+            return response
         if (x32_mouse or x32_no_cd or x32_vbe) and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
             offset = values['dx']
             if ds not in (16, 24) or not 0x260 < offset <= memory_size - 18:
@@ -1274,7 +1293,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_residency_policy='prepared-only' if x32_residency else 'disabled',
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   x32_no_cd_policy='no-cd-prepared-only' if x32_no_cd else 'disabled',
-                  x32_vbe_policy='controller-info-mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
+                  x32_vbe_policy='controller-info-mode-info-scanline-and-legacy-video-mode-prepared-only' if x32_vbe else 'disabled',
                   x32_vector_policy='flat-prepared-only' if x32_vectors else 'disabled',
                   dos_clock_date='2026-11-18' if dos_clock else None,
                   dos_clock_sample='12:34:56.78Z' if dos_clock else None,
@@ -1329,7 +1348,7 @@ def main(argv=None):
     parser.add_argument('--x32-no-cd', action='store_true',
                         help='compare X-32 MSCDEX requests with CD support absent')
     parser.add_argument('--x32-vbe', action='store_true',
-                        help='compare X-32 VBE controller-info, mode-info and scanline requests against prepared DOS RAM')
+                        help='compare X-32 VBE requests and legacy BIOS video modes using prepared DOS RAM')
     parser.add_argument('--x32-vectors', action='store_true',
                         help='compare X-32 interrupt vector queries and updates with separate flat tables')
     parser.add_argument('--dos-clock', action='store_true',
