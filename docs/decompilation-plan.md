@@ -14229,3 +14229,19 @@ These probes raise the complete-match total to 3,893 of 4,354 generated
 entries. See replay-bulk-gameport-bios-vfx-orientation.py and its JSONL
 output under local/ghidra-group-followup-20261118. Physical headset
 behavior remains unverified.
+
+### 2026-11-18 — Compare script and menu branches
+
+Six prepared probes match through return without DOS exit. At 0xa8958,
+the skip flag suppresses drawing. At 0xa9aa8, the already-active path
+sets its status byte, and the prepared formatting path reaches the
+formatter without entering the keyboard wait. At 0xa9130, three
+unconditional branch records cover updating the script pointer with
+and without pushing a return address. Separate checkpoints confirm
+that the probes reach their expected branches.
+
+These comparisons bring the complete-match total to 3,896 of 4,354
+generated entries. The drawing, keyboard-wait and other script paths
+still need complete comparisons. See
+replay-bulk-gameport-bios-script-menu-branches.py and its JSONL output
+under local/ghidra-group-followup-20261118.
