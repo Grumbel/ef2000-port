@@ -35,6 +35,9 @@ regression harness, but it is not the goal.
   extender/compiler runtime 48 / 21 KB; untriaged GUI 43 / 21 KB; guest-call
   routing drafts 88 / 11 KB; register thunks 50; smaller classes. Most of these
   were skipped during triage and were never actually attempted.
+- Hybrid candidates (compiles or later, not in `hybrid-exclude.tsv`):
+  3,003 functions, 384 KB (42.0 %). This is an upper bound; recent link
+  reports redirect about 2,600-2,700.
 - Readability (`tools/readability_metrics.py`): `literal` 11,893 raw
   global accesses, `computed` 13,854 raw pointer accesses, `unnamed` 4,203
   `guest_fn_*` calls, 568 named globals, 14 struct headers. `misc_drafts1.c`
@@ -151,9 +154,12 @@ with no original code bytes executed.
 - One commit per tranche or per fix. Do not create separate `docs:` commits
   that record evidence for an earlier commit; put the evidence in that
   commit's message.
-- Every tranche commit body lists the output of
-  `tools/decomp_status.py summary` (first table only),
-  `tools/readability_metrics.py`, and the Stream A regression result.
+- Every tranche commit body lists the milestone table, the hybrid
+  candidate row and the readability line from `nix run .#status`
+  (`tools/decomp_status.py status`), plus the Stream A regression result.
+  Pass `--link-report` with the `hybrid_link.py --report` output when a
+  tranche relinks the hybrid, so that the exact redirect count is recorded
+  as well.
 - If ten consecutive commits move none of these numbers, stop. Write one
   progress line that says why, and switch to the next item in the order
   above instead of building new infrastructure.

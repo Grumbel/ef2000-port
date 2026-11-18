@@ -142,10 +142,32 @@ class DecompStatusTest(unittest.TestCase):
         self.assertIn('Inventory: 4 functions; 40 original body bytes', lines)
         self.assertTrue(any('Compiles or later' in line and '50.0%' in line for line in lines))
         self.assertTrue(any('Verified equivalence' in line and '25.0%' in line for line in lines))
-        self.assertIn('Byte-identical recompilation', out.getvalue())
+        self.assertIn('Byte-identical recompilation is frozen', out.getvalue())
+        self.assertIn('Readability (decomp/src', out.getvalue())
+        detail = io.StringIO()
+        decomp_status.status(rows, detail, byte_match=True)
+        self.assertIn('Byte-identical recompilation (strict', detail.getvalue())
         empty = io.StringIO()
         decomp_status.status([], empty)
         self.assertIn('0.0%', empty.getvalue())
+
+    def test_status_hybrid_candidates_skip_excluded_and_unlinked_states(self):
+        root = self.root / 'root'
+        write(root / 'decomp/symbols/hybrid-exclude.tsv',
+              '# SPDX header\naddr\treason\n0x00000110\tkeep original\n')
+        write(root / 'decomp/src/m.c', 'EF_U32(0x1234u) = 1; guest_fn_abcd();\n')
+        rows = []
+        for index, state in enumerate(('compiles', 'compiles', 'verified', 'blocked')):
+            row = decomp_status.new_row(0x100 + index * 16, 10, '')
+            row['state'] = state
+            rows.append(row)
+        out = io.StringIO()
+        decomp_status.status(rows, out, root=root,
+                             link_report={'functions_redirected': 2, 'excluded_functions': 1})
+        text = out.getvalue()
+        self.assertRegex(text, r'Hybrid candidates \(not excluded\)\s+2\s+20\s+50\.0%')
+        self.assertIn('Link report: 2 functions redirected, 1 excluded', text)
+        self.assertIn('literal=1 computed=0 unnamed=1', text)
 
     def test_translation_blockers_overlap_and_missing_inventory(self):
         rows = [decomp_status.new_row(address, 10, '')

@@ -48,8 +48,8 @@
   append to `docs/decompilation-plan.md` except to update status markers.
   Do not commit hashes of `local/` files, per-probe narratives, or new
   `decomp-batch-*.md` files.
-- Every tranche commit reports `tools/decomp_status.py summary`,
-  `tools/readability_metrics.py` and the hybrid regression result. Work
+- Every tranche commit reports `nix run .#status` (tracker, hybrid
+  candidates, readability) and the hybrid regression result. Work
   that moves none of these numbers for ten commits is off track: stop and
   move to the next item in rev 5.
 - The instruction lifter (`tools/asm_c_program.py`,

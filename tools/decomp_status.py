@@ -266,8 +266,17 @@ def differential_summary(rows, translation_path, differential_path):
                              counts=counts, sizes=sizes, missing_sizes=missing_sizes)
 
 
+def read_hybrid_excludes(path):
+    """Addresses listed in decomp/symbols/hybrid-exclude.tsv (comments skipped)."""
+    if not path.exists():
+        return set()
+    lines = [line for line in path.read_text().splitlines()
+             if line.strip() and not line.startswith('#')]
+    return {parse_addr(row['addr']) for row in csv.DictReader(lines, delimiter='\t')}
+
+
 def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None,
-           differential=None):
+           differential=None, link_report=None, byte_match=False):
     """Report recorded evidence, without treating compilation as equivalence."""
     total = len(rows)
     total_bytes = sum(int(row['size']) for row in rows)
@@ -293,6 +302,36 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None
     print('Counts describe tracker states, including C and assembly; blocked rows may contain drafts.', file=out)
     print('Bytes are summed original function body sizes, not unique image coverage or generated C size.', file=out)
     print('Compilation does not prove a match. Verified means recorded behavioral evidence.', file=out)
+    excludes = read_hybrid_excludes(root / 'decomp/symbols/hybrid-exclude.tsv')
+    candidates = [row for row in rows if row['state'] in ('compiles', 'spliced', 'verified')
+                  and parse_addr(row['addr']) not in excludes]
+    size = sum(int(row['size']) for row in candidates)
+    share = 100.0 * size / total_bytes if total_bytes else 0.0
+    print(f'{"Hybrid candidates (not excluded)":<34} {len(candidates):>10,} {size:>12,} {share:>7.1f}%',
+          file=out)
+    print('Hybrid candidates are compiles-or-later rows not in hybrid-exclude.tsv; an upper bound,'
+          ' the linker drops more.', file=out)
+    if link_report is not None:
+        print(f"Link report: {link_report['functions_redirected']:,} functions redirected, "
+              f"{link_report['excluded_functions']:,} excluded", file=out)
+    from readability_metrics import collect
+    metrics, _ = collect(root)
+    print('Readability (decomp/src, lower is better): '
+          f"literal={metrics['literal']:,} computed={metrics['computed']:,} "
+          f"unnamed={metrics['unnamed']:,}; named globals={metrics['named_globals']:,}, "
+          f"struct headers={metrics['struct_headers']:,}", file=out)
+    if byte_match or recompilation is not None:
+        recompilation_section(rows, out, recompilation, root)
+    else:
+        print('Byte-identical recompilation is frozen (plan rev 5); --byte-match shows it.', file=out)
+    print('No recompilation or game tests run here.', file=out)
+    if translation is not None:
+        translation_blockers(rows, translation, out)
+    if differential is not None:
+        differential_section(differential, out)
+
+
+def recompilation_section(rows, out, recompilation, root):
     from recompilation_status import current, read_report, DEFAULT_REPORT
     records = read_report(DEFAULT_REPORT if recompilation is None else recompilation)['records']
     counts = collections.Counter()
@@ -307,26 +346,25 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None
     for state in ('exact', 'different', 'not-comparable', 'not-measured', 'stale'):
         print(f'  {state:<18} {counts[state]:>8,} functions {sizes[state]:>10,} body bytes', file=out)
     print('Stale evidence is excluded from matches; a difference is not a behavioral failure.', file=out)
-    print('No recompilation or game tests run here.', file=out)
-    if translation is not None:
-        translation_blockers(rows, translation, out)
-    if differential is not None:
-        states = ('probes-pass', 'inconclusive', 'mismatch', 'unmeasured')
-        print('Prepared differential inputs for all emitted C bodies:', file=out)
-        for state in states:
-            size = ('unknown' if state in differential['missing_sizes']
-                    else f"{differential['sizes'][state]:,}")
-            print(f"  {state:<18} {differential['counts'][state]:>8,} functions "
-                  f'{size:>10} body bytes', file=out)
-        print('Prepared differential inputs for generated blocked functions:', file=out)
-        for state in states:
-            print(f"  {state:<18} {differential['blocked'][state]:>8,} functions "
-                  f"{differential['blocked_sizes'][state]:>10,} body bytes", file=out)
-        if differential['blocked_stops']:
-            print('Inconclusive blocked functions by stop reason (groups may overlap):', file=out)
-            for reason, count in sorted(differential['blocked_stops'].items(),
-                                        key=lambda item: (-item[1], item[0])):
-                print(f'  {reason:<22} {count:>8,} functions', file=out)
+
+
+def differential_section(differential, out):
+    states = ('probes-pass', 'inconclusive', 'mismatch', 'unmeasured')
+    print('Prepared differential inputs for all emitted C bodies:', file=out)
+    for state in states:
+        size = ('unknown' if state in differential['missing_sizes']
+                else f"{differential['sizes'][state]:,}")
+        print(f"  {state:<18} {differential['counts'][state]:>8,} functions "
+              f'{size:>10} body bytes', file=out)
+    print('Prepared differential inputs for generated blocked functions:', file=out)
+    for state in states:
+        print(f"  {state:<18} {differential['blocked'][state]:>8,} functions "
+              f"{differential['blocked_sizes'][state]:>10,} body bytes", file=out)
+    if differential['blocked_stops']:
+        print('Inconclusive blocked functions by stop reason (groups may overlap):', file=out)
+        for reason, count in sorted(differential['blocked_stops'].items(),
+                                    key=lambda item: (-item[1], item[0])):
+            print(f'  {reason:<22} {count:>8,} functions', file=out)
 
 
 def read_calls(path):
@@ -445,6 +483,10 @@ def main(argv=None):
     status_parser = sub.add_parser('status')
     status_parser.add_argument('--recompilation', type=Path,
                                help='override the committed byte-comparison report')
+    status_parser.add_argument('--byte-match', action='store_true',
+                               help='also show the frozen byte-identical recompilation records')
+    status_parser.add_argument('--link-report', type=Path,
+                               help='report JSON written by tools/hybrid_link.py --report')
     status_parser.add_argument('--translation-report', type=Path,
                                help='cross-reference a bulk translator report snapshot')
     status_parser.add_argument('--differential-report', type=Path,
@@ -477,8 +519,11 @@ def main(argv=None):
             else:
                 translation = (json.loads(args.translation_report.read_text())
                                if args.translation_report else None)
+            link_report = (json.loads(args.link_report.read_text())
+                           if args.link_report else None)
             status(rows, recompilation=args.recompilation, translation=translation,
-                   differential=differential)
+                   differential=differential, link_report=link_report,
+                   byte_match=args.byte_match)
         elif args.command == 'summary':
             summary(rows)
         elif args.command == 'next':
