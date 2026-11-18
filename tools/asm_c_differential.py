@@ -165,7 +165,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if checkpoint is not None:
         checkpoint_pc, visits = checkpoint
         if (not program or captured is not None or not 0 <= checkpoint_pc < len(payload)
-                or checkpoint_pc in sti_stop_sites or checkpoint_pc in cpuid_sites or not 1 <= visits <= budget):
+                or (checkpoint_pc in sti_stop_sites and visits != 1)
+                or checkpoint_pc in cpuid_sites or not 1 <= visits <= budget):
             raise ValueError('invalid checkpoint for prepared program probe')
     original_visits = translated_visits = 0
     original_cpuid, translated_cpuid = [], []
@@ -661,7 +662,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         engine.emu_stop()
 
     for pc in sti_stop_sites:
-        cpu.hook_add(UC_HOOK_CODE, stop_at_sti, begin=pc, end=pc)
+        # A first-visit checkpoint already stops before this STI executes.
+        if checkpoint is None or pc != checkpoint_pc:
+            cpu.hook_add(UC_HOOK_CODE, stop_at_sti, begin=pc, end=pc)
     def record_cpuid(engine, pc, _size, _data):
         original_cpuid.append(dict(ip=pc, eax=engine.reg_read(x86_const.UC_X86_REG_EAX),
                                    ecx=engine.reg_read(x86_const.UC_X86_REG_ECX)))

@@ -13326,3 +13326,15 @@ byte reads at ports 0x60 and 0x64 and the acknowledgement of writes at
 One of the four previously blocked probes now matches through completion
 (0xcd3c0). The other three reach the existing STI stop at 0xcd42b.
 See local/ghidra-group-followup-20261118/bulk-keyboard-replay.jsonl.
+
+### 2026-11-18 — Compare prepared state at an STI stop
+
+The differential runner now accepts a first-visit checkpoint at a
+reviewed STI stop. Both sides stop before the instruction, so the
+checkpoint compares register state, guest RAM, and service transcripts
+without requiring asynchronous interrupt delivery.
+
+The three idle-keyboard probes that reach 0xcd42b (0xa9878, 0xcd414,
+and 0xcd4d4) all match through that checkpoint. The 0xcd3c0 control
+returns before the checkpoint. See bulk-keyboard-sti-prefix.jsonl
+under local/ghidra-group-followup-20261118.

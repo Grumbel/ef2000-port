@@ -1689,6 +1689,10 @@ ret
             self.assertEqual(by_address[0x100]['state'], 'probes-pass')
             self.assertEqual(by_address[0x200]['probes'][0]['reason'],
                              'original reached STI stop at 0x200')
+            prefix = asm_c_differential.verify(
+                out, root / 'prefix', image, scenarios=1, service_free_paths=True,
+                addresses=[0x200], checkpoint=(0x200, 1))
+            self.assertEqual(prefix['entries'][0]['probes'][0]['state'], 'prefix-pass')
             run = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run
             run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
                             ctypes.c_uint32]
