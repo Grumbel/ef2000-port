@@ -12496,3 +12496,18 @@ site and code, and final guest state. This covers the exercised exit
 paths through 0xa455b and 0xedd49. The other branches still have
 untranslated dependencies at 0xeddc3 and 0x10e7b5. Report:
 `local/ghidra-group-followup-20261118/bulk-exit-partial-diff/report.json`.
+
+2026-11-18 — The paired status summary now displays prepared differential
+counts and original body bytes for all emitted C bodies, including
+untracked inventory entries. It also retains the blocked tracker subset.
+All 13 status tests passed.
+
+A static boundary audit of the 22 remaining renderer exclusions found
+46 exact INT 21h/31h sites and six exact STI sites. Feeding these sites
+to the existing interrupt-yield and STI-stop renderers made 12 more
+bodies eligible to emit C. The audit measured 4,339 renderable bodies
+and 4,162 bodies in strict direct closure. Those additional paths have
+yet to be compared. Ten bodies still have other blockers, including
+CR0, CPUID, far returns, IRET and the mixed code/table layout at
+0x11d695. The site list and source report digest are recorded in
+`local/ghidra-group-followup-20261118/bulk-extra-boundary-audit.json`.

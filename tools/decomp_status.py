@@ -215,7 +215,7 @@ def differential_summary(rows, translation_path, differential_path):
     if (differential.get('translation_report_sha256') != hashlib.sha256(source).hexdigest()
             or differential.get('payload_sha256') != translation.get('payload_sha256')):
         raise TrackerError('differential report does not match the supplied generation report')
-    generated = {entry['address'] for entry in translation['entries']
+    generated = {entry['address']: entry for entry in translation['entries']
                  if entry['state'] == 'generated-unverified'}
     results = {}
     for entry in differential['entries']:
@@ -224,10 +224,21 @@ def differential_summary(rows, translation_path, differential_path):
                 or state not in ('probes-pass', 'inconclusive', 'mismatch')):
             raise TrackerError(f'invalid differential entry at {format_addr(address)}')
         results[address] = state
-    counts = collections.Counter(results.get(address, 'unmeasured')
-                                 for row in rows if row['state'] == 'blocked'
-                                 if (address := parse_addr(row['addr'])) in generated)
-    return translation, counts
+    blocked = collections.Counter(results.get(address, 'unmeasured')
+                                  for row in rows if row['state'] == 'blocked'
+                                  if (address := parse_addr(row['addr'])) in generated)
+    counts = collections.Counter()
+    sizes = collections.Counter()
+    missing_sizes = set()
+    for address, entry in generated.items():
+        state = results.get(address, 'unmeasured')
+        counts[state] += 1
+        size = entry.get('body_bytes')
+        if type(size) is int and size > 0:
+            sizes[state] += size
+        else:
+            missing_sizes.add(state)
+    return translation, dict(blocked=blocked, counts=counts, sizes=sizes, missing_sizes=missing_sizes)
 
 
 def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None,
@@ -275,9 +286,16 @@ def status(rows, out=sys.stdout, recompilation=None, root=ROOT, translation=None
     if translation is not None:
         translation_blockers(rows, translation, out)
     if differential is not None:
+        states = ('probes-pass', 'inconclusive', 'mismatch', 'unmeasured')
+        print('Prepared differential inputs for all emitted C bodies:', file=out)
+        for state in states:
+            size = ('unknown' if state in differential['missing_sizes']
+                    else f"{differential['sizes'][state]:,}")
+            print(f"  {state:<18} {differential['counts'][state]:>8,} functions "
+                  f'{size:>10} body bytes', file=out)
         print('Prepared differential inputs for generated blocked functions:', file=out)
-        for state in ('probes-pass', 'inconclusive', 'mismatch', 'unmeasured'):
-            print(f'  {state:<18} {differential[state]:>8,} functions', file=out)
+        for state in states:
+            print(f"  {state:<18} {differential['blocked'][state]:>8,} functions", file=out)
 
 
 def read_calls(path):
