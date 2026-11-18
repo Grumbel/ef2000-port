@@ -13025,3 +13025,18 @@ See local/early-game-regressions-9R5aDI/{quick-delayed,quick-original,
 quick-entry-fixed,engine_helpers.lst}. A local diagnostic trap at the
 original null-code entry was present in the quick-combat replays and
 did not fire in the corrected run.
+
+### 2026-11-18 — Compare DOS get-time calls
+
+The prepared differential verifier's `--dos-clock` fixture answers
+INT 21h AH=2Ch with 12:34:56.78 UTC on each side. It follows the
+measured DOSBox-X ABI recorded in runtime/startup.c. EAX is 0x2c00,
+the upper halves of ECX and EDX are preserved, and flags are preserved.
+The differential report records the sample and compares the service
+transcripts alongside the guest state.
+
+Six of the 13 previously blocked entries at 0x11f2a4 matched with
+the fixture. The control with the same initial RAM and other fixtures
+left all 13 inconclusive. Four entries later fault on guest memory,
+and three reach the instruction budget while polling the fixed clock.
+See local/ghidra-group-followup-20261118/dos-clock-{control,replay}.json.
