@@ -14466,3 +14466,29 @@ comparison matches before INT3 at 0x1204c7. Execution after that
 debugger trap remains outside the verified paths. See
 stack-exhaustion-expanded-exit-1 and stack-exhaustion-debug-prefix in
 the same workspace.
+
+#### Debugger hook resumption (0x1204b6)
+
+The candidate body ranges are [0x1204b6,0x1204ca) and
+[0x1204d0,0x1204dc). Add instruction spans (0x1204c8,2),
+(0x1204d0,5), (0x1204d5,3) and (0x1204d8,1).
+The post-INT3 jump skips the six-byte debugger marker at
+[0x1204ca,0x1204d0). The resumed hook sets EAX to 1 and removes the
+two pushed arguments. The flag-clear path returns EAX=0.
+
+The overlay changes only this C body hash and preserves the bulk count
+of 4,357 generated and four unsupported. See
+bulk-debugger-return-c/report.json (SHA-256
+20292827256c650b504bd557bc2250d8cb1358b846f42a637c5c9201a6c6efb6).
+In the same local workspace, run rebuild-bulk-debugger-return.py
+followed by replay-debugger-return.py with Unicorn 2.1.4. With the flag
+clear and set, ASM and C match through the hook return. The scripted
+INT3 service checks the two stacked values, changes EAX, and resumes
+at the following instruction. The 0x11d695 caller also matches through
+the six padding ADDs at the pre-CLI checkpoint 0x11d6b0.
+debugger-return-diff/results.json has SHA-256
+8ff1646637d87ef7792b69802d44e721e71506f43ec49d7600f6cffda66d3cde.
+The focused hook compiles with OpenWatcom 1.9
+(`wcc386 -bt=dos -3r -za99 -w1 -we`) with zero warnings.
+Live debugger delivery and execution beyond the table checkpoint
+remain unverified.
