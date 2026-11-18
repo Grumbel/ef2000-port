@@ -600,9 +600,15 @@ class TranslationTests(unittest.TestCase):
                     lambda *_: self.fail('translation ran after original fault'),
                     payload, 0x100, registers, flags)
                 self.assertEqual(result['state'], 'inconclusive')
-                self.assertEqual(result['original_memory_fault'],
-                                 dict(access=access, cause='unmapped', address=0x20000000,
-                                      size=4, pc=0x100))
+                expected = dict(
+                    access=access, cause='unmapped', address=0x20000000, size=4, pc=0x100,
+                    registers=dict(ax=0, cx=0, dx=0, bx=0, sp=0x3f0000, bp=0,
+                                   si=0, di=0, flags=flags),
+                    segments=dict(cs=8, ds=16, es=16, fs=16, gs=16, ss=16),
+                )
+                if access == 'write':
+                    expected['value'] = 0
+                self.assertEqual(result['original_memory_fault'], expected)
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_generated_artifact_provenance_and_bulk_verifier(self):
