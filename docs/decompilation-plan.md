@@ -13486,3 +13486,24 @@ bulk-gameport-bios-x87-object-inputs.jsonl. Replay with
 replay-bulk-gameport-bios-x87-objects.py in that directory, or pass
 the fixtures to the bulk differential CLI with the same common
 prepared memory and host service settings as the baseline.
+
+### 2026-11-18 — Verify remaining x87 snapshot paths through return
+
+Seven entries reached 0x10a170 with a pointer obtained from the
+uninitialized object at global 0x4ddee0 or, for direct entry
+0x11c584, the object passed in EBX. Prepared a nonzero object and a
+64-byte record at its +0x69 pointer field for entries 0x1cde8,
+0x53ecc, 0xe474c, 0x1098f0, 0x1196a0, 0x11c20c and 0x11c584.
+Entry 0x710a4 used a prepared caller object and coordinate records
+for the call to 0x7ca8. Each of the eight entries reached its
+previous fault PC in a first-visit checkpoint comparison and
+matched through return in a separate full comparison.
+
+All 17 entries that originally stopped at an x87 operand snapshot
+now have at least one complete prepared match. The sweep total is
+3,788 of 4,353. See bulk-x87-caller-prepared-fixtures.json,
+bulk-gameport-bios-x87-caller-checkpoints.jsonl and
+bulk-gameport-bios-x87-caller-inputs.jsonl in
+local/ghidra-group-followup-20261118. The corresponding replay
+scripts are replay-bulk-gameport-bios-x87-caller-checkpoints.py and
+replay-bulk-gameport-bios-x87-callers.py.
