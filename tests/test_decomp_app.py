@@ -92,7 +92,7 @@ class DecompAppTests(unittest.TestCase):
                 return 7
 
             with patch.dict(os.environ, {}, clear=True), \
-                    patch.object(decomp_app, 'ENGLISH_SHA256', hashlib.sha256(executable).hexdigest()), \
+                    patch.object(decomp_app.extract_image, 'ENGLISH_SHA256', hashlib.sha256(executable).hexdigest()), \
                     patch.object(decomp_app, 'build_patch') as build, \
                     patch.object(decomp_app.subprocess, 'call', side_effect=run), \
                     redirect_stderr(io.StringIO()):

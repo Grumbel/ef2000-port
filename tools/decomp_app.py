@@ -24,7 +24,6 @@ except ImportError:
 ROOT = Path(__file__).resolve().parent.parent
 
 
-ENGLISH_SHA256 = 'ff245c9f812d4113c4a2a8fe60fb9a0e45687bc6ae73c19e4c23c32bccd2ec49'
 ENGLISH_DOS_CONFIG = """[sdl]
 waitonerror=false
 [dosbox]
@@ -102,7 +101,7 @@ def main(argv=None):
     if not executable.is_file():
         parser.error(f'original _EF2000.EXE not found: {executable}')
     try:
-        if hashlib.sha256(executable.read_bytes()).hexdigest() == ENGLISH_SHA256:
+        if hashlib.sha256(executable.read_bytes()).hexdigest() == extract_image.ENGLISH_SHA256:
             return run_english(executable, args.dosbox, runner_args)
         if args.objects is None:
             parser.error('provide --objects (build .#ef2000-decomp-watcom first) '

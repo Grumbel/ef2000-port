@@ -18,6 +18,8 @@ except ImportError:
 
 SUPPORTED_SHA256 = 'f21a72d82d768f8990f14a3af9e98caa06c0c08457ab1898ca8d2b50badd7afd'
 
+ENGLISH_SHA256 = 'ff245c9f812d4113c4a2a8fe60fb9a0e45687bc6ae73c19e4c23c32bccd2ec49'
+
 
 def u16(data, offset):
     return struct.unpack_from('<H', data, offset)[0]
@@ -94,9 +96,10 @@ def relocate_words(image, offsets, segment):
     return bytes(result)
 
 
-def extract(data, load_segment=0x1000):
+def extract(data, load_segment=0x1000, *, allow_english=False):
     """Produce images with static relocations only, not a runnable snapshot."""
-    if hashlib.sha256(data).hexdigest() != SUPPORTED_SHA256:
+    digest = hashlib.sha256(data).hexdigest()
+    if digest != SUPPORTED_SHA256 and not (allow_english and digest == ENGLISH_SHA256):
         raise ValueError('unsupported executable SHA-256; no extraction attempted')
     layout = decode_layout(data)
     mz = layout['mz']

@@ -3,6 +3,9 @@
  */
 
 ENTRY(_start)
+PROVIDE(image_initialized_end = 0x195fb0);
+PROVIDE(image_bss_end = 0x4de2f0);
+PROVIDE(image_english = 0);
 PHDRS {
     guest PT_LOAD FLAGS(7);
     boot PT_LOAD FLAGS(5);
@@ -22,7 +25,14 @@ SECTIONS {
     .conventional : { *(.conventional) } :conventional
     . = 0x08000000;
     .text : { *(.text*) } :runtime
-    .rodata : { *(.rodata*) } :runtime
+    .rodata : {
+        *(.rodata*)
+        . = ALIGN(4);
+        guest_image_layout = .;
+        LONG(image_initialized_end)
+        LONG(image_bss_end)
+        LONG(image_english)
+    } :runtime
     .data : { *(.data*) } :runtime
     .bss : { *(.bss*) *(COMMON) } :runtime
     /DISCARD/ : { *(.note*) *(.comment) *(.eh_frame*) }

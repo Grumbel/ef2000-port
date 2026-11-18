@@ -188,7 +188,12 @@ the native64 and C++ Unicorn backends. The native launcher accepts an EF2000
 installation directory and finds `_EF2000.EXE` inside it; the C++ Unicorn
 launcher accepts either the installation directory or executable path. The
 native launcher creates a unique cache run directory by default, so `--output`
-is optional.
+is optional. The English release in `../EF2000-rdeprera/` also runs
+through native64.
+
+```sh
+NIXPKGS_ALLOW_UNFREE=1 nix run --impure .#ef2000-native -- ../EF2000-rdeprera/
+```
 
 The *standalone decomp builds* now have distinct compilers, binaries, and apps:
 

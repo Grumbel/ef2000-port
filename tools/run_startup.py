@@ -17,22 +17,21 @@ import subprocess
 import uuid
 
 try:
-    from .extract_image import extract
+    from .extract_image import ENGLISH_SHA256, extract
     from .input_devices import flight_control_settings
     from .paths import resolve_paths, format_paths
 except ImportError:
-    from extract_image import extract
+    from extract_image import ENGLISH_SHA256, extract
     from input_devices import flight_control_settings
     from paths import resolve_paths, format_paths
 
 IMAGE_SIZE = 0x4000000
 BSS_END = 0x4de2f0
-HEAP_START = (BSS_END + 0xfff) & 0xfffff000
 INITIAL_SP = IMAGE_SIZE - 0x1000
 STACK_LOW = (INITIAL_SP - 0x126a) & 0xfffff000
 
 
-def analyze_calls(log):
+def analyze_calls(log, bss_end=BSS_END):
     calls = []
     returns = []
     stops = []
@@ -78,13 +77,14 @@ def analyze_calls(log):
         elif line.startswith('MEMORY '):
             memory_watermark = values
     sequence = [(item.get('IP'), item.get('AX')) for item in calls]
+    heap_start = (bss_end + 0xfff) & ~0xfff
     verified = (sequence[:3] == [(0x93, 0x3505), (0xa0, 0x3005), (0x19a, 0x3509)] and
                 len(returns) >= 3 and
                 [(item.get('IP'), item.get('AX')) for item in returns[:3]] == [(0x93, 0x3505), (0xa0, 5), (0x19a, 0x3509)] and
                 returns[0].get('CX') == 0x260 and returns[0].get('FLAGS', 0) & 0x41 == 0x40 and
                 returns[1].get('BX') == 0 and returns[1].get('CX') == 0 and
-                calls[2].get('CX') == 0x4000 and calls[2].get('SI') == 0x4df000 and
-                calls[2].get('DI') == 0x4de2f0 and calls[2].get('SS') == 7 and
+                calls[2].get('CX') == 0x4000 and calls[2].get('SI') == heap_start and
+                calls[2].get('DI') == bss_end and calls[2].get('SS') == 7 and
                 calls[2].get('SP') == calls[2].get('BX') and
                 allocation is not None and returns[2].get('DX') == allocation.get('STACK_LOW') and
                 checkpoint == {'DATA_LIMIT': 0x260, 'BSS_ZERO': 1, 'COMMAND': 1,
@@ -257,7 +257,10 @@ def main():
         print(f'paths: assets={args.executable.resolve().parent}', flush=True)
         print(f'paths: output={output}; writable overlay={output / "drive"}', flush=True)
         print(f'config: sound={args.sound}; controls={args.controls}; joystick={args.joystick}; vr={args.vr}', flush=True)
-        manifest, images = extract(args.executable.read_bytes())
+        manifest, images = extract(args.executable.read_bytes(), allow_english=True)
+        english = manifest['source_sha256'] == ENGLISH_SHA256
+        bss_end = manifest['layout']['bss_end']
+        heap_start = (bss_end + 0xfff) & ~0xfff
         try:
             from .efpatch import apply_patches, decode
         except ImportError:
@@ -274,7 +277,7 @@ def main():
         if arena_writes:
             arena_start = min(offset for offset, _data in arena_writes)
             arena_end = max(offset + len(data) for offset, data in arena_writes)
-            if arena_start < HEAP_START or arena_end > STACK_LOW:
+            if arena_start < heap_start or arena_end > STACK_LOW:
                 raise ValueError('hybrid arena must be above initial heap and below guest stack')
             reserved_arena = (arena_start, arena_end)
         patch_report = [{'file': str(path.resolve()), 'sha256': sha,
@@ -294,7 +297,6 @@ def main():
         config = paths['config'][0] / 'EF2000.CFG'
         if not config.is_file():
             config = args.executable.resolve().parent / 'EF2000.CFG'
-        lines = config.read_bytes().splitlines()
         settings = {b'MUSIC': b'0,127', b'SOUNDFX': b'0,127', b'SPEECH': b'0'} if args.sound == 'off' else {}
         if args.sound in ('sb16-probe', 'sb16'):
             settings[b'MUSIC'] = b'0,127'  # Isolate digital sound from FM music.
@@ -304,8 +306,13 @@ def main():
         settings[b'VRHELMET'] = b'1' if args.vr == 'vfx1' else b'0'
         if args.controls != 'original':
             settings[b'CONTROL'] = b'1' if args.controls == 'joystick' else b'0'
-        lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
-                 if line.split(b'=', 1)[0] in settings else line for line in lines]
+        if english and not config.is_file():
+            # This distribution ships without EF2000.CFG.
+            lines = [key + b'=' + value for key, value in settings.items()]
+        else:
+            lines = config.read_bytes().splitlines()
+            lines = [line.split(b'=', 1)[0] + b'=' + settings[line.split(b'=', 1)[0]]
+                     if line.split(b'=', 1)[0] in settings else line for line in lines]
         if args.controls == 'joystick':
             lines = flight_control_settings(lines, True)
         (overlay / 'EF2000.CFG').write_bytes(b'\r\n'.join(lines) + b'\r\n')
@@ -342,6 +349,9 @@ def main():
             assembler + [str(entry), '-o', 'entry.o'],
             ['as', '--' + width, 'payload.S', '-o', 'payload.o'],
             ['ld', '-m', 'elf_x86_64' if native else 'elf_i386', '-T', str(linker),
+             '--defsym', f'image_initialized_end={len(original_image)}',
+             '--defsym', f'image_bss_end={bss_end}',
+             '--defsym', f'image_english={int(english)}',
              'entry.o', 'startup.o', 'x32.o', 'payload.o', '-o', 'startup.elf'],
         ]
         if args.runtime_objects:
@@ -450,7 +460,7 @@ def main():
                              'Sound hardware is absent; audio is disabled in a local configuration copy by default.'),
                             'VGA/VBE implements the observed indexed banked modes, not the complete hardware API.'],
         }
-        report.update(analyze_calls((output / 'calls.log').read_text(encoding='utf-8', errors='replace')))
+        report.update(analyze_calls((output / 'calls.log').read_text(encoding='utf-8', errors='replace'), bss_end))
         report['real_mode_backend'] = args.real_mode
         report['real_mode_execution'] = real_mode_requests
         report['segment_limit_diagnostic'] = args.check_segment_limit

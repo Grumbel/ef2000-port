@@ -113,10 +113,16 @@ static void *active_fp;
 static struct context divide_context;
 static u32 divide_frame, divide_active, divide_virtual_if;
 
+extern const struct {
+    u32 initialized_end;
+    u32 bss_end;
+    u32 english;
+} guest_image_layout;
+
 static uptr guest(u32 offset) { return (u32)(GUEST_BASE + offset); }
 
 static int guest_io_address(u32 offset) {
-    if (offset >= 0x86 && offset < 0x195fb0) return 1;
+    if (offset >= 0x86 && offset < guest_image_layout.initialized_end) return 1;
 #ifdef EF_RESERVED_ARENA_START
     if (offset >= RESERVED_ARENA_START && offset < RESERVED_ARENA_END) return 1;
 #endif
@@ -389,17 +395,17 @@ static void checkpoint(struct context const *r) {
     u32 selector = 7;
     __asm__ volatile("lsl %1, %0" : "=r"(selector_limit) : "r"(selector) : "cc");
     int zeroed = 1;
-    for (u32 address = 0x195fb0; address < 0x4de2f0; ++address)
+    for (u32 address = guest_image_layout.initialized_end; address < guest_image_layout.bss_end; ++address)
         if (*(volatile u8 *)guest(address) != 0) { zeroed = 0; break; }
-    int command = equals((char *)guest(*(u32 *)guest(0x132a34)), "gui");
-    int program = equals((char *)guest(*(u32 *)guest(0x132a38)), "C:\\EF2000\\_EF2000.EXE");
+    int command = equals((char *)guest(*(u32 *)guest(guest_image_layout.english ? 0x1320b8 : 0x132a34)), "gui");
+    int program = equals((char *)guest(*(u32 *)guest(guest_image_layout.english ? 0x1320bc : 0x132a38)), "C:\\EF2000\\_EF2000.EXE");
     text("CHECK ", 6);
     field("DATA_LIMIT", selector_limit);
     field("BSS_ZERO", zeroed);
     field("COMMAND", command);
     field("PROGRAM", program);
-    field("PSP", *(u16 *)guest(0x132a3c));
-    field("ENV", *(u16 *)guest(0x132a65));
+    field("PSP", *(u16 *)guest(guest_image_layout.english ? 0x1320c0 : 0x132a3c));
+    field("ENV", *(u16 *)guest(guest_image_layout.english ? 0x1320e9 : 0x132a65));
     text("\n", 1);
     if (selector_limit != 0x260 || !zeroed || !command || !program || r->ss != 7)
         finish(24);
@@ -573,7 +579,7 @@ static void guest_fault(u32 signal, struct context *r) {
      */
     protection_fault |= signal == 11 && r->trap == 0xffffffffu;
 #endif
-    if (protection_fault && r->ip >= 0x86 && r->ip < 0x195fae &&
+    if (protection_fault && r->ip >= 0x86 && r->ip < guest_image_layout.initialized_end - 2 &&
         *(u8 *)guest(r->ip) == 0xcd && real_mode_request >= 0) {
         u32 vector = *(u8 *)guest(r->ip + 1);
         if (vector == 0x10 || vector == 0x33 || vector == 0x16 || vector == 0x1a) {
@@ -719,7 +725,7 @@ static void guest_fault(u32 signal, struct context *r) {
         ++r->ip;
         return;
     }
-    if (signal != 11 || r->ip < 0x86 || r->ip > 0x195fae ||
+    if (signal != 11 || r->ip < 0x86 || r->ip > guest_image_layout.initialized_end - 2 ||
         *(u8 *)guest(r->ip) != 0xcd || *(u8 *)guest(r->ip + 1) != 0x21) {
         if (r->sp > 0x260 && r->sp <= IMAGE_SIZE - 32) {
             static char const *const stack_names[] = {
@@ -749,13 +755,13 @@ static void guest_fault(u32 signal, struct context *r) {
             if (previous <= frame || previous > IMAGE_SIZE - 8) break;
             frame = previous;
         }
-        field("PAGE", *(u8 *)guest(0x0015bdd1u));
-        field("PAGE_CB0", *(u32 *)guest(0x0015b74cu));
-        field("PAGE_CB1", *(u32 *)guest(0x0015b750u));
-        field("DRAW_CB", *(u32 *)guest(0x0041f3d0u));
-        field("SCREEN_BUF", *(u32 *)guest(0x0015b758u));
-        field("BLIT_COUNT", *(u32 *)guest(0x00164600u));
-        field("BLIT_SOURCE", *(u32 *)guest(0x0015b754u));
+        field("PAGE", *(u8 *)guest(guest_image_layout.english ? 0x15b451 : 0x15bdd1));
+        field("PAGE_CB0", *(u32 *)guest(guest_image_layout.english ? 0x15adcc : 0x15b74c));
+        field("PAGE_CB1", *(u32 *)guest(guest_image_layout.english ? 0x15add0 : 0x15b750));
+        field("DRAW_CB", *(u32 *)guest(guest_image_layout.english ? 0x41ea50 : 0x41f3d0));
+        field("SCREEN_BUF", *(u32 *)guest(guest_image_layout.english ? 0x15add8 : 0x15b758));
+        field("BLIT_COUNT", *(u32 *)guest(guest_image_layout.english ? 0x163c80 : 0x164600));
+        field("BLIT_SOURCE", *(u32 *)guest(guest_image_layout.english ? 0x15add4 : 0x15b754));
         field("BLIT_OFFSET", *(u32 *)guest(0x00120cc6u));
         field("BLIT_DEST", *(u32 *)guest(0x00120cc6u) + 0xa0000u);
         if (r->ip >= 16 && r->ip <= IMAGE_SIZE - 16) {
@@ -1195,11 +1201,11 @@ void setup(uptr *initial_stack) {
         *(volatile u8 *)((uptr)0x02001000 + i) = environment[i];
     *(volatile u16 *)guest(0x120cc4) = 0x1f;
     *(volatile u32 *)guest(0x120cc6) = DOS_BASE - GUEST_BASE;
-    *(volatile u16 *)guest(0x132a24) = 0x27;
+    *(volatile u16 *)guest(guest_image_layout.english ? 0x1320a8 : 0x132a24) = 0x27;
     /* The original allocator calculation runs against this declared synthetic
      * 64 MiB model. Keep two pages between initialized heap and stack growth.
      */
-    allocation.heap_end = 0x4df000;
+    allocation.heap_end = (guest_image_layout.bss_end + 0xfff) & ~0xfffu;
     allocation.stack_end = (INITIAL_SP - 0x126a) & 0xfffff000u;
     allocation.minimum_stack = allocation.heap_end + 0x2000;
     allocation.heap_ceiling = IMAGE_SIZE;
@@ -1214,7 +1220,7 @@ void setup(uptr *initial_stack) {
     heap_peak = allocation.heap_end;
     stack_low = allocation.stack_end;
     /* Prove that ORIGINAL startup clears BSS rather than relying on ELF zeros. */
-    for (u32 address = 0x195fb0; address < 0x4de2f0; ++address)
+    for (u32 address = guest_image_layout.initialized_end; address < guest_image_layout.bss_end; ++address)
         *(volatile u8 *)guest(address) = 0xa5;
     text("STARTUP synthetic-memory-model\n", 31);
     *(u8 *)(uptr)(DOS_BASE + 0x449) = 3;

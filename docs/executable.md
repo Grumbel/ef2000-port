@@ -36,12 +36,18 @@ operand and control-flow review.
 | Current high score loaded at `0x43e2` | `0x1970a0` | `0x196720` |
 | Difficulty loaded at `0x43dd` | `0x121e44` | `0x121e44` |
 
-The English launcher currently uses DOSBox-X. The native extractor and
-hybrid linker pin the German executable and payload, and the hybrid
-symbols and compiled objects use German addresses. A native English
-profile needs verified function and global mappings, including direct
-addresses compiled into the recovered objects. A uniform translation
-would also move operands such as the unchanged difficulty reference.
+The native64 launcher recognizes both source hashes. It links the
+harness with the initialized and BSS boundaries from the selected X-32
+header. The allocation starts at `0x4de000` for English and `0x4df000`
+for German. The startup interrupt sites coincide in both builds. The
+Watcom command, program, PSP, environment and extender-selector globals
+are `0x97c` lower in English. The VGA selector and base fields at
+`0x120cc4` and `0x120cc6` retain their addresses.
+
+The hybrid launcher uses DOSBox-X for English. Applying recovered C
+patches requires verified English function and global mappings, including
+direct addresses compiled into the recovered objects. Some addresses,
+such as the difficulty reference above, are shared across editions.
 
 ## Verified observations
 
