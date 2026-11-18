@@ -14973,3 +14973,26 @@ Run the local probe with
 The report `bulk-cpu-boundaries-positive-relationship-cohort.json`
 retains the 20 passing probes and the original x87 operation counts.
 SHA-256 `56d2ea03b8ec8a45e0146dbda1f96a28865d246680ecab45f753500fc8a9318e`.
+
+#### Verify serial-slot cleanup and rejected initialization
+
+The original fault at 0x7c9 in four default bulk probes is a descriptor
+table read indexed by the saved serial object field at +0x3c. The
+default RAM supplied an unprepared object. The prepared comparisons
+provide either a closed object or an active COM1 object with descriptor
+index zero and an empty descriptor entry at 0x1960c4.
+
+Nine probes against the 4,363-entry candidate match through return.
+They cover invalid selectors, missing UART configuration, allocation
+before failed initialization, and releasing both empty and allocated
+slots. The wrapper at 0x107004 also matches after failed initialization
+and frees the allocation through 0x10703c. Three active-object probes
+match at the first visit to 0x117b13, immediately before the first
+UART output during teardown. The active device I/O and successful
+initialization remain outside this result.
+
+Run the local probe with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-serial-slot-fixtures.py`.
+The report `bulk-cpu-boundaries-serial-slot-fixtures.json` retains
+the nine return matches and three checkpoint matches. SHA-256
+`c048a58c2259ffb754d4a8cfb630ef4c0085ec58c267166ac76a54bd8fd0ad29`.
