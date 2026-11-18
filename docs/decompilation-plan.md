@@ -12750,3 +12750,22 @@ in its status 6 diagnostic. The synthetic changed-instruction test
 still records a mismatch even when omitting the guard would leave
 the same final state. The 0x27fec trace still reaches status 6 after
 the original executes the modified instruction.
+
+A prepared-raster replay isolates the cause of the 0x27fec code
+write. The fill at 0xdeb72 receives its destination from 0xceccc,
+which adds the raster base at 0x15b754, a row offset from 0x163200,
+and the x coordinate. Under the default probe the base, row offsets,
+and pitch are zero, so the fill writes near the start of the image.
+This trace does not establish that an initialized game patches code.
+
+In a local experiment, initialize the primary and secondary raster
+buffers in scratch RAM and populate the 320-byte pitch and row
+offsets for a 320-by-200 raster. Leave the generated C and its byte
+guard unchanged. With a 500,000-instruction budget, the original and
+the existing compiled C both complete the prepared empty-drive
+probe. Their traces contain 40,921 matching instruction addresses
+and the differential verifier reports a pass. The local
+`trace-prepared-raster.py` and
+`prepared-raster-divergence-trace.json` record this synthetic case.
+This setup has not been checked against a captured call or used
+for a full sweep.
