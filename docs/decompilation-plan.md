@@ -14307,3 +14307,27 @@ The complete prepared-match total reaches 3,903 of 4,354 generated
 entries. The fixture leaves real-time timer delivery untested. See
 replay-bulk-gameport-bios-pit-progress.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Finish the full sweep with the timer callback linked
+
+The fresh 100,000-instruction default sweep completed for every one of
+the 4,354 generated entries. It found 2,998 matches through return,
+756 matches through DOS exit, 600 inconclusive results, and zero
+mismatches. All 4,353 prior entries retained their comparison state.
+The newly linked timer callback at 0xe28c4 matched through return.
+Seven additional inventory entries lack a generated body.
+
+The 600 inconclusive results include 398 original memory faults,
+100 original service stops, 76 budget stops, 20 STI stops, five
+invalid-instruction faults and one x87 decode stop. These are default
+probe outcomes. Targeted fixtures bring cumulative coverage to 3,903
+generated entries with at least one complete prepared comparison.
+Byte-identical recompilation and release integration remain separate
+verification work.
+
+Run evidence is in local/ghidra-group-followup-20261118. The command was
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/replay-bulk-timer-full.py`.
+The output bulk-timer-full.jsonl has SHA-256
+45473d896a9ab0533839682d984b91de9b56e667782f143154d40ff0914eff4e.
+The linked translations.so has SHA-256
+172f90b75eaf6480d7f2ba7dc08825811b4aa7302c16fa36ec148f8c986f5037.
