@@ -12463,3 +12463,13 @@ accepted 0x110330 and discovered 0x110341 and 0xfa7b4 through direct
 edges. The 4,349-body overlay covers every instruction PC in the two
 recorded exit traces. All 19 inventory tests passed. See
 `local/ghidra-group-followup-20261118/bulk-exit-complete-audit.json`.
+
+The expanded inventory emitted 4,095 C bodies. All 467 probes passed
+the two previous dispatcher gaps and stopped at 0xa455b. Its callee
+0xedd49 is excluded by an INT 21h on a branch the recorded probes do
+not take. Adding that exact yield boundary at 0xedd90 left the count
+and replay results unchanged. It exposed two further closure blockers
+at 0xeddc3 and 0x10e7b5, both with unsupported interrupt sites and
+CR0 accesses. Reports: `bulk-exit-complete-diff/report.json` and
+`bulk-exit-sound-boundary-diff/report.json` under
+`local/ghidra-group-followup-20261118/`.
