@@ -14391,3 +14391,30 @@ loads ES=0x60 and reads and updates the live IDT through that
 selector. The other path skips SIDT and uses paired vector installation.
 The body still requires the SIDT and descriptor context before whole-body
 generation and comparison.
+
+### 2026-11-18 — Translate the IRQ installer's SIDT store
+
+State ABI 6 appends the loaded IDTR and an availability flag. The
+32-bit unprefixed memory form stores the 16-bit limit and 32-bit base
+through the guest memory and segment checks. Prepared probes take the
+initial IDTR from Unicorn. Saved call captures lack that register and
+leave it unavailable. The generated instruction stops if the host
+has not supplied an IDTR for a profile that permits SIDT.
+
+The synthetic differential regression uses an unaligned SS destination
+and a nonzero base and limit. In the focused original installer at
+0x120ad0, [0x132a5e]=3 matches through return with the existing X-32
+vector fixture. With [0x132a5e]=2, comparison passes at checkpoint
+0x120b4f after the SIDT write. Continuing this path requires the loaded
+selector 0x60 and a live IDT fixture. The focused program also compiles
+with Open Watcom 1.9 via asm_c_differential --watcom.
+
+Add interrupt boundaries 0x120af7, 0x120afe, 0x120b0c, 0x120b13,
+0x120b24, 0x120b37, 0x120b82 and 0x120b8f to the preceding DPMI build.
+This generates 4,356 bodies, with five inventory entries still
+unsupported. All 4,355 previously emitted body hashes agree. The full
+candidate report is local/ghidra-group-followup-20261118/bulk-irq-install-c/report.json
+(SHA-256 f6a4877c2e7aec1c7ab78759423389fc0b55997e96bc0b748bae15b52e44a716).
+Focused reports are in irq-install-diff, irq-install-sidt-prefix and
+irq-install-watcom under the same workspace. Both prepared original
+probes use [0x17f05d]=5 and [0x17f05f]=0x20.

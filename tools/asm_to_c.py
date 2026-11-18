@@ -26,7 +26,7 @@ except ImportError:
 ROOT = Path(__file__).resolve().parents[1]
 REGS = ('eax', 'ecx', 'edx', 'ebx', 'esp', 'ebp', 'esi', 'edi')
 SEGMENTS = ('es', 'cs', 'ss', 'ds', 'fs', 'gs')
-STATE_ABI = 5
+STATE_ABI = 6
 REG = {name: (index, 32, 0) for index, name in enumerate(REGS)}
 for index, name in enumerate(('ax', 'cx', 'dx', 'bx', 'sp', 'bp', 'si', 'di')):
     REG[name] = (index, 16, 0)
@@ -69,6 +69,8 @@ typedef struct {
     /* Opt-in live table windows in bounded RAM: bit 0=GDT, bit 1=LDT.
      * Bases/limits describe loaded table context, not saved descriptors. */
     uint32_t table_mask, table_base[2], table_limit[2];
+    /* Loaded IDTR supplied by a host with SIDT enabled at guest privilege. */
+    uint32_t idtr_valid, idtr_base, idtr_limit;
 } ef_lift_state;
 static unsigned ef_segments_valid(ef_lift_state *s) {
     unsigned i;
@@ -816,6 +818,19 @@ def instruction_c(insn, starts):
         return string_instruction_c(mnemonic, text, repeat, insn['address'], next_pc)
     if repeat:
         raise Unsupported('unsupported repeated instruction: ' + mnemonic)
+    if mnemonic in ('sidt', 'sidtd'):
+        op = operand(text)
+        encoded = bytes.fromhex(insn['bytes'])
+        if (op[0] != 'mem' or op[2] not in (None, 48) or len(encoded) < 3
+                or encoded[:2] != b'\x0f\x01' or encoded[2] & 0x38 != 8
+                or encoded[2] >= 0xc0):
+            raise Unsupported('unsupported SIDT encoding')
+        segment = op[3]
+        return ('if (!s->idtr_valid) return 7; '
+                'a = %s; if (ef_check_segment(s, %d, a, 6, %d)) return s->fault; '
+                'ef_write(s, a, 16, s->idtr_limit); if (s->fault) return s->fault; '
+                'ef_write(s, a+2u, 32, s->idtr_base); if (s->fault) return s->fault; '
+                's->pc = 0x%xu; break;' % (op[1], segment, 4 if segment == 2 else 1, next_pc))
     code = []
     # Only these instruction spellings are supported. Prefixes, x87, calls,
     # implicit segment operations and partial architectural models fail closed.

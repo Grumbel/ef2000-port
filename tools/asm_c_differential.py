@@ -54,7 +54,9 @@ class State(ctypes.Structure):
                 ('x87_compare_profile', ctypes.c_uint32),
                 ('segment_profile', ctypes.c_uint32), ('segment_cache', Segment * 6),
                 ('table_mask', ctypes.c_uint32), ('table_base', ctypes.c_uint32 * 2),
-                ('table_limit', ctypes.c_uint32 * 2)]
+                ('table_limit', ctypes.c_uint32 * 2),
+                ('idtr_valid', ctypes.c_uint32), ('idtr_base', ctypes.c_uint32),
+                ('idtr_limit', ctypes.c_uint32)]
 
 
 X87_FIELDS = dict(x87_control='FPCW', x87_status='FPSW', x87_tag='FPTAG',
@@ -521,6 +523,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         selectors = [captured.registers[name] for name in asm_to_c.SEGMENTS]
         initial_fpu = capture_x87(cpu)
     reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
+    idtr_configuration = (0, 0, 0)
+    if captured is None:
+        _, base, limit, _ = cpu.reg_read(x86_const.UC_X86_REG_IDTR)
+        idtr_configuration = (1, base, limit)
     if checkpoint is not None:
         if checkpoint_pc == sentinel:
             raise ValueError('checkpoint overlaps probe return sentinel')
@@ -740,6 +746,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     state = State((ctypes.c_uint32 * 8)(*registers), flags, address, 0,
                   native_memory, memory_size)
     state.segment[:] = selectors
+    state.idtr_valid, state.idtr_base, state.idtr_limit = idtr_configuration
     if captured is not None:
         try:
             from . import asm_segments
@@ -881,6 +888,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             expected_caches[index] = Segment(*cache)
     if (state.table_mask, tuple(state.table_base), tuple(state.table_limit)) != table_configuration:
         differences.append('C descriptor table configuration changed')
+    if (state.idtr_valid, state.idtr_base, state.idtr_limit) != idtr_configuration:
+        differences.append('C interrupt descriptor table register changed')
     if (state.segment_profile != segment_configuration or
             bytes(state.segment_cache) != bytes(expected_caches)):
         differences.append('C descriptor profile/cache configuration changed')

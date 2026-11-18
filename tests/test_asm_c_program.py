@@ -50,6 +50,30 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_sidt_stores_six_bytes_from_prepared_idtr(self):
+        source = """.type root,@function
+root: sidt [esp-7]
+ret
+.size root, .-root"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, _ = inventory(root, source)
+            asm_c_program.generate(directory, root/'out', image)
+
+            from unicorn import Uc
+            from unicorn.x86_const import UC_X86_REG_IDTR
+
+            def with_idtr(*args, **kwargs):
+                cpu = Uc(*args, **kwargs)
+                cpu.reg_write(UC_X86_REG_IDTR, (0, 0x89abcdef, 0x1234, 0))
+                return cpu
+
+            with patch('unicorn.Uc', side_effect=with_idtr):
+                report = asm_c_differential.verify(root/'out', root/'evidence', image, scenarios=1)
+            probe, = report['entries'][0]['probes']
+            self.assertEqual(probe['state'], 'pass', probe)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_x32_vector_fixture_reports_remapped_irq_base(self):
         source = """.type root,@function
 root: mov eax,0xabcd250c
