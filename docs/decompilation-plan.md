@@ -14996,3 +14996,21 @@ Run the local probe with
 The report `bulk-cpu-boundaries-serial-slot-fixtures.json` retains
 the nine return matches and three checkpoint matches. SHA-256
 `c048a58c2259ffb754d4a8cfb630ef4c0085ec58c267166ac76a54bd8fd0ad29`.
+
+### Prepared object-coordinate comparison
+
+Four baseline probes entering at `0x88c80`, `0x89060`, `0x89c64`, and
+`0x8a318` stopped at `0x88c89` when the coordinate helper dereferenced the
+unprepared object field at offset `0x30`. Give that field a pointer to a
+three-component signed record and set the update countdown at offset `0x40`
+above the tick delta. All 14 prepared comparisons returned with matching
+observable state under the native x87 oracle. Each entry saw zero, mixed
+signed, and minimum signed Y coordinates. The direct helper also saw a null
+record with a seeded destination, and `0x89060` installed a record in an initially
+null field for an object of type 6. Countdown expiry and runtime splice
+and replay remain open.
+
+Run `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-object-coordinate-fixtures.py`
+against the 4,363-entry floating-scanner candidate. The retained
+`bulk-cpu-boundaries-object-coordinate-fixtures.json` has SHA-256
+`ef11fbf29002bca3d3b7135f542ece62ec23b6520ab30cc1408e52fff15c2b7a`.
