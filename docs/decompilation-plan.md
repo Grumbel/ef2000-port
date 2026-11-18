@@ -12657,3 +12657,15 @@ both passed on one prepared input each. The first was the sole mismatch
 in the preceding full comparison. All 39 program tests passed.
 Artifacts are in `local/ghidra-group-followup-20261118/bulk-cpuid-diff/`.
 No tracker states changed.
+
+2026-11-18 — Audited remaining BIOS and multiplex interrupt boundaries
+against the CPUID generation snapshot. An ignored candidate build
+allowed six exact INT 10h and INT 2Fh sites and emitted the two BIOS
+video wrappers at 0xfe700 and 0xfe710, for 4,343 generated bodies.
+This establishes renderability only. The multiplex caller at 0x11cda5
+also needs the INT 31h site at 0x11cde8. The caller at 0x10e7b5 still
+needs CR0 handling and its INT 21h site at 0x10e806. Candidate report:
+`local/ghidra-group-followup-20261118/bulk-multiplex-c/report.json`.
+The status output now identifies these reasons as generator diagnostics.
+In particular, the largest dependency group still points to the mixed
+code/table body at 0x11d695, whose INS diagnostic comes from table data.

@@ -199,7 +199,9 @@ def translation_blockers(rows, report, out=sys.stdout):
                        ('unknown', 'incomplete reachability data')):
         print(f'  {label:<29} {service_dependencies[key]:>6,} functions', file=out)
     print('Direct-edge reachability excludes dynamic targets; it does not prove service support.', file=out)
-    print('Root blockers (affected blocked functions; groups overlap):', file=out)
+    print('Direct dependency blockers (affected blocked functions; groups overlap):', file=out)
+    print('Reasons are generator diagnostics. A code/data boundary error can appear as an instruction rejection.',
+          file=out)
     for address, count in sorted(roots.items(), key=lambda item: (-item[1], item[0]))[:10]:
         reason = entries.get(address, {}).get('reason', 'absent from report')
         print(f'  {format_addr(address)} {count:>6,}  {reason}', file=out)
