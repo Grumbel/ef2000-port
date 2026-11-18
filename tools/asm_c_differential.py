@@ -572,7 +572,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             if status != 1:
                 break
     if status:
-        reason = {7: 'unsupported segment profile',
+        reason = {6: 'guest instruction bytes differ from translated code',
+                  7: 'unsupported segment profile',
                   8: 'pending x87 exception delivery unsupported',
                   0x204: 'STI stop', 0x205: 'CPUID boundary'}.get(status, 'budget/pc/memory/divide')
         return outcome(state='mismatch', translated_stop=dict(status=status, pc=state.pc, fault=state.fault),

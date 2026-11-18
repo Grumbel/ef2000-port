@@ -12744,3 +12744,9 @@ evidence that it represents a valid call, or explicit handling of
 modified instructions. The local trace is
 `code-guard-divergence-trace.json`, obtained with
 `trace-code-guard.py` against the existing empty-drive build.
+
+The differential verifier now names the dispatch byte-guard condition
+in its status 6 diagnostic. The synthetic changed-instruction test
+still records a mismatch even when omitting the guard would leave
+the same final state. The 0x27fec trace still reaches status 6 after
+the original executes the modified instruction.

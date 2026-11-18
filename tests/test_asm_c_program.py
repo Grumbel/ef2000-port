@@ -442,7 +442,8 @@ ret
             asm_c_program.generate(directory, out, image)
             report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=16)
             self.assertEqual(report['entries'][0]['counts'], {'mismatch': 16})
-            self.assertTrue(all('C status 6' in p['differences'][0]
+            self.assertTrue(all('C status 6 (guest instruction bytes differ from translated code)'
+                                in p['differences'][0]
                                 for p in report['entries'][0]['probes']))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
