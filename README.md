@@ -916,6 +916,7 @@ steps, and the incremental adoption of the gamepkgstd Linux conventions.
 
 - [Port architecture and milestones](docs/port-plan.md)
 - [Decompilation and modernization plan](docs/decompilation-plan.md)
+- [Current work order (plan revision 5)](docs/decompilation-plan-rev5.md)
 - [Executable and startup findings](docs/executable.md)
 - [Recovered loader and image layout](docs/loader.md)
 - [Headless Ghidra import and decompilation workflow](docs/ghidra.md)

@@ -36,14 +36,25 @@
 
 ## Decompilation work
 
-- For a new GPT-6 Luna decompilation session, read
-  `docs/handoffs/luna-hybrid-2026-11-06.md` and
-  `docs/decompilation-plan-rev2.md` and `docs/decompilation-plan-rev3.md` first (they supersede
-  `docs/handoffs/luna-decomp-2026-11-05.md`); the plan and
-  original code remain authoritative.
-- Follow `docs/decompilation-plan.md`: read its "Ground rules" and
-  "Operating loop" sections at the start of every session, and update its
-  status markers and progress log in the commits that complete steps.
+- The goal is readable C for every game function under `decomp/src` that
+  builds into a working game without original code bytes.
+- At the start of every decompilation session (any model), read
+  `docs/decompilation-plan-rev5.md` (current work order; it overrides rev 2-4
+  and the handoffs in `docs/handoffs/`), then §1 "Ground rules" and §4
+  "Operating loop" of `docs/decompilation-plan.md`, then the last lines of
+  `docs/decompilation-progress.md`. Original code remains authoritative.
+- Progress is one line per tranche in `docs/decompilation-progress.md`.
+  The old log in `docs/decompilation-log-archive.md` is read-only. Do not
+  append to `docs/decompilation-plan.md` except to update status markers.
+  Do not commit hashes of `local/` files, per-probe narratives, or new
+  `decomp-batch-*.md` files.
+- Every tranche commit reports `tools/decomp_status.py summary`,
+  `tools/readability_metrics.py` and the hybrid regression result. Work
+  that moves none of these numbers for ten commits is off track: stop and
+  move to the next item in rev 5.
+- The instruction lifter (`tools/asm_c_program.py`,
+  `tools/asm_c_differential.py`, `ef_lift_*`) is frozen. Its output is an
+  emulator, not decompiled source, and never counts as coverage.
 - Binaries need not match the original; guest RAM state and observable
   behavior must (plan §2.2).
 - Never commit Ghidra pseudo-C, original executable bytes, or extracted game

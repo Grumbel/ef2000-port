@@ -362,7 +362,7 @@ The tracked source inventory contains 4,293 functions: 3,382
 `compiles`, 30 `verified`, 11 `spliced`, 852 `blocked`, and 9 `compiles-bad`,
 plus nine entries in other states. These inventory counts do not measure
 which functions the hybrid actually executes.
-See the latest entries in [the progress log](../docs/decompilation-plan.md).
+See [the progress log](../docs/decompilation-progress.md) and [its archive](../docs/decompilation-log-archive.md).
 
 Historical Status (2026-11-09): 4,277 Ghidra-inventoried functions plus 13 manually
 confirmed additional entry points (4,290 tracked); 3,216 marked `compiles`,
