@@ -13091,3 +13091,25 @@ Local traces show the indirect call at 0xc3f38 using the unset graphics
 dispatch slot at 0x41f3d0 and reaching address zero. Earlier writes had
 changed the bytes at 0x14 to 0xff. See local/ghidra-group-followup-20261118/
 vga-dac-invalid-instruction-trace.json and the corresponding replay.
+
+### 2026-11-18 — Isolate the next graphics replay boundaries
+
+With the DOS aperture, scratch raster, DAC, and existing input
+fixtures, setting 0x41f3d0 to the ordinary copy callback 0xe9a24
+selected by 0xc3a74 clears the low-address instruction fault in
+0x284ec and 0xa9aa8. Both reach the 500,000-instruction budget.
+At 0xa9b4b, 0xa9aa8 clears the keyboard byte at 0x41f833 before
+waiting for 0x15 or 0x31, so initial RAM alone cannot supply
+the required input.
+
+Setting the saved framebuffer at 0x146e4c to scratch RAM also lets
+0x278c0 and 0x28224 run past the original x87 decode rejection.
+All four entries have matching guest state and service transcripts at
+their first visits to 0xd65ba, 0xa9b51, 0xcddac, and 0xcdd68,
+respectively. These are prefix results. All four full probes reach the
+budget. The added dispatch setup also changes the path of 0x27fec,
+whose earlier complete match uses the scratch raster alone. Keep those
+results attached to their respective prepared inputs.
+
+See local/ghidra-group-followup-20261118/
+raster-current-dispatch-{replay,prefix}.json.
