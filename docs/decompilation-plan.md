@@ -12310,3 +12310,13 @@ their static blockers. This evidence covers the original payload slot
 values in the flat address model. The generated dispatcher still reads
 guest memory at runtime.
 Report: `local/ghidra-group-followup-20261118/trace-table-guarded.json`.
+
+2026-11-18 — Generated a disposable overlay with the guarded candidates
+and their known direct dependencies, including the shared RET at
+0x80d88 and the reviewed interrupt sites. OpenWatcom compiled all 516
+generated bodies. The four guarded candidates and their caller 0x12160
+matched their first prepared inputs. Across the scope, 407 matched,
+103 were inconclusive and six stopped at callbacks outside the generated
+registry (four at 0x9d794 and two at 0xfa804). No tracker or Ghidra
+ownership changes were made.
+Report: `local/ghidra-group-followup-20261118/guarded-shared-tail-diff/report.json`.
