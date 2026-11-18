@@ -12669,3 +12669,18 @@ needs CR0 handling and its INT 21h site at 0x10e806. Candidate report:
 The status output now identifies these reasons as generator diagnostics.
 In particular, the largest dependency group still points to the mixed
 code/table body at 0x11d695, whose INS diagnostic comes from table data.
+
+The full CPUID-enabled host sweep compared all 4,341 emitted bodies
+with one prepared input per body and 5 MiB RAM. It used the hardware
+x87 oracle and the prepared DOS console, PIT write, X-32 heap and
+residency, and invalid DOS open fixtures. There were 3,486 matches
+(715,665 original body bytes), 855 inconclusive cases and zero
+mismatches. The paired status report shows 599 matches and 159
+inconclusive results among generated tracker-blocked bodies. Of those
+159, 87 original probes faulted, 47 stopped at a service and 25
+exhausted the instruction budget. Across the full sweep the largest
+remaining service stops are DOS write-mode open (54) and X-32
+real-mode calls (31). No tracker promotions or byte-identity claims
+follow from this run. Report and invocation are under
+`local/ghidra-group-followup-20261118/` as
+`bulk-cpuid-full-diff/report.json` and `verify-cpuid-full.py`.
