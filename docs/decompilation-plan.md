@@ -14331,3 +14331,27 @@ The output bulk-timer-full.jsonl has SHA-256
 45473d896a9ab0533839682d984b91de9b56e667782f143154d40ff0914eff4e.
 The linked translations.so has SHA-256
 172f90b75eaf6480d7f2ba7dc08825811b4aa7302c16fa36ec148f8c986f5037.
+
+### 2026-11-18 — Generate and compare the DPMI presence probe
+
+The 139-byte body at 0x11cda5 generates when its two explicit host
+boundaries are allowed. INT 2Fh at 0x11cdc2 queries AX=0x1686, and
+INT 31h at 0x11cde8 queries AX=0x0400. The bulk candidate emits 4,355
+entries, with six remaining unsupported entries. The DPMI probe is
+the only entry whose generation state changed, clearing its root
+blocker for 11 entries. All 4,354 previously emitted body hashes match
+the timer build.
+
+In the focused build, a cached value of 1 or -1 at 0x17e5fc matches
+through return. With the cache cleared, the differential comparison
+matches before the first interrupt for both values 0 and 1 of the
+selector byte at 0x132a5e. These checkpoint probes leave both host
+responses and the uncached return paths unverified.
+
+Use asm_c_program with --interrupt-boundaries and --interrupt-site
+0x11cdc2 and 0x11cde8. Use asm_c_differential with --scenarios 1
+--service-free-paths --address 0x11cda5 and --prepared-u32 for the
+cache and selector values above. For the two uncached inputs use
+--checkpoint 0x11cdc2 1 and --checkpoint 0x11cde8 1, respectively.
+Reports are under local/ghidra-group-followup-20261118 in
+bulk-dpmi-query-c, dpmi-query-c and dpmi-query-diff-*.
