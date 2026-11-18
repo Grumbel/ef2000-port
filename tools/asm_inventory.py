@@ -292,7 +292,7 @@ def guarded_jump_tables(instructions, edges, entry, stop, payload):
 
 
 def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None,
-                         interrupt_sites=()):
+                         interrupt_sites=(), indirect_call_sites=()):
     """Follow local static edges and require reviewed external entry points."""
     decoded = {insn['address']: insn for insn in instructions}
     edges = {}
@@ -306,6 +306,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
     spans = []
     returns = set()
     tail_targets = set()
+    dynamic_calls = set()
     blockers = []
     while pending:
         pc = pending.pop()
@@ -326,6 +327,10 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
         for edge in edges.get(pc, []):
             kind, target = edge['kind'], edge['target']
             if kind == 'review' and pc in interrupt_sites and insn['mnemonic'] == 'int':
+                continue
+            if (kind == 'call' and target is None and pc in indirect_call_sites and
+                    insn['mnemonic'] == 'call' and bytes.fromhex(insn['bytes'])[0] == 0xff):
+                dynamic_calls.add(pc)
                 continue
             if kind == 'call' and target in known_entries:
                 continue
@@ -355,17 +360,22 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
         result['guarded_jump_tables'] = sorted(used_tables, key=lambda table: table['site'])
     if tail_targets:
         result['tail_targets'] = sorted(tail_targets)
+    if dynamic_calls:
+        result['dynamic_call_sites'] = sorted(dynamic_calls)
     return result
 
 
 def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
-                       max_callees=0, observed_entries=(), interrupt_sites=()):
+                       max_callees=0, observed_entries=(), interrupt_sites=(), indirect_call_sites=()):
     if max_bytes <= 0:
         raise ValueError('candidate scan limit must be positive')
     if max_callees < 0:
         raise ValueError('candidate callee limit must be nonnegative')
     if any(not 0 <= site < len(payload) - 1 or payload[site] != 0xcd for site in interrupt_sites):
         raise ValueError('candidate interrupt site must point to a two-byte INT')
+    if any(not 0 <= site < len(payload) - 1 or payload[site] != 0xff or
+           payload[site + 1] & 0x38 != 0x10 for site in indirect_call_sites):
+        raise ValueError('candidate indirect call site must point to a near indirect CALL')
     owned = bytearray(len(payload))
     for body in bodies.values():
         for start, end in body['ranges']:
@@ -385,7 +395,8 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
             if key not in windows:
                 windows[key] = decode_window(image, entry, stop - entry, objdump=objdump)
             report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies,
-                                               payload=payload, interrupt_sites=interrupt_sites))
+                                               payload=payload, interrupt_sites=interrupt_sites,
+                                               indirect_call_sites=indirect_call_sites))
         remaining = max_callees - (len(candidates) - len(roots))
         if not remaining:
             break
@@ -570,6 +581,8 @@ def main(argv=None):
                         help='statically audit this observed gap target; repeatable')
     parser.add_argument('--trace-interrupt-site', action='append', type=lambda value: int(value, 0),
                         default=[], help='admit a reviewed two-byte INT during the candidate audit')
+    parser.add_argument('--trace-indirect-call-site', action='append', type=lambda value: int(value, 0),
+                        default=[], help='admit a reviewed near indirect CALL with a local continuation')
     parser.add_argument('--trace-callee-limit', type=int,
                         help='also audit up to this many uncovered direct call or tail-jump targets')
     parser.add_argument('--candidate-overlay', type=Path,
@@ -589,6 +602,8 @@ def main(argv=None):
         parser.error('--trace-entry requires --trace-body-limit')
     if args.trace_interrupt_site and args.trace_body_limit is None:
         parser.error('--trace-interrupt-site requires --trace-body-limit')
+    if args.trace_indirect_call_site and args.trace_body_limit is None:
+        parser.error('--trace-indirect-call-site requires --trace-body-limit')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
         parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
@@ -613,12 +628,14 @@ def main(argv=None):
                     raise ValueError(f'candidate entries absent from observed gap targets: {sorted(missing)}')
                 if args.trace_interrupt_site:
                     report['reviewed_interrupt_sites'] = sorted(set(args.trace_interrupt_site))
+                if args.trace_indirect_call_site:
+                    report['reviewed_indirect_call_sites'] = sorted(set(args.trace_indirect_call_site))
                 report['candidate_bodies'] = audit_table_bodies(
                     workspace / ghidra_ef2000.IMAGE_NAME, payload,
                     load_body_ranges(args.body_ranges, payload)[0], report.get('tables', []),
                     max_bytes=args.trace_body_limit, objdump=args.objdump,
                     max_callees=args.trace_callee_limit or 0, observed_entries=args.trace_entry,
-                    interrupt_sites=args.trace_interrupt_site)
+                    interrupt_sites=args.trace_interrupt_site, indirect_call_sites=args.trace_indirect_call_site)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

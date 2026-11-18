@@ -139,6 +139,26 @@ class InventoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'two-byte INT'):
                 audit([1])
 
+    def test_reviewed_indirect_call_preserves_the_continuation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            image = Path(temporary) / 'payload.bin'
+
+            def audit(payload, sites):
+                image.write_bytes(payload)
+                return asm_inventory.audit_table_bodies(
+                    image, payload, {}, [], max_bytes=16, objdump='objdump',
+                    observed_entries=[0], indirect_call_sites=sites)[0]
+
+            payload = bytes.fromhex('ffd0 c3')
+            self.assertTrue(audit(payload, [])['blockers'])
+            reviewed = audit(payload, [0])
+            self.assertFalse(reviewed['blockers'])
+            self.assertEqual(reviewed['dynamic_call_sites'], [0])
+            self.assertEqual(reviewed['return_sites'], [2])
+            self.assertTrue(audit(payload[:2], [0])['blockers'])
+            with self.assertRaisesRegex(ValueError, 'near indirect CALL'):
+                audit(bytes.fromhex('ffe0 c3'), [0])
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

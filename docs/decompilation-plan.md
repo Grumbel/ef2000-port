@@ -12454,3 +12454,12 @@ path still stops at 0xdbf2c. All 467 originals reached DOS exit, so these
 are still coverage mismatches. The two previously recorded traces show
 the edge to 0x110330 originates at 0x9bdfd.
 Report: `local/ghidra-group-followup-20261118/bulk-exit-reviewed-diff/report.json`.
+
+2026-11-18 — The candidate audit accepts an explicitly reviewed
+near indirect CALL with a local continuation. It records the call site
+while the translator still resolves the destination from guest state.
+This admitted 0xdbf2c with 0xdbf31 reviewed. The same trace audit also
+accepted 0x110330 and discovered 0x110341 and 0xfa7b4 through direct
+edges. The 4,349-body overlay covers every instruction PC in the two
+recorded exit traces. All 19 inventory tests passed. See
+`local/ghidra-group-followup-20261118/bulk-exit-complete-audit.json`.
