@@ -13649,3 +13649,18 @@ return, leaving the prepared-match total at 3,834.
 
 Replay with replay-bulk-gameport-bios-null-terminated-lists.py.
 The synthetic interrupt boundary test also passed.
+
+### 2026-11-18 — Verify list callers with populated divisor tables
+
+The second divisor comes from the 10-byte records in the table
+pointed to by the selected node at offset 0x20. Supplying three
+records with nonzero divisors allowed both 0xb7d4c and 0xb8510
+to match through return on the hit path. The 0xb8510 miss still
+matches. The 0xb7d4c miss still raises a divide exception in the
+original after the failed search returns a null node.
+
+The bulk total is now 3,835 of 4,353 entries with at least one
+complete prepared match. Replay with
+replay-bulk-gameport-bios-list-divisors.py and see
+bulk-gameport-bios-list-divisors.jsonl under
+local/ghidra-group-followup-20261118.
