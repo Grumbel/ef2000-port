@@ -13951,3 +13951,17 @@ also covers the in-place result written by 0xf0ffe.
 The prepared-match total is now 3,882 of 4,353 entries. See
 replay-bulk-gameport-bios-polynomial.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare VBE raster setup through return
+
+Entry 0xd1d40 previously exhausted the instruction budget in the
+scanline setup with unprepared dimensions. With the 640×400 and
+640×480 dimensions used by its callers and the existing X-32 VBE
+model, both comparisons match through return. The initializer
+selects its own draw callbacks, and both indirect calls execute
+without fixture overrides. These probes begin at 0xd1d40, after
+the callers' VBE mode selection.
+
+The prepared-match total is now 3,883 of 4,353 entries. See
+replay-bulk-gameport-bios-video-init.py and its JSONL output under
+local/ghidra-group-followup-20261118.
