@@ -12614,3 +12614,19 @@ Disassembly places this PC at the INT 21h/near RET entry in a
 contiguous table of three-byte interrupt stubs. It is absent from the
 generation inventory. The comparison report is
 `local/ghidra-group-followup-20261118/residency-stop-replay.json`.
+
+2026-11-18 — Traced the 0xd6df0 prepared path through the RET at
+0x9c4d6 into the INT 21h stub at 0x9c5bb and through its RET at
+0x9c5bd. The trace audit accepted the two-instruction body with
+`--trace-entry 0x9c5bb --trace-body-limit 3 --trace-interrupt-site 0x9c5bb`.
+The local overlay adds that one entry, for 4,350 inventory bodies
+and 4,340 generated C bodies. All 19 inventory tests passed.
+
+The scoped host build reran the 22 residency paths. All 11 previous
+dispatcher mismatches now match. The other paths account for four
+more matches and seven inconclusive results. Standalone comparisons
+with explicit lock, unlock and invalid residency requests also
+match. The generic standalone prepared input reaches a different
+unmodeled INT 21h request. No tracker states changed. Audit and
+comparison artifacts: `bulk-residency-audit.json` and
+`bulk-residency-diff/` under `local/ghidra-group-followup-20261118/`.
