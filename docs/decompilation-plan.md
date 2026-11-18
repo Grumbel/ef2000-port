@@ -14696,3 +14696,22 @@ respective PCs (entries 0xfddb0, 0x833a0, 0x83a40, 0xcbcc5, 0xcbd0f,
 0x102228 and 0x6f48). The local evidence
 `bulk-cpu-boundaries-arithmetic-fixtures.json` has SHA-256
 `446e7a817ceb0d7ed28703bea36978ffdff72cd69587d74f0cd4a021d65bda24`.
+
+#### Audit complete prepared coverage of the 4,361-entry candidate
+
+The interrupted prefix, the finished checked-in range report, and four
+completed ranges against the original linked host library cover the
+candidate's generated entries once each in manifest order. The audit
+checked range positions, addresses, and the four completion digests.
+It counted 2,999 matching returns, 757 matching DOS exits, 605
+inconclusive probes and zero mismatches. The aggregate local audit
+`bulk-cpu-boundaries-sweep-audit.json` has SHA-256
+`e4e4ec155bdf70e53dfbf343682c33d60090d4704a187a21a0c0d7bbf9f4d2ed`.
+
+This sweep used one default prepared input per entry and the earlier
+verifier policy. The separate divide-fault probes above supply
+additional evidence. Unmapped memory dominates the remaining
+inconclusive results (352 reads, 36 writes, 10 fetches), followed by 76
+instruction budget stops. The descriptor-aware selector services and
+privileged CPU transitions still need comparison coverage. No recovered
+patch was promoted based on this sweep.
