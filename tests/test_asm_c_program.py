@@ -1751,41 +1751,43 @@ ret
                         self.assertIn('host service request/response trace', result['differences'])
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
-    def test_explicit_sti_stop_leaves_unreached_path_comparable(self):
-        source = '''.type root,@function
+    def test_explicit_interrupt_flag_stop_leaves_unreached_path_comparable(self):
+        for mnemonic, status, flags in (('sti', 0x204, 2), ('cli', 0x206, 0x202)):
+            site_key = f'{mnemonic}_stop_sites'
+            source = f'''.type root,@function
 root: ret
 .size root, .-root
 .org 0x200
 .type leaf,@function
-leaf: sti
+leaf: {mnemonic}
 ret
 .size leaf, .-leaf'''
-        with tempfile.TemporaryDirectory() as temporary:
-            root = Path(temporary)
-            image, directory, _ = inventory(root, source)
-            out = root / 'out'
-            with self.assertRaisesRegex(ValueError, 'reviewed STI'):
-                asm_c_program.generate(directory, out, image, sti_stop_sites=[0x201])
-            asm_c_program.generate(directory, out, image, sti_stop_sites=[0x200])
-            report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
-                                                  service_free_paths=True)
-            self.assertEqual(report['sti_stop_sites'], [0x200])
-            by_address = {e['address']: e for e in report['entries']}
-            self.assertEqual(by_address[0x100]['state'], 'probes-pass')
-            self.assertEqual(by_address[0x200]['probes'][0]['reason'],
-                             'original reached STI stop at 0x200')
-            self.assertEqual(by_address[0x200]['probes'][0]['original_sti_stop'], {'pc': 0x200})
-            prefix = asm_c_differential.verify(
-                out, root / 'prefix', image, scenarios=1, service_free_paths=True,
-                addresses=[0x200], checkpoint=(0x200, 1))
-            self.assertEqual(prefix['entries'][0]['probes'][0]['state'], 'prefix-pass')
-            run = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run
-            run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
-                            ctypes.c_uint32]
-            memory = (ctypes.c_uint8 * 4096).from_buffer_copy(image.read_bytes().ljust(4096, b'\0'))
-            state = asm_c_differential.State(pc=0x200, flags=2, memory=memory, memory_size=4096)
-            self.assertEqual(run(ctypes.byref(state), 1, 0xf00), 0x204)
-            self.assertEqual((state.pc, state.flags), (0x200, 2))
+            with self.subTest(mnemonic=mnemonic), tempfile.TemporaryDirectory() as temporary:
+                root = Path(temporary)
+                image, directory, _ = inventory(root, source)
+                out = root / 'out'
+                with self.assertRaisesRegex(ValueError, f'reviewed {mnemonic.upper()}'):
+                    asm_c_program.generate(directory, out, image, **{site_key: [0x201]})
+                asm_c_program.generate(directory, out, image, **{site_key: [0x200]})
+                report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
+                                                      service_free_paths=True)
+                self.assertEqual(report[site_key], [0x200])
+                by_address = {e['address']: e for e in report['entries']}
+                self.assertEqual(by_address[0x100]['state'], 'probes-pass')
+                self.assertEqual(by_address[0x200]['probes'][0]['reason'],
+                                 f'original reached {mnemonic.upper()} stop at 0x200')
+                self.assertEqual(by_address[0x200]['probes'][0][f'original_{mnemonic}_stop'], {'pc': 0x200})
+                prefix = asm_c_differential.verify(
+                    out, root / 'prefix', image, scenarios=1, service_free_paths=True,
+                    addresses=[0x200], checkpoint=(0x200, 1))
+                self.assertEqual(prefix['entries'][0]['probes'][0]['state'], 'prefix-pass')
+                run = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run
+                run.argtypes = [ctypes.POINTER(asm_c_differential.State), ctypes.c_uint32,
+                                ctypes.c_uint32]
+                memory = (ctypes.c_uint8 * 4096).from_buffer_copy(image.read_bytes().ljust(4096, b'\0'))
+                state = asm_c_differential.State(pc=0x200, flags=flags, memory=memory, memory_size=4096)
+                self.assertEqual(run(ctypes.byref(state), 1, 0xf00), status)
+                self.assertEqual((state.pc, state.flags), (0x200, flags))
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_instruction_budget_is_shared_across_calls_and_can_resume(self):

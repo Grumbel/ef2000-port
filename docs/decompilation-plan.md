@@ -14436,3 +14436,33 @@ Run asm_c_differential --scenarios 1 --service-free-paths --x32-vectors
 irq-install-caller-c and irq-caller-checked-{0..5} under
 local/ghidra-group-followup-20261118. The generation report has SHA-256
 bb7e21bfa986c1b9c3cbfd03deb7586f6e53d7c79692d94f1c0ea84ef82f54c5.
+
+### 2026-11-18 — Bound stack exhaustion at the dispatch table
+
+The candidate body for 0x11d695 contains the error call, all six
+zero-byte ADD instructions on its debugger fallthrough and one
+stop site at 0x11d6b0. The latter is the first byte of the dispatch
+table, decoded as CLI if reached by execution. The opt-in
+--cli-stop-site boundary retains the original PC and flags and
+requires an exact CLI encoding at a reviewed instruction start.
+No table bytes after that stop are rendered as instructions. The
+tracker and authoritative Ghidra export still carry the old range.
+
+The bulk candidate generates 4,357 bodies with four unsupported
+entries. Only 0x11d695 changed generation state, clearing this body
+as a generation blocker for 160 entries. All 4,356 prior C body hashes
+agree. Run rebuild-bulk-stack-exhaustion.py under
+local/ghidra-group-followup-20261118. The result
+bulk-stack-exhaustion-c/report.json has SHA-256
+914f565ce0dd7066371604bb4c1bcef9041d7c15117e4b467da21a1d26931b17.
+
+With the debugger flag clear, original and C match through DOS exit
+code 1. The focused build links the dynamic shutdown callbacks at
+0xeb3d0, 0x110330 and 0xa455b and their direct callees. Use
+asm_c_differential --address 0x11d695 --scenarios 1 --service-free-paths
+--dos-console --dos-empty-drive --pit-writes --prepared-memory-size
+0x500000 --prepared-u32 0x17ee30 0. With the debugger flag set,
+comparison matches before INT3 at 0x1204c7. Execution after that
+debugger trap remains outside the verified paths. See
+stack-exhaustion-expanded-exit-1 and stack-exhaustion-debug-prefix in
+the same workspace.

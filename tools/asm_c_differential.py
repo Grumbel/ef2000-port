@@ -143,7 +143,7 @@ def validate_prepared_memory_size(size):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
+            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
             x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
@@ -167,7 +167,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if checkpoint is not None:
         checkpoint_pc, visits = checkpoint
         if (not program or captured is not None or not 0 <= checkpoint_pc < len(payload)
-                or (checkpoint_pc in sti_stop_sites and visits != 1)
+                or ((checkpoint_pc in sti_stop_sites or checkpoint_pc in cli_stop_sites) and visits != 1)
                 or checkpoint_pc in cpuid_sites or not 1 <= visits <= budget):
             raise ValueError('invalid checkpoint for prepared program probe')
     original_visits = translated_visits = 0
@@ -686,15 +686,15 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     cpu.hook_add(UC_HOOK_MEM_INVALID, invalid_memory)
     stopped_at = None
 
-    def stop_at_sti(engine, pc, size, _data):
+    def stop_before_instruction(engine, pc, size, _data):
         nonlocal stopped_at
         stopped_at = pc
         engine.emu_stop()
 
-    for pc in sti_stop_sites:
-        # A first-visit checkpoint already stops before this STI executes.
+    for pc in (*sti_stop_sites, *cli_stop_sites):
+        # A first-visit checkpoint already stops before the instruction executes.
         if checkpoint is None or pc != checkpoint_pc:
-            cpu.hook_add(UC_HOOK_CODE, stop_at_sti, begin=pc, end=pc)
+            cpu.hook_add(UC_HOOK_CODE, stop_before_instruction, begin=pc, end=pc)
     def record_cpuid(engine, pc, _size, _data):
         original_cpuid.append(dict(ip=pc, eax=engine.reg_read(x86_const.UC_X86_REG_EAX),
                                    ecx=engine.reg_read(x86_const.UC_X86_REG_ECX)))
@@ -730,6 +730,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         detail = {'original_service_stop': rejected_service} if rejected_service else {}
         return outcome(state='inconclusive', reason='original service unavailable: '+str(error),
                        **detail)
+    if stopped_at in cli_stop_sites:
+        return outcome(state='inconclusive', reason=f'original reached CLI stop at {stopped_at:#x}',
+                       original_cli_stop=dict(pc=stopped_at))
     if stopped_at is not None:
         return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}',
                        original_sti_stop=dict(pc=stopped_at))
@@ -870,7 +873,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         reason = {6: 'guest instruction bytes differ from translated code',
                   7: 'unsupported segment profile',
                   8: 'pending x87 exception delivery unsupported',
-                  0x204: 'STI stop', 0x205: 'CPUID boundary'}.get(status, 'budget/pc/memory/divide')
+                  0x204: 'STI stop', 0x205: 'CPUID boundary', 0x206: 'CLI stop'}.get(status, 'budget/pc/memory/divide')
         return outcome(state='mismatch', translated_stop=dict(status=status, pc=state.pc, fault=state.fault),
                        differences=[
             'C status %d (%s) at 0x%x after original completed' % (status, reason, state.pc)])
@@ -1001,7 +1004,7 @@ def load_prepared_fixtures(path):
 
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
-                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
+                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False, x32_heap=False,
                     dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False, prepared_registers=()):
     """Keep oracle/native crashes local and distinguish the failing phase.
@@ -1033,7 +1036,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock or x32_vectors) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
-                                 sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
+                                 sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
                                  prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
@@ -1215,6 +1218,13 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('invalid STI stop sites')
     if sti_stop_sites and (not program or not service_free_paths):
         raise ValueError('STI stops require a boundary-aware program comparison')
+    cli_stop_sites = manifest.get('cli_stop_sites', [])
+    if (not isinstance(cli_stop_sites, list) or
+            any(type(pc) is not int or not 0 <= pc < len(payload) or payload[pc] != 0xfa
+                for pc in cli_stop_sites)):
+        raise ValueError('invalid CLI stop sites')
+    if cli_stop_sites and (not program or not service_free_paths):
+        raise ValueError('CLI stops require a boundary-aware program comparison')
     cpuid_sites = manifest.get('cpuid_sites', [])
     if (not isinstance(cpuid_sites, list) or
             any(type(pc) is not int or not 0 <= pc < len(payload) - 1
@@ -1349,7 +1359,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         entry_registers, entry_words = fixtures.get(address, (prepared_registers, ()))
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
-                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
+                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites,
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
                                   gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
@@ -1378,7 +1388,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.restype = ctypes.c_uint
         result = isolated_probes(function, payload, captured.address, 1, budget, program,
                                  native_x87=native_x87, captured=captured, reject_services=reject_services,
-                                 sti_stop_sites=sti_stop_sites)[0]
+                                 sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites)[0]
         record_registry_membership(result)
         capture_results.append(dict(file=str(path), capture_sha256=digest,
                                     address=captured.address, sequence=captured.sequence,
@@ -1422,7 +1432,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
                                        'reject-on-reach' if reject_services else 'no-boundaries'),
-                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
+                  sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites,
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
                                          if captured_inputs else {},

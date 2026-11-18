@@ -82,7 +82,7 @@ def interrupt_vector(insn):
 
 
 def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
-                  interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cpuid_sites=()):
+                  interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=()):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
     if insn['address'] in sti_stop_sites:
@@ -90,6 +90,10 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
             raise asm_to_c.Unsupported('STI stop encoding/spelling mismatch')
         # Resume requires an external CPU implementation of STI and its interrupt shadow.
         return 'return 0x204u;'
+    if insn['address'] in cli_stop_sites:
+        if mnemonic != 'cli' or insn['bytes'] != 'fa' or insn['operands']:
+            raise asm_to_c.Unsupported('CLI stop encoding/spelling mismatch')
+        return 'return 0x206u;'
     if insn['address'] in cpuid_sites:
         if mnemonic != 'cpuid' or insn['bytes'] != '0fa2' or insn['operands']:
             raise asm_to_c.Unsupported('CPUID boundary encoding/spelling mismatch')
@@ -144,7 +148,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
 
 
 def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
-            port_boundaries=False, port_sites=None, failure_details=None, sti_stop_sites=(), cpuid_sites=()):
+            port_boundaries=False, port_sites=None, failure_details=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=()):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -179,7 +183,7 @@ def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
     renderer = partial(instruction_c, consuming_targets=consuming_targets,
                        interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites,
                        port_boundaries=port_boundaries, port_sites=port_sites,
-                       sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites)
+                       sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -392,19 +396,21 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
 
 
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
-             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cpuid_sites=(),
+             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(),
              allow_partial_closure=False):
     if port_sites is not None and not port_boundaries:
         raise ValueError('port sites require port boundaries')
     if interrupt_sites is not None and not interrupt_boundaries:
         raise ValueError('interrupt sites require interrupt boundaries')
     manifest, records = asm_to_c.read_inventory(inventory, image)
-    sti_stop_sites = frozenset(sti_stop_sites)
-    valid_sti = {i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
-                 for i in r['instructions'] if i['mnemonic'] == 'sti' and i['bytes'] == 'fb'
-                 and not i['operands']} if sti_stop_sites else set()
-    if sti_stop_sites - valid_sti:
-        raise ValueError('STI stop sites must be reviewed STI instruction starts')
+    sti_stop_sites, cli_stop_sites = map(frozenset, (sti_stop_sites, cli_stop_sites))
+    for sites, mnemonic, encoding in ((sti_stop_sites, 'sti', 'fb'), (cli_stop_sites, 'cli', 'fa')):
+        if sites:
+            valid = {i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
+                     for i in r['instructions'] if i['mnemonic'] == mnemonic and i['bytes'] == encoding
+                     and not i['operands']}
+            if sites - valid:
+                raise ValueError(f'{mnemonic.upper()} stop sites must be reviewed {mnemonic.upper()} instruction starts')
     cpuid_sites = frozenset(cpuid_sites)
     if cpuid_sites:
         valid_cpuid = {i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
@@ -417,7 +423,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                                                   interrupt_boundaries=interrupt_boundaries,
                                                   interrupt_sites=interrupt_sites,
                                                   port_boundaries=port_boundaries, port_sites=port_sites,
-                                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites)
+                                                  sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites)
     blockers = root_blockers(dependencies, closed, reasons)
     emitted = set(codes) if allow_partial_closure else closed
     output.mkdir(parents=True, exist_ok=False)
@@ -487,6 +493,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
         'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
     if cpuid_sites:
         result['cpuid_sites'] = sorted(cpuid_sites)
+    if cli_stop_sites:
+        result['cli_stop_sites'] = sorted(cli_stop_sites)
     if sti_stop_sites:
         result['sti_stop_sites'] = sorted(sti_stop_sites)
     if interrupt_boundaries:
@@ -531,6 +539,8 @@ def main(argv=None):
                         help='yield at a reviewed CPUID instruction for CPU-model emulation')
     parser.add_argument('--sti-stop-site', type=lambda value: int(value, 0), action='append', default=[],
                         help='stop before an explicit STI, leaving PC and flags unchanged (repeatable)')
+    parser.add_argument('--cli-stop-site', type=lambda value: int(value, 0), action='append', default=[],
+                        help='stop before an explicit CLI, leaving PC and flags unchanged (repeatable)')
     parser.add_argument('--allow-partial-closure', action='store_true',
                         help='emit supported bodies even when some direct dependencies are untranslated')
     args = parser.parse_args(argv)
@@ -544,7 +554,7 @@ def main(argv=None):
                           interrupt_sites=None if args.interrupt_site is None else frozenset(args.interrupt_site),
                           port_boundaries=args.port_boundaries,
                           port_sites=None if args.port_site is None else frozenset(args.port_site),
-                          sti_stop_sites=args.sti_stop_site, cpuid_sites=args.cpuid_site,
+                          sti_stop_sites=args.sti_stop_site, cli_stop_sites=args.cli_stop_site, cpuid_sites=args.cpuid_site,
                           allow_partial_closure=args.allow_partial_closure)
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
