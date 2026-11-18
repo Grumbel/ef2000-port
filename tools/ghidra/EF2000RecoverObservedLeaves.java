@@ -38,12 +38,16 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xd8168, 0xd8170, 0xd90b3, 0},
         {0xfa804, 0xfa815, 0xfa856, 0},
         {0xd8220, 0xd8358, 0xd90b8, 0},
+        {0x122a0, 0x12318, 0, 0},
+        {0x12f18, 0x12f9c, 0x12188, 0},
+        {0x13a50, 0x13abc, 0x12dfd, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
         "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244",
         "position_callback_d83b8", "position_callback_d849c", "position_callback_prefix_d8168",
-        "format_stream_putc_fa804", "position_callback_d8220"
+        "format_stream_putc_fa804", "position_callback_d8220",
+        "dispatch_group_helper_122a0", "dispatch_group_12f18", "dispatch_group_13a50"
     };
 
     @Override
@@ -70,6 +74,9 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                 long entry = recipe[0], end = recipe[1], literal = recipe[2];
                 boolean positionCallback = entry == 0xd83b8 || entry == 0xd849c;
                 boolean positionBranch = entry == 0xd8220;
+                boolean groupDispatch = entry == 0x12f18 || entry == 0x13a50;
+                long directCallee = positionBranch ? 0xd8170 : groupDispatch ? 0x122a0 :
+                    entry == 0x122a0 ? 0x11e7c : 0;
                 boolean formatStream = entry == 0xfa804;
                 boolean entryPrefix = entry == 0xd8168;
                 Function function = getFunctionAt(toAddr(entry));
@@ -119,6 +126,24 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     if (!table || !indexRegister || caller == null || caller.getEntryPoint().getOffset() != 0x1c780 ||
                             Integer.toUnsignedLong(currentProgram.getMemory().getInt(toAddr(0x122d34))) != entry) {
                         throw new IllegalStateException("missing observed callback-table corroboration");
+                    }
+                } else if (groupDispatch) {
+                    Instruction call = getInstructionAt(toAddr(literal));
+                    Function caller = getFunctionContaining(toAddr(literal));
+                    long callerEntry = entry == 0x12f18 ? 0x12160 : 0x12d90;
+                    long slot = entry == 0x12f18 ? 0x121fea : 0x122333;
+                    String indexRegister = entry == 0x12f18 ? "EAX" : "ECX";
+                    boolean base = false, register = false;
+                    if (call != null && call.getFlowType().isCall() && call.getFlowType().isComputed()) {
+                        for (Object object : call.getOpObjects(0)) {
+                            if (object instanceof Scalar && ((Scalar)object).getUnsignedValue() == 0x121fcd) base = true;
+                            if (object instanceof Address && ((Address)object).getOffset() == 0x121fcd) base = true;
+                            if (object instanceof Register && ((Register)object).getName().equals(indexRegister)) register = true;
+                        }
+                    }
+                    if (!base || !register || caller == null || caller.getEntryPoint().getOffset() != callerEntry ||
+                            Integer.toUnsignedLong(currentProgram.getMemory().getInt(toAddr(slot))) != entry) {
+                        throw new IllegalStateException("missing group callback table corroboration");
                     }
                 } else if (literal != 0) {
                     Instruction reference = getInstructionAt(toAddr(literal));
@@ -181,17 +206,21 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                                 !toAddr(cursor + instruction.getLength()).equals(instruction.getFallThrough())) {
                             throw new IllegalStateException("unexpected entry prefix flow at " + toAddr(cursor));
                         }
-                    } else if (positionBranch) {
-                        if (last ? !mnemonic.equals("RET") : instruction.getFlowType().isTerminal() ||
-                                instruction.getFlowType().isComputed() ||
-                                !toAddr(cursor + instruction.getLength()).equals(instruction.getFallThrough())) {
-                            throw new IllegalStateException("unexpected position callback flow at " + toAddr(cursor));
+                    } else if (directCallee != 0) {
+                        var flow = instruction.getFlowType();
+                        Address[] targets = instruction.getFlows();
+                        boolean returns = mnemonic.equals("RET");
+                        boolean hasFallthrough = !returns && (!flow.isJump() || flow.isConditional());
+                        Address fallthrough = hasFallthrough ? toAddr(cursor + instruction.getLength()) : null;
+                        if ((last && !returns) || flow.isComputed() || (flow.isTerminal() && !returns) ||
+                                !java.util.Objects.equals(fallthrough, instruction.getFallThrough()) ||
+                                targets.length != (flow.isCall() || flow.isJump() ? 1 : 0)) {
+                            throw new IllegalStateException("unexpected callback flow at " + toAddr(cursor));
                         }
-                        for (Address target : instruction.getFlows()) {
-                            if (instruction.getFlowType().isCall() ?
-                                    target.getOffset() != 0xd8170 || getFunctionAt(target) == null :
-                                    !instruction.getFlowType().isConditional() || !body.contains(target)) {
-                                throw new IllegalStateException("unexpected position callback target at " + toAddr(cursor));
+                        for (Address target : targets) {
+                            if (flow.isCall() ? target.getOffset() != directCallee || getFunctionAt(target) == null :
+                                    !flow.isJump() || !body.contains(target)) {
+                                throw new IllegalStateException("unexpected callback target at " + toAddr(cursor));
                             }
                         }
                     } else if (formatStream && cursor == 0xfa80b) {
@@ -212,12 +241,12 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     }
                     cursor += instruction.getLength();
                 }
-                if (positionBranch) {
+                if (directCallee != 0) {
                     var instructions = currentProgram.getListing().getInstructions(body, true);
                     while (instructions.hasNext()) {
                         for (Address target : instructions.next().getFlows()) {
                             if (getInstructionAt(target) == null) {
-                                throw new IllegalStateException("position callback target crosses an instruction: " + target);
+                                throw new IllegalStateException("callback target crosses an instruction: " + target);
                             }
                         }
                     }

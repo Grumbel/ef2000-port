@@ -12194,3 +12194,16 @@ All 34 scoped bodies compiled with OpenWatcom. The caller that previously
 stopped at 0xd8220 now matches on all 16 prepared inputs. Standalone
 callback probes remain inconclusive. All 47 wrapper tests passed.
 Evidence is under `local/ghidra-position-branch-20261118/`.
+
+2026-11-18 — Recovered indexed group callbacks at 0x12f18 and 0x13a50
+and their direct callee at 0x122a0, totaling 360 original body bytes.
+The guard checks the indexed CALLs and the original table slots at
+0x121fea and 0x122333. It audits internal branches and return boundaries
+and requires the expected direct callees. Audit, apply and repeat apply
+succeeded. The fresh export contains 4,291 functions. All 47 Ghidra
+wrapper tests passed.
+All 85 scoped bodies compiled with OpenWatcom. The three recovered
+bodies matched their first prepared inputs. The original failing callers
+now stop at later uncovered entries: 0x13e14 from 0x6460 and 0x1303c
+from 0x12160. The scoped run counted 62 matches, 21 inconclusive probes
+and two mismatches. Evidence is under `local/ghidra-group-dispatch-20261118/`.
