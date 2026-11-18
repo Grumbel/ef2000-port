@@ -365,6 +365,11 @@ static int test_getrusage(int who, struct rusage *sample) {
                 result = self.compare(must_not_run, image.read_bytes(), **kwargs)
                 self.assertEqual(result['state'], 'inconclusive', result)
                 self.assertIn(reason, result['reason'])
+                if reason == 'register encoding':
+                    self.assertEqual(result['original_x87_decode_stop'],
+                                     dict(pc=0x100, encoding='d9f5'))
+                elif reason == 'pending':
+                    self.assertNotIn('original_x87_decode_stop', result)
         values = dict(x87_control=0x37f, x87_status=0, x87_tag=0xffff, x87_opcode=0,
                       x87=[[0, 0, 0] for _ in range(8)])
         for operation, data in ((0xd916, b''), (0xd9f5, b'')):

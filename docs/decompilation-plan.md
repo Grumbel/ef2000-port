@@ -12875,3 +12875,13 @@ of 0x27fec, which passes under the earlier raster-only preparation.
 Local evidence is in `dos-other-budget-replay.json`,
 `raster-neighbors-replay.json`, `raster-dispatch-replay.json`, and
 `raster-dispatch-aperture-replay.json`.
+
+The native x87 rejection on both prepared graphics paths is at 0x11ea
+with encoding dfdf. A memory-write hook showed that the original
+memcpy overwrites code after 0xc39b1 restores the unset framebuffer
+pointer from 0x146e4c. A subsequent raster write at 0xcf81e reaches
+the same address. Initializing the saved pointer to a separate
+scratch framebuffer at 0x370000 lets both probes advance to the
+unmodeled X-32 2511h service at 0x977. The verifier now reports guest
+PC and encoding for original x87 decoder rejections. See local
+`profile-raster-x87.json` and `raster-saved-framebuffer-replay.json`.

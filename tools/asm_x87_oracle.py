@@ -308,6 +308,7 @@ class Binding:
     def __init__(self, native, cpu):
         self.native, self.cpu = native, cpu
         self.counts, self.interrupted = Counter(), 0
+        self.decode_stop = None
 
     def evidence(self):
         return dict(operations=dict(self.counts), interrupted_native_samples=self.interrupted)
@@ -325,7 +326,11 @@ class Binding:
         if not (0xd8 <= first <= 0xdf or first == 0x9b):
             return
         registers = {name: cpu.reg_read(getattr(x, 'UC_X86_REG_'+name)) for name in REGISTERS}
-        op = decode(encoded, registers)
+        try:
+            op = decode(encoded, registers)
+        except Unavailable:
+            self.decode_stop = dict(pc=address, encoding=encoded.hex())
+            raise
         values = snapshot(cpu)
         if not op['nonwaiting'] and (values['x87_status'] & 0x80 or
                                     values['x87_status'] & ~values['x87_control'] & 0x3f):

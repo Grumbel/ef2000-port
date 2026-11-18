@@ -514,7 +514,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         if port_errors:
             raise ValueError(port_errors[0])
     except asm_x87_oracle.Unavailable as error:
-        return outcome(state='inconclusive', reason='original native x87 unavailable: '+str(error))
+        detail = {'original_x87_decode_stop': binding.decode_stop} if binding and binding.decode_stop else {}
+        return outcome(state='inconclusive', reason='original native x87 unavailable: '+str(error),
+                       **detail)
     except UcError as error:
         detail = {'original_memory_fault': memory_fault} if memory_fault else {}
         return outcome(state='inconclusive', reason='original fault: ' + str(error), **detail)
