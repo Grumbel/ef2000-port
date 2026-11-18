@@ -13129,3 +13129,31 @@ and 32-bit accumulator operands. The existing opcode-change test still
 rejects modified opcode bytes. The four original entries are queued
 for a new generated-C comparison. The existing hybrid redirect
 exclusion at 0xc4755 stays in place.
+
+### 2026-11-18 — Replay the inconclusive entries with DOS and graphics fixtures
+
+Replayed all 759 inconclusive entries from the 4,344-body raster sweep
+using the same generated library and a 100,000-instruction budget.
+The replay supplied the DOS aperture, scratch raster, BIOS window
+pointer, DAC, DOS clock, X-32 heap and residency, and the existing
+empty-drive, idle mouse, no-CD, and VBE fixtures. It produced 113
+complete semantic matches, 641 inconclusive probes, and five mismatches.
+The results apply to this prepared state.
+
+Of the 641 inconclusive probes, 400 stopped at an original fault,
+157 at an unmodeled or rejected host service, 75 at the budget, eight
+at an STI boundary, and one at the native x87 oracle. Among the service
+stops, 31 reached INT 21h AH=25h and 21 reached AH=35h. These groups
+include distinct operations. The existing X-32 vector and selector
+models in the startup probe give a starting point for auditing them.
+
+Four mismatches stopped at the mutable SUB instruction described
+above. The fifth, entry 0x410d0, reached untranslated 0x9850c in C
+while the original continued to DOS exit 255. An audited local
+inventory overlay adds the 63-byte span 0x9850c..0x9854b. In the
+rebuilt two-entry check, both 0x410d0 and 0x9850c match, including
+the exit code and service transcripts for 0x410d0. The span remains
+a local inventory candidate.
+
+See local/ghidra-group-followup-20261118/
+bulk-inconclusive-prepared-replay.jsonl and bulk-allocator-diff/report.json.
