@@ -154,6 +154,8 @@ def translation_blockers(rows, report, out=sys.stdout):
     entries = {}
     for entry in report['entries']:
         address = entry['address']
+        if entry.get('state') not in ('generated-unverified', 'unsupported'):
+            raise TrackerError('expected a C generation report from asm_c_program.py')
         if address in entries:
             raise TrackerError(f'duplicate translation entry: {format_addr(address)}')
         entries[address] = entry

@@ -170,6 +170,9 @@ class DecompStatusTest(unittest.TestCase):
         report['entries'].append(report['entries'][0])
         with self.assertRaises(decomp_status.TrackerError):
             decomp_status.translation_blockers(rows, report, io.StringIO())
+        report['entries'] = [{'address': 0x100, 'state': 'match'}]
+        with self.assertRaisesRegex(decomp_status.TrackerError, 'C generation report'):
+            decomp_status.translation_blockers(rows, report, io.StringIO())
 
     def test_service_dependency_counts_include_ports_and_preserve_unknowns(self):
         rows = [decomp_status.new_row(address, 10, '') for address in range(1, 7)]
