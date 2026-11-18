@@ -14025,3 +14025,18 @@ loops are both required for complete positive-delay comparisons.
 The prepared-match total stays at 3,885 of 4,353 entries. See
 replay-bulk-gameport-bios-timer-callback.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Validate the timer callback as its own entry
+
+The reviewed range [0xe28c4, 0xe28d7) contains three counter
+updates and a near return. Timer initialization passes 0xe28c4
+to the registration routine at 0x102144, and the bulk body
+ranges have no overlapping owner. A payload-bound local overlay
+for this range exported and compiled one additional C entry.
+The focused differential passed 16 standard scenarios and all
+three prepared counter fixtures, including rollover and a zero
+countdown. Callback scheduling during positive waits still needs
+comparison. The previous 4,353-entry bulk build is unchanged.
+
+The overlay, focused diff report, and replay-timer-callback-focused.py
+are under local/ghidra-group-followup-20261118.
