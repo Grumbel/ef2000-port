@@ -13742,3 +13742,16 @@ verifier.
 The prepared-match total is now 3,846 of 4,353 entries. See
 replay-bulk-gameport-bios-slot-wrap.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify string append paths
+
+Entries 0x9ca57 and 0x8fd70 previously exhausted their instruction
+budgets in the string copy loop. Both matched the generated C
+through return with empty, one-byte and two-byte suffixes. These
+cases exercise termination at both byte positions of the unrolled
+loop. The 0x8fd70 cases also exercised the prefix copy and three
+successive appends.
+
+The prepared-match total is now 3,848 of 4,353 entries. See
+replay-bulk-gameport-bios-string-heap-inputs.py and its JSONL output
+under local/ghidra-group-followup-20261118.
