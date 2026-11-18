@@ -12524,3 +12524,29 @@ heap growth (222 original stops at 0x245 with AX=0x3508). Among the
 inconclusive. `nix run .#status` was exercised on the earlier paired
 467-probe report. Full report:
 `local/ghidra-group-followup-20261118/bulk-partial-full-diff/report.json`.
+
+The blocked tracker subset in that sweep breaks down as follows:
+
+| Prepared comparison result or inventory gap | Functions | Original body bytes |
+| --- | ---: | ---: |
+| Matched on one prepared input | 544 | 307,634 |
+| Original reached a rejected host service | 101 | 74,119 |
+| Original faulted from the prepared state | 85 | 50,872 |
+| Original exhausted the instruction budget | 23 | 20,945 |
+| Body excluded by the generator | 9 | 2,020 |
+| Outside the translation inventory | 10 | 451 |
+| Total | 772 | 456,041 |
+
+The expanded boundary build emits four more blocked tracker bodies
+(1,048 bytes), leaving five generator exclusions and the same ten
+inventory omissions. This is a generation count. Tracker promotion
+still requires the evidence listed in the ground rules.
+
+The scoped comparison compiled the 4,339-body host build and reran the
+eight previous mismatches plus the two newly emitted targets. The
+prepared inputs at 0x101f78 and its target 0x1111e5 matched. The six
+former dispatcher gaps at 0x110f0c now reach the original STI stop at
+0x110f34, as does the probe beginning at 0x110f0c itself. Those seven
+results are inconclusive. The 0xf2800 probe still reaches untranslated
+CPUID code at 0xf2819 in C after the original has completed. Report:
+`local/ghidra-group-followup-20261118/bulk-extra-boundary-diff/report.json`.
