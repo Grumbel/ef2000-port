@@ -217,6 +217,8 @@ def differential_summary(rows, translation_path, differential_path):
     if (differential.get('translation_report_sha256') != hashlib.sha256(source).hexdigest()
             or differential.get('payload_sha256') != translation.get('payload_sha256')):
         raise TrackerError('differential report does not match the supplied generation report')
+    if differential.get('prepared_checkpoint') is not None:
+        raise TrackerError('checkpoint comparisons cover prefixes only and cannot summarize full probes')
     generated = {entry['address']: entry for entry in translation['entries']
                  if entry['state'] == 'generated-unverified'}
     results = {}

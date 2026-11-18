@@ -131,7 +131,7 @@ def validate_prepared_memory_size(size):
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
-            dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False):
+            dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, checkpoint=None):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -150,6 +150,12 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         raise ValueError('memory services require a service factory')
     if cpuid_sites and (not program or captured is not None):
         raise ValueError('CPUID boundaries require prepared program probes')
+    if checkpoint is not None:
+        checkpoint_pc, visits = checkpoint
+        if (not program or captured is not None or not 0 <= checkpoint_pc < len(payload)
+                or checkpoint_pc in sti_stop_sites or checkpoint_pc in cpuid_sites or not 1 <= visits <= budget):
+            raise ValueError('invalid checkpoint for prepared program probe')
+    original_visits = translated_visits = 0
     original_cpuid, translated_cpuid = [], []
     cpuid_cpu = None
     prepared_services = dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse
@@ -413,8 +419,22 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         selectors = [captured.registers[name] for name in asm_to_c.SEGMENTS]
         initial_fpu = capture_x87(cpu)
     reloads = asm_capture.DataReloadObserver(cpu, captured) if captured is not None else None
+    if checkpoint is not None:
+        if checkpoint_pc == sentinel:
+            raise ValueError('checkpoint overlaps probe return sentinel')
+
+        def stop_at_checkpoint(engine, _pc, _size, _data):
+            nonlocal original_visits
+            original_visits += 1
+            if original_visits == visits:
+                engine.emu_stop()
+
+        cpu.hook_add(UC_HOOK_CODE, stop_at_checkpoint, begin=checkpoint_pc, end=checkpoint_pc)
     binding = native_x87.bind(cpu) if native_x87 is not None else None
     def outcome(**fields):
+        if checkpoint is not None:
+            fields['checkpoint'] = dict(pc=checkpoint_pc, visits=visits, original_visits=original_visits,
+                                        translated_visits=translated_visits)
         if drive_directory is not None:
             drive_directory.cleanup()
         if cpuid_sites and (original_cpuid or translated_cpuid):
@@ -561,7 +581,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        **detail)
     if stopped_at is not None:
         return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
-    if original_exit is None:
+    if checkpoint is not None and original_visits != visits:
+        return outcome(state='inconclusive', reason='original did not reach requested checkpoint')
+    if checkpoint is None and original_exit is None:
         next_pc = cpu.reg_read(x86_const.UC_X86_REG_EIP)
         if next_pc != sentinel:
             return outcome(state='inconclusive', reason='original instruction budget exhausted',
@@ -594,12 +616,18 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
-    if translated_service is None and translated_port is None and not prepared_services and not cpuid_sites:
+    if (translated_service is None and translated_port is None and not prepared_services
+            and not cpuid_sites and checkpoint is None):
         status = (function(ctypes.byref(state), budget, sentinel) if program else
                   function(ctypes.byref(state), budget))
     else:
         status = 1
         for _ in range(budget):
+            if checkpoint is not None and state.pc == checkpoint_pc:
+                translated_visits += 1
+                if translated_visits == visits:
+                    status = 0
+                    break
             status = function(ctypes.byref(state), 1, sentinel)
             if (0x100 <= status <= 0x1ff or status == 0x203) and (translated_service is not None or prepared_services):
                 length = 1 if status == 0x203 else 2
@@ -679,6 +707,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 status = 0 if state.pc == sentinel else 1
             if status != 1:
                 break
+    if checkpoint is not None and translated_visits != visits:
+        return outcome(state='mismatch', differences=['C did not reach requested checkpoint'],
+                       translated_stop=dict(status=status, pc=state.pc, fault=state.fault))
     if status:
         reason = {6: 'guest instruction bytes differ from translated code',
                   7: 'unsupported segment profile',
@@ -734,7 +765,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     if memory != original_ram:
         first = next(i for i, (a, b) in enumerate(zip(memory, original_ram)) if a != b)
         differences.append('RAM first mismatch at 0x%x' % first)
-    return outcome(state='mismatch' if differences else 'pass', differences=differences)
+    match = 'prefix-pass' if checkpoint is not None else 'pass'
+    return outcome(state='mismatch' if differences else match, differences=differences)
 
 
 def reject_host_service(*args):
@@ -772,7 +804,7 @@ def vga_status_service(pit_writes=False):
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, checkpoint=None):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -797,7 +829,7 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
-                                 sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
+                                 sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
                                  port_factory=(lambda: vga_status_service(pit_writes)) if vga_status_reads else
@@ -908,7 +940,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, checkpoint=None):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -919,6 +951,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    if checkpoint is not None and (not program or not service_free_paths or captures or not addresses):
+        raise ValueError('checkpoint requires prepared program probes and explicit entry addresses')
     if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS console fixture requires --service-free-paths and interrupt boundaries')
     if x32_heap and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
@@ -1077,14 +1111,16 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
-                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse)
+                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
+                                  checkpoint=checkpoint)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
         entries.append(dict(address=address, counts=dict(counts), probes=results,
                             watcom_object_sha256=watcom_results.get('ef_lift_%08x' % address),
                             state='mismatch' if counts['mismatch'] else
-                            'probes-pass' if counts['pass'] == scenarios else 'inconclusive'))
+                            'probes-pass' if counts['pass'] == scenarios else
+                            'prefix-pass' if counts['prefix-pass'] == scenarios else 'inconclusive'))
         with progress.open('a') as stream:
             stream.write(json.dumps(entries[-1]) + '\n')
         if len(entries) % 25 == 0:
@@ -1112,6 +1148,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
+                  prepared_checkpoint=dict(pc=checkpoint[0], visits=checkpoint[1]) if checkpoint else None,
                   prepared_memory_size=prepared_memory_size or 0x400000,
                   x32_heap_policy='prepared-only' if x32_heap else 'disabled',
                   x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
@@ -1174,6 +1211,8 @@ def main(argv=None):
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--address', type=lambda value: int(value, 0), action='append', default=[],
                         help='probe only this entry; repeatable, with all generated C linked')
+    parser.add_argument('--checkpoint', nargs=2, type=lambda value: int(value, 0),
+                        metavar=('PC', 'VISITS'), help='compare before the given visit to a guest PC')
     parser.add_argument('--budget', type=int, default=10000)
     parser.add_argument('--capture', type=Path, action='append', default=[],
                         help='also compare an original EFCAP002 call input; repeatable')
@@ -1191,7 +1230,8 @@ def main(argv=None):
                         pit_writes=args.pit_writes, vga_status_reads=args.vga_status_reads, x32_heap=args.x32_heap,
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse,
-                        prepared_memory_size=args.prepared_memory_size, addresses=args.address)
+                        prepared_memory_size=args.prepared_memory_size, addresses=args.address,
+                        checkpoint=args.checkpoint)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:

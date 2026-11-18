@@ -1288,6 +1288,15 @@ ret
             self.assertEqual(vga_events['original'], vga_events['translated'])
             self.assertEqual([e['after']['ax'] for e in vga_events['original']],
                              [0x12345600, 0x12345608])
+            prefix_report = asm_c_differential.verify(
+                out, root / 'prefix', image, scenarios=1, service_free_paths=True,
+                vga_status_reads=True, addresses=[0xa00], checkpoint=(0xa0b, 1))
+            prefix = prefix_report['entries'][0]
+            self.assertEqual(prefix['state'], 'prefix-pass', prefix)
+            probe = prefix['probes'][0]
+            self.assertEqual(probe['checkpoint'],
+                             dict(pc=0xa0b, visits=1, original_visits=1, translated_visits=1))
+            self.assertEqual(len(probe['port_services']['original']), 1)
             self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
             self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
             events = console_entries[0x200]['probes'][0]['host_services']

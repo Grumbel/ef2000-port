@@ -376,6 +376,17 @@ static int test_getrusage(int who, struct rusage *sample) {
             with self.assertRaises(oracle.Unavailable):
                 self.native.execute(operation, values, data, 0)
 
+    def test_checkpoint_stops_before_unsupported_x87_instruction(self):
+        def must_not_run(*args):
+            self.fail('checkpoint at entry must stop before executing C')
+
+        with tempfile.TemporaryDirectory() as temporary:
+            image, _ = assemble(Path(temporary), 'fprem1\nret')
+            result = self.compare(must_not_run, image.read_bytes(), program=True,
+                                  checkpoint=(0x100, 1))
+            self.assertEqual(result['state'], 'prefix-pass', result)
+            self.assertEqual(result['original_x87']['operations'], {})
+
     def test_report_explicitly_binds_the_original_oracle(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

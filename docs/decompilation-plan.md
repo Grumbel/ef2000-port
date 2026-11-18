@@ -12935,3 +12935,12 @@ including 126 port events each and 196 and 206 host service events
 respectively. This verifies the observed prefixes only. Complete
 probes remain inconclusive. See local `raster-prefix-check.json`
 and `raster-prefix-64.json`.
+
+Use `--checkpoint PC VISITS` with explicit `--address` entries and
+`--service-free-paths` to compare prepared program state before the
+specified visit to a guest instruction. The verifier compares the
+same register, RAM and service evidence as a full probe, and reports
+`prefix-pass` for matching state. The status summary accepts full
+probe reports only. With the existing local graphics preparation,
+the verifier reproduced the 64th-visit matches at 0xdc2ee for
+0x278c0 and 0x28224. See local `raster-verifier-checkpoint.json`.
