@@ -14948,3 +14948,28 @@ Run the local probe with
 The report `bulk-cpu-boundaries-relationship-cohort.json` retains the
 inputs and outcomes. SHA-256
 `af5ece74effccd13233a4eef31cfe843839c7145ac0f411fcfbf18c329d710ea`.
+
+#### Verify positive and zero relationship checks
+
+Four default probes faulted while walking the relationship list at
+0xcc235. With a two-record list and a prepared flag array, all four
+entries match through return in the 4,363-entry candidate. The
+positive and zero lookups (0xcc22c and 0xcc1ec) each match for all
+three flag signs, reserved indices 9 and 10, low-byte index wrapping
+and an absent group. The matching group is the second record, so the
+probes exercise traversal as well as flag selection.
+
+The filtered count at 0xb0954 matches for a positive relationship
+and for the zero-type shortcut. The slot filler at 0xb686c matches
+the two-candidate search with initialized coordinates and one slot,
+including two x87 square roots and distance comparisons. It also
+matches the fallback copy when neither candidate qualifies. The
+validator at 0xf8b14 matches the zero-relationship rejection and the
+slot-count rejection after a positive lookup. Later validation
+branches and game replays remain pending.
+
+Run the local probe with
+`bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-positive-relationship-cohort.py`.
+The report `bulk-cpu-boundaries-positive-relationship-cohort.json`
+retains the 20 passing probes and the original x87 operation counts.
+SHA-256 `56d2ea03b8ec8a45e0146dbda1f96a28865d246680ecab45f753500fc8a9318e`.
