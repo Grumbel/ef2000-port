@@ -14715,3 +14715,40 @@ inconclusive results (352 reads, 36 writes, 10 fetches), followed by 76
 instruction budget stops. The descriptor-aware selector services and
 privileged CPU transitions still need comparison coverage. No recovered
 patch was promoted based on this sweep.
+
+#### Compare scene lookup, coordinate conversion and list consumers
+
+Sixteen prepared probes on the linked 4,361-entry candidate matched
+across twelve entries formerly inconclusive on default inputs. Fourteen
+reached normal return and two reached DOS exit 255 with matching console
+and port traces. The fixtures use the prepared DOS console, X-32 heap,
+PIT write and VGA status policies.
+
+- For 0x87f9c the globals at 0x20f160 and 0x20f164 point to the list head
+  and tail sentinel. Link the head directly to the tail at offset 0x34
+  for the empty case. To exercise traversal, link the head through one
+  node with lookup key byte 7 and word 0x1234 at offsets 0x50 and 0x51.
+  Probe with EDX=0x1234 and 0x1235. The empty list also lets callers
+  0x56954, 0x65748 and 0x657c4 return with a zeroed input record in EAX.
+- The same empty list makes 0x55928 reach the allocation failure exit
+  under this fixture. With the keyed node present, provide input dword
+  0x12340700 at record offset 0x12, a word of 255 at offset 0x16, a
+  readable table entry through 0x135878, and byte 1 at 0x122c5c to
+  bypass the follow-on update. That existing-node path returns normally.
+- At 0x88c80, compare both a null pointer at object offset 0x30 and a
+  nonnull pointer to three signed coordinates (19, INT32_MIN, -15).
+  Pass a separate output buffer in EDX. Calls from 0x89060 and 0x89c64
+  return with a zeroed object. At 0x8a318 the zeroed object reaches the
+  DOS exit path, and setting its word at offset 0x40 to 0x7fff instead
+  lets the active-counter branch return normally.
+- At 0xcc22c and 0xb0954 pass a null list head slot in EBX. At 0xb686c
+  pass that slot and a separate zeroed result record in EAX.
+
+The local report `bulk-cpu-boundaries-scene-fixtures.json` retains the
+exact inputs and transcripts (SHA-256
+`8b04670762c13cca0ce52836018f732de706078fd28ef548692943d5f7bacc0a`).
+A scan of the retained local call snapshots found one unique EFCAP002
+snapshot matching this candidate's payload and entry inventory.
+The original 0x604 snapshot still matches through return. Its separate
+local report `bulk-cpu-boundaries-retained-captures.jsonl` has SHA-256
+`4a33290bc0c08166dd6ddc71bb25dcfb9aba62869cb7b3c922ab369f297523b8`.
