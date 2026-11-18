@@ -13586,3 +13586,18 @@ in a prepared probe. These checks leave the complete-match count
 unchanged. See replay-bulk-gameport-bios-ail-checkpoints.py and
 replay-bulk-gameport-bios-ail-requests.py and their JSONL output in
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify tagged-list lookup and four callers
+
+Five entries that faulted at the tag comparison at 0x87fbb now
+match through return when the list head and sentinel are initialized:
+0x55928, 0x56954, 0x65748, 0x657c4 and 0x87f9c. Each matched with
+two nodes, one scenario finding the requested tag and key in the
+second node and the other reaching the sentinel without a hit.
+These inputs cover lookup and the paths taken by the four callers
+with the supplied packet and node fields. The bulk total is now
+3,819 of 4,353 entries with at least one complete prepared match.
+
+See replay-bulk-gameport-bios-tagged-list.py and
+bulk-gameport-bios-tagged-list.jsonl under
+local/ghidra-group-followup-20261118.
