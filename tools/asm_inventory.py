@@ -9,6 +9,7 @@ not a control-flow recovery pass or evidence that decoded bytes are code.
 """
 
 import argparse
+from bisect import bisect_right
 import hashlib
 import json
 from pathlib import Path
@@ -262,6 +263,69 @@ def audit_trace_table(payload, gaps, source, base, stop, stride):
 
 
 
+def audit_candidate_body(instructions, entry, stop, owned, known_entries):
+    """Follow local static edges and require known external callees."""
+    decoded = {insn['address']: insn for insn in instructions}
+    edges = {}
+    for edge in control_flow_report(instructions)['edges']:
+        edges.setdefault(edge['site'], []).append(edge)
+    pending = [entry]
+    visited = set()
+    spans = []
+    returns = set()
+    blockers = []
+    while pending:
+        pc = pending.pop()
+        if pc in visited:
+            continue
+        visited.add(pc)
+        insn = decoded.get(pc)
+        if insn is None:
+            blockers.append(dict(site=pc, reason='missing instruction start'))
+            continue
+        end = pc + len(bytes.fromhex(insn['bytes']))
+        if not entry <= pc < end <= stop or any(owned[pc:end]):
+            blockers.append(dict(site=pc, reason='instruction crosses candidate or owned boundary'))
+            continue
+        spans.append((pc, end))
+        if insn['mnemonic'] in ('ret', 'retn'):
+            returns.add(pc)
+        for edge in edges.get(pc, []):
+            kind, target = edge['kind'], edge['target']
+            if kind == 'call' and target in known_entries:
+                continue
+            if kind in ('jump', 'fallthrough') and target in decoded:
+                pending.append(target)
+                continue
+            blockers.append(dict(site=pc, kind=kind, target=target, reason=edge['status']))
+        if not edges.get(pc) and pc not in returns:
+            blockers.append(dict(site=pc, reason='unsupported terminal instruction'))
+    spans.sort()
+    if not returns:
+        blockers.append(dict(site=entry, reason='no reachable near return'))
+    if any(left[1] != right[0] for left, right in zip(spans, spans[1:])):
+        blockers.append(dict(site=entry, reason='reachable instruction spans are disjoint'))
+    return dict(entry=entry, scan_stop=stop, end_exclusive=max((end for _, end in spans), default=None),
+                instruction_count=len(spans), return_sites=sorted(returns), blockers=blockers)
+
+
+def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump):
+    if max_bytes <= 0:
+        raise ValueError('candidate scan limit must be positive')
+    owned = bytearray(len(payload))
+    for body in bodies.values():
+        for start, end in body['ranges']:
+            owned[start:end] = b'\x01' * (end - start)
+    candidates = sorted({match['target'] for table in tables for match in table['matches']})
+    boundaries = sorted(set(candidates) | set(bodies) | {len(payload)})
+    report = []
+    for entry in candidates:
+        stop = min(entry + max_bytes, boundaries[bisect_right(boundaries, entry)])
+        instructions = decode_window(image, entry, stop - entry, objdump=objdump)
+        report.append(audit_candidate_body(instructions, entry, stop, owned, bodies))
+    return report
+
+
 def export_inventory(image, rows, output, *, objdump='objdump', runner=subprocess.run,
                      body_ranges=None, skip_missing_bodies=False):
     """Caller supplies a validated payload. Never change tracker recovery states."""
@@ -370,7 +434,11 @@ def main(argv=None):
     parser.add_argument('--trace-table', action='append', nargs=4, default=[],
                         type=lambda value: int(value, 0), metavar=('SOURCE', 'BASE', 'STOP', 'STRIDE'),
                         help='check observed destinations against bounded 32-bit pointer slots')
+    parser.add_argument('--trace-body-limit', type=int,
+                        help='statically audit matched table targets, scanning at most this many bytes each')
     args = parser.parse_args(argv)
+    if args.trace_body_limit is not None and not args.trace_table:
+        parser.error('--trace-body-limit requires --trace-table')
     if args.trace_table and not args.trace_gaps:
         parser.error('--trace-table requires --trace-gaps')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
@@ -385,6 +453,11 @@ def main(argv=None):
         if args.trace_gaps:
             payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
             report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps, tables=args.trace_table)
+            if args.trace_body_limit is not None:
+                report['candidate_bodies'] = audit_table_bodies(
+                    workspace / ghidra_ef2000.IMAGE_NAME, payload,
+                    load_body_ranges(args.body_ranges, payload)[0], report['tables'],
+                    max_bytes=args.trace_body_limit, objdump=args.objdump)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

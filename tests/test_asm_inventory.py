@@ -45,6 +45,23 @@ class InventoryTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'bounds or stride'):
             asm_inventory.audit_trace_table(payload, gaps, 1, 4, len(payload), 2)
 
+    def test_candidate_body_checks_both_branch_paths_and_call_ownership(self):
+        instructions = [
+            dict(address=0, bytes='7405', mnemonic='je', direct_target=7),
+            dict(address=2, bytes='e809000000', mnemonic='call', direct_target=16),
+            dict(address=7, bytes='c3', mnemonic='ret'),
+        ]
+        owned = bytearray(17)
+        report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, {16})
+        self.assertEqual(report['end_exclusive'], 8)
+        self.assertEqual(report['return_sites'], [7])
+        self.assertEqual(report['blockers'], [])
+        report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, set())
+        self.assertEqual(report['blockers'][0]['kind'], 'call')
+        owned[3] = 1
+        report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, {16})
+        self.assertIn('owned boundary', report['blockers'][0]['reason'])
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

@@ -12242,3 +12242,12 @@ group dispatch traces, all 42 gap edges from 0x12188 and the one from
 0x12dfd match slots in the 29-byte-stride table at 0x121fcd. This is
 pointer evidence for boundary review. All 14 inventory tests passed.
 Report: `local/ghidra-group-followup-20261118/trace-table-audit.json`.
+
+2026-11-18 — Added `--trace-body-limit` to audit matched table targets
+with bounded static control flow. The audit follows both conditional
+paths, checks owned bytes and known callees, and reports disjoint spans,
+unresolved transfers and missing returns. On the recorded dispatch
+traces, 37 of 42 distinct targets have contiguous candidates with no
+reported blockers. Five need further review. The audit leaves function
+ownership unchanged. All 15 inventory tests passed.
+Report: `local/ghidra-group-followup-20261118/trace-table-bodies.json`.
