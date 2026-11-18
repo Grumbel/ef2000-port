@@ -14,6 +14,7 @@ import argparse
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 import ctypes
+from datetime import datetime, timedelta, timezone
 import hashlib
 import json
 import multiprocessing
@@ -356,16 +357,13 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             response = dict(values, ax=error, flags=values['flags'] | 1)
             events.append(dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response))
             return response
-        if dos_clock and vector == 0x21 and (values['ax'] >> 8) & 0xff == 0x2c:
-            # Both machines start at 12:34:56.78 UTC and advance independently.
-            sample = (4529678 + clock_reads[side]) % 8640000
-            clock_reads[side] += 1
-            seconds, hundredths = divmod(sample, 100)
-            minutes, seconds = divmod(seconds, 60)
-            hours, minutes = divmod(minutes, 60)
-            response = dict(values, ax=0x2c00,
-                            cx=(values['cx'] & 0xffff0000) | (hours << 8) | minutes,
-                            dx=(values['dx'] & 0xffff0000) | (seconds << 8) | hundredths)
+        if dos_clock and vector == 0x21 and (values['ax'] >> 8) & 0xff in (0x2a, 0x2c):
+            # Each machine starts with the same UTC calendar and advances independently.
+            now = datetime(2026, 11, 18, 12, 34, 56, 780000, tzinfo=timezone.utc)
+            now += timedelta(milliseconds=10 * clock_reads[side])
+            if (values['ax'] >> 8) & 0xff == 0x2c:
+                clock_reads[side] += 1
+            response = unicorn_backend.serve_startup_int21(ip, values, now=now)
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
         if not dos_console:
@@ -1246,6 +1244,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   x32_no_cd_policy='no-cd-prepared-only' if x32_no_cd else 'disabled',
                   x32_vbe_policy='mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
+                  dos_clock_date='2026-11-18' if dos_clock else None,
                   dos_clock_sample='12:34:56.78Z' if dos_clock else None,
                   dos_clock_step_centiseconds=1 if dos_clock else None,
                   dos_empty_drive_policy='create-open-write-close-seek-device-info' if dos_empty_drive else 'disabled',
@@ -1300,7 +1299,7 @@ def main(argv=None):
     parser.add_argument('--x32-vbe', action='store_true',
                         help='compare X-32 VBE mode-info and scanline requests against prepared DOS RAM')
     parser.add_argument('--dos-clock', action='store_true',
-                        help='compare DOS get-time calls with a deterministic advancing UTC clock on prepared probes')
+                        help='compare DOS date and time calls with a deterministic advancing UTC clock on prepared probes')
     parser.add_argument('--dos-empty-drive', action='store_true',
                         help='compare DOS file requests against separate disposable empty drives')
     parser.add_argument('--dos-invalid-open', action='store_true',

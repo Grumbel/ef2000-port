@@ -13157,3 +13157,23 @@ a local inventory candidate.
 
 See local/ghidra-group-followup-20261118/
 bulk-inconclusive-prepared-replay.jsonl and bulk-allocator-diff/report.json.
+
+### 2026-11-18 — Compare DOS calendar reads in prepared probes
+
+The opt-in DOS clock now handles INT 21h AH=2Ah as well as AH=2Ch,
+using the same register handling as the startup probe. Each side starts
+at 2026-11-18 12:34:56.78 UTC. Get-time advances that side by one
+centisecond, and get-date reads the resulting calendar without advancing
+it. The report records the initial date alongside the time and step.
+
+Replaying the 13 prepared probes whose first service stop was AH=2Ah
+produced 13 complete semantic matches. The run reused the original
+4,344-body generated library and the 100,000-instruction fixture setup
+from the previous replay. See local/ghidra-group-followup-20261118/
+bulk-dos-date-replay.jsonl.
+
+The fresh generated-C run with the accumulator SUB decoder fix and
+local allocator overlay also completed. All six scoped entries matched
+under their prepared inputs, including the four camera-origin entries,
+0x410d0, and 0x9850c. See bulk-mutable-sub-diff/report.json in the same
+local directory.
