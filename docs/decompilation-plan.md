@@ -13910,3 +13910,17 @@ The callback at 0x132a74 remains outside this comparison. The
 prepared-match total through return stays at 3,876. See
 replay-bulk-gameport-bios-fade-error-prefix.py and its JSONL
 output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare packed palette processing through return
+
+Entries 0x110790 and 0x11082c exhausted the baseline instruction budget
+with unprepared input. Both generated translations now match the
+original through return on an empty packet list, two packets with
+nonzero skips and distinct lengths, and a packet whose zero length
+encodes 256 RGB triplets. The comparison covers palette buffer writes
+by 0x110790 and in-place component scaling by 0x11082c. The optional
+palette upload callback at 0x17d61c was unset in all probes.
+
+The prepared-match total is now 3,878 of 4,353 entries. See
+replay-bulk-gameport-bios-palette-packets.py and its JSONL output under
+local/ghidra-group-followup-20261118.
