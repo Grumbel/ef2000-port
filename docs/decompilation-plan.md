@@ -12704,3 +12704,30 @@ additional input fixture. Eight of the 43 mismatches and five of the
 Local evidence is in `dos-open-classes.json` and
 `dos-empty-drive-replay.json` under
 `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — Traced the DOS empty-drive dispatcher mismatches with
+instruction-by-instruction PC, general register and flag snapshots.
+For representative paths from 0x27544 and 0xe81b0, the original and
+generated C reach the same missing PC with matching registers and
+flags at the transfer. At 0x0 the original executes a five-byte
+JMP into 0x1de, an existing instruction inside the 0x86 body.
+The candidate audit now recognizes direct tail transfers to known
+instruction starts inside owned bodies. It still requires a known
+entry for a direct call. All 20 inventory tests passed.
+
+All five paths to 0xc7e38 reach the indirect JMP at 0xc7f04. Their
+live EAX is 0xe4, and the payload table at 0x15b270 plus that offset
+supplies the observed target 0xc63e4. The current audit has no
+general bound on that indirect transfer and leaves the candidate
+unaccepted. Local traces are `dos-open-divergence-trace.json` and
+`dos-open-threaded-traces.json` under
+`local/ghidra-group-followup-20261118/`.
+
+The scoped host rebuild emitted 4,342 bodies, including the JMP at
+0x0, then replayed all 43 previous mismatches under the empty-drive
+fixture. Thirty-seven now match. Five still reach untranslated
+0xc7e38. The path from 0x27fec now reaches registered instruction
+0x1df but stops at the dispatch byte guard (status 6). That case
+needs a guest-memory write trace before the translated body can
+claim coverage. The local build and report are
+`bulk-zero-dispatch-c/` and `bulk-zero-dispatch-diff/report.json`.

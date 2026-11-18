@@ -62,6 +62,18 @@ class InventoryTests(unittest.TestCase):
         report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, {16})
         self.assertIn('owned boundary', report['blockers'][0]['reason'])
 
+    def test_candidate_tail_jump_accepts_an_owned_instruction_start(self):
+        instruction = dict(address=0, bytes='eb06', mnemonic='jmp', direct_target=8)
+        owned = bytearray(9)
+        owned[7:] = b'\x01\x01'
+        accepted = asm_inventory.audit_candidate_body(
+            [instruction], 0, 2, owned, {7}, known_instruction_starts={7, 8})
+        rejected = asm_inventory.audit_candidate_body(
+            [instruction], 0, 2, owned, {7}, known_instruction_starts={7})
+        self.assertEqual(accepted['blockers'], [])
+        self.assertEqual(accepted['tail_targets'], [8])
+        self.assertEqual(rejected['blockers'][0]['kind'], 'tail-jump')
+
     def test_candidate_audit_rejects_bypassed_or_invalid_jump_table_guards(self):
         with tempfile.TemporaryDirectory() as temporary:
             image = Path(temporary) / 'payload.bin'

@@ -292,7 +292,7 @@ def guarded_jump_tables(instructions, edges, entry, stop, payload):
 
 
 def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None,
-                         interrupt_sites=(), indirect_call_sites=()):
+                         interrupt_sites=(), indirect_call_sites=(), known_instruction_starts=()):
     """Follow local static edges and require reviewed external entry points."""
     decoded = {insn['address']: insn for insn in instructions}
     edges = {}
@@ -343,7 +343,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
                 continue
             if kind == 'jump' and target is not None and insn['mnemonic'] == 'jmp':
                 tail_targets.add(target)
-                if target in known_entries:
+                if target in known_entries or target in known_instruction_starts:
                     continue
                 kind = 'tail-jump'
             blockers.append(dict(site=pc, kind=kind, target=target, reason=edge['status']))
@@ -380,6 +380,9 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
     for body in bodies.values():
         for start, end in body['ranges']:
             owned[start:end] = b'\x01' * (end - start)
+    # Tail jumps can enter an existing body at an interior instruction.
+    known_starts = {pc for body in bodies.values() if body.get('instruction_spans') is not None
+                    for pc, _ in normalized_layout(body['instruction_spans'], payload)}
     table_roots = {match['target'] for table in tables for match in table['matches']}
     roots = table_roots | set(observed_entries)
     if any(not 0 <= entry < len(payload) for entry in roots):
@@ -396,7 +399,8 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
                 windows[key] = decode_window(image, entry, stop - entry, objdump=objdump)
             report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies,
                                                payload=payload, interrupt_sites=interrupt_sites,
-                                               indirect_call_sites=indirect_call_sites))
+                                               indirect_call_sites=indirect_call_sites,
+                                               known_instruction_starts=known_starts))
         remaining = max_callees - (len(candidates) - len(roots))
         if not remaining:
             break
