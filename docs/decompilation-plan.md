@@ -14176,3 +14176,16 @@ The visible rendering branch remains unverified.
 These probes raise the complete-match total to 3,889 of 4,354 generated
 entries. See replay-bulk-gameport-bios-page-history.py and its JSONL
 output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare page history draw submission
+
+The three prepared queue lengths for 0xa0f84 also match through return
+with a view that accepts the records and a synthetic resource lookup
+table containing one object. Separate checkpoints at 0xa13b2 confirm
+that all three probes reach history draw submission. This covers guest
+draw-list writes using the original renderer callbacks.
+
+The complete-match total stays at 3,889 of 4,354 generated entries.
+See replay-bulk-gameport-bios-page-history-visible.py and
+replay-bulk-gameport-bios-page-history-draw-checkpoint.py with their
+JSONL output under local/ghidra-group-followup-20261118.
