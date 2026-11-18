@@ -13819,3 +13819,18 @@ whitespace, line skipping and advancing the source cursor.
 The prepared-match total is now 3,861 of 4,353 entries. See
 replay-bulk-gameport-bios-parser-line-reader.py and its JSONL
 output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify path and extension assembly
+
+Entries 0xd7040 and 0xe7cd0 exhausted the baseline instruction
+budget in the shared append loop. Preparing NUL-terminated
+source names and destination buffers produced complete matches
+through return in all four probes. The 0xd7040 cases used a
+cached default directory and exercised construction of a sample
+path. The 0xe7cd0 cases appended a period and the supplied
+extension to an existing name. Both entries used one-byte and
+longer source strings.
+
+The prepared-match total is now 3,863 of 4,353 entries. See
+replay-bulk-gameport-bios-path-append.py and its JSONL output
+under local/ghidra-group-followup-20261118.
