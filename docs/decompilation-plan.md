@@ -13545,3 +13545,26 @@ bulk-gameport-bios-cleanup-followup-checkpoints.jsonl under
 local/ghidra-group-followup-20261118. Replay with
 replay-bulk-gameport-bios-cleanup-followup.py and
 replay-bulk-gameport-bios-cleanup-followup-checkpoints.py.
+
+### 2026-11-18 — Verify prepared string paths and locate a later invalid transfer
+
+Four entries (0x33720, 0x33738, 0x337ac and 0x7c574) matched through
+return with initialized string fields. The two inputs put the
+terminating zero in different iterations of the two-byte copy loop.
+Entry 0x7c574 also needed its table base at global 0x1f8f74.
+The bulk total is 3,814 of 4,353 entries with at least one complete
+prepared match.
+
+With its string initialized, 0xe1958 reached address zero. The
+original continued into image-header bytes, where the OUT hook
+reported inconsistent values at 0x31. The verifier now includes
+the instruction address, port, width and both values in that
+diagnostic. The original and C matched at address zero in both
+prepared cases, leaving the full entry inconclusive.
+
+See replay-bulk-gameport-bios-strings.py and
+replay-bulk-gameport-bios-string-checkpoints.py and their JSONL output
+under local/ghidra-group-followup-20261118. The separate eleven-entry
+group at 0x1112a4 needs initialized AIL driver records and reaches
+an INT 21h AX=2511h call with a real-mode vector of 0x66. The current
+prepared real-mode fixtures cover mouse, CD and VBE requests.

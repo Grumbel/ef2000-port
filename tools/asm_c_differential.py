@@ -635,8 +635,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 return 0  # ctypes IN callbacks must return an integer even on rejection.
         def port_out(engine, port, size, value, _):
             try:
-                if value != engine.reg_read(x86_const.UC_X86_REG_EAX) & ((1 << (size*8))-1):
-                    raise ValueError('original OUT value differs from accumulator')
+                accumulator = engine.reg_read(x86_const.UC_X86_REG_EAX) & ((1 << (size*8))-1)
+                if value != accumulator:
+                    pc = engine.reg_read(x86_const.UC_X86_REG_EIP)
+                    raise ValueError(f'original OUT at {pc:#x} to port {port:#x} supplied '
+                                     f'{value:#x}, expected {accumulator:#x} for width {size}')
                 original_port_request(engine, port, size, True)
             except (ValueError, RuntimeError) as error:
                 port_errors.append(str(error))
