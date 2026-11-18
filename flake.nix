@@ -548,7 +548,7 @@
           set -- "$EF2000_GAME_DIR" "$@"
         fi
         exec ${python}/bin/python3 ${package}/libexec/ef2000/tools/decomp_app.py \
-          --launcher ${package}/bin/ef2000 "$@"
+          --launcher ${package}/bin/ef2000 --dosbox ${pkgs.dosbox-x}/bin/dosbox-x "$@"
       '';
       dosDecompWorkflow = pkgs.writeShellScriptBin "ef2000-decomp-watcom" ''
         set -euo pipefail

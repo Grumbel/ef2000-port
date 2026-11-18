@@ -254,6 +254,17 @@ objects="$(nix build --no-link --print-out-paths .#ef2000-decomp-watcom)/lib/ef2
 nix run .#ef2000-hybrid -- /path/to/EF2000 --objects "$objects"
 ```
 
+The English DOS build from `EF2000-rdeprera` is also accepted by the launcher.
+
+```sh
+NIXPKGS_ALLOW_UNFREE=1 nix run --impure .#ef2000-hybrid -- ../EF2000-rdeprera/
+```
+
+The launcher recognizes the English executable by SHA-256 and runs it in
+DOSBox-X. The recovered C patches are specific to the German TACTCOM
+executable. The English session uses a temporary copy of the installation,
+and settings or saves written during that session are discarded on exit.
+
 `apps.default`/`apps.ef2000` remain native aliases; `apps.ef2000-unicorn` is
 the C++ frontend, `apps.ef2000-unicorn-py` is the deprecated Python frontend, and
 `apps.unicorn-probe` retains its bounded headless diagnostic behavior.

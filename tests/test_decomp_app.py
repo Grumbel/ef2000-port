@@ -4,6 +4,7 @@
 """Asset-free checks for independently supplied OpenWatcom objects."""
 
 from contextlib import redirect_stderr
+import hashlib
 import io
 import os
 from pathlib import Path
@@ -73,11 +74,42 @@ class DecompAppTests(unittest.TestCase):
                     str(game), '--launcher', '/bin/ef2000']), 0)
             self.assertEqual(build.call_args.args[:2], (game, objects))
 
+    def test_english_build_uses_a_disposable_dosbox_copy(self):
+        with tempfile.TemporaryDirectory() as directory:
+            game = Path(directory)
+            executable = b'english fixture'
+            (game / '_EF2000.EXE').write_bytes(executable)
+            (game / 'DID.DAT').write_bytes(b'assets')
+            (game / '.git').mkdir()
+
+            def run(command, *, cwd):
+                self.assertEqual(command[0], '/bin/dosbox-x')
+                self.assertEqual(command[-2:], ['-time-limit', '3'])
+                copy = cwd / 'drive' / 'EF2000'
+                self.assertEqual((copy / '_EF2000.EXE').read_bytes(), executable)
+                self.assertFalse((copy / '.git').exists())
+                (copy / 'DID.DAT').write_bytes(b'changed')
+                return 7
+
+            with patch.dict(os.environ, {}, clear=True), \
+                    patch.object(decomp_app, 'ENGLISH_SHA256', hashlib.sha256(executable).hexdigest()), \
+                    patch.object(decomp_app, 'build_patch') as build, \
+                    patch.object(decomp_app.subprocess, 'call', side_effect=run), \
+                    redirect_stderr(io.StringIO()):
+                result = decomp_app.main([str(game), '--launcher', '/bin/false',
+                                          '--dosbox', '/bin/dosbox-x', '--', '-time-limit', '3'])
+            self.assertEqual(result, 7)
+            build.assert_not_called()
+            self.assertEqual((game / 'DID.DAT').read_bytes(), b'assets')
+
     def test_missing_object_directory_has_actionable_error(self):
         error = io.StringIO()
-        with patch.dict(os.environ, {}, clear=True), redirect_stderr(error):
+        with tempfile.TemporaryDirectory() as directory, \
+                patch.dict(os.environ, {}, clear=True), redirect_stderr(error):
+            game = Path(directory) / '_EF2000.EXE'
+            game.touch()
             with self.assertRaises(SystemExit) as raised:
-                decomp_app.main(['/nonexistent/_EF2000.EXE', '--launcher', '/bin/ef2000'])
+                decomp_app.main([str(game), '--launcher', '/bin/ef2000'])
         self.assertEqual(raised.exception.code, 2)
         self.assertIn('build .#ef2000-decomp-watcom first', error.getvalue())
 
