@@ -12488,3 +12488,11 @@ have this marker and nine are still excluded by the generator. The
 synthetic regression covers a branch that avoids an untranslated
 callee and verifies that a call into that callee still stops at its PC.
 All 38 program tests and 13 tracker tests passed.
+
+The 467 prepared console/PIT exit probes all matched against the
+4,327-body registry, with no inconclusive results or mismatches.
+The probes compared the console output and port transcripts, DOS exit
+site and code, and final guest state. This covers the exercised exit
+paths through 0xa455b and 0xedd49. The other branches still have
+untranslated dependencies at 0xeddc3 and 0x10e7b5. Report:
+`local/ghidra-group-followup-20261118/bulk-exit-partial-diff/report.json`.
