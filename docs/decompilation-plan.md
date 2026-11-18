@@ -13978,3 +13978,17 @@ The populated cases use one font bank and one occupied bitmap row.
 The prepared-match total is now 3,884 of 4,353 entries. See
 replay-bulk-gameport-bios-glyph-runs.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare packed vertex transforms through dispatch
+
+Entry 0xc7e38 exhausted its baseline budget with an unprepared
+vertex count. Two prepared streams now match through return,
+covering a single vertex and three vertices with signed coordinates.
+The cases use identity and mixed-coefficient matrices, respectively.
+Both execute the translation pass at 0xc8c34 and reach the normal
+return handler at 0xc5e65 through opcode zero in the original dispatch
+table. Other stream opcodes are outside these probes.
+
+The prepared-match total is now 3,885 of 4,353 entries. See
+replay-bulk-gameport-bios-vertex-dispatch.py and its JSONL output
+under local/ghidra-group-followup-20261118.
