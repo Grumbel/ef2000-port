@@ -306,6 +306,26 @@ class OracleTests(unittest.TestCase):
                     result = self.compare(function, payload, initial_x87=initial)
                     self.assertEqual(result['state'], 'pass', result)
 
+    def test_generated_native_register_retries_with_original_input(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            interposer = root/'interrupt-sample.h'
+            interposer.write_text("""
+#include <sys/resource.h>
+static int test_getrusage(int who, struct rusage *sample) {
+    static unsigned calls;
+    int result = getrusage(who, sample);
+    if (!result && ++calls == 2) ++sample->ru_nivcsw;
+    return result;
+}
+#define getrusage test_getrusage
+""")
+            payload, function = self.compiled(
+                root, 'fld1\nfsin\nret', '-D_GNU_SOURCE', '-DEF_LIFT_ENABLE_NATIVE_X87',
+                '-include', str(interposer))
+            result = self.compare(function, payload)
+            self.assertEqual(result['state'], 'pass', result)
+
     def test_hardware_result_does_not_waive_any_compared_state(self):
         with tempfile.TemporaryDirectory() as temporary:
             payload, function = self.compiled(Path(temporary), 'fld1\nfstp tbyte ptr [0x300200]\nfnstsw ax\nret')

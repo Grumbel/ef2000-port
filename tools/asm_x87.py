@@ -783,12 +783,12 @@ def native_runtime():
 }''' for name in NATIVE_REGISTER
     ]
     dispatch = [
-        '    case 0x%02xu: ef_x87_%s(saved, image); break;' % (opcode, name)
+        '    case 0x%02xu: ef_x87_%s(saved, image); return 0;' % (opcode, name)
         for name, opcode in NATIVE_REGISTER.items()
     ]
     return (opening + '\n'.join(watcom) +
             '\n#elif defined(__GNUC__) && defined(__linux__) && (defined(__i386__) || defined(__x86_64__))\n' +
-            '#include <signal.h>\n#include <sys/resource.h>\n' +
+            '#include <signal.h>\n#include <sys/resource.h>\n#include <string.h>\n' +
             '\n'.join(gcc) + r'''
 #else
 #error EF_LIFT_ENABLE_NATIVE_X87 requires GNU Linux x86 or OpenWatcom 386
@@ -796,13 +796,24 @@ def native_runtime():
 
 #endif
 
+#if defined(EF_LIFT_ENABLE_NATIVE_X87)
+static unsigned ef_x87_native_sample(unsigned opcode, uint8_t *saved, uint8_t *image) {
+    switch (opcode) {
+''' + '\n'.join(dispatch) + r'''
+    default: return 9;
+    }
+}
+#endif
+
 static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
 #if defined(EF_LIFT_ENABLE_NATIVE_X87)
     uint8_t saved[108], image[108] = {0};
+    unsigned status;
 #if defined(__linux__)
+    uint8_t initial[sizeof image];
     sigset_t blocked, original;
     struct rusage before, after;
-    int sampled;
+    unsigned attempt;
 #endif
     if ((s->x87_status & 0x80u) || (s->x87_status & ~s->x87_control & 0x3fu)) return 8;
     ef_x87_image_put(image, s->x87_control, 2);
@@ -812,25 +823,23 @@ static unsigned ef_x87_native_register(ef_lift_state *s, unsigned opcode) {
     ef_x87_store_image_registers(s, image);
 #if defined(__linux__)
     /* Signal return and preemption can lose hardware x87 metadata on AMD. */
+    memcpy(initial, image, sizeof initial);
     if (sigfillset(&blocked) || sigprocmask(SIG_BLOCK, &blocked, &original)) return 9;
-    if (getrusage(RUSAGE_THREAD, &before)) {
-        sigprocmask(SIG_SETMASK, &original, 0);
-        return 9;
+    status = 9;
+    for (attempt = 0; attempt < 100; ++attempt) {
+        memcpy(image, initial, sizeof image);
+        if (getrusage(RUSAGE_THREAD, &before) || ef_x87_native_sample(opcode, saved, image) ||
+            getrusage(RUSAGE_THREAD, &after)) break;
+        if (before.ru_nvcsw == after.ru_nvcsw && before.ru_nivcsw == after.ru_nivcsw) {
+            status = 0;
+            break;
+        }
     }
+    if (sigprocmask(SIG_SETMASK, &original, 0)) return 9;
+#else
+    status = ef_x87_native_sample(opcode, saved, image);
 #endif
-    switch (opcode) {
-''' + '\n'.join(dispatch) + r'''
-    default:
-#if defined(__linux__)
-        sigprocmask(SIG_SETMASK, &original, 0);
-#endif
-        return 9;
-    }
-#if defined(__linux__)
-    sampled = getrusage(RUSAGE_THREAD, &after);
-    if (sigprocmask(SIG_SETMASK, &original, 0) || sampled ||
-        before.ru_nvcsw != after.ru_nvcsw || before.ru_nivcsw != after.ru_nivcsw) return 9;
-#endif
+    if (status) return status;
     s->x87_status = ef_x87_image_get(image + 4, 2);
     s->x87_tag = ef_x87_image_get(image + 8, 2);
     s->x87_opcode = ef_x87_image_get(image + 18, 2) & 0x7ffu;

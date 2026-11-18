@@ -12173,3 +12173,13 @@ compiled with OpenWatcom. Forty first prepared probes matched and 16
 were inconclusive. The five callers that previously stopped at
 0xfa804 now match on those inputs. All 47 wrapper tests passed.
 Artifacts are under `local/ghidra-format-stream-20261118/`.
+
+2026-11-18 — Made the Linux native x87 backend retry a sample interrupted
+by a context switch. Every retry reloads the original guest x87 image.
+The backend publishes only an uninterrupted result and retains the
+failure status if sampling fails. A synthetic FSIN comparison forces a
+context-switch count change after the first execution and checks the
+complete result against the hardware oracle. In a 32-body OpenWatcom
+build, both previously failing prepared probes at 0x5f698 and 0x5f944
+matched. The scoped differential found 26 matches and six inconclusive
+inputs. Evidence: `local/ghidra-format-stream-20261118/x87-diff/report.json`.
