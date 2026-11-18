@@ -12366,3 +12366,19 @@ unmodeled port I/O in the original before STI and stayed inconclusive.
 The replay used host C and the hardware x87 oracle. Tracker states and
 strict recompilation evidence are unchanged.
 Report: `local/ghidra-group-followup-20261118/bulk-sti-diff/report.json`.
+
+2026-11-18 — The full 4,088-body host comparison with the reviewed
+STI stop completed with 2,703 matches, 1,385 inconclusive inputs and
+zero mismatches. Of the 701 generated tracker-blocked bodies, 389
+matched and 312 were inconclusive. This smoke run used one prepared
+input per body and leaves strict byte comparison and tracker states
+unchanged. Report: `local/ghidra-group-followup-20261118/bulk-sti-full-diff/report.json`.
+
+The verifier now records rejected original interrupt vectors and AX,
+or scalar port requests, alongside inconclusive results. Replaying
+895 previously service-limited inputs classified 818 interrupt stops,
+53 scalar port stops and 24 with an unsupported original service
+instruction. All 815 DOS INT 21h stops were replayed with AX evidence.
+The largest groups by AH were 40h (467), 35h (183), 25h (61) and
+3Dh (56). Reports: `bulk-service-stops.json` and `bulk-dos-stops.json`
+under `local/ghidra-group-followup-20261118/`.
