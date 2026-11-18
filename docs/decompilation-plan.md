@@ -13285,3 +13285,20 @@ registers and flags, plus DS and ES. Rejected port writes report the
 width-limited output value. The existing synthetic service-boundary
 test checks both additions. These fields distinguish unsupported
 operations that share a DOS function number or I/O port.
+
+### 2026-11-18 — Compare gameport probes with no controller attached
+
+The prepared differential runner accepts `--gameport-disconnected`.
+Byte reads from port 0x201 return 0xff, as in the runtime with no
+controller attached. Byte writes leave registers and flags unchanged.
+The comparison includes the I/O transcript on both sides.
+
+Three of the four previously inconclusive gameport probes match through
+completion (0x1c60c, 0xd6694, and 0xd66c2). The 0x82cec probe now exposes
+a C stop at 0x9cf74 after the original reached DOS exit. The prepared
+inputs cover the disconnected controller case.
+
+The local VBE release build also passed all four scoped probes
+(0xd1da8, 0x9c398, 0xfc440, and 0xfc534) with the audited callback
+boundaries. See bulk-gameport-replay.jsonl and bulk-vbe-release-diff/report.json
+under local/ghidra-group-followup-20261118.
