@@ -13040,3 +13040,12 @@ the fixture. The control with the same initial RAM and other fixtures
 left all 13 inconclusive. Four entries later fault on guest memory,
 and three reach the instruction budget while polling the fixed clock.
 See local/ghidra-group-followup-20261118/dos-clock-{control,replay}.json.
+
+Advance the prepared DOS clock by one centisecond per read with independent
+counters for original x86 and generated C. Both start at 12:34:56.78 UTC.
+With the same 100,000-instruction budget, the three polling entries
+0x93f44, 0xd9cb4 and 0xd9dc0 remained inconclusive with a fixed sample
+and matched with the advancing clock. Their service transcripts match
+across 228, 228 and 114 reads respectively, including a seconds carry.
+The cohort now has nine matching prepared probes and four guest-memory
+faults. See local/ghidra-group-followup-20261118/dos-clock-{fixed,advancing}-100k.json.
