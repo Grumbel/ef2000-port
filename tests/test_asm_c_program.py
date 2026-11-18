@@ -50,6 +50,54 @@ def inventory(root, source):
                      'requires GNU binutils and a C compiler')
 class ProgramTests(unittest.TestCase):
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
+    def test_cpu_stops_leave_original_instruction_pending(self):
+        source = """.type root,@function
+root: test eax,eax
+je safe
+read_cr0: mov ecx,cr0
+write_cr0: mov cr0,ecx
+far_return: retf
+interrupt_return: iret
+safe: ret
+.size root, .-root"""
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            image, directory, records = inventory(root, source)
+            sites = [i['address'] for i in records[0]['instructions']
+                     if i['operands'] in ('ecx,cr0', 'cr0,ecx')
+                     or i['mnemonic'] in ('retf', 'iret')]
+            self.assertEqual(len(sites), 4)
+            with self.assertRaisesRegex(ValueError, 'reviewed CR0'):
+                asm_c_program.generate(directory, root/'invalid', image,
+                                       cpu_stop_sites=[sites[0] + 1])
+            asm_c_program.generate(directory, root/'out', image, cpu_stop_sites=sites)
+            report = asm_c_differential.verify(root/'out', root/'evidence', image,
+                                               scenarios=2, service_free_paths=True)
+            passed, stopped = report['entries'][0]['probes']
+            self.assertEqual(passed['state'], 'pass', passed)
+            self.assertEqual(stopped['state'], 'inconclusive', stopped)
+            self.assertEqual(stopped['original_cpu_stop'], {'pc': sites[0]})
+            payload = image.read_bytes()
+            memory = (ctypes.c_uint8 * len(payload)).from_buffer_copy(payload)
+            run = ctypes.CDLL(str(root/'evidence/translations.so')).ef_lift_run
+            run.argtypes = [ctypes.POINTER(asm_c_differential.State),
+                            ctypes.c_uint32, ctypes.c_uint32]
+            run.restype = ctypes.c_uint
+            for pc in sites:
+                state = asm_c_differential.State()
+                state.memory, state.memory_size = memory, len(memory)
+                state.pc, state.flags, state.r[4] = pc, 0x202, 0x1234
+                before = bytes(state)
+                self.assertEqual(run(ctypes.byref(state), 1, 0xffffffff), 0x207)
+                self.assertEqual(bytes(state), before)
+            report = asm_c_differential.verify(root/'out', root/'prefix', image,
+                                               scenarios=1, service_free_paths=True,
+                                               checkpoint=(sites[0], 1), addresses=[records[0]['address']],
+                                               prepared_registers=[('eax', 1)])
+            probe, = report['entries'][0]['probes']
+            self.assertEqual(probe['state'], 'prefix-pass', probe)
+
+    @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_sidt_stores_six_bytes_from_prepared_idtr(self):
         source = """.type root,@function
 root: sidt [esp-7]

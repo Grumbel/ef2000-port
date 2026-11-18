@@ -28,6 +28,13 @@ except ImportError:
 MODEL = 'flat-x86-program-explicit-state'
 
 
+def cpu_stop_encoding(encoded):
+    """Recognize the reviewed unprefixed CR0 and protected-mode return forms."""
+    return (encoded in (b'\xcb', b'\xcf') or
+            (len(encoded) == 3 and encoded[0] == 0x0f and
+             encoded[1] in (0x20, 0x22) and 0xc0 <= encoded[2] <= 0xc7))
+
+
 def legacy_transfer(insn):
     """Interpret objdump's CET-era alias in the pre-CET 32-bit model."""
     if insn['mnemonic'] != 'notrack':
@@ -82,7 +89,7 @@ def interrupt_vector(insn):
 
 
 def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boundaries=False,
-                  interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=()):
+                  interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(), cpu_stop_sites=()):
     insn = legacy_transfer(insn)
     mnemonic = insn['mnemonic']
     if insn['address'] in sti_stop_sites:
@@ -94,6 +101,10 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
         if mnemonic != 'cli' or insn['bytes'] != 'fa' or insn['operands']:
             raise asm_to_c.Unsupported('CLI stop encoding/spelling mismatch')
         return 'return 0x206u;'
+    if insn['address'] in cpu_stop_sites:
+        if not cpu_stop_encoding(bytes.fromhex(insn['bytes'])):
+            raise asm_to_c.Unsupported('CPU stop encoding mismatch')
+        return 'return 0x207u;'
     if insn['address'] in cpuid_sites:
         if mnemonic != 'cpuid' or insn['bytes'] != '0fa2' or insn['operands']:
             raise asm_to_c.Unsupported('CPUID boundary encoding/spelling mismatch')
@@ -148,7 +159,7 @@ def instruction_c(insn, starts, *, consuming_targets=frozenset(), interrupt_boun
 
 
 def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
-            port_boundaries=False, port_sites=None, failure_details=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=()):
+            port_boundaries=False, port_sites=None, failure_details=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(), cpu_stop_sites=()):
     owners = {}
     for record in records:
         if record.get('ghidra_instruction_layout_matches') is not True:
@@ -183,7 +194,7 @@ def analyse(records, *, interrupt_boundaries=False, interrupt_sites=None,
     renderer = partial(instruction_c, consuming_targets=consuming_targets,
                        interrupt_boundaries=interrupt_boundaries, interrupt_sites=interrupt_sites,
                        port_boundaries=port_boundaries, port_sites=port_sites,
-                       sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites)
+                       sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites, cpu_stop_sites=cpu_stop_sites)
     codes, dependencies, reasons = {}, {}, {}
     for record in records:
         address = record['address']
@@ -249,14 +260,14 @@ def root_blockers(dependencies, closed, reasons):
     return {address: sorted(targets) for address, targets in roots.items()}
 
 
-def dispatcher(records, *, shard_entries=2048):
+def dispatcher(records, *, shard_entries=2048, cpu_stop_sites=()):
     """Keep each Watcom unit below its constant-initializer limits."""
     if type(shard_entries) is not int or not 1 <= shard_entries <= 2048:
         raise ValueError('registry shard size must be between 1 and 2048')
     prototypes = ['unsigned ef_lift_%08x(ef_lift_state *, uint32_t);' % r['address']
                   for r in records]
     locations = sorted((i['address'], r['address'], bytes.fromhex(i['bytes']),
-                        asm_to_c.mutable_immediate(i))
+                        None if i['address'] in cpu_stop_sites else asm_to_c.mutable_immediate(i))
                        for r in records for i in r['instructions'])
     if not locations:
         raise ValueError('no closed translated instructions')
@@ -396,7 +407,7 @@ def reachable_service_sites(records, dependencies, closed, *, ports=False):
 
 
 def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundaries=False,
-             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(),
+             interrupt_sites=None, port_boundaries=False, port_sites=None, sti_stop_sites=(), cli_stop_sites=(), cpuid_sites=(), cpu_stop_sites=(),
              allow_partial_closure=False):
     if port_sites is not None and not port_boundaries:
         raise ValueError('port sites require port boundaries')
@@ -411,6 +422,14 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                      and not i['operands']}
             if sites - valid:
                 raise ValueError(f'{mnemonic.upper()} stop sites must be reviewed {mnemonic.upper()} instruction starts')
+    cpu_stop_sites = frozenset(cpu_stop_sites)
+    if cpu_stop_sites:
+        valid_cpu_stops = {
+            i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
+            for i in r['instructions'] if cpu_stop_encoding(bytes.fromhex(i['bytes']))
+        }
+        if cpu_stop_sites - valid_cpu_stops:
+            raise ValueError('CPU stop sites must be reviewed CR0, RETF or IRET instruction starts')
     cpuid_sites = frozenset(cpuid_sites)
     if cpuid_sites:
         valid_cpuid = {i['address'] for r in records if r['ghidra_instruction_layout_matches'] is True
@@ -423,7 +442,7 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                                                   interrupt_boundaries=interrupt_boundaries,
                                                   interrupt_sites=interrupt_sites,
                                                   port_boundaries=port_boundaries, port_sites=port_sites,
-                                                  sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites)
+                                                  sti_stop_sites=sti_stop_sites, cli_stop_sites=cli_stop_sites, cpuid_sites=cpuid_sites, cpu_stop_sites=cpu_stop_sites)
     blockers = root_blockers(dependencies, closed, reasons)
     emitted = set(codes) if allow_partial_closure else closed
     output.mkdir(parents=True, exist_ok=False)
@@ -456,7 +475,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
                         body_bytes=sum(end-start for start, end in record['ranges']))
             (output / item['file']).write_text(codes[address])
         report.append(item)
-    files = dispatcher([r for r in records if r['address'] in emitted], shard_entries=shard_entries)
+    files = dispatcher([r for r in records if r['address'] in emitted],
+                       shard_entries=shard_entries, cpu_stop_sites=cpu_stop_sites)
     for name, code in files.items():
         (output / name).write_text(code)
     program = files['ef_lift_program.c']
@@ -491,6 +511,8 @@ def generate(inventory, output, image, *, shard_entries=2048, interrupt_boundari
     result['host_port_service_reachability_scope'] = (
         'scalar port sites only; conservative direct-edge closure; dynamic targets and '
         'runtime DX port numbers unknown; reachable sites do not prove device implementation or equivalence')
+    if cpu_stop_sites:
+        result['cpu_stop_sites'] = sorted(cpu_stop_sites)
     if cpuid_sites:
         result['cpuid_sites'] = sorted(cpuid_sites)
     if cli_stop_sites:
@@ -541,6 +563,8 @@ def main(argv=None):
                         help='stop before an explicit STI, leaving PC and flags unchanged (repeatable)')
     parser.add_argument('--cli-stop-site', type=lambda value: int(value, 0), action='append', default=[],
                         help='stop before an explicit CLI, leaving PC and flags unchanged (repeatable)')
+    parser.add_argument('--cpu-stop-site', type=lambda value: int(value, 0), action='append', default=[],
+                        help='stop before a reviewed CR0 access, RETF or IRET (repeatable)')
     parser.add_argument('--allow-partial-closure', action='store_true',
                         help='emit supported bodies even when some direct dependencies are untranslated')
     args = parser.parse_args(argv)
@@ -555,7 +579,7 @@ def main(argv=None):
                           port_boundaries=args.port_boundaries,
                           port_sites=None if args.port_site is None else frozenset(args.port_site),
                           sti_stop_sites=args.sti_stop_site, cli_stop_sites=args.cli_stop_site, cpuid_sites=args.cpuid_site,
-                          allow_partial_closure=args.allow_partial_closure)
+                          cpu_stop_sites=args.cpu_stop_site, allow_partial_closure=args.allow_partial_closure)
         print(dict(Counter(e['state'] for e in report['entries'])))
     except (OSError, ValueError) as error:
         parser.exit(1, f'asm_c_program: {error}\n')

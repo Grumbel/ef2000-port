@@ -14532,3 +14532,30 @@ without either service. The two far-return handlers can both call
 0xc4310 to rewrite the saved target before returning through their
 extender frames. Their differential fixtures need those frames and
 the matching selector state.
+
+#### Emit the four remaining bodies with explicit CPU stops
+
+The opt-in `--cpu-stop-site` accepts reviewed unprefixed CR0 reads and
+writes, RETF, and IRET. The dispatcher validates the complete guest
+instruction encoding at those PCs and returns status 0x207 with the
+original state unchanged. A differential run that reaches a stop is
+inconclusive unless the comparison explicitly requests a checkpoint there.
+The privileged instruction remains pending for a CPU implementation.
+
+The 4,361-body candidate admits 0xeddc3, 0x10e7b5, 0xfcc01, and 0xfcc6f
+with the six exact CPU stops and four interrupt sites in
+`rebuild-bulk-cpu-stops.py`. All 4,357 previous body source hashes agree.
+The empty root blocker list describes generation only. The boundary
+paths still need architectural execution and differential coverage.
+
+In `local/ghidra-group-followup-20261118/`, the generation report
+`bulk-cpu-boundaries-c/report.json` has SHA-256
+`d5b82c7cbf60a87f863e1987dbe483b01942ebd05d9cfa4ebf4642a24206807f`.
+`probe-cpu-stops.py` compares the 0x10e7b5 flags-clear path through
+return and each of the four bodies up to its first CPU stop. The
+five results match. `cpu-stop-probe-evidence/results.json` has SHA-256
+`1f4237f843c72fd01703626d73801e3c095c3c04002fb89868fe3fc0a9596ab2`.
+All 11 focused units compile with OpenWatcom 1.9 using
+`wcc386 -bt=dos -3r -za99 -w1 -we`. Run
+`python -m unittest tests.test_asm_c_program` with Unicorn 2.1.4 for
+the synthetic regression covering all four encodings.
