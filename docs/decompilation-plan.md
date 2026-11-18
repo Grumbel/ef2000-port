@@ -14053,3 +14053,17 @@ registry files for the new entry.
 
 See rebuild-bulk-timer.py, bulk-timer-overlay.json, and
 bulk-timer-c/report.json under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify the timer callback in the linked bulk library
+
+The regenerated bulk C compiled and linked. Entry 0xe28c4 matched
+the original through return in the default differential probe and
+all three prepared counter cases against that linked library.
+With the previous body comparisons carried forward from the
+unchanged generated sources, 3,886 of 4,354 generated entries have
+at least one complete differential match. The new library has
+not received a fresh full sweep. The positive-delay wait paths
+still require asynchronous callback delivery.
+
+See bulk-timer-diff/report.json and replay-timer-callback-linked.py
+under local/ghidra-group-followup-20261118.
