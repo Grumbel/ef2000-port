@@ -13834,3 +13834,19 @@ longer source strings.
 The prepared-match total is now 3,863 of 4,353 entries. See
 replay-bulk-gameport-bios-path-append.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify complete palette fades
+
+Entries 0xde580, 0xde5f4, 0xde648 and 0xde6c4 exhausted
+500,000 instructions inside their fixed-size palette loops.
+Each step scales 768 component bytes before waiting for VGA
+retrace and writing the palette. With a 2,000,000-instruction
+budget and the existing VGA status and DAC models, all four
+entries matched through return for both a black palette and a
+pattern covering the six-bit component range. The isolated
+differential probes compared the ordered port accesses as well
+as guest state.
+
+The prepared-match total is now 3,867 of 4,353 entries. See
+replay-bulk-gameport-bios-palette-fades.py and its JSONL output
+under local/ghidra-group-followup-20261118.
