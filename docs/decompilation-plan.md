@@ -12139,3 +12139,15 @@ oracle. The targeted evidence in
 `local/ghidra-scan-unget-20261118/affected-callers.json` records the
 prior report, updated manifest, executable library, oracle and payload
 digests. This build predates the IMUL and ADD immediate changes above.
+
+2026-11-18 — The first 5 MiB input at 0xd8fd8 enters 0xd83b8 and
+0xd849c through the slots at 0x420e74 and 0x420e70. The original trace
+and literals at 0xd916f and 0xd917b corroborate both branch-free bodies.
+Ghidra audit, apply and repeat apply succeeded on a disposable project.
+The fresh export inventories 4,285 functions. A scoped OpenWatcom build
+of 12 bodies advances the same translated caller input to the next
+unregistered PC, 0xd8168, which the original reaches from 0xd9319.
+Both standalone callback probes stop on an original exception with the
+first generic input. Nine other scoped probes match. All 47 wrapper
+tests passed. Evidence: `local/ghidra-scan-unget-20261118/callback-followup-traces.json`
+and `local/ghidra-position-callbacks-20261118/`.

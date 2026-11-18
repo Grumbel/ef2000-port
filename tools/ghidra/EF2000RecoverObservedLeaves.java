@@ -33,10 +33,13 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xc5e65, 0xc5e66, 0xc6cdf, 0},
         {0x1c53c, 0x1c545, 0x1c902, 0},
         {0xdf244, 0xdf248, 0xdf252, 0},
+        {0xd83b8, 0xd849a, 0xd916f, 0},
+        {0xd849c, 0xd8528, 0xd917b, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
-        "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244"
+        "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244",
+        "position_callback_d83b8", "position_callback_d849c"
     };
 
     @Override
@@ -61,6 +64,7 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
             for (int index = 0; index < RECIPES.length; ++index) {
                 long[] recipe = RECIPES[index];
                 long entry = recipe[0], end = recipe[1], literal = recipe[2];
+                boolean positionCallback = entry == 0xd83b8 || entry == 0xd849c;
                 Function function = getFunctionAt(toAddr(entry));
                 long before = function == null ? 0 : function.getBody().getNumAddresses();
                 if (before != recipe[3] && before != end-entry) {
@@ -112,11 +116,13 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                 } else if (literal != 0) {
                     Instruction reference = getInstructionAt(toAddr(literal));
                     Function caller = getFunctionContaining(toAddr(literal));
-                    String register = entry == 0xdf244 ? "ESI" : "ECX";
+                    String register = entry == 0xdf244 ? "ESI" :
+                        entry == 0xd83b8 ? "EBX" : entry == 0xd849c ? "EDX" : "ECX";
+                    long callerEntry = entry == 0xdf244 ? 0xdf248 : positionCallback ? 0xd8fd8 : 0;
                     boolean matches = false;
                     if (reference != null && reference.getMnemonicString().equals("MOV") &&
                             reference.getRegister(0) != null && reference.getRegister(0).getName().equals(register) &&
-                            caller != null && (entry != 0xdf244 || caller.getEntryPoint().getOffset() == 0xdf248)) {
+                            caller != null && (callerEntry == 0 || caller.getEntryPoint().getOffset() == callerEntry)) {
                         for (Object object : reference.getOpObjects(1)) {
                             if (object instanceof Scalar && ((Scalar)object).getUnsignedValue() == entry) matches = true;
                             if (object instanceof Address && ((Address)object).getOffset() == entry) matches = true;
@@ -161,7 +167,8 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     if (last ? !mnemonic.equals("RET") :
                             !Set.of("PUSH", "POP", "MOV", "LEA", "INC", "LODS", "LODSW", "ADD", "XLAT", "XLATB").contains(mnemonic) &&
                             !(entry == 0x1c53c && cursor == entry && mnemonic.equals("XOR")) &&
-                            !(entry == 0xdf244 && cursor == entry && mnemonic.equals("DEC"))) {
+                            !(entry == 0xdf244 && cursor == entry && mnemonic.equals("DEC")) &&
+                            !(positionCallback && Set.of("SUB", "XOR", "SAR", "IMUL", "IDIV").contains(mnemonic))) {
                         throw new IllegalStateException("unexpected leaf control flow at " + toAddr(cursor));
                     }
                     cursor += instruction.getLength();
