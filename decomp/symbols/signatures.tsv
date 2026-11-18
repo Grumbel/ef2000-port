@@ -3554,3 +3554,23 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000347ac	net_open_loops_347ac	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Callback slot 12b5b0; 347ac loads byte widget+10, zero extends and tails a4b80; RET0; callee ABI from original disassembly; source comparison report local/network-dialog-source-20261117/report.json
 0x000349ec	net_main_loop_349ec	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Callback slot 12b4f8; lookup a78bc(widget,182e60), store result 19f320 before refresh 348e4; RET0; original callee ABI audited; local/network-status-source-20261117/report.json
 0x00035128	net_open_initialise_35128			ebx,ecx,edx,esi,edi,ebp	0	Callback slot 12b5e0; set byte 19f59b=ff before close a3e04, clear 34ea4, tail ac7a8(EAX=182f24); RET0; original callee ABI audited; local/network-status-source-20261117/report.json
+0x00084afc	guiClosedownHelp			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0xabc98; inherits target signature (draw_named_widget_abc98).
+0x00084b04	UpdateMagnify			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0xabce8; inherits target signature (refresh_named_widget_abce8).
+0x00084b0c	gnStartup			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x34f94; inherits target signature (update_mission_page_34f94).
+0x00084b14	gnClosedown			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x34ca4; inherits target signature (start_session_34ca4).
+0x00084b1c	rxmissStartup			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x34e18; inherits target signature (end_session_34e18).
+0x00084b24	gnNetAbort			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x33750; inherits target signature (forward_if_flag_1357c8).
+0x00084b2c	rxmissMainloop			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x35144; inherits target signature (reset_flags_35144).
+0x00084b34	rxmissClosedown			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x35590; inherits target signature (step_menu_screen_35590).
+0x00084b3c	txmissStartup			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x357a4; inherits target signature (start_screen_357a4).
+0x00084b44	txmissMainloop			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x35cfc; inherits target signature (prepare_briefing_file_35cfc).
+0x00084b4c	txmissClosedown			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x36f84; inherits target signature (step_setup_screen_36f84).
+0x00084b54	gnReadyToFly			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x3711c; inherits target signature (reset_list_view_3711c).
+0x00084b5c	gpwWeaponsAccepted			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x69fac; inherits target signature (rebuild_tactical_screen_69fac).
+0x00084b64	gpwGenerateCampaign			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x689f0; inherits target signature (copy_table_689f0).
+0x00084b6c	gpwClickCampaign			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x40e20; inherits target signature (reset_name_record_40e20).
+0x00084b7c	InitSim2			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x7cc5c; inherits target signature (show_main_widgets_7cc5c).
+0x00084b84	simShowDebrief			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x7cc38; inherits target signature (run_named_widget_7cc38).
+0x00084b9c	gpwSimTypeSelected		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x7ccd0; inherits target signature (call_b1a10_1379bc).
+0x00084bac	gpwContinueArcade			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x4738; inherits target signature (reset_menu_state_4738).
+0x00084bb4	InitArcade2			ebx,ecx,edx,esi,edi,ebp	0	Disassembly JMP 0x4bf8; inherits target signature (select_entry_4bf8).
