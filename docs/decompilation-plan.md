@@ -15014,3 +15014,20 @@ Run `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-object-co
 against the 4,363-entry floating-scanner candidate. The retained
 `bulk-cpu-boundaries-object-coordinate-fixtures.json` has SHA-256
 `ef11fbf29002bca3d3b7135f542ece62ec23b6520ab30cc1408e52fff15c2b7a`.
+
+### Prepared packed-list lookup comparison
+
+The baseline stopped at `0xb55d1` and `0xb5604` on the first packed
+coordinate read through an unprepared list head. Supply a two-node chain
+and distinct packed lookup and filter records. Both lookup entries
+(`0xb55c8`, `0xb55f8`) match on second-node success, empty lists, misses
+on either coordinate, type mismatch, and mismatch on the extra filter.
+Caller `0xb80ac` also returns with matching state on hit and miss with an
+empty destination list. All 14 prepared comparisons matched. The callers
+`0xb7d4c` and `0xb8510`, nonempty destination processing, runtime splice,
+and golden replays remain open.
+
+Run `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-packed-list-search.py`
+against the 4,363-entry floating-scanner candidate. The retained
+`bulk-cpu-boundaries-packed-list-search.json` has SHA-256
+`e9d0b04352373bc5a06fb0db809b531a3305df4ba0cfc5a57dff0a0acba5cbe8`.
