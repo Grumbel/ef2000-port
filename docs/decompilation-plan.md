@@ -13713,3 +13713,17 @@ All ten probes passed and the prepared-match total is now
 replay-bulk-gameport-bios-bounded-table-loops.py and
 bulk-gameport-bios-bounded-table-loops.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify two additional sentinel-driven scans
+
+Entries 0xe490 and 0x80400 previously exhausted the instruction
+budget. The first scan looks for a type byte of 8. The second
+walks a pointer table until the pointed-to record starts with a
+zero byte. Placing the expected marker after one or three records
+produced four complete matches between the original and C.
+These inputs exercise both scan lengths and the subsequent return
+paths, including the cleanup loop at 0xd6ffc.
+
+The prepared-match total is now 3,845 of 4,353 entries. See
+replay-bulk-gameport-bios-scan-terminators.py and its JSONL output
+under local/ghidra-group-followup-20261118.
