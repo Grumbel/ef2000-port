@@ -24,11 +24,12 @@ import struct
 import subprocess
 
 try:
-    from . import asm_to_c, asm_softfloat, asm_x87_oracle
+    from . import asm_to_c, asm_softfloat, asm_x87_oracle, x32_allocation
 except ImportError:
     import asm_to_c
     import asm_softfloat
     import asm_x87_oracle
+    import x32_allocation
 
 
 class Segment(ctypes.Structure):
@@ -127,7 +128,7 @@ def validate_prepared_memory_size(size):
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(),
-            dos_console=False):
+            dos_console=False, x32_heap=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -144,8 +145,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         raise ValueError('host services require the program dispatcher')
     if memory_services and service_factory is None and port_factory is None:
         raise ValueError('memory services require a service factory')
-    if dos_console and (not program or captured is not None or service_factory is not None):
-        raise ValueError('DOS console fixture requires prepared program probes and no custom interrupt handler')
+    prepared_services = dos_console or x32_heap
+    if prepared_services and (not program or captured is not None or service_factory is not None):
+        raise ValueError('Interrupt fixtures require prepared program probes and no custom interrupt handler')
+    if x32_heap and (prepared_memory_size or 0) < x32_allocation.Allocation.minimum_stack:
+        raise ValueError('X-32 heap fixture requires prepared RAM covering the initial heap and stack floor')
     validate_prepared_memory_size(prepared_memory_size)
     if captured is not None and prepared_memory_size is not None:
         raise ValueError('captured RAM cannot be resized')
@@ -159,7 +163,23 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_exit = None
     translated_exit = None
 
-    def console_service(ip, values, vector, ds, read, events):
+    original_heap = x32_allocation.Allocation() if x32_heap else None
+    translated_heap = x32_allocation.Allocation() if x32_heap else None
+
+    def prepared_service(ip, values, vector, ds, read, events, heap):
+        if heap is not None and vector == 0x21 and ip == 0x245 and values['ax'] & 0xffff == 0x3508:
+            rounded = (values['cx'] + 0xfff) & 0xfffff000
+            if rounded > memory_size:
+                raise ValueError('X-32 heap request exceeds prepared RAM')
+            grown = heap.grow_heap(values['cx'], values['flags'])
+            if grown is None:
+                raise ValueError('X-32 heap request exhausted the allocator')
+            ax, cx, flags = grown
+            response = dict(values, ax=ax, cx=cx, flags=flags)
+            events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
+            return response
+        if not dos_console:
+            return reject_host_service()
         offset, count = values['dx'], values['cx']
         if (vector != 0x21 or ((values['ax'] >> 8) & 0xff) != 0x40 or
                 values['bx'] & 0xffff > 2 or ds not in (16, 24) or
@@ -264,7 +284,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             fields['dos_exit'] = dict(original=original_exit, translated=translated_exit)
         if binding is not None:
             fields['original_x87'] = binding.evidence()
-        if service_factory is not None or dos_console:
+        if service_factory is not None or prepared_services:
             fields['host_services'] = dict(original=original_events, translated=translated_events)
         if port_factory is not None:
             fields['port_services'] = dict(original=original_ports, translated=translated_ports)
@@ -273,7 +293,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
     rejected_service = {}
-    if original_service is not None or dos_console:
+    if original_service is not None or prepared_services:
         def interrupt(engine, vector, _):
             nonlocal original_exit
             ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
@@ -290,9 +310,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 return
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
             try:
-                if dos_console:
+                if prepared_services:
                     ds = engine.reg_read(x86_const.UC_X86_REG_DS)
-                    response = console_service(ip, values, vector, ds, engine.mem_read, original_events)
+                    response = prepared_service(ip, values, vector, ds, engine.mem_read, original_events, original_heap)
                 else:
                     response = service(original_service, ip, values, original_events, vector, ram)
             except (ValueError, RuntimeError):
@@ -413,14 +433,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
-    if translated_service is None and translated_port is None and not dos_console:
+    if translated_service is None and translated_port is None and not prepared_services:
         status = (function(ctypes.byref(state), budget, sentinel) if program else
                   function(ctypes.byref(state), budget))
     else:
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if (0x100 <= status <= 0x1ff or status == 0x203) and (translated_service is not None or dos_console):
+            if (0x100 <= status <= 0x1ff or status == 0x203) and (translated_service is not None or prepared_services):
                 length = 1 if status == 0x203 else 2
                 if dos_console and status == 0x121 and ((state.r[0] >> 8) & 0xff) == 0x4c:
                     translated_exit = dict(ip=state.pc-length, code=state.r[0] & 0xff)
@@ -430,11 +450,11 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                 values['flags'] = state.flags
                 try:
                     ram = bytearray(memory) if memory_services else None
-                    if dos_console:
-                        response = console_service(state.pc-length, values, status & 0xff,
+                    if prepared_services:
+                        response = prepared_service(state.pc-length, values, status & 0xff,
                                                    state.segment[asm_to_c.SEGMENTS.index('ds')],
                                                    lambda offset, count: memory[offset:offset+count],
-                                                   translated_events)
+                                                   translated_events, translated_heap)
                     else:
                         response = service(translated_service, state.pc-length, values, translated_events,
                                            status & 0xff, ram)
@@ -544,7 +564,7 @@ def pit_write_service(request, registers):
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(),
-                    dos_console=False, pit_writes=False):
+                    dos_console=False, pit_writes=False, x32_heap=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -566,11 +586,11 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)),
                                  service_factory=(lambda: reject_host_service)
-                                 if reject_services and not dos_console else None,
+                                 if reject_services and not (dos_console or x32_heap) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites,
-                                 dos_console=dos_console,
+                                 dos_console=dos_console, x32_heap=x32_heap,
                                  port_factory=(lambda: pit_write_service) if pit_writes else
                                  (lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
@@ -677,7 +697,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False):
+           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, x32_heap=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -690,6 +710,10 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
     if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS console fixture requires --service-free-paths and interrupt boundaries')
+    if x32_heap and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
+        raise ValueError('X-32 heap fixture requires --service-free-paths and interrupt boundaries')
+    if x32_heap and (prepared_memory_size or 0) < x32_allocation.Allocation.minimum_stack:
+        raise ValueError('X-32 heap fixture requires prepared RAM covering the initial heap and stack floor')
     if pit_writes and (not program or not manifest.get('host_port_service_boundaries') or not service_free_paths):
         raise ValueError('PIT write fixture requires --service-free-paths and port boundaries')
     sti_stop_sites = manifest.get('sti_stop_sites', [])
@@ -825,7 +849,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites,
-                                  dos_console=dos_console, pit_writes=pit_writes)
+                                  dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -861,6 +885,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_memory_size=prepared_memory_size or 0x400000,
+                  x32_heap_policy='prepared-only' if x32_heap else 'disabled',
+                  x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
+                                        if x32_heap else None,
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
                                        'reject-on-reach' if reject_services else 'no-boundaries'),
@@ -896,6 +923,8 @@ def main(argv=None):
                         help='with --service-free-paths, compare channel-zero PIT writes on prepared probes')
     parser.add_argument('--dos-console', action='store_true',
                         help='with --service-free-paths, model DOS console writes and exit on prepared probes')
+    parser.add_argument('--x32-heap', action='store_true',
+                        help='with --service-free-paths, model X-32 heap growth on prepared probes')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
@@ -916,7 +945,7 @@ def main(argv=None):
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
                         service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
-                        pit_writes=args.pit_writes,
+                        pit_writes=args.pit_writes, x32_heap=args.x32_heap,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))

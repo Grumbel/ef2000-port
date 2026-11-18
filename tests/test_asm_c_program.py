@@ -1322,6 +1322,20 @@ ret
                     self.assertEqual(len(result['host_services']['original']), 1)
                     self.assertEqual(allocations[0], allocations[1])
                     self.assertEqual(allocations[0].heap_end, (requested+4095)&~4095)
+                    prepared = asm_c_differential.compare(
+                        function, image.read_bytes(), 0x240,
+                        [0xabcd0000, requested, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                        program=True, x32_heap=True, prepared_memory_size=0x500000)
+                    self.assertEqual(prepared['state'], 'pass', prepared)
+                    for side in ('original', 'translated'):
+                        self.assertEqual(prepared['host_services'][side][0]['after'],
+                                         result['host_services'][side][0]['after'])
+            unmapped = asm_c_differential.compare(
+                function, image.read_bytes(), 0x240,
+                [0, 0x500001, 3, 4, 0x300000, 6, 7, 8], 0x246,
+                program=True, x32_heap=True, prepared_memory_size=0x500000)
+            self.assertEqual(unmapped['state'], 'inconclusive', unmapped)
+            self.assertIn('exceeds prepared RAM', unmapped['reason'])
             result = asm_c_differential.compare(
                 function, image.read_bytes(), 0x240,
                 [0, 0x5000000, 3, 4, 0x300000, 6, 7, 8], 0x246,

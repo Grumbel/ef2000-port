@@ -12550,3 +12550,20 @@ former dispatcher gaps at 0x110f0c now reach the original STI stop at
 results are inconclusive. The 0xf2800 probe still reaches untranslated
 CPUID code at 0xf2819 in C after the original has completed. Report:
 `local/ghidra-group-followup-20261118/bulk-extra-boundary-diff/report.json`.
+
+2026-11-18 — Added the opt-in `--x32-heap` prepared differential
+fixture for INT 21h AX=3508h at 0x245. The original and translated
+paths use separate instances of the existing X-32 allocation model,
+with register and flags responses compared in the interrupt transcript.
+Prepared RAM must cover the initial heap and stack floor. Requests
+that round past mapped RAM stop the probe.
+
+Replaying the 222 initial heap stops from the 4,327-body sweep
+produced 179 matches and 43 inconclusive results, including 48 new
+matches among blocked tracker rows (40,888 body bytes). Of the 43
+inconclusive probes, 35 reached another rejected interrupt, four
+faulted, two exhausted the instruction budget, and two asked for heap
+growth beyond mapped RAM. This replay reused the recorded host library,
+the hardware x87 oracle and the original 5 MiB prepared inputs.
+The filtered results and the parent report digest are in
+`local/ghidra-group-followup-20261118/heap-stop-replay.json`.
