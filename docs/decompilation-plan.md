@@ -13177,3 +13177,17 @@ local allocator overlay also completed. All six scoped entries matched
 under their prepared inputs, including the four camera-origin entries,
 0x410d0, and 0x9850c. See bulk-mutable-sub-diff/report.json in the same
 local directory.
+
+### 2026-11-18 — Compare X-32 interrupt-vector table operations
+
+The opt-in `--x32-vectors` fixture uses separate copies of the
+startup probe's vector tables for the original and C machines. It
+models INT 21h AX=2502h through 2507h under the prepared flat-selector
+profile. Protected-vector queries apply the returned ES as well as EBX
+on both sides. The comparison checks the service transcript and the
+final registers, including ES.
+
+Of the 24 entries whose first service stop was one of these operations,
+13 matched under the prepared fixtures. Nine advanced to an STI
+boundary and two advanced to another unsupported service. See
+local/ghidra-group-followup-20261118/bulk-x32-vector-replay.jsonl.

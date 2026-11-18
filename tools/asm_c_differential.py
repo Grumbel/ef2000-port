@@ -143,7 +143,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
             prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(), cpuid_sites=(),
             dos_console=False, x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False,
-            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False):
+            x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -171,7 +171,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_cpuid, translated_cpuid = [], []
     cpuid_cpu = None
     prepared_services = (dos_console or x32_heap or dos_invalid_open or x32_residency
-                         or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock)
+                         or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock or x32_vectors)
     if prepared_services and (not program or captured is not None or service_factory is not None):
         raise ValueError('Interrupt fixtures require prepared program probes and no custom interrupt handler')
     if vga_dac and (not program or captured is not None or port_factory is None or memory_services
@@ -206,6 +206,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     drives = {}
     real_mode_handlers = {}
     clock_reads = Counter()
+    vector_tables = {side: unicorn_backend.VectorState(code_selector=8)
+                     for side in ('original', 'translated')} if x32_vectors else {}
 
     def write_translated(offset, data):
         memory[offset:offset + len(data)] = data
@@ -222,6 +224,14 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             ax, cx, flags = grown
             response = dict(values, ax=ax, cx=cx, flags=flags)
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
+            return response
+        if x32_vectors and vector == 0x21 and values['ax'] & 0xffff in (
+                0x2502, 0x2503, 0x2504, 0x2505, 0x2506, 0x2507):
+            response = vector_tables[side].service(dict(values, ds=ds))
+            response.pop('ds')
+            if 'es' in response and response['es'] not in (8, 16, 24):
+                raise ValueError('X-32 vector selector is outside the prepared flat profile')
+            events.append(dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response))
             return response
         if x32_residency and vector == 0x21 and values['ax'] & 0xffff == 0x252b:
             operation = values['bx'] & 0xffff
@@ -556,6 +566,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             for n, r in zip(service_names, asm_to_c.REGS):
                 engine.reg_write(getattr(x86_const, 'UC_X86_REG_'+r.upper()), response[n])
             engine.reg_write(x86_const.UC_X86_REG_EFLAGS, response['flags'])
+            if prepared_services and 'es' in response:
+                engine.reg_write(x86_const.UC_X86_REG_ES, response['es'])
         cpu.hook_add(UC_HOOK_INTR, interrupt)
     port_errors = []
     if original_port is not None:
@@ -721,6 +733,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                     memory[:] = ram
                 state.r[:] = [response[n] for n in service_names]
                 state.flags = response['flags']
+                if prepared_services and 'es' in response:
+                    state.segment[asm_to_c.SEGMENTS.index('es')] = response['es']
                 status = 0 if state.pc == sentinel else 1
             if (status & 0xf000) == 0x1000 and translated_port is not None:
                 length, opcode = (status >> 8) & 15, status & 255
@@ -872,7 +886,7 @@ def vga_status_service(pit_writes=False):
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
                     dos_console=False, pit_writes=False, vga_status_reads=False, x32_heap=False,
-                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False):
+                    dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -894,11 +908,11 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)),
                                  service_factory=(lambda: reject_host_service)
-                                 if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock) else None,
+                                 if reject_services and not (dos_console or x32_heap or dos_invalid_open or x32_residency or dos_empty_drive or x32_mouse or x32_no_cd or x32_vbe or dos_clock or x32_vectors) else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites, checkpoint=checkpoint,
-                                 prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac,
+                                 prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors,
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
                                  x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
@@ -1010,7 +1024,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -1027,6 +1041,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('initial RAM writes require --service-free-paths and prepared program probes')
     if checkpoint is not None and (not program or not service_free_paths or captures or not addresses):
         raise ValueError('checkpoint requires prepared program probes and explicit entry addresses')
+    if x32_vectors and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
+        raise ValueError('X-32 vector fixture requires --service-free-paths and interrupt boundaries')
     if dos_clock and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS clock fixture requires --service-free-paths and interrupt boundaries')
     if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
@@ -1197,7 +1213,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac)
+                                  checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -1244,6 +1260,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   x32_mouse_policy='idle-prepared-only' if x32_mouse else 'disabled',
                   x32_no_cd_policy='no-cd-prepared-only' if x32_no_cd else 'disabled',
                   x32_vbe_policy='mode-info-and-scanline-prepared-only' if x32_vbe else 'disabled',
+                  x32_vector_policy='flat-prepared-only' if x32_vectors else 'disabled',
                   dos_clock_date='2026-11-18' if dos_clock else None,
                   dos_clock_sample='12:34:56.78Z' if dos_clock else None,
                   dos_clock_step_centiseconds=1 if dos_clock else None,
@@ -1298,6 +1315,8 @@ def main(argv=None):
                         help='compare X-32 MSCDEX requests with CD support absent')
     parser.add_argument('--x32-vbe', action='store_true',
                         help='compare X-32 VBE mode-info and scanline requests against prepared DOS RAM')
+    parser.add_argument('--x32-vectors', action='store_true',
+                        help='compare X-32 interrupt vector queries and updates with separate flat tables')
     parser.add_argument('--dos-clock', action='store_true',
                         help='compare DOS date and time calls with a deterministic advancing UTC clock on prepared probes')
     parser.add_argument('--dos-empty-drive', action='store_true',
@@ -1338,7 +1357,7 @@ def main(argv=None):
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
                         checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster,
-                        vga_dac=args.vga_dac)
+                        vga_dac=args.vga_dac, x32_vectors=args.x32_vectors)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
