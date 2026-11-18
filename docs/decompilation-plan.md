@@ -13664,3 +13664,18 @@ complete prepared match. Replay with
 replay-bulk-gameport-bios-list-divisors.py and see
 bulk-gameport-bios-list-divisors.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify channel owner checks and locate cleanup boundary
+
+Initializing the driver's channel map and locking the selected
+channel to a different owner removed the invalid pointer read at
+0x112559. Entries 0x1123a4, 0x1128e4 and 0x112bd8 matched through
+return with the selected channel set to 2 and to 3. Both prepared
+0x112808 cases matched up to the cleanup interrupt at 0x1112fe,
+which requests INT 21h AX=3501h. The prepared service model
+currently stops there.
+
+The bulk total is now 3,838 of 4,353 entries with at least one
+complete prepared match. See replay-bulk-gameport-bios-channel-owner.py
+and replay-bulk-gameport-bios-channel-owner-checkpoint.py and their
+JSONL output under local/ghidra-group-followup-20261118.
