@@ -12684,3 +12684,23 @@ real-mode calls (31). No tracker promotions or byte-identity claims
 follow from this run. Report and invocation are under
 `local/ghidra-group-followup-20261118/` as
 `bulk-cpuid-full-diff/report.json` and `verify-cpuid-full.py`.
+
+2026-11-18 — Added opt-in `--dos-empty-drive` prepared open
+comparisons. Each request uses the existing DOS resolver with a fresh
+empty asset root and overlay configuration. This exercises open errors
+with carry set and leaves successful opens and later file operations
+outside the fixture. A synthetic named open returns AX=2 with matching
+service transcripts. All 39 program tests passed.
+
+An instruction trace classified the 54 write-mode and 11 read-mode
+stops at the two leading DOS open sites as printable, NUL-terminated
+filenames. Replaying all 68 DOS open stops from the full CPUID sweep
+with the empty drive yielded 16 matches, nine inconclusive results
+and 43 dispatcher mismatches. The original reaches DOS exit while
+the translated path stops before its first service event. The stopped
+PCs are 0x0 (38) and 0xc7e38 (five). These are gaps exposed by the
+additional input fixture. Eight of the 43 mismatches and five of the
+16 passes are tracker-blocked entries. No tracker states changed.
+Local evidence is in `dos-open-classes.json` and
+`dos-empty-drive-replay.json` under
+`local/ghidra-group-followup-20261118/`.

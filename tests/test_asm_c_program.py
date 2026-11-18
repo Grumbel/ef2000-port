@@ -1223,6 +1223,16 @@ ret
             self.assertEqual(console_entries[0x400]['probes'][0]['dos_exit'],
                              dict(original=dict(ip=0x404, code=7), translated=dict(ip=0x404, code=7)))
 
+            empty_drive_report = asm_c_differential.verify(
+                out, root / 'empty-drive', image, scenarios=1,
+                service_free_paths=True, dos_empty_drive=True, addresses=[0x600])
+            entry, = empty_drive_report['entries']
+            self.assertEqual(entry['state'], 'probes-pass', entry)
+            events = entry['probes'][0]['host_services']
+            self.assertEqual(events['original'], events['translated'])
+            self.assertEqual(events['original'][0]['after']['ax'], 2)
+            self.assertEqual(events['original'][0]['after']['flags'] & 1, 1)
+
         self.assertEqual(console_report['dos_invalid_open_policy'], 'prepared-only')
         self.assertEqual(console_entries[0x500]['state'], 'probes-pass')
         open_events = console_entries[0x500]['probes'][0]['host_services']
