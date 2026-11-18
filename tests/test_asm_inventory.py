@@ -62,6 +62,27 @@ class InventoryTests(unittest.TestCase):
         report = asm_inventory.audit_candidate_body(instructions, 0, 8, owned, {16})
         self.assertIn('owned boundary', report['blockers'][0]['reason'])
 
+    def test_table_audit_requires_a_resolved_direct_call_chain(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            image = Path(temporary) / 'payload.bin'
+            # Both calls target the next six-byte body.
+            payload = bytes.fromhex('e801000000c3 e801000000c3 c3')
+            tables = [dict(matches=[dict(target=0)])]
+
+            def audit(data, limit):
+                image.write_bytes(data)
+                return asm_inventory.audit_table_bodies(
+                    image, data, {}, tables, max_bytes=32, max_callees=limit,
+                    objdump='objdump')
+
+            limited = audit(payload, 1)
+            self.assertEqual([len(body['blockers']) for body in limited], [1, 1])
+            complete = audit(payload, 2)
+            self.assertEqual([body['candidate_callees'] for body in complete], [[6], [12], []])
+            self.assertEqual([body['blockers'] for body in complete], [[], [], []])
+            rejected = audit(payload[:-1] + bytes.fromhex('ffe0'), 2)
+            self.assertTrue(all(body['blockers'] for body in rejected))
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

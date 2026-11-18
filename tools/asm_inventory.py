@@ -309,20 +309,56 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries):
                 instruction_count=len(spans), return_sites=sorted(returns), blockers=blockers)
 
 
-def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump):
+def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
+                       max_callees=0):
     if max_bytes <= 0:
         raise ValueError('candidate scan limit must be positive')
+    if max_callees < 0:
+        raise ValueError('candidate callee limit must be nonnegative')
     owned = bytearray(len(payload))
     for body in bodies.values():
         for start, end in body['ranges']:
             owned[start:end] = b'\x01' * (end - start)
-    candidates = sorted({match['target'] for table in tables for match in table['matches']})
-    boundaries = sorted(set(candidates) | set(bodies) | {len(payload)})
-    report = []
-    for entry in candidates:
-        stop = min(entry + max_bytes, boundaries[bisect_right(boundaries, entry)])
-        instructions = decode_window(image, entry, stop - entry, objdump=objdump)
-        report.append(audit_candidate_body(instructions, entry, stop, owned, bodies))
+    roots = {match['target'] for table in tables for match in table['matches']}
+    candidates = set(roots)
+    windows = {}
+    while True:
+        boundaries = sorted(candidates | set(bodies) | {len(payload)})
+        report = []
+        for entry in sorted(candidates):
+            stop = min(entry + max_bytes, boundaries[bisect_right(boundaries, entry)])
+            key = entry, stop
+            if key not in windows:
+                windows[key] = decode_window(image, entry, stop - entry, objdump=objdump)
+            report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies))
+        remaining = max_callees - (len(candidates) - len(roots))
+        if not remaining:
+            break
+        extra = {edge['target'] for body in report for edge in body['blockers']
+                 if edge.get('kind') == 'call' and edge['target'] is not None
+                 and 0 <= edge['target'] < len(payload) and not owned[edge['target']]}
+        extra -= candidates
+        if not extra:
+            break
+        candidates.update(sorted(extra)[:remaining])
+    if max_callees:
+        # Resolve leaves first, so a cycle or a rejected callee cannot certify its callers.
+        accepted = set(bodies)
+        while True:
+            ready = {body['entry'] for body in report if body['entry'] not in accepted
+                     and all(edge.get('kind') == 'call' and edge['target'] in accepted
+                             for edge in body['blockers'])}
+            if not ready:
+                break
+            accepted.update(ready)
+        for body in report:
+            body['origin'] = 'table' if body['entry'] in roots else 'direct-call'
+            body['candidate_callees'] = sorted({
+                edge['target'] for edge in body['blockers']
+                if edge.get('kind') == 'call' and edge['target'] in candidates
+            })
+            body['blockers'] = [edge for edge in body['blockers']
+                                if edge.get('kind') != 'call' or edge['target'] not in accepted]
     return report
 
 
@@ -436,7 +472,11 @@ def main(argv=None):
                         help='check observed destinations against bounded 32-bit pointer slots')
     parser.add_argument('--trace-body-limit', type=int,
                         help='statically audit matched table targets, scanning at most this many bytes each')
+    parser.add_argument('--trace-callee-limit', type=int,
+                        help='also audit up to this many uncovered direct callees')
     args = parser.parse_args(argv)
+    if args.trace_callee_limit is not None and args.trace_body_limit is None:
+        parser.error('--trace-callee-limit requires --trace-body-limit')
     if args.trace_body_limit is not None and not args.trace_table:
         parser.error('--trace-body-limit requires --trace-table')
     if args.trace_table and not args.trace_gaps:
@@ -457,7 +497,8 @@ def main(argv=None):
                 report['candidate_bodies'] = audit_table_bodies(
                     workspace / ghidra_ef2000.IMAGE_NAME, payload,
                     load_body_ranges(args.body_ranges, payload)[0], report['tables'],
-                    max_bytes=args.trace_body_limit, objdump=args.objdump)
+                    max_bytes=args.trace_body_limit, objdump=args.objdump,
+                    max_callees=args.trace_callee_limit or 0)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

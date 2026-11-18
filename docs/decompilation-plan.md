@@ -12288,3 +12288,13 @@ at 0x11d6b0, the first byte of the pointer table. The ordinary error
 path calls DOS termination through 0x1e9 instead. A boundary correction
 needs to preserve the debugger continuation before generation can claim
 coverage of this body.
+
+2026-11-18 — Added `--trace-callee-limit` to the table-body audit. It
+expands bounded direct dependencies, rechecks candidate boundaries after
+discovering new entries and resolves the call chain from accepted leaves.
+The 42-target trace audit now finds 38 table bodies and four additional
+callees with no static blockers. The 0x13854 chain passes automatically,
+and the bodies at 0x85a24 and 0x85a60 clear direct-call blockers for two
+other candidates. Four table bodies still need indirect-flow or range
+evidence. These are candidates for review.
+Report: `local/ghidra-group-followup-20261118/trace-table-callees.json`.
