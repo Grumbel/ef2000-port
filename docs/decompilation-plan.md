@@ -13937,3 +13937,17 @@ source and positive pair count, 0x10dc1d matched through return for
 The prepared-match total is now 3,880 of 4,353 entries. See
 replay-bulk-gameport-bios-line-checksum.py and its JSONL output under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare software extended-precision polynomial evaluation
+
+Entries 0xf0fac and 0xf0ffe exhausted the baseline instruction budget.
+The loop at 0xf0ff2 decrements its degree counter after each iteration,
+so the prepared cases supply positive degrees and degree-plus-one
+packed 80-bit coefficients. Both entries matched through return for
+degrees 1, 3, and 6 at argument 0.75, with positive and negative
+coefficients and a zero coefficient in the longer cases. The comparison
+also covers the in-place result written by 0xf0ffe.
+
+The prepared-match total is now 3,882 of 4,353 entries. See
+replay-bulk-gameport-bios-polynomial.py and its JSONL output under
+local/ghidra-group-followup-20261118.
