@@ -238,6 +238,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             response = conventional_allocators[side].allocate(values)
             events.append(dict(ip=ip, vector=vector, before=dict(values), after=response))
             return response
+        if vector == 0x21 and 0x3501 <= (values['ax'] & 0xffff) <= 0x3505:
+            raise ValueError('X-32 selector service requires a descriptor-aware probe')
         if x32_vectors and vector == 0x21 and values['ax'] & 0xffff in (
                 0x2502, 0x2503, 0x2504, 0x2505, 0x2506, 0x2507):
             response = vector_tables[side].service(dict(values, ds=ds))
@@ -599,6 +601,9 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                     rejected_service['write_request'] = dict(
                         handle=values['bx'] & 0xffff, count=values['cx'], offset=values['dx'],
                         ds=ds)
+                if vector == 0x21 and 0x3501 <= (values['ax'] & 0xffff) <= 0x3505:
+                    rejected_service['selector_request'] = dict(
+                        function=values['ax'] & 0xffff, bx=values['bx'], cx=values['cx'])
                 if captured is None and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
                     offset = values['dx']
                     request = dict(ds=ds, offset=offset, bx=values['bx'], cx=values['cx'])

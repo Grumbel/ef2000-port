@@ -13679,3 +13679,21 @@ The bulk total is now 3,838 of 4,353 entries with at least one
 complete prepared match. See replay-bulk-gameport-bios-channel-owner.py
 and replay-bulk-gameport-bios-channel-owner-checkpoint.py and their
 JSONL output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Identify the descriptor dependency in channel cleanup
+
+The prepared verifier now identifies X-32 descriptor operations
+3501h through 3505h explicitly and records their request registers.
+Both 0x112808 cases stop at 3501h. The original next loads DS with
+the returned selector, sets its base to 0x400, reads the CRT port
+from the BIOS data area, and frees the selector before polling.
+The runtime retargets low physical bases into its conventional
+memory mapping and refreshes loaded segment caches when a
+descriptor changes. A canned register reply would miss that
+memory dependency. The verifier needs a descriptor-aware probe
+with the same mapping on both sides before the cleanup can be
+compared through return.
+
+The channel owner replay still reports six complete matches and
+two inconclusive cases. The synthetic software interrupt boundary
+test passed. The prepared-match total remains 3,838.
