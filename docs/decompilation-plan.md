@@ -14149,3 +14149,17 @@ the DOS write payload hashes. Occupied-slot retries remain open.
 The complete-match total stays at 3,888 of 4,354 generated entries.
 See replay-bulk-gameport-bios-save-full.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify occupied screenshot slot retries
+
+Entry 0xac57c matches through return in three prepared probes with
+occupied slots, including the signed counter wrap from 32767 to -32768.
+Each side starts with one free Watcom stream record and an independently
+seeded disposable DOS overlay. The probe checks the filename hashes and
+carry flags of the read-only opens and confirms that the encoder creates
+the first free filename. Without the prepared stream record the first
+open fails before calling DOS and the retry loop is skipped.
+
+See replay-bulk-gameport-bios-save-occupied.py and its JSONL output
+under local/ghidra-group-followup-20261118. The complete-match total
+stays at 3,888 of 4,354 generated entries.
