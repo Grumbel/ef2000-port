@@ -1128,7 +1128,24 @@ terminate: mov ax,0x4c07
 int 0x21
 inc eax
 ret
-.size terminate, .-terminate"""
+.size terminate, .-terminate
+.org 0x500
+.type bad_open,@function
+bad_open: mov ax,0x3d01
+xor edx,edx
+int 0x21
+adc eax,0
+ret
+.size bad_open, .-bad_open
+.org 0x600
+.type named_open,@function
+named_open: mov ax,0x3d00
+mov edx,0x680
+int 0x21
+ret
+.size named_open, .-named_open
+.org 0x680
+.asciz "EXAMPLE.TXT" """
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1157,7 +1174,7 @@ ret
                              dict(kind='port', ip=0x300, direction='in', port=0x61, width=8))
             console_report = asm_c_differential.verify(
                 out, root / 'console', image, scenarios=1, service_free_paths=True,
-                dos_console=True, pit_writes=True)
+                dos_console=True, pit_writes=True, dos_invalid_open=True)
             self.assertEqual(console_report['host_service_policy'], 'dos-console-and-exit-prepared-only')
             self.assertEqual(console_report['pit_write_policy'], 'transcript-prepared-only')
             console_entries = {entry['address']: entry for entry in console_report['entries']}
@@ -1173,6 +1190,15 @@ ret
             self.assertEqual(console_entries[0x400]['state'], 'probes-pass', console_entries[0x400])
             self.assertEqual(console_entries[0x400]['probes'][0]['dos_exit'],
                              dict(original=dict(ip=0x404, code=7), translated=dict(ip=0x404, code=7)))
+
+        self.assertEqual(console_report['dos_invalid_open_policy'], 'prepared-only')
+        self.assertEqual(console_entries[0x500]['state'], 'probes-pass')
+        open_events = console_entries[0x500]['probes'][0]['host_services']
+        self.assertEqual(open_events['original'], open_events['translated'])
+        self.assertEqual(open_events['original'][0]['after']['ax'], 3)
+        self.assertEqual(open_events['original'][0]['after']['flags'] & 1, 1)
+        self.assertEqual(console_entries[0x600]['state'], 'inconclusive')
+        self.assertIn('filesystem state', console_entries[0x600]['probes'][0]['reason'])
 
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function

@@ -12586,3 +12586,18 @@ The paired status app now prints blocked body bytes for each comparison
 state and groups inconclusive blocked functions by their stop reasons.
 The 13 status tests passed and the Nix app was exercised with a paired
 comparison snapshot.
+
+2026-11-18 — Added `--dos-invalid-open` to prepared comparisons.
+It reproduces DOS error 3 and carry for an invalid filename pointer
+or unterminated filename buffer, and for malformed read-only names
+whose validation fails before filesystem lookup. A window outside the
+prepared RAM but inside the runtime's address range remains an
+inconclusive stop. Open requests that depend on access permissions or
+file contents also remain inconclusive.
+
+Replayed the 86 DOS open stops from the 4,339-body heap-enabled
+comparison with the same inputs, host library and hardware x87
+oracle. Eighteen probes matched (3,121 original body bytes), including
+three blocked tracker bodies (894 bytes). The other 68 still require
+a filesystem or access-mode fixture. Filtered replay and parent report
+digest: `local/ghidra-group-followup-20261118/dos-open-stop-replay.json`.
