@@ -14189,3 +14189,16 @@ The complete-match total stays at 3,889 of 4,354 generated entries.
 See replay-bulk-gameport-bios-page-history-visible.py and
 replay-bulk-gameport-bios-page-history-draw-checkpoint.py with their
 JSONL output under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare compressed-stream decoding through return
+
+The generated entry at 0x10da50 matches the original through return
+for three synthetic single-block streams. The fixtures cover a two-byte
+literal run, checksum rejection, and a two-byte back-reference copy.
+Separate comparisons confirm the expected checksum branches at
+0x10dafb and 0x10db07 and the copy at 0x10dada. Multi-block streams
+and release integration remain unverified.
+
+The complete-match total is now 3,890 of 4,354 generated entries.
+See replay-bulk-gameport-bios-decode-stream.py and its JSONL output
+under local/ghidra-group-followup-20261118.
