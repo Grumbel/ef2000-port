@@ -19,7 +19,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 
-/** Reviewed straight-line bodies and entry prefixes exposed by checked indirect dispatch. */
+/** Reviewed callback bodies and entry prefixes exposed by checked indirect dispatch. */
 public class EF2000RecoverObservedLeaves extends GhidraScript {
     private static final int IMAGE_SIZE = 0x195fb0;
     // entry, exclusive end, corroborating instruction, previous body bytes.
@@ -37,12 +37,13 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xd849c, 0xd8528, 0xd917b, 0},
         {0xd8168, 0xd8170, 0xd90b3, 0},
         {0xfa804, 0xfa815, 0xfa856, 0},
+        {0xd8220, 0xd8358, 0xd90b8, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
         "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244",
         "position_callback_d83b8", "position_callback_d849c", "position_callback_prefix_d8168",
-        "format_stream_putc_fa804"
+        "format_stream_putc_fa804", "position_callback_d8220"
     };
 
     @Override
@@ -68,6 +69,7 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                 long[] recipe = RECIPES[index];
                 long entry = recipe[0], end = recipe[1], literal = recipe[2];
                 boolean positionCallback = entry == 0xd83b8 || entry == 0xd849c;
+                boolean positionBranch = entry == 0xd8220;
                 boolean formatStream = entry == 0xfa804;
                 boolean entryPrefix = entry == 0xd8168;
                 Function function = getFunctionAt(toAddr(entry));
@@ -123,7 +125,7 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     Function caller = getFunctionContaining(toAddr(literal));
                     String register = entry == 0xdf244 ? "ESI" :
                         entry == 0xd83b8 || entryPrefix ? "EBX" : entry == 0xd849c ? "EDX" : "ECX";
-                    long callerEntry = entry == 0xdf244 ? 0xdf248 : positionCallback || entryPrefix ? 0xd8fd8 :
+                    long callerEntry = entry == 0xdf244 ? 0xdf248 : positionCallback || entryPrefix || positionBranch ? 0xd8fd8 :
                         formatStream ? 0xfa815 : 0;
                     boolean matches = false;
                     if (reference != null && reference.getMnemonicString().equals("MOV") &&
@@ -179,6 +181,19 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                                 !toAddr(cursor + instruction.getLength()).equals(instruction.getFallThrough())) {
                             throw new IllegalStateException("unexpected entry prefix flow at " + toAddr(cursor));
                         }
+                    } else if (positionBranch) {
+                        if (last ? !mnemonic.equals("RET") : instruction.getFlowType().isTerminal() ||
+                                instruction.getFlowType().isComputed() ||
+                                !toAddr(cursor + instruction.getLength()).equals(instruction.getFallThrough())) {
+                            throw new IllegalStateException("unexpected position callback flow at " + toAddr(cursor));
+                        }
+                        for (Address target : instruction.getFlows()) {
+                            if (instruction.getFlowType().isCall() ?
+                                    target.getOffset() != 0xd8170 || getFunctionAt(target) == null :
+                                    !instruction.getFlowType().isConditional() || !body.contains(target)) {
+                                throw new IllegalStateException("unexpected position callback target at " + toAddr(cursor));
+                            }
+                        }
                     } else if (formatStream && cursor == 0xfa80b) {
                         Address target = toAddr(0x10f43b);
                         Address[] flows = instruction.getFlows();
@@ -196,6 +211,16 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                         throw new IllegalStateException("unexpected leaf control flow at " + toAddr(cursor));
                     }
                     cursor += instruction.getLength();
+                }
+                if (positionBranch) {
+                    var instructions = currentProgram.getListing().getInstructions(body, true);
+                    while (instructions.hasNext()) {
+                        for (Address target : instructions.next().getFlows()) {
+                            if (getInstructionAt(target) == null) {
+                                throw new IllegalStateException("position callback target crosses an instruction: " + target);
+                            }
+                        }
+                    }
                 }
                 if (function == null) function = createFunction(toAddr(entry), NAMES[index]);
                 if (function == null) throw new IllegalStateException("function creation failed");

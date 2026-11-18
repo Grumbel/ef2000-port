@@ -12183,3 +12183,14 @@ complete result against the hardware oracle. In a 32-body OpenWatcom
 build, both previously failing prepared probes at 0x5f698 and 0x5f944
 matched. The scoped differential found 26 matches and six inconclusive
 inputs. Evidence: `local/ghidra-format-stream-20261118/x87-diff/report.json`.
+
+2026-11-18 — Recovered the 312-byte position callback at 0xd8220. The
+caller at 0xd8fd8 loads the address into ECX at 0xd90b8, stores it at
+0x15bb38, then calls through that slot at 0xd947c. The guarded recipe
+checks instruction ownership, forward decoding, internal conditional
+targets and direct calls to the existing 0xd8170 entry. Audit, apply and
+repeat apply succeeded. The fresh export contains 4,288 functions.
+All 34 scoped bodies compiled with OpenWatcom. The caller that previously
+stopped at 0xd8220 now matches on all 16 prepared inputs. Standalone
+callback probes remain inconclusive. All 47 wrapper tests passed.
+Evidence is under `local/ghidra-position-branch-20261118/`.

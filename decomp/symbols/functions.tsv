@@ -3141,6 +3141,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000d7f0c	604	build_clip_records_d7f0c	game_helpers130	compiles	game	confirmed	decomp/tests/0x000d7f0c.json	Original 0xd7f0c (604 bytes)
 0x000d8168	8	position_callback_prefix_d8168		unknown	asm	unverified		Observed callback through slot 0x15bb34, falling through to 0xd8170.
 0x000d8170	329			blocked	game	unverified		Skipped as too difficult: a branch leaves the function body (shared tail or Ghidra boundary split); needs the neighbouring code recovered together.
+0x000d8220	312	position_callback_d8220		unknown	asm	unverified		Observed callback through slot 0x15bb38, with internal conditional branches and direct calls to 0xd8170.
 0x000d8358	96	advance_position_d8358	engine_helpers	compiles	game	confirmed	decomp/tests/0x000d8358.json	docs/compiler-abi.md; Advance the wrapping position at word 0x15bb3c by delta/4.; callers 95e58@97033; guest pending
 0x000d83b8	226	position_callback_d83b8		unknown	asm	unverified		Observed indirect position callback through slot 0x420e74.
 0x000d849c	140	position_callback_d849c		unknown	asm	unverified		Observed indirect position callback through slot 0x420e70.
