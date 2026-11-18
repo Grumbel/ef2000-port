@@ -1855,8 +1855,15 @@ ret
             manifest = asm_c_program.generate(directory, out, image, shard_entries=2)
             with self.assertRaisesRegex(ValueError, 'no generated translation at 0x201'):
                 asm_c_differential.verify(out, root / 'missing', image, addresses=[0x201])
+            with self.assertRaisesRegex(ValueError, 'entry range must be within'):
+                asm_c_differential.verify(out, root / 'bad-range', image, entry_range=(0, 3))
+            with self.assertRaisesRegex(ValueError, 'entry ranges cannot be combined'):
+                asm_c_differential.verify(out, root / 'conflict', image, addresses=[0x100],
+                                          entry_range=(0, 1))
             report = asm_c_differential.verify(out, root / 'evidence', image, scenarios=1,
-                                                  addresses=[0x100])
+                                               entry_range=(1, 2))
+            self.assertEqual(report['generated_entry_count'], 2)
+            self.assertEqual(report['entry_range'], (1, 2))
             self.assertEqual([(e['address'], e['state']) for e in report['entries']],
                              [(0x100, 'probes-pass')])
             function = ctypes.CDLL(str(root / 'evidence/translations.so')).ef_lift_run

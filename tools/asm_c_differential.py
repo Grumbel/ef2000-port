@@ -1154,7 +1154,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False, prepared_registers=(), prepared_fixtures=None):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False, prepared_registers=(), prepared_fixtures=None, entry_range=None):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -1268,6 +1268,13 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if missing:
         raise ValueError('no generated translation at ' + ', '.join(map(hex, sorted(missing))))
     probe_entries = [e for e in generated if not requested or e['address'] in requested]
+    if entry_range is not None:
+        if requested or captures:
+            raise ValueError('entry ranges cannot be combined with addresses, fixtures or captures')
+        start, end = entry_range
+        if not 0 <= start < end <= len(generated):
+            raise ValueError(f'entry range must be within the {len(generated)} generated entries')
+        probe_entries = generated[start:end]
     support = manifest.get('dispatcher_support', [])
     registered_pcs = None
     if program and manifest.get('dispatcher_layout') == 'pc-shards-v1':
@@ -1418,6 +1425,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dispatcher_support_watcom_objects={e['file']: watcom_results.get(Path(e['file']).stem)
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
+                  generated_entry_count=len(generated), entry_range=entry_range,
                   prepared_checkpoint=dict(pc=checkpoint[0], visits=checkpoint[1]) if checkpoint else None,
                   prepared_memory_size=prepared_memory_size or 0x400000,
                   prepared_raster='320x200-scratch' if prepared_raster else None,
@@ -1520,6 +1528,8 @@ def main(argv=None):
     parser.add_argument('--scenarios', type=int, default=16)
     parser.add_argument('--address', type=lambda value: int(value, 0), action='append', default=[],
                         help='probe only this entry; repeatable, with all generated C linked')
+    parser.add_argument('--entry-range', nargs=2, type=int, metavar=('START', 'END'),
+                        help='probe a zero-based half-open range in manifest order, with all C linked')
     parser.add_argument('--checkpoint', nargs=2, type=lambda value: int(value, 0),
                         metavar=('PC', 'VISITS'), help='compare before the given visit to a guest PC')
     parser.add_argument('--budget', type=int, default=10000)
@@ -1544,7 +1554,7 @@ def main(argv=None):
                         checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster,
                         vga_dac=args.vga_dac, x32_vectors=args.x32_vectors,
                         prepared_registers=[(name, int(value, 0)) for name, value in args.prepared_register],
-                        prepared_fixtures=args.prepared_fixtures)
+                        prepared_fixtures=args.prepared_fixtures, entry_range=args.entry_range)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:

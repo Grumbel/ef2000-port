@@ -14600,3 +14600,22 @@ the mission list on private Xvfb. The session used the Nix native64
 runtime, OpenWatcom-built objects, and a disposable overlay. The
 run loaded the German Norway placement script and proceeded through the
 campaign, navigation, mission and briefing data with no guest fault.
+
+#### Split the 4,361-entry prepared sweep into bounded ranges
+
+For long runs, add `--entry-range START END` to the prepared sweep above
+and use a fresh output path for each range. The bounds are zero-based and
+half-open over the manifest's generated entries in manifest order. Each
+range links the complete candidate so cross-range calls still run translated
+code. A completed report records the range, total generated entry count,
+and candidate digest. Check for contiguous coverage under the same
+candidate and probe profile before treating several reports as one sweep.
+
+The interrupted canonical ABI 6 run for `bulk-cpu-boundaries-c` retained
+1,183 complete progress records (indices 0 through 1182, last address
+0x5b080). Of these, 1,084 matched and 99 were inconclusive. The partial
+journal SHA-256 is
+`99a19b7719c6d61e776adb4175d97e03f266adb762fe27a432a274d0e667fc9d`.
+The earlier candidate's separate sweep was also interrupted, with 3,578
+matches and 548 inconclusive results in 4,126 records. Keep that evidence
+with its own candidate. Neither interrupted sweep produced a final report.
