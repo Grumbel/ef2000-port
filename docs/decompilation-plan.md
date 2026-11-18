@@ -13049,3 +13049,17 @@ and matched with the advancing clock. Their service transcripts match
 across 228, 228 and 114 reads respectively, including a seconds carry.
 The cohort now has nine matching prepared probes and four guest-memory
 faults. See local/ghidra-group-followup-20261118/dos-clock-{fixed,advancing}-100k.json.
+
+### 2026-11-18 — Expose the prepared scratch raster
+
+`asm_c_differential.py --service-free-paths --prepared-raster` applies
+the scratch raster setup from the 0x27fec investigation through initial
+RAM writes. The report records all addresses and values, and explicit
+`--prepared-u32` writes can override individual words. The loaded
+payload and instruction byte guard retain their original values.
+
+On the current 4,344-body build, a paired replay at a 500,000-instruction
+budget reproduced the status 6 mismatch at 0x1df with default RAM and
+matched with the scratch raster enabled. The two adjacent probes at
+0x278c0 and 0x28224 remain inconclusive with original-side memory faults.
+See local/ghidra-group-followup-20261118/prepared-raster-current-replay.json.

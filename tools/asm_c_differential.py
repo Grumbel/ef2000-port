@@ -123,6 +123,14 @@ def probes(count, seed):
         yield registers, flags
 
 
+def prepared_raster_u32():
+    width, height = 320, 200
+    # Scratch buffers for the selected, primary and secondary raster surfaces.
+    return ((0x146e40, 0x340000), (0x15b754, 0x340000), (0x15b758, 0x350000),
+            (0x1631f4, width), (0x164600, width * height),
+            *((0x163200 + 4 * row, width * row) for row in range(height)))
+
+
 def validate_prepared_memory_size(size):
     if size is not None and (type(size) is not int or not 0x400000 <= size <= 0x10000000
                              or size % 0x1000):
@@ -983,7 +991,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
            prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False,
-           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False):
+           x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -994,6 +1002,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    if prepared_raster:
+        prepared_u32 = (*prepared_raster_u32(), *prepared_u32)
     if prepared_u32 and (not program or not service_free_paths or captures):
         raise ValueError('initial RAM writes require --service-free-paths and prepared program probes')
     if checkpoint is not None and (not program or not service_free_paths or captures or not addresses):
@@ -1203,6 +1213,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_checkpoint=dict(pc=checkpoint[0], visits=checkpoint[1]) if checkpoint else None,
                   prepared_memory_size=prepared_memory_size or 0x400000,
+                  prepared_raster='320x200-scratch' if prepared_raster else None,
                   prepared_u32=[dict(address=offset, value=value) for offset, value in prepared_u32],
                   x32_heap_policy='prepared-only' if x32_heap else 'disabled',
                   x32_heap_model_sha256=hashlib.sha256(Path(x32_allocation.__file__).read_bytes()).hexdigest()
@@ -1269,6 +1280,8 @@ def main(argv=None):
                         help='with --service-free-paths, model deterministic DOS open buffer errors')
     parser.add_argument('--x32-residency', action='store_true',
                         help='with --service-free-paths, model X-32 lock and unlock on prepared RAM')
+    parser.add_argument('--prepared-raster', action='store_true',
+                        help='initialize scratch buffers and row offsets for a 320x200 raster')
     parser.add_argument('--prepared-u32', type=lambda value: int(value, 0), nargs=2,
                         action='append', default=[], metavar=('ADDRESS', 'VALUE'),
                         help='initialize a little-endian u32 in prepared guest RAM')
@@ -1298,7 +1311,7 @@ def main(argv=None):
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,
-                        checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock)
+                        checkpoint=args.checkpoint, prepared_u32=args.prepared_u32, dos_clock=args.dos_clock, prepared_raster=args.prepared_raster)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))
         if report['captures']:
