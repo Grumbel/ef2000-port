@@ -14418,3 +14418,21 @@ candidate report is local/ghidra-group-followup-20261118/bulk-irq-install-c/repo
 Focused reports are in irq-install-diff, irq-install-sidt-prefix and
 irq-install-watcom under the same workspace. Both prepared original
 probes use [0x17f05d]=5 and [0x17f05f]=0x20.
+
+### 2026-11-18 — Compare the IRQ installer through its caller
+
+The generated closure for 0x120746 links 0x120800, 0x120ad0,
+0x120bc0, 0x120c06 and 0x120c5e. Four original/C whole-call probes
+take the paired-vector branch, cover both handler addresses
+0x120815 and 0x120822, and install vectors 0x6d, 0x68, 0x6f and 0x77.
+They match through the caller's x87 control-word change and return.
+Two further whole-call comparisons match with no interrupt requests
+when initialization is disabled or a vector is already saved.
+The fixture uses the modeled X-32 vector service. The legacy path
+with ES=0x60 still requires descriptor and IDT inputs.
+
+Run asm_c_differential --scenarios 1 --service-free-paths --x32-vectors
+--prepared-fixtures with each irq-caller-fixture-{0..5}.json. See
+irq-install-caller-c and irq-caller-checked-{0..5} under
+local/ghidra-group-followup-20261118. The generation report has SHA-256
+bb7e21bfa986c1b9c3cbfd03deb7586f6e53d7c79692d94f1c0ea84ef82f54c5.
