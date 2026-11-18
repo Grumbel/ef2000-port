@@ -14664,3 +14664,9 @@ Nonempty object and score processing remains unverified for these
 callers. The local evidence `bulk-cpu-boundaries-list-callers.json`
 includes both failed input preparations and the eight matches
 (SHA-256 `f58b1900271e2b3f0216434025cc34bac480de4e06a8139048728f35cf6ae804`).
+
+The first completed bounded report, `bulk-cpu-boundaries-range-1183-1433`,
+covers the next 250 entries after the interrupted prefix. It contains
+240 matches, 10 inconclusive probes and no mismatches for the same
+candidate and prepared profile. The final report SHA-256 is
+`4bb3d25ffe4d6c696c4eb3be2e3d4c61173d3105ee11e10a6b97100d1eb1a14a`.
