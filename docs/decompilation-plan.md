@@ -14763,3 +14763,36 @@ zero-based `fixture_index` identifies its row. `--scenarios` applies to
 each row. A mismatch in any row determines the entry verdict, and an
 inconclusive row prevents an all-pass verdict. Reports for addresses with
 one row retain `prepared_fixture`.
+
+#### Compare preparation of X-32 audio-driver requests
+
+All eleven default-input entries that faulted on the descriptor word read
+at 0x1112a4 reached the first visit to 0x1112b7 with matching state when
+given initialized objects. This checkpoint is before INT 21h AX=2511,
+which would dispatch real-mode interrupt 66h. The comparison covers
+request construction and the RAM and register state at that boundary.
+It leaves driver execution and its returned state unverified.
+
+Use ESP=0x3f0000 with cdecl arguments at ESP+4 and above. The outer
+object at 0x240000 has its backend pointer at +8. The backend at
+0x241000 holds word 0x9234 at +0x32, which checks sign extension into
+EBX. For direct entry 0x11124c, pass command 0x0302 with null input and
+output or command 0x0502 with input words 0x1234, 0x5678, 0x9abc and
+0xdef0 at input offsets +4 through +0xa and a nonnull output pointer.
+Entry 0x101f88 forwards the first argument list, and 0x103e0c takes
+the outer pointer and constructs command 0x0302.
+
+The other callers take a context at 0x242000 pointing to the outer
+object at offset zero. For 0x105334 and 0x105da0, set context +0x54
+to one. For 0x111df0, 0x111e40, 0x111ed4, 0x112c10, 0x1146ec and
+0x103b08, set the pending count at +0x1a8 to one. For 0x111e40,
+0x1146ec and 0x103b08, set the queue length at +0x1ac to 0x200 to
+trigger flushing before adding a message. For 0x112c10, an empty
+sequence list and a clear guard at 0x17e258 lead directly to the
+pending flush. A separate 0x111df0 probe with zero pending messages
+matched through normal return.
+
+The local `bulk-cpu-boundaries-audio-driver-prefix.json` report records
+the exact inputs and results for twelve checkpoint probes and one
+normal return against the 4,361-entry linked candidate. SHA-256
+`51f041177a95002945e71d66044a57548173fe79277e3043aad5a9e5b02b3072`.
