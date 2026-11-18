@@ -14492,3 +14492,43 @@ The focused hook compiles with OpenWatcom 1.9
 (`wcc386 -bt=dos -3r -za99 -w1 -we`) with zero warnings.
 Live debugger delivery and execution beyond the table checkpoint
 remain unverified.
+
+#### Repeat the ABI 6 prepared sweep with the checked-in driver
+
+Use the candidate directory and a fresh output path under the same local
+workspace. The verifier validates payload, generated sources, state ABI,
+and arithmetic dependencies before compiling. It writes one record per
+entry to `progress.jsonl`, then a complete `report.json` with probe results
+and provenance.
+
+```sh
+w=local/ghidra-group-followup-20261118
+python -m tools.asm_c_differential \
+  --workspace "$w" --translations "$w/bulk-debugger-return-c" \
+  --output "$w/bulk-abi6-differential" \
+  --softfloat-build local/asm-softfloat-verified-build-20261113 \
+  --x87-oracle hardware --jobs 8 --scenarios 1 --budget 100000 \
+  --service-free-paths --prepared-memory-size 0x5100000 \
+  --prepared-raster --prepared-u32 0x120cc6 0x05000000 \
+  --dos-console --pit-writes --vga-status-reads --x32-heap \
+  --x32-residency --dos-empty-drive --x32-mouse --x32-no-cd --x32-vbe \
+  --dos-clock --vga-dac --x32-vectors --gameport-disconnected --keyboard-idle
+```
+
+Add repeated `--address` options for a focused pass using the same linked
+registry and fixture profile. Use `--prepared-fixtures` for branch-specific
+inputs and retain those results separately. The standard profile uses one
+prepared input per entry.
+
+The remaining generator exclusions are 0xeddc3 and 0x10e7b5 (interrupt
+service and CR0 access), 0xfcc01 (RETF at 0xfcc1f) and 0xfcc6f (IRET
+at 0xfcc9b). In 0xeddc3 the signed selector byte at 0x132a5e selects
+the X-32 INT 21h AX=2535 path when it is at least three. The other
+branch updates CR0 from its old value and the word at 0x160a82.
+At 0x10e7b5 the flag at 0x17d4fd selects the INT 2Fh path, and the
+secondary flag at 0x17d4fc controls the path with CR0 and INT 21h
+AH=30h. With both flags clear the function reaches its near return
+without either service. The two far-return handlers can both call
+0xc4310 to rewrite the saved target before returning through their
+extender frames. Their differential fixtures need those frames and
+the matching selector state.
