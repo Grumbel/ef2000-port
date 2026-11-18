@@ -66,8 +66,9 @@ The first target is the installed `_EF2000.EXE` in the sibling
 On x86-64 Linux, build and run with Nix:
 
 ```sh
-nix build -L .                 # Precompile the native and QEMU harness objects
+nix build -L .                 # Build the port without running tests
 nix flake check                # Unit tests, app/help/version checks, REUSE
+nix build -L .#checks.x86_64-linux.unit  # Run only the unit suite
 nix run .#ef2000-native -- ../EF2000/c/EF2000
 nix run .#ef2000-unicorn -- ../EF2000/c/EF2000
 nix run .#ef2000-decomp             # GCC Linux standalone bootstrap

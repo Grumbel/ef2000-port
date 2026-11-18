@@ -76,6 +76,96 @@
             runtime/pcm_audio.cpp runtime/wav_capture.cpp \
             -lunicorn -lcrypto -lSDL3 \
             -o objects/ef2000-unicorn-cpp
+          runHook postBuild
+        '';
+
+        installPhase = ''
+          runHook preInstall
+          mkdir -p "$out/bin" "$out/lib/ef2000" "$out/libexec/ef2000" \
+            "$out/share/doc/ef2000" "$out/share/licenses/ef2000" \
+            "$out/share/ef2000" "$out/share/applications" "$out/share/metainfo" \
+            "$out/share/man/man6" "$out/share/icons/hicolor/scalable/apps"
+          cp -r objects/native64 objects/qemu "$out/lib/ef2000/"
+          cp objects/ef2000-unicorn-cpp "$out/bin/ef2000-unicorn-cpp"
+          ln -s ef2000-unicorn-cpp "$out/bin/ef2000-unicorn"
+          cp -r runtime tools probes "$out/libexec/ef2000/"
+          cp VERSION "$out/libexec/ef2000/"
+          cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
+          cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/GPL-3.0-linking-exception.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
+          cp LICENSES/LicenseRef-EF2000-Derived.txt "$out/share/licenses/ef2000/"
+          mkdir -p "$out/libexec/ef2000/decomp/include" \
+            "$out/libexec/ef2000/decomp/symbols"
+          cp decomp/include/ef_abi.h "$out/libexec/ef2000/decomp/include/"
+          cp decomp/symbols/functions.tsv decomp/symbols/globals.tsv \
+            decomp/symbols/signatures.tsv \
+            decomp/symbols/hybrid-exclude.tsv "$out/libexec/ef2000/decomp/symbols/"
+          cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
+          cp data/io.github.grumbel.ef2000.metainfo.xml \
+            "$out/share/metainfo/io.github.grumbel.ef2000.metainfo.xml"
+          cp data/ef2000.6 "$out/share/man/man6/ef2000.6"
+          cp data/icons/ef2000.svg "$out/share/icons/hicolor/scalable/apps/ef2000.svg"
+          cp data/icons/ef2000.bmp "$out/share/ef2000/ef2000.bmp"
+          # Install each expected size explicitly so the layout check validates
+          # the same paths the package promises to ship.
+          for size in 16x16 32x32 48x48 64x64 128x128 256x256; do
+            install -Dm644 "data/icons/hicolor/$size/apps/ef2000.png" \
+              "$out/share/icons/hicolor/$size/apps/ef2000.png"
+          done
+
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000" \
+            --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
+            --add-flags "--runtime-objects $out/lib/ef2000" \
+            --set EF2000_VERSION ${lib.escapeShellArg version} \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
+            --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-probe" \
+            --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py" \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
+          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-py" \
+            --add-flags "$out/libexec/ef2000/tools/unicorn_app.py" \
+            --set EF2000_VERSION ${lib.escapeShellArg version} \
+            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
+            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
+          ln -s ef2000 "$out/bin/ef2000-startup"
+          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
+            --add-flags "$out/libexec/ef2000/tools/inspect_exe.py"
+          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-extract" \
+            --add-flags "$out/libexec/ef2000/tools/extract_image.py"
+          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-probe-entry" \
+            --add-flags "$out/libexec/ef2000/tools/probe_entry.py" \
+            --prefix PATH : ${lib.makeBinPath [ pkgs.qemu-user ]}
+          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-reference" \
+            --add-flags "$out/libexec/ef2000/tools/reference_run.py" \
+            --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.dosbox-x ]}
+          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-read-x32-probe" \
+            --add-flags "$out/libexec/ef2000/tools/read_x32_probe.py"
+          runHook postInstall
+        '';
+
+        meta = {
+          description = "Original-code EF2000 main-menu port";
+          platforms = [ system ];
+          mainProgram = "ef2000";
+          license = lib.licenses.gpl3Plus;
+        };
+      };
+      unitTests = pkgs.stdenv.mkDerivation {
+        pname = "ef2000-unit-tests";
+        inherit version;
+        src = source;
+
+        nativeBuildInputs = [ python ];
+        buildInputs = [ pkgs.unicorn pkgs.openssl ];
+        hardeningDisable = package.hardeningDisable;
+        dontConfigure = true;
+
+        buildPhase = ''
+          runHook preBuild
+          mkdir -p objects
           $CXX -std=c++17 -O2 -Wall -Wextra -Werror -Wl,--no-relax \
             tests/unicorn_x87_smoke.cpp -lunicorn \
             -o objects/ef2000-unicorn-x87-smoke
@@ -207,14 +297,14 @@
           unset EF2000_EXE
           unset EF2000_DATA_DIR
           PYTHONDONTWRITEBYTECODE=1 python3 -m unittest discover -s tests -v
-          objects/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
-          objects/ef2000-unicorn-cpp --self-test-zero-return | grep -q 'zero-return stop detected'
-          objects/ef2000-unicorn-cpp --self-test-zero-return --timing realtime | grep -q 'zero-return stop detected'
-          objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail | grep -q 'zero-return stop detected'
-          objects/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail --timing realtime | grep -q 'zero-return stop detected'
+          ${package}/bin/ef2000-unicorn-cpp --self-test | grep -q 'status=guest_exit interrupts=2'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-zero-return | grep -q 'zero-return stop detected'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-zero-return --timing realtime | grep -q 'zero-return stop detected'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail | grep -q 'zero-return stop detected'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-zero-return --trace-block-tail --timing realtime | grep -q 'zero-return stop detected'
           for fault_timing in instruction realtime; do
-            objects/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" | grep -q 'memory-fault stop detected'
-            objects/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" --trace-block-tail | grep -q 'memory-fault stop detected'
+            ${package}/bin/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" | grep -q 'memory-fault stop detected'
+            ${package}/bin/ef2000-unicorn-cpp --self-test-memory-fault --timing "$fault_timing" --trace-block-tail | grep -q 'memory-fault stop detected'
           done
           objects/ef2000-unicorn-x87-smoke | grep -q '5/5 FLD/FSTP qword memory round-trips passed'
           objects/ef2000-dos-clock-test | grep -q 'deterministic PIT calendar conversion passed'
@@ -228,20 +318,20 @@
           objects/ef2000-decomp-gui-options-096-test
           objects/ef2000-decomp-gui-cursor-097-test
           objects/ef2000-decomp-gui-display-097-test
-          objects/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
+          ${package}/bin/ef2000-unicorn-cpp --self-test --joystick-event 0:0:0:0 \
             --joystick-axes=0,1 --trace-joystick | grep -q 'gameport: axes=2 reads=1 writes=1'
-          objects/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
-          objects/ef2000-unicorn-cpp --self-test-clock | grep -Eq 'status=wall_time_limit interrupts=0 ticks=[1-9].*ax=0x12345678'
-          objects/ef2000-unicorn-cpp --self-test-retrace | grep -q 'status=guest_exit'
-          objects/ef2000-unicorn-cpp --self-test-retrace --vga-clock-check 1 --block-clock-check 1 | grep -q 'status=guest_exit'
-          objects/ef2000-unicorn-cpp --self-test-retrace --profile | grep -Eq 'profile: blocks=[0-9]+.*vga_reads=[1-9]'
-          objects/ef2000-unicorn-cpp --self-test-fast-copy | grep -q 'fast_copy: calls=1 bytes=1024 fallback_calls=0'
-          objects/ef2000-unicorn-cpp --self-test-fast-copy --profile-copy-callers | \
+          ${package}/bin/ef2000-unicorn-cpp --self-test-bda | grep -q 'status=guest_exit interrupts=5'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-clock | grep -Eq 'status=wall_time_limit interrupts=0 ticks=[1-9].*ax=0x12345678'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-retrace | grep -q 'status=guest_exit'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-retrace --vga-clock-check 1 --block-clock-check 1 | grep -q 'status=guest_exit'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-retrace --profile | grep -Eq 'profile: blocks=[0-9]+.*vga_reads=[1-9]'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-fast-copy | grep -q 'fast_copy: calls=1 bytes=1024 fallback_calls=0'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-fast-copy --profile-copy-callers | \
             grep -q 'copy_caller: ret=0xab calls=1 bytes=1024 max=1024 ge1024=1 ge4096=0 vga_calls=0 vga_bytes=0 accelerated=1 accelerated_bytes=1024'
-          objects/ef2000-unicorn-cpp --self-test-fast-copy --fast-copy-vga | \
+          ${package}/bin/ef2000-unicorn-cpp --self-test-fast-copy --fast-copy-vga | \
             grep -q 'fast_copy_vga: calls=1 bytes=1024'
-          objects/ef2000-unicorn-cpp --self-test-clock --wall-seconds 0.1 --profile-hot-blocks | grep -Eq 'hot_blocks: samples=[1-9]'
-          objects/ef2000-unicorn-cpp --self-test-clock --tcg-cache-mib 128 | grep -q 'status=wall_time_limit'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-clock --wall-seconds 0.1 --profile-hot-blocks | grep -Eq 'hot_blocks: samples=[1-9]'
+          ${package}/bin/ef2000-unicorn-cpp --self-test-clock --tcg-cache-mib 128 | grep -q 'status=wall_time_limit'
           objects/ef2000-dos-drive-test
           objects/ef2000-bios-disk-test
           objects/ef2000-real-mode-test
@@ -265,77 +355,9 @@
 
         installPhase = ''
           runHook preInstall
-          mkdir -p "$out/bin" "$out/lib/ef2000" "$out/libexec/ef2000" \
-            "$out/share/doc/ef2000" "$out/share/licenses/ef2000" \
-            "$out/share/ef2000" "$out/share/applications" "$out/share/metainfo" \
-            "$out/share/man/man6" "$out/share/icons/hicolor/scalable/apps"
-          cp -r objects/native64 objects/qemu "$out/lib/ef2000/"
-          cp objects/ef2000-unicorn-cpp "$out/bin/ef2000-unicorn-cpp"
-          ln -s ef2000-unicorn-cpp "$out/bin/ef2000-unicorn"
-          cp -r runtime tools probes "$out/libexec/ef2000/"
-          cp VERSION "$out/libexec/ef2000/"
-          cp -r docs README.md TODO.md VERSION "$out/share/doc/ef2000/"
-          cp LICENSES/GPL-3.0-or-later.txt "$out/share/licenses/ef2000/"
-          cp LICENSES/GPL-3.0-linking-exception.txt "$out/share/licenses/ef2000/"
-          cp LICENSES/CC0-1.0.txt "$out/share/licenses/ef2000/"
-          cp LICENSES/LicenseRef-EF2000-Derived.txt "$out/share/licenses/ef2000/"
-          mkdir -p "$out/libexec/ef2000/decomp/include" \
-            "$out/libexec/ef2000/decomp/symbols"
-          cp decomp/include/ef_abi.h "$out/libexec/ef2000/decomp/include/"
-          cp decomp/symbols/functions.tsv decomp/symbols/globals.tsv \
-            decomp/symbols/signatures.tsv \
-            decomp/symbols/hybrid-exclude.tsv "$out/libexec/ef2000/decomp/symbols/"
-          cp data/ef2000.desktop "$out/share/applications/ef2000.desktop"
-          cp data/io.github.grumbel.ef2000.metainfo.xml \
-            "$out/share/metainfo/io.github.grumbel.ef2000.metainfo.xml"
-          cp data/ef2000.6 "$out/share/man/man6/ef2000.6"
-          cp data/icons/ef2000.svg "$out/share/icons/hicolor/scalable/apps/ef2000.svg"
-          cp data/icons/ef2000.bmp "$out/share/ef2000/ef2000.bmp"
-          # Install each expected size explicitly so the layout check validates
-          # the same paths the package promises to ship.
-          for size in 16x16 32x32 48x48 64x64 128x128 256x256; do
-            install -Dm644 "data/icons/hicolor/$size/apps/ef2000.png" \
-              "$out/share/icons/hicolor/$size/apps/ef2000.png"
-          done
-
-          makeWrapper ${python}/bin/python3 "$out/bin/ef2000" \
-            --add-flags "$out/libexec/ef2000/tools/run_startup.py" \
-            --add-flags "--runtime-objects $out/lib/ef2000" \
-            --set EF2000_VERSION ${lib.escapeShellArg version} \
-            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
-            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp" \
-            --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.qemu-user ]}
-          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-probe" \
-            --add-flags "$out/libexec/ef2000/tools/unicorn_backend.py" \
-            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
-            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
-          makeWrapper ${python}/bin/python3 "$out/bin/ef2000-unicorn-py" \
-            --add-flags "$out/libexec/ef2000/tools/unicorn_app.py" \
-            --set EF2000_VERSION ${lib.escapeShellArg version} \
-            --set EF2000_SDL_LIBRARY ${pkgs.sdl3}/lib/libSDL3.so \
-            --set EF2000_ICON_BMP "$out/share/ef2000/ef2000.bmp"
-          ln -s ef2000 "$out/bin/ef2000-startup"
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-inspect" \
-            --add-flags "$out/libexec/ef2000/tools/inspect_exe.py"
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-extract" \
-            --add-flags "$out/libexec/ef2000/tools/extract_image.py"
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-probe-entry" \
-            --add-flags "$out/libexec/ef2000/tools/probe_entry.py" \
-            --prefix PATH : ${lib.makeBinPath [ pkgs.qemu-user ]}
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-reference" \
-            --add-flags "$out/libexec/ef2000/tools/reference_run.py" \
-            --prefix PATH : ${lib.makeBinPath [ pkgs.binutils pkgs.dosbox-x ]}
-          makeWrapper ${pkgs.python3}/bin/python3 "$out/bin/ef2000-read-x32-probe" \
-            --add-flags "$out/libexec/ef2000/tools/read_x32_probe.py"
+          touch "$out"
           runHook postInstall
         '';
-
-        meta = {
-          description = "Original-code EF2000 main-menu port";
-          platforms = [ system ];
-          mainProgram = "ef2000";
-          license = lib.licenses.gpl3Plus;
-        };
       };
       # Native decomp bootstrap: GCC objects for every currently portable
       # recovered module, plus a small runnable ELF linked from recovered C.
@@ -659,6 +681,7 @@
         };
       };
       checks.${system} = self.packages.${system} // {
+        unit = unitTests;
         app-default = pkgs.runCommand "ef2000-app-check" {} ''
           test -x ${package}/bin/ef2000
           touch "$out"
