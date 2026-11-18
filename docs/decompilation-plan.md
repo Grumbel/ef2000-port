@@ -13338,3 +13338,16 @@ The three idle-keyboard probes that reach 0xcd42b (0xa9878, 0xcd414,
 and 0xcd4d4) all match through that checkpoint. The 0xcd3c0 control
 returns before the checkpoint. See bulk-keyboard-sti-prefix.jsonl
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify the gameport callback and review all recorded STI stops
+
+With 0x9cf2c and 0x9cf74 admitted to the local inventory, the prepared
+0x82cec probe agrees through DOS exit and the direct 0x9cf74 probe
+also passes. See bulk-gameport-diff/report.json.
+
+The 20 recorded STI cases agree through first arrival at their stop
+addresses. The sites are 0xcd42b (3), 0x110f34 (7), 0x1110bd (6),
+0x111111 (3), and 0x11f2d5 (1). This compares state before interrupt
+enable. Future reports expose the stop PC as `original_sti_stop.pc`
+for selecting these checkpoints without parsing diagnostic prose.
+See bulk-sti-prefix.jsonl under local/ghidra-group-followup-20261118.

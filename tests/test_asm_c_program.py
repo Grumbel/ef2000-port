@@ -1689,6 +1689,7 @@ ret
             self.assertEqual(by_address[0x100]['state'], 'probes-pass')
             self.assertEqual(by_address[0x200]['probes'][0]['reason'],
                              'original reached STI stop at 0x200')
+            self.assertEqual(by_address[0x200]['probes'][0]['original_sti_stop'], {'pc': 0x200})
             prefix = asm_c_differential.verify(
                 out, root / 'prefix', image, scenarios=1, service_free_paths=True,
                 addresses=[0x200], checkpoint=(0x200, 1))

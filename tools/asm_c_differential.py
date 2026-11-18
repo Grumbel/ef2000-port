@@ -697,7 +697,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         return outcome(state='inconclusive', reason='original service unavailable: '+str(error),
                        **detail)
     if stopped_at is not None:
-        return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}')
+        return outcome(state='inconclusive', reason=f'original reached STI stop at {stopped_at:#x}',
+                       original_sti_stop=dict(pc=stopped_at))
     if checkpoint is not None and original_visits != visits:
         return outcome(state='inconclusive', reason='original did not reach requested checkpoint')
     if checkpoint is None and original_exit is None:
