@@ -15031,3 +15031,17 @@ Run `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-packed-li
 against the 4,363-entry floating-scanner candidate. The retained
 `bulk-cpu-boundaries-packed-list-search.json` has SHA-256
 `e9d0b04352373bc5a06fb0db809b531a3305df4ba0cfc5a57dff0a0acba5cbe8`.
+
+### Prepared packed-list destination writes
+
+Extend the `0xb80ac` hit fixture with one destination slot, a nested source
+record, and a free-list allocator usable by `0xcc6c0`. With two source
+records, the original and generated C agree at `0xb82e7` after the
+destination header writes and at the second hit of `0xb8121` after the
+25-byte copy and type-byte clear. Full probes with source counts 0, 1 and 2
+agree on DOS exit 255. A fixture that completes the later caller path and
+returns normally remains open, along with runtime splice and golden replays.
+
+Run `bash /tmp/ef-run-probe local/ghidra-group-followup-20261118/probe-packed-list-destination.py`.
+The retained `bulk-cpu-boundaries-packed-list-destination.json` has SHA-256
+`1c80d69d6adbda36816d5c6aaba36486ce07a4709a5b33fe631154d5c23ebbcc`.
