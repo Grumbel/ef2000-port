@@ -102,6 +102,15 @@ class InventoryTests(unittest.TestCase):
             complete = audit(payload, 2)
             self.assertEqual([body['candidate_callees'] for body in complete], [[6], [12], []])
             self.assertEqual([body['blockers'] for body in complete], [[], [], []])
+            base = self.write_bodies(image.parent, image, [])
+            overlay = image.parent / 'overlay.json'
+            evidence = dict(candidate_bodies=complete, trace_sha256='trace',
+                            payload_sha256=hashlib.sha256(payload).hexdigest(),
+                            body_ranges_sha256=hashlib.sha256(base.read_bytes()).hexdigest())
+            count = asm_inventory.candidate_overlay(image, base, evidence, overlay, objdump='objdump')
+            self.assertEqual(count, 3)
+            bodies, _ = asm_inventory.load_body_ranges(overlay, payload)
+            self.assertEqual(bodies[6]['instruction_spans'], [[6, 5], [11, 1]])
             rejected = audit(payload[:-1] + bytes.fromhex('ffe0'), 2)
             self.assertTrue(all(body['blockers'] for body in rejected))
 

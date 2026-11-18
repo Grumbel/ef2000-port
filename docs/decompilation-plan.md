@@ -12337,3 +12337,11 @@ used host C for the differential comparison. These overlays leave
 the authoritative tracker and function ownership intact.
 Reports: `local/ghidra-group-followup-20261118/callback-closure-diff/report.json`
 and `local/ghidra-group-followup-20261118/callback-shared-ret-diff/report.json`.
+
+2026-11-18 — The trace audit can now write a disposable
+`--candidate-overlay` bound to the base body inventory and payload.
+It re-decodes each accepted candidate and records the added addresses.
+Bulk inventory with `--include-untracked-bodies --skip-missing-bodies`
+then imports those bodies alongside the baseline. The recorded trace
+added 46 candidates to the 4,296-body export, yielding 4,342 inventory
+entries. Thirteen tracker rows had no body in that inventory.

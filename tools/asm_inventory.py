@@ -495,6 +495,41 @@ def export_inventory(image, rows, output, *, objdump='objdump', runner=subproces
     return manifest
 
 
+def candidate_overlay(image, body_ranges, audit, output, *, objdump):
+    """Write a disposable inventory input with statically accepted candidates."""
+    payload = image.read_bytes()
+    bodies, digest = load_body_ranges(body_ranges, payload)
+    if (audit['body_ranges_sha256'] != digest
+            or audit['payload_sha256'] != hashlib.sha256(payload).hexdigest()):
+        raise ValueError('candidate audit does not match body-range provenance')
+    added = []
+    for candidate in audit['candidate_bodies']:
+        if candidate['blockers']:
+            continue
+        entry, end = candidate['entry'], candidate['end_exclusive']
+        if entry in bodies:
+            raise ValueError(f'candidate already has a body at {entry:#x}')
+        decoded = decode_window(image, entry, end - entry, objdump=objdump)
+        spans = [[i['address'], len(bytes.fromhex(i['bytes']))] for i in decoded]
+        cursor = entry
+        for site, size in spans:
+            if site != cursor:
+                raise ValueError(f'candidate disassembly gap at {cursor:#x}')
+            cursor += size
+        if cursor != end or len(spans) != candidate['instruction_count']:
+            raise ValueError(f'candidate disassembly differs at {entry:#x}')
+        bodies[entry] = dict(address=entry, ranges=[[entry, end]], instruction_spans=spans)
+        added.append(entry)
+    overlay = dict(schema=1, boundary='ghidra-body-ranges',
+                   payload_sha256=audit['payload_sha256'], base_body_ranges_sha256=digest,
+                   trace_sha256=audit['trace_sha256'], candidate_entries=sorted(added),
+                   entries=[bodies[entry] for entry in sorted(bodies)])
+    with output.open('x') as stream:
+        json.dump(overlay, stream)
+        stream.write('\n')
+    return len(added)
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--workspace', type=Path, default=decomp_status.DEFAULT_WORKSPACE)
@@ -505,6 +540,8 @@ def main(argv=None):
     parser.add_argument('--body-ranges', type=Path, help='payload-bound Ghidra body-ranges.json')
     parser.add_argument('--skip-missing-bodies', action='store_true',
                         help='omit tracker entries without Ghidra bodies and list them in the manifest')
+    parser.add_argument('--include-untracked-bodies', action='store_true',
+                        help='include body-range entries absent from the tracker')
     parser.add_argument('--trace-gaps', type=Path, help='audit a payload-bound execution trace against --body-ranges')
     parser.add_argument('--trace-table', action='append', nargs=4, default=[],
                         type=lambda value: int(value, 0), metavar=('SOURCE', 'BASE', 'STOP', 'STRIDE'),
@@ -513,7 +550,13 @@ def main(argv=None):
                         help='statically audit matched table targets, scanning at most this many bytes each')
     parser.add_argument('--trace-callee-limit', type=int,
                         help='also audit up to this many uncovered direct callees')
+    parser.add_argument('--candidate-overlay', type=Path,
+                        help='write body ranges with statically accepted trace candidates')
     args = parser.parse_args(argv)
+    if args.candidate_overlay and args.trace_body_limit is None:
+        parser.error('--candidate-overlay requires --trace-body-limit')
+    if args.include_untracked_bodies and (not args.body_ranges or args.address or args.trace_gaps):
+        parser.error('--include-untracked-bodies requires a bulk body-range inventory')
     if args.trace_callee_limit is not None and args.trace_body_limit is None:
         parser.error('--trace-callee-limit requires --trace-body-limit')
     if args.trace_body_limit is not None and not args.trace_table:
@@ -528,6 +571,12 @@ def main(argv=None):
         output = args.output.resolve()
         if not output.is_relative_to(ghidra_ef2000.ROOT / 'local'):
             raise ValueError('original ASM exports must stay under the ignored local/ directory')
+        overlay_path = args.candidate_overlay.resolve() if args.candidate_overlay else None
+        if overlay_path is not None:
+            if not overlay_path.is_relative_to(ghidra_ef2000.ROOT / 'local'):
+                raise ValueError('candidate overlays must stay under the ignored local/ directory')
+            if overlay_path == output:
+                raise ValueError('audit and overlay outputs must differ')
         workspace = ghidra_ef2000.validated_workspace(args.workspace)
         if args.trace_gaps:
             payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
@@ -542,8 +591,18 @@ def main(argv=None):
                 json.dump(report, stream, indent=2)
                 stream.write('\n')
             print(f'Audited {len(report["entries"])} observed gap edges to {output}')
+            if overlay_path is not None:
+                count = candidate_overlay(workspace / ghidra_ef2000.IMAGE_NAME,
+                                          args.body_ranges, report, overlay_path, objdump=args.objdump)
+                print(f'Wrote {count} candidate bodies to {overlay_path}')
             return
         rows = decomp_status.read_tracker(args.tracker)
+        if args.include_untracked_bodies:
+            payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
+            bodies, _ = load_body_ranges(args.body_ranges, payload)
+            tracked = {int(row['addr'], 16) for row in rows}
+            rows.extend(decomp_status.new_row(entry, sum(end - start for start, end in body['ranges']), '')
+                        for entry, body in bodies.items() if entry not in tracked)
         if args.address:
             requested = set(args.address)
             rows = [row for row in rows if int(row['addr'], 16) in requested]
