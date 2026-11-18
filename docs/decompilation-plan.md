@@ -12944,3 +12944,12 @@ same register, RAM and service evidence as a full probe, and reports
 probe reports only. With the existing local graphics preparation,
 the verifier reproduced the 64th-visit matches at 0xdc2ee for
 0x278c0 and 0x28224. See local `raster-verifier-checkpoint.json`.
+
+Use `--x32-no-cd` with `--service-free-paths` to handle prepared
+X-32 real-mode MSCDEX requests (INT 2Fh, AX 1500h and 1510h) through
+the runtime's no-CD handler. The probe compares registers, flags and
+the before/after X-32 frames. Replaying the same 31-entry X-32 cohort
+with the idle mouse fixture and no CD increased full prepared-probe
+matches from 10 to 17, with 14 inconclusive. The new matches are
+0xddc88, 0xddce8, 0xddd48, 0xdde80, 0xde12c, 0xde2d8 and 0xde4b0.
+See local `x32-no-cd-replay.json`.

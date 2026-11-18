@@ -1230,7 +1230,26 @@ mov eax,0x12345678
 in al,dx
 in al,dx
 ret
-.size retrace, .-retrace"""
+.size retrace, .-retrace
+.org 0xb00
+.type mscdex,@function
+mscdex: mov eax,0x2511
+mov edx,0xc00
+mov ebx,0x1234
+int 0x21
+mov esi,ebx
+mov eax,0x2511
+mov edx,0xc20
+mov ebx,0x5678
+int 0x21
+ret
+.size mscdex, .-mscdex
+.org 0xc00
+.short 0x2f,1,2,3,4
+.long 0x1500,0x12345678
+.org 0xc20
+.short 0x2f,1,2,3,4
+.long 0x1510,0x87654321"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1279,6 +1298,17 @@ ret
             event = mouse_events['original'][0]
             self.assertEqual(event['after']['dx'], 0x12340000)
             self.assertEqual(bytes.fromhex(event['frame_after'])[-4:], b'\x00\x004\x12')
+            cd_report = asm_c_differential.verify(
+                out, root / 'no-cd', image, scenarios=1, service_free_paths=True,
+                x32_no_cd=True, addresses=[0xb00])
+            cd_probe = cd_report['entries'][0]['probes'][0]
+            self.assertEqual(cd_probe['state'], 'pass', cd_probe)
+            cd_events = cd_probe['host_services']
+            self.assertEqual(cd_events['original'], cd_events['translated'])
+            detection, request = cd_events['original']
+            self.assertEqual(detection['after']['bx'], 0)
+            self.assertEqual(request['after']['bx'], 0x5678)
+            self.assertEqual(request['after']['dx'], 0x87654321)
             vga_report = asm_c_differential.verify(
                 out, root / 'vga', image, scenarios=1, service_free_paths=True,
                 vga_status_reads=True, addresses=[0xa00])
