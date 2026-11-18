@@ -14067,3 +14067,18 @@ still require asynchronous callback delivery.
 
 See bulk-timer-diff/report.json and replay-timer-callback-linked.py
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare selected and unselected statistics rows
+
+Entry 0x275e0 exhausted the baseline instruction budget inside
+a glyph renderer. In the linked bulk timer build it now matches
+through return for selected and unselected rows with a two-space
+label and for an unselected row with an empty label. The selected
+case sets the record's populated flag and exercises the five-column
+summary branch. These fixtures leave visible label glyphs and
+the alternate record branch for later comparisons.
+
+The prepared-match total is now 3,887 of 4,354 generated entries.
+See replay-bulk-gameport-bios-stat-row.py and its JSONL output under
+local/ghidra-group-followup-20261118. The full rerun is in progress
+in bulk-timer-full.jsonl.
