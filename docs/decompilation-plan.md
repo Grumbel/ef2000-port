@@ -14823,3 +14823,25 @@ floating-point runtime initialization required for that path.
 The local report `bulk-cpu-boundaries-scanner-fixtures.json` retains
 inputs and results, including the inconclusive probe. SHA-256
 `2eca470c9486bf9eff868bd84f2add079e7bcbae64511d0371c877a3fdd90cff`.
+
+#### Recover the floating scanner callback dependency
+
+The startup routine at 0xedba8 writes 0x10e5b8 and 0x10e6dd to
+0x17d498 and 0x17d49c respectively. Initializing those two slots
+from the disassembly resolves the original-side stop in the scanner
+fixture. Five prepared assignments through 0x108afd and 0xdf26f then
+finish on the original side and stop in C at the unregistered
+0x10e6dd callback. The separate fixed-point `%hf` probe matches
+through return with the same initialization.
+
+The missing body [0x10e6dd, 0x10e6eb) saves EBX, preserves the result
+pointer from EDX in EBX, clears EDX, calls 0x9d55d and stores and pops
+ST(0) to the output double. The linked candidate already contains
+0x9d55d. A local body-range audit verified the disjoint boundaries of
+the missing body and its initializer [0xedba8, 0xedbc3). This identifies
+a registry gap for the observed callback target. The comparisons still
+need to be repeated with the callback registered.
+
+The baseline follow-up report `bulk-cpu-boundaries-scanner-float.json`
+records the inputs and stops. SHA-256
+`1618ed409bd998c7009d497e3a5b18f7c3d8913316ba62ee908b89ed9666e9c1`.
