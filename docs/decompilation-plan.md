@@ -12447,3 +12447,10 @@ additions, for 4,091 generated bodies and 254 exclusions. The indirect
 call at 0xdbf31 is still unresolved. All 18 inventory tests passed.
 Artifacts are under `local/ghidra-group-followup-20261118/` with the
 `bulk-exit-reviewed-` prefix.
+
+Replaying all 467 prepared exit paths against the newly linked 4,091
+bodies moved 466 translated stops from 0xeb3d0 to 0x110330. The remaining
+path still stops at 0xdbf2c. All 467 originals reached DOS exit, so these
+are still coverage mismatches. The two previously recorded traces show
+the edge to 0x110330 originates at 0x9bdfd.
+Report: `local/ghidra-group-followup-20261118/bulk-exit-reviewed-diff/report.json`.
