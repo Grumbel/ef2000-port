@@ -14163,3 +14163,16 @@ open fails before calling DOS and the retry loop is skipped.
 See replay-bulk-gameport-bios-save-occupied.py and its JSONL output
 under local/ghidra-group-followup-20261118. The complete-match total
 stays at 3,888 of 4,354 generated entries.
+
+### 2026-11-18 — Compare page history queue updates through return
+
+Entry 0xa0f84 matches through return on three prepared resource records
+with zero, one, and two existing history entries. The probes enable
+updates and exercise insertion, shifting, and aging. A view matrix with
+a large coefficient drives the clipping rejection path, so the probes
+use the original callbacks without requiring a populated draw list.
+The visible rendering branch remains unverified.
+
+These probes raise the complete-match total to 3,889 of 4,354 generated
+entries. See replay-bulk-gameport-bios-page-history.py and its JSONL
+output under local/ghidra-group-followup-20261118.
