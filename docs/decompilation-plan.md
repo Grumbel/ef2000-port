@@ -13601,3 +13601,20 @@ with the supplied packet and node fields. The bulk total is now
 See replay-bulk-gameport-bios-tagged-list.py and
 bulk-gameport-bios-tagged-list.jsonl under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify record scans and coordinate reads
+
+Entries 0xbecc0, 0xbecf8, 0xfaafc and 0xfabf0 matched through return
+with two 21-byte records. The first record's field at offset 5 was
+50 in one fixture and 51 in the other, crossing the predicate's
+threshold. The second record used the rejected tag 0xff in both.
+
+Entries 0x88c80, 0x89060, 0x89c64 and 0x8a318 matched through return
+with a populated coordinate pointer at offset 0x30. The middle
+coordinate was 23 or INT32_MIN, exercising the special-case flag
+write in 0x88c80. All 16 probes passed. The bulk total is now 3,827
+of 4,353 entries with at least one complete prepared match.
+
+Replay with replay-bulk-gameport-bios-record-fields.py and see
+bulk-gameport-bios-record-fields.jsonl under
+local/ghidra-group-followup-20261118.
