@@ -12151,3 +12151,15 @@ Both standalone callback probes stop on an original exception with the
 first generic input. Nine other scoped probes match. All 47 wrapper
 tests passed. Evidence: `local/ghidra-scan-unget-20261118/callback-followup-traces.json`
 and `local/ghidra-position-callbacks-20261118/`.
+
+2026-11-18 — Recovered the eight-byte entry prefix at 0xd8168. The
+literal at 0xd90b3 is stored in 0x15bb34 and can be copied to 0x15bb30.
+The two instructions fall through to the existing 0xd8170 body; the
+guarded recipe checks this destination and preserves its ownership.
+Ghidra audit, apply and repeat apply succeeded. The fresh export
+contains 4,286 functions. The 33-body scoped translation compiled with
+OpenWatcom, recorded a direct fallthrough dependency on 0xd8170, and
+matched the first prepared input at 0xd8168. The translated caller at
+0xd8fd8 advanced to the next observed entry, 0xd8220. Its original path
+uses shared code and needs a separate boundary review. All 47 wrapper
+tests passed. Artifacts: `local/ghidra-position-prefix-20261118/`.

@@ -19,7 +19,7 @@ import java.util.HexFormat;
 import java.util.List;
 import java.util.Set;
 
-/** Reviewed branch-free leaves exposed by checked indirect dispatch. No byte recipes. */
+/** Reviewed branch-free bodies and entry prefixes exposed by checked indirect dispatch. */
 public class EF2000RecoverObservedLeaves extends GhidraScript {
     private static final int IMAGE_SIZE = 0x195fb0;
     // entry, exclusive end, corroborating instruction, previous body bytes.
@@ -35,11 +35,12 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
         {0xdf244, 0xdf248, 0xdf252, 0},
         {0xd83b8, 0xd849a, 0xd916f, 0},
         {0xd849c, 0xd8528, 0xd917b, 0},
+        {0xd8168, 0xd8170, 0xd90b3, 0},
     };
     private static final String[] NAMES = {
         "format_buffer_putc_a432f", "format_buffer_putc_e300f", "shade_lookup_store_c64d0",
         "dispatch_return_c5e65", "dispatch_clear_latch_1c53c", "scan_stream_unget_df244",
-        "position_callback_d83b8", "position_callback_d849c"
+        "position_callback_d83b8", "position_callback_d849c", "position_callback_prefix_d8168"
     };
 
     @Override
@@ -65,6 +66,7 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                 long[] recipe = RECIPES[index];
                 long entry = recipe[0], end = recipe[1], literal = recipe[2];
                 boolean positionCallback = entry == 0xd83b8 || entry == 0xd849c;
+                boolean entryPrefix = entry == 0xd8168;
                 Function function = getFunctionAt(toAddr(entry));
                 long before = function == null ? 0 : function.getBody().getNumAddresses();
                 if (before != recipe[3] && before != end-entry) {
@@ -117,8 +119,8 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     Instruction reference = getInstructionAt(toAddr(literal));
                     Function caller = getFunctionContaining(toAddr(literal));
                     String register = entry == 0xdf244 ? "ESI" :
-                        entry == 0xd83b8 ? "EBX" : entry == 0xd849c ? "EDX" : "ECX";
-                    long callerEntry = entry == 0xdf244 ? 0xdf248 : positionCallback ? 0xd8fd8 : 0;
+                        entry == 0xd83b8 || entryPrefix ? "EBX" : entry == 0xd849c ? "EDX" : "ECX";
+                    long callerEntry = entry == 0xdf244 ? 0xdf248 : positionCallback || entryPrefix ? 0xd8fd8 : 0;
                     boolean matches = false;
                     if (reference != null && reference.getMnemonicString().equals("MOV") &&
                             reference.getRegister(0) != null && reference.getRegister(0).getName().equals(register) &&
@@ -149,6 +151,10 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     }
                 }
                 AddressSet body = new AddressSet(toAddr(entry), toAddr(end-1));
+                if (entryPrefix && (getFunctionAt(toAddr(end)) == null ||
+                        getInstructionAt(toAddr(end)) == null)) {
+                    throw new IllegalStateException("missing prefix fallthrough destination");
+                }
                 long cursor = entry;
                 while (cursor < end) {
                     Instruction instruction = getInstructionAt(toAddr(cursor));
@@ -164,7 +170,12 @@ public class EF2000RecoverObservedLeaves extends GhidraScript {
                     }
                     String mnemonic = instruction.getMnemonicString();
                     boolean last = cursor + instruction.getLength() == end;
-                    if (last ? !mnemonic.equals("RET") :
+                    if (entryPrefix) {
+                        if (!mnemonic.equals(last ? "LEA" : "MOV") ||
+                                !toAddr(cursor + instruction.getLength()).equals(instruction.getFallThrough())) {
+                            throw new IllegalStateException("unexpected entry prefix flow at " + toAddr(cursor));
+                        }
+                    } else if (last ? !mnemonic.equals("RET") :
                             !Set.of("PUSH", "POP", "MOV", "LEA", "INC", "LODS", "LODSW", "ADD", "XLAT", "XLATB").contains(mnemonic) &&
                             !(entry == 0x1c53c && cursor == entry && mnemonic.equals("XOR")) &&
                             !(entry == 0xdf244 && cursor == entry && mnemonic.equals("DEC")) &&

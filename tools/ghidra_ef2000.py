@@ -361,7 +361,7 @@ def recover_calls(args):
 
 
 def recover_observed_leaves(args):
-    """Audit or apply reviewed leaf boundaries exposed by indirect execution."""
+    """Audit or apply reviewed leaf and entry-prefix boundaries."""
     workspace = validated_workspace(args.workspace)
     output = (args.output or workspace / 'observed-leaves.tsv').resolve()
     output.parent.mkdir(parents=True, exist_ok=True)
@@ -376,7 +376,7 @@ def recover_observed_leaves(args):
     with output.open(newline='') as stream:
         rows = list(csv.DictReader(stream, delimiter='\t'))
     expected = {'0x000a432f', '0x000e300f', '0x000c64d0', '0x000c5e65', '0x0001c53c', '0x000df244',
-                '0x000d83b8', '0x000d849c'}
+                '0x000d83b8', '0x000d849c', '0x000d8168'}
     if ({row['entry'] for row in rows} != expected or len(rows) != len(expected) or
             any(row['result'] not in ('proposed', 'recovered', 'already_recovered') for row in rows)):
         raise ValueError('invalid observed-leaf report')
@@ -771,7 +771,7 @@ def main(argv=None):
                         help='strong alignment-padding evidence, or opt-in immediate preceding RET byte')
     observed = subparsers.choices['recover-observed-leaves']
     observed.add_argument('--output', type=Path)
-    observed.add_argument('--apply', action='store_true', help='apply reviewed leaf boundaries; default rolls back')
+    observed.add_argument('--apply', action='store_true', help='apply reviewed boundaries; default rolls back')
     division = subparsers.choices['recover-divide-dispatch']
     division.add_argument('--output', type=Path)
     division.add_argument('--apply', action='store_true', help='recover complete reviewed 64-case division body; default rolls back')
