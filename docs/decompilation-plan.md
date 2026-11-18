@@ -12885,3 +12885,14 @@ scratch framebuffer at 0x370000 lets both probes advance to the
 unmodeled X-32 2511h service at 0x977. The verifier now reports guest
 PC and encoding for original x87 decoder rejections. See local
 `profile-raster-x87.json` and `raster-saved-framebuffer-replay.json`.
+
+Prepared-probe reports now decode the X-32 2511h frame when the
+service rejects a request with a readable flat frame. The synthetic
+test verifies frame fields and the inconclusive result. Both
+saved-framebuffer probes request INT 33h AX=000Bh (mouse motion).
+Replaying all 31 previous 2511h stops finds 19 INT 33h requests,
+seven INT 2Fh requests, four INT 10h requests, and one vector-zero
+frame. The runtime already implements the common mouse requests
+using per-instance input state. The cohort includes VBE and CD
+requests that require their own state. See the local
+`x32-request-cohort.json` and `raster-saved-framebuffer-replay.json`.

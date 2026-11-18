@@ -437,6 +437,15 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                     rejected_service['write_request'] = dict(
                         handle=values['bx'] & 0xffff, count=values['cx'], offset=values['dx'],
                         ds=engine.reg_read(x86_const.UC_X86_REG_DS))
+                if captured is None and vector == 0x21 and values['ax'] & 0xffff == 0x2511:
+                    ds = engine.reg_read(x86_const.UC_X86_REG_DS)
+                    offset = values['dx']
+                    request = dict(ds=ds, offset=offset, bx=values['bx'], cx=values['cx'])
+                    if ds in (16, 24) and 0x260 < offset <= memory_size - 18:
+                        fields = ('vector', 'ds', 'es', 'fs', 'gs', 'ax', 'dx')
+                        request['frame'] = dict(zip(fields, struct.unpack(
+                            '<5H2I', engine.mem_read(offset, 18))))
+                    rejected_service['real_mode_request'] = request
                 raise
             if memory_services:
                 engine.mem_write(0, bytes(ram))

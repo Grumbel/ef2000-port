@@ -1210,7 +1210,19 @@ mov ecx,8
 int 0x21
 mov esi,dword ptr [0x300000]
 ret
-.size write_file, .-write_file"""
+.size write_file, .-write_file
+.org 0x800
+.type real_mode_call,@function
+real_mode_call: mov eax,0x2511
+mov edx,0x900
+xor ebx,ebx
+xor ecx,ecx
+int 0x21
+ret
+.size real_mode_call, .-real_mode_call
+.org 0x900
+.short 0x33,1,2,3,4
+.long 0xb,0x12345678"""
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1243,6 +1255,12 @@ ret
             self.assertEqual(console_report['host_service_policy'], 'dos-console-and-exit-prepared-only')
             self.assertEqual(console_report['pit_write_policy'], 'transcript-prepared-only')
             console_entries = {entry['address']: entry for entry in console_report['entries']}
+            real_probe = console_entries[0x800]['probes'][0]
+            self.assertEqual(real_probe['state'], 'inconclusive')
+            self.assertEqual(real_probe['original_service_stop']['real_mode_request'],
+                             dict(ds=16, offset=0x900, bx=0, cx=0,
+                                  frame=dict(vector=0x33, ds=1, es=2, fs=3, gs=4,
+                                             ax=0xb, dx=0x12345678)))
             self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
             self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
             events = console_entries[0x200]['probes'][0]['host_services']
