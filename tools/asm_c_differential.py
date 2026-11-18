@@ -126,7 +126,8 @@ def validate_prepared_memory_size(size):
 
 def compare(function, payload, address, registers, flags, *, budget=10000, program=False, phase=None,
             initial_x87=None, native_x87=None, captured=None, service_factory=None, vector_services=False,
-            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=()):
+            prepared_memory_size=None, memory_services=False, port_factory=None, sti_stop_sites=(),
+            dos_console=False):
     """Compare under explicit per-side service instances; ports never imply real hardware fidelity.
 
     port_factory returns handler(request, registers[, ram]) -> registers.
@@ -143,6 +144,8 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         raise ValueError('host services require the program dispatcher')
     if memory_services and service_factory is None and port_factory is None:
         raise ValueError('memory services require a service factory')
+    if dos_console and (not program or captured is not None or service_factory is not None):
+        raise ValueError('DOS console fixture requires prepared program probes and no custom interrupt handler')
     validate_prepared_memory_size(prepared_memory_size)
     if captured is not None and prepared_memory_size is not None:
         raise ValueError('captured RAM cannot be resized')
@@ -153,6 +156,17 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     original_port = port_factory() if port_factory else None
     translated_port = port_factory() if port_factory else None
     original_ports, translated_ports = [], []
+
+    def console_service(ip, values, vector, ds, read, events):
+        offset, count = values['dx'], values['cx']
+        if (vector != 0x21 or ((values['ax'] >> 8) & 0xff) != 0x40 or
+                values['bx'] & 0xffff > 2 or ds not in (16, 24) or
+                not 0x260 < offset < memory_size or count > min(65536, memory_size - offset)):
+            raise ValueError('probe reached an unmodeled host service or invalid DOS console request')
+        response = dict(values, ax=count, flags=values['flags'] & ~1)
+        events.append(dict(ip=ip, vector=vector, ds=ds, before=dict(values), after=response,
+                           output_sha256=hashlib.sha256(read(offset, count)).hexdigest()))
+        return response
 
     def port_service(handler, request, values, event_log, ram=None):
         args = (dict(request), dict(values))
@@ -246,7 +260,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     def outcome(**fields):
         if binding is not None:
             fields['original_x87'] = binding.evidence()
-        if service_factory is not None:
+        if service_factory is not None or dos_console:
             fields['host_services'] = dict(original=original_events, translated=translated_events)
         if port_factory is not None:
             fields['port_services'] = dict(original=original_ports, translated=translated_ports)
@@ -255,7 +269,7 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + name.upper()), value)
     cpu.reg_write(x86_const.UC_X86_REG_EFLAGS, flags)
     rejected_service = {}
-    if original_service is not None:
+    if original_service is not None or dos_console:
         def interrupt(engine, vector, _):
             ip = engine.reg_read(x86_const.UC_X86_REG_EIP) - 2
             if ip < 0 or vector not in range(256) or engine.mem_read(ip, 2) != bytes((0xcd, vector)):
@@ -267,10 +281,18 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
             values['flags'] = engine.reg_read(x86_const.UC_X86_REG_EFLAGS)
             ram = bytearray(engine.mem_read(0, memory_size)) if memory_services else None
             try:
-                response = service(original_service, ip, values, original_events, vector, ram)
+                if dos_console:
+                    ds = engine.reg_read(x86_const.UC_X86_REG_DS)
+                    response = console_service(ip, values, vector, ds, engine.mem_read, original_events)
+                else:
+                    response = service(original_service, ip, values, original_events, vector, ram)
             except (ValueError, RuntimeError):
                 rejected_service.update(kind='interrupt', ip=ip, vector=vector,
                                         ax=values['ax'] & 0xffff)
+                if vector == 0x21 and (values['ax'] >> 8) & 0xff == 0x40:
+                    rejected_service['write_request'] = dict(
+                        handle=values['bx'] & 0xffff, count=values['cx'], offset=values['dx'],
+                        ds=engine.reg_read(x86_const.UC_X86_REG_DS))
                 raise
             if memory_services:
                 engine.mem_write(0, bytes(ram))
@@ -382,21 +404,27 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
     table_configuration = (state.table_mask, tuple(state.table_base), tuple(state.table_limit))
     if phase:
         phase('c')
-    if translated_service is None and translated_port is None:
+    if translated_service is None and translated_port is None and not dos_console:
         status = (function(ctypes.byref(state), budget, sentinel) if program else
                   function(ctypes.byref(state), budget))
     else:
         status = 1
         for _ in range(budget):
             status = function(ctypes.byref(state), 1, sentinel)
-            if (0x100 <= status <= 0x1ff or status == 0x203) and translated_service is not None:
+            if (0x100 <= status <= 0x1ff or status == 0x203) and (translated_service is not None or dos_console):
                 length = 1 if status == 0x203 else 2
                 values = dict(zip(service_names, state.r))
                 values['flags'] = state.flags
                 try:
                     ram = bytearray(memory) if memory_services else None
-                    response = service(translated_service, state.pc-length, values, translated_events,
-                                       status & 0xff, ram)
+                    if dos_console:
+                        response = console_service(state.pc-length, values, status & 0xff,
+                                                   state.segment[asm_to_c.SEGMENTS.index('ds')],
+                                                   lambda offset, count: memory[offset:offset+count],
+                                                   translated_events)
+                    else:
+                        response = service(translated_service, state.pc-length, values, translated_events,
+                                           status & 0xff, ram)
                 except (ValueError, RuntimeError) as error:
                     return outcome(state='mismatch', differences=['C service unavailable: '+str(error)])
                 if memory_services:
@@ -491,7 +519,8 @@ def reject_host_service(*args):
 
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
-                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=()):
+                    captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(),
+                    dos_console=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
     No retry follows a crash: completed probes remain evidence and unexecuted
@@ -512,10 +541,12 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                 result = compare(function, payload, address, registers, flags, budget=budget,
                                  program=program, native_x87=native_x87, captured=captured,
                                  phase=lambda stage: sender.send(('phase', index, stage)),
-                                 service_factory=(lambda: reject_host_service) if reject_services else None,
+                                 service_factory=(lambda: reject_host_service)
+                                 if reject_services and not dos_console else None,
                                  vector_services=reject_services,
                                  prepared_memory_size=prepared_memory_size,
                                  sti_stop_sites=sti_stop_sites,
+                                 dos_console=dos_console,
                                  port_factory=(lambda: reject_host_service) if reject_services else None)
                 sender.send(('result', index, result))
         except Exception as error:
@@ -621,7 +652,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None, addresses=()):
+           prepared_memory_size=None, addresses=(), dos_console=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
         raise ValueError('unknown x87 oracle')
@@ -632,6 +663,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
     if manifest.get('state_abi') != asm_to_c.STATE_ABI:
         raise ValueError('incompatible translation state ABI; regenerate the C sources')
     program = manifest.get('model') == 'flat-x86-program-explicit-state'
+    if dos_console and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
+        raise ValueError('DOS console fixture requires --service-free-paths and interrupt boundaries')
     sti_stop_sites = manifest.get('sti_stop_sites', [])
     if (not isinstance(sti_stop_sites, list) or
             any(type(pc) is not int or not 0 <= pc < len(payload) or payload[pc] != 0xfb
@@ -764,7 +797,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         function.restype = ctypes.c_uint
         results = isolated_probes(function, payload, address, scenarios, budget, program,
                                   native_x87=native_x87, reject_services=reject_services,
-                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites)
+                                  prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites,
+                                  dos_console=dos_console)
         for result in results:
             record_registry_membership(result)
         counts = Counter(item['state'] for item in results)
@@ -800,7 +834,8 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                                      for e in support if e['file'].endswith('.c')},
                   scenarios=scenarios, instruction_budget=budget, entries=entries, captures=capture_results,
                   prepared_memory_size=prepared_memory_size or 0x400000,
-                  host_service_policy='reject-on-reach' if reject_services else 'no-boundaries',
+                  host_service_policy=('dos-console-prepared-only' if dos_console else
+                                       'reject-on-reach' if reject_services else 'no-boundaries'),
                   sti_stop_sites=sti_stop_sites,
                   capture_support_sha256={name: hashlib.sha256(Path(__file__).with_name(name).read_bytes()).hexdigest()
                                           for name in ('asm_capture.py', 'asm_segments.py', 'call_capture.py')}
@@ -829,6 +864,8 @@ def main(argv=None):
                         help='explicit independent native x87 coprocessor for original execution')
     parser.add_argument('--service-free-paths', action='store_true',
                         help='compare paths in boundary-enabled programs, stopping at any host service')
+    parser.add_argument('--dos-console', action='store_true',
+                        help='with --service-free-paths, model console writes on prepared probes')
     parser.add_argument('--prepared-memory-size', type=lambda value: int(value, 0),
                         help='RAM bytes for prepared probes, page aligned (default: 0x400000)')
     parser.add_argument('--jobs', type=int, default=1, help='parallel host C compiler processes')
@@ -848,7 +885,7 @@ def main(argv=None):
                         scenarios=args.scenarios, budget=args.budget, watcom=args.watcom,
                         softfloat_build=args.softfloat_build.resolve() if args.softfloat_build else None,
                         x87_oracle=args.x87_oracle, captures=args.capture,
-                        service_free_paths=args.service_free_paths, jobs=args.jobs,
+                        service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address)
         counts = Counter(e['state'] for e in report['entries'])
         print(dict(counts))

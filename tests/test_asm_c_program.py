@@ -1086,7 +1086,11 @@ ret
 .size leaf, .-leaf
 .org 0x200
 .type dos,@function
-dos: int 0x21
+dos: mov ax,0x4000
+mov ebx,1
+mov ecx,4
+mov edx,0x300000
+int 0x21
 ret
 .size dos, .-dos
 .org 0x300
@@ -1115,11 +1119,21 @@ ret
                 self.assertEqual(entries[address]['state'], 'inconclusive')
                 self.assertIn('unmodeled host service', entries[address]['probes'][0]['reason'])
             interrupt_stop = entries[0x200]['probes'][0]['original_service_stop']
-            registers, _ = next(asm_c_differential.probes(1, 0x200))
-            self.assertEqual(interrupt_stop, dict(kind='interrupt', ip=0x200, vector=0x21,
-                                                  ax=registers[0] & 0xffff))
+            self.assertEqual(interrupt_stop, dict(
+                kind='interrupt', ip=0x213, vector=0x21, ax=0x4000,
+                write_request=dict(handle=1, count=4, offset=0x300000, ds=16)))
             self.assertEqual(entries[0x300]['probes'][0]['original_service_stop'],
                              dict(kind='port', ip=0x300, direction='in', port=0x61, width=8))
+            console_report = asm_c_differential.verify(
+                out, root / 'console', image, scenarios=1, service_free_paths=True, dos_console=True)
+            self.assertEqual(console_report['host_service_policy'], 'dos-console-prepared-only')
+            console_entries = {entry['address']: entry for entry in console_report['entries']}
+            self.assertEqual(console_entries[0x300]['state'], 'inconclusive')
+            self.assertEqual(console_entries[0x200]['state'], 'probes-pass', console_entries[0x200])
+            events = console_entries[0x200]['probes'][0]['host_services']
+            self.assertEqual(events['original'], events['translated'])
+            self.assertEqual(events['original'][0]['output_sha256'],
+                             hashlib.sha256(bytes(range(4))).hexdigest())
 
     def test_interrupt_boundary_preserves_state_and_resumes_after_host_service(self):
         source = '''.type root,@function

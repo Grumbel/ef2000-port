@@ -12392,3 +12392,18 @@ state at this boundary before supplying a response. Another 167 of the
 183 AH=35h stops share 0x245, and 51 of the 56 AH=3Dh stops share
 0x1f5. These are counts of first stops on prepared inputs. Additional
 service calls may surface once those boundaries are modeled.
+
+2026-11-18 — Added the opt-in prepared-input DOS console fixture
+(`--service-free-paths --dos-console`). It models the runtime's console
+write response in memory and compares the requested registers, selector
+and output digest. Captured calls still use the normal rejection policy.
+Replaying the 467 original AH=40h stops confirmed flat DS=16, handle 1
+and 5–80 bytes per request. With the fixture enabled, all 467 original
+probes passed the console write and reached an unmodeled byte output to
+PIT command port 0x43 at 0xeb437. Each result remains inconclusive and
+the verifier has yet to compare the translated paths in these probes.
+The synthetic console differential matched the response and exact
+output digest. All 38 C program translator tests passed.
+Reports: `bulk-dos-write-requests.json` and
+`bulk-dos-console-replay.json` under
+`local/ghidra-group-followup-20261118/`.
