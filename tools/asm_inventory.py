@@ -192,7 +192,7 @@ def load_body_ranges(path, payload):
     return bodies, hashlib.sha256(source).hexdigest()
 
 
-def audit_trace_gaps(payload, body_ranges, trace_path):
+def audit_trace_gaps(payload, body_ranges, trace_path, *, tables=()):
     """Group observed entries into runs of PCs absent from the reviewed layout."""
     bodies, body_digest = load_body_ranges(body_ranges, payload)
     source = trace_path.read_bytes()
@@ -232,8 +232,34 @@ def audit_trace_gaps(payload, body_ranges, trace_path):
     for gap in entries:
         gap['roots'] = sorted(gap['roots'])
         gap['observed_pcs'] = sorted(gap['observed_pcs'])
-    return dict(schema=1, payload_sha256=payload_digest, body_ranges_sha256=body_digest,
-                trace_sha256=hashlib.sha256(source).hexdigest(), entries=entries)
+    report = dict(schema=1, payload_sha256=payload_digest, body_ranges_sha256=body_digest,
+                  trace_sha256=hashlib.sha256(source).hexdigest(), entries=entries)
+    if tables:
+        report['tables'] = [audit_trace_table(payload, entries, *table) for table in tables]
+    return report
+
+
+def audit_trace_table(payload, gaps, source, base, stop, stride):
+    """Corroborate observed destinations with little-endian pointer slots."""
+    if not (0 <= source < len(payload) and 0 <= base <= stop - 4 and stop <= len(payload) and stride >= 4):
+        raise ValueError('invalid trace table source, bounds or stride')
+    slots = {}
+    for address in range(base, stop - 3, stride):
+        target = int.from_bytes(payload[address:address + 4], 'little')
+        slots.setdefault(target, []).append(address)
+    matches = []
+    uncovered = []
+    for gap in gaps:
+        if gap['source'] != source:
+            continue
+        target = gap['target']
+        if target in slots:
+            matches.append(dict(target=target, slots=slots[target]))
+        else:
+            uncovered.append(target)
+    return dict(source=source, base=base, stop=stop, stride=stride,
+                matches=matches, unmatched_targets=uncovered)
+
 
 
 def export_inventory(image, rows, output, *, objdump='objdump', runner=subprocess.run,
@@ -341,7 +367,12 @@ def main(argv=None):
     parser.add_argument('--skip-missing-bodies', action='store_true',
                         help='omit tracker entries without Ghidra bodies and list them in the manifest')
     parser.add_argument('--trace-gaps', type=Path, help='audit a payload-bound execution trace against --body-ranges')
+    parser.add_argument('--trace-table', action='append', nargs=4, default=[],
+                        type=lambda value: int(value, 0), metavar=('SOURCE', 'BASE', 'STOP', 'STRIDE'),
+                        help='check observed destinations against bounded 32-bit pointer slots')
     args = parser.parse_args(argv)
+    if args.trace_table and not args.trace_gaps:
+        parser.error('--trace-table requires --trace-gaps')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
         parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
@@ -353,7 +384,7 @@ def main(argv=None):
         workspace = ghidra_ef2000.validated_workspace(args.workspace)
         if args.trace_gaps:
             payload = (workspace / ghidra_ef2000.IMAGE_NAME).read_bytes()
-            report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps)
+            report = audit_trace_gaps(payload, args.body_ranges, args.trace_gaps, tables=args.trace_table)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

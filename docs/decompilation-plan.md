@@ -12234,3 +12234,11 @@ four recorded group dispatch traces against the 4,296-body inventory
 finds 50 incoming edges to 49 distinct uncovered entries. The indexed
 CALL at 0x12188 accounts for 42 edges, which can now be reviewed as one
 table. Report: `local/ghidra-group-followup-20261118/trace-gap-audit.json`.
+
+2026-11-18 — Added `asm_inventory.py --trace-table SOURCE BASE STOP STRIDE`
+to corroborate observed gap targets against bounded 32-bit pointer slots.
+The audit keeps aliases and reports unmatched targets. On the recorded
+group dispatch traces, all 42 gap edges from 0x12188 and the one from
+0x12dfd match slots in the 29-byte-stride table at 0x121fcd. This is
+pointer evidence for boundary review. All 14 inventory tests passed.
+Report: `local/ghidra-group-followup-20261118/trace-table-audit.json`.

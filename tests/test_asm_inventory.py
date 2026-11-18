@@ -36,6 +36,15 @@ class InventoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, 'trace provenance'):
                 asm_inventory.audit_trace_gaps(payload, bodies, trace)
 
+    def test_trace_table_keeps_aliases_and_reports_unmatched_targets(self):
+        payload = bytes.fromhex('0000000009000000ffff09000000ffff08000000')
+        gaps = [dict(source=1, target=9), dict(source=1, target=10), dict(source=2, target=8)]
+        report = asm_inventory.audit_trace_table(payload, gaps, 1, 4, len(payload), 6)
+        self.assertEqual(report['matches'], [dict(target=9, slots=[4, 10])])
+        self.assertEqual(report['unmatched_targets'], [10])
+        with self.assertRaisesRegex(ValueError, 'bounds or stride'):
+            asm_inventory.audit_trace_table(payload, gaps, 1, 4, len(payload), 2)
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
