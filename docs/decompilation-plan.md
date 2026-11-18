@@ -12601,3 +12601,16 @@ oracle. Eighteen probes matched (3,121 original body bytes), including
 three blocked tracker bodies (894 bytes). The other 68 still require
 a filesystem or access-mode fixture. Filtered replay and parent report
 digest: `local/ghidra-group-followup-20261118/dos-open-stop-replay.json`.
+
+2026-11-18 — Added prepared `--x32-residency` comparisons for X-32
+INT 21h AX=252bh. The fixture models lock and unlock for mapped
+ranges and the existing extender error response for invalid
+subfunctions. Other residency queries and unmapped ranges stop.
+
+Replayed the 22 residency stops from the expanded heap comparison.
+Four matched, seven remained inconclusive, and eleven exposed the
+same C dispatcher gap at 0x9c5bb after the original path completed.
+Disassembly places this PC at the INT 21h/near RET entry in a
+contiguous table of three-byte interrupt stubs. It is absent from the
+generation inventory. The comparison report is
+`local/ghidra-group-followup-20261118/residency-stop-replay.json`.

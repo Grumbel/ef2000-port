@@ -1321,7 +1321,13 @@ nop
 int 0x21
 adc eax,0
 ret
-.size root, .-root'''
+.size root, .-root
+.org 0x280
+.type residency,@function
+residency: mov ax,0x252b
+int 0x21
+ret
+.size residency, .-residency'''
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
             image, directory, _ = inventory(root, source)
@@ -1368,6 +1374,25 @@ ret
                 program=True, service_factory=factory)
             self.assertEqual(result['state'], 'inconclusive', result)
             self.assertIn('service unavailable', result['reason'])
+
+            for operation, start, length, expected in (
+                (0x501, 0x300000, 0x1000, (0x252b, 0)),
+                (0x601, 0x3fffff, 1, (0x252b, 0)),
+                (0x700, 0, 0, (0xa5a5a5a5, 1)),
+                (0x501, 0x3fffff, 2, None),
+                (0x500, 0, 0, None),
+            ):
+                with self.subTest(operation=operation, start=start, length=length):
+                    result = asm_c_differential.compare(
+                        function, image.read_bytes(), 0x280,
+                        [0, start, length, operation, 0x300000, 6, 7, 8], 0x247,
+                        program=True, x32_residency=True)
+                    if expected is None:
+                        self.assertEqual(result['state'], 'inconclusive', result)
+                    else:
+                        self.assertEqual(result['state'], 'pass', result)
+                        response = result['host_services']['original'][0]['after']
+                        self.assertEqual((response['ax'], response['flags'] & 1), expected)
 
     @unittest.skipUnless(unicorn, 'requires Python Unicorn')
     def test_memory_service_effects_are_compared_before_later_overwrites(self):
