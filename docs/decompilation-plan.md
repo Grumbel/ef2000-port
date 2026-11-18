@@ -12511,3 +12511,16 @@ yet to be compared. Ten bodies still have other blockers, including
 CR0, CPUID, far returns, IRET and the mixed code/table layout at
 0x11d695. The site list and source report digest are recorded in
 `local/ghidra-group-followup-20261118/bulk-extra-boundary-audit.json`.
+
+The full host differential finished for the 4,327-body partial-closure
+build with one prepared probe per body. There were 3,268 matches
+(645,446 original body bytes), 1,051 inconclusive results and eight
+mismatches. All eight translated paths stopped at untranslated PCs:
+six at 0x110f0c, one at 0x1111e5 and one at 0xf2819. The first two
+targets emit in the expanded STI-boundary build. The third remains
+blocked by CPUID. The largest remaining rejected service was X-32
+heap growth (222 original stops at 0x245 with AX=0x3508). Among the
+753 generated tracker-blocked entries, 544 matched and 209 were
+inconclusive. `nix run .#status` was exercised on the earlier paired
+467-probe report. Full report:
+`local/ghidra-group-followup-20261118/bulk-partial-full-diff/report.json`.
