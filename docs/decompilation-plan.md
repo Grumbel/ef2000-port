@@ -14261,3 +14261,19 @@ instruction boundary. It leaves keyboard IRQ delivery untested.
 The complete-match total stays at 3,896 of 4,354 generated entries.
 See replay-bulk-gameport-bios-menu-key-wait.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare positive timer waits through return
+
+Ten prepared comparisons match through return. The fixture executes
+the original or translated 0xe28c4 timer callback before every first
+or third poll of 0xe2988. It restores the interrupted flags and its
+temporary return slot after the callback. The two sides record identical
+tick counts and countdowns. The direct waits run for one and four ticks.
+Callers 0x7e5a0 and 0x7e670 each wait for 30 ticks, and 0x7e758 waits
+twice for 30 ticks with deterministic PIT latch reads.
+
+This brings complete prepared matches to 3,899 of 4,354 generated
+entries. The fixture controls callback delivery and PIT reads. Real-time
+IRQ scheduling and release integration remain unverified. See
+replay-bulk-gameport-bios-timer-delivery.py and its JSONL output
+under local/ghidra-group-followup-20261118.
