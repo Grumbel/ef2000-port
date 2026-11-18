@@ -12995,3 +12995,14 @@ OpenWatcom compiled game_helpers51.c with zero warnings. Relinking that
 object into the same hybrid and replaying the click on private Xvfb
 displayed the full Mitarbeiter panel. The baseline and corrected runs
 and original entry capture are under local/early-game-regressions-9R5aDI/.
+
+The widget callback correction also clears the Helsinki child lookup
+fault. Accepting its parameters reached flight and exposed a second
+fault, at compiled 0x304cd39 in 0x84e3c. Original branches at 0x84eeb
+and 0x84eed both skip the reference-block dereference unless the
+entry type equals 5. The C condition admitted types above 5 and read
+through the absent reference block. Correct the equality check.
+OpenWatcom compiled misc_drafts1.c with zero warnings. The rebuilt
+hybrid replay passed both Helsinki acceptance dialogs and rendered
+the cockpit. Evidence: local/early-game-regressions-9R5aDI/
+helsinki-fixed and helsinki-recheck.

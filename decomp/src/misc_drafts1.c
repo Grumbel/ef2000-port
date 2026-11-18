@@ -9686,7 +9686,7 @@ void build_mode_label_326d8(void)
     }
 }
 
-/* 0x84e3c, 289 bytes. Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX): the unit's class (high half of dword +0x26) indexes the 0xca-byte records at dword 0x19bb58, a missing table (+0x8a) is reported through 0x132a74 with 0x189bf8; entries whose byte +0x18 is 5 or more are then replaced by 0x400 + (word << 11) style packed values built from the record at +0xb5. */
+/* 0x84e3c, 289 bytes. Fetch two packed words for sub-entry SUB (BL) of the class record owned by unit UNIT (DX, signed) into OUT[0..1] (EAX): the unit's class (high half of dword +0x26) indexes the 0xca-byte records at dword 0x19bb58, a missing table (+0x8a) is reported through 0x132a74 with 0x189bf8; entries whose byte +0x18 is exactly 5 are then replaced by 0x400 + (word << 11) style packed values built from the record at +0xb5. */
 void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub)
 {
     int32_t u16 = (int16_t)unit;
@@ -9707,7 +9707,7 @@ void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub)
     tbl = EF_U32(rec + 0x8au);
     EF_U32(out) = EF_U32(tbl + off + 4u);
     EF_U32(out + 4u) = EF_U32(tbl + off);
-    if (EF_U8(tbl + off + 0x18u) < 5u)
+    if (EF_U8(tbl + off + 0x18u) != 5u)
         return;
     b = EF_U8(u + 0x2au);
     p2 = EF_U32(rec + 0xb5u);
