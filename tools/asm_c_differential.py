@@ -899,20 +899,22 @@ def pit_write_service(request, registers):
     return reject_host_service()
 
 
-def prepared_port_service(pit_writes=False, vga_status_reads=False, gameport_disconnected=False):
+def prepared_port_service(pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False):
     """Provide deterministic I/O for selected prepared devices."""
     from itertools import cycle
-    try:
-        from .unicorn_backend import VgaStatus
-    except ImportError:
-        from unicorn_backend import VgaStatus
 
     clock = cycle((0, 15000000))
-    status = VgaStatus(clock=lambda: next(clock)) if vga_status_reads else None
+    status = unicorn_backend.VgaStatus(clock=lambda: next(clock)) if vga_status_reads else None
+    keyboard = unicorn_backend.KeyboardController() if keyboard_idle else None
 
     def handle(request, registers):
         if status is not None and request['direction'] == 'in' and request['port'] == 0x3da and request['width'] == 8:
             return dict(registers, ax=(registers['ax'] & ~0xff) | status.read())
+        if keyboard is not None and request['width'] == 8 and request['port'] in (0x60, 0x64):
+            if request['direction'] == 'in':
+                return dict(registers, ax=(registers['ax'] & ~0xff) | keyboard.read(request['port']))
+            keyboard.write(request['port'], registers['ax'] & 0xff)
+            return registers
         if gameport_disconnected and request['port'] == 0x201 and request['width'] == 8:
             # An absent controller leaves all four axes and buttons high.
             if request['direction'] == 'in':
@@ -925,7 +927,7 @@ def prepared_port_service(pit_writes=False, vga_status_reads=False, gameport_dis
 
 def isolated_probes(function, payload, address, scenarios, budget, program, native_x87=None,
                     captured=None, *, reject_services=False, prepared_memory_size=None, sti_stop_sites=(), cpuid_sites=(),
-                    dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, x32_heap=False,
+                    dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False, x32_heap=False,
                     dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, vga_dac=False, x32_vectors=False):
     """Keep oracle/native crashes local and distinguish the failing phase.
 
@@ -956,8 +958,8 @@ def isolated_probes(function, payload, address, scenarios, budget, program, nati
                                  dos_console=dos_console, x32_heap=x32_heap,
                                  dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive, x32_mouse=x32_mouse,
                                  x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
-                                 port_factory=(lambda: prepared_port_service(pit_writes, vga_status_reads, gameport_disconnected))
-                                 if pit_writes or vga_status_reads or gameport_disconnected else
+                                 port_factory=(lambda: prepared_port_service(pit_writes, vga_status_reads, gameport_disconnected, keyboard_idle))
+                                 if pit_writes or vga_status_reads or gameport_disconnected or keyboard_idle else
                                  (lambda: reject_host_service) if reject_services or vga_dac else None)
                 sender.send(('result', index, result))
         except Exception as error:
@@ -1063,7 +1065,7 @@ def compile_host_library(sources, directory, output, compiler, needs_native, lib
 
 def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=10000,
            watcom=None, softfloat_build=None, x87_oracle='unicorn', captures=(), service_free_paths=False, jobs=1,
-           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False,
+           prepared_memory_size=None, addresses=(), dos_console=False, pit_writes=False, vga_status_reads=False, gameport_disconnected=False, keyboard_idle=False,
            x32_heap=False, dos_invalid_open=False, x32_residency=False, dos_empty_drive=False, x32_mouse=False, x32_no_cd=False, x32_vbe=False, checkpoint=None, prepared_u32=(), dos_clock=False, prepared_raster=False, vga_dac=False, x32_vectors=False):
     validate_prepared_memory_size(prepared_memory_size)
     if x87_oracle not in ('unicorn', 'hardware'):
@@ -1102,6 +1104,9 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
         raise ValueError('X-32 VBE fixture requires --service-free-paths, interrupt boundaries and DOS aperture RAM')
     if (dos_invalid_open or dos_empty_drive) and (not program or not manifest.get('host_service_boundaries') or not service_free_paths):
         raise ValueError('DOS open fixtures require --service-free-paths and interrupt boundaries')
+    if keyboard_idle and (not program or not manifest.get('host_port_service_boundaries')
+                          or not service_free_paths):
+        raise ValueError('idle keyboard requires prepared program probes with port boundaries')
     if gameport_disconnected and (not program or not manifest.get('host_port_service_boundaries')
                                   or not service_free_paths):
         raise ValueError('disconnected gameport requires prepared program probes with port boundaries')
@@ -1254,7 +1259,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                                   native_x87=native_x87, reject_services=reject_services,
                                   prepared_memory_size=prepared_memory_size, sti_stop_sites=sti_stop_sites, cpuid_sites=cpuid_sites,
                                   dos_console=dos_console, x32_heap=x32_heap, pit_writes=pit_writes, vga_status_reads=vga_status_reads,
-                                  gameport_disconnected=gameport_disconnected,
+                                  gameport_disconnected=gameport_disconnected, keyboard_idle=keyboard_idle,
                                   dos_invalid_open=dos_invalid_open, x32_residency=x32_residency, dos_empty_drive=dos_empty_drive,
                                   x32_mouse=x32_mouse, x32_no_cd=x32_no_cd, x32_vbe=x32_vbe,
                                   checkpoint=checkpoint, prepared_u32=prepared_u32, dos_clock=dos_clock, vga_dac=vga_dac, x32_vectors=x32_vectors)
@@ -1315,6 +1320,7 @@ def verify(directory, output, image, *, compiler='cc', scenarios=16, budget=1000
                   dos_invalid_open_policy='prepared-only' if dos_invalid_open else 'disabled',
                   vga_dac_policy='dos-palette-aperture-prepared-only' if vga_dac else 'disabled',
                   vga_status_policy='alternating-retrace-prepared-only' if vga_status_reads else 'disabled',
+                  keyboard_policy='idle-prepared-only' if keyboard_idle else 'disabled',
                   gameport_policy='disconnected-prepared-only' if gameport_disconnected else 'disabled',
                   pit_write_policy='transcript-prepared-only' if pit_writes else 'disabled',
                   host_service_policy=('dos-console-and-exit-prepared-only' if dos_console else
@@ -1351,6 +1357,8 @@ def main(argv=None):
                         help='compare VGA palette writes with separate DAC state and prepared DOS aperture RAM')
     parser.add_argument('--vga-status-reads', action='store_true',
                         help='compare VGA status reads using deterministic retrace phase')
+    parser.add_argument('--keyboard-idle', action='store_true',
+                        help='model keyboard controller I/O with no host scan codes queued')
     parser.add_argument('--gameport-disconnected', action='store_true',
                         help='model an absent joystick on byte I/O to port 0x201')
     parser.add_argument('--pit-writes', action='store_true',
@@ -1403,7 +1411,7 @@ def main(argv=None):
                         x87_oracle=args.x87_oracle, captures=args.capture,
                         service_free_paths=args.service_free_paths, jobs=args.jobs, dos_console=args.dos_console,
                         pit_writes=args.pit_writes, vga_status_reads=args.vga_status_reads, x32_heap=args.x32_heap,
-                        gameport_disconnected=args.gameport_disconnected,
+                        gameport_disconnected=args.gameport_disconnected, keyboard_idle=args.keyboard_idle,
                         dos_invalid_open=args.dos_invalid_open, x32_residency=args.x32_residency,
                         dos_empty_drive=args.dos_empty_drive, x32_mouse=args.x32_mouse, x32_no_cd=args.x32_no_cd, x32_vbe=args.x32_vbe,
                         prepared_memory_size=args.prepared_memory_size, addresses=args.address,

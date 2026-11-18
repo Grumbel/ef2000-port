@@ -13315,3 +13315,14 @@ the callback at [0x9cf74, 0x9cfa2). The latter excludes the two alignment
 bytes counted by the tracker. The local overlay includes both ranges.
 See bulk-gameport-prefix.jsonl and verify-gameport-candidate.py under
 local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare keyboard controller I/O with an empty queue
+
+The prepared runner accepts `--keyboard-idle`. Each side uses a separate
+keyboard controller model with no host scan codes. The fixture compares
+byte reads at ports 0x60 and 0x64 and the acknowledgement of writes at
+0x60 using the existing Unicorn backend model.
+
+One of the four previously blocked probes now matches through completion
+(0xcd3c0). The other three reach the existing STI stop at 0xcd42b.
+See local/ghidra-group-followup-20261118/bulk-keyboard-replay.jsonl.
