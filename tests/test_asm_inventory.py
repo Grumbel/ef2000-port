@@ -118,6 +118,27 @@ class InventoryTests(unittest.TestCase):
             rejected = audit(payload[:-1] + bytes.fromhex('ffe0'), 2)
             self.assertTrue(all(body['blockers'] for body in rejected))
 
+    def test_tail_candidate_requires_an_accepted_target(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            image = Path(temporary) / 'payload.bin'
+            # INT; RET, followed by PUSH; JMP backward to the first body.
+            payload = bytes.fromhex('cd21c3 50ebfa')
+            image.write_bytes(payload)
+
+            def audit(sites):
+                return asm_inventory.audit_table_bodies(
+                    image, payload, {}, [], max_bytes=16, max_callees=1, objdump='objdump',
+                    observed_entries=[3], interrupt_sites=sites)
+
+            self.assertTrue(all(body['blockers'] for body in audit([])))
+            wrapper, thunk = audit([0])
+            self.assertFalse(wrapper['blockers'])
+            self.assertFalse(thunk['blockers'])
+            self.assertEqual(thunk['tail_targets'], [0])
+            self.assertEqual(thunk['return_sites'], [])
+            with self.assertRaisesRegex(ValueError, 'two-byte INT'):
+                audit([1])
+
     def test_branch_targeted_test_immediate_mov_is_preserved_and_rechecked(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

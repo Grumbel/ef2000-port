@@ -291,8 +291,9 @@ def guarded_jump_tables(instructions, edges, entry, stop, payload):
             if not incoming.intersection((site - 11, site - 5, site))}
 
 
-def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None):
-    """Follow local static edges and require known external callees."""
+def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, payload=None,
+                         interrupt_sites=()):
+    """Follow local static edges and require reviewed external entry points."""
     decoded = {insn['address']: insn for insn in instructions}
     edges = {}
     flow = control_flow_report(instructions)['edges']
@@ -304,6 +305,7 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
     visited = set()
     spans = []
     returns = set()
+    tail_targets = set()
     blockers = []
     while pending:
         pc = pending.pop()
@@ -323,6 +325,8 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
             returns.add(pc)
         for edge in edges.get(pc, []):
             kind, target = edge['kind'], edge['target']
+            if kind == 'review' and pc in interrupt_sites and insn['mnemonic'] == 'int':
+                continue
             if kind == 'call' and target in known_entries:
                 continue
             if kind in ('jump', 'fallthrough') and target in decoded:
@@ -332,11 +336,16 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
                 used_tables.append(tables[pc])
                 pending.extend(tables[pc]['targets'])
                 continue
+            if kind == 'jump' and target is not None and insn['mnemonic'] == 'jmp':
+                tail_targets.add(target)
+                if target in known_entries:
+                    continue
+                kind = 'tail-jump'
             blockers.append(dict(site=pc, kind=kind, target=target, reason=edge['status']))
         if not edges.get(pc) and pc not in returns:
             blockers.append(dict(site=pc, reason='unsupported terminal instruction'))
     spans.sort()
-    if not returns:
+    if not returns and not tail_targets:
         blockers.append(dict(site=entry, reason='no reachable near return'))
     if any(left[1] != right[0] for left, right in zip(spans, spans[1:])):
         blockers.append(dict(site=entry, reason='reachable instruction spans are disjoint'))
@@ -344,15 +353,19 @@ def audit_candidate_body(instructions, entry, stop, owned, known_entries, *, pay
                   instruction_count=len(spans), return_sites=sorted(returns), blockers=blockers)
     if used_tables:
         result['guarded_jump_tables'] = sorted(used_tables, key=lambda table: table['site'])
+    if tail_targets:
+        result['tail_targets'] = sorted(tail_targets)
     return result
 
 
 def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
-                       max_callees=0, observed_entries=()):
+                       max_callees=0, observed_entries=(), interrupt_sites=()):
     if max_bytes <= 0:
         raise ValueError('candidate scan limit must be positive')
     if max_callees < 0:
         raise ValueError('candidate callee limit must be nonnegative')
+    if any(not 0 <= site < len(payload) - 1 or payload[site] != 0xcd for site in interrupt_sites):
+        raise ValueError('candidate interrupt site must point to a two-byte INT')
     owned = bytearray(len(payload))
     for body in bodies.values():
         for start, end in body['ranges']:
@@ -372,12 +385,12 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
             if key not in windows:
                 windows[key] = decode_window(image, entry, stop - entry, objdump=objdump)
             report.append(audit_candidate_body(windows[key], entry, stop, owned, bodies,
-                                               payload=payload))
+                                               payload=payload, interrupt_sites=interrupt_sites))
         remaining = max_callees - (len(candidates) - len(roots))
         if not remaining:
             break
         extra = {edge['target'] for body in report for edge in body['blockers']
-                 if edge.get('kind') == 'call' and edge['target'] is not None
+                 if edge.get('kind') in ('call', 'tail-jump') and edge['target'] is not None
                  and 0 <= edge['target'] < len(payload) and not owned[edge['target']]}
         extra -= candidates
         if not extra:
@@ -388,7 +401,7 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
         accepted = set(bodies)
         while True:
             ready = {body['entry'] for body in report if body['entry'] not in accepted
-                     and all(edge.get('kind') == 'call' and edge['target'] in accepted
+                     and all(edge.get('kind') in ('call', 'tail-jump') and edge['target'] in accepted
                              for edge in body['blockers'])}
             if not ready:
                 break
@@ -402,7 +415,7 @@ def audit_table_bodies(image, payload, bodies, tables, *, max_bytes, objdump,
                 if edge.get('kind') == 'call' and edge['target'] in candidates
             })
             body['blockers'] = [edge for edge in body['blockers']
-                                if edge.get('kind') != 'call' or edge['target'] not in accepted]
+                                if edge.get('kind') not in ('call', 'tail-jump') or edge['target'] not in accepted]
     return report
 
 
@@ -555,8 +568,10 @@ def main(argv=None):
                         help='statically audit selected trace targets, scanning at most this many bytes each')
     parser.add_argument('--trace-entry', action='append', type=lambda value: int(value, 0), default=[],
                         help='statically audit this observed gap target; repeatable')
+    parser.add_argument('--trace-interrupt-site', action='append', type=lambda value: int(value, 0),
+                        default=[], help='admit a reviewed two-byte INT during the candidate audit')
     parser.add_argument('--trace-callee-limit', type=int,
-                        help='also audit up to this many uncovered direct callees')
+                        help='also audit up to this many uncovered direct call or tail-jump targets')
     parser.add_argument('--candidate-overlay', type=Path,
                         help='write body ranges with statically accepted trace candidates')
     args = parser.parse_args(argv)
@@ -572,6 +587,8 @@ def main(argv=None):
         parser.error('--trace-table and --trace-entry require --trace-gaps')
     if args.trace_entry and args.trace_body_limit is None:
         parser.error('--trace-entry requires --trace-body-limit')
+    if args.trace_interrupt_site and args.trace_body_limit is None:
+        parser.error('--trace-interrupt-site requires --trace-body-limit')
     if args.trace_gaps and (not args.body_ranges or args.address or args.skip_missing_bodies):
         parser.error('--trace-gaps requires --body-ranges and no inventory selection')
     if args.skip_missing_bodies and (not args.body_ranges or args.address):
@@ -594,11 +611,14 @@ def main(argv=None):
                 missing = set(args.trace_entry) - {gap['target'] for gap in report['entries']}
                 if missing:
                     raise ValueError(f'candidate entries absent from observed gap targets: {sorted(missing)}')
+                if args.trace_interrupt_site:
+                    report['reviewed_interrupt_sites'] = sorted(set(args.trace_interrupt_site))
                 report['candidate_bodies'] = audit_table_bodies(
                     workspace / ghidra_ef2000.IMAGE_NAME, payload,
                     load_body_ranges(args.body_ranges, payload)[0], report.get('tables', []),
                     max_bytes=args.trace_body_limit, objdump=args.objdump,
-                    max_callees=args.trace_callee_limit or 0, observed_entries=args.trace_entry)
+                    max_callees=args.trace_callee_limit or 0, observed_entries=args.trace_entry,
+                    interrupt_sites=args.trace_interrupt_site)
             with output.open('x') as stream:
                 json.dump(report, stream, indent=2)
                 stream.write('\n')

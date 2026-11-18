@@ -12435,3 +12435,15 @@ found an unresolved indirect call at 0xdbf31, which targeted 0xeb2c0
 on the recorded input. Neither candidate was added to the overlay.
 All 17 inventory tests passed. Reports: `bulk-exit-traces.json` and
 `bulk-exit-audit.json` under `local/ghidra-group-followup-20261118/`.
+
+2026-11-18 — The candidate audit now follows direct unconditional
+tail jumps to accepted entries. Uncovered tail targets count against
+the same expansion limit as direct callees. A separate
+`--trace-interrupt-site` option admits an exact reviewed two-byte INT.
+Auditing 0xeb3d0 with 0x10e230 admitted the wrapper at 0x10e223,
+its thunk at 0x10e248 and the caller at 0xeb3d0. The resulting bulk
+inventory contains 4,345 bodies. The C generator emitted all three
+additions, for 4,091 generated bodies and 254 exclusions. The indirect
+call at 0xdbf31 is still unresolved. All 18 inventory tests passed.
+Artifacts are under `local/ghidra-group-followup-20261118/` with the
+`bulk-exit-reviewed-` prefix.
