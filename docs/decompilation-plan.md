@@ -14245,3 +14245,19 @@ generated entries. The drawing, keyboard-wait and other script paths
 still need complete comparisons. See
 replay-bulk-gameport-bios-script-menu-branches.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Compare the menu keyboard wait through completion
+
+At 0xa9aa8, a local differential fixture delivers a scan code to
+0x41f833 immediately before a selected visit to the poll at 0xa9b51.
+The fixture records delivery and visit counts inside the comparison
+worker for each side. Three comparisons match through return with
+0x15 arriving on the first, second or seventh poll. The seventh-poll
+case delivers an ignored scan code on the third poll. A fourth case
+delivers 0x31 on the fourth poll and matches through DOS exit 255.
+
+The fixture models the visible keyboard byte update at a controlled
+instruction boundary. It leaves keyboard IRQ delivery untested.
+The complete-match total stays at 3,896 of 4,354 generated entries.
+See replay-bulk-gameport-bios-menu-key-wait.py and its JSONL output
+under local/ghidra-group-followup-20261118.
