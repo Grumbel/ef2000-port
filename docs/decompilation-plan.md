@@ -12785,3 +12785,13 @@ before either of its later indirect sites executes. Static review
 still finds an indirect call at 0xc63f3 and an indirect tail at
 0xc6401, so this destination needs separate evidence before its
 entire body can be admitted.
+
+The threaded-body rebuild emitted 0xc7e38 and reports 0xc7f04 as a
+dynamic transfer. All five empty-drive replays now reach 0xc63e4
+before stopping on the untranslated target. An instruction trace
+comparison shows equal PC, general registers and flags at every
+step up to and including that target for all five probes. The
+full probes remain mismatches. Local evidence is in
+`bulk-threaded-body-diff/report.json` and
+`threaded-body-replay-trace.json`, produced by
+`verify-threaded-body.py` and `trace-threaded-body-replay.py`.
