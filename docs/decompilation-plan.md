@@ -13257,3 +13257,18 @@ three sites for a full comparison.
 See local/ghidra-group-followup-20261118/
 bulk-service-stops-current-replay.jsonl, bulk-bios-mode-change-replay.jsonl,
 and bulk-bios-mode-prefix.jsonl.
+
+### 2026-11-18 — Follow the cleanup path to the VBE release callback
+
+With 0x9c398 added to the local inventory, its direct prepared probe
+and the 0xfc534 control both match. The full 0xd1da8 probe now runs
+through the cleanup dispatcher and stops at the unowned callback
+0xfc440, which 0xfc534 registers. A first-visit checkpoint at 0xfc440
+confirms matching guest state through entry to that callback.
+
+The boundary audit accepts 0xfc440..0xfc477, plus the two missing
+dependencies it reaches through 0x584..0x601 and 0x9c03b..0x9c1a1
+(all end addresses exclusive). The 0x584 body has a reviewed indirect
+call at 0x5bd. A local build includes all three candidates for the next
+full comparison. See local/ghidra-group-followup-20261118/
+bulk-cleanup-diff/report.json and bulk-vbe-release-prefix.jsonl.
