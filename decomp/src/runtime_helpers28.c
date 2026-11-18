@@ -96,7 +96,7 @@ void start_session_34ca4(void)
     EF_U8(0x0019f5aeu) = 0;
     EF_U8(0x0019f59bu) = 0xff;
     EF_U8(0x0019f59au) = 0xff;
-    if (running == 0 && EF_U8(0x001357bau) == 0 && (guest_fn_a29cc(0) & 0xffu) != 0) {
+    if (running == 0 && EF_U8(0x001357bau) == 0 && latch_decoded_key_a29cc(0) != 0) {
         uint32_t mode = EF_U8(0x0013578eu);
 
         if (mode == 9) {

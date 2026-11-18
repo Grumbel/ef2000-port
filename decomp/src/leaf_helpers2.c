@@ -55,14 +55,15 @@ void register_callback_84d94(void)
 }
 
 /* 0xa29cc, 41 bytes. Latch a decoded key into the state table. */
-void latch_decoded_key_a29cc(uint8_t key)
+uint8_t latch_decoded_key_a29cc(uint8_t key)
 {
     uint8_t decoded;
 
-    guest_fn_a29f8_w(key);
-    decoded = guest_fn_a2948_w(key, 0);
+    reset_input_state_a29f8();
+    decoded = probe_data_file_a2948(key);
     EF_U8(0x0013578eu) = decoded;
     EF_U32(0x00135790u) = EF_U32(0x00135710u + (uint32_t)decoded * 4u);
+    return decoded;
 }
 
 /* 0xa32c8, 30 bytes. Issue a request for one byte of state. */

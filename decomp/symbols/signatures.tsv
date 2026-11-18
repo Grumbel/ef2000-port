@@ -1840,7 +1840,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000a5bc	run_named_widget_a5bc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000a5bc (28 bytes); Find a named widget and hand it to 0xc868.; callers ba5c@bb3b,bfcc@c284; docs/compiler-abi.md
 0x0007cc38	run_named_widget_7cc38			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007cc38 (35 bytes); Reset via 0xc768, then run 0x7bc40 on a named widget.; callers none direct; docs/compiler-abi.md
 0x00084d94	register_callback_84d94			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00084d94 (37 bytes); Register the 0x84dbc callback through 0xab838 after 0xabf8c.; callers aaee8@aafaf; docs/compiler-abi.md
-0x000a29cc	latch_decoded_key_a29cc	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a29cc (41 bytes); Latch a decoded key into the state table.; callers 34ca4@34cde,a3c18@a3c72; docs/compiler-abi.md
+0x000a29cc	latch_decoded_key_a29cc	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a29cc (41 bytes); Latch a decoded key into the state table.; callers 34ca4@34cde,a3c18@a3c72; docs/compiler-abi.md
 0x000a32c8	issue_state_request_a32c8	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a32c8 (30 bytes); Issue a request for one byte of state.; callers a32e8@a331d,a32e8@a3342; docs/compiler-abi.md
 0x000c469b	copy_constants_c469b			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c469b (33 bytes); Copy three constant dwords from the code area into the work area.; callers 39744@3975c; docs/compiler-abi.md
 0x000cdc64	restore_video_mode_cdc64			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000cdc64 (40 bytes); Re-apply the stored video mode if it differs from the current one.; callers 8b2d8@8b31a,aaee8@aafdb; docs/compiler-abi.md

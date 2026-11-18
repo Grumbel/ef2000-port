@@ -3049,7 +3049,6 @@ uint32_t guest_fn_1e214(int32_t a, int32_t b, int32_t c, int32_t d); /* 0x1e214 
 uint16_t guest_fn_cd258(void); /* 0xcd258 -> AX */
 void guest_fn_ab324(uint32_t a, uint32_t b); /* 0xab324 EAX/EDX */
 void guest_fn_ab47c(uint32_t a); /* 0xab47c EAX */
-uint8_t guest_fn_a29cc(uint32_t a); /* 0xa29cc EAX -> AL */
 void guest_fn_a29f8(void); /* 0xa29f8 */
 void guest_fn_a2bdc(void); /* 0xa2bdc */
 void guest_fn_a41d0(void); /* 0xa41d0 */
@@ -3570,7 +3569,7 @@ void dos_call_3503_c24(int16_t a, uint32_t b);
 void run_named_widget_a5bc(void);
 void run_named_widget_7cc38(void);
 void register_callback_84d94(void);
-void latch_decoded_key_a29cc(uint8_t key);
+uint8_t latch_decoded_key_a29cc(uint8_t key);
 void issue_state_request_a32c8(uint8_t value);
 void copy_constants_c469b(void);
 void restore_video_mode_cdc64(void);
@@ -3584,8 +3583,6 @@ void guest_fn_c768_w(uint32_t value); /* 0xc768 EAX */
 void guest_fn_7bc40_w(ef_addr32 widget); /* 0x7bc40 EAX */
 void guest_fn_abf8c_w(uint32_t a, uint32_t b, uint32_t c); /* 0xabf8c EAX/EDX/EBX */
 void guest_fn_ab838_w(uint32_t callback); /* 0xab838 EAX */
-void guest_fn_a29f8_w(uint32_t key); /* 0xa29f8 EAX */
-uint8_t guest_fn_a2948_w(uint32_t key, uint32_t flag); /* 0xa2948 EAX/EDX -> AL */
 void guest_fn_cdc38_w(void); /* 0xcdc38 */
 uint16_t guest_fn_fe700_w(void); /* 0xfe700 -> AX */
 void guest_fn_fe710_w(int32_t mode); /* 0xfe710 EAX */
