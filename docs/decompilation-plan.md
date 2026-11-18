@@ -13803,3 +13803,19 @@ negative decimal values.
 The prepared-match total is now 3,859 of 4,353 entries. See
 replay-bulk-gameport-bios-parser-records.py and its JSONL output
 under local/ghidra-group-followup-20261118.
+
+### 2026-11-18 — Verify parser line reader and termination directives
+
+Entries 0xf3b78 and 0xf4178 previously exhausted their instruction
+budgets in the line reader at 0xf2c78. The reader stops at LF.
+It reads from the cursor at 0x485924, which 0xf4178 initializes
+from the source pointer at 0x485928.
+
+Both entries matched the generated C through return on a single
+CRLF line with an eof directive and on a comment and blank line
+followed by a return directive. The latter case exercises leading
+whitespace, line skipping and advancing the source cursor.
+
+The prepared-match total is now 3,861 of 4,353 entries. See
+replay-bulk-gameport-bios-parser-line-reader.py and its JSONL
+output under local/ghidra-group-followup-20261118.
