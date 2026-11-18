@@ -13447,3 +13447,25 @@ inconclusive. Seventeen other unmapped reads lacked a recorded fault
 address and were outside this replay. See
 bulk-gameport-bios-data-fault-prefixes.jsonl and
 bulk-gameport-bios-all-bad-targets.jsonl under the same local directory.
+
+### 2026-11-18 — Close the x87 operand-snapshot evidence gap
+
+The original x87 oracle reads memory operands directly before invoking
+the native instruction. Direct reads bypass Unicorn's invalid-memory
+hook. The differential verifier now reports the instruction PC,
+encoding, data address, operand width, segment and guest registers
+when that snapshot hits unmapped memory. The distinct report field
+preserves the distinction between an oracle snapshot failure and a
+guest memory-access fault.
+
+All 17 previously unattributed unmapped reads reproduced as x87
+operand-snapshot faults. The original and generated C states matched
+at the first visit to the recorded instruction in all 17 cases.
+Entry 0x7ca8 then matched through return with two prepared coordinate
+table inputs, using distinct record indices and signed offsets.
+This brings the number of entries with at least one complete
+prepared match to 3,772 of 4,353. See
+bulk-gameport-bios-x87-snapshot-faults.jsonl,
+bulk-gameport-bios-x87-snapshot-prefixes.jsonl and
+bulk-gameport-bios-x87-coordinate-inputs.jsonl under
+local/ghidra-group-followup-20261118.

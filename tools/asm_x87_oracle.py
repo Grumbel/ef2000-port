@@ -309,12 +309,13 @@ class Binding:
         self.native, self.cpu = native, cpu
         self.counts, self.interrupted = Counter(), 0
         self.decode_stop = None
+        self.operand_snapshot_fault = None
 
     def evidence(self):
         return dict(operations=dict(self.counts), interrupted_native_samples=self.interrupted)
 
     def instruction(self, cpu, address, size, _):
-        from unicorn import x86_const as x
+        from unicorn import UC_ERR_READ_UNMAPPED, UcError, x86_const as x
         first_byte = cpu.mem_read(address, 1)[0]
         if first_byte not in (*PREFIXES, 0x66, 0x67, 0xf0, 0xf2, 0xf3, 0x9b) and not 0xd8 <= first_byte <= 0xdf:
             return
@@ -339,7 +340,16 @@ class Binding:
             self.counts['fwait'] += 1
             cpu.reg_write(x.UC_X86_REG_EIP, address+size)
             return
-        data = bytes(cpu.mem_read(op['address'], op['width'])) if 'address' in op else b''
+        data = b''
+        if 'address' in op:
+            try:
+                data = bytes(cpu.mem_read(op['address'], op['width']))
+            except UcError as error:
+                if error.errno == UC_ERR_READ_UNMAPPED:
+                    self.operand_snapshot_fault = dict(
+                        pc=address, encoding=encoded.hex(), address=op['address'],
+                        size=op['width'], segment=op['segment'])
+                raise
         result, written, ax, native_pc, native_dp, retries = self.native.execute(op['operation'], values, data, registers['EAX'])
         self.interrupted += retries
         if op['operation'] in (0xdbe3, SAVE):

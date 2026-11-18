@@ -188,6 +188,15 @@ class OracleTests(unittest.TestCase):
         return diff.compare(function, payload, 0x100, [17, 19, 23, 29, 0x3f0000, 31, 37, 41],
                             0xad7, native_x87=self.native, **kwargs)
 
+    def test_unmapped_operand_snapshot_reports_instruction(self):
+        image, _ = assemble(self.root, 'mov eax, 0x500000\nfld qword ptr [eax]\nret')
+        result = self.compare(None, image.read_bytes())
+        self.assertEqual(result['state'], 'inconclusive')
+        fault = result['original_x87_operand_snapshot_fault']
+        self.assertEqual({key: value for key, value in fault.items() if key != 'registers'},
+                         dict(pc=0x105, encoding='dd00', address=0x500000, size=8, segment='DS'))
+        self.assertEqual(fault['registers']['ax'], 0x500000)
+
     def test_all_modrm_sib_addresses_against_independent_unicorn_accesses(self):
         x = unicorn.x86_const
         cpu = unicorn.Uc(unicorn.UC_ARCH_X86, unicorn.UC_MODE_32)

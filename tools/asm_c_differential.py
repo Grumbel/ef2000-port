@@ -691,6 +691,10 @@ def compare(function, payload, address, registers, flags, *, budget=10000, progr
                        **detail)
     except UcError as error:
         detail = {'original_memory_fault': memory_fault} if memory_fault else {}
+        if binding and binding.operand_snapshot_fault:
+            detail['original_x87_operand_snapshot_fault'] = {
+                **binding.operand_snapshot_fault, 'registers': original_registers(cpu),
+            }
         if error.errno == UC_ERR_INSN_INVALID:
             pc = cpu.reg_read(x86_const.UC_X86_REG_EIP)
             instruction_fault = dict(pc=pc)
