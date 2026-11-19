@@ -577,3 +577,5 @@ addr	size	type	name	evidence	notes
 0x0015bdcc	4	uint32_t	g_view_clip_bottom	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
 0x0015b76c	4	uint32_t	g_view_latched_width	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
 0x0015b770	4	uint32_t	g_view_latched_height	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x00127d92	2	uint16_t	g_simulation_tick_step	0x29f71 unsigned zero gate; 0x2a03b unsigned load	frame step used in engagement rate divisor
+0x001264e2	1	uint8_t	g_combat_skill_level	0x2a073 zero-extended load; thresholds 3 and 6	combat skill band for engagement frequency

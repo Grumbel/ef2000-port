@@ -165,6 +165,8 @@ extern int16_t g_excluded_object_index; /* 0x001f71d0 */
 extern uint8_t g_object_type_flags[]; /* 0x00128636, 0xe5-byte stride */
 extern ef_addr32 g_world_grid_base; /* 0x0019bb58, pointer to 0xca-byte records */
 extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
+extern uint16_t g_simulation_tick_step; /* 0x00127d92 */
+extern uint8_t g_combat_skill_level; /* 0x001264e2 */
 extern uint32_t g_video_width; /* 0x0015b744 */
 extern uint32_t g_video_height; /* 0x0015b748 */
 extern uint32_t g_view_clip_left; /* 0x0015bdc0, inclusive bounds */

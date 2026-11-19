@@ -6429,6 +6429,8 @@ void measure_view_range_67d4(void);
 void refresh_node_progress_1e28c(void);
 
 void unit_damage_tick_29dd0(uint32_t ax);
+void unit_attack_tick_29b14(int32_t index); /* original x87 body, EAX signed AX */
+void update_unit_engagement_29f54(int16_t index);
 
 void clear_state_block_9a348(void);
 

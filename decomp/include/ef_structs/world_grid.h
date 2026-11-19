@@ -92,12 +92,15 @@ typedef struct EF_PACKED ef_grid_adjacency {
 EF_STATIC_ASSERT(ef_grid_adjacency_size, sizeof(ef_grid_adjacency) == 0x11);
 EF_STATIC_ASSERT(ef_grid_adjacency_neighbors_off, offsetof(ef_grid_adjacency, neighbors) == 1);
 
-/* 0x12bc94: only the first byte of each 0x91-byte category description is
- * touched by the original 0x2da54 implementation. */
+/* 0x12bc94: 0x91-byte category descriptions. The grid predicates use
+ * the first byte; the engagement gate at 0x29f54 dispatches on byte +3. */
 typedef struct EF_PACKED ef_grid_category_type {
     uint8_t allowed_kind;
-    uint8_t unknown_01[0x90];
+    uint8_t unknown_01[2];
+    uint8_t engagement_kind;         /* +3, 1=attack, 2=damage */
+    uint8_t unknown_04[0x8d];
 } ef_grid_category_type;
+EF_STATIC_ASSERT(ef_grid_category_engagement_off, offsetof(ef_grid_category_type, engagement_kind) == 3);
 EF_STATIC_ASSERT(ef_grid_category_type_size, sizeof(ef_grid_category_type) == 0x91);
 
 /* 0x1a5c2e: fixed external probes, 27 bytes each; the point at +5 has
