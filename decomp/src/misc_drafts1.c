@@ -2601,7 +2601,7 @@ void select_button_state_4f718(uint32_t idx, uint32_t mode)
     uint32_t n;
     for (n = 1u; n < 5u; n++) {
         guest_sprintf_a4342(b, 0x00184e3cu, n, idx & 0xffu);
-        guest_fn_a7380(find_widget_checked_a78bc(root, b));
+        clear_widget_dirty(find_widget_checked_a78bc(root, b));
     }
     mode &= 0xffu;
     if (mode == 0u)
@@ -4946,7 +4946,7 @@ void init_video_mode_cdb20(void)
     guest_fn_fe710_s(0x13u);
     g_video_width = 0x140u;
     g_video_height = 0xc8u;
-    guest_fn_fc39c_s(0xc8u, 0x140u);
+    build_row_table_fc39c(0xc8u, 0x140u);
     select_draw_handlers_c3a74();
     if (EF_U8(0x00146e4au) != 0u)
         EF_U32(0x0015b758u) = g_runtime_segment_base + 0xa0000u;
@@ -7277,7 +7277,7 @@ uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t 
         flags |= (EF_U8(file + 0xcu) & 0x40u) ? 0x200u : 0x100u;
         perm = 0x180u;
     }
-    EF_U32(file + 0x10u) = (uint32_t)guest_fn_fa4a9_x(name, flags, share, perm);
+    EF_U32(file + 0x10u) = (uint32_t)open_shared_fa4a9(name, flags, share, perm);
     if (EF_U32(file + 0x10u) == 0xffffffffu) {
         release_list_node_fa77b(file);
         return 0u;
@@ -7921,7 +7921,7 @@ void open_named_data_a81e4(uint32_t name, uint32_t src)
         guest_callptr_eaxedx_ret_x(g_resource_load_hook, (uint32_t)(uintptr_t)buf, 0x00417278u);
     }
     EF_U32(0x0041868cu) = 0x00417278u;
-    guest_fn_a82f0_w(0x00418678u);
+    prepare_scrolling_text_a82f0(0x00418678u);
     EF_U8(0x001371fau) = 1u;
 }
 
@@ -8108,9 +8108,9 @@ void append_table_entry_16018a(void)
     EF_U16(0x0014de58u + idx * 2u) = w2;
     EF_U16(0x0014ee58u + idx * 2u) = (uint16_t)EF_U32(0x001600bcu);
     if ((uint16_t)(w0 | w1 | w2) == 0u)
-        guest_fn_c552e_x(g_script_queue_slot);
+        scale_entry_c552e(g_script_queue_slot);
     else
-        guest_fn_c565e_x(g_script_queue_slot);
+        scale_entry_c565e(g_script_queue_slot);
 }
 
 /* 0xebee4, 231 bytes. Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are first replaced by the constants at 0x195c0c / 0x195c14; then for |N| above 0x134 X is multiplied (N >= 0) or divided (N < 0) by the double at 0x195c62 and the count reduced by 0xd8; the remainder is consumed greedily against the (word count, double factor) 10-byte table at 0x195c60 and X is multiplied (N >= 0) or divided (N < 0) by the product. Returns X in ST0. */
@@ -11087,7 +11087,7 @@ void recompute_bounds_31d7c(void)
     if (0x0019e58bu != 1u)
         return;
     memset(rec, 0, sizeof(rec));
-    guest_fn_324b0_x(0x0019e560u, 0x0019e56cu, 0x0019e572u, r + 0x24u);
+    aim_angles_to_point_324b0(0x0019e560u, 0x0019e56cu, 0x0019e572u, r + 0x24u);
     init_bounds_d0b68(r);
     update_scene_angle_first(r, EF_U16(0x0019e56eu));
     guest_fn_d0dbc(r, EF_U16(0x0019e56cu), 0x0019e572u);
@@ -11836,7 +11836,7 @@ void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t 
     EF_U16(unit + 0x56u) = 0xffu;
     if (EF_U8((uint32_t)EF_U8(unit + 0x18u) * 0x91u + 0x0012bca7u) == 1u)
         EF_U16(unit + 0x68u) = (uint16_t)advance_panel_strip();
-    guest_fn_88100_x(unit);
+    refresh_object_child_slot(unit);
     if (g_world_grid_mode != 0u && (EF_U8(unit + 0x67u) & 1u) == 0u)
         send_record_state_55aac(unit);
 }
@@ -12240,7 +12240,7 @@ uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target)
     uint32_t cls;
     if (target != 0u && EF_U8(rec + 0x18u) == 6u)
         EF_U32(rec + 0x30u) = target;
-    guest_fn_88c54_x(rec, (ef_addr32)(uintptr_t)v48);
+    convert_scene_vector(rec, (ef_addr32)(uintptr_t)v48);
     guest_fn_88c80_x(rec, (ef_addr32)(uintptr_t)v60, (ef_addr32)(uintptr_t)v80);
     guest_fn_88d4c_x(rec, (ef_addr32)(uintptr_t)v78);
     direction_vector_88fb4((ef_addr32)(uintptr_t)v2c, 0x001fcf58u, 0x001fcf88u, rec, v80[0], v78[0]);
@@ -12527,7 +12527,7 @@ void lock_on_target_899d8(ef_addr32 rec)
     double limit;
     double c1;
     double c2;
-    if ((uint8_t)guest_fn_8c09c_x(t) == 0u)
+    if ((uint8_t)indexed_object_is_canonical(t) == 0u)
         return;
     if ((EF_U8(t + 0x24u) & 4u) != 0u || (EF_U8(t + 0x24u) & 8u) != 0u)
         return;
@@ -12545,7 +12545,7 @@ void lock_on_target_899d8(ef_addr32 rec)
         return;
     EF_U16(rec + 0x56u) = 0xffu;
     EF_U8(rec + 0x5au) = 1u;
-    guest_fn_8be54_x(t, rec);
+    update_object_with_link(t, rec);
 }
 
 /* 0xfecc, 231 bytes. Load a resource of group records: NAME (EBX) is checked with the size hook 0x132ab4 and opened (0x9ccb8, kept in 0x197ab0), reporting through the error hook 0x132a74 when either fails. After the setup calls 0xe7dc, 0xe810 and 0xe89c the record count from 0xe95c is stored to *COUNTP (EAX); each of the records is allocated with the hook at 0x121ebc (initially 0xe764, 0x24 bytes), initialised with 0xfc54 and filled with 0xbc570(record, ARG = EDX, local state), or reported with 0xcd12e when the allocation failed. The handle is closed with 0x9ce84; returns 1. */
@@ -12693,10 +12693,10 @@ void next_target_65d24(void)
     }
     saved = EF_U32(0x001a820cu);
     do {
-        ef_addr32 cur = guest_fn_907f0_x(EF_U32(0x001a820cu));
+        ef_addr32 cur = next_scene_node_with_active_children(EF_U32(0x001a820cu));
         EF_U32(0x001a820cu) = cur;
         if (cur == 0u) {
-            cur = guest_fn_907f0_x(0u);
+            cur = next_scene_node_with_active_children(0u);
             EF_U32(0x001a820cu) = cur;
             wraps++;
         }
@@ -13034,7 +13034,7 @@ void pick_nearest_unit_65c1c(void)
         if (first == -1)
             first = id;
         u = lookup_filtered_indexed_object(id);
-        if ((uint8_t)guest_fn_6acc_x(u) == 3u) {
+        if ((uint8_t)object_category(u) == 3u) {
             int32_t x = (int32_t)EF_U32(u) >> 16;
             int32_t y = (int32_t)EF_U32(u + 4u) >> 16;
             int32_t z = (int32_t)EF_U32(u + 8u) >> 16;
@@ -14594,7 +14594,7 @@ void classify_view_axis_83a40(void)
     int32_t dot, len, q;
     uint8_t cond;
     build_rotation_e994c(0u, (uint32_t)((int32_t)EF_U32(0x001fcc1eu) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc20u) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc22u) >> 16));
-    guest_fn_83734_x((ef_addr32)(uintptr_t)fwd, 0, 0x4000, 0);
+    scale_vector_down_16((ef_addr32)(uintptr_t)fwd, 0, 0x4000, 0);
     store_scaled_vector_831a4((ef_addr32)(uintptr_t)off,
                               (int32_t)(g_ui_composite_arg_d - g_ui_reference_x),
                               (int32_t)(g_ui_composite_arg_b - EF_U32(0x001fcc18u)),
@@ -15285,7 +15285,7 @@ void track_closest_link_88574(ef_addr32 rec)
     EF_U32(0x0020f14cu) = (uint32_t)d2;
     if (EF_U8(rec + 0x59u) != 0u)
         return;
-    guest_fn_88c54_x(rec, (ef_addr32)(uintptr_t)buf);
+    convert_scene_vector(rec, (ef_addr32)(uintptr_t)buf);
     memcpy(buf + 0x18, ef_guest_memory_ptr(player + 0x49u), 16u);
     memcpy(&z, ef_guest_memory_ptr(player + 0x59u), sizeof z);
     memcpy(&add, ef_guest_memory_ptr(0x0018a456u), sizeof add);
@@ -18683,7 +18683,7 @@ void load_flight_model_89c64(ef_addr32 rec)
 	memcpy(&x, ef_guest_memory_ptr(row + 0x0012bcd5u), 8);
 	d = x * 3.1415926536 * 0.005555555555555555;
 	memcpy(ef_guest_memory_ptr(0x001fcee8u), &d, 8);
-	guest_fn_88c54_x(rec, 0x001fcf58u);
+	convert_scene_vector(rec, 0x001fcf58u);
 	guest_fn_88c80_x(rec, 0x001fcf88u, 0x001fcfd0u);
 	guest_fn_88d4c_x(rec, 0x001fd020u);
 	convert_scene_scalar(rec, 0x001fcf48u);
@@ -18733,7 +18733,7 @@ void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head)
 				EF_U16(0x001a55d4u) = xw;
 				EF_U16(0x001a5608u) = yw;
 				EF_U32(0x001a5506u) = node;
-				rec = guest_fn_bfcfc(0x00137958u, node);
+				rec = find_node_by_record_b(0x00137958u, node);
 				p1 = EF_U32(rec + 0x33u);
 				EF_U8(0x001a5530u) = EF_U8(p1);
 				p2 = EF_U32(rec + 0x37u);
