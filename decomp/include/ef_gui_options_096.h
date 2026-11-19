@@ -20,6 +20,7 @@ uint32_t gui_options_format_096(ef_addr32 format, uint32_t first,
 
 #ifdef __WATCOMC__
 #pragma aux format_global_option_line modify [eax ebx ecx]
+#pragma aux gui_options_read_command_f2d74 modify [eax]
 #endif
 
 #ifdef __cplusplus

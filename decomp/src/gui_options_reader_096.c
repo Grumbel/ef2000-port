@@ -9,7 +9,9 @@
 
 enum { INPUT_LINE = 0x485956, COMMAND = 0x48592c };
 
-/* 0x000f2d74, 86 bytes including its fallthrough at f2da4. The original
+/* B1 direct-call recipe: replace guest_fn adapters with recovered typed
+ * calls, then preserve every caller-live register in the public ABI.
+ * 0x000f2d74, 86 bytes including its fallthrough at f2da4. The original
  * lexer has already advanced the underlying file pointer by one line when
  * the comment, short-line, or label checks request another iteration.
  * Unlike f46cc, this is the OPTIONS file's separate tokenizer. */
@@ -21,7 +23,7 @@ void gui_options_read_command_f2d74(void)
         read_script_line_f2c78();
         if (EF_U8(INPUT_LINE) == ';')
             continue;
-        length = guest_fn_b1b8b(INPUT_LINE);
+        length = strlen_ds(INPUT_LINE);
         if (length < 3u)
             continue;
         read_script_token_f2cd0();
@@ -32,8 +34,7 @@ void gui_options_read_command_f2d74(void)
          * used by the label matcher in f44b6. */
         for (i = 0u; EF_U8(COMMAND + i) != 0u; ++i) {
             uint8_t ch = EF_U8(COMMAND + i);
-            if (ch >= 'A' && ch <= 'Z')
-                EF_U8(COMMAND + i) = (uint8_t)(ch + ('a' - 'A'));
+            EF_U8(COMMAND + i) = (uint8_t)to_lower_ascii(ch);
         }
         return;
     }
