@@ -4936,7 +4936,7 @@ void init_video_mode_cdb20(void)
             if (guest_strcmp(env, 0x0018f644u) == 0u)
                 EF_U8(0x00146e4au) = 1u;
         }
-        EF_U16(0x0015b75cu) = (uint16_t)guest_fn_fe700_w();
+        EF_U16(0x0015b75cu) = (uint16_t)get_video_mode_fe700();
         push_handler_9c3cf(0x000cdc64u);
     }
     guest_fn_fe710_s(0x13u);
@@ -5071,11 +5071,11 @@ void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b)
     }
     if (EF_U16(0x00126562u) != 0u) {
         guest_fn_43f48_x(a, b);
-        guest_fn_44f68_x(a, s);
+        draw_unit_icons_44f68(a, s);
     }
     if (EF_U16(0x00126564u) != 0u) {
         guest_fn_450f4_x(a, s);
-        guest_fn_44aec_x(a, s);
+        draw_node_markers_44aec(a, s);
         guest_fn_4496c_x(a, s);
     }
     if (EF_U16(0x00126566u) != 0u) {
@@ -5083,16 +5083,16 @@ void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b)
         guest_fn_443fc_x(a, s);
     }
     if (EF_U16(0x0012655eu) != 0u) {
-        guest_fn_436dc_x(a, b);
+        draw_map_markers_436dc(a, b);
         guest_fn_43b14_x(a, b);
         guest_fn_45274_x(a, s);
     }
     if (EF_U16(0x0012655au) != 0u) {
-        guest_fn_4357c_x(a, b);
-        guest_fn_44aec_x(a, s);
+        draw_map_markers_4357c(a, b);
+        draw_node_markers_44aec(a, s);
     }
     if (EF_U16(0x0012655cu) != 0u) {
-        guest_fn_433fc_x(a, b);
+        draw_group_icons_433fc(a, b);
         guest_fn_43c84_x(a, b);
         guest_fn_43df4_x(a, b);
         guest_fn_441fc_x(a, s);
@@ -5125,7 +5125,7 @@ void redraw_item_a5ef8(uint32_t id)
     }
     guest_fn_e5960(rec);
     clip_rect_to_screen_e58a8();
-    guest_fn_a5b70_x(rec);
+    draw_widget_a5b70(rec);
     if (EF_U8(0x00137268u) != 0u || EF_U8(0x0013725du) != 0u)
         tail_jump_ab954(0u);
     redraw_all_children_a7260(rec);
@@ -5211,7 +5211,7 @@ void advance_follow_slot_3a148(int32_t a)
         return;
     if (EF_U8(e + 1u) == 0xffu) {
         if ((guest_fn_3a268_x((uint32_t)v) & 0xffu) != 0u)
-            guest_fn_39edc_x((uint32_t)(int32_t)ia, (uint32_t)v);
+            report_nearest_object_39edc((uint32_t)(int32_t)ia, (uint32_t)v);
     } else {
         guest_fn_3a000_x((uint32_t)(int32_t)ia);
     }
@@ -5313,7 +5313,7 @@ uint8_t find_nearest_target_89698(uint32_t obj)
                 continue;
             if (d2 >= EF_S32(obj + 0x63u))
                 continue;
-            if ((guest_fn_89060_x(obj, unit) & 0xffu) == 0u)
+            if ((can_reach_target_89060(obj, unit) & 0xffu) == 0u)
                 continue;
             EF_U32(obj + 0x5bu) = unit;
             EF_U32(obj + 0x63u) = (uint32_t)d2;
@@ -5331,12 +5331,12 @@ uint32_t open_resource_9ccb8(uint32_t name)
     uint32_t magic;
     uint32_t size;
     if (EF_U32(0x0040d1f0u) != 0u && (EF_U8(0x00132ab0u) & 1u) != 0u) {
-        r = guest_fn_ebb58_x(name, EF_U32(0x0040d1f0u));
+        r = start_stream_ebb58(name, EF_U32(0x0040d1f0u));
         if (r != 0xffffffffu)
             return r | 0x10000u;
     }
     if (EF_U32(0x0040d1f4u) != 0u && (EF_U8(0x00132ab0u) & 2u) != 0u) {
-        r = guest_fn_ebb58_x(name, EF_U32(0x0040d1f4u));
+        r = start_stream_ebb58(name, EF_U32(0x0040d1f4u));
         if (r != 0xffffffffu)
             return r | 0x20000u;
     }
@@ -7179,7 +7179,7 @@ void load_text_file_510d0(void)
     EF_U32(0x001a58b0u) = arena_alloc_e2a94(size);
     if (EF_U32(0x001a58b0u) == 0u)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x0018519cu);
-    if ((guest_fn_b3c04_x((uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u)) & 0xffu) == 0u)
+    if ((load_file_unpacked_b3c04((uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u)) & 0xffu) == 0u)
         guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), (uint32_t)(uintptr_t)path, EF_U32(0x001a58b0u));
     reset_text_50c70();
 }
@@ -7282,7 +7282,7 @@ uint32_t fopen_core_bc287(uint32_t name, uint32_t mode, uint32_t file, uint32_t 
     EF_U32(file + 8u) = 0u;
     EF_U32(file + 0x14u) = 0u;
     if (c == 0x61u)
-        guest_fn_f2183(file, 0u, 2u);
+        fseek_f2183(file, 0u, 2u);
     update_flags_fa7d2(file);
     return file;
 }
@@ -7956,7 +7956,7 @@ void prepare_briefing_file_35cfc(void)
     apply_a4cb4_a4d90(0x00182f4cu);
     show_status_34a68();
     copy_counts_35bb8();
-    guest_fn_a42c4_x();
+    poll_device_ready_a42c4();
     EF_U8(0x00127da9u) = 1u;
     if (EF_U8(0x00125846u) == 3u) {
         uint32_t r = step_generator_a45b3() & 0xffffu;
@@ -9216,7 +9216,7 @@ void redraw_widget_a60a8(uint32_t obj)
         return;
     if (mode == 1u)
         save_rect_list_e5114();
-    guest_fn_abb00_x(obj);
+    compute_view_window_abb00(obj);
     set_view_rect_c9f28(obj);
     if (EF_U8(obj + 0x3cu) & 1u) {
         if (EF_U32(obj + 0x95u) != 0u) {
@@ -11170,7 +11170,7 @@ void draw_widget_a5b70(ef_addr32 w)
     if ((EF_U8(w + 0xcbu) & 1u) != 0u && EF_U32(w + 0xc7u) != 0u)
         visit_overlapping_nodes_e2564(w);
     if (EF_U32(w + 0xb1u) != 0u) {
-        guest_fn_abb00_x(w);
+        compute_view_window_abb00(w);
         set_view_rect_c9f28(w);
         EF_U8(0x0041f2e5u) = 1u;
         EF_U32(0x0041eea0u) = w;
@@ -11556,7 +11556,7 @@ void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip)
     }
     if ((uint8_t)skip == 0u) {
         if (b_kind == 1u) {
-            guest_fn_16c7c_x(b);
+            clear_missile_slots_16c7c(b);
             decrement_grid_row_link_wide((int32_t)b);
         }
         guest_fn_16e60_x(a, b);
@@ -11630,9 +11630,9 @@ void update_target_2631c(uint32_t flag)
         memcpy(&den, ef_guest_memory_ptr(0x0019b2c8u), sizeof den);
         memcpy(&c2, ef_guest_memory_ptr(0x00181e90u), sizeof c2);
         if (num / den < c2)
-            guest_fn_2611c_x((int32_t)EF_U32(0x001f71ceu) >> 16);
+            focus_camera_side_2611c((int32_t)EF_U32(0x001f71ceu) >> 16);
         else
-            guest_fn_24c40_x((int32_t)EF_U32(0x001f71ceu) >> 16);
+            focus_camera_on_unit_24c40((int32_t)EF_U32(0x001f71ceu) >> 16);
     }
     guest_fn_24f24_x();
 }
@@ -12087,7 +12087,7 @@ void update_mode_e9c00(void)
     if (EF_U8(0x0043399du) == 1u) {
         guest_fn_e9e7c_x(0x00464480u, EF_U32(0x004321f0u), EF_U32(0x004321f4u), EF_U32(0x00432288u),
                          EF_U32(0x0043228cu), EF_U32(0x00432220u), EF_U32(0x00432224u));
-        guest_fn_e9f84_x();
+        derive_view_angles_e9f84();
         memcpy(&d, ef_guest_memory_ptr(0x00432298u), sizeof d);
         memcpy(&limit, ef_guest_memory_ptr(0x00191494u), sizeof limit);
         if (abs_double_b427c(d) < limit)
@@ -12095,7 +12095,7 @@ void update_mode_e9c00(void)
     } else {
         guest_fn_e9cd8_x(0x00464480u, EF_U32(0x00432230u), EF_U32(0x00432234u), EF_U32(0x00432298u),
                          EF_U32(0x0043229cu), EF_U32(0x004321f8u), EF_U32(0x004321fcu));
-        guest_fn_e9dcc_x();
+        derive_view_angles_e9dcc();
         memcpy(&d, ef_guest_memory_ptr(0x00432298u), sizeof d);
         memcpy(&limit, ef_guest_memory_ptr(0x0019148cu), sizeof limit);
         if (abs_double_b427c(d) > limit)
@@ -12175,7 +12175,7 @@ void load_camera_92e30(uint32_t unit)
     EF_U32(0x00214470u) = EF_U32(obj + 4u);
     EF_U32(0x00214474u) = EF_U32(obj + 8u);
     if (EF_U8(obj + 0xe9u) == 0u)
-        guest_fn_95bf4_x();
+        apply_rotated_offset_95bf4();
     update_scene_angle_first(0x00214378u, EF_U16(obj + 0xeu));
     if (EF_U8(0x0021454bu) != 0u)
         guest_fn_d0dbc(0x00214378u, EF_U16(obj + 0xcu), obj);
@@ -12248,7 +12248,7 @@ uint8_t can_reach_target_89060(ef_addr32 rec, uint32_t target)
     memcpy(&c1, ef_guest_memory_ptr(0x0018a4d0u), sizeof c1);
     memcpy(&c2, ef_guest_memory_ptr(0x0018a4d8u), sizeof c2);
     limit = limit * c1 * c2;
-    return guest_fn_88ff8_x((ef_addr32)(uintptr_t)v30, (ef_addr32)(uintptr_t)v00) < limit ? 1u : 0u;
+    return angle_between_88ff8((ef_addr32)(uintptr_t)v30, (ef_addr32)(uintptr_t)v00) < limit ? 1u : 0u;
 }
 
 /* 0x5a220, 176 bytes. Refresh the map cursor: latch (0xce328) and apply (0xcdf48) the four signed high words 0x1a6cf0, 0x1a6cee, 0x1a6cf6 and 0x1a6cf4. When the selected node [0x1a821c] exists and projects (0x5ca88) to a point (two signed words), update it with 0x5d520 and, if it is also the current node [0x1a8210], run 0x5dbc8 on the point and 0x5df08. */
@@ -12453,10 +12453,10 @@ uint32_t release_pending_item_172b4(uint32_t id)
     cnt = (uint8_t)(EF_U8(rec + 0x4fu) - 1u);
     EF_U8(rec + 0x4fu) = cnt;
     if (cnt == 0u) {
-        guest_fn_2b0b4_x((int16_t)id, 0u);
+        set_record_state_2b0b4((int16_t)id, 0u);
         EF_U8(EF_U32(0x0019bb58u) + id * 0xcau + 0x4fu) = 0u;
     }
-    guest_fn_2b708((int16_t)id);
+    compact_slot_list_2b708((int16_t)id);
     return item;
 }
 
@@ -12537,7 +12537,7 @@ void lock_on_target_899d8(ef_addr32 rec)
     memcpy(&c1, ef_guest_memory_ptr(0x0018a5b0u), sizeof c1);
     memcpy(&c2, ef_guest_memory_ptr(0x0018a5b8u), sizeof c2);
     limit = limit * c1 * c2;
-    if (guest_fn_88ff8_x(0x001fcfd8u, (ef_addr32)(uintptr_t)v18) < limit)
+    if (angle_between_88ff8(0x001fcfd8u, (ef_addr32)(uintptr_t)v18) < limit)
         return;
     EF_U16(rec + 0x56u) = 0xffu;
     EF_U8(rec + 0x5au) = 1u;
@@ -12553,7 +12553,7 @@ uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
     EF_U32(0x00121eacu) = 0u;
     if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name) == 0u)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x00181174u, name);
-    EF_U32(0x00197ab0u) = guest_fn_9ccb8(name);
+    EF_U32(0x00197ab0u) = open_resource_9ccb8(name);
     if (EF_U32(0x00197ab0u) == 0xffffffffu)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x001811a0u, name);
     guest_fn_e7dc_x();
@@ -12978,7 +12978,7 @@ void check_player_altitude_711f0(void)
     memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
     memcpy(&lim, ef_guest_memory_ptr(0x001868d1u), sizeof lim);
     if (alt < lim) {
-        guest_fn_740e4(id, 0xffu, 0xffu, 0u, 0xffu);
+        assign_roster_slot_740e4(id, 0xffu, 0xffu, 0u, 0xffu);
         guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
     }
     cur = EF_U32(0x001f71bcu);
@@ -13066,16 +13066,16 @@ uint32_t any_nearby_flagged_2c358(void)
     end = p + 4 < (int32_t)EF_U32(0x0019bb54u) ? p + 4 : (int32_t)EF_U32(0x0019bb54u);
     for (i = start; (int16_t)i <= (int16_t)end && (int16_t)start <= (int16_t)end; i++) {
         if (EF_U16(EF_U32(0x0019bb58u) + (uint32_t)(int32_t)(int16_t)i * 0xcau + 0x1cu) == (uint16_t)group &&
-            (uint8_t)guest_fn_2c224_x((int32_t)(int16_t)i) != 0u)
+            (uint8_t)row_needs_attention_2c224((int32_t)(int16_t)i) != 0u)
             found = 1u;
     }
     p = (int32_t)EF_U32(0x0019bb5cu) >> 16;
-    if (p != 0xff && (uint8_t)guest_fn_2c224_x(p) != 0u)
+    if (p != 0xff && (uint8_t)row_needs_attention_2c224(p) != 0u)
         found = 1u;
     if (EF_U8(0x00127da9u) != 0u) {
         for (n = 0u; n < EF_U8(0x0012583au); n++) {
             ef_addr32 u = lookup_filtered_indexed_object((int32_t)EF_U32((uint32_t)n * 0x1bu + 0x001a5c2eu) >> 16);
-            if (u != 0u && (uint8_t)guest_fn_2c224_x((int32_t)EF_U32(u + 0x26u) >> 16) != 0u)
+            if (u != 0u && (uint8_t)row_needs_attention_2c224((int32_t)EF_U32(u + 0x26u) >> 16) != 0u)
                 found = 1u;
         }
     }
@@ -13502,7 +13502,7 @@ void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type)
         return;
     if ((int32_t)EF_U32(vec + 4u) > 0)
         EF_U32(vec + 4u) = 0u;
-    orient = guest_fn_7bb00_x(vec);
+    orient = terrain_slope_at_7bb00(vec);
     if (t == (int16_t)EF_U16(0x00425bdeu) || t == (int16_t)EF_U16(0x00425beau)
         || t == (int16_t)EF_U16(0x00425beeu) || t == (int16_t)EF_U16(0x00425bd4u))
         ring = 0x00425b24u;
@@ -13889,7 +13889,7 @@ void move_unit_72390(uint32_t id)
         memcpy(ef_guest_memory_ptr(u + 0x59u), &pz, sizeof pz);
     }
     EF_U8(u + 0x26u) = (uint8_t)(EF_U8(u + 0x26u) & 0xefu);
-    guest_fn_73d50_w((int16_t)id);
+    store_fixed_point_state_73d50((int16_t)id);
 }
 
 /* 0x848e0, 280 bytes. Refresh the view cursor record REC (EDX) from the camera block SRC (EAX: 12 bytes copied to 0x1fcc14, 6 bytes from +0xc to 0x1fcc20, dword 0x1fcc26 = SRC+0x12 >> 16). Does nothing unless the unit of word 0x1f71c8 has a slot (0x84a80). Resets the view when REC bit 0x10 of +0x23 is set, latches the control bits, runs 0x83a40 and clears the "placed" bits (0x1fcbe3 bit 0, REC+0x22 bit 0). When the pick point 0x1fcc2c.. is active (byte 0x1fcc43, words 0x1fcbd0/2 clear) and either bit 0x80 of 0x1fcbe2 is set or the point lies outside the bounds (0x832b8) it clears bits 0x38 of 0x1fcbe2 and re-initialises the UI. If bit 0x40 (and not 0x80) of 0x1fcbe2 is then set with the pick point active, mark it placed and copy the point into REC +0, +4, +8; otherwise invalidate REC+4 with 0x80000000. */
@@ -13905,7 +13905,7 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     if ((EF_U8(rec + 0x23u) & 0x10u) != 0u)
         reset_unit_view_846c8(rec);
     latch_control_bits_84788(rec);
-    guest_fn_83a40_x();
+    classify_view_axis_83a40();
     EF_U8(0x001fcbe3u) = (uint8_t)(EF_U8(0x001fcbe3u) & 0xfeu);
     active = EF_U8(0x001fcc43u);
     EF_U8(rec + 0x22u) = (uint8_t)(EF_U8(rec + 0x22u) & 0xfeu);
@@ -14543,7 +14543,7 @@ void update_view_target_817a8(void)
             guest_fn_15be10_x();
         }
     } else if ((EF_U8(0x00425bc4u) & 0x80u) != 0u) {
-        guest_fn_81680_x();
+        update_random_effect_81680();
     }
     if (EF_U16(0x001a5a8eu) != 0u)
         guest_fn_2a4c8_x();
@@ -14878,7 +14878,7 @@ void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
         update_ui_record_from_template((int16_t)((int32_t)EF_U32(u + 0x2cu) >> 16), u + 0x68u);
         EF_U16(u + 0x68u) = (uint16_t)guest_fn_80abc_x();
     }
-    guest_fn_89e08(u);
+    advance_object_89e08(u);
 }
 
 /* 0x74718, 382 bytes. Destroy the unit ID (AX). Units that use the secondary grid (0x7574c) are removed with the effect 0x5f/2 (0x106b0 with the position >> 8, then 0x10750; in play mode also announced with packet 0x56974); other units first unlink from their leader (the unit of dword +0x144 >> 16 loses its +0x158 back reference when it points at ID) and, unless bit 0x10 of +0x24 is already set, explode: 0x106b0, bit 0x10 set, 0x10750(ID, 1, 0x64) and the matching packet. Units owned by us (word +0x18 equal 0xff or byte 0x1a666b) that are not yet flagged (bit 2 of +0x24) and not on the secondary grid get the wreck timer +0x22 = 0x96 and the wreck model byte +0x187 from the map 0x74448 of byte +0xe9. Bit 2 is set in every case. */
@@ -15307,7 +15307,7 @@ uint32_t land_object_9775c(ef_addr32 u)
     EF_U32(u + 0x10u) = (uint32_t)t;
     guest_fn_975f0_x(u);
     guest_fn_ea864(u + 0x24u, 0u, 0u, 0u);
-    guest_fn_801e4(0x44u, 1u, 1u);
+    claim_ui_slot_801e4(0x44u, 1u, 1u);
     speed = guest_fn_ea884_x(u + 0x18u);
     memcpy(&lim, ef_guest_memory_ptr(0x0018ac6au), sizeof lim);
     if (speed < (double)lim) {
@@ -15773,7 +15773,7 @@ uint32_t run_frame_step_ac5f8(uint32_t al)
 		if (EF_U8(0x0041f2deu) == 0u)
 			run_entry_callbacks_abde4();
 		if (EF_U16(0x0041eed2u) != 0u)
-			guest_fn_ac780_x();
+			show_status_ac780();
 		guest_fn_c9fc4();
 		if (EF_U8(0x0041f2e8u) != 0u)
 			result = EF_U8(0x0041f2e8u);
@@ -15822,12 +15822,12 @@ void show_text_ac408(ef_addr32 text)
 				text++;
 		}
 	}
-	guest_fn_c8f38_x();
-	guest_fn_c90e0_x();
-	guest_fn_c8e58_x();
+	load_fixed_files_c8f38();
+	show_splash_c90e0();
+	load_dataset_files_c8e58();
 	EF_U8(0x0013727du) = 1u;
 	EF_U32(0x0041eea0u) = 0u;
-	guest_fn_c9ecc_x();
+	init_view_corners_c9ecc();
 	fill_bytes_b3fb0(0x0041f284u, 0u, 0x59u);
 	EF_U16(0x0041eec2u) = 0u;
 	guest_fn_ac9e8_x();
@@ -16234,9 +16234,9 @@ void step_setup_screen_36f84(void)
 	update_frame_delta_a4138();
 	EF_U16(0x00125900u) = (uint16_t)(EF_U16(0x001357acu) - 3u);
 	if (EF_U8(0x0019f5afu) == 1u) {
-		guest_fn_36438_x();
+		step_host_transfer_36438();
 	} else if (EF_U8(0x0019f5afu) == 2u) {
-		guest_fn_36d30_x();
+		step_lobby_36d30();
 	} else {
 		switch (EF_U8(0x0019f5a8u)) {
 		case 0:
@@ -16300,7 +16300,7 @@ void step_menu_screen_35590(void)
 	EF_U8(0x0019f598u) = 0u;
 	EF_U8(0x0019f599u) = 0u;
 	if (EF_U8(0x0019f5a1u) == 1u) {
-		guest_fn_36ad8_x();
+		step_transfer_36ad8();
 	} else if (EF_U8(0x0019f5a1u) == 2u) {
 		step_connection_367f0();
 	} else {
@@ -16335,7 +16335,7 @@ void step_menu_screen_35590(void)
 			refresh_all_widgets_a4c84();
 			apply_a4cb4_a4d90(EF_U8(0x00125846u) == 3u ? 0x00182f94u : 0x00182fa0u);
 			EF_U8(0x0041f2e8u) = 1u;
-			guest_fn_abe44(0x00182f2cu);
+			copy_last_token_abe44(0x00182f2cu);
 			break;
 		default:
 			break;
@@ -16804,7 +16804,7 @@ void report_fatal_text_a9aa8(ef_addr32 text)
 		guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018d818u, uppercase_string(text));
 		draw_text_font6_dd370(0xfu, 0x14u, 0xau, (ef_addr32)(uintptr_t)buf);
 		draw_text_font6_dd370(0xfu, 0x14u, 0x12u, 0x0018d82cu);
-		guest_fn_f2660_w(0x0018d698u);
+		load_page_palette_f2660(0x0018d698u);
 		toggle_page_dc250();
 		apply_palette_d663c(0x00464060u);
 		EF_U8(0x0041f833u) = 0u;
@@ -16953,7 +16953,7 @@ void rebuild_tactical_screen_69fac(void)
 		clear_paired_object_marks((int16_t)i);
 	notify_tactical_action((int32_t)EF_U32(0x001282dau) >> 16, 5u);
 	guest_fn_68fe0_x(0u, 0u);
-	r = guest_fn_c3670(0x00186370u, 0u, 0u, 0x1e0u, 0x12cu);
+	r = alloc_picture_c3670(0x00186370u, 0u, 0u, 0x1e0u, 0x12cu);
 	widget = find_named_or_abort_a46cc(0x0018637cu);
 	set_widget_params_a5b1c(widget, r, 0x1e0u, 0x12cu, 0x1e0u);
 	for (i = 0; i < 0x14u; i++) {
@@ -17122,10 +17122,10 @@ void apply_selection_69374(ef_addr32 first, ef_addr32 second)
 		if (EF_U16(0x001282d8u) != 0u) {
 			if (slot == 0x1d && (guest_fn_68ccc(0x1e, (uint16_t)tgt) & 0xffu) != 0u) {
 				EF_U16(0x001f6f4au) = 0x1eu;
-				guest_fn_68a60_x(tgt, (int32_t)EF_U32(0x0012cd86u) >> 16);
+				assign_slot_68a60(tgt, (int32_t)EF_U32(0x0012cd86u) >> 16);
 				EF_U16(0x001f6f4au) = 0x1du;
 			} else {
-				guest_fn_68a60_x(tgt, (int32_t)EF_U32((uint32_t)slot * 145u + 0x0012bc88u) >> 16);
+				assign_slot_68a60(tgt, (int32_t)EF_U32((uint32_t)slot * 145u + 0x0012bc88u) >> 16);
 				EF_U32(0x001282e0u) = 0xffffffffu;
 				return;
 			}
@@ -17433,7 +17433,7 @@ uint8_t row_needs_attention_2c224(uint32_t ax)
 				bl = 1u;
 		}
 	}
-	if (guest_fn_2bfcc(cx) != 0u || grid_has_object_mode((int16_t)cx, 2u) != 0u)
+	if (row_has_active_unit_2bfcc(cx) != 0u || grid_has_object_mode((int16_t)cx, 2u) != 0u)
 		bl = 1u;
 	return bl;
 }
@@ -17659,7 +17659,7 @@ void resize_widget_a520c(ef_addr32 obj, uint32_t dx, uint32_t bx, uint32_t cl)
 	EF_U16(obj + 0x45u) = (uint16_t)(w > 0 ? (int32_t)w : 0);
 	EF_U16(obj + 0x47u) = (uint16_t)(h > 0 ? (int32_t)h : 0);
 	guest_fn_a5070(obj);
-	guest_fn_a558c(obj);
+	update_widget_extent_a558c(obj);
 	if ((EF_U8(obj + 0x3au) & 0x10u) == 0u) {
 		if ((uint8_t)cl == 0u) {
 			ox = (int16_t)EF_U16(obj + 0x41u);
@@ -18383,7 +18383,7 @@ void advance_object_position_724a8(uint32_t index, uint32_t obj)
 		EF_U32(obj + 0x59u) = 0u;
 		EF_U32(obj + 0x5du) = 0u;
 	}
-	guest_fn_73d50_w((int32_t)(int16_t)index);
+	store_fixed_point_state_73d50((int32_t)(int16_t)index);
 }
 
 /* 0x89478, 321 bytes. Per-frame damping of the heading double at 0x1fd020 (X) by mode byte 0x12d7b2 (1..4; the mode is rewritten unchanged). Mode 1: X above -0.7453981634000001 or below -0.8253981634 becomes X - (X + 0.7853981634) * 0.16 * 0.3183098861827565. Mode 2: the double 0x1fcf98 gets -2200.0 added and, when X < -0.1745329252, X becomes X - X * 0.135 * 0.3183098861827565. Mode 3: like mode 1 with the bounds -0.2455993321454546 / -0.3255993321454546 and the offset 0.2855993321454546. Mode 4: 0x1fcf98 gets -10.0 added and, when X < -0.1745329252, X becomes X - X * 0.225 * 0.3183098861827565. */
@@ -20063,9 +20063,9 @@ uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3
 
 	if (EF_S32(0x0015bb4cu) == 0x7fffffff)
 		read_stream_header_d9dc0();
-	EF_U8(0x00420f54u) = guest_fn_107070_w(0x00420f00u, (uint32_t)times_100(1));
+	EF_U8(0x00420f54u) = serial_read_packet_107070(0x00420f00u, (uint32_t)times_100(1));
 	if (EF_U8(0x00420f54u) != 0u) {
-		EF_U8(0x00420f54u) = guest_fn_106d34_w(0x00420f00u, (uint32_t)times_100_div_10(1));
+		EF_U8(0x00420f54u) = poll_device_106d34(0x00420f00u, (uint32_t)times_100_div_10(1));
 		if (EF_U8(0x00420f54u) != 0u)
 			return 0u;
 	}
