@@ -1093,7 +1093,7 @@ void draw_unit_info_78f3c(void)
     } else if (key == 0x2bu) {
         if (lookup_filtered_indexed_object((int16_t)(EF_S32(0x001f71c8u) >> 16)) == 0u)
             return;
-        id = EF_U32(EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(0x0019bb5cu) >> 16) * 0xcau + 0x4eu +
+        id = EF_U32(g_world_grid_base + (uint32_t)(EF_S32(0x0019bb5cu) >> 16) * 0xcau + 0x4eu +
                     (uint32_t)EF_U8(0x0012dc34u) * 2u);
     } else {
         return;
@@ -1105,7 +1105,7 @@ void draw_unit_info_78f3c(void)
     uppercase_string(buf);
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(0xfu, 0xa, 0x14, buf);
-    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    rec = g_world_grid_base + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
     state = EF_U16(rec + 0x15u);
     if (state == 1u || state == 4u)
         fmt = 0x0012f4c8u;
@@ -1116,9 +1116,9 @@ void draw_unit_info_78f3c(void)
     guest_sprintf_a4342(buf, fmt);
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(0xfu, 0xa, 0x1e, buf);
-    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    rec = g_world_grid_base + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
     guest_sprintf_a4342(buf, 0x0012f4e0u, (EF_S32(rec + 0x1au) >> 16) + 1);
-    rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
+    rec = g_world_grid_base + (uint32_t)(EF_S32(object + 0x26u) >> 16) * 0xcau;
     copy_string_9d749((ef_addr32)(uintptr_t)name, 0x00125708u + (uint32_t)EF_U8(rec + 0x1bu) * 20u);
     strcat_9ca57(buf, (ef_addr32)(uintptr_t)name);
     EF_U8(0x00127b1au) = 1u;
@@ -1302,7 +1302,7 @@ void find_nearest_object_33b4(int16_t group)
     int32_t k;
     uint32_t d;
 
-#define EF_GROUP_REC() (EF_U32(0x0019bb58u) + (uint32_t)((int32_t)group * 0xca))
+#define EF_GROUP_REC() (g_world_grid_base + (uint32_t)((int32_t)group * 0xca))
     while ((int16_t)j < (int16_t)EF_U8(EF_GROUP_REC() + 0x4fu)) {
         rec = EF_GROUP_REC();
         obj = lookup_filtered_indexed_object((int16_t)EF_U16(rec + 0x50u + (uint32_t)((int32_t)(int16_t)j * 2)));
@@ -1602,11 +1602,11 @@ static void append_track_sample_2e494(void)
     uint32_t scaledX;
     uint32_t scaledY;
 
-    scaledX = (uint32_t)scaled_double_2e494(EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca) + 0x69u);
+    scaledX = (uint32_t)scaled_double_2e494(g_world_grid_base + (uint32_t)(group * 0xca) + 0x69u);
     sample = 0x001a3650u + (uint32_t)((int32_t)(int16_t)EF_U16(0x00126550u) * 10);
     EF_U16(sample) = (uint16_t)scaledX;
     group = (int16_t)EF_U16(0x001f71ccu);
-    scaledY = 0x190u - (uint32_t)scaled_double_2e494(EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca) + 0x61u);
+    scaledY = 0x190u - (uint32_t)scaled_double_2e494(g_world_grid_base + (uint32_t)(group * 0xca) + 0x61u);
     sample = 0x001a3650u + (uint32_t)((int32_t)(int16_t)EF_U16(0x00126550u) * 10);
     EF_U16(sample + 2u) = (uint16_t)scaledY;
     EF_U16(sample + 4u) = EF_U16(0x0012583cu);
@@ -1633,11 +1633,11 @@ void record_track_sample_2e494(void)
         uint32_t prev = 0x001a3650u + (uint32_t)((count - 1) * 10);
         int16_t prevX = (int16_t)EF_U16(prev);
         int16_t prevY = (int16_t)EF_U16(prev + 2u);
-        uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)(group * 0xca);
+        uint32_t rec = g_world_grid_base + (uint32_t)(group * 0xca);
         int32_t nx = scaled_double_2e494(rec + 0x69u);
         int32_t ny;
 
-        rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x001f71ccu) * 0xca);
+        rec = g_world_grid_base + (uint32_t)((int32_t)(int16_t)EF_U16(0x001f71ccu) * 0xca);
         ny = 0x190 - scaled_double_2e494(rec + 0x61u);
         if (abs_a28f2((int32_t)prevX - (int16_t)nx) > 1u || abs_a28f2((int32_t)prevY - (int16_t)ny) > 1u) {
             append_track_sample_2e494();
@@ -1682,7 +1682,7 @@ void draw_debug_overlay_58714(void)
         owner = EF_S32(obj + 0x26u) >> 16;
         EF_U8(0x00127b1au) = 1u;
         draw_shadowed_text_48c90(0x0cu, 0, 0x28, 0x00185da8u, owner,
-                                 (uint32_t)EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(owner * 0xca) + 0x20u));
+                                 (uint32_t)EF_U8(g_world_grid_base + (uint32_t)(owner * 0xca) + 0x20u));
         y = 0x30;
     }
     latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
@@ -1878,7 +1878,7 @@ ef_addr32 select_target_object_92668(void)
     }
     if (mode >= 0x15u && mode <= 0x17u && (EF_S32(0x001f71c8u) >> 16) != 0xff &&
         (EF_S32(0x0019bb5cu) >> 16) != 0xff) {
-        own = EF_U32(0x0019bb58u) + (uint32_t)((EF_S32(0x0019bb5cu) >> 16) * 0xca);
+        own = g_world_grid_base + (uint32_t)((EF_S32(0x0019bb5cu) >> 16) * 0xca);
         own = lookup_filtered_indexed_object(
             (int16_t)(EF_S32(own + 0x4eu + (uint32_t)EF_U8(0x0012dc34u) * 2u) >> 16));
         if (own != 0u && (EF_U8(own + 0x24u) & 8u) == 0u) {
@@ -3907,7 +3907,7 @@ void update_tracked_pair_759c(int32_t id)
 			EF_U16(e + 3u) = 0;
 	}
 	v = (int32_t)EF_U32(p + 0x26u) >> 16;
-	base = EF_U32(0x0019bb58u);
+	base = g_world_grid_base;
 	obj = (uint32_t)(v * 0xca) + base;
 	if (obj == 0u)
 		return;
@@ -4127,27 +4127,27 @@ void draw_compass_strip_3bf44(int16_t col, int16_t dy, int16_t ang)
 void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
 {
 	uint32_t off = (uint32_t)((int32_t)obj * 0xca);
-	uint32_t base = EF_U32(0x0019bb58u);
+	uint32_t base = g_world_grid_base;
 	uint8_t best, slot;
 	uint32_t rec, ent;
 	int i;
 
 	best = find_min_metric_index_8184(base + off + 0x61u);
-	base = EF_U32(0x0019bb58u);
+	base = g_world_grid_base;
 	EF_U8(base + off + 0x5fu) = best;
 	if (EF_U8(0x001285a1u + (uint32_t)EF_U8(base + off + 0x19u) * 0xe5u) != 0u) {
 		for (i = 0; i < 6; i++)
-			guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)obj * 0xca) + 0x50u + (uint32_t)(2 * i)),
+			guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u + (uint32_t)(2 * i)),
 			               0x55u, 0u, 0u, 0u);
 		return;
 	}
 	slot = find_free_slot_825c(best);
 	if (slot == 0xfe) {
-		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + off + 0x50u), 0x57u, esi_in, 0xfeu, 0u);
+		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x57u, esi_in, 0xfeu, 0u);
 		return;
 	}
 	if (slot == 0xff) {
-		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + off + 0x50u), 0x56u, esi_in, 0xffu, 0u);
+		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x56u, esi_in, 0xffu, 0u);
 		return;
 	}
 	rec = EF_U32(0x001972e0u) + (uint32_t)best * 34u;
@@ -4161,7 +4161,7 @@ void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
 	EF_U8(EF_U32(rec + 0x16u) + (uint32_t)slot * 56u + 0x26u) = 1;
 	{
 		int32_t h = sub_entry_heading_8424(best, slot);
-		guest_fn_46254(0x899u, (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)obj * 0xca) + 0x50u),
+		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u),
 		               0x54u, (uint32_t)(int32_t)(int16_t)h, (uint32_t)slot, 0u);
 	}
 }
@@ -4464,7 +4464,7 @@ uint8_t object_fire_request_298f0(int16_t id, uint8_t slot)
 	}
 	if ((EF_S32(obj + 0x1d4u) >> 24) == 0x13)
 		fire_object_slot_2a1fc(id, EF_U8(obj + 0x1d7u), 0u);
-	rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(obj + 0x26u) >> 16) * 0xcau;
+	rec = g_world_grid_base + (uint32_t)(EF_S32(obj + 0x26u) >> 16) * 0xcau;
 	idx = EF_S32(obj + 0x1d4u) >> 24;
 	if (EF_U16(0x00125835u) == EF_U16(rec + 0x1cu) && EF_U8(0x00125846u) == 3u &&
 	    (EF_S32(obj + 0x198u + (uint32_t)idx * 3u) >> 24) == 6 && EF_U8(rec + 0x1bu) == 0xbu) {
@@ -5299,10 +5299,10 @@ uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3
 	o = 0;
 	do {
 		if ((int32_t)o != 0xff) {
-			rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+			rec = g_world_grid_base + (uint32_t)((int32_t)o * 0xca);
 			if (EF_U8(rec + 0x20u) == 1u) {
 				for (j = 0; j < 6; j++) {
-					rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+					rec = g_world_grid_base + (uint32_t)((int32_t)o * 0xca);
 					id = HI(rec + 0x4eu + (uint32_t)((int32_t)j * 2));
 					obj = guest_fn_7489c(id);
 					cur = EF_U32(0x0020f430u);
@@ -5329,7 +5329,7 @@ uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3
 					cnt++;
 					if (cur != 0u)
 						EF_U16(0x00197c28u) = EF_U16(cur + 0x16u);
-					rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)o * 0xca);
+					rec = g_world_grid_base + (uint32_t)((int32_t)o * 0xca);
 					guest_fn_8e940_x((uint32_t)HI(rec + 0x4eu + (uint32_t)((int32_t)j * 2)),
 					                 p0, p1, p2, p3);
 					if (!(EF_U8(obj + 0x24u) & 4u))
@@ -5347,8 +5347,8 @@ uint8_t scan_neighbours_8ecdc(uint32_t p0, uint32_t p1, uint32_t p2, uint32_t p3
 					if (HI(obj + 0x16u) == 0xff)
 						continue;
 					if (EF_U8(0x0012584bu) != 1u) {
-						uint32_t b = EF_U32(0x0019bb58u) + (uint32_t)(HI(obj + 0x26u) * 0xca);
-						uint32_t d = EF_U32(0x0019bb58u) + (uint32_t)(HI(cur + 0x26u) * 0xca);
+						uint32_t b = g_world_grid_base + (uint32_t)(HI(obj + 0x26u) * 0xca);
+						uint32_t d = g_world_grid_base + (uint32_t)(HI(cur + 0x26u) * 0xca);
 						if (EF_U16(b + 0x15u) == EF_U16(d + 0x15u))
 							continue;
 					}
@@ -5534,7 +5534,7 @@ void draw_tactical_marker_5c518(void)
 			return;
 	}
 	{
-		ef_addr32 rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
+		ef_addr32 rec = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
 		if (EF_U16(0x00197250u) == EF_U16(rec + 0x15u))
 			return;
 		if (EF_U8(0x001a6d1du) == 0)
@@ -5574,7 +5574,7 @@ void draw_range_marker_5df08(void)
 	EF_U32(0x001a6cc4u) = EF_U32(0x00197220u);
 	obj = guest_fn_7489c(HI(0x001a823cu));
 	if (obj != 0) {
-		ef_addr32 rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
+		ef_addr32 rec = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(obj + 0x26u)) >> 16) * 0xcau;
 		if (EF_U16(0x00197250u) != EF_U16(rec + 0x15u) && Lc > (int32_t)EF_U32(0x001a6cc4u))
 			EF_U8(0x001a6d20u) = 1;
 	}
@@ -5698,7 +5698,7 @@ void update_player_target_6bee8(void)
 	ef_addr32 obj;
 	uint32_t v;
 	uint32_t si = 0;
-#define RECB(o) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
+#define RECB(o) (g_world_grid_base + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
 	if (EF_U8(P + 0x16cu) == 1u) {
 		uint32_t cx = EF_U16(RECB(P) + 0x50u);
 		if ((int32_t)cx != HI(0x001f71c6u))
@@ -5808,7 +5808,7 @@ void report_contact_73964(int16_t a, int16_t b)
 	ef_addr32 obj, q;
 	uint16_t cx = (uint16_t)a;
 	int32_t di = (int16_t)b;
-#define RECB(o) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
+#define RECB(o) (g_world_grid_base + (uint32_t)(((int32_t)EF_U32((o) + 0x26u)) >> 16) * 0xcau)
 	obj = guest_fn_7489c((int16_t)a);
 	if (obj == 0)
 		return;
@@ -5837,7 +5837,7 @@ void report_contact_73964(int16_t a, int16_t b)
 			int32_t d, r;
 			if (u == 0xff)
 				return;
-			si = (int16_t)EF_U16(EF_U32(0x0019bb58u) + (uint32_t)u * 0xcau + 0x50u);
+			si = (int16_t)EF_U16(g_world_grid_base + (uint32_t)u * 0xcau + 0x50u);
 			d = 10000 / (int32_t)EF_U16(0x00127d92u);
 			r = (int32_t)(uint16_t)guest_fn_9c960() % (d + 1);
 			if (r != 0)
@@ -5871,12 +5871,12 @@ void report_contact_73964(int16_t a, int16_t b)
 			int32_t u;
 			int16_t bx;
 			int32_t d, r;
-			if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)idx * 0xcau + 0x1bu) == 0xbu)
+			if (EF_U8(g_world_grid_base + (uint32_t)idx * 0xcau + 0x1bu) == 0xbu)
 				return;
 			u = (int16_t)guest_fn_2bb64(idx);
 			if (u == 0xff)
 				return;
-			bx = (int16_t)EF_U16(EF_U32(0x0019bb58u) + (uint32_t)u * 0xcau + 0x50u);
+			bx = (int16_t)EF_U16(g_world_grid_base + (uint32_t)u * 0xcau + 0x50u);
 			d = 10000 / (int32_t)EF_U16(0x00127d92u);
 			r = (int32_t)(uint16_t)guest_fn_9c960() % (d + 1);
 			if (r != 0) {
@@ -6052,7 +6052,7 @@ void draw_object_marker_5d520(int32_t a0, int32_t b0, ef_addr32 obj)
 		} else {
 			uint32_t r;
 			guest_fn_5dc20(a, b, S, esi);
-			r = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(esi + 0x26u)) >> 16) * 0xcau;
+			r = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(esi + 0x26u)) >> 16) * 0xcau;
 			if (EF_U16(0x00197250u) == EF_U16(r + 0x15u)) {
 				guest_fn_c8ccc_x((uint32_t)yb, (uint32_t)xr, (uint32_t)yt, (uint32_t)xl, EF_U8(0x00128148u));
 				guest_fn_c8ccc_x((uint32_t)yt, (uint32_t)xr, (uint32_t)yb, (uint32_t)xl, EF_U8(0x00128148u));
@@ -6073,7 +6073,7 @@ void draw_object_marker_5d520(int32_t a0, int32_t b0, ef_addr32 obj)
 			w = (int16_t)guest_fn_48da0(edi);
 			guest_fn_48bb0(3u, (uint32_t)((1 - EF_U8(0x0012b369u)) & 0xff),
 				       (int16_t)(a + 1 - (w >> 1)), y1, edi);
-			rr = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(esi + 0x26u)) >> 16) * 0xcau;
+			rr = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(esi + 0x26u)) >> 16) * 0xcau;
 			if (EF_U8(0x0012584bu) == 1u || EF_U16(rr + 0x15u) == 0u) {
 				w = (int16_t)guest_fn_48da0(edi);
 				guest_fn_48bb0(0xcu, (uint32_t)((1 - EF_U8(0x0012b369u)) & 0xff),
@@ -6542,7 +6542,7 @@ void draw_target_box_5a468(void)
 		       (uint32_t)(EF_S32(0x001a6cf4u) >> 16));
 	eax = (uint32_t)((int32_t)EF_S32(0x0019bb5cu) >> 16) * 0xcau;
 	guest_fn_84e3c_x((uint32_t)(uintptr_t)(L + 0x18), (uint32_t)(EF_S32(0x001f71c8u) >> 16),
-			 (uint32_t)EF_U8(EF_U32(0x0019bb58u) + eax + 0x8eu));
+			 (uint32_t)EF_U8(g_world_grid_base + eax + 0x8eu));
 	eax = (uint32_t)((int32_t)EF_U32(obj + 0x1d4u) >> 24);
 	if ((int32_t)eax != 0x14)
 		guest_fn_873a4((uint32_t)((int32_t)EF_U32(obj + 0x198u + eax * 3u) >> 24), (uint32_t)(uintptr_t)(L + 0x24));
@@ -6716,7 +6716,7 @@ static void count_matching_rows_86110(ef_addr32 p, ef_addr32 counters)
 
 #define SLOT_86110(p) ((p) + (uint32_t)((int32_t)EF_U32((p) + 0x1d4u) >> 24) * 3u)
 #define KIND_86110(p) ((int32_t)EF_U32(SLOT_86110(p) + 0x198u) >> 24)
-#define ENT_86110(p) (EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32((p) + 0x26u) >> 16) * 0xca))
+#define ENT_86110(p) (g_world_grid_base + (uint32_t)(((int32_t)EF_U32((p) + 0x26u) >> 16) * 0xca))
 
 /* 0x86110, 1476 bytes. Per-frame update of the player's object (looked up with 0x7489c): when it exists and the flags 0x122c5c/0x1a363a/0x127d42/0x132ac2 are clear and its weapon slot (+0x1d4 >> 24) is not 0x14, find the muzzle position (page row 0x85c90 rotated by the angle words at +0xc/+0xe/+0x10, scaled by 1/0x6900 and added to the position); if the slot's ammo word (+0x19c + 3*slot) is positive create a unit there (0x87db8), report it (0x8f22c, 0x56f0c), use up a round and for kind 1 adjust the ammo and word 0x20f19e. When the target entry matches 0x125835 and state 0x125846 is 3, count hits per kind in 0x19b960/0x19b96c/0x19b966 and send object codes 4a/4b/4c. With the ammo gone pick the next slot (0x8600c, 0x85f78, 0x8bf00); finally 0x86720. */
 void update_player_weapon_86110(void)
