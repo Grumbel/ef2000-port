@@ -3992,7 +3992,7 @@ void update_remote_view_f2ac0(void)
         return;
     get_view_state_dd988(0x00485920u, 0x0048591cu, 0x0048594eu, 0x0048594au,
                          0x00485954u, 0x00485952u, 0x00485950u, 0x0048594cu);
-    guest_fn_dd870_s();
+    restore_saved_block_dd870();
     r = tail_jump_39180(0u) & 0xffffu;
     if (r == 0u) {
         send_param_block_f2a30();
@@ -11128,7 +11128,7 @@ uint32_t fseek_f2183(ef_addr32 stream, uint32_t offset, uint32_t whence)
         return r == 0xffffffffu ? r : 0u;
     }
     if (whence == 0u) {
-        edi = offset - (guest_fn_10f4df(EF_U32(stream + 0x10u)) - EF_U32(stream + 4u));
+        edi = offset - (call_fa95f_from_start(EF_U32(stream + 0x10u)) - EF_U32(stream + 4u));
         if (advance_window_f2141((int32_t)edi, stream) == 0u)
             return 0u;
         r = lseek_fa95f(EF_U32(stream + 0x10u), offset, whence);
@@ -11835,7 +11835,7 @@ void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t 
     EF_U8(unit + 0x50u) = g_world_grid_marker;
     EF_U16(unit + 0x56u) = 0xffu;
     if (EF_U8((uint32_t)EF_U8(unit + 0x18u) * 0x91u + 0x0012bca7u) == 1u)
-        EF_U16(unit + 0x68u) = (uint16_t)guest_fn_80abc_x();
+        EF_U16(unit + 0x68u) = (uint16_t)advance_panel_strip();
     guest_fn_88100_x(unit);
     if (g_world_grid_mode != 0u && (EF_U8(unit + 0x67u) & 1u) == 0u)
         send_record_state_55aac(unit);
@@ -12271,10 +12271,10 @@ void refresh_map_cursor_5a220(void)
         return;
     if ((uint8_t)guest_fn_5ca88_ret_x(node, (ef_addr32)(uintptr_t)pt) == 0u)
         return;
-    guest_fn_5d520_x(pt[0], pt[1], node);
+    draw_object_marker_5d520(pt[0], pt[1], node);
     if (EF_U32(0x001a8210u) == EF_U32(0x001a821cu)) {
         guest_fn_5dbc8_x(pt[0], pt[1]);
-        guest_fn_5df08_x();
+        draw_range_marker_5df08();
     }
 }
 
@@ -12560,7 +12560,7 @@ uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
     EF_U32(0x00197ab0u) = open_resource_9ccb8(name);
     if (EF_U32(0x00197ab0u) == 0xffffffffu)
         guest_callptr2_x(g_gui_error_hook, 0x001811a0u, name);
-    guest_fn_e7dc_x();
+    initialize_parser_records();
     read_parser_line();
     read_parser_token();
     EF_U32(countp) = read_parser_integer();
@@ -12737,17 +12737,17 @@ void refresh_weapon_readout_597d8(void)
     memcpy(&k, ef_guest_memory_ptr(0x00185e80u), sizeof k);
     EF_U32(0x00197234u) = (uint32_t)(int32_t)truncate_9d72c(v * k);
     if (EF_U8(0x0012814cu) == 6u) {
-        guest_fn_58d04_x();
+        set_mode_limits_4_5();
         return;
     }
     if ((uint16_t)type == 4u || (uint16_t)type == 0x12u) {
-        guest_fn_58d24_x();
+        initialize_mode_limits();
         EF_U8(0x001a6d1cu) = 1u;
     } else if ((uint16_t)type == 5u) {
-        guest_fn_58d04_x();
+        set_mode_limits_4_5();
         EF_U8(0x001a6d1cu) = 2u;
     } else {
-        guest_fn_58d44_x();
+        set_mode_limits_8_10();
         EF_U8(0x001a6d1cu) = 0u;
     }
 }
@@ -13173,7 +13173,7 @@ double angle_between_88ff8(ef_addr32 a, ef_addr32 b)
         d = 1.0;
     if (!(d >= -1.0))
         d = -1.0;
-    return abs_double_b427c(wrap_angle_b42f0(guest_fn_e7df4_x(d)));
+    return abs_double_b427c(wrap_angle_b42f0(acos_neg_e7df4(d)));
 }
 
 /* 0x89f50, 105 bytes. Project the aim vector: with the angles A = double 0x1fd020 and B = double 0x1fcfd0 and the range D = double 0x1fcf48, store D * cos(B) * cos(A) at 0x1fcff0, cos(A) * (sin(B) * D) at 0x1fcff8 and (-sin(A)) * D + double 0x1fcf10 * double 0x1fcca0 at 0x1fd000. */
@@ -13236,7 +13236,7 @@ void refresh_map_label_5c7dc(void)
         return;
     if ((uint8_t)guest_fn_5ca88_ret_x(node, (ef_addr32)(uintptr_t)pt) == 0u)
         return;
-    guest_fn_5d520_x(pt[0], pt[1], node);
+    draw_object_marker_5d520(pt[0], pt[1], node);
     guest_sprintf_a4342(textp, 0x00185facu, EF_U32(0x001971b0u));
     half = (int16_t)formatted_width_48da0(textp) >> 1;
     shift = g_tactical_display_mode;
@@ -13369,7 +13369,7 @@ void init_runtime_globals_9d834(void)
     if (EF_U8(0x00132b12u) == 0u) {
         build_default_path_9c980(0x0041719au);
         strcat_9ca57(0x0041719au, 0x0018b234u);
-        guest_fn_9da80_x();
+        load_page_name_table_9da80();
         EF_U8(0x00132b12u) = 1u;
     }
 }
@@ -14880,7 +14880,7 @@ void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
     EF_U8(u + 0x58u) = EF_U8(r + 0x1du);
     if (created != 0u && EF_U8(0x0012bca7u + (uint32_t)EF_U8(u + 0x18u) * 145u) == 1u) {
         update_ui_record_from_template((int16_t)((int32_t)EF_U32(u + 0x2cu) >> 16), u + 0x68u);
-        EF_U16(u + 0x68u) = (uint16_t)guest_fn_80abc_x();
+        EF_U16(u + 0x68u) = (uint16_t)advance_panel_strip();
     }
     advance_object_89e08(u);
 }
@@ -14952,7 +14952,7 @@ void update_ground_sound_9021c(ef_addr32 u)
         EF_U16(0x00420938u) = EF_U16(0x00420908u);
         EF_U16(0x0042093au) = EF_U16(0x0042091cu);
     }
-    if (guest_fn_7b7d8_x() == 0u)
+    if (draw_marker_line_7b7d8() == 0u)
         render_page_9e0c4((int32_t)EF_U32(u + 0x1eu) >> 16, EF_U32(u) << 8, EF_U32(u + 4u) << 8, EF_U32(u + 8u) << 8);
 }
 
@@ -15200,7 +15200,7 @@ void derive_view_angles_e9dcc(void)
         EF_U32(0x004644c4u) = 0xbff00000u;
     }
     memcpy(&v, ef_guest_memory_ptr(0x004644c0u), sizeof v);
-    r = guest_fn_e7df4_x(v);
+    r = acos_neg_e7df4(v);
     memcpy(ef_guest_memory_ptr(0x00432288u), &r, sizeof r);
 }
 
@@ -15228,7 +15228,7 @@ void derive_view_angles_e9f84(void)
         EF_U32(0x004644b4u) = 0xbff00000u;
     }
     memcpy(&v, ef_guest_memory_ptr(0x004644b0u), sizeof v);
-    r = guest_fn_deb1a_x(-v);
+    r = asin_deb1a(-v);
     memcpy(ef_guest_memory_ptr(0x00432298u), &r, sizeof r);
 }
 
@@ -15805,7 +15805,7 @@ void show_text_ac408(ef_addr32 text)
 	clear_byte_c8e38();
 	clear_id_table_a4e6c();
 	run_page_callbacks_ac240(0x0018dc40u, 0u);
-	guest_fn_aca94_w();
+	set_word_41eeda();
 	if (EF_U8(text) == 0u) {
 		for (i = 0; i < 0x10u && EF_U8(0x0041eab0u + i * 0x15u) != 0u; i++)
 			run_page_callbacks_ac240(0x0041eab0u + i * 0x15u, 0u);
@@ -15834,10 +15834,10 @@ void show_text_ac408(ef_addr32 text)
 	init_view_corners_c9ecc();
 	fill_bytes_b3fb0(0x0041f284u, 0u, 0x59u);
 	EF_U16(0x0041eec2u) = 0u;
-	guest_fn_ac9e8_x();
+	reset_view_ac9e8();
 	EF_U8(0x0041f2e0u) = 0u;
 	if (EF_U8(0x0041f2e3u) != 0u)
-		guest_fn_abc98_x();
+		draw_named_widget_abc98();
 	g_ui_state_flag_41f833 = 0u;
 	g_ui_state_flag_41f2e6 = 0u;
 	while ((guest_fn_ce064_x() & 0xffffu) != 0u)
@@ -16267,7 +16267,7 @@ void step_setup_screen_36f84(void)
 			open_stream_36054(0x00125828u, 6u);
 			break;
 		case 6:
-			guest_fn_aca88_w();
+			clear_word_41eeda();
 			refresh_all_widgets_a4c84();
 			apply_a4cb4_a4d90(g_frontend_connection_mode == 3u ? 0x00182f94u : 0x00182fa0u);
 			g_frontend_pending_latch = 1u;
@@ -16335,7 +16335,7 @@ void step_menu_screen_35590(void)
 			open_stream_369fc(0x00125828u, 5u);
 			break;
 		case 5:
-			guest_fn_aca88_w();
+			clear_word_41eeda();
 			refresh_all_widgets_a4c84();
 			apply_a4cb4_a4d90(g_frontend_connection_mode == 3u ? 0x00182f94u : 0x00182fa0u);
 			g_frontend_pending_latch = 1u;
@@ -16996,7 +16996,7 @@ void latch_box_69540(ef_addr32 first, ef_addr32 second)
 	EF_U32(0x00420904u) = (uint32_t)a1;
 	if (guest_fn_d0470((int32_t)g_object_pair_root_packed >> 16, 0, 0, 0) != 1u)
 		return;
-	idx = (int16_t)guest_fn_cd24c_x();
+	idx = (int16_t)cursor_word_at_2();
 	EF_U32(0x001282e0u) = (uint32_t)idx;
 	if (idx != -1
 	    && (guest_fn_68ccc((int16_t)((int32_t)EF_U32(0x001f6f48u) >> 16), (uint16_t)((int32_t)EF_U32(0x001282deu) >> 16)) & 0xffu) != 0u
@@ -17116,7 +17116,7 @@ void apply_selection_69374(ef_addr32 first, ef_addr32 second)
 	EF_U32(0x00420904u) = (uint32_t)a1;
 	if (guest_fn_d0470((int32_t)g_object_pair_root_packed >> 16, 0, 0, 0) != 1u)
 		return;
-	idx = (int16_t)guest_fn_cd24c_x();
+	idx = (int16_t)cursor_word_at_2();
 	EF_U32(0x001282e0u) = (uint32_t)idx;
 	if (idx == -1)
 		return;
@@ -20008,7 +20008,7 @@ ef_addr32 terrain_slope_at_7bb00(ef_addr32 pos)
 			v = 1.0;
 		if (!(v >= -1.0))
 			v = -1.0;
-		ang = guest_fn_deb1a_x(v) * 32768.0 * 0.3183098861827565 + -16384.0;
+		ang = asin_deb1a(v) * 32768.0 * 0.3183098861827565 + -16384.0;
 		a = (int32_t)truncate_9d72c(ang);
 		EF_U16(0x001f8ebcu) = (uint16_t)a;
 		EF_U16(0x001f8ebeu) = (uint16_t)angle_of_b3b1c((int16_t)EF_U16(rec), (int16_t)EF_U16(rec + 4u));
@@ -20150,7 +20150,7 @@ void present_status_frame_f34cc(void)
 			apply_palette_d663c(0x00425c8cu);
 		select_buffer_15b758();
 		save_and_draw_block_dd8dc();
-		guest_fn_dd8c0_x();
+		redraw_if_unsaved_dd8c0();
 		return;
 	}
 	select_buffer_146e40();
