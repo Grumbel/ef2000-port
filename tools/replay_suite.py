@@ -369,10 +369,15 @@ REGRESSION_CASES = {
     'main-menu': ('german', 30),
     'quick-fight-flight': ('german', 100),
     'english-quick-combat': ('english', 100),
-    'german-campaign-map': ('german', 45),
+    'german-campaign-map': ('german', 75),
     'mitarbeiter': ('german', 35),
     'multiplayer': ('german', 35),
 }
+
+
+# The owner currently prioritizes campaign interaction and actual flight.
+DEFAULT_REGRESSION_CASES = tuple(name for name in REGRESSION_CASES
+                                 if name not in ('mitarbeiter', 'multiplayer'))
 
 
 def run_native_regression_case(runner, executable, output, name, extras=()):
@@ -416,11 +421,14 @@ def run_native_regression_case(runner, executable, output, name, extras=()):
         window, = windows
         input_event('windowfocus', '--sync', window)
 
-        def capture(label):
+        def capture(label, region=None):
             if game.poll() is not None:
                 raise ValueError(f'launcher exited before {label} ({game.returncode})')
             frame = output / f'{label}.png'
-            subprocess.run(['import', '-window', window, str(frame)], check=True, timeout=5)
+            command = ['import', '-window', window]
+            if region:
+                command.extend(['-crop', region])
+            subprocess.run([*command, str(frame)], check=True, timeout=5)
             return frame
 
         def screen_text(frame):
@@ -463,6 +471,15 @@ def run_native_regression_case(runner, executable, output, name, extras=()):
             wait_for('game: mission data=', 12)
             wait_for('game: flight (', 35)
             time.sleep(4)
+            capture('flight-before-input')
+            input_event('keydown', 'equal', 'sleep', 0.5, 'keyup', 'equal',
+                        'keydown', 'period', 'sleep', 0.5, 'keyup', 'period')
+            input_event('keydown', 'F4', 'sleep', 0.2, 'keyup', 'F4')
+            time.sleep(3)
+            capture('flight-external')
+            input_event('keydown', 'F1', 'sleep', 0.2, 'keyup', 'F1',
+                        'keydown', 'minus', 'sleep', 0.5, 'keyup', 'minus')
+            time.sleep(3)
         elif name == 'german-campaign-map':
             input_event('mousemove_relative', '--', -50, -40, 'sleep', 1)
             click()
@@ -471,6 +488,20 @@ def run_native_regression_case(runner, executable, output, name, extras=()):
             click()
             wait_for('game: navigation data=', 15)
             time.sleep(2)
+            # The captured pointer is near (400, 250) on entering the map.
+            # Select two separated rows, exercising selection and overview refresh.
+            input_event('mousemove_relative', '--', -320, -170, 'sleep', 1)
+            click()
+            time.sleep(2)
+            first = screen_text(capture('mission-first', '310x230+5+220'))
+            input_event('mousemove_relative', '--', 0, 72, 'sleep', 1)
+            click()
+            time.sleep(2)
+            second = screen_text(capture('mission-second', '310x230+5+220'))
+            (output / 'mission-overviews.json').write_text(json.dumps(
+                {'first': first, 'second': second}, indent=2) + '\n')
+            if not first.strip() or not second.strip() or first == second:
+                raise ValueError('selecting a different mission did not change the overview')
         elif name == 'mitarbeiter':
             input_event('mousemove_relative', '--', 40, 50, 'sleep', 1)
             click()
@@ -554,7 +585,7 @@ def regression_main(argv):
     except (OSError, ValueError) as error:
         parser.error(str(error))
 
-    chosen = args.case or REGRESSION_CASES
+    chosen = args.case or DEFAULT_REGRESSION_CASES
     supported = {'german': extract_image.SUPPORTED_SHA256, 'english': extract_image.ENGLISH_SHA256}
     failed = False
     patches = {}

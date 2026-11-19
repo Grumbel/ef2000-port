@@ -57,10 +57,13 @@ regression harness, but it is not the goal.
 1. Script the hybrid regression set as **one command** that runs on private
    Xvfb and prints one PASS/FAIL line per scenario. Extend `hybrid_bisect.py`
    / `replay_suite.py`; do not write a new framework. Scenarios: main menu;
-   Quick Fight → flight (native64, 100 s); English Quick Combat; German
-   Kampagne erstellen → campaign map; Mitarbeiter; Multiplayer screen.
-2. Fix the Mitarbeiter and Multiplayer crashes with `hybrid_bisect.py`. A
-   culprit that does not converge within the time-box (plan §1 rule 9) is
+   Quick Fight → flight (native64, 100 s); English Quick Combat; both flight
+   paths exercise throttle, rudder, and cockpit/external views. German
+   Kampagne erstellen → campaign map with mission selection and overview refresh.
+   Owner priority (2026-11-19): campaign interaction and actual flight;
+   Mitarbeiter and Multiplayer are optional cases outside the default set.
+2. Fix regressions in campaign interaction and flight with `hybrid_bisect.py`.
+   A culprit that does not converge within the time-box (plan §1 rule 9) is
    demoted to `compiles-bad` and excluded.
 3. Run the regression set and `tools/abi_check.py` after every tranche from
    streams B and C. A tranche that regresses is fixed or reverted before the
