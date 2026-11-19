@@ -192,3 +192,69 @@ void mpSamCoverage(ef_addr32 widget)
     g_assignment_current_value = widget;
     g_sam_coverage_range = 10000 + (int32_t)(uint16_t)half_word_9c960() % 30000;
 }
+
+/* 0x4f994, 206 bytes, flight button WIDGET of the "mp_atc_list" dialog
+ * (digit at +0x40). Clear the list's widgets; a slot without a flight
+ * (-1) reports the mission-time warning, otherwise enable its "t<n>",
+ * "s<n>", "l<n>" and "w<n>" widgets and select the slot. */
+void mpFlyMission(ef_addr32 widget)
+{
+    char name[16];
+    ef_addr32 list = find_named_or_abort_a46cc(0x00184b58u);   /* "mp_atc_list" */
+    int16_t slot;
+
+    clear_children_dirty(list);
+    slot = (int16_t)(EF_U8(widget + 0x40u) - 0x30u);
+    if (g_atc_slot_flights[slot] == -1) {
+        update_dialog_bindings(0x00132410u, 0x0013243au); /* mission-time warning texts */
+        return;
+    }
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x00184e78u, (int32_t)slot); /* "t%d" */
+    show_named_widget_a7318(list, (ef_addr32)(uintptr_t)name);
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x00184e7cu, (int32_t)slot); /* "s%d" */
+    show_named_widget_a7318(list, (ef_addr32)(uintptr_t)name);
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x00184e80u, (int32_t)slot); /* "l%d" */
+    show_named_widget_a7318(list, (ef_addr32)(uintptr_t)name);
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x00184e84u, (int32_t)slot); /* "w%d" */
+    show_named_widget_a7318(list, (ef_addr32)(uintptr_t)name);
+    g_atc_selected_slot = (uint8_t)slot;
+}
+
+/* 0x4595c, 245 bytes, map click callback of WIDGET (mode flags in the
+ * low byte of word +0xa7). Ignored while input byte 0x121e8c is set.
+ * The cursor is clamped to 12..387 on both axes. Flag 0x10 selects the
+ * marker under the cursor; flag 0x08 moves the selected marker (25-byte
+ * entries at +0x20 of the current map record; y is stored flipped as
+ * 400 - y) and marks the markers changed; flag 0x20 clears the
+ * selection. */
+void GenGUIHelp(ef_addr32 widget)
+{
+    int16_t x;
+    int16_t y;
+    uint8_t flags;
+    uint32_t entry;
+
+    if (g_runtime_input_byte_c != 0u)
+        return;
+    x = g_gui_cursor_x;
+    y = g_gui_cursor_y;
+    if (x < 12)
+        x = 12;
+    if (y < 12)
+        y = 12;
+    if (x > 0x183)
+        x = 0x183;
+    if (y > 0x183)
+        y = 0x183;
+    flags = EF_U8(widget + 0xa7u);
+    if ((flags & 0x10u) != 0u)
+        g_selected_map_marker = (int16_t)hit_test_markers_45a54((uint32_t)(int32_t)x, (uint32_t)(int32_t)y);
+    if ((flags & 0x08u) != 0u && g_selected_map_marker != -1) {
+        entry = (uint32_t)((int32_t)g_selected_map_marker * 25);
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + entry) = (uint32_t)(int32_t)x;
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + entry + 4u) = (uint32_t)(0x190 - (int32_t)y);
+        g_map_markers_changed = 1u;
+    }
+    if ((flags & 0x20u) != 0u)
+        g_selected_map_marker = -1;
+}

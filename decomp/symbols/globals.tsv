@@ -521,6 +521,17 @@ addr	size	type	name	evidence	notes
 0x0012584c	variable	uint8_t[]	g_kots_base_side_mirror	5144 increments, 5167 clears	advanced and reset together with g_kots_base_side
 0x00121e28	8	ef_addr32[2]	g_kots_side_labels	517a reads	side names GRUN/ROT
 0x00121e30	16	ef_kots_side_base[2]	g_kots_side_bases	51b5 reads name	home base name and coordinates per side
+0x00137960	4	ef_addr32	g_group_list_head	b5f6/b615 reads; 69d10 walks	group list, next link +4, record pointer +0x13
+0x001976a0	2	int16_t	g_target_group_index	b5d3/b61a reads	selected group, -1 none
+0x0019769a	2	int16_t	g_target_window_open	b5e8 tests; 418c4 tests	target window state word
+0x0019769c	2	int16_t	g_target_member_index	b63d read via dword 0x19769a shifted 16	selected member, 124-byte entries at record +0x51
+0x001a5722	2 * count	int16_t[]	g_atc_slot_flights	4f9c1 read via dword 0x1a5720 shifted 16	flight per ATC slot, -1 none
+0x001a5790	1	uint8_t	g_atc_selected_slot	4fa55 stores	selected ATC slot
+0x0041eef4	2	int16_t	g_gui_cursor_x	45970 reads; stored as marker x	GUI cursor; 0x4ce4c pairs it with 0x41eef2
+0x0041eef2	2	int16_t	g_gui_cursor_y	4597a reads; stored as 400 - y	GUI cursor
+0x00126630	2	int16_t	g_selected_map_marker	459d3/45a42 stores; 459eb reads via dword 0x12662e shifted 16	marker index, -1 none
+0x001a4a9c	4	ef_addr32	g_current_map_record	45a08 reads; 45a54 reads	marker count word +0x1c, 25-byte entries at +0x20
+0x0012654c	1	uint8_t	g_map_markers_changed	45a29 stores 1	set when a marker moves
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

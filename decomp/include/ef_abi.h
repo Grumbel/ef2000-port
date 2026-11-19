@@ -6560,6 +6560,9 @@ void simSyncSlots(ef_addr32 widget); /* 0x7de5c */
 void InitArcade(void); /* 0x4c50 */
 void gpwAcceptHiscore(ef_addr32 widget); /* 0x4d4c */
 void kotsClickBase(ef_addr32 widget); /* 0x5110 */
+void gpwRedrawTargetWindow(ef_addr32 name); /* 0xb5d0 */
+void mpFlyMission(ef_addr32 widget); /* 0x4f994 */
+void GenGUIHelp(ef_addr32 widget); /* 0x4595c */
 void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */
 ef_addr32 show_named_widget_a7318(ef_addr32 root, ef_addr32 name); /* 0xa7318 EAX/EDX, EAX widget, EDX clobbered */
 uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, EAX result, EDX clobbered */

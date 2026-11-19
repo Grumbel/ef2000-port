@@ -556,6 +556,23 @@ extern uint8_t g_kots_base_side_mirror[]; /* 0x12584c, advanced and reset with t
 extern ef_addr32 g_kots_side_labels[2]; /* 0x121e28, "GRUN" (0x9a umlaut) / "ROT" */
 extern ef_kots_side_base g_kots_side_bases[2]; /* 0x121e30 */
 
+/* Target window, 0xb5d0. */
+extern ef_addr32 g_group_list_head; /* 0x137960, next link +4, record +0x13 */
+extern int16_t g_target_group_index; /* 0x1976a0, -1 = none */
+extern int16_t g_target_window_open; /* 0x19769a */
+extern int16_t g_target_member_index; /* 0x19769c */
+
+/* ATC flight list, 0x4f994. */
+extern int16_t g_atc_slot_flights[]; /* 0x1a5722, -1 = no flight */
+extern uint8_t g_atc_selected_slot; /* 0x1a5790 */
+
+/* Map marker editing, 0x4595c. */
+extern int16_t g_gui_cursor_x; /* 0x41eef4 */
+extern int16_t g_gui_cursor_y; /* 0x41eef2 */
+extern int16_t g_selected_map_marker; /* 0x126630, -1 = none */
+extern ef_addr32 g_current_map_record; /* 0x1a4a9c, markers: count word +0x1c, 25-byte entries at +0x20 */
+extern uint8_t g_map_markers_changed; /* 0x12654c */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */

@@ -3708,3 +3708,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004d920	mpSamCoverage	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI; EAX widget; GUI click callback
 0x00004d4c	gpwAcceptHiscore	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI click callback
 0x00005110	kotsClickBase	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; 20-byte local buffer; EAX widget; GUI click callback
+0x0000b5d0	gpwRedrawTargetWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; EAX dialog name; GUI redraw callback
+0x0004f994	mpFlyMission	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; 16-byte local name buffer; EAX widget; GUI click callback
+0x0004595c	GenGUIHelp	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI click callback

@@ -7,6 +7,7 @@
 
 #include "ef_abi.h"
 #include "ef_globals.h"
+#include "ef_mem.h"
 
 /* 0x69f1c, 141 bytes, callback slot 0x12b680. Save the 20 three-byte
  * pair marks, clear the GUI word 0x41eeda and mark the plane window
@@ -122,4 +123,37 @@ void RedrawEnemyView(ef_addr32 widget)
     if (type->has_page_text != 0u)
         run_page_text_9e508(g_enemy_view_page, 7u);
     simSyncSlots(widget);
+}
+
+/* 0xb5d0, 204 bytes, redraw callback for the dialog named NAME. While a
+ * target group is selected (index word 0x1976a0 not -1, window word
+ * 0x19769a set, group list non-empty) and NAME is "targview", walk to
+ * the selected group; when its record has a member entry at the selected
+ * member index (124-byte members, dword +0x51), activate and refresh the
+ * "targetwin" and "targetzoom" dialogs. */
+void gpwRedrawTargetWindow(ef_addr32 name)
+{
+    ef_addr32 node;
+    ef_addr32 dialog;
+    uint32_t i = 0;
+
+    if (g_target_group_index == -1 || g_target_window_open == 0 || g_group_list_head == 0u)
+        return;
+    if (guest_strcmp(name, 0x0018083cu) != 0)                  /* "targview" */
+        return;
+    node = g_group_list_head;
+    while (node != 0u && (int16_t)i < g_target_group_index) {
+        node = EF_U32(node + 4u);
+        ++i;
+    }
+    if (node == 0u)
+        return;
+    if (EF_U32(EF_U32(node + 0x13u) + 0x51u + (uint32_t)((int32_t)g_target_member_index * 124)) == 0u)
+        return;
+    dialog = find_named_or_abort_a46cc(0x001805f0u);           /* "targetwin" */
+    activate_widget_a4cb4(EF_U8(dialog + 0x10u));
+    refresh_flagged_object_a4b08(dialog);
+    dialog = find_named_or_abort_a46cc(0x001805fcu);           /* "targetzoom" */
+    activate_widget_a4cb4(EF_U8(dialog + 0x10u));
+    refresh_flagged_object_a4b08(dialog);
 }
