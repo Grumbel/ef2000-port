@@ -266,7 +266,7 @@ addr	reason
 0xd35b0	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xd36c4	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xdeb1a	abi_check: stack/x87 convention differs from the original (original 0, compiled 8  ); declare before linking
-0xe7df4	abi_check: stack/x87 convention differs from the original (original 0, compiled 8  ); declare before linking
+0xe7df4	C sqrt/math-error adapters do not implement the original x87/AL protocol; retain original body with ST0 ABI for named callers
 0xfa362	abi_check: stack/x87 convention differs from the original (original 0, compiled 12  ); declare before linking
 0x10dbc1	abi_check: stack/x87 convention differs from the original (original 0, compiled 4  ); declare before linking
 0x120a07	abi_check: stack/x87 convention differs from the original (original 0, compiled 12  ); declare before linking

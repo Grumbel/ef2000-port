@@ -7547,6 +7547,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 /* x87 ST0-argument guest functions: Watcom would push the double on the stack. */
 #pragma aux guest_fn_fa362_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dcb96_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
+/* Original arccos entry consumes and returns ST0, including named C callers. */
+#pragma aux acos_neg_e7df4 parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_e7df4_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_deb1a_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 /* Pure stack-argument functions (original ends in ret 4*nargs) lacking a pragma. */
