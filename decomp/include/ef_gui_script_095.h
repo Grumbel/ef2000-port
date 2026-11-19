@@ -10,16 +10,14 @@
 extern "C" {
 #endif
 
-/* The original comparison, decimal conversion, errno-pointer and options
- * command handlers still use host adapters until their ABIs are established.
- * The tokenizer and six-value setter below do not require a lexer adapter. */
-uint32_t gui_script_guest_call_095(uint32_t target, uint32_t eax, uint32_t edx);
+/* The parser token comparator and OPTIONS command handlers use their
+ * recovered direct C entry points. */
 void gui_script_report_095(ef_addr32 format, unsigned arguments,
                            ef_addr32 token, ef_addr32 line);
 
 uint32_t gui_script_next_token_f46cc(void);
 void gui_script_rect_f5484(void);
-void gui_options_dispatch_f3b78(void);
+void process_command_dispatch_loop(void);
 
 #ifdef __cplusplus
 }

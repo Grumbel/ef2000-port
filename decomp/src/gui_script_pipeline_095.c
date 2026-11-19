@@ -2,6 +2,8 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
+#include "ef_gui_cursor_097.h"
+#include "ef_gui_options_096.h"
 #include "ef_gui_script_095.h"
 #include "ef_mem.h"
 
@@ -119,13 +121,6 @@ void gui_script_rect_f5484(void)
                      (uint32_t)(int32_t)(int16_t)values[5]);
 }
 
-#ifdef EF_DECOMP_HOST_TEST
-
-static uint32_t guest(uint32_t target, uint32_t eax, uint32_t edx)
-{
-    return gui_script_guest_call_095(target, eax, edx);
-}
-
 /* OPTIONS command table from f3b78; token comparator a4380 returns zero
  * for a match, the input reader f2d74 writes the command to 48592c. */
 struct option_command {
@@ -155,19 +150,28 @@ static const struct option_command option_commands[] = {
 /* 0x000f3b78, 476 bytes. Dispatch continues after unknown tokens (the
  * original fallback f3b58) and every nonterminal command. display, return
  * and eof terminate the loop; display invokes f3f84 before returning. */
-void gui_options_dispatch_f3b78(void)
+void process_command_dispatch_loop(void)
 {
     for (;;) {
         unsigned i;
         int matched = 0;
-        guest(0xf2d74u, 0u, 0u);
+        gui_options_read_command_f2d74();
         for (i = 0u; i < sizeof(option_commands) / sizeof(option_commands[0]); ++i) {
             const struct option_command *entry = &option_commands[i];
-            if (guest(0xa4380u, entry->name, OPTION_TOKEN) != 0u)
+            if (guest_compare_parser_token(OPTION_TOKEN, entry->name) != 0)
                 continue;
             matched = 1;
-            if (entry->handler != 0u)
-                guest(entry->handler, 0u, 0u);
+            switch (entry->handler) {
+            case 0xf2dfcu: restart_driver_f2dfc(); break;
+            case 0xf2e54u: copy_path_f2e54(); break;
+            case 0xf2e74u: read_plain_entry_f2e74(); break;
+            case 0xf2fbcu: read_entry_f2fbc(); break;
+            case 0xf314cu: read_pair_list_f314c(); break;
+            case 0xf35d8u: load_path_value_f35d8(); break;
+            case 0xf3f84u: gui_options_display_f3f84(); break;
+            case 0xf3b1cu: load_path_f3b1c(); break;
+            case 0xf3b40u: load_path_value_f3b40(); break;
+            }
             if (entry->set_flag != 0u)
                 EF_U8(entry->set_flag) = 1u;
             if (entry->terminate)
@@ -175,7 +179,6 @@ void gui_options_dispatch_f3b78(void)
             break;
         }
         if (!matched)
-            guest(0xf3b58u, 0u, 0u);
+            load_path_pointer_f3b58();
     }
 }
-#endif
