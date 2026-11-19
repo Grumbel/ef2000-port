@@ -117,7 +117,7 @@ void unit_owner_update_6b344(uint32_t unit)
         return;
     }
     {
-        int16_t idx2 = EF_S16(EF_U32(0x001f71bcu) + 0x28u);
+        int16_t idx2 = EF_S16(g_current_object + 0x28u);
         int32_t w = (int32_t)EF_S16(tbl + (uint32_t)((int32_t)idx2 * 0xca) + 0x50u);
         guest_fn_46254((uint32_t)id, w, 0x1bu, 0u, 0u, 0u);
     }
@@ -2088,7 +2088,7 @@ void show_main_widgets_7cc5c(void)
 /* 0xd1c54, 70 bytes. Start a log: remember [0x15b744] / 8 at 0x15b7cc, open the log file NAME, emit the display list, log the palette SRC (mode MODE), run 0xd1afc, finish the log and close the file. */
 void write_log_d1c54(ef_addr32 name, ef_addr32 src, int32_t mode)
 {
-    EF_U32(0x0015b7ccu) = (uint32_t)((int32_t)EF_U32(0x0015b744u) / 8);
+    EF_U32(0x0015b7ccu) = (uint32_t)((int32_t)g_video_width / 8);
     open_log_d1774(name);
     emit_display_list_d17d0();
     log_palette_d1894(src, (int16_t)mode);
@@ -2491,8 +2491,8 @@ void add_direction_offset_cee88(ef_addr32 vec, uint32_t a, uint32_t b, int32_t k
 /* 0xc94f4, 182 bytes. Clip the rectangle (X0, Y0)-(X1, Y1) to the screen size 0x15b744 x 0x15b748 (ret 4, Y1 on the stack); a rectangle entirely outside is ignored, otherwise store the clipped corners at 0x4208e6..0x4208ec and the colour byte at 0x4208e4 and run 0xcf78c. */
 void set_clip_rect_c94f4(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
 {
-    int32_t w = (int32_t)EF_U32(0x0015b744u);
-    int32_t h = (int32_t)EF_U32(0x0015b748u);
+    int32_t w = (int32_t)g_video_width;
+    int32_t h = (int32_t)g_video_height;
     int16_t ax0 = (int16_t)x0;
     int16_t ay0 = (int16_t)y0;
     int16_t ax1 = (int16_t)x1;
@@ -4940,8 +4940,8 @@ void init_video_mode_cdb20(void)
         push_handler_9c3cf(0x000cdc64u);
     }
     guest_fn_fe710_s(0x13u);
-    EF_U32(0x0015b744u) = 0x140u;
-    EF_U32(0x0015b748u) = 0xc8u;
+    g_video_width = 0x140u;
+    g_video_height = 0xc8u;
     guest_fn_fc39c_s(0xc8u, 0x140u);
     select_draw_handlers_c3a74();
     if (EF_U8(0x00146e4au) != 0u)
@@ -5913,8 +5913,8 @@ void run_top_script_f4a88(void)
     EF_U16(node + 0x5du) = 0u;
     EF_U16(node + 0x67u) = 0u;
     EF_U16(node + 0x69u) = 0u;
-    cx = (int32_t)EF_U32(0x0015b744u) >> 1;
-    cy = (int32_t)EF_U32(0x0015b748u) >> 1;
+    cx = (int32_t)g_video_width >> 1;
+    cy = (int32_t)g_video_height >> 1;
     EF_U16(node + 0x4bu) = (uint16_t)cx;
     EF_U16(node + 0x4du) = (uint16_t)cy;
     EF_U16(node + 0x53u) = (uint16_t)cx;
@@ -7694,7 +7694,7 @@ uint8_t open_resource_file_e378c(uint32_t name)
 /* 0x6bca8, 221 bytes. Normalise the three angle-like doubles of the current object (dword pointer 0x1f71bc; fields +0x69, +0x71, +0x61 = X, Y, Z) into range: if X is above the limit at 0x1863cc it is mirrored (X = k - X, with Y and Z each advanced by k = double 0x1863d4); if X is below 0x1863dc it is mirrored about 0x1863e4 with the same Y/Z advance; then Z and Y are wrapped by the period (0x1863ec / 0x1863f4) when above 0x1863d4 or below 0x1863e4. */
 void normalise_angles_6bca8(void)
 {
-    uint32_t o = EF_U32(0x001f71bcu);
+    uint32_t o = g_current_object;
     double *x = (double *)ef_guest_memory_ptr(o + 0x69u);
     double *y = (double *)ef_guest_memory_ptr(o + 0x71u);
     double *z = (double *)ef_guest_memory_ptr(o + 0x61u);
@@ -8034,14 +8034,14 @@ void draw_nearby_entries_87fe4(void)
 void setup_viewport_window_76620(void)
 {
     uint32_t rec = (uint32_t)EF_U8(0x0012db9eu) * 28u;
-    uint32_t w = EF_U32(0x0015b744u);
+    uint32_t w = g_video_width;
     uint32_t sh = EF_U8(0x0012b369u);
     uint32_t x = (uint32_t)((int32_t)EF_U32(0x00125ad6u + rec) >> 16) << sh;
     uint32_t y = (uint32_t)((int32_t)EF_U32(0x00125ae4u + rec) >> 16) << sh;
     set_view_origin_dc21c(y, w - 1u, x, (uint32_t)((int32_t)w >> 1));
-    guest_fn_dc71b_x(x, y, 0u, EF_U32(0x0015b744u) - 1u, 0u);
-    latch_values_ce328(0u, EF_U32(0x0015b744u) - 1u, 0u, y);
-    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    guest_fn_dc71b_x(x, y, 0u, g_video_width - 1u, 0u);
+    latch_values_ce328(0u, g_video_width - 1u, 0u, y);
+    store_four_dwords_17cf9c(0u, g_video_width - 1u, 0u, g_video_height - 1u);
 }
 
 /* 0x9dcf8, 228 bytes. Register the resource NAME (EAX) under the key string TEXT (EDX): obtain its data either from the cached chunk (0xea3ec on descriptor 0x16040c; size 0xea414, decode 0xea420) or by sizing it with the hook at 0x132ab4 (zero reports through 0x132a74) and loading it with 0x132ab8 into a fresh arena block; duplicate TEXT into an arena block, take the next slot (word 0x132b10, overflow at 0x7d0 reported), store the key hash (0xebfd0) at 0x412fc0, the key copy at 0x411080, the data at 0x40d200 and the end-of-data pointer (data + size - 2 when flag 2 of data byte +5 is set, else 0) at 0x414f00. Returns the slot number. */
@@ -8163,7 +8163,7 @@ void compute_turn_rate_6eaf4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
         EF_D(0x001f7110u) = EF_D(0x001f7098u);
     if (!(EF_D(0x001f7110u) >= -EF_D(0x001f7098u)))
         EF_D(0x001f7110u) = -EF_D(0x001f7098u);
-    t = EF_D(0x001f7110u) - EF_D(EF_U32(0x001f71bcu) + 0x71u);
+    t = EF_D(0x001f7110u) - EF_D(g_current_object + 0x71u);
     EF_D(0x001f7090u) = t;
     if (EF_D(0x001f7090u) > EF_D(0x001866ccu))
         EF_D(0x001f7090u) = EF_D(0x001f7090u) + EF_D(0x001866d4u);
@@ -9782,8 +9782,8 @@ uint32_t run_choice_prompt_7a194(void)
 {
     uint8_t result = 0u;
     uint8_t done = 0u;
-    uint32_t w = EF_U32(0x0015b744u) - 1u;
-    uint32_t h = EF_U32(0x0015b748u) - 1u;
+    uint32_t w = g_video_width - 1u;
+    uint32_t h = g_video_height - 1u;
     uint32_t page;
     uint8_t key;
     latch_values_ce328(0u, w, 0u, h);
@@ -11149,13 +11149,13 @@ void draw_widget_a5b70(ef_addr32 w)
     if ((int16_t)EF_U16(w + 0x75u) <= 0 || (int16_t)EF_U16(w + 0x77u) <= 0)
         return;
     x = ((int32_t)EF_U32(w + 0x3fu) >> 16) + ((int32_t)EF_U32(w + 0x6fu) >> 16);
-    if (x >= (int32_t)EF_U32(0x0015b744u))
+    if (x >= (int32_t)g_video_width)
         return;
     x += (int32_t)EF_U32(w + 0x73u) >> 16;
     if (x <= 0)
         return;
     y = ((int32_t)EF_U32(w + 0x41u) >> 16) + ((int32_t)EF_U32(w + 0x71u) >> 16);
-    if (y >= (int32_t)EF_U32(0x0015b748u))
+    if (y >= (int32_t)g_video_height)
         return;
     y += (int32_t)EF_U32(w + 0x75u) >> 16;
     if (y <= 0)
@@ -11725,7 +11725,7 @@ void pack_settings_record_35c08(void)
 /* 0x6be28, 190 bytes. Follow-up for the current ship (record at [0x1f71bc]) when its mode byte at +0x16c is 6: look up the object named by the high word at +0x168 (0x8ffe8). Unless the lookup is empty or has a nonzero +0x1c or flags 1/2 at +0x30 clear and 0x6ae30(target) reports done, send the target (high word of 0x1f71c6) through 0x6a1d0(.., 1); then, if an object was found, scale its three dwords (+8, +0, +4) by the doubles 0x18640c and 0x186414 into a vector and pass it to 0x2461c with the target. */
 void follow_target_6be28(void)
 {
-    ef_addr32 cur = EF_U32(0x001f71bcu);
+    ef_addr32 cur = g_current_object;
     ef_addr32 obj;
     int32_t target;
     double vec[3];
@@ -12286,7 +12286,7 @@ void select_view_object_24e58(uint32_t id)
         return;
     guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, sid, 1u);
     if (sid != 0xff) {
-        cur = EF_U32(0x001f71bcu);
+        cur = g_current_object;
         memcpy(&ox, ef_guest_memory_ptr(obj + 0x49u), sizeof ox);
         memcpy(&cx, ef_guest_memory_ptr(cur + 0x49u), sizeof cx);
         memcpy(&oy, ef_guest_memory_ptr(obj + 0x51u), sizeof oy);
@@ -12968,7 +12968,7 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode)
 /* 0x711f0, 248 bytes. Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship is dropped from its roster slot (0x740e4(.., 0xff, 0xff, 0, 0xff) and 0x6a1d0(.., 1) for the id in the high word of 0x1f71c6). The double 0x1f6f68 is set to (double 0x1868d9 - altitude) * double 0x1868e1; below the double 0x1284fc the byte +0x18d is cleared. When bit 6 of +0x24 is set and the altitude is below 0x1284fc - 0x12847c, send 0x46168(id, 0x5b, 0, 0, 0) and clear that bit. Always finish by zeroing the controls (dwords 0x1f7100/04/10/14 and 0x1f70b0/b4) and running 0x6eaf4(1.3) and 0x6e8d8(2.5). */
 void check_player_altitude_711f0(void)
 {
-    ef_addr32 cur = EF_U32(0x001f71bcu);
+    ef_addr32 cur = g_current_object;
     double alt;
     double lim;
     double a;
@@ -12981,7 +12981,7 @@ void check_player_altitude_711f0(void)
         assign_roster_slot_740e4(id, 0xffu, 0xffu, 0u, 0xffu);
         guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
     }
-    cur = EF_U32(0x001f71bcu);
+    cur = g_current_object;
     memcpy(&a, ef_guest_memory_ptr(0x001868d9u), sizeof a);
     memcpy(&b, ef_guest_memory_ptr(0x001868e1u), sizeof b);
     memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
@@ -12991,7 +12991,7 @@ void check_player_altitude_711f0(void)
     memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
     if (alt < lim)
         EF_U8(cur + 0x18du) = 0u;
-    cur = EF_U32(0x001f71bcu);
+    cur = g_current_object;
     if ((EF_U8(cur + 0x24u) & 0x40u) != 0u) {
         double l2;
         memcpy(&lim, ef_guest_memory_ptr(0x001284fcu), sizeof lim);
@@ -12999,7 +12999,7 @@ void check_player_altitude_711f0(void)
         memcpy(&alt, ef_guest_memory_ptr(cur + 0x59u), sizeof alt);
         if (lim - l2 > alt) {
             draw_object_entries_46168((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), 0x5bu, 0u, 0u, 0u);
-            cur = EF_U32(0x001f71bcu);
+            cur = g_current_object;
             EF_U8(cur + 0x24u) = (uint8_t)(EF_U8(cur + 0x24u) & 0xbfu);
         }
     }
@@ -13529,20 +13529,20 @@ void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type)
 /* 0x254e4, 268 bytes. Player/leader contact check for the record at 0x1f71bc: look up the unit of its +0x144 word and of its +0x41 word (kind byte +0x16c must be 2 and flag bits 2, 4, 8 of +0x24 clear). If the second unit's mode byte +0x16d is 3 and the record's double +0x15a is positive and +0x150 negative, send message code 0x12 (otherwise return); otherwise compare the unit's double +0x150 with the record's +0x150: not greater sends 0x13, greater sends 0x14 and also sets mode 3 on the object of word 0x1f71c6. Messages go through 0x46254 with the word 0x1f71c6 as source, the +0x41 word as target and two zero stack arguments. */
 void check_contact_254e4(void)
 {
-    ef_addr32 p = EF_U32(0x001f71bcu);
+    ef_addr32 p = g_current_object;
     ef_addr32 u;
     uint32_t flags;
     uint32_t code;
     double m150, m15a;
     if (lookup_filtered_indexed_object((int32_t)EF_U32(p + 0x144u) >> 16) == 0u)
         return;
-    u = lookup_filtered_indexed_object((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+    u = lookup_filtered_indexed_object((int32_t)EF_U32(g_current_object + 0x41u) >> 16);
     if (u == 0u || EF_U8(u + 0x16cu) != 2u)
         return;
     flags = EF_U8(u + 0x24u);
     if ((flags & 2u) != 0u || (flags & 4u) != 0u || (flags & 8u) != 0u)
         return;
-    p = EF_U32(0x001f71bcu);
+    p = g_current_object;
     if (EF_U8(u + 0x16du) == 3u) {
         memcpy(&m15a, ef_guest_memory_ptr(p + 0x15au), sizeof m15a);
         if (0.0 >= m15a)
@@ -13761,7 +13761,7 @@ void update_drag_terms_6c2a4(void)
     double v, g, k1, k2, ratio, a, b;
     double t, c, kq, s;
     double ca, cb, cc, lift, h, r, num;
-    ef_addr32 p = EF_U32(0x001f71bcu);
+    ef_addr32 p = g_current_object;
     memcpy(&v, ef_guest_memory_ptr(p + 0x59u), sizeof v);
     memcpy(&k1, ef_guest_memory_ptr(0x0018644cu), sizeof k1);
     g = (-v) * k1;
@@ -13788,7 +13788,7 @@ void update_drag_terms_6c2a4(void)
     memcpy(&cc, ef_guest_memory_ptr(0x001284bcu), sizeof cc);
     lift = ca * cb + cc;
     memcpy(ef_guest_memory_ptr(0x001f6f90u), &lift, sizeof lift);
-    p = EF_U32(0x001f71bcu);
+    p = g_current_object;
     memcpy(&v, ef_guest_memory_ptr(p + 0x59u), sizeof v);
     if (v > cb) {
         lift = ca * v + cc;
@@ -15098,9 +15098,9 @@ void outline_box_c9360(uint32_t color, uint32_t style)
     y = (int32_t)EF_U32(0x0041ec08u) >> 16;
     w = (int32_t)EF_U32(0x0041ec0au) >> 16;
     h = (int32_t)EF_U32(0x0041ec0cu) >> 16;
-    if (x >= (int32_t)EF_U32(0x0015b744u))
+    if (x >= (int32_t)g_video_width)
         return;
-    if (y >= (int32_t)EF_U32(0x0015b748u))
+    if (y >= (int32_t)g_video_height)
         return;
     if (w + x <= 0)
         return;
@@ -15235,7 +15235,7 @@ void draw_status_overlay_59334(void)
     double lim, a, b, v;
     if (EF_U16(0x00126516u) != 0u)
         return;
-    store_four_dwords_17cf9c(0u, EF_U32(0x0015b744u) - 1u, 0u, EF_U32(0x0015b748u) - 1u);
+    store_four_dwords_17cf9c(0u, g_video_width - 1u, 0u, g_video_height - 1u);
     if (EF_U8(0x00197255u) == 0u)
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185e48u, EF_U32(0x00197238u));
     else
@@ -17664,20 +17664,20 @@ void resize_widget_a520c(ef_addr32 obj, uint32_t dx, uint32_t bx, uint32_t cl)
 		if ((uint8_t)cl == 0u) {
 			ox = (int16_t)EF_U16(obj + 0x41u);
 			ow = (int16_t)EF_U16(obj + 0x45u);
-			if (ox + ow >= (int32_t)EF_U32(0x0015b744u))
+			if (ox + ow >= (int32_t)g_video_width)
 				EF_U16(obj + 0x45u) = (uint16_t)(EF_U16(0x0015b744u) - EF_U16(obj + 0x41u));
 			oy = (int16_t)EF_U16(obj + 0x43u);
 			oh = (int16_t)EF_U16(obj + 0x47u);
-			if (oy + oh >= (int32_t)EF_U32(0x0015b748u))
+			if (oy + oh >= (int32_t)g_video_height)
 				EF_U16(obj + 0x47u) = (uint16_t)(EF_U16(0x0015b748u) - EF_U16(obj + 0x43u));
 		} else {
 			ox = (int16_t)EF_U16(obj + 0x41u);
 			ow = (int16_t)EF_U16(obj + 0x45u);
-			if (ox + ow >= (int32_t)EF_U32(0x0015b744u))
+			if (ox + ow >= (int32_t)g_video_width)
 				move_widget_a5484(obj, (int16_t)(EF_U16(0x0015b744u) - EF_U16(obj + 0x45u)), (int16_t)EF_U16(obj + 0x43u));
 			oy = (int16_t)EF_U16(obj + 0x43u);
 			oh = (int16_t)EF_U16(obj + 0x47u);
-			if (oy + oh >= (int32_t)EF_U32(0x0015b748u))
+			if (oy + oh >= (int32_t)g_video_height)
 				move_widget_a5484(obj, (int16_t)EF_U16(obj + 0x41u), (int16_t)(EF_U16(0x0015b748u) - EF_U16(obj + 0x47u)));
 		}
 	}
@@ -18543,7 +18543,7 @@ void update_atmosphere_e6c54(void)
 /* 0x6f2bc, 290 bytes. Aim the chase camera at the point stored in the class row of the player unit (dword 0x1f71bc; row 0xca bytes, doubles +0x27, +0x2f, +0x37), unless the double 0x1f71b0 is below 1.0 or (for unit kinds 1 and 3, byte +0x2a) the check 0x6e390(1, 1) holds: heading 0x1f70f8 = atan2(y distance, x distance) (0xb4620), target height 0x1f7088 = z + (-304.8), distance 0x1f70a0 = 2d distance to the unit (0xb415c), the double 0x1f7100 is set to 100000.0 and the camera is started with 0x6ebe0 (3.0, 1.3, 0.0, 0.0, 1000.0 passed as ten stack dwords). */
 void aim_chase_camera_6f2bc(void)
 {
-	uint32_t unit = EF_U32(0x001f71bcu);
+	uint32_t unit = g_current_object;
 	uint32_t row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	double p[3], lim, v, w, h;
 
@@ -18557,7 +18557,7 @@ void aim_chase_camera_6f2bc(void)
 		if ((uint8_t)apply_step_6e390(1u, 1u) != 0u)
 			return;
 	}
-	unit = EF_U32(0x001f71bcu);
+	unit = g_current_object;
 	memcpy(&v, ef_guest_memory_ptr(unit + 0x49u), 8);
 	memcpy(&w, ef_guest_memory_ptr(unit + 0x51u), 8);
 	h = atan2_b4620(p[1] - w, p[0] - v);
@@ -18580,17 +18580,17 @@ void aim_camera_fixed_6f3e0(void)
 	memcpy(&lim, ef_guest_memory_ptr(0x001f71b0u), 8);
 	if (1.0 > lim)
 		return;
-	unit = EF_U32(0x001f71bcu);
+	unit = g_current_object;
 	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	memcpy(&p[0], ef_guest_memory_ptr(row + 0x27u), 8);
 	memcpy(&p[1], ef_guest_memory_ptr(row + 0x2fu), 8);
 	p[2] = -5000.0;
 	if (EF_U8(unit + 0x2au) == 1u || EF_U8(unit + 0x2au) == 3u) {
-		row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+		row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(g_current_object + 0x26u) >> 16) * 0xca);
 		if ((uint8_t)apply_step_6e390(0u, EF_U8(row + 0x5eu)) != 0u)
 			return;
 	}
-	unit = EF_U32(0x001f71bcu);
+	unit = g_current_object;
 	memcpy(&v, ef_guest_memory_ptr(unit + 0x49u), 8);
 	memcpy(&w, ef_guest_memory_ptr(unit + 0x51u), 8);
 	h = atan2_b4620(p[1] - w, p[0] - v);
@@ -18847,7 +18847,7 @@ uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
 /* 0x70278, 416 bytes. Per-frame update of the player unit's (dword 0x1f71bc) gun mount: look up the mount record M (0x8ffe8 with the signed word at unit +0x16a); nothing when missing. If M has flag 2 in byte +0x30 or a non-zero dword +0x1c and the unit has no grid link (0x6ae30 on the word at unit +0x16), the unit is released (0x6a1d0(word 0x1f71c8, 1)) and the function ends. For a row of kind 0xb (byte +0x1b) whose features 0xbc-byte, 6, 7, 9 and 0xf (0x2949c) all return 0x14 the unit is released the same way. Finally the vector (M dwords +8, +0, +4) * 2.4384 * (1/256) is passed with the row's byte +0xbc and its double +0xc1 to 0x6f758. */
 void update_gun_mount_70278(void)
 {
-	uint32_t unit = EF_U32(0x001f71bcu);
+	uint32_t unit = g_current_object;
 	uint32_t m = lookup_scene_node((int32_t)EF_U32(unit + 0x168u) >> 16);
 	uint32_t row;
 	double v[3];
@@ -18863,19 +18863,19 @@ void update_gun_mount_70278(void)
 			return;
 		}
 	}
-	unit = EF_U32(0x001f71bcu);
+	unit = g_current_object;
 	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	if (EF_U8(row + 0x1bu) == 0xbu) {
 		ok = (query_indexed_object_feature((int32_t)EF_U32(unit + 0x14u) >> 16, EF_U8(row + 0xbcu)) & 0xffu) == 0x14u;
 		for (i = 0; ok && i < 4; i++)
-			ok = (query_indexed_object_feature((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x14u) >> 16, feats[i]) & 0xffu) == 0x14u;
+			ok = (query_indexed_object_feature((int32_t)EF_U32(g_current_object + 0x14u) >> 16, feats[i]) & 0xffu) == 0x14u;
 		if (ok)
 			guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
 	}
 	v[0] = (double)(int32_t)EF_U32(m + 8u) * 2.4384 * 0.00390625;
 	v[1] = (double)(int32_t)EF_U32(m) * 2.4384 * 0.00390625;
 	v[2] = (double)(int32_t)EF_U32(m + 4u) * 2.4384 * 0.00390625;
-	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(g_current_object + 0x26u) >> 16) * 0xca);
 	guest_fn_6f758_x((ef_addr32)(uintptr_t)v, EF_U8(row + 0xbcu), EF_U32(row + 0xc1u), EF_U32(row + 0xc5u));
 }
 
@@ -18930,7 +18930,7 @@ void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb)
 /* 0x6e3e0, 443 bytes (ret 0x10). Chase camera update with two stack doubles D1 (first) and D2 (second). Target height 0x1f7088 = player unit double +0x59 + [0x1f6f80]; distance 0x1f7100 starts as [0x1f6fe0] and grows by [0x1f6f70] * D2 (when [0x1f6f70] is positive; for unit mode byte +0x16c = 0x10 it is raised to [0x1f6fe0] + 1.0) or by [0x1f6f70] * D1 otherwise, and is capped by the aircraft limit (double 0x128599 + 0xe5 * byte unit+0xe9). Heading 0x1f70f8 = atan2([0x1f6f78], [0x1f71b0] * 15.0) + [0x1f6ff0]; 0x1f70a0 = 2000.0, 0x1f7050 = 1.0, and the camera runs through 0x6ebe0 with 3.0, 1.3, tan([0x1f6fd0]) * 9.81 / [0x1f6fe0] (0.0 when [0x1f6fe0] <= 1.0), [0x1f7060] and 2000.0 (ten stack dwords). */
 void update_chase_camera_6e3e0(double d1, double d2)
 {
-	uint32_t unit = EF_U32(0x001f71bcu);
+	uint32_t unit = g_current_object;
 	double g, v, w, lim, tmp, a, b;
 	uint32_t k;
 	uint32_t lo4, hi4;
@@ -18963,7 +18963,7 @@ void update_chase_camera_6e3e0(double d1, double d2)
 	memcpy(&w, ef_guest_memory_ptr(0x001f6ff0u), 8);
 	v = v + w;
 	memcpy(ef_guest_memory_ptr(0x001f70f8u), &v, 8);
-	k = EF_U8(EF_U32(0x001f71bcu) + 0xe9u);
+	k = EF_U8(g_current_object + 0xe9u);
 	memcpy(&lim, ef_guest_memory_ptr(0x00128599u + k * 0xe5u), 8);
 	memcpy(&v, ef_guest_memory_ptr(0x001f7100u), 8);
 	if (!(v < lim))
@@ -19001,7 +19001,7 @@ void focus_camera_on_unit_24c40(uint32_t ax)
 	if (u == 0u)
 		return;
 	guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, id, 0u);
-	player = EF_U32(0x001f71bcu);
+	player = g_current_object;
 	memcpy(&dx, ef_guest_memory_ptr(u + 0x49u), 8);
 	memcpy(&c, ef_guest_memory_ptr(player + 0x49u), 8);
 	dx = dx - c;
@@ -19017,7 +19017,7 @@ void focus_camera_on_unit_24c40(uint32_t ax)
 	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
 	if (h > lim)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
-	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(g_current_object + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
 		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 2u) == 0u && (EF_U8(v + 0x24u) & 4u) == 0u) {
@@ -19058,7 +19058,7 @@ void focus_camera_side_2611c(uint32_t ax)
 	if (u == 0u)
 		return;
 	guest_fn_2479c_x((int32_t)EF_U32(0x001f71c6u) >> 16, id, 3u);
-	player = EF_U32(0x001f71bcu);
+	player = g_current_object;
 	memcpy(&dx, ef_guest_memory_ptr(u + 0x49u), 8);
 	memcpy(&c, ef_guest_memory_ptr(player + 0x49u), 8);
 	dx = dx - c;
@@ -19074,7 +19074,7 @@ void focus_camera_side_2611c(uint32_t ax)
 	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
 	if (h > lim)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
-	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(g_current_object + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
 		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 4u) == 0u && (EF_U8(v + 0x24u) & 8u) == 0u &&
@@ -19169,7 +19169,7 @@ void update_record_speed_26960(ef_addr32 rec)
 /* 0x255f0, 461 bytes. Chase camera for the player unit's (dword 0x1f71bc) wingman: the unit named by word +0x146 is looked up (0x7489c; nothing if missing), registered with 0x2479c (word 0x1f71c8, id, 0) and the weight 0x1f7068 = exp(-distance * 0.0025) (0xb415c, 0xdcb96) is stored. The heading 0x1f70f8 is the wrapped bearing to that unit plus weight * pi. The unit named by the high word of dword +0x41 (word +0x43) is then looked up; if it is missing, is not of mode 2 (byte +0x16c) with sub-mode 1 or 2 (byte +0x16d) or has flags 2, 4 or 8 set the current mode is updated (0x2546c) instead. Otherwise the height 0x1f7088 is that unit's double +0x59 (limited to [0x1284d4] - 200.0), the distance 0x1f7100 comes from the aircraft table (double 0x128591 + 0xe5 * byte +0xe9), the player's wingman word +0x146 is replaced when its double +0x15a is negative, 0x1f7050 = 1.0 and the camera starts via 0x6ebe0 (2.5, 1.3, 0.0 x4, double 0x1f70a0). */
 void camera_follow_target_255f0(void)
 {
-	uint32_t p = EF_U32(0x001f71bcu);
+	uint32_t p = g_current_object;
 	uint32_t t = lookup_filtered_indexed_object((int32_t)EF_U32(p + 0x144u) >> 16);
 	uint32_t u, k;
 	double dist, wgt, dx, dy, c, h, lim, base;
@@ -19181,7 +19181,7 @@ void camera_follow_target_255f0(void)
 	dist = distance_2d_b415c(p + 0x49u, t + 0x49u);
 	wgt = guest_fn_dcb96_x(-dist * 0.0025);
 	memcpy(ef_guest_memory_ptr(0x001f7068u), &wgt, 8);
-	p = EF_U32(0x001f71bcu);
+	p = g_current_object;
 	memcpy(&dx, ef_guest_memory_ptr(t + 0x49u), 8);
 	memcpy(&c, ef_guest_memory_ptr(p + 0x49u), 8);
 	dx = dx - c;
@@ -19190,7 +19190,7 @@ void camera_follow_target_255f0(void)
 	dy = dy - c;
 	h = wrap_angle_b42f0(atan2_b4620(dy, dx) + wgt * 3.1415926536);
 	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
-	u = lookup_filtered_indexed_object((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+	u = lookup_filtered_indexed_object((int32_t)EF_U32(g_current_object + 0x41u) >> 16);
 	if (u == 0u) {
 		update_current_mode_2546c();
 		return;
@@ -19209,7 +19209,7 @@ void camera_follow_target_255f0(void)
 	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
 	if (h > lim)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
-	p = EF_U32(0x001f71bcu);
+	p = g_current_object;
 	k = EF_U8(p + 0xe9u);
 	memcpy(ef_guest_memory_ptr(0x001f7100u), ef_guest_memory_ptr(0x00128591u + k * 0xe5u), 8);
 	if (EF_U16(p + 0x146u) != EF_U16(u + 0x146u)) {

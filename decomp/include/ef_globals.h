@@ -45,6 +45,8 @@ extern int16_t g_excluded_object_index; /* 0x001f71d0 */
 extern uint8_t g_object_type_flags[]; /* 0x00128636, 0xe5-byte stride */
 extern ef_addr32 g_world_grid_base; /* 0x0019bb58, pointer to 0xca-byte records */
 extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
+extern uint32_t g_video_width; /* 0x0015b744 */
+extern uint32_t g_video_height; /* 0x0015b748 */
 extern uint8_t g_world_grid_mode; /* 0x00127da9, gates alternate grid lookup */
 extern uint8_t g_world_grid_marker; /* 0x001a666b, compares neighboring rows */
 extern uint8_t g_external_grid_count; /* 0x0012583a, number of external rows */
