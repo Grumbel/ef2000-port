@@ -522,4 +522,12 @@ extern float g_camera_chain_clock; /* 0x12dc78 */
 extern float g_camera_chain_step; /* 0x132b20 */
 extern double g_camera_chain_wrap; /* 0x18ac52, constant -1.0 */
 
+/* Plane window callback, 0x69f1c. */
+extern uint8_t g_saved_object_pair_marks[60]; /* 0x1f8f78, copy of 20 pair marks */
+extern uint8_t g_plane_window_redrawn; /* 0x1f6f4f */
+extern uint8_t g_socket_pending_ready; /* 0x00125935 */
+
+/* Mission-role buttons, 0x4f548. */
+extern uint32_t g_assignment_target_record; /* 0x1a54fa */
+
 #endif

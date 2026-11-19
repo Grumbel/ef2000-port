@@ -231,7 +231,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00014ef4	refresh_all_event_slots			edx	0	Original 0x14ef4 (29 bytes); 34 signed-index events; callers 5f60@5fbf/5fd8@6008; docs/compiler-abi.md
 0x0001d5cc	dispatch_two_object_events	EAX:ef_addr32,DX:int16_t		ebx,ecx	0	Original 0x1d5cc (38 bytes); optional then unconditional dispatch; callers 1e0ec@1e126/394e0@3953f; docs/compiler-abi.md
 0x0004f314	update_dialog_bindings	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x4f314 (88 bytes); two child bindings and guest close; callers 4b6a0@4b761/4ca90@4cad5; docs/compiler-abi.md
-0x0004f6bc	flush_active_dialog_slots			ebx,edx	0	Original 0x4f6bc (74 bytes); BL byte index may wrap; callers 4f3e0@4f48b/4f494@4f53f; docs/compiler-abi.md
+0x0004f6bc	flush_active_dialog_slots		EAX:uint32_t	ebx,edx	0	Original 0x4f6bc (74 bytes); BL byte index may wrap; EAX = final index (zero-extended BL); callers 4f3e0@4f48b/4f494@4f53f; docs/compiler-abi.md
 0x000545e4	send_command_1d			ebx,ecx,edx,esi,edi,ebp	0	Original 0x545e4 (26 bytes); one stack byte 1d, call 0xa3f74 size 1; caller 7e758@7e7b8; docs/compiler-abi.md
 0x00054600	send_marker_packet_26			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54600 (34 bytes); stack bytes 26 marker, size 2; caller 557e8@55855; docs/compiler-abi.md
 0x00054624	send_marker_packet_1e			ebx,ecx,edx,esi,edi,ebp	0	Original 0x54624 (34 bytes); stack bytes 1e marker, size 2; caller 558b0@5591e; docs/compiler-abi.md
@@ -3692,3 +3692,9 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00032b90	select_key_view_f8_32b90		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x32b90 stub: MOV EAX,0x182af4 ("F8"); JMP 0x32c04; caller 95e58@960b0
 0x00097b18	advance_camera_chain_97b18		EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x97b18 pushes EBX EDX, returns via 0x97a8e; ECX/ESI/EDI untouched and 0x97a94 preserves all; EAX = sign-extended last index; caller 3dd30@3e141
 0x000974b8	step_camera_chain_974b8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x974b8 pushes EBX EDX and exits via 0x94a70; ECX/ESI/EDI untouched and 0x97860 preserves all; EAX scratch (FNSTSW or -1); caller 97464@974ae
+0x00069f1c	gpwRedrawPlaneWindow		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x69f1c pushes EBX EDX; every callee preserves ECX/ESI/EDI/EBP; EAX returns the connection-mode byte (mode 3: the 0xa7588 result); GUI callback slot 0x12b680
+0x0004f3e0	mpMission2Click	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original pushes EBX ECX EDX; EAX widget in, EAX out (roster count, holder count or the 0x4f6bc result); tail callee 0x4f6bc preserves only EBX/EDX; GUI callback
+0x0004f494	mpMission3Click	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original pushes EBX ECX EDX; EAX widget in, EAX out (roster count, holder count or the 0x4f6bc result); tail callee 0x4f6bc preserves only EBX/EDX; GUI callback
+0x0004f548	mpMission4Click	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original pushes EBX ECX EDX; EAX widget in, EAX out (roster count, holder count or the 0x4f6bc result); tail callee 0x4f6bc preserves only EBX/EDX; GUI callback
+0x0004f608	mpClickATC	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx	0	Original pushes EBX ECX EDX; EAX widget in, EAX out (roster count, holder count or the 0x4f6bc result); tail callee 0x4f6bc preserves only EBX/EDX; GUI callback
+0x000a7588	show_widget_a7588_r	EAX:ef_addr32,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	Original 0xa7588; EAX result as left by 0xa6d00/0xa66cc (or the null widget); used where the caller returns it

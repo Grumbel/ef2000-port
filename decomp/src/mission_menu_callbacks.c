@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
+#include "ef_globals.h"
 #include "ef_mem.h"
 
 /* 0x4ec44, 44 bytes: the Mission1Click body subtracts 60 from the
@@ -96,4 +97,71 @@ void mp_redraw_target_view_50c40(ef_addr32 widget)
     uint8_t mode = (uint8_t)(1u - EF_U8(0x1a53deu));
     EF_U8(0x1a53deu) = mode;
     show_widget_a7588(widget, mode == 0u ? 0x13211eu : 0x132119u);
+}
+
+/* Shared body of the mission-role buttons 0x4f3e0/0x4f494/0x4f548/0x4f608.
+ * The widget name (bytes +0x42/+0x43) is the button number "1".."16";
+ * a second digit after "1" selects 10..19. A number below the roster
+ * count toggles ROLE on that entry: an entry already holding ROLE is
+ * cleared, otherwise it takes ROLE only while fewer than four entries
+ * hold it. The button row, the button labels and the active dialog
+ * slots are then refreshed. The index stays a signed 16-bit value as in
+ * the original, so a name below '0' reaches entries before the table.
+ * EAX, which the GUI dispatcher sees, is the roster count on the early
+ * exits, the holder count when the cap refuses, else the slot flush
+ * result. */
+static uint32_t toggle_mission_role(ef_addr32 widget, uint8_t role, int check_target)
+{
+    int16_t index = (int16_t)(EF_U8(widget + 0x42u) - 0x30u);
+    int16_t holders;
+    int16_t i;
+
+    if (index == 1) {
+        uint8_t digit = EF_U8(widget + 0x43u);
+        if (digit >= '0' && digit <= '9')
+            index = (int16_t)(digit - 0x26u);
+    }
+    if (index >= (int16_t)g_assignment_entry_count)
+        return g_assignment_entry_count;
+    if (check_target && g_assignment_target_record != 0u)
+        return g_assignment_entry_count;
+    if (g_tactical_lookup_codes[index] == role) {
+        g_tactical_lookup_codes[index] = 0u;
+    } else {
+        holders = 0;
+        for (i = 0; i < (int16_t)g_assignment_entry_count; ++i)
+            if (g_tactical_lookup_codes[i] == role)
+                ++holders;
+        if (holders >= 4)
+            return (uint32_t)(int32_t)holders;
+        g_tactical_lookup_codes[index] = role;
+    }
+    select_button_state_4f718((uint8_t)index, g_tactical_lookup_codes[index]);
+    fill_button_widgets_4f7d0();
+    return flush_active_dialog_slots();
+}
+
+/* 0x4f3e0, 180 bytes, callback slot 0x12ba78: role 3. */
+uint32_t mpMission2Click(ef_addr32 widget)
+{
+    return toggle_mission_role(widget, 3u, 0);
+}
+
+/* 0x4f494, 180 bytes, callback slot 0x12ba80: role 4. */
+uint32_t mpMission3Click(ef_addr32 widget)
+{
+    return toggle_mission_role(widget, 4u, 0);
+}
+
+/* 0x4f548, 192 bytes, callback slot 0x12ba88: role 1, refused while a
+ * target record (dword 0x1a54fa) is selected. */
+uint32_t mpMission4Click(ef_addr32 widget)
+{
+    return toggle_mission_role(widget, 1u, 1);
+}
+
+/* 0x4f608, 180 bytes, callback slot 0x12ba90: role 2. */
+uint32_t mpClickATC(ef_addr32 widget)
+{
+    return toggle_mission_role(widget, 2u, 0);
 }

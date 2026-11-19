@@ -468,7 +468,7 @@ void dispatch_two_object_events(ef_addr32 object, int16_t index); /* 0x1d5cc EAX
 void guest_dispatch_object_event_optional(ef_addr32 object, int16_t index); /* 0x55dac */
 void guest_dispatch_object_event_required(ef_addr32 object, int16_t index); /* 0x1d5f4 */
 void update_dialog_bindings(ef_addr32 first, ef_addr32 second); /* 0x4f314 EAX/EDX */
-void flush_active_dialog_slots(void); /* 0x4f6bc */
+uint32_t flush_active_dialog_slots(void); /* 0x4f6bc */
 ef_addr32 guest_open_named_dialog(ef_addr32 name, ef_addr32 root); /* 0xa46cc */
 ef_addr32 guest_select_dialog_widget(ef_addr32 root, ef_addr32 name); /* 0xa78bc */
 void guest_bind_dialog_widget(ef_addr32 widget, ef_addr32 source); /* 0xa7588 */
@@ -6551,6 +6551,12 @@ void guest_fn_c4167_x(void); /* 0xc4167 */
 
 
 void refresh_slot_list_69d10(void);
+uint32_t gpwRedrawPlaneWindow(void); /* 0x69f1c */
+uint32_t show_widget_a7588_r(ef_addr32 widget, ef_addr32 text); /* 0xa7588 EAX/EDX, EAX result */
+uint32_t mpMission2Click(ef_addr32 widget); /* 0x4f3e0 */
+uint32_t mpMission3Click(ef_addr32 widget); /* 0x4f494 */
+uint32_t mpMission4Click(ef_addr32 widget); /* 0x4f548 */
+uint32_t mpClickATC(ef_addr32 widget); /* 0x4f608 */
 uint8_t guest_fn_8ac64_x(int32_t a); /* 0x8ac64 EAX -> AL */
 void guest_fn_b3168_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4); /* 0xb3168 EAX/EDX/EBX/ECX + 5 stack, callee cleanup */
 

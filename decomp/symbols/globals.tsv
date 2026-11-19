@@ -499,6 +499,9 @@ addr	size	type	name	evidence	notes
 0x0012dc78	4	float	g_camera_chain_clock	97b1a..97b2c FLDS step, FADDS clock, FSTPS clock	chain clock accumulator
 0x00132b20	4	float	g_camera_chain_step	97464 stores 0x3e000000 (0.125)	clock step per update
 0x0018ac52	8	double	g_camera_chain_wrap	974e3 FADDL after the clock passes 1.0	constant -1.0 in the data segment
+0x001f8f78	60	uint8_t[60]	g_saved_object_pair_marks	69f2d memcpy of 0x3c bytes from 0x1f6ef4	saved copy of twenty 3-byte pair marks
+0x001f6f4f	1	uint8_t	g_plane_window_redrawn	69f37 stores 1 in gpwRedrawPlaneWindow	meaning otherwise unknown
+0x001a54fa	4	uint32_t	g_assignment_target_record	4c78c clears, 4f581 tests, 4d180 tests	selected target sprite record; role-1 buttons refused while set
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
