@@ -520,5 +520,6 @@ extern ef_camera_chain_record g_camera_chain_records[]; /* 0x212270, extent unkn
 extern int16_t g_camera_chain_head; /* 0x12dc74 */
 extern float g_camera_chain_clock; /* 0x12dc78 */
 extern float g_camera_chain_step; /* 0x132b20 */
+extern double g_camera_chain_wrap; /* 0x18ac52, constant -1.0 */
 
 #endif

@@ -45,7 +45,7 @@ void draw_chain_97464(void)
             guest_fn_978e8(record);
             index = (int16_t)EF_U16(record + 4u);
         }
-        guest_fn_974b8();
+        step_camera_chain_974b8();
     }
 }
 

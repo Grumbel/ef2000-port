@@ -24,3 +24,26 @@ int32_t advance_camera_chain_97b18(void)
     }
     return index;
 }
+
+/* 0x974b8, 121 bytes. Advance the chain clock; once it exceeds 1.0
+ * (unordered also continues: FLD1/FCOMPS/SAHF/JAE), subtract one through
+ * the double constant -1.0 at 0x18ac52 and step every record's animation
+ * with 0x97860. A record whose step returns nonzero makes its successor
+ * the new head; the walk always continues with the successor reloaded
+ * after the call. Exits use POP EDX/POP EBX/RET at 0x94a70; EAX scratch.
+ * Sole caller draw_chain_97464. */
+void step_camera_chain_974b8(void)
+{
+    int16_t index;
+
+    g_camera_chain_clock = g_camera_chain_step + g_camera_chain_clock;
+    if (1.0f >= g_camera_chain_clock)
+        return;
+    g_camera_chain_clock = (float)(g_camera_chain_clock + g_camera_chain_wrap);
+    index = g_camera_chain_head;
+    while (index != -1) {
+        if (step_animation_97860((ef_addr32)(uintptr_t)&g_camera_chain_records[index]) != 0)
+            g_camera_chain_head = g_camera_chain_records[index].next;
+        index = g_camera_chain_records[index].next;
+    }
+}

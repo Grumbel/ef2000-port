@@ -2727,6 +2727,7 @@ uint32_t next_free_object_9075c(uint32_t start);
 void pair_with_target_948c4(int16_t target_id);
 void apply_camera_record_97a94(int16_t index);
 int32_t advance_camera_chain_97b18(void); /* 0x97b18 */
+void step_camera_chain_974b8(void); /* 0x974b8 */
 void read_camera_record_97ca8(ef_addr32 out_x, ef_addr32 out_y, ef_addr32 out_z, ef_addr32 out_a,
                               ef_addr32 stack_b, ef_addr32 stack_c);
 void guest_fn_5b2f0(void); /* 0x5b2f0 */

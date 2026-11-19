@@ -498,6 +498,7 @@ addr	size	type	name	evidence	notes
 0x0012dc74	2	int16_t	g_camera_chain_head	97b26 loads, 97a4c stores -1	first chain index, -1 empty
 0x0012dc78	4	float	g_camera_chain_clock	97b1a..97b2c FLDS step, FADDS clock, FSTPS clock	chain clock accumulator
 0x00132b20	4	float	g_camera_chain_step	97464 stores 0x3e000000 (0.125)	clock step per update
+0x0018ac52	8	double	g_camera_chain_wrap	974e3 FADDL after the clock passes 1.0	constant -1.0 in the data segment
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
