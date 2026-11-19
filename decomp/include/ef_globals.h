@@ -5,6 +5,9 @@
 #define EF_GLOBALS_H
 
 #include "ef_types.h"
+
+extern uint8_t g_character_class_table[256]; /* 0x195af0, byte-wrapped c+1 */
+extern char g_network_session_title[]; /* 0x19f566, only minimum extent known */
 #include "ef_structs/hiscore.h"
 #include "ef_structs/spatial.h"
 #include "ef_structs/world_grid.h"
