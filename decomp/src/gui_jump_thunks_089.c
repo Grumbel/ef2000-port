@@ -131,10 +131,28 @@ void simShowDebrief(void)
     run_named_widget_7cc38();
 }
 
+/* 0x84b8c, 5 bytes. */
+void ChooseEnemy(void)
+{
+    finish_enemy_selection_7ccdc();
+}
+
+/* 0x84b94, 5 bytes. */
+void gpwExitSimulator(void)
+{
+    close_simulator_7d2f8();
+}
+
 /* 0x84b9c, 5 bytes. */
 uint32_t gpwSimTypeSelected(void)
 {
     return call_b1a10_1379bc();
+}
+
+/* 0x84ba4, 5 bytes. */
+void onopenParams(void)
+{
+    open_simulator_parameters_7c770();
 }
 
 /* 0x84bac, 5 bytes. */
@@ -149,10 +167,45 @@ void InitArcade2(void)
     select_entry_4bf8();
 }
 
+/* 0x84bbc, 5 bytes. */
+void gpwSelectLevel(void)
+{
+    select_arcade_level_494c();
+}
+
 /* 0x84bc4, 5 bytes. */
 void arcNextDifficulty(void)
 {
     enter_hiscore_screen_4e14();
+}
+
+/* 0x84bcc, 5 bytes. */
+void kotsClickTeam(void)
+{
+    select_kots_team_4f18();
+}
+
+/* 0x84bd4, 5 bytes. */
+void InitCampaign(void)
+{
+    initialize_campaign_5630();
+}
+
+/* 0x84bdc, 5 bytes. */
+void gpwLoadSaveCampaign(void)
+{
+    load_saved_campaign_bfcc();
+}
+
+/* 0x84be4, 5 bytes. The original target 0xa9a4 immediately returns. */
+void gpwRedrawMap(void)
+{
+}
+
+/* 0x84bec, 5 bytes. */
+void gpwExitCampaign(void)
+{
+    exit_campaign_b1e0();
 }
 
 /* 0x84bf4, 5 bytes. */
@@ -179,10 +232,21 @@ void gpwNextFLight(void)
     emit_and_advance_d628();
 }
 
+/* 0x84c14, 5 bytes. The original target 0xe48c immediately returns. */
+void gcClickMap(void)
+{
+}
+
 /* 0x84c1c, 5 bytes. */
 void QuitEF2000(void)
 {
     update_panel_pages_42e8c();
+}
+
+/* 0x84c24, 5 bytes. */
+void onopenDirectPlaySettings(void)
+{
+    open_directplay_settings_98bec();
 }
 
 /* 0x84c2c, 5 bytes. */
@@ -245,24 +309,5 @@ void InitCustom(void)
     update_flight_options_widgets_7e2a8();
 }
 
-#ifdef EF_DECOMP_HOST_TEST
-/* Every original five-byte body is a JMP rel32. A host-only adapter models
- * this as a guest tail call with the incoming register tuple unchanged.
- * The target is responsible for modifying registers and RAM. */
-#define EF_DEFINE_UI_JUMP_089(name, addr, target) \
-    ef_ui_regs_089 ef_ui_jump_##name##_##addr(ef_ui_regs_089 registers) \
-    { return ef_ui_jump_guest_089(0x##target##u, registers); }
-EF_UI_JUMPS_089(EF_DEFINE_UI_JUMP_089)
-#undef EF_DEFINE_UI_JUMP_089
-
-#define EF_REGISTER_UI_JUMP_089(name, addr, target) \
-    { 0x##addr##u, 0x##target##u, #name, ef_ui_jump_##name##_##addr },
-const ef_ui_jump_entry_089 ef_ui_jump_table_089[] = {
-    EF_UI_JUMPS_089(EF_REGISTER_UI_JUMP_089)
-};
-#undef EF_REGISTER_UI_JUMP_089
-
-const unsigned ef_ui_jump_table_size_089 =
-    (unsigned)(sizeof(ef_ui_jump_table_089) / sizeof(ef_ui_jump_table_089[0]));
-
-#endif
+/* 0x84c4c jumps to 0x9bcf8. Its callback entry remains outside the
+ * canonical inventory pending caller and boundary evidence. */

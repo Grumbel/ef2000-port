@@ -6,6 +6,17 @@
 
 #include "ef_types.h"
 
+/* Original GUI callback implementations used by the hybrid thunks. */
+void finish_enemy_selection_7ccdc(void); /* 0x7ccdc */
+void close_simulator_7d2f8(void); /* 0x7d2f8 */
+void open_simulator_parameters_7c770(void); /* 0x7c770 */
+void select_arcade_level_494c(void); /* 0x494c */
+void select_kots_team_4f18(void); /* 0x4f18 */
+void initialize_campaign_5630(void); /* 0x5630 */
+void load_saved_campaign_bfcc(void); /* 0xbfcc */
+void exit_campaign_b1e0(void); /* 0xb1e0 */
+void open_directplay_settings_98bec(void); /* 0x98bec */
+
 /* Game entry path from the SHA-pinned original, recovered from instruction
  * flow. These C interfaces are not yet Watcom splice-verified. */
 int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);

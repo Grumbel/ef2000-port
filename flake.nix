@@ -1012,7 +1012,7 @@
             ${source}/decomp/src/target_close.c \
             -o work/environment_gui_088_host_test
           work/environment_gui_088_host_test
-          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
+          $CC -std=c11 -O2 -Wall -Wextra -Werror \
             -I${source}/decomp/include \
             ${source}/tests/decomp_ui_thunks_089_test.c \
             ${source}/decomp/src/gui_jump_thunks_089.c \

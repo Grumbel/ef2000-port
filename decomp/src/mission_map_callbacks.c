@@ -4,6 +4,18 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
+/* 0x4c610, 37 bytes: 16-bit map selection toggles as 1 - old. */
+void mp_cycle_map_4c610(void)
+{
+    uint16_t mode = EF_U16(0x12656au);
+
+    EF_U8(0x12654cu) = 1u;
+    EF_U8(0x1a54f3u) = 1u;
+    EF_U16(0x12656au) = (uint16_t)(1u - mode);
+}
+
+#ifdef EF_DECOMP_HOST_TEST
+
 /* These are named GUI callbacks, not complete replacements for their guest
  * UI callees. The callback receives the original EAX/EDX values; its return
  * is the original callee's EAX. It also preserves original call ordering. */
@@ -42,14 +54,6 @@ void mp_map_select_4bef0(void)
     mp_ui_guest_map_select_084(0x4bf1cu, 0x137980u, 0x137988u, 0x137960u);
     if (EF_U8(0x1a53dcu) == 4u)
         guest(0x4e360u, 0u, 0u);
-}
-
-/* 0x4c610, 37 bytes: 16-bit map selection toggles as 1 - old. */
-void mp_cycle_map_4c610(void)
-{
-    EF_U8(0x12654cu) = 1u;
-    EF_U8(0x1a54f3u) = 1u;
-    EF_U16(0x12656au) = (uint16_t)(1u - EF_U16(0x12656au));
 }
 
 static void increment_three_way_flag(uint32_t address)
@@ -128,3 +132,4 @@ void mp_dec_speed_4ec14(void)
     EF_U16(0x1a56f4u) = speed > 900u ? 900u : speed;
     guest(0x4ec70u, 0u, 0u);
 }
+#endif

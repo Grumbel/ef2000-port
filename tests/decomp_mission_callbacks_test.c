@@ -56,6 +56,41 @@ void mp_ui_guest_map_select_084(uint32_t target, uint32_t eax,
     calls[count++].ebx = ebx;
 }
 
+ef_addr32 find_named_or_abort_a46cc(ef_addr32 name)
+{
+    return mp_ui_guest_call_084(0xa46ccu, name, 0);
+}
+
+void close_widget_a4b80(uint32_t id)
+{
+    mp_ui_guest_call_084(0xa4b80u, id, 0);
+}
+
+void reset_view_ac9e8(void)
+{
+    mp_ui_guest_call_084(0xac9e8u, 0, 0);
+}
+
+ef_addr32 apply_a4cb4_a4d90(ef_addr32 name)
+{
+    return mp_ui_guest_call_084(0xa4d90u, name, 0);
+}
+
+void redraw_widget_ac9a0(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0xac9a0u, widget, 0);
+}
+
+void activate_widget_a4cb4(uint16_t id)
+{
+    mp_ui_guest_call_084(0xa4cb4u, id, 0);
+}
+
+void show_widget_a7588(ef_addr32 widget, ef_addr32 text)
+{
+    mp_ui_guest_call_084(0xa7588u, widget, text);
+}
+
 static void clear(void)
 {
     memset(ram, 0, sizeof(ram));

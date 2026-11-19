@@ -3594,3 +3594,23 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00084c6c	simrecallmiss			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7bc00; direct C tail call to toggle_named_widget_7bc00. OpenWatcom emits a single JMP to the named target.
 0x00084c74	gpwUpdateTime			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x42f7c; direct C tail call to bind_page_widgets_42f7c. OpenWatcom emits a single JMP to the named target.
 0x00084c7c	InitCustom			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7e2a8; direct C tail call to update_flight_options_widgets_7e2a8. OpenWatcom emits a single JMP to the named target.
+0x0004c610	mp_cycle_map_4c610			ebx,ecx,edx,esi,edi,ebp	0	16-bit 1 - old selection with both dirty bytes set.
+0x0004f2f8	mp_click_v8_okay_4f2f8			ebx,ecx,edx,esi,edi,ebp	0	Find the warning widget, close its ID, then tail-call the view reset.
+0x0004f36c	mp_warning_ok_click_4f36c			ebx,ecx,edx,esi,edi,ebp	0	Find the second warning widget, close its ID, then tail-call the view reset.
+0x000505e4	mp_return_to_campaign_505e4			ebx,ecx,edx,esi,edi,ebp	0	Retain the original lookup pointer across activation, then redraw it.
+0x00050604	mp_no_quit_50604			ebx,ecx,edx,esi,edi,ebp	0	Restore three menu fields, reset the view, then set mode six.
+0x00050750	mp_miss_plan_task_50750			ebx,ecx,edx,esi,edi,ebp	0	Set both dirty bytes and toggle the task byte on zero versus nonzero.
+0x000507f4	mp_set_role_507f4			ebx,ecx,edx,esi,edi,ebp	0	Look up the role selector and close the widget ID.
+0x0005080c	mp_set_ac_type_5080c			ebx,ecx,edx,esi,edi,ebp	0	Close the previous aircraft widget before activating the new one.
+0x00050c40	mp_redraw_target_view_50c40	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Wrap the view toggle and update the incoming widget label.
+0x00084b8c	ChooseEnemy			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7ccdc; exact C tail JMP through the named hybrid binding finish_enemy_selection_7ccdc.
+0x00084b94	gpwExitSimulator			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7d2f8; exact C tail JMP through the named hybrid binding close_simulator_7d2f8.
+0x00084ba4	onopenParams			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x7c770; exact C tail JMP through the named hybrid binding open_simulator_parameters_7c770.
+0x00084bbc	gpwSelectLevel			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x494c; exact C tail JMP through the named hybrid binding select_arcade_level_494c.
+0x00084bcc	kotsClickTeam			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x4f18; exact C tail JMP through the named hybrid binding select_kots_team_4f18.
+0x00084bd4	InitCampaign			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x5630; exact C tail JMP through the named hybrid binding initialize_campaign_5630.
+0x00084bdc	gpwLoadSaveCampaign			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xbfcc; exact C tail JMP through the named hybrid binding load_saved_campaign_bfcc.
+0x00084be4	gpwRedrawMap			eax,ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xa9a4 reaches a bare RET; preserves all GPRs and flags.
+0x00084bec	gpwExitCampaign			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xb1e0; exact C tail JMP through the named hybrid binding exit_campaign_b1e0.
+0x00084c14	gcClickMap			eax,ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xe48c reaches a bare RET; preserves all GPRs and flags.
+0x00084c24	onopenDirectPlaySettings			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x98bec; exact C tail JMP through the named hybrid binding open_directplay_settings_98bec.

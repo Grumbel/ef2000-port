@@ -6,44 +6,9 @@
 
 #include <assert.h>
 #include <stdint.h>
-#include <string.h>
 
 static unsigned calls;
 static uint32_t last_target;
-static ef_ui_regs_089 last_regs;
-
-ef_ui_regs_089 ef_ui_jump_guest_089(uint32_t target, ef_ui_regs_089 registers)
-{
-    ++calls;
-    last_target = target;
-    last_regs = registers;
-    registers.eax ^= 0x3a5ac003u;
-    registers.edx += 17u;
-    return registers;
-}
-
-static void test_pending_jump_models(void)
-{
-    const ef_ui_regs_089 incoming = {0x12345678u, 0xfedcba98u,
-                                      0x13579bdfu, 0x2468ace0u};
-    unsigned i;
-    assert(ef_ui_jump_table_size_089 == 11u);
-    for (i = 0; i < ef_ui_jump_table_size_089; ++i) {
-        ef_ui_regs_089 output;
-        const ef_ui_jump_entry_089 *entry = &ef_ui_jump_table_089[i];
-        assert(strlen(entry->original_name) != 0u);
-        calls = 0u;
-        output = entry->model(incoming);
-        assert(calls == 1u);
-        assert(last_target == entry->jump_target);
-        assert(memcmp(&last_regs, &incoming, sizeof(incoming)) == 0);
-        assert(output.eax == (incoming.eax ^ 0x3a5ac003u));
-        assert(output.edx == incoming.edx + 17u);
-        assert(output.ebx == incoming.ebx);
-        assert(output.ecx == incoming.ecx);
-    }
-}
-
 const char g_quit_confirmation_name[5] = "test";
 const char g_quit_notice_text[1] = "";
 
@@ -118,7 +83,16 @@ static void test_quit_wrappers(void)
     X(entergamename, show_notice_34390, 0x34390u) \
     X(simrecallmiss, toggle_named_widget_7bc00, 0x7bc00u) \
     X(gpwUpdateTime, bind_page_widgets_42f7c, 0x42f7cu) \
-    X(InitCustom, update_flight_options_widgets_7e2a8, 0x7e2a8u)
+    X(InitCustom, update_flight_options_widgets_7e2a8, 0x7e2a8u) \
+    X(ChooseEnemy, finish_enemy_selection_7ccdc, 0x7ccdcu) \
+    X(gpwExitSimulator, close_simulator_7d2f8, 0x7d2f8u) \
+    X(onopenParams, open_simulator_parameters_7c770, 0x7c770u) \
+    X(gpwSelectLevel, select_arcade_level_494c, 0x494cu) \
+    X(kotsClickTeam, select_kots_team_4f18, 0x4f18u) \
+    X(InitCampaign, initialize_campaign_5630, 0x5630u) \
+    X(gpwLoadSaveCampaign, load_saved_campaign_bfcc, 0xbfccu) \
+    X(gpwExitCampaign, exit_campaign_b1e0, 0xb1e0u) \
+    X(onopenDirectPlaySettings, open_directplay_settings_98bec, 0x98becu)
 
 #define STUB_TARGET(name, target, address) \
     void target(void) { ++calls; last_target = address; }
@@ -148,8 +122,12 @@ static void test_recovered_jumps(void)
 
 int main(void)
 {
-    test_pending_jump_models();
     test_recovered_jumps();
     test_quit_wrappers();
+
+    calls = 0;
+    gpwRedrawMap();
+    gcClickMap();
+    assert(calls == 0);
     return 0;
 }
