@@ -17,6 +17,14 @@ void load_saved_campaign_bfcc(void); /* 0xbfcc */
 void exit_campaign_b1e0(void); /* 0xb1e0 */
 void open_directplay_settings_98bec(void); /* 0x98bec */
 
+/* Named original implementations used by the map and menu callbacks. */
+void adjust_route_view_4dcd8(ef_addr32 widget); /* 0x4dcd8 */
+void rebuild_waypoint_speed_4ec70(void); /* 0x4ec70 */
+void open_hiscores_a870(ef_addr32 widget); /* 0xa870 */
+void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
+uint8_t hiscore_load_41fc(void); /* 0x41fc */
+void hiscore_refresh_display_40dc(uint32_t widget); /* 0x40dc */
+
 /* Game entry path from the SHA-pinned original, recovered from instruction
  * flow. These C interfaces are not yet Watcom splice-verified. */
 int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);
@@ -82,8 +90,6 @@ void gui_new_socket_37254(void);
 
 /* Batch 088: eight original environment commands and twelve GUI callbacks.
  * Hooks are host-only boundaries for unresolved original guest calls. */
-void environment_report_normal_line_088(ef_addr32 source, uint32_t format,
-                                        uint32_t sink);
 void env_normal_dbdd0(void);
 uint32_t env_spacecorr_dbe5c(uint32_t eax);
 uint32_t env_rings_dbe80(uint32_t eax);
@@ -93,8 +99,6 @@ void env_shield_dbee4(void);
 void env_city_dbeec(void);
 uint32_t env_day_dbef8(uint32_t eax);
 
-uint32_t gui_guest_call_088(uint32_t entry, uint32_t eax, uint32_t edx,
-                           uint32_t ebx);
 void gui_mainloop_4318(ef_addr32 widget);
 void gui_change_difficulty_4cf4(ef_addr32 widget);
 void gui_change_mode_a960(ef_addr32 widget);
@@ -106,7 +110,7 @@ void gui_click_pilot3_be8c(ef_addr32 widget);
 void gui_click_pilot4_bed8(ef_addr32 widget);
 void gui_save_conflict_bf24(ef_addr32 widget);
 void gui_show_debrief_c838(void);
-void gui_alter_size_ca40(void);
+uint32_t gui_alter_size_ca40(uint32_t eax);
 
 /* Batch 087: 15 original damage/environment parameter readers. The parser
  * hook represents the untouched guest sscanf, not a confirmed Watcom ABI. */
@@ -190,9 +194,6 @@ void gpw_open_big_current_weapon_699d4(ef_addr32 widget);
 
 /* Mission-planning GUI callback entries (batch 084). Guest UI callees are
  * explicit register-call hooks; no guest splice ABI is claimed yet. */
-uint32_t mp_ui_guest_call_084(uint32_t address, uint32_t eax, uint32_t edx);
-void mp_ui_guest_map_select_084(uint32_t target, uint32_t eax,
-                                uint32_t edx, uint32_t ebx);
 void mp_zoom_in_map_4bc40(ef_addr32 widget);
 void mp_redraw_map_4bec0(ef_addr32 widget);
 void mp_map_select_4bef0(void);
@@ -201,7 +202,7 @@ void mp_ewr_coverage_4c638(void);
 void mp_toggle_flags_4c66c(void);
 void mp_clear_wp_route_4dae8(void);
 void mp_redraw_wp_heights_4e768(void);
-void mp_inc_speed_4eb78(void);
+uint32_t mp_inc_speed_4eb78(void);
 void mp_dec_speed_4ec14(void);
 void mp_mission_1_click_4ec44(void);
 void mp_click_v8_okay_4f2f8(void);

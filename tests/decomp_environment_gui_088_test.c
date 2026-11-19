@@ -7,6 +7,7 @@
 
 #include <assert.h>
 #include <stdint.h>
+#include <stdarg.h>
 #include <stdio.h>
 #include <string.h>
 
@@ -18,7 +19,7 @@ static uint16_t rebuilt_group;
 uint16_t g_debrief_group;
 int16_t g_match_group_count;
 static uint32_t compare_results[2];
-static ef_addr32 report_source;
+static ef_addr32 report_source, report_buffer;
 static uint32_t report_format, report_sink;
 
 void *ef_guest_memory_ptr(ef_addr32 addr)
@@ -27,12 +28,21 @@ void *ef_guest_memory_ptr(ef_addr32 addr)
     return &ram[addr];
 }
 
-void environment_report_normal_line_088(ef_addr32 source, uint32_t format,
-                                        uint32_t sink)
+int32_t guest_sprintf_a4342(ef_addr32 buffer, ef_addr32 format, ...)
 {
-    ++report_count;
-    report_source = source;
+    va_list args;
+    va_start(args, format);
+    report_source = va_arg(args, ef_addr32);
+    va_end(args);
+    report_buffer = buffer;
     report_format = format;
+    return 0;
+}
+
+void guest_callptr1_x(ef_addr32 sink, ef_addr32 buffer)
+{
+    assert(buffer == report_buffer);
+    ++report_count;
     report_sink = sink;
 }
 
@@ -81,6 +91,41 @@ void set_session_text_7c4fc(ef_addr32 name, uint32_t target)
 void redraw_item_a5ef8(uint32_t id)
 {
     gui_guest_call_088(0xa5ef8u, id, 0, 0);
+}
+
+uint8_t hiscore_load_41fc(void)
+{
+    return (uint8_t)gui_guest_call_088(0x41fcu, 0, 0, 0);
+}
+
+void hiscore_refresh_display_40dc(uint32_t widget)
+{
+    gui_guest_call_088(0x40dcu, widget, 0, 0);
+}
+
+void open_hiscores_a870(ef_addr32 widget)
+{
+    gui_guest_call_088(0xa870u, widget, 0, 0);
+}
+
+void generate_gui_help_4595c(ef_addr32 widget)
+{
+    gui_guest_call_088(0x4595cu, widget, 0, 0);
+}
+
+void close_widget_a4b80(uint32_t id)
+{
+    gui_guest_call_088(0xa4b80u, id, 0, 0);
+}
+
+void randomize_pilot_779f4(uint32_t pilot)
+{
+    gui_guest_call_088(0x779f4u, pilot, 0, 0);
+}
+
+void fill_record_dialog_bc38(ef_addr32 name, uint8_t slot)
+{
+    gui_guest_call_088(0xbc38u, name, slot, 0);
 }
 
 void rebuild_page_c868(void)
@@ -174,8 +219,8 @@ static void test_mainloop_and_mode(void)
     reset();
     gui_mainloop_4318(0x1000u);
     assert(call_count == 2u);
-    check_call(0, 0x41fcu, 0x1000u, 0x1000u);
-    check_call(1, 0x40dcu, 0x1000u, 0x1000u);
+    check_call(0, 0x41fcu, 0, 0);
+    check_call(1, 0x40dcu, 0x1000u, 0);
 
     reset();
     gui_change_mode_a960(0x345u);
@@ -251,17 +296,17 @@ static void test_pilots(void)
     reset();
     EF_U32(0x197668u) = 0x200u;
     gui_click_pilot3_be8c(0x200u);
-    check_call(1, 0x779f4u, 0x243u, 1u);
+    check_call(1, 0x779f4u, 0x243u, 0u);
     check_call(2, 0xbc38u, 0x1808fcu, 1u);
 
     reset();
     gui_click_pilot4_bed8(0x200u);
-    check_call(1, 0x779f4u, 0x86u, 2u);
+    check_call(1, 0x779f4u, 0x86u, 0u);
     check_call(2, 0xbc38u, 0x180904u, 2u);
 
     reset();
     gui_save_conflict_bf24(0x200u);
-    check_call(1, 0x779f4u, 0xc9u, 3u);
+    check_call(1, 0x779f4u, 0xc9u, 0u);
     check_call(2, 0xbc38u, 0x18090cu, 3u);
 
     reset();
@@ -289,7 +334,7 @@ static void test_debrief_and_size(void)
 
     EF_U16(0x1a365eu) = 0x9876u;
     EF_U16(0x1a3660u) = 0x1234u;
-    gui_alter_size_ca40();
+    assert(gui_alter_size_ca40(0x9876ffffu) == 0x98761234u);
     assert(EF_U16(0x1a4ba2u) == 0x9876u);
     assert(EF_U16(0x1a4ba0u) == 0x1234u);
 }

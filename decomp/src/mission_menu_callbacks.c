@@ -4,6 +4,17 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
+/* 0x4ec44, 44 bytes: the Mission1Click body subtracts 60 from the
+ * unsigned 16-bit speed (wrapping) then clamps only small values. */
+void mp_mission_1_click_4ec44(void)
+{
+    uint16_t speed = (uint16_t)(EF_U16(0x1a56f4u) - 60u);
+    EF_U16(0x1a56f4u) = speed;
+    if (speed < 120u)
+        EF_U16(0x1a56f4u) = 120u;
+    rebuild_waypoint_speed_4ec70();
+}
+
 static void close_warning(ef_addr32 identifier)
 {
     ef_addr32 window = find_named_or_abort_a46cc(identifier);
@@ -70,6 +81,15 @@ void mp_set_ac_type_5080c(void)
     activate_widget_a4cb4(menu_widget_id(0x184a8cu));
 }
 
+/* 0x50c2c, 18 bytes: tail-jump to map zoom or the high-score callback. */
+void mp_change_mode_50c2c(ef_addr32 widget)
+{
+    if (EF_U8(0x1a53deu) == 0u)
+        mp_zoom_in_map_4bc40(widget);
+    else
+        open_hiscores_a870(widget);
+}
+
 /* 0x50c40, 43 bytes: invert + update target view label. */
 void mp_redraw_target_view_50c40(ef_addr32 widget)
 {
@@ -77,25 +97,3 @@ void mp_redraw_target_view_50c40(ef_addr32 widget)
     EF_U8(0x1a53deu) = mode;
     show_widget_a7588(widget, mode == 0u ? 0x13211eu : 0x132119u);
 }
-
-#ifdef EF_DECOMP_HOST_TEST
-
-/* 0x4ec44, 44 bytes: the Mission1Click body subtracts 60 from the
- * unsigned 16-bit speed (wrapping) then clamps only small values. */
-void mp_mission_1_click_4ec44(void)
-{
-    uint16_t speed = (uint16_t)(EF_U16(0x1a56f4u) - 60u);
-    EF_U16(0x1a56f4u) = speed < 120u ? 120u : speed;
-    mp_ui_guest_call_084(0x4ec70u, 0u, 0u);
-}
-
-/* 0x50c2c, 18 bytes: tail-jump to map zoom or alternative guest mode. */
-void mp_change_mode_50c2c(ef_addr32 widget)
-{
-    if (EF_U8(0x1a53deu) == 0u)
-        mp_zoom_in_map_4bc40(widget);
-    else
-        mp_ui_guest_call_084(0xa870u, widget, 0u);
-}
-
-#endif

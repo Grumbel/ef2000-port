@@ -4,19 +4,20 @@
 #include "ef_abi.h"
 #include "ef_mem.h"
 
-/* 0xdbdd0, 88 bytes. Skips spaces, writes the advanced 0x425af0 cursor,
- * then reports nonempty, non-comment lines using a stack-local sprintf
- * buffer and the indirect guest error sink [0x132a74]. This host hook
- * represents the two unresolved guest calls and the stack buffer; it does
- * not assert that their argument ABI or format text has been recovered. */
+/* 0xdbdd0, 88 bytes. Advance the parser cursor past spaces and report
+ * nonempty, non-comment lines through the original cdecl error callback. */
 void env_normal_dbdd0(void)
 {
     ef_addr32 cursor = EF_U32(0x425af0u);
-    while (EF_U8(cursor) == 0x20u)
+    uint8_t first;
+    char message[100];
+
+    while ((first = EF_U8(cursor)) == ' ')
         ++cursor;
     EF_U32(0x425af0u) = cursor;
-    if (EF_U8(cursor) != (uint8_t)';' &&
-        EF_U8(cursor) != (uint8_t)'\n' && EF_U8(cursor) != 0u)
-        environment_report_normal_line_088(cursor, 0x190448u,
-                                           EF_U32(0x132a74u));
+    if (first != ';' && first != '\n' && first != 0u) {
+        ef_addr32 buffer = (ef_addr32)(uintptr_t)message;
+        guest_sprintf_a4342(buffer, 0x190448u, cursor);
+        guest_callptr1_x(EF_U32(0x132a74u), buffer);
+    }
 }

@@ -91,6 +91,66 @@ void show_widget_a7588(ef_addr32 widget, ef_addr32 text)
     mp_ui_guest_call_084(0xa7588u, widget, text);
 }
 
+void draw_map_layers_4bf1c(uint32_t first, uint32_t second, uint32_t third)
+{
+    mp_ui_guest_map_select_084(0x4bf1cu, first, second, third);
+}
+
+void update_marker_4bc80(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0x4bc80u, widget, 0);
+}
+
+void check_flags_4be88(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0x4be88u, widget, 0);
+}
+
+void adjust_route_view_4dcd8(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0x4dcd8u, widget, 0);
+}
+
+void open_hiscores_a870(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0xa870u, widget, 0);
+}
+
+void clear_children_dirty(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0xa7434u, widget, 0);
+}
+
+void enable_widget_a72d8(ef_addr32 widget)
+{
+    mp_ui_guest_call_084(0xa72d8u, widget, 0);
+}
+
+void draw_active_marker_e5088(void)
+{
+    mp_ui_guest_call_084(0xe5088u, 0, 0);
+}
+
+void draw_route_overlay_4e360(void)
+{
+    mp_ui_guest_call_084(0x4e360u, 0, 0);
+}
+
+void rebuild_waypoint_speed_4ec70(void)
+{
+    mp_ui_guest_call_084(0x4ec70u, 0, 0);
+}
+
+void update_dialog_bindings(ef_addr32 first, ef_addr32 second)
+{
+    mp_ui_guest_call_084(0x4f314u, first, second);
+}
+
+void update_counter_widget_4e7b8(uint32_t show)
+{
+    mp_ui_guest_call_084(0x4e7b8u, show, 0);
+}
+
 static void clear(void)
 {
     memset(ram, 0, sizeof(ram));

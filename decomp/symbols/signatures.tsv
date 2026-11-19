@@ -3614,3 +3614,23 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00084bec	gpwExitCampaign			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xb1e0; exact C tail JMP through the named hybrid binding exit_campaign_b1e0.
 0x00084c14	gcClickMap			eax,ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0xe48c reaches a bare RET; preserves all GPRs and flags.
 0x00084c24	onopenDirectPlaySettings			ebx,ecx,edx,esi,edi,ebp	0	Original JMP 0x98bec; exact C tail JMP through the named hybrid binding open_directplay_settings_98bec.
+0x00004318	gui_mainloop_4318	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Load highscores without arguments, then refresh using the saved incoming widget.
+0x0000a960	gui_change_mode_a960	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Pass the widget to the original high-score or help callback according to the mode.
+0x0000bde8	gui_click_pilot1_bde8			ebx,ecx,edx,esi,edi,ebp	0	Find the four named entries and close their widget IDs in order.
+0x0000be48	gui_click_pilot2_be48	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Randomize a pilot with its record pointer in EAX, then fill slot zero in DL.
+0x0000be8c	gui_click_pilot3_be8c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Randomize a pilot with its record pointer in EAX, then fill slot one in DL.
+0x0000bed8	gui_click_pilot4_bed8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Randomize a pilot with its record pointer in EAX, then fill slot two in DL.
+0x0000bf24	gui_save_conflict_bf24	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Randomize a pilot with its record pointer in EAX, then fill slot three in DL.
+0x0000ca40	gui_alter_size_ca40	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Copy the two size words in order, replacing AX with the last word and retaining high EAX.
+0x0004bc40	mp_zoom_in_map_4bc40	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Reload the mode before each named zoom callback; original calls at 0x4bc51, 0x4bc64, 0x4bc77.
+0x0004bec0	mp_redraw_map_4bec0			ebx,ecx,edx,esi,edi,ebp	0	Draw the active marker and map, then clear the dirty latch. Map select resets its incoming EAX.
+0x0004bef0	mp_map_select_4bef0			ebx,ecx,edx,esi,edi,ebp	0	Pass three named layer lists in EAX, EDX and EBX. Draw the route overlay for mode four.
+0x0004c638	mp_ewr_coverage_4c638			ebx,ecx,edx,esi,edi,ebp	0	Cycle the EWR state byte, preserving its intermediate store and original wrap.
+0x0004c66c	mp_toggle_flags_4c66c			ebx,ecx,edx,esi,edi,ebp	0	Cycle the flags state byte, preserving its intermediate store and original wrap.
+0x0004dae8	mp_clear_wp_route_4dae8			ebx,ecx,edx,esi,edi,ebp	0	Call named dialog and widget helpers, reloading the index after the callback.
+0x0004e768	mp_redraw_wp_heights_4e768			ebx,ecx,edx,esi,edi,ebp	0	Reset route entries 1 through 24 and call the named update with EAX zero.
+0x0004eb78	mp_inc_speed_4eb78		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Store and return the zoom toggle in EAX, preserving the comparison with one.
+0x0004ec14	mp_dec_speed_4ec14			ebx,ecx,edx,esi,edi,ebp	0	Wrap the speed word before clamping to 900; use the named original waypoint refresh.
+0x0004ec44	mp_mission_1_click_4ec44			ebx,ecx,edx,esi,edi,ebp	0	Wrap the speed word before clamping to 120; use the named original waypoint refresh.
+0x00050c2c	mp_change_mode_50c2c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Forward EAX to map zoom or the original high-score callback according to the view byte.
+0x000dbdd0	env_normal_dbdd0			ebx,ecx,edx,esi,edi,ebp	0	Use a 100-byte stack message and the original variadic formatter and one-argument cdecl error callback.
