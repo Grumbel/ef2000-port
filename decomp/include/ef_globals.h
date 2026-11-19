@@ -19,6 +19,7 @@
  * must resolve each symbol to its original address (symbols/globals.tsv).
  * An unresolved struct layout is deliberately represented as raw bytes. */
 extern uint8_t g_difficulty;          /* 0x00121e44 */
+extern ef_addr32 g_gui_error_hook;   /* 0x00132a74, indirect error callback */
 extern uint32_t __x32_stack_size;     /* 0x00132a28 */
 extern uint32_t _dynend;              /* 0x00132a2c */
 extern uint32_t _curbrk;              /* 0x00132a30 */
