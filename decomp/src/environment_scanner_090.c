@@ -10,7 +10,7 @@
  * On empty/unterminated lines the same potentially surprising writes occur
  * in the original binary. Some callbacks clear [end-1] before incrementing
  * the cursor, others clear [end-2] afterward; both address the same byte. */
-static ef_addr32 take_line(void)
+ef_addr32 env_take_line_090(void)
 {
     ef_addr32 start = EF_U32(0x425af8u);
     ef_addr32 end = start;
@@ -22,10 +22,11 @@ static ef_addr32 take_line(void)
     return start;
 }
 
+#ifdef EF_DECOMP_HOST_TEST
 void env_scan_line_090(uint32_t entry, uint32_t format,
                        ef_environment_fields_090 *fields)
 {
-    ef_addr32 line = take_line();
+    ef_addr32 line = env_take_line_090();
     env_scan_fields_090(entry, format, line, fields);
 }
 
@@ -33,3 +34,4 @@ void env_report_090(uint32_t message_address)
 {
     (void)env_engine_call_090(0x132a74u, message_address, 0u, 0u);
 }
+#endif

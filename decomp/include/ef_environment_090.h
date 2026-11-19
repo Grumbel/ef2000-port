@@ -6,6 +6,8 @@
 
 #include "ef_types.h"
 
+ef_addr32 env_take_line_090(void);
+
 /* These are host drafts, not Watcom ABI definitions. A scanner adapter
  * represents the original sscanf-like 0xdf26f call, including its stack
  * outputs; an engine adapter represents still-unrecovered guest callees.

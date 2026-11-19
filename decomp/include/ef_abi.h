@@ -3452,7 +3452,7 @@ double guest_fn_dc1e9(double a, double b); /* 0xdc1e9 ST1/ST0 -> ST0 */
 /* leaf_helpers1.c */
 ef_addr32 log_alloc_e764(uint32_t a);
 uint32_t constant_44_35218(void);
-void store_word_39300(void);
+uint32_t store_word_39300(ef_addr32 name);
 double scale_float_52eb0(float value);
 void run_mode_one_56c7c(uint32_t a);
 uint8_t low_byte_7a290(void);
@@ -5713,6 +5713,7 @@ void u64_to_digits_10e2f5(ef_addr32 value_ptr, ef_addr32 buf, uint32_t n);
 
 uint32_t bsearch_10d9e3(uint32_t key, uint32_t base, uint32_t n, uint32_t size, uint32_t cmp);
 void set_scale_pair_c486c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t value);
+void guest_set_scale_pair_x(uint32_t value); /* 0xc486c, one callee-cleaned stack argument */
 
 void unpack_settings_3519c(ef_addr32 src);
 
@@ -7348,6 +7349,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 /* Original callee pops stack arguments (`ret N`); the registers named in the
  * signature stay register arguments. Found by tools/abi_check.py. */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_set_scale_pair_x parm routine [] modify [eax ebx ecx edx]
 #pragma aux select_page_e3c6c parm routine [] /* 0xe3c6c, ret 4 */
 #pragma aux reset_clip_bounds_c58cc parm routine [] modify exact [] /* 0xc58cc, ret 8 */
 #pragma aux nop_9d774 parm routine [] /* 0x9d774, ret 8 */

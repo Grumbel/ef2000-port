@@ -1789,7 +1789,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000ce0cc	scale_view_y_ce0cc	[ESP+4]:float,[ESP+8]:float	ST0:double	eax,ebx,ecx,edx,esi,edi,ebp	8	Original 0x000ce0cc (25 bytes); two stack floats at [ESP+4]/[ESP+8], ST0 double result, ret 8; callers ce268@ce28c,ce268@ce2b0,ce268@ce2d9; docs/compiler-abi.md
 0x0000e764	log_alloc_e764	EAX:uint32_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000e764 (15 bytes); EAX=size, return EAX=allocated zeroed block. Push diagnostic 0x180bfc and size, call cdecl 0xcc6c0, ADD ESP,8; all other GPRs preserved. Indirect allocation callback at [0x121ebc], selected by f6a8 and others.
 0x00035218	constant_44_35218		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00035218 (8 bytes); Constant 0x44.; callers 34f30@34f70,3527c@352b6; docs/compiler-abi.md
-0x00039300	store_word_39300			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00039300 (12 bytes); Store the result of 0x9ddfc as a word.; callers db16c@db1af; docs/compiler-abi.md
+0x00039300	store_word_39300	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 39300 calls the model lookup with the EAX name and writes its low word at 0x1a17b2; caller 0xdb16c.
 0x00052eb0	scale_float_52eb0	EAX:float	EAX:double	ebx,ecx,edx,esi,edi,ebp	4	Original 0x00052eb0 (13 bytes); Scale a float to double.; callers 5375c@537cf,5375c@53816,5375c@5385d; docs/compiler-abi.md
 0x00056c7c	run_mode_one_56c7c	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00056c7c (20 bytes); Run 0x56c90 with mode 1 and set the flag word.; callers 581b0@585e6; docs/compiler-abi.md
 0x0007a290	low_byte_7a290		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007a290 (8 bytes); Low byte of 0x7a194's result.; callers 19a80@19a86; docs/compiler-abi.md
@@ -3653,3 +3653,23 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000f5214	gui_script_gadgetry_f5214			ebx,ecx,edx,esi,edi,ebp	0	Use the original 100-byte path buffer and named graphics calls. Palette extrema start at index zero.
 0x000f53bc	gui_script_name_f53bc			ebx,ecx,edx,esi,edi,ebp	0	Use the original 100-byte path buffer and the second named graphics-buffer selector.
 0x000f5484	gui_script_rect_f5484			ebx,ecx,edx,esi,edi,ebp	0	Parse six coordinates by named calls and use the original mixed register and stack setter.
+0x000da7fc	env_load_missile_palette_da7fc			ebx,ecx,edx,esi,edi,ebp	0	Select the original destination pair and pass the scanned filename to the named companion loader.
+0x000da964	env_world_name_da964			ebx,ecx,edx,esi,edi,ebp	0	Scan two global coordinates and copy the low words of the local results.
+0x000da9d4	env_xmap_name_da9d4			ebx,ecx,edx,esi,edi,ebp	0	Scan, check, copy and append the filename using the named string functions.
+0x000daa5c	env_mmap_name_daa5c			ebx,ecx,edx,esi,edi,ebp	0	Scan the signed index and filename; keep the original two-argument range diagnostic.
+0x000dab40	env_ref_point_dab40			ebx,ecx,edx,esi,edi,ebp	0	Scan, check, copy and append the reference filename.
+0x000dabc8	env_map_name_dabc8			ebx,ecx,edx,esi,edi,ebp	0	Uppercase the scanned name before copying it to the game field.
+0x000db0b4	env_load_player_virtual_db0b4			ebx,ecx,edx,esi,edi,ebp	0	Call the record pool initializer with the name; its preserved DH carries the original ff constant.
+0x000db114	env_load_player_sort_db114			ebx,ecx,edx,esi,edi,ebp	0	Consume the player sort name and keep the original no-op callback.
+0x000db16c	env_load_player_db16c			ebx,ecx,edx,esi,edi,ebp	0	Pass the parsed name to the 39300 model lookup and word store.
+0x000db1c4	env_set_flak_count_db1c4			ebx,ecx,edx,esi,edi,ebp	0	Consume the flak count name and keep the original no-op callback.
+0x000db21c	env_load_flak_db21c			ebx,ecx,edx,esi,edi,ebp	0	Scan the flak label directly, report the signed count limit and clear the flak state.
+0x000db420	env_cloud_fade_db420			ebx,ecx,edx,esi,edi,ebp	0	Scan directly into the five record fields in original order; decrement the first field read.
+0x000da1b4	env_darkside_fade_da1b4			ebx,ecx,edx,esi,edi,ebp	0	Scan depth into a local and color into its global; call the stack-only scale setter.
+0x000da224	env_coltab_da224			ebx,ecx,edx,esi,edi,ebp	0	Scan the upper and lower bounds before the color; pass the bounds in original register order.
+0x000da2b8	env_altitude_da2b8			ebx,ecx,edx,esi,edi,ebp	0	Scan altitude and name; report capacity and reload the index before writing.
+0x000da360	env_altitude2_da360			ebx,ecx,edx,esi,edi,ebp	0	Scan two global heights and append the named texture; preserve the presence flag and signed conversion.
+0x000da408	env_ground_da408			ebx,ecx,edx,esi,edi,ebp	0	Scan two global ground heights and append the named texture; preserve the presence flag and signed conversion.
+0x000da4b0	env_ceiling_da4b0			ebx,ecx,edx,esi,edi,ebp	0	Scan the ceiling directly into its word and negate it after scanning.
+0x000da518	env_planet_number_da518			ebx,ecx,edx,esi,edi,ebp	0	Scan the planet index directly into its word and negate it after scanning.
+0x000da580	env_game_type_da580			ebx,ecx,edx,esi,edi,ebp	0	Scan the game type directly into its original destination word.

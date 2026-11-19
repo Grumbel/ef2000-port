@@ -23,9 +23,11 @@ uint32_t constant_44_35218(void)
 }
 
 /* 0x39300, 12 bytes. Store the result of 0x9ddfc as a word. */
-void store_word_39300(void)
+uint32_t store_word_39300(ef_addr32 name)
 {
-    EF_U16(0x001a17b2u) = (uint16_t)guest_fn_9ddfc_w();
+    uint32_t model = guest_lookup_value(name);
+    EF_U16(0x001a17b2u) = (uint16_t)model;
+    return model;
 }
 
 /* 0x52eb0, 13 bytes. Scale a float to double. */
