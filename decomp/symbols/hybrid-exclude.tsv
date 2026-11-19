@@ -226,7 +226,7 @@ addr	reason
 0x000e81b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000f0cb6	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000f3714	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x000f3f84	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
+0x000f3f84	Keep the original OPTIONS display loop in the hybrid until gui_display_pointer_097, gui_display_hit_test_097, and gui_display_cursor_097 are recovered as linkable game or platform calls; gui_display_097.obj is currently omitted for unresolved gui_display_pointer_097_.
 0x000f6124	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000f8b14	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000fd164	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).

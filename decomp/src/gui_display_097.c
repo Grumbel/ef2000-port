@@ -2,21 +2,17 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_gui_cursor_097.h"
+#include "ef_gui_script_095.h"
+#include "ef_abi.h"
 #include "ef_mem.h"
 
 #include <stdint.h>
 
 enum { X_POS = 0x425fc8u, Y_POS = 0x425fc6u, SELECTED = 0x161e20u };
 
-static uint32_t guest(uint32_t target, uint32_t eax)
-{
-    return gui_display_guest_call_097(target, eax);
-}
-
-/* 0x000f3f84, 497 bytes. The display loop processes a pointer button and
- * a second (polling) button source. A selected action is allowed to keep
- * running only while the first bit remains pressed. All hardware drawing,
- * input and command actions are kept as explicit host adapters. */
+/* 0x000f3f84, 497 bytes. Recovered callees are invoked directly with their
+ * confirmed Watcom register/stack signatures; only pointer and cursor I/O
+ * remains behind host adapters. */
 void gui_options_display_f3f84(void)
 {
     uint16_t selected = 0u;
@@ -27,22 +23,24 @@ void gui_options_display_f3f84(void)
     uint32_t cursor_x = 0u, cursor_y = 0u;
     int32_t index;
     ef_addr32 record;
-    struct gui_display_params_097 args;
+    uint32_t arg_eax, arg_edx, arg_ebx, arg_ecx, arg_stack[4];
     unsigned i;
 
     if (EF_U8(0x161e22u) != 0u)
-        guest(0xf41c4u, 0u);
-    guest(0xf34ccu, 0u);
+        apply_request_f41c4();
+    present_status_frame_f34cc();
 
     index = EF_S32(0x161e1cu) >> 16;
     record = 0x161d98u + (uint32_t)index * 20u;
-    args.eax = EF_U32(record);
-    args.edx = EF_U32(record + 4u);
-    args.ebx = (uint32_t)(int32_t)EF_S16(record + 8u);
-    args.ecx = (uint32_t)(int32_t)EF_S16(record + 10u);
+    arg_eax = EF_U32(record);
+    arg_edx = EF_U32(record + 4u);
+    arg_ebx = (uint32_t)(int32_t)EF_S16(record + 8u);
+    arg_ecx = (uint32_t)(int32_t)EF_S16(record + 10u);
     for (i = 0u; i != 4u; ++i)
-        args.stack[i] = (uint32_t)(int32_t)EF_S16(record + 12u + 2u * i);
-    gui_display_set_params_097(&args); /* original dd9e4 */
+        arg_stack[i] = (uint32_t)(int32_t)EF_S16(record + 12u + 2u * i);
+    set_param_block_dd9e4(arg_eax, arg_edx, arg_ebx, arg_ecx,
+                          arg_stack[0], arg_stack[1],
+                          arg_stack[2], arg_stack[3]);
 
     for (;;) {
         if (EF_U8(SELECTED) != 0u)
@@ -50,7 +48,7 @@ void gui_options_display_f3f84(void)
         if (selected != 0u && (buttons & 1u) == 0u)
             break;
 
-        guest(0xf2ac0u, 0u);
+        update_remote_view_f2ac0();
         gui_display_pointer_097(&buttons, &pointer_x, &pointer_y);
         buttons |= mouse_button;
 
@@ -60,24 +58,24 @@ void gui_options_display_f3f84(void)
             hover = (uint16_t)gui_display_hit_test_097(x, y);
         }
         if (EF_U16(0x161e18u) != 0u)
-            guest(0xf36a4u, 0u);
+            step_animation_f36a4();
         if ((buttons & 1u) != 0u && hover != 0u && selected == 0u) {
             selected = 1u;
             /* Original DEC EAX followed by CWDE: sign-extend low 16 bits. */
-            guest(0xf3aa8u, (uint32_t)(int32_t)(int16_t)(uint16_t)(hover - 1u));
-            guest(0xf3b78u, 0u);
+            draw_record_text_f3aa8((uint32_t)(int32_t)(int16_t)(uint16_t)(hover - 1u));
+            process_command_dispatch_loop();
         }
         if (EF_U8(0x4859deu) != 0u) {
-            guest(0xf34a0u, 0u);
+            refresh_f34a0();
         } else {
-            guest(0xddae0u, 0u);
-            if ((guest(0x3efa0u, 0u) & 0xffu) != 0u)
+            poll_mouse_ddae0();
+            if (get_byte_3efa0() != 0u)
                 gui_display_cursor_097(&cursor_x, &cursor_y, &mouse_button);
 
             if (EF_U16(X_POS) != EF_U16(0x1616eeu) ||
                 EF_U16(Y_POS) != EF_U16(0x1616f0u)) {
-                guest(0xdc2e0u, 0u);
-                guest(0xdd8d0u, 0u);
+                wait_vsync_dc2e0();
+                run_shutdown_pair_dd8d0();
             }
             EF_U16(0x1616eeu) = EF_U16(X_POS);
             EF_U16(0x1616f0u) = EF_U16(Y_POS);
@@ -85,16 +83,16 @@ void gui_options_display_f3f84(void)
     }
 
     if (EF_U8(0x4859dcu) == 0u) {
-        guest(0xde648u, 0x425c8cu);
+        fade_palette_out_de648(0x425c8cu);
     } else {
-        guest(0xc3834u, 0u);
+        call_e9a24_c3834();
         if (EF_U8(0x4859deu) == 0u)
-            guest(0xc39acu, 0u);
-        guest(0xc386cu, 0u);
+            leave_scroll_mode_c39ac();
+        call_e9a24_c386c();
     }
     if (EF_U8(0x4859deu) != 0u)
-        guest(0xeae10u, 0u);
-    guest(0xdc250u, 0u);
-    guest(0xdc250u, 0u);
-    guest(0xdd870u, 0u);
+        release_pending_handle_eae10();
+    toggle_page_dc250();
+    toggle_page_dc250();
+    restore_saved_block_dd870();
 }

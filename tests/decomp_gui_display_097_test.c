@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception */
 
 #include "ef_gui_cursor_097.h"
+#include "ef_gui_script_095.h"
 #include "ef_mem.h"
 
 #include <assert.h>
@@ -13,7 +14,7 @@ static uint32_t calls[128], call_args[128];
 static unsigned call_count, pointer_count, hit_count, move_count;
 static uint32_t pointer_status[8], hover_result;
 static uint32_t mouse_pressed, screen_move;
-static struct gui_display_params_097 actual_params;
+static struct { uint32_t eax, edx, ebx, ecx, stack[4]; } actual_params;
 static unsigned params_count;
 
 void *ef_guest_memory_ptr(ef_addr32 address)
@@ -22,21 +23,61 @@ void *ef_guest_memory_ptr(ef_addr32 address)
     return ram + address;
 }
 
-void gui_display_set_params_097(const struct gui_display_params_097 *args)
-{
-    actual_params = *args;
-    ++params_count;
-}
-
-uint32_t gui_display_guest_call_097(uint32_t target, uint32_t eax)
+static void record_call(uint32_t target, uint32_t eax)
 {
     assert(call_count < sizeof(calls) / sizeof(calls[0]));
     calls[call_count] = target;
     call_args[call_count] = eax;
     ++call_count;
-    if (target == 0x3efa0u)
-        return screen_move != 0u;
-    return 0u;
+}
+
+void set_param_block_dd9e4(uint32_t eax, uint32_t edx, uint32_t ebx,
+                           uint32_t ecx, uint32_t s0, uint32_t s1,
+                           uint32_t s2, uint32_t s3)
+{
+    actual_params.eax = eax;
+    actual_params.edx = edx;
+    actual_params.ebx = ebx;
+    actual_params.ecx = ecx;
+    actual_params.stack[0] = s0;
+    actual_params.stack[1] = s1;
+    actual_params.stack[2] = s2;
+    actual_params.stack[3] = s3;
+    ++params_count;
+}
+
+#define VOID_CALL(name, target) void name(void) { record_call(target, 0u); }
+VOID_CALL(apply_request_f41c4, 0xf41c4u)
+VOID_CALL(present_status_frame_f34cc, 0xf34ccu)
+VOID_CALL(update_remote_view_f2ac0, 0xf2ac0u)
+VOID_CALL(step_animation_f36a4, 0xf36a4u)
+VOID_CALL(process_command_dispatch_loop, 0xf3b78u)
+VOID_CALL(refresh_f34a0, 0xf34a0u)
+VOID_CALL(poll_mouse_ddae0, 0xddae0u)
+VOID_CALL(wait_vsync_dc2e0, 0xdc2e0u)
+VOID_CALL(run_shutdown_pair_dd8d0, 0xdd8d0u)
+VOID_CALL(call_e9a24_c3834, 0xc3834u)
+VOID_CALL(leave_scroll_mode_c39ac, 0xc39acu)
+VOID_CALL(call_e9a24_c386c, 0xc386cu)
+VOID_CALL(release_pending_handle_eae10, 0xeae10u)
+VOID_CALL(toggle_page_dc250, 0xdc250u)
+VOID_CALL(restore_saved_block_dd870, 0xdd870u)
+#undef VOID_CALL
+
+uint8_t get_byte_3efa0(void)
+{
+    record_call(0x3efa0u, 0u);
+    return (uint8_t)(screen_move != 0u);
+}
+
+void fade_palette_out_de648(ef_addr32 palette)
+{
+    record_call(0xde648u, palette);
+}
+
+void draw_record_text_f3aa8(uint32_t index)
+{
+    record_call(0xf3aa8u, index);
 }
 
 void gui_display_pointer_097(uint32_t *buttons, uint32_t *x, uint32_t *y)
