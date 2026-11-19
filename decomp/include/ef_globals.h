@@ -500,4 +500,7 @@ extern int32_t g_scene_eye_position[3]; /* 0x21436c */
 extern uint16_t g_scene_change_pending; /* 0x21449c */
 extern uint8_t g_scene_direction_changed; /* 0x1a6d1f */
 
+/* Completion array, 0xb00d0. */
+extern uint32_t g_completion_entry_count; /* 0x1379b4 */
+
 #endif

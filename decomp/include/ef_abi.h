@@ -3270,6 +3270,7 @@ void select_video_mode_acac0(ef_addr32 name);
 void clear_ui_state_ac16c(void);
 void reset_ui_state_ac0e0(void);
 void run_page_callbacks_ac240(ef_addr32 arg, uint8_t flag);
+ef_addr32 alloc_completion_array_b00d0(ef_addr32 listp, ef_addr32 countp);
 ef_addr32 alloc_record_pool_b0138(ef_addr32 listp, ef_addr32 countp);
 void free_record_tree_b1a68(ef_addr32 rec);
 void print_record_b21ec(ef_addr32 rec, uint32_t out);

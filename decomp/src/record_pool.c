@@ -3,6 +3,37 @@
 
 #include "ef_abi.h"
 #include "ef_mem.h"
+#include "ef_globals.h"
+#include "ef_guest_memory.h"
+#include "ef_structs/record_pool.h"
+
+/* 0xb00d0, 103 bytes. EAX list pointer, EDX count pointer -> EAX array.
+ * Sum the group counts of kind-0 and kind-1 nodes into *COUNTP, add 50
+ * spare entries, store the result, and allocate 27 bytes per entry.
+ * EDX scratch (the allocator is cdecl), other registers preserved.
+ * Callers 0xba5c@0xbb7c and 0xbfcc@0xc4c8 store EAX. */
+ef_addr32 alloc_completion_array_b00d0(ef_addr32 listp, ef_addr32 countp)
+{
+    uint32_t *count = (uint32_t *)ef_guest_memory_ptr(countp);
+    ef_addr32 node = EF_U32(listp);
+    ef_addr32 array;
+    uint32_t entries;
+
+    *count = 0u;
+    while (node != 0u) {
+        const ef_pool_source_node *source =
+            (const ef_pool_source_node *)ef_guest_memory_ptr(node);
+        if (source->kind == 0u || source->kind == 1u)
+            *count += source->group_count;
+        node = source->next;
+    }
+    entries = *count + 50u;
+    *count = entries;
+    array = guest_alloc_fmt_cc6c0(entries * 27u, 0x0018dd48u,
+                                  entries * 27u, entries);
+    g_completion_entry_count = 0u;
+    return array;
+}
 
 /* 0xb0138,208 bytes. EAX list pointer, EDX count pointer -> EAX pool;
  * EDX scratch, five other registers preserved, RET. Sole caller 49461. */
