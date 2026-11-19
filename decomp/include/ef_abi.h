@@ -224,10 +224,16 @@ void renderer_insertion_sort_c409c(void);
 void renderer_finish_queue_c4167(void);
 void renderer_enqueue_c41b0(uint16_t key);
 void renderer_frame_callback_c4167(ef_addr32 callback);
-uint16_t renderer_write_special_word_c5369(ef_addr32 *cursor);
-uint16_t renderer_swap_word_c5384(ef_addr32 *cursor);
-uint16_t renderer_index_biased_c53b4(ef_addr32 *cursor);
-uint16_t renderer_index_absolute_c53cf(ef_addr32 *cursor);
+uint16_t renderer_write_special_word_c5369(ef_addr32 cursor);
+uint16_t renderer_swap_word_c5384(ef_addr32 cursor);
+uint16_t renderer_index_biased_c53b4(ef_addr32 cursor);
+uint16_t renderer_index_absolute_c53cf(ef_addr32 cursor);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux renderer_write_special_word_c5369 parm [ebx] value [ax] modify [eax ebx]
+#pragma aux renderer_swap_word_c5384 parm [ebx] value [ax] modify [eax ebx]
+#pragma aux renderer_index_biased_c53b4 parm [ebx] value [ax] modify [eax ebx]
+#pragma aux renderer_index_absolute_c53cf parm [ebx] value [ax] modify [eax ebx]
+#endif
 
 /* Buffered Huffman and two-stream decoders (register ABI exposed as pointers). */
 void bitstream_refill_fa332(uint32_t *esi, int32_t *edx);

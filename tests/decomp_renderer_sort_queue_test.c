@@ -18,9 +18,10 @@ void *ef_guest_memory_ptr(ef_addr32 address)
     return &ram[address];
 }
 
-void run_handler_stack_c425a(void)
+uint32_t run_handler_stack_c425a(void)
 {
     ++draw_calls;
+    return 0;
 }
 
 void renderer_frame_callback_c4167(ef_addr32 callback)
@@ -119,20 +120,23 @@ static void test_endian(void)
     reset();
     cursor = 0x200u;
     EF_U16(cursor) = 0x1234;
-    assert(renderer_swap_word_c5384(&cursor) == 0x3412);
-    assert(cursor == 0x202u && EF_U16(0x200u) == 0x3412u);
+    assert(renderer_swap_word_c5384(cursor) == 0x3412);
+    assert(EF_U16(0x200u) == 0x3412u);
+    cursor += 2u;
     EF_U16(cursor) = 0xaabb;
-    assert(renderer_write_special_word_c5369(&cursor) == 0xbfu);
-    assert(EF_U16(0x202u) == 0xbfu && cursor == 0x204u);
+    assert(renderer_write_special_word_c5369(cursor) == 0xbfu);
+    assert(EF_U16(0x202u) == 0xbfu);
+    cursor += 2u;
     EF_U16(0x15af90u) = 1960;
     EF_U16(cursor) = 0x0200u; /* decoded: 2; (2+2000-1960)*48 */
-    assert(renderer_index_biased_c53b4(&cursor) == 2016u);
-    assert(EF_U16(0x204u) == 2016u && cursor == 0x206u);
+    assert(renderer_index_biased_c53b4(cursor) == 2016u);
+    assert(EF_U16(0x204u) == 2016u);
+    cursor += 2u;
     EF_U16(cursor) = 0x0300u;
-    assert(renderer_index_absolute_c53cf(&cursor) == 144u);
-    assert(cursor == 0x208u);
+    assert(renderer_index_absolute_c53cf(cursor) == 144u);
+    cursor += 2u;
     EF_U16(cursor) = 0xffffu;
-    assert(renderer_index_absolute_c53cf(&cursor) == (uint16_t)(0xffffu * 48u));
+    assert(renderer_index_absolute_c53cf(cursor) == (uint16_t)(0xffffu * 48u));
 }
 
 int main(void)
