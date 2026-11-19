@@ -165,3 +165,30 @@ uint32_t mpClickATC(ef_addr32 widget)
 {
     return toggle_mission_role(widget, 2u, 0);
 }
+
+/* 0x4d920, 169 bytes, SAM-coverage button WIDGET (decimal number at
+ * +0x3f). Pick the number-th entry of the selected record's 0x15-byte
+ * table that is not a 0xff/0xfe placeholder (the 16-bit counter is not
+ * range checked, as in the original), remember its index and the
+ * widget, and roll the coverage: width 0x2000 when the full-coverage
+ * flag is set, else 0x800 + rand % 0x3000; range 10000 + rand % 30000. */
+void mpSamCoverage(ef_addr32 widget)
+{
+    uint16_t remaining = (uint16_t)guest_convert_parser_integer(widget + 0x3fu);
+    uint32_t index = 0;
+    uint8_t kind;
+
+    for (;; ++index) {
+        kind = EF_U8(EF_U32(g_assignment_selected_record + 0x2cu) +
+                     (uint32_t)((int32_t)(int16_t)index * 0x15));
+        if (kind != 0xffu && kind != 0xfeu && --remaining == 0u)
+            break;
+    }
+    if (g_sam_full_coverage == 0u)
+        g_sam_coverage_width = (int16_t)(0x800 + (int32_t)(uint16_t)half_word_9c960() % 0x3000);
+    else
+        g_sam_coverage_width = 0x2000;
+    g_assignment_current_byte = (uint8_t)index;
+    g_assignment_current_value = widget;
+    g_sam_coverage_range = 10000 + (int32_t)(uint16_t)half_word_9c960() % 30000;
+}

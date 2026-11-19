@@ -3704,3 +3704,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007cb70	gpwTurnXPlane	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX EDX; EAX widget, scratch; GUI click callback (dispatch sites discard EAX)
 0x0007d138	RedrawEnemyView	EAX:ef_addr32		ebx,edx,edi	0	Original pushes EBX EDX EDI only; ECX/ESI/EBP follow the callees (0x9125c does not promise ECX); GUI redraw callback
 0x0007de5c	simSyncSlots	EAX:ef_addr32		ebx,ecx,edx,esi,ebp	0	Original 0x7de5c pushes EBX ECX EDX ESI EBP (EDI not saved); EAX widget; called by 0x7d138
+0x00004c50	InitArcade			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX EDX; callees preserve ECX/ESI/EDI/EBP; GUI callback
+0x0004d920	mpSamCoverage	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI; EAX widget; GUI click callback
+0x00004d4c	gpwAcceptHiscore	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI click callback
+0x00005110	kotsClickBase	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; 20-byte local buffer; EAX widget; GUI click callback

@@ -24,6 +24,7 @@ void open_hiscores_a870(ef_addr32 widget); /* 0xa870 */
 void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
 void refresh_campaign_view_c9fc4(void); /* 0xc9fc4 */
 uint8_t hiscore_load_41fc(void); /* 0x41fc */
+uint8_t hiscore_save_42a4(void); /* 0x42a4 */
 void hiscore_refresh_display_40dc(uint32_t widget); /* 0x40dc */
 
 /* Game entry path from the SHA-pinned original, recovered from instruction
@@ -6556,6 +6557,10 @@ uint32_t onopenCurrentMission(ef_addr32 root); /* 0x7cad4 */
 void gpwTurnXPlane(ef_addr32 widget); /* 0x7cb70 */
 void RedrawEnemyView(ef_addr32 widget); /* 0x7d138 */
 void simSyncSlots(ef_addr32 widget); /* 0x7de5c */
+void InitArcade(void); /* 0x4c50 */
+void gpwAcceptHiscore(ef_addr32 widget); /* 0x4d4c */
+void kotsClickBase(ef_addr32 widget); /* 0x5110 */
+void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */
 ef_addr32 show_named_widget_a7318(ef_addr32 root, ef_addr32 name); /* 0xa7318 EAX/EDX, EAX widget, EDX clobbered */
 uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, EAX result, EDX clobbered */
 uint32_t show_widget_a7588_r(ef_addr32 widget, ef_addr32 text); /* 0xa7588 EAX/EDX, EAX result */

@@ -542,4 +542,26 @@ extern int16_t g_enemy_view_types[]; /* 0x12afda, unit type per view slot, 0 = n
 extern int16_t g_enemy_view_page; /* 0x1f8fd8 */
 extern int16_t g_enemy_view_detail; /* 0x1f8fdc */
 
+/* Arcade high-score entry, 0x4c50. */
+extern int16_t g_hiscore_new_rank; /* 0x121e48 */
+extern uint16_t g_difficulty_word; /* 0x121e44, word store over g_difficulty */
+extern int16_t g_difficulty_selection; /* 0x121e46 */
+extern uint8_t g_arcade_score_file[11]; /* 0x1f8fc8, "arcXXX.txt" */
+
+/* "kots" base selection, 0x5110. */
+#include "ef_structs/kots.h"
+extern uint8_t g_kots_lock; /* 0x12584b, 1 = base buttons ignored */
+extern uint8_t g_kots_base_side[]; /* 0x197098, 0/1 per base */
+extern uint8_t g_kots_base_side_mirror[]; /* 0x12584c, advanced and reset with the side */
+extern ef_addr32 g_kots_side_labels[2]; /* 0x121e28, "GRUN" (0x9a umlaut) / "ROT" */
+extern ef_kots_side_base g_kots_side_bases[2]; /* 0x121e30 */
+
+/* SAM coverage, 0x4d920. */
+extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
+extern uint8_t g_sam_full_coverage; /* 0x1a5599 */
+extern int16_t g_sam_coverage_width; /* 0x19e5a5 */
+extern int32_t g_sam_coverage_range; /* 0x19e597 */
+extern uint8_t g_assignment_current_byte; /* 0x1a5540 */
+extern uint32_t g_assignment_current_value; /* 0x1a5554 */
+
 #endif

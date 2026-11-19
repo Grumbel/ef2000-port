@@ -509,6 +509,18 @@ addr	size	type	name	evidence	notes
 0x0012afda	2 * count	int16_t[]	g_enemy_view_types	7d147/7d177 reads	unit type per enemy-view slot number, 0 = none
 0x001f8fd8	2	int16_t	g_enemy_view_page	7d161/7d192 stores, 7d1d3 reads	looked-up name value of the shown type
 0x001f8fdc	2	int16_t	g_enemy_view_detail	7d167/7d19e stores	scene word of the type, 3500 or at least 50
+0x00121e48	2	int16_t	g_hiscore_new_rank	4c6b/4c8e/4cb3 read via dword 0x121e46 shifted 16	row of the entry whose name is being entered
+0x001a54f6	4	ef_addr32	g_assignment_selected_record	4c78c stores the hit entry; 4d936 reads +0x2c	selected map entry; +0x2c points at 0x15-byte rows
+0x001a5599	1	uint8_t	g_sam_full_coverage	4d95f selects width 0x2000	meaning beyond the width choice unknown
+0x0019e5a5	2	int16_t	g_sam_coverage_width	4d984/4d98d stores	0x800..0x37ff or 0x2000
+0x0019e597	4	int32_t	g_sam_coverage_range	4d9be stores	10000..39999
+0x00121e44	2	uint16_t	g_difficulty_word	4d73/4d9b/4db3 word stores	same storage as g_difficulty; the byte above is cleared
+0x001f8fc8	11	uint8_t[11]	g_arcade_score_file	4dba movs of 11 bytes	arcade score file name for the chosen level
+0x0012584b	1	uint8_t	g_kots_lock	511a compares with 1	base buttons ignored when 1
+0x00197098	variable	uint8_t[]	g_kots_base_side	5136/5154 read-modify-write	side 0/1 per base, wraps at 2
+0x0012584c	variable	uint8_t[]	g_kots_base_side_mirror	5144 increments, 5167 clears	advanced and reset together with g_kots_base_side
+0x00121e28	8	ef_addr32[2]	g_kots_side_labels	517a reads	side names GRUN/ROT
+0x00121e30	16	ef_kots_side_base[2]	g_kots_side_bases	51b5 reads name	home base name and coordinates per side
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
