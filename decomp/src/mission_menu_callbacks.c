@@ -107,7 +107,7 @@ void mp_redraw_target_view_50c40(ef_addr32 widget)
  * hold it. The button row, the button labels and the active dialog
  * slots are then refreshed. The index stays a signed 16-bit value as in
  * the original, so a name below '0' reaches entries before the table.
- * EAX, which the GUI dispatcher sees, is the roster count on the early
+ * EAX, as in the original, is the roster count on the early
  * exits, the holder count when the cap refuses, else the slot flush
  * result. */
 static uint32_t toggle_mission_role(ef_addr32 widget, uint8_t role, int check_target)

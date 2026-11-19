@@ -6552,6 +6552,12 @@ void guest_fn_c4167_x(void); /* 0xc4167 */
 
 void refresh_slot_list_69d10(void);
 uint32_t gpwRedrawPlaneWindow(void); /* 0x69f1c */
+uint32_t onopenCurrentMission(ef_addr32 root); /* 0x7cad4 */
+void gpwTurnXPlane(ef_addr32 widget); /* 0x7cb70 */
+void RedrawEnemyView(ef_addr32 widget); /* 0x7d138 */
+void simSyncSlots(ef_addr32 widget); /* 0x7de5c */
+ef_addr32 show_named_widget_a7318(ef_addr32 root, ef_addr32 name); /* 0xa7318 EAX/EDX, EAX widget, EDX clobbered */
+uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, EAX result, EDX clobbered */
 uint32_t show_widget_a7588_r(ef_addr32 widget, ef_addr32 text); /* 0xa7588 EAX/EDX, EAX result */
 uint32_t mpMission2Click(ef_addr32 widget); /* 0x4f3e0 */
 uint32_t mpMission3Click(ef_addr32 widget); /* 0x4f494 */

@@ -54,7 +54,7 @@ void update_dialog_bindings(ef_addr32 first, ef_addr32 second)
 
 /* 0x4f6bc, 74 bytes. ORIGINAL BUG: the loop index is BL and wraps
  * at 255, so a signed positive count greater than 255 never terminates.
- * EAX returns the final index; GUI callbacks that end here pass it on. */
+ * EAX returns the final index, which the role-button callbacks pass on. */
 uint32_t flush_active_dialog_slots(void)
 {
     uint8_t index = 0;

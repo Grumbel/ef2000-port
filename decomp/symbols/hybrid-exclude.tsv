@@ -144,8 +144,6 @@ addr	reason
 0x0006f15c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0006f504	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0007c574	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x0007cb70	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x0007d138	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0007e0a4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0007e2a8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000834e8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
@@ -310,7 +308,6 @@ addr	reason
 0x0007b3fc	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0007b7d8	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0007c328	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x0007cad4	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0007d1f0	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00081448	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000888cc	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)

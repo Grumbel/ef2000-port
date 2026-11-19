@@ -530,4 +530,16 @@ extern uint8_t g_socket_pending_ready; /* 0x00125935 */
 /* Mission-role buttons, 0x4f548. */
 extern uint32_t g_assignment_target_record; /* 0x1a54fa */
 
+/* Current-mission dialog, 0x7cad4. */
+extern uint8_t g_ground_effects_enabled; /* 0x12854b */
+extern uint8_t g_mission_difficulty; /* 0x15b7e4 */
+extern uint16_t g_mission_option_word; /* 0x12b058 */
+
+/* Enemy view, 0x7d138. */
+#include "ef_structs/unit_types.h"
+extern ef_unit_type_record g_unit_type_records[]; /* 0x128564 */
+extern int16_t g_enemy_view_types[]; /* 0x12afda, unit type per view slot, 0 = none */
+extern int16_t g_enemy_view_page; /* 0x1f8fd8 */
+extern int16_t g_enemy_view_detail; /* 0x1f8fdc */
+
 #endif
