@@ -532,6 +532,18 @@ addr	size	type	name	evidence	notes
 0x00126630	2	int16_t	g_selected_map_marker	459d3/45a42 stores; 459eb reads via dword 0x12662e shifted 16	marker index, -1 none
 0x001a4a9c	4	ef_addr32	g_current_map_record	45a08 reads; 45a54 reads	marker count word +0x1c, 25-byte entries at +0x20
 0x0012654c	1	uint8_t	g_map_markers_changed	45a29 stores 1	set when a marker moves
+0x00197370	4 * count	ef_campaign_target_choice[]	g_campaign_target_choices	a625/a62d reads	group and member per numbered target button
+0x00197500	12 * count	ef_saved_marker_position[]	g_saved_marker_positions	a5ee/a6b4 copies	saved x/y of each map marker
+0x00126574	2	int16_t	g_adjacency_selected_value	a68c stores	adjacency word of the selected group/member
+0x0012bced	145 * count	ef_weapon_record[]	g_weapon_records	69c42/69cb0 picture-name reads	anchored at the picture names; record start may be earlier
+0x001f6f4a	2	int16_t	g_current_weapon	69c02 stores; read via dword 0x1f6f48 shifted 16	selected weapon record, 0 none
+0x001282d8	2	int16_t	g_weapon_page_flag	69d01 stores 1	meaning unknown
+0x001379a0	2	int16_t	g_flight_origin_x	430b8 reads	source position of the flight window
+0x001379a2	2	int16_t	g_flight_origin_y	430c9 reads	source position of the flight window
+0x00126580	2	int16_t	g_flight_window_x	430c3 stores; read via dword 0x12657e shifted 16	x + 8, minus 24 when past 23
+0x00126582	2	int16_t	g_flight_window_y	430cf stores	copied from the origin
+0x001a364b	1	uint8_t	g_performance_value	43141 reads, 4314d/4315a stores	shown as percent, lowered by 10 per close
+0x001a364c	1	uint8_t	g_performance_display	43136 tests	performance figure shown when set
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

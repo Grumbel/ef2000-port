@@ -573,6 +573,26 @@ extern int16_t g_selected_map_marker; /* 0x126630, -1 = none */
 extern ef_addr32 g_current_map_record; /* 0x1a4a9c, markers: count word +0x1c, 25-byte entries at +0x20 */
 extern uint8_t g_map_markers_changed; /* 0x12654c */
 
+/* Campaign target acceptance, 0xa5d8. */
+#include "ef_structs/campaign_targets.h"
+extern ef_campaign_target_choice g_campaign_target_choices[]; /* 0x197370 */
+extern ef_saved_marker_position g_saved_marker_positions[]; /* 0x197500 */
+extern int16_t g_adjacency_selected_value; /* 0x126574 */
+
+/* Current weapon window, 0x69bdc. */
+#include "ef_structs/weapon_records.h"
+extern ef_weapon_record g_weapon_records[]; /* 0x12bced */
+extern int16_t g_current_weapon; /* 0x1f6f4a, 0 = none */
+extern int16_t g_weapon_page_flag; /* 0x1282d8 */
+
+/* Pilot selection close, 0x43020. */
+extern int16_t g_flight_origin_x; /* 0x1379a0 */
+extern int16_t g_flight_origin_y; /* 0x1379a2 */
+extern int16_t g_flight_window_x; /* 0x126580 */
+extern int16_t g_flight_window_y; /* 0x126582 */
+extern uint8_t g_performance_value; /* 0x1a364b */
+extern uint8_t g_performance_display; /* 0x1a364c */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */

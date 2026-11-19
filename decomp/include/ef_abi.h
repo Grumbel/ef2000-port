@@ -6563,6 +6563,11 @@ void kotsClickBase(ef_addr32 widget); /* 0x5110 */
 void gpwRedrawTargetWindow(ef_addr32 name); /* 0xb5d0 */
 void mpFlyMission(ef_addr32 widget); /* 0x4f994 */
 void GenGUIHelp(ef_addr32 widget); /* 0x4595c */
+void gpwCampAccepted(ef_addr32 widget); /* 0xa5d8 */
+void gpwRedrawCurrentWeaponWindow(ef_addr32 widget); /* 0x69bdc */
+void gpwClosePilots(void); /* 0x43020 */
+void guest_fn_9820(void); /* 0x9820 */
+void guest_fn_9ea0(void); /* 0x9ea0 */
 void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */
 ef_addr32 show_named_widget_a7318(ef_addr32 root, ef_addr32 name); /* 0xa7318 EAX/EDX, EAX widget, EDX clobbered */
 uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, EAX result, EDX clobbered */

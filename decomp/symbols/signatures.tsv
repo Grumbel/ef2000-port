@@ -3711,3 +3711,8 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000b5d0	gpwRedrawTargetWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; EAX dialog name; GUI redraw callback
 0x0004f994	mpFlyMission	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; 16-byte local name buffer; EAX widget; GUI click callback
 0x0004595c	GenGUIHelp	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI click callback
+0x0000a5d8	gpwCampAccepted	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes all six; EAX widget; callees 0x421c0/0x9820/0x9ea0 take no register inputs (ESI/EDI written before use); GUI click callback
+0x00009820	guest_fn_9820			ebx,ecx,edx,esi,edi,ebp	0	Original 0x9820 pushes EBX ECX EDX ESI EDI EBP; no register inputs
+0x00009ea0	guest_fn_9ea0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x9ea0 pushes EBX ECX EDX ESI EDI EBP; no register inputs
+0x00069bdc	gpwRedrawCurrentWeaponWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI; EAX widget; GUI redraw callback
+0x00043020	gpwClosePilots			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; 0x34-byte local text; GUI close callback

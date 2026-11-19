@@ -157,3 +157,134 @@ void gpwRedrawTargetWindow(ef_addr32 name)
     activate_widget_a4cb4(EF_U8(dialog + 0x10u));
     refresh_flagged_object_a4b08(dialog);
 }
+
+/* 0xa5d8, 292 bytes, accept callback of the numbered campaign target
+ * buttons (WIDGET name at +0x3f). The map markers' positions are first
+ * restored from the 12-byte save table at 0x197500. The chosen target's
+ * group and member become the selection (also mirrored to 0x125835),
+ * the network value is refreshed from the group's adjacency list when
+ * the frontend network is active, the target views are rebuilt, the
+ * marker positions saved again and "missionoverview" redrawn. */
+void gpwCampAccepted(ef_addr32 widget)
+{
+    const ef_campaign_target_choice *choice;
+    int32_t i;
+
+    for (i = 0; i < (int32_t)(int16_t)EF_U16(g_current_map_record + 0x1cu); ++i) {
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u) = g_saved_marker_positions[i].x;
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u + 4u) = g_saved_marker_positions[i].y;
+    }
+    choice = &g_campaign_target_choices[guest_convert_parser_integer(widget + 0x3fu) - 1];
+    g_target_member_index = choice->member;
+    g_target_group_index = choice->group;
+    g_reference_mirror[2] = (uint8_t)g_target_member_index;
+    g_reference_mirror[0] = (uint8_t)choice->group;
+    g_reference_mirror[1] = (uint8_t)((uint16_t)choice->group >> 8);
+    g_reference_mirror[3] = 0u;
+    if (g_frontend_network_active != 0u) {
+        g_adjacency_selected_value =
+            (int16_t)EF_U16(g_grid_adjacency_base + (uint32_t)((int32_t)g_target_group_index * 17) + 1u +
+                            (uint32_t)((int32_t)g_target_member_index * 2));
+        guest_fn_421c0_w();
+    }
+    ui_emit_selected_message();
+    guest_fn_9820();
+    guest_fn_9ea0();
+    for (i = 0; i < (int32_t)(int16_t)EF_U16(g_current_map_record + 0x1cu); ++i) {
+        g_saved_marker_positions[i].x = EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u);
+        g_saved_marker_positions[i].y = EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u + 4u);
+    }
+    redraw_item_a5ef8(EF_U8(find_named_or_abort_a46cc(0x00180584u) + 0x10u)); /* "missionoverview" */
+}
+
+/* Draw the image named by NAME (0 = none) into BUFFER and show it in
+ * DIALOG at WIDTH x HEIGHT. */
+static void show_weapon_image(ef_addr32 dialog, ef_addr32 name, ef_addr32 buffer,
+                              uint16_t width, uint16_t height)
+{
+    if (name == 0u)
+        return;
+    guest_fn_c36b4(name, 0u, 0u, width, height, buffer);
+    set_widget_params_a5b1c(dialog, buffer, width, height, width);
+}
+
+/* 0x69bdc, 305 bytes, redraw callback of the weapon list; WIDGET's name
+ * (+0x3f) names the weapon. Title the "currentweapon" dialog with it,
+ * select the weapon record (0x699f4), and when one is found draw its
+ * small (320x200) and large (640x400) pictures into the "currentweapon"
+ * and "bigcurrweapon" dialogs. The weapon's page words are assigned and
+ * word 0x1282d8 set to 1. */
+void gpwRedrawCurrentWeaponWindow(ef_addr32 widget)
+{
+    ef_addr32 name = widget + 0x3fu;
+    ef_addr32 title = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00186328u), /* "currentweapon" */
+                                                0x0018630cu);                         /* "title" */
+
+    ef_addr32 dialog;
+
+    g_current_weapon = (int16_t)find_named_record_699f4(name);
+    if (title != 0u)
+        show_widget_a7588(title, name);
+    dialog = find_named_or_abort_a46cc(0x00186328u);                        /* "currentweapon" */
+    if (g_current_weapon != 0)
+        show_weapon_image(dialog, g_weapon_records[g_current_weapon].small_image,
+                          0x001e74a0u, 0x140u, 0xc8u);
+    dialog = find_named_or_abort_a46cc(0x00186338u);                        /* "bigcurrweapon" */
+    if (g_current_weapon != 0)
+        show_weapon_image(dialog, g_weapon_records[g_current_weapon].large_image,
+                          0x001a8ca0u, 0x280u, 0x190u);
+    assign_page_words_68e84((uint32_t)(int32_t)g_current_weapon);
+    g_weapon_page_flag = 1;
+}
+
+/* 0x43020, 386 bytes, close callback of the pilot selection. Unless the
+ * frontend network is already active: close "menu", restore the map
+ * marker positions saved at 0x197500 (byte index, as in the original),
+ * reallocate the active record pool, mark the network active, open
+ * "test" and "flightinfo", place the flight window (x + 8, 24 to the
+ * left once it is past 23), reset the slots, world state and DOS
+ * buffers, refresh the adjacency value and its views, close
+ * "timeadjust" and, when the performance display is enabled, lower the
+ * performance figure by 10 (to 0 below 10) and show it as "<n>%". */
+void gpwClosePilots(void)
+{
+    char text[0x34];
+    uint8_t i;
+    uint8_t performance;
+    ef_addr32 widget;
+
+    if (g_frontend_network_active != 0u)
+        return;
+    apply_a4b80_a4db0(0x00184558u);                         /* "menu" */
+    for (i = 0; (int16_t)i < (int16_t)EF_U16(g_current_map_record + 0x1cu); ++i) {
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u) = g_saved_marker_positions[i].x;
+        EF_U32(EF_U32(g_current_map_record + 0x20u) + (uint32_t)i * 25u + 4u) = g_saved_marker_positions[i].y;
+    }
+    clear_word_41eeda();
+    release_pointer_b1a10(0x001379bcu);
+    g_active_record_pool = allocate_weighted_node_records(0x00137970u, 0x001379a8u);
+    g_frontend_network_active = 1u;
+    apply_a4cb4_a4d90(0x00184550u);                         /* "test" */
+    apply_a4cb4_a4d90(0x001844a4u);                         /* "flightinfo" */
+    g_flight_window_x = (int16_t)(g_flight_origin_x + 8);
+    g_flight_window_y = g_flight_origin_y;
+    if (g_flight_window_x > 0x17)
+        g_flight_window_x = (int16_t)(g_flight_window_x - 0x18);
+    clear_slots_41f24();
+    reset_world_state_410d0();
+    dos_commit_f44();
+    g_adjacency_selected_value =
+        (int16_t)EF_U16(g_grid_adjacency_base + (uint32_t)((int32_t)g_target_group_index * 17) + 1u +
+                        (uint32_t)((int32_t)g_target_member_index * 2));
+    guest_fn_421c0_w();
+    apply_a4b80_a4db0(0x0018457cu);                         /* "timeadjust" */
+    set_word_41eeda();
+    if (g_performance_display == 0u)
+        return;
+    performance = g_performance_value;
+    g_performance_value = (uint8_t)(performance < 10u ? 0u : performance - 10u);
+    widget = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00184588u), /* "performance" */
+                                       0x00184588u);
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)text, 0x00184594u, (uint32_t)g_performance_value); /* "%d%%" */
+    show_widget_a7588(widget, (ef_addr32)(uintptr_t)text);
+}
