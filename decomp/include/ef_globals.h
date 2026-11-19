@@ -593,6 +593,29 @@ extern int16_t g_flight_window_y; /* 0x126582 */
 extern uint8_t g_performance_value; /* 0x1a364b */
 extern uint8_t g_performance_display; /* 0x1a364c */
 
+/* Campaign map mode and layer flags, 0xa6fc. */
+extern uint8_t g_map_mode; /* 0x1a53dd, 0 geographical, 1 political, 2 strategic */
+extern int16_t g_map_show_nato; /* 0x126554 */
+extern int16_t g_map_show_russian; /* 0x126556 */
+extern int16_t g_map_show_neutral; /* 0x126558 */
+extern int16_t g_map_show_airdef; /* 0x12655a */
+extern int16_t g_map_show_airsup; /* 0x12655c */
+extern int16_t g_map_show_navy; /* 0x12655e */
+extern int16_t g_map_show_comms; /* 0x126564 */
+extern int16_t g_map_show_supply; /* 0x126566 */
+extern int16_t g_map_show_polit; /* 0x126560 */
+
+/* Flight-info window buttons, 0x431a4. */
+extern ef_addr32 g_flightinfo_page; /* 0x12657c, 0 or a page table */
+extern uint8_t g_flightinfo_mode; /* 0x126578 */
+extern uint8_t g_flightinfo_toggle; /* 0x126577 */
+extern int16_t g_unit_count; /* 0x19bb5c */
+
+/* Mission-planner target list, 0x4bcd4. */
+extern uint8_t g_target_list_changed; /* 0x1a54f3 */
+extern int16_t g_target_type; /* 0x1a54f4 */
+extern uint8_t g_target_ship_class; /* 0x1a559b, 1 awacs, 2 refueller, 3 supply, 4 kill ship */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */

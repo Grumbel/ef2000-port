@@ -258,3 +258,51 @@ void GenGUIHelp(ef_addr32 widget)
     if ((flags & 0x20u) != 0u)
         g_selected_map_marker = -1;
 }
+
+/* Target-list entries of 0x4bcd4: widget name, target type, and the
+ * values stored to the full-coverage and ship-class bytes (-1 = keep). */
+struct target_list_entry {
+    ef_addr32 name;
+    int16_t type;
+    int8_t full_coverage;
+    int8_t ship_class;
+};
+
+static const struct target_list_entry target_list_entries[] = {
+    { 0x00184a34u, 0x00, -1, -1 },  /* "ewr_site" */
+    { 0x00184b8cu, 0x13, 1, -1 },   /* "choke_point" */
+    { 0x00184b98u, 0x1d, -1, -1 },  /* "pol_indust_site" */
+    { 0x00184ba8u, 0x26, -1, -1 },  /* "pol_site" */
+    { 0x00184bb4u, 0x31, -1, -1 },  /* "airfield" */
+    { 0x00184bc0u, 0x39, -1, -1 },  /* "air_defence_site" */
+    { 0x00184bd4u, 0x49, -1, -1 },  /* "port" */
+    { 0x00184bdcu, 0x17, -1, 4 },   /* "kill_ship" */
+    { 0x00184be8u, 0x0e, -1, 3 },   /* "supply_ship" */
+    { 0x00184bf4u, 0x16, -1, -1 },  /* "carrier" */
+    { 0x00184bfcu, 0x4f, 1, -1 },   /* "dam" */
+    { 0x00184c00u, 0x0f, -1, 1 },   /* "awacs" */
+    { 0x00184c08u, 0x10, -1, 2 },   /* "refueller" */
+};
+
+/* 0x4bcd4, 434 bytes, selection callback of the mission-planner target
+ * list. Mark the list changed, clear the full-coverage and ship-class
+ * bytes, then apply every entry whose name equals WIDGET's (+0x3f). */
+void mpTargetListSelected(ef_addr32 widget)
+{
+    size_t i;
+
+    g_target_list_changed = 1u;
+    g_sam_full_coverage = 0u;
+    g_target_ship_class = 0u;
+    for (i = 0; i < sizeof(target_list_entries) / sizeof(target_list_entries[0]); ++i) {
+        const struct target_list_entry *entry = &target_list_entries[i];
+
+        if (guest_strcmp(widget + 0x3fu, entry->name) != 0)
+            continue;
+        g_target_type = entry->type;
+        if (entry->full_coverage >= 0)
+            g_sam_full_coverage = (uint8_t)entry->full_coverage;
+        if (entry->ship_class >= 0)
+            g_target_ship_class = (uint8_t)entry->ship_class;
+    }
+}

@@ -288,3 +288,114 @@ void gpwClosePilots(void)
     guest_sprintf_a4342((ef_addr32)(uintptr_t)text, 0x00184594u, (uint32_t)g_performance_value); /* "%d%%" */
     show_widget_a7588(widget, (ef_addr32)(uintptr_t)text);
 }
+
+/* Layer-toggle checkbox of the "mapmodeswin" dialog: bit 0 of the
+ * widget's +0x1d flags. */
+static int16_t map_layer_checked(ef_addr32 dialog, ef_addr32 name)
+{
+    return (int16_t)((EF_U8(find_widget_checked_a78bc(dialog, name) + 0x1du) & 1u) != 0u);
+}
+
+/* 0xa6fc, 371 bytes (tracker name gpwFlyMission), callback of the map
+ * mode selection; WIDGET's name (+0x3f) is the chosen mode. "geographical",
+ * "political" and "strategic" select map mode 0/1/2 and its background
+ * picture; any other name keeps the mode. Then the nine layer flags
+ * are read back from the "mapmodeswin" checkboxes and the selection
+ * message is emitted. */
+void gpwFlyMission(ef_addr32 widget)
+{
+    ef_addr32 name = widget + 0x3fu;
+    ef_addr32 dialog;
+
+    if (guest_strcmp(name, 0x00180730u) == 0) {          /* "geographical" */
+        show_preview_picture_41314(0x00180740u);            /* "map03.lbm" */
+        g_map_mode = 0;
+    } else if (guest_strcmp(name, 0x0018074cu) == 0) {   /* "political" */
+        show_preview_picture_41314(0x00180758u);            /* "map04.lbm" */
+        g_map_mode = 1;
+    } else if (guest_strcmp(name, 0x00180764u) == 0) {   /* "strategic" */
+        show_preview_picture_41314(0x00180770u);            /* "norjstr.lbm" */
+        g_map_mode = 2;
+    }
+    dialog = find_named_or_abort_a46cc(0x0018077cu);         /* "mapmodeswin" */
+    g_map_show_nato = map_layer_checked(dialog, 0x00180788u);
+    g_map_show_russian = map_layer_checked(dialog, 0x00180790u);
+    g_map_show_neutral = map_layer_checked(dialog, 0x00180798u);
+    g_map_show_airdef = map_layer_checked(dialog, 0x001807a0u);
+    g_map_show_airsup = map_layer_checked(dialog, 0x001807a8u);
+    g_map_show_navy = map_layer_checked(dialog, 0x001807b0u);
+    g_map_show_comms = map_layer_checked(dialog, 0x001807b8u);
+    g_map_show_supply = map_layer_checked(dialog, 0x001807c0u);
+    g_map_show_polit = map_layer_checked(dialog, 0x001807c8u);
+    ui_emit_selected_message();
+}
+
+/* Step the selected adjacency unit by DELTA, skipping the 0xff
+ * sentinel and wrapping around the unit count (16-bit arithmetic). */
+static void step_selected_unit(int16_t delta)
+{
+    int16_t count = g_unit_count;
+    int16_t unit = (int16_t)(g_adjacency_selected_value + delta);
+
+    if (unit == 0xff)
+        unit = (int16_t)(unit + (delta > 0 ? 1 : -1));
+    if (delta > 0 && unit >= count)
+        unit = (int16_t)(delta == 1 ? 0 : unit - count);
+    else if (delta < 0 && unit < 0)
+        unit = (int16_t)(delta == -1 ? count - 1 : unit + count);
+    g_adjacency_selected_value = unit;
+}
+
+/* 0x431a4, 597 bytes, button callback of the flight-info window; the
+ * widget's one-letter name (+0x3f) picks the action:
+ *   a  clear the selection and page, close "flightinfo"
+ *   b/c  show page 0x13474a / 0x134d8a
+ *   d  set the info mode byte
+ *   e  toggle the info toggle byte
+ *   f/g/h/i  (network active only) select the next/previous unit or
+ *            step by +10/-10, then refresh the views and emit the
+ *            selection message. */
+void gpwOnOpenTargetWindow(ef_addr32 widget)
+{
+    ef_addr32 name = widget + 0x3fu;
+    int16_t delta;
+
+    if (guest_strcmp(name, 0x0018459cu) == 0) {          /* "a" */
+        g_flightinfo_page = 0u;
+        g_flightinfo_mode = 0u;
+        g_adjacency_selected_value = -1;
+        find_named_or_abort_a46cc(0x001844a4u);             /* "flightinfo" */
+        return;
+    }
+    if (guest_strcmp(name, 0x001845a0u) == 0) {          /* "b" */
+        g_flightinfo_page = 0x0013474au;
+        return;
+    }
+    if (guest_strcmp(name, 0x001845a4u) == 0) {          /* "c" */
+        g_flightinfo_page = 0x00134d8au;
+        return;
+    }
+    if (guest_strcmp(name, 0x001845a8u) == 0) {          /* "d" */
+        g_flightinfo_mode = 1u;
+        return;
+    }
+    if (guest_strcmp(name, 0x001845acu) == 0) {          /* "e" */
+        g_flightinfo_toggle = (uint8_t)(g_flightinfo_toggle == 0u);
+        return;
+    }
+    if (guest_strcmp(name, 0x001845b0u) == 0)            /* "f" */
+        delta = 1;
+    else if (guest_strcmp(name, 0x001845b4u) == 0)       /* "g" */
+        delta = -1;
+    else if (guest_strcmp(name, 0x001845b8u) == 0)       /* "h" */
+        delta = 10;
+    else if (guest_strcmp(name, 0x001845bcu) == 0)       /* "i" */
+        delta = -10;
+    else
+        return;
+    if (g_frontend_network_active == 0u)
+        return;
+    step_selected_unit(delta);
+    guest_fn_421c0_w();
+    ui_emit_selected_message();
+}

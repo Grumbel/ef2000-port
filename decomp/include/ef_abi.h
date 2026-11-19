@@ -6566,6 +6566,9 @@ void GenGUIHelp(ef_addr32 widget); /* 0x4595c */
 void gpwCampAccepted(ef_addr32 widget); /* 0xa5d8 */
 void gpwRedrawCurrentWeaponWindow(ef_addr32 widget); /* 0x69bdc */
 void gpwClosePilots(void); /* 0x43020 */
+void gpwFlyMission(ef_addr32 widget); /* 0xa6fc */
+void gpwOnOpenTargetWindow(ef_addr32 widget); /* 0x431a4 */
+void mpTargetListSelected(ef_addr32 widget); /* 0x4bcd4 */
 void guest_fn_9820(void); /* 0x9820 */
 void guest_fn_9ea0(void); /* 0x9ea0 */
 void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */

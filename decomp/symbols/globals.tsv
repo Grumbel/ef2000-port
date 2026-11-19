@@ -544,6 +544,23 @@ addr	size	type	name	evidence	notes
 0x00126582	2	int16_t	g_flight_window_y	430cf stores	copied from the origin
 0x001a364b	1	uint8_t	g_performance_value	43141 reads, 4314d/4315a stores	shown as percent, lowered by 10 per close
 0x001a364c	1	uint8_t	g_performance_display	43136 tests	performance figure shown when set
+0x001a53dd	1	uint8_t	g_map_mode	a71d/a741/a763 stores	0 geographical, 1 political, 2 strategic
+0x00126554	2	int16_t	g_map_show_nato	a6fc stores checkbox "nato"	map layer shown, side positive
+0x00126556	2	int16_t	g_map_show_russian	a6fc stores checkbox "russian"	map layer shown, side negative
+0x00126558	2	int16_t	g_map_show_neutral	a6fc stores checkbox "neutral"	map layer shown, side zero
+0x0012655a	2	int16_t	g_map_show_airdef	a6fc stores checkbox "airdef"	map layer shown
+0x0012655c	2	int16_t	g_map_show_airsup	a6fc stores checkbox "airsup"	map layer shown
+0x0012655e	2	int16_t	g_map_show_navy	a6fc stores checkbox "navy"	map layer shown
+0x00126564	2	int16_t	g_map_show_comms	a6fc stores checkbox "comms"	map layer shown
+0x00126566	2	int16_t	g_map_show_supply	a6fc stores checkbox "supply"	map layer shown
+0x00126560	2	int16_t	g_map_show_polit	a6fc stores checkbox "polit"	map layer shown
+0x0012657c	4	ef_addr32	g_flightinfo_page	431c6/43200/43225 stores	0, 0x13474a or 0x134d8a
+0x00126578	1	uint8_t	g_flightinfo_mode	431d2 clears, 4324a sets	flight-info button d
+0x00126577	1	uint8_t	g_flightinfo_toggle	4326c toggles	flight-info button e
+0x0019bb5c	2	int16_t	g_unit_count	432d2 compares; read elsewhere via dword 0x19bb5a shifted 16	unit 0xff is a sentinel
+0x001a54f3	1	uint8_t	g_target_list_changed	4bcdf sets	also set by the target-list scans
+0x001a54f4	2	int16_t	g_target_type	4bd04.. stores per list entry	compared with node byte +0xb
+0x001a559b	1	uint8_t	g_target_ship_class	4bceb clears, list entries store 1-4	1 awacs, 2 refueller, 3 supply ship, 4 kill ship
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
