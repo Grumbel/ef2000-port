@@ -484,4 +484,20 @@ extern ef_addr32 g_current_render_object_span; /* 0x00420994 */
 extern ef_addr32 g_current_render_object_vertex_list; /* 0x004209bc */
 extern ef_addr32 g_data_playback_screen_buffer; /* 0x0048415c */
 
+/* Tracked camera, 0x94a74. */
+extern uint16_t g_scene_update_latch; /* 0x12dba0 */
+extern int32_t g_scene_distance_packed; /* 0x12dba4 */
+extern int32_t g_scene_view_matrix[9]; /* 0x12dbec */
+extern int32_t g_scene_subject_matrix[9]; /* 0x2143c0 */
+extern uint16_t g_scene_direction_words[2]; /* 0x2143e4 */
+extern int32_t g_scene_combined_matrix[9]; /* 0x214404 */
+extern ef_addr32 g_scene_target; /* 0x214454 */
+extern ef_addr32 g_scene_subject; /* 0x214458 */
+extern int32_t g_scene_offset_x; /* 0x214460 */
+extern int32_t g_scene_offset_y; /* 0x2143fc */
+extern int32_t g_scene_offset_z; /* 0x21445c */
+extern int32_t g_scene_eye_position[3]; /* 0x21436c */
+extern uint16_t g_scene_change_pending; /* 0x21449c */
+extern uint8_t g_scene_direction_changed; /* 0x1a6d1f */
+
 #endif

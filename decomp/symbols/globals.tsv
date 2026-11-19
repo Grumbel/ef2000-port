@@ -579,3 +579,17 @@ addr	size	type	name	evidence	notes
 0x0015b770	4	uint32_t	g_view_latched_height	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
 0x00127d92	2	uint16_t	g_simulation_tick_step	0x29f71 unsigned zero gate; 0x2a03b unsigned load	frame step used in engagement rate divisor
 0x001264e2	1	uint8_t	g_combat_skill_level	0x2a073 zero-extended load; thresholds 3 and 6	combat skill band for engagement frequency
+0x0012dba0	2	uint16_t	g_scene_update_latch	0x94a74 original assembly	Cleared before selecting the tracked-camera target
+0x0012dba4	4	int32_t	g_scene_distance_packed	0x94a74 original assembly	Signed high word scales the camera offset
+0x0012dbec	36	int32_t[9]	g_scene_view_matrix	0x94a74 original assembly	Row-major fixed-point camera rotation
+0x002143c0	36	int32_t[9]	g_scene_subject_matrix	0x94a74 original assembly	Row-major fixed-point subject rotation
+0x002143e4	4	uint16_t[2]	g_scene_direction_words	0x94a74 original assembly	Pitch and yaw words selected by 92290
+0x00214404	36	int32_t[9]	g_scene_combined_matrix	0x94a74 original assembly	Product of subject and view rotations
+0x00214454	4	ef_addr32	g_scene_target	0x94a74 original assembly	Selected target position pointer
+0x00214458	4	ef_addr32	g_scene_subject	0x94a74 original assembly	Tracked subject position and attitude pointer
+0x00214460	4	int32_t	g_scene_offset_x	0x94a74 original assembly	Scaled third matrix column
+0x002143fc	4	int32_t	g_scene_offset_y	0x94a74 original assembly	Scaled third matrix column
+0x0021445c	4	int32_t	g_scene_offset_z	0x94a74 original assembly	Scaled third matrix column
+0x0021436c	12	int32_t[3]	g_scene_eye_position	0x94a74 original assembly	Camera position in Y/X/Z order
+0x0021449c	2	uint16_t	g_scene_change_pending	0x94a74 original assembly	Set when target selection fails
+0x001a6d1f	1	uint8_t	g_scene_direction_changed	0x94a74 original assembly	Set when either view direction angle is nonzero

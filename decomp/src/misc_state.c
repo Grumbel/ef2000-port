@@ -98,7 +98,7 @@ void reset_scene_words_and_update(void)
     EF_U16(0x0012dba6u) = 0;
     EF_U16(0x0012dba4u) = 0;
     EF_U16(0x0012dba2u) = 0;
-    guest_scene_update();
+    update_tracked_camera_94a74();
 }
 
 /* 0x94ffc, 28 bytes. Signed high word of dword 0x21449e selects a filtered

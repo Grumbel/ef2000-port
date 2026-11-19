@@ -793,7 +793,7 @@ uint8_t guest_link_check_b(ef_addr32 record, uint32_t value); /* 0x90050 EAX/EDX
 void guest_mode_36_hook(uint32_t first, uint32_t second); /* 0xdc334 stack, callee cleanup */
 uint32_t guest_square_root_of(int32_t value); /* 0xe2b60 EAX -> EAX */
 uint32_t guest_record_field_30(ef_addr32 record, uint32_t field); /* 0x9457c EAX/EDX -> EAX */
-void guest_scene_update(void); /* 0x94a74 */
+void update_tracked_camera_94a74(void); /* 0x94a74 */
 void guest_scene_apply(void); /* 0x94d08 */
 void guest_record_tail(ef_addr32 record); /* 0x975f0 EAX */
 void guest_tick_sample(void); /* 0x10640 */

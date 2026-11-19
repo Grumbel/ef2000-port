@@ -39,4 +39,17 @@ typedef struct EF_PACKED ef_scene_event_counter {
 EF_STATIC_ASSERT(ef_scene_counter_high, offsetof(ef_scene_event_counter, count) == 2);
 EF_STATIC_ASSERT(ef_scene_counter_secondary, offsetof(ef_scene_event_counter, secondary) == 4);
 
+/* Position and attitude prefix used by the tracked camera. */
+typedef struct EF_PACKED ef_scene_subject {
+    int32_t position[3];
+    uint16_t pitch;
+    uint16_t yaw;
+    uint16_t roll;
+} ef_scene_subject;
+EF_STATIC_ASSERT(ef_scene_subject_position, offsetof(ef_scene_subject, position) == 0);
+EF_STATIC_ASSERT(ef_scene_subject_pitch, offsetof(ef_scene_subject, pitch) == 12);
+EF_STATIC_ASSERT(ef_scene_subject_yaw, offsetof(ef_scene_subject, yaw) == 14);
+EF_STATIC_ASSERT(ef_scene_subject_roll, offsetof(ef_scene_subject, roll) == 16);
+EF_STATIC_ASSERT(ef_scene_subject_size, sizeof(ef_scene_subject) == 18);
+
 #endif
