@@ -167,6 +167,12 @@ extern ef_addr32 g_world_grid_base; /* 0x0019bb58, pointer to 0xca-byte records 
 extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
 extern uint32_t g_video_width; /* 0x0015b744 */
 extern uint32_t g_video_height; /* 0x0015b748 */
+extern uint32_t g_view_clip_left; /* 0x0015bdc0, inclusive bounds */
+extern uint32_t g_view_clip_right; /* 0x0015bdc4 */
+extern uint32_t g_view_clip_top; /* 0x0015bdc8 */
+extern uint32_t g_view_clip_bottom; /* 0x0015bdcc */
+extern uint32_t g_view_latched_width; /* 0x0015b76c */
+extern uint32_t g_view_latched_height; /* 0x0015b770 */
 extern uint8_t g_world_grid_mode; /* 0x00127da9, gates alternate grid lookup */
 extern uint8_t g_world_grid_marker; /* 0x001a666b, compares neighboring rows */
 extern uint8_t g_external_grid_count; /* 0x0012583a, number of external rows */

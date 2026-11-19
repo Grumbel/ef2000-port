@@ -168,15 +168,20 @@ uint32_t mouse_read_buttons_ce064(void)
     return EF_U8(0x004201c0u) & 7u;
 }
 
-/* 0xce328, 44 bytes. Latch four values and the current pair at 0x15b744/0x15b748. */
-void latch_values_ce328(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
+/* 0xce328, 44-byte entry prefix falling through to 0xce354.
+ * Shared-tail recipe: retain the tail as a direct named C call, including
+ * its side effects and clobbers. The original entry has no RET of its own.
+ * Bounds are inclusive; preserve the original order of the six stores. */
+void latch_values_ce328(uint32_t left, uint32_t right,
+                        uint32_t top, uint32_t bottom)
 {
-    EF_U32(0x0015bdc0u) = a;
-    EF_U32(0x0015bdc4u) = b;
-    EF_U32(0x0015b76cu) = EF_U32(0x0015b744u);
-    EF_U32(0x0015bdc8u) = c;
-    EF_U32(0x0015b770u) = EF_U32(0x0015b748u);
-    EF_U32(0x0015bdccu) = d;
+    g_view_clip_left = left;
+    g_view_clip_right = right;
+    g_view_clip_top = top;
+    g_view_latched_width = g_video_width;
+    g_view_clip_bottom = bottom;
+    g_view_latched_height = g_video_height;
+    rebuild_clip_planes_ce354();
 }
 
 /* 0xce944, 93 bytes. Apply pending event bits of an object through the 5-entry table at 0x15b798. */

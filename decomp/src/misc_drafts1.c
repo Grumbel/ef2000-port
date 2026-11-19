@@ -21545,13 +21545,13 @@ void rebuild_clip_planes_ce354(void)
 {
 	double k = md_rd_f64(0x18f668u);
 	float v0, v1, v2, v3;
-	EF_S32(0x4208bcu) = (int32_t)((uint32_t)EF_S32(0x15bdc0u) << 16) + 0x4000;
+	EF_S32(0x4208bcu) = (int32_t)((g_view_clip_left << 16) + 0x4000u);
 	v0 = (float)((double)EF_S32(0x4208bcu) * k);
-	EF_S32(0x4208b8u) = (int32_t)((uint32_t)EF_S32(0x15bdc4u) << 16) - 0x4000;
+	EF_S32(0x4208b8u) = (int32_t)((g_view_clip_right << 16) - 0x4000u);
 	v1 = (float)((double)EF_S32(0x4208b8u) * k);
-	EF_S32(0x4208c0u) = (int32_t)((uint32_t)EF_S32(0x15bdc8u) << 16) + 0x4000;
+	EF_S32(0x4208c0u) = (int32_t)((g_view_clip_top << 16) + 0x4000u);
 	v2 = (float)((double)EF_S32(0x4208c0u) * k);
-	EF_S32(0x4208b4u) = (int32_t)((uint32_t)EF_S32(0x15bdccu) << 16) - 0x4000;
+	EF_S32(0x4208b4u) = (int32_t)((g_view_clip_bottom << 16) - 0x4000u);
 	v3 = (float)((double)EF_S32(0x4208b4u) * k);
 	view_plane_ce268(0x420808u, -1000.0f, v2, 1000.0f, v2);
 	view_plane_ce268(0x420888u, v1, -1000.0f, v1, 1000.0f);

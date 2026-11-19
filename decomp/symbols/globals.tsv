@@ -571,3 +571,9 @@ addr	size	type	name	evidence	notes
 0x00189b78	5	char[5]	g_quit_confirmation_name	84ac4	widget name used by the quit confirmation callback
 0x00189b5c	1	char[1]	g_quit_notice_text	84aec	message argument passed when saving settings and quitting
 0x000fc8a8	4	ef_addr32	g_renderer_frame_callback	0xc41a7 indirect call reads the callback pointer	Frame callback invoked after renderer handler stack.
+0x0015bdc0	4	uint32_t	g_view_clip_left	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x0015bdc4	4	uint32_t	g_view_clip_right	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x0015bdc8	4	uint32_t	g_view_clip_top	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x0015bdcc	4	uint32_t	g_view_clip_bottom	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x0015b76c	4	uint32_t	g_view_latched_width	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions
+0x0015b770	4	uint32_t	g_view_latched_height	0xce328 store before fallthrough into 0xce354	viewport bounds or latched video dimensions

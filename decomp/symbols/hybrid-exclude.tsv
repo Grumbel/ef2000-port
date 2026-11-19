@@ -17,7 +17,6 @@ addr	reason
 0x00000e20	initialize_x32_services_e20 is a Linux-startup-probe reconstruction; as a hybrid redirect it faults on an unmapped read in the cockpit replay (bisect m2-bisect-002). Keep original pre-main X-32 setup.
 0x0000081c	Hybrid redirect breaks cockpit replay (bisect m2-bisect-003); keep original bytes.
 0x000fc534	Hybrid redirect breaks cockpit replay (bisect m2-bisect-004); keep original bytes.
-0x000ce328	Hybrid redirect breaks cockpit replay (bisect m2-bisect-005); keep original bytes.
 0x000a6d00	Mechanical widget redraw body suspected of corrupting the stack (return lands in heap at 0xd6b6fa in cockpit replay, bisect m2-bisect-007); keep original.
 0x000c9fc4	Mechanical body has uninitialised stack locals and guessed call args (bisect m2-bisect-010); keep original.
 0x00160255	Mechanical body mis-scales uint32_t* array indices (bisect m2-bisect-011); keep original.

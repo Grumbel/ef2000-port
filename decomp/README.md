@@ -454,7 +454,7 @@ The [OPTIONS display batch 097](../docs/subsystems/decomp-batch-097.md)
 models the original cursor repeat timers, pointer selection loop and
 fade/no-fade cleanup; rendering, hit testing and device inputs remain adapters.
 
-Batch 113 adds `copy_record9_d0858` as a spliced, unverified OpenWatcom candidate: function differential passes, but the deterministic cockpit replay has a selected BSS hash mismatch. `latch_values_ce328` is blocked because its current C lowering exceeds the original extent. See [batch 113](../docs/subsystems/decomp-batch-113.md).
+Batch 113 adds `copy_record9_d0858` as a spliced, unverified OpenWatcom candidate: function differential passes, but the deterministic cockpit replay has a selected BSS hash mismatch. `latch_values_ce328` now preserves its original fallthrough into `rebuild_clip_planes_ce354`; arena linking removes the old size limit. The two entries have 48 differential cases each; full golden replay equivalence remains pending. See [batch 113](../docs/subsystems/decomp-batch-113.md).
 Batch 114 corrects the `group_flag_negative_cc1ac` ABI record: original disassembly masks EDX, so it is not preserved. Its 72-byte OpenWatcom C lowering cannot fit the 61-byte body; see [batch 114](../docs/subsystems/decomp-batch-114.md).
 Batch 115 verifies `init_bounds_d0b68`, an exact 63-byte OpenWatcom replacement with 12 isolated cases, three captured caller states and a passing cockpit replay (155 hits). See [batch 115](../docs/subsystems/decomp-batch-115.md).
 Batch 116 adds `find_node_by_byte_b` as a spliced OpenWatcom candidate. Its eight isolated cases pass, but available deterministic replay paths did not reach it; see [batch 116](../docs/subsystems/decomp-batch-116.md).
