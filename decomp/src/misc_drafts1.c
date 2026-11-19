@@ -2009,7 +2009,7 @@ void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c)
     uint32_t w;
     int32_t px = (int16_t)(((uint32_t)a << s) + EF_U16(0x001a6cfcu));
     int32_t py = (int16_t)(((uint32_t)b << s) + EF_U16(0x001a6cfau));
-    draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (uint8_t)(1u - g_tactical_display_mode), px, py, fmt);
+    draw_formatted_text_mode_48bb0(g_tactical_marker_code, (uint8_t)(1u - g_tactical_display_mode), px, py, fmt);
     w = formatted_width_48d5c(fmt);
     a += (int32_t)w + 1;
     odometer_text_5e21c((int16_t)a, (int16_t)b, (uint32_t)c);
@@ -2078,7 +2078,7 @@ void show_main_widgets_7cc5c(void)
         w = find_named_or_abort_a46cc(0x00187f74u);
         activate_widget_a4cb4((uint16_t)EF_U8(w + 0x10u));
     }
-    EF_U8(0x00125847u) = 1u;
+    g_tactical_action_enabled = 1u;
     guest_fn_7bee8_x(0x001f8f74u);
     w = find_named_or_abort_a46cc(0x00187f38u);
     resize_widget_a520c(w, (int16_t)EF_U16(w + 0x45u), (uint32_t)(int16_t)(EF_U16(0x0012b056u) * 0x14u + 0x18u), 0u);
@@ -2263,7 +2263,7 @@ uint32_t classify_record_113b78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
             return 3u;
     }
     far_ptr = EF_U32(EF_U32(ctx + 4u) + 4u);
-    name = (far_ptr >> 16) * 16u + (far_ptr & 0xffffu) + EF_U32(0x00120cc6u);
+    name = (far_ptr >> 16) * 16u + (far_ptr & 0xffffu) + g_runtime_segment_base;
     if (name != 0u && EF_U8(name) != 0u) {
         if (ascii_stricmp_9d524(name, 0x0019552cu) == 0u) {
             if (EF_U32(EF_U32(ctx) + 0xcu) <= 0x5000u)
@@ -3212,7 +3212,7 @@ uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
     uint16_t orient = 0u;
     uint32_t win = 0u;
     int16_t i;
-    if (EF_U8(0x00125847u) != 0u && EF_U8(0x00121ec6u) == 0u) {
+    if (g_tactical_action_enabled != 0u && EF_U8(0x00121ec6u) == 0u) {
         orient = record_flag_bits56((int16_t)EF_U16(0x001f8ec2u));
         win = script_cursor_data_cd29c();
     }
@@ -3220,7 +3220,7 @@ uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
         uint32_t e = EF_U32(obj + 0x2cu) + (uint32_t)(int32_t)i * 0x15u;
         uint32_t px = EF_U16(e + 7u);
         uint32_t py = EF_U16(e + 9u);
-        if (EF_U8(0x00125847u) != 0u && EF_U8(0x00121ec6u) == 0u) {
+        if (g_tactical_action_enabled != 0u && EF_U8(0x00121ec6u) == 0u) {
             transform_runtime_word_pair(orient, (uint32_t)(uintptr_t)&px, (uint32_t)(uintptr_t)&py);
             if ((int16_t)px > (int16_t)EF_U16(win) && (int16_t)px < (int16_t)EF_U16(win + 6u)
                 && (int16_t)py > (int16_t)EF_U16(win + 4u) && (int16_t)py < (int16_t)EF_U16(win + 0xau))
@@ -3648,7 +3648,7 @@ void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg)
 {
     int32_t x;
     int32_t y;
-    uint32_t color = EF_U8(0x00128148u);
+    uint32_t color = g_tactical_marker_code;
     uint32_t s;
     guest_fn_39a0c_x(obj, (uint32_t)(int32_t)(int16_t)arg);
     x = (int16_t)EF_U16(obj);
@@ -4884,7 +4884,7 @@ void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, ui
     uint32_t owner;
     uint32_t prev;
     uint32_t table;
-    if (rec == 0u || EF_U8(0x00125847u) == 0u)
+    if (rec == 0u || g_tactical_action_enabled == 0u)
         return;
     slot &= 0xffu;
     owner = (uint32_t)((int32_t)(int16_t)EF_U16(rec + 0x28u) * 0xca) + g_world_grid_base;
@@ -4945,7 +4945,7 @@ void init_video_mode_cdb20(void)
     guest_fn_fc39c_s(0xc8u, 0x140u);
     select_draw_handlers_c3a74();
     if (EF_U8(0x00146e4au) != 0u)
-        EF_U32(0x0015b758u) = EF_U32(0x00120cc6u) + 0xa0000u;
+        EF_U32(0x0015b758u) = g_runtime_segment_base + 0xa0000u;
     if (EF_U32(0x0015b758u) == 0u) {
         EF_U32(0x0015b758u) = guest_fn_c3f70(0xfc84u);
         if (EF_U32(0x0015b758u) == 0u)
@@ -7818,7 +7818,7 @@ void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
     desc = EF_U32(EF_U32(obj) + 0x10u);
     if (EF_U16(desc + 0x10u) != 0u) {
         p = EF_U32(desc + 0xcu);
-        def = EF_U32(0x00120cc6u) + (p & 0xffffu) + ((p >> 16) << 4);
+        def = g_runtime_segment_base + (p & 0xffffu) + ((p >> 16) << 4);
         for (i = 0; i < 4u; i++)
             if ((int16_t)w[i] < 1)
                 w[i] = EF_U16(def + i * 2u);
@@ -8294,7 +8294,7 @@ uint32_t read_hires_timer_fe560(void)
 {
     uint32_t tick1, tick2, lo, hi, count;
     if (EF_U32(0x0017cf98u) == 0u) {
-        EF_U32(0x00485fc4u) = EF_U32(0x00120cc6u) + 0x46cu;
+        EF_U32(0x00485fc4u) = g_runtime_segment_base + 0x46cu;
         if (EF_U8(0x0015bac5u) == 0u) {
             outp_117b0c(0x43u, 0x34u);
             outp_117b0c(0x40u, 0u);
@@ -9257,7 +9257,7 @@ void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t o
     draw_tactical_line(
                      (uint32_t)(int32_t)(int16_t)(p1[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p1[0] + (int16_t)x),
                      (uint32_t)(int32_t)(int16_t)(p0[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p0[0] + (int16_t)x),
-                     EF_U8(0x00128148u));
+                     g_tactical_marker_code);
 }
 
 /* 0x34298, 237 bytes. Update the item-list dialog: without a name match (0xa4380 of 0x125937 against 0x182b34) just activate and redraw the widget 0x182dd0. Otherwise, unless one of the bytes 0x19f5ae, 0x125902, 0x1357c8 is set, query 0xe1758 and then either lay out the list widget 0x182dc4 for dword 0x429210 rows (rows * 20 height at word +0x67; fewer than 5 rows show the children and resize to rows * 20 + 0x18 high, otherwise hide them and use the fixed size 0x7c) and activate it, or (no rows) activate and redraw the widget 0x182de0. */
@@ -10781,7 +10781,7 @@ void draw_outline_5af50(uint32_t n)
         if (i != 0) {
             p = tab + (uint32_t)((int32_t)i * 4);
             sh = g_tactical_display_mode;
-            EF_U16(0x004208e4u) = EF_U8(0x00128148u);
+            EF_U16(0x004208e4u) = g_tactical_marker_code;
             EF_U16(0x004208e6u) = (uint16_t)(((uint32_t)EF_U16(p - 4u) << sh) + sy);
             EF_U16(0x004208e8u) = (uint16_t)(((uint32_t)EF_U16(p - 2u) << sh) + sx);
             EF_U16(0x004208eau) = (uint16_t)(((uint32_t)EF_U16(p) << sh) + sy);
@@ -10791,7 +10791,7 @@ void draw_outline_5af50(uint32_t n)
     }
     p = tab + 0x18u * 4u;
     sh = g_tactical_display_mode;
-    EF_U16(0x004208e4u) = EF_U8(0x00128148u);
+    EF_U16(0x004208e4u) = g_tactical_marker_code;
     EF_U16(0x004208e6u) = (uint16_t)(((uint32_t)EF_U16(p - 4u) << sh) + sy);
     EF_U16(0x004208e8u) = (uint16_t)(((uint32_t)EF_U16(p - 2u) << sh) + sx);
     EF_U16(0x004208eau) = (uint16_t)(((uint32_t)EF_U16(tab) << sh) + sy);
@@ -11001,7 +11001,7 @@ void queue_grid_node_2a8ac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
     EF_U16(node + 2u) = EF_U16(s1 + 4u);
     EF_U16(node + 4u) = EF_U16(s1 + 8u);
     EF_U16(node + 6u) = EF_U16(node + (uint32_t)((int32_t)(int16_t)s0 * 2) + 8u);
-    if (EF_U8(0x00125847u) != 0u)
+    if (g_tactical_action_enabled != 0u)
         run_page_text_9e508((int16_t)EF_U16(node + 6u), 0u);
     tail = EF_U32(0x0019bb38u);
     if (tail != 0u) {
@@ -11590,7 +11590,7 @@ void clear_missile_slots_16c7c(uint32_t a)
                 if ((uint32_t)t > 0xfu && ((uint32_t)t < 0x15u || (uint32_t)t > 0x1cu))
                     continue;
             }
-            if (EF_U8(0x00125847u) != 0u && t != 9 && t != 0x14) {
+            if (g_tactical_action_enabled != 0u && t != 9 && t != 0x14) {
                 guest_fn_8f22c((int32_t)EF_U32(obj + 0x14u) >> 16, (uint32_t)(uint8_t)counter);
                 if (g_world_grid_mode != 0u)
                     guest_fn_56f0c_x((int32_t)EF_U32(obj + 0x14u) >> 16, (uint32_t)(uint8_t)counter);
@@ -13238,7 +13238,7 @@ void refresh_map_label_5c7dc(void)
     shift = g_tactical_display_mode;
     y = (int16_t)((int32_t)pt[1] - (int32_t)((EF_U16(0x001a6ce2u) + 7u) << shift));
     x = (int16_t)((int32_t)pt[0] - half);
-    draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (1u - shift) & 0xffu, x, y, textp);
+    draw_formatted_text_mode_48bb0(g_tactical_marker_code, (1u - shift) & 0xffu, x, y, textp);
 }
 
 /* 0x539e0, 265 bytes. Variant of 0x538e4 for the second drift mode: the tick counter 0x1a5b5c advances by DT (word 0x127d92), the positions and velocities integrate the same way with the decay float 0x185b74, 0x1a5ba4 gains scale(10.0) * DT * (float 0x185b78)^2 and when the counter exceeds 0x19 byte 0x1a364e is incremented and dword 0x1a5b38 set to 1. */
@@ -13328,9 +13328,9 @@ uint8_t wander_view_point_843b0(void)
         dy = (int32_t)(step_generator_a45b3() & 0x1ffu);
         if ((EF_U16(0x0012b4bcu) & 0x2u) != 0u)
             dy = -dy;
-        if (ui_point_near_reference((int32_t)EF_U32(0x001fcc2cu) + dx, (int32_t)EF_U32(0x001fcc34u) + dy) != 0u) {
-            EF_U32(0x001fcc2cu) = EF_U32(0x001fcc2cu) + (uint32_t)dx;
-            EF_U32(0x001fcc34u) = EF_U32(0x001fcc34u) + (uint32_t)dy;
+        if (ui_point_near_reference((int32_t)g_ui_composite_arg_d + dx, (int32_t)g_ui_composite_arg_c + dy) != 0u) {
+            g_ui_composite_arg_d = g_ui_composite_arg_d + (uint32_t)dx;
+            g_ui_composite_arg_c = g_ui_composite_arg_c + (uint32_t)dy;
         }
         center_view_842b4();
         update_ui_composite();
@@ -13498,7 +13498,7 @@ void queue_effect_event_1d5f4(ef_addr32 vec, uint32_t type)
     ef_addr32 orient;
     ef_addr32 slot;
     ef_addr32 ring;
-    if (EF_U8(0x00125847u) == 0u)
+    if (g_tactical_action_enabled == 0u)
         return;
     if ((int32_t)EF_U32(vec + 4u) > 0)
         EF_U32(vec + 4u) = 0u;
@@ -13911,7 +13911,7 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     EF_U8(rec + 0x22u) = (uint8_t)(EF_U8(rec + 0x22u) & 0xfeu);
     if (active != 0u && EF_U16(0x001fcbd0u) == 0u && EF_U16(0x001fcbd2u) == 0u) {
         if ((EF_U8(0x001fcbe2u) & 0x80u) != 0u
-            || box_outside_bounds_832b8((int32_t)EF_U32(0x001fcc2cu), (int32_t)EF_U32(0x001fcc30u), (int32_t)EF_U32(0x001fcc34u)) != 0u) {
+            || box_outside_bounds_832b8((int32_t)g_ui_composite_arg_d, (int32_t)EF_U32(0x001fcc30u), (int32_t)g_ui_composite_arg_c) != 0u) {
             EF_U8(0x001fcbe2u) = (uint8_t)(EF_U8(0x001fcbe2u) & 0xc7u);
             initialize_ui_component();
             run_12d90_pair_13950();
@@ -13921,9 +13921,9 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     if ((flags & 0x40u) != 0u && (flags & 0x80u) == 0u && EF_U8(0x001fcc43u) != 0u) {
         EF_U8(0x001fcbe3u) = (uint8_t)(EF_U8(0x001fcbe3u) | 1u);
         EF_U8(rec + 0x22u) = (uint8_t)((EF_U8(rec + 0x22u) & 0xfeu) | 1u);
-        EF_U32(rec) = EF_U32(0x001fcc2cu);
+        EF_U32(rec) = g_ui_composite_arg_d;
         EF_U32(rec + 4u) = EF_U32(0x001fcc30u);
-        EF_U32(rec + 8u) = EF_U32(0x001fcc34u);
+        EF_U32(rec + 8u) = g_ui_composite_arg_c;
         return;
     }
     EF_U32(rec + 4u) = 0x80000000u;
@@ -13934,7 +13934,7 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
 {
     int32_t i;
     (void)u0; (void)u2; (void)s0;
-    if (EF_U8(0x00125847u) == 0u)
+    if (g_tactical_action_enabled == 0u)
         return 0u;
     for (i = 0; i < 0x28; i++) {
         ef_addr32 e = 0x00211af0u + (uint32_t)i * 0x30u;
@@ -14592,9 +14592,9 @@ void classify_view_axis_83a40(void)
     build_rotation_e994c(0u, (uint32_t)((int32_t)EF_U32(0x001fcc1eu) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc20u) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc22u) >> 16));
     guest_fn_83734_x((ef_addr32)(uintptr_t)fwd, 0, 0x4000, 0);
     store_scaled_vector_831a4((ef_addr32)(uintptr_t)off,
-                              (int32_t)(EF_U32(0x001fcc2cu) - EF_U32(0x001fcc14u)),
+                              (int32_t)(g_ui_composite_arg_d - EF_U32(0x001fcc14u)),
                               (int32_t)(EF_U32(0x001fcc30u) - EF_U32(0x001fcc18u)),
-                              (int32_t)(EF_U32(0x001fcc34u) - EF_U32(0x001fcc1cu)));
+                              (int32_t)(g_ui_composite_arg_c - EF_U32(0x001fcc1cu)));
     dot = (int32_t)((uint32_t)fwd[1] * (uint32_t)off[1] + (uint32_t)fwd[0] * (uint32_t)off[0] + (uint32_t)fwd[2] * (uint32_t)off[2]);
     len = (int32_t)length_3d_decc4(off[0], off[1], off[2]);
     q = (int32_t)((uint32_t)dot * 2u) / len;
@@ -15167,8 +15167,8 @@ void draw_map_cursor_5a2d0(void)
     px = (int16_t)pr[0];
     py = (int16_t)pr[1];
     m = 5 << g_tactical_display_mode;
-    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), EF_U8(0x00128148u));
-    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), EF_U8(0x00128148u));
+    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), g_tactical_marker_code);
+    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), g_tactical_marker_code);
 }
 
 /* 0xe9dcc, 175 bytes. Derive three view angles from the direction doubles at 0x464490, 0x4644a8, 0x4644b0, 0x4644b8 and 0x4644c0: 0x432220 = atan2(0x464490, -0x4644a8), 0x4321f0 = atan2(0x4644b0, 0x4644b8) and, with 0x4644c0 clamped to [double 0x19149c, 1.0] in place, 0x432288 = acos-style 0xe7df4 of it. */
@@ -17802,7 +17802,7 @@ void draw_bearing_marker_5d080(ef_addr32 ptr)
 	YP = Y + r;
 	XM = X - r;
 	YM = Y - r;
-	col = EF_U8(0x00128148u);
+	col = g_tactical_marker_code;
 	draw_tactical_line((uint32_t)YM, (uint32_t)XM, (uint32_t)YP, (uint32_t)XP, col);
 	draw_tactical_line((uint32_t)YP, (uint32_t)XM, (uint32_t)YM, (uint32_t)XP, col);
 	draw_tactical_line((uint32_t)Y, (uint32_t)XP, (uint32_t)YM, (uint32_t)X, col);
@@ -17963,7 +17963,7 @@ void update_effect_entries_90f50(void)
 	int32_t i;
 	uint32_t e;
 
-	if (EF_U8(0x00125847u) == 0u)
+	if (g_tactical_action_enabled == 0u)
 		return;
 	for (i = 0; i < 0x28; i++) {
 		e = 0x00211af0u + (uint32_t)(i * 0x30);
@@ -18615,7 +18615,7 @@ void check_row_target_85604(uint32_t id, double scale)
 	rows = g_world_grid_base;
 	k = EF_U8(rows + (uint32_t)(ib * 0xca) + 0x8eu);
 	if ((uint16_t)id == EF_U16(0x0019bb5eu) && EF_U16(0x00126516u) == 0u && EF_U8(0x00132ac2u) == 0u &&
-	    EF_U8(0x00125847u) != 0u) {
+	    g_tactical_action_enabled != 0u) {
 		row = rows + (uint32_t)((int32_t)(int16_t)id * 0xca);
 		if (EF_U8(EF_U32(row + 0x8au) + k * 25u + 0x18u) == 5u)
 			return;
@@ -20091,7 +20091,7 @@ void enter_hiscore_screen_4e14(void)
 	EF_U8(0x00137a00u) = 1u;
 	guest_fn_41fc_x();
 	guest_fn_42a4_x();
-	EF_U8(0x00125847u) = 1u;
+	g_tactical_action_enabled = 1u;
 	release_parser_buffers();
 	EF_U32(0x001970a0u) = 0u;
 	EF_U16(0x00121e46u) = 1u;
@@ -21379,12 +21379,12 @@ uint32_t extender_range_9c2d3(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 	if (end < base)
 		return 0xffffffffu;
 	if (end <= 0x100000u)
-		return EF_U32(0x00120cc6u) + base;
+		return g_runtime_segment_base + base;
 	if (base < 0x100000u)
 		return 0xffffffffu;
 	if (md_int21_regs(0x350au, base, 0u, 0u, 0u, 0) != 0u)
 		return 0xffffffffu;
-	return base + EF_U32(0x00120cc6u);
+	return base + g_runtime_segment_base;
 }
 
 /* 0xedb2d, 123 bytes. Math error dispatcher (ret 12): X is the offending double, CODE the error kind. CODE 1..3 reports with flags 0x2040|CODE; CODE 4 with X < 0 returns 0.0 without a report; any other case (including CODE 0 and CODE > 4) reports with flags 0x8100|CODE, or 0x1106 when CODE is 6 and X < 0. The report is 0x10e4dd on (X, X) and its result is returned. X is passed to the callee by address of a local copy. */
@@ -23145,7 +23145,7 @@ uint32_t send_303_104504(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_
     uint32_t v = EF_U32(p + 0x12u);
     uint32_t cur;
     (void)u0; (void)u1; (void)u2; (void)u3;
-    if ((v & 0xffffu) + ((v >> 16) << 4) + EF_U32(0x00120cc6u) == 0)
+    if ((v & 0xffffu) + ((v >> 16) << 4) + g_runtime_segment_base == 0)
         return 0;
     cur = guest_current_pointer();
     if (cur == 0)
@@ -24238,7 +24238,7 @@ void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 	a = EF_U32(EF_U32(pobj) + 0x10u);
 	if (EF_U16(a + 0x10u) != 0) {
 		v = EF_U32(a + 0xcu);
-		base = (v & 0xffffu) + ((v >> 16) << 4) + EF_U32(0x00120cc6u);
+		base = (v & 0xffffu) + ((v >> 16) << 4) + g_runtime_segment_base;
 		for (i = 0; i < 4; i++) {
 			if ((int16_t)w[i] < 0) {
 				w[i] = EF_U16(base + 2u * i);
