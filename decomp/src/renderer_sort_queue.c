@@ -2,9 +2,15 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
+#include "ef_globals.h"
 #include "ef_mem.h"
 
-/* These are host-tested C models of four original renderer queue entries.
+#include <stdint.h>
+
+/* B2 implicit-register recipe: declare the original register inputs,
+ * caller-live outputs and clobbers in ef_abi.h #pragma aux; keep register
+ * flags needed by C callers as explicit return values or out parameters.
+ * These are host-tested C models of four original renderer queue entries.
  * The x86 queue has TWO associated 16-bit arrays, indexed from one. A
  * self-modified displacement at c41c4 selects its overflow policy; the C
  * model keeps that byte in guest memory, without writing into executable
@@ -28,6 +34,24 @@ static void swap_pair(uint32_t a, uint32_t b)
     move_pair(a, b);
     EF_U16(0x146e54u + 2u * b) = key;
     EF_U16(0x147e54u + 2u * b) = tag;
+}
+
+static void queue_partial_quicksort(uint32_t low, uint32_t high)
+{
+#ifdef EF_DECOMP_HOST_TEST
+    renderer_partial_quicksort_c3fd4((int32_t)low, (int32_t)high);
+#else
+    guest_callptr2_x(0x000c3fd4u, low, high);
+#endif
+}
+
+static void queue_insertion_sort(void)
+{
+#ifdef EF_DECOMP_HOST_TEST
+    renderer_insertion_sort_c409c();
+#else
+    guest_callptr0_x(0x000c409cu);
+#endif
 }
 
 /* c3fd4, 200 bytes. The source uses the final element as the pivot and
@@ -79,17 +103,26 @@ void renderer_finish_queue_c4167(void)
     if (EF_U8(0xc41c4u) != 0x6eu) {
         uint32_t count = EF_U16(0x146e50u);
         if (count >= 15u)
-            renderer_partial_quicksort_c3fd4(1, (int32_t)count);
+            queue_partial_quicksort(1u, count);
         if (count >= 2u) {
-            renderer_insertion_sort_c409c();
+            queue_insertion_sort();
             EF_U8(0xc41c4u) = 0x6eu;
         }
     }
     run_handler_stack_c425a();
-    renderer_frame_callback_c4167(EF_U32(0xfc8a8u));
+#ifdef EF_DECOMP_HOST_TEST
+    renderer_frame_callback_c4167(g_renderer_frame_callback);
+#else
+    {
+        typedef void (EF_CDECL *RendererFrameCallback)(void);
+        RendererFrameCallback callback =
+            (RendererFrameCallback)(uintptr_t)g_renderer_frame_callback;
+        callback();
+    }
+#endif
 }
 
-/* c41b0, 170 bytes including the patched branch. AX supplies the sort key.
+/* 0x000c41b0, 170 bytes including the patched branch. AX supplies the sort key.
  * Signed word counts below0x800 use insertion, including negative words.
  * Overflow resets count to0x800 and uses a different path after sorting, by
  * changing the JGE rel8 displacement from 0x1b to 0x6e. */
@@ -106,15 +139,15 @@ void renderer_enqueue_c41b0(uint16_t key)
     } else if (EF_U8(0xc41c4u) == 0x6eu) {
         EF_U16(0x147e54u) = key;
         EF_U16(0x146e50u) = 0x800u;
-        renderer_insertion_sort_c409c();
+        queue_insertion_sort();
         EF_U16(0x146e52u) = EF_U16(0x148e54u);
     } else {
         uint32_t slot = EF_U16(0x146e52u);
         EF_U16(0x146e56u + 2u * slot) = key;
         EF_U16(0x147e56u + 2u * slot) = 0x7ffu;
         EF_U16(0x146e50u) = 0x800u;
-        renderer_partial_quicksort_c3fd4(1, EF_U16(0x146e50u));
-        renderer_insertion_sort_c409c();
+        queue_partial_quicksort(1u, EF_U16(0x146e50u));
+        queue_insertion_sort();
         EF_U16(0x146e52u) = EF_U16(0x148e54u);
         EF_U8(0xc41c4u) = 0x6eu;
     }

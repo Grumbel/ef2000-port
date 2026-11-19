@@ -570,3 +570,4 @@ addr	size	type	name	evidence	notes
 0x00121e98	2	uint16_t	g_debrief_group	c838 and c868	current group index compared as a signed word
 0x00189b78	5	char[5]	g_quit_confirmation_name	84ac4	widget name used by the quit confirmation callback
 0x00189b5c	1	char[1]	g_quit_notice_text	84aec	message argument passed when saving settings and quitting
+0x000fc8a8	4	ef_addr32	g_renderer_frame_callback	0xc41a7 indirect call reads the callback pointer	Frame callback invoked after renderer handler stack.

@@ -38,6 +38,7 @@ extern uint8_t g_spatial_slot_tags[29]; /* 0x0019b358..0x0019b374 */
 extern int16_t g_spatial_slot_count; /* 0x0019b376, high word of 0x0019b374 */
 extern ef_addr32 g_indexed_object_table[]; /* 0x0020f550, 4-byte guest pointers */
 extern int16_t g_indexed_object_count; /* 0x002119f4, signed 16-bit bound */
+extern ef_addr32 g_renderer_frame_callback; /* 0x000fc8a8, indirect frame callback */
 extern uint32_t g_filtered_object_lookup_calls; /* 0x001a3580 */
 extern int16_t g_excluded_object_index; /* 0x001f71d0 */
 extern uint8_t g_object_type_flags[]; /* 0x00128636, 0xe5-byte stride */

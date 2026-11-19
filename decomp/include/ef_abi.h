@@ -233,6 +233,9 @@ uint16_t renderer_index_absolute_c53cf(ef_addr32 cursor);
 #pragma aux renderer_swap_word_c5384 parm [ebx] value [ax] modify [eax ebx]
 #pragma aux renderer_index_biased_c53b4 parm [ebx] value [ax] modify [eax ebx]
 #pragma aux renderer_index_absolute_c53cf parm [ebx] value [ax] modify [eax ebx]
+#pragma aux renderer_partial_quicksort_c3fd4 parm caller [] modify [eax ebx ecx edx edi]
+#pragma aux renderer_insertion_sort_c409c parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux renderer_enqueue_c41b0 parm [eax] modify [eax ebx ecx]
 #endif
 
 /* Buffered Huffman and two-stream decoders (register ABI exposed as pointers). */

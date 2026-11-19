@@ -11,6 +11,7 @@
 static uint8_t ram[0x200000];
 static unsigned draw_calls;
 static unsigned callback_calls;
+ef_addr32 g_renderer_frame_callback;
 
 void *ef_guest_memory_ptr(ef_addr32 address)
 {
@@ -41,7 +42,7 @@ static void reset(void)
 {
     memset(ram, 0, sizeof(ram));
     set_pair(0, -32768, 0xdddd);
-    EF_U32(0xfc8a8u) = 0x12340u;
+    g_renderer_frame_callback = 0x12340u;
     EF_U8(0xc41c4u) = 0x1bu;
     draw_calls = callback_calls = 0u;
 }

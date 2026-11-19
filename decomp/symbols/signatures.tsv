@@ -3679,3 +3679,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000da580	env_game_type_da580			ebx,ecx,edx,esi,edi,ebp	0	Scan the game type directly into its original destination word.
 0x000f6124	format_global_option_line			ebx,ecx,edx,esi,edi,ebp	0	0x132a74 cdecl formatter receives four stack arguments; EDX is saved/restored; callers f7518/f79b0/f8010 ignore EAX.
 0x000f2d74	gui_options_read_command_f2d74			ebx,ecx,edx,esi,edi,ebp	0	Caller f3b78 sets ECX=0x48592c and uses it after the call; body preserves all except EAX. Calls confirmed helpers f2c78, b1b8b, f2cd0, f2d54, e7835; docs/compiler-abi.md
+0x000c41b0	renderer_enqueue_c41b0	EAX:uint16_t		edx,esi,edi,ebp	0	Original 0xc41b0..0xc4259; AX key input; EBX/ECX clobbered; EDX, ESI, EDI, EBP and DS preserved; three callers load EAX and ignore return; overflow path leaves DF as original c409c does; docs/compiler-abi.md
