@@ -109,7 +109,7 @@ void unit_owner_update_6b344(uint32_t unit)
     if (obj == 0u)
         return;
     idx = EF_S16(obj + 0x28u);
-    tbl = EF_U32(0x0019bb58u);
+    tbl = g_world_grid_base;
     if ((uint32_t)EF_U16(tbl + (uint32_t)((int32_t)idx * 0xca) + 0x50u) == (uint32_t)id) {
         set_grid_link_state(idx, 2);
         enable_grid_slot_state(idx);
@@ -3109,7 +3109,7 @@ void bind_object_slot_6e74(uint32_t id)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x0018038cu);
     rec = (uint32_t)(int32_t)(int16_t)EF_U16(obj + 0x28u) * 0xcau;
     EF_U8(0x0019726au) = (uint8_t)(EF_U8(0x0019726au) + 1u);
-    EF_U8(0x001fcc63u + (uint32_t)(int32_t)(int16_t)EF_U16(EF_U32(0x0019bb58u) + rec + 0x15u)) = 1u;
+    EF_U8(0x001fcc63u + (uint32_t)(int32_t)(int16_t)EF_U16(g_world_grid_base + rec + 0x15u)) = 1u;
 }
 
 /* 0x66fc, 213 bytes. Heading from the view origin (0x1a5bec, 0x1a5be8) to the current object: the object (word 0x1f71ca) is looked up, its position is taken from the active coordinates (mode 2), the entry at [0x1a821c] (mode 6, scaled by 1/256) or computed by 0x84e3c; the offsets are shifted down until both fit in 16 bits and the angle is returned (0 when the object does not exist). ORIGINAL BUG: in mode 6 with no entry the position buffer is used uninitialised (zero here). */
@@ -3133,7 +3133,7 @@ uint32_t heading_to_current_object_66fc(void)
         }
     } else {
         uint32_t rec = (uint32_t)(int32_t)(int16_t)EF_U16(0x0019bb5eu) * 0xcau;
-        fetch_entry_pair_84e3c((uint32_t)(uintptr_t)pos, (int16_t)EF_U16(0x001f71cau), EF_U8(EF_U32(0x0019bb58u) + rec + 0x8eu));
+        fetch_entry_pair_84e3c((uint32_t)(uintptr_t)pos, (int16_t)EF_U16(0x001f71cau), EF_U8(g_world_grid_base + rec + 0x8eu));
     }
     bx = pos[0] - (int32_t)EF_U32(0x001a5becu);
     dx = pos[1] - (int32_t)EF_U32(0x001a5be8u);
@@ -4231,7 +4231,7 @@ void set_unit_target_73734(int32_t a, int32_t b)
     } else {
         t = EF_U8(ra + 0x16cu);
         if ((t == 1u || t == 3u || t == 4u || t == 6u) && EF_U16(ra + 0x143u) != 0u) {
-            uint32_t base = EF_U32(0x0019bb58u);
+            uint32_t base = g_world_grid_base;
             uint32_t p = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca);
             uint32_t q = (uint32_t)((int32_t)(int16_t)EF_U16(ra + 0x28u) * 0xca);
             if (EF_U16(base + p + 0x15u) != EF_U16(base + q + 0x15u))
@@ -4410,7 +4410,7 @@ void rebuild_group_tables_49bdc(uint32_t p)
     for (i = 0; i < (int16_t)EF_U8(p + 0x12u); i++) {
         uint32_t roster = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(0x00125835u) * 0x11);
         int16_t unit = (int16_t)EF_U16(roster + (uint32_t)(int32_t)i * 2u + 1u);
-        uint32_t rec = (uint32_t)((int32_t)unit * 0xca) + EF_U32(0x0019bb58u);
+        uint32_t rec = (uint32_t)((int32_t)unit * 0xca) + g_world_grid_base;
         EF_U16(0x001a53b0u + (uint32_t)(int32_t)cnt * 2u) = EF_U8(rec + 0x4eu);
         cnt++;
     }
@@ -4419,7 +4419,7 @@ void rebuild_group_tables_49bdc(uint32_t p)
     for (i = 0; i < groups; i++) {
         for (j = 0; j < (int16_t)EF_U16(0x001a53b0u + (uint32_t)(int32_t)i * 2u); j++) {
             int16_t k = (int16_t)EF_U16(0x001a5280u + (uint32_t)(int32_t)i * 2u);
-            uint32_t rec = (uint32_t)((int32_t)k * 0xca) + EF_U32(0x0019bb58u);
+            uint32_t rec = (uint32_t)((int32_t)k * 0xca) + g_world_grid_base;
             uint32_t off = (uint32_t)(int32_t)j * 2u + (uint32_t)(int32_t)i * 16u;
             uint32_t u;
             EF_U16(0x001a5330u + off) = EF_U16(rec + 0x50u + (uint32_t)(int32_t)j * 2u);
@@ -4717,7 +4717,7 @@ void credit_hit_74480(int32_t a)
     flags = EF_U8(ra + 0x24u);
     if ((flags & 4u) != 0u || (flags & 2u) != 0u)
         return;
-    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca) + EF_U32(0x0019bb58u);
+    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rb + 0x28u) * 0xca) + g_world_grid_base;
     EF_U8(owner + 0xc9u)++;
     if (EF_U8(0x00127da9u) != 0u && EF_U16(rb + 0x18u) != EF_U8(0x001a666bu)) {
         send_byte_word_byte_packet_3e(EF_U8(rb + 0x18u), (uint32_t)(int32_t)(int16_t)EF_U16(rb + 0x16u), EF_U8(owner + 0xc9u));
@@ -4887,7 +4887,7 @@ void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, ui
     if (rec == 0u || EF_U8(0x00125847u) == 0u)
         return;
     slot &= 0xffu;
-    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rec + 0x28u) * 0xca) + EF_U32(0x0019bb58u);
+    owner = (uint32_t)((int32_t)(int16_t)EF_U16(rec + 0x28u) * 0xca) + g_world_grid_base;
     table = EF_U32(0x001972e0u) + (uint32_t)EF_U8(owner + 0x5fu) * 0x22u;
     if (slot == 0xffu) {
         prev = EF_U8(rec + 0x20bu);
@@ -5188,7 +5188,7 @@ void draw_mission_clock_78e1c(void)
 void advance_follow_slot_3a148(int32_t a)
 {
     int16_t ia = (int16_t)a;
-    uint32_t owner = (uint32_t)((int32_t)ia * 0xca) + EF_U32(0x0019bb58u);
+    uint32_t owner = (uint32_t)((int32_t)ia * 0xca) + g_world_grid_base;
     uint32_t unit = lookup_filtered_indexed_object((int16_t)EF_U16(owner + 0x50u));
     uint32_t r;
     uint32_t cnt;
@@ -5836,7 +5836,7 @@ uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
         found = 1u;
         EF_U16(unit + 0x16au) = EF_U16(p + 0x16u);
         for (j = 0; j < 7; j++) {
-            uint32_t t2 = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(unit + 0x28u) * 0xca);
+            uint32_t t2 = g_world_grid_base + (uint32_t)((int32_t)(int16_t)EF_U16(unit + 0x28u) * 0xca);
             uint32_t peer = lookup_filtered_indexed_object((int16_t)EF_U16(t2 + 0x50u + (uint32_t)j * 2u));
             if (peer != 0u && peer != unit && EF_U16(peer + 0x16au) == EF_U16(p + 0x16u)) {
                 EF_U16(unit + 0x16au) = 0xffu;
@@ -7069,7 +7069,7 @@ void init_weapon_slots_8ca24(uint32_t rec, uint32_t index)
     uint32_t i;
     uint32_t cls;
     for (i = 0u; (int16_t)i < 0x14; i++) {
-        uint32_t src = (uint32_t)((int32_t)(int16_t)index * 0xca) + EF_U32(0x0019bb58u) + i;
+        uint32_t src = (uint32_t)((int32_t)(int16_t)index * 0xca) + g_world_grid_base + i;
         uint32_t slot = i * 3u + rec;
         uint8_t type = EF_U8(src + 0xa1u);
         EF_U16(slot + 0x19cu) = 1u;
@@ -7483,7 +7483,7 @@ void assign_table_slot_8fe4(uint32_t index, uint32_t table)
     flag_sub_entry_side_8394((uint8_t)tbl, (uint8_t)slot);
     if (idx >= (int16_t)EF_U16(0x0019bb5cu))
         return;
-    obj = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)idx * 0xca);
+    obj = g_world_grid_base + (uint32_t)((int32_t)idx * 0xca);
     if (EF_U8(obj + 0x1au) != 0xcu)
         return;
     ent = EF_U32(0x001972e0u) + tbl * 34u;
@@ -7645,11 +7645,11 @@ uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uin
         double d;
         if ((int32_t)i == 0xff)
             continue;
-        base = EF_U32(0x0019bb58u);
+        base = g_world_grid_base;
         d = distance_2d_b415c(base + (uint32_t)((int32_t)i * 0xca) + 0x61u, pos);
         if (!(d < best) && (int32_t)(int16_t)result != 0xff)
             continue;
-        base = EF_U32(0x0019bb58u);
+        base = g_world_grid_base;
         obj = base + (uint32_t)((int32_t)i * 0xca);
         if ((uint16_t)id != EF_U16(obj + 0x15u))
             continue;
@@ -7657,7 +7657,7 @@ uint32_t find_nearest_object_2c454(uint32_t pos, uint32_t id, uint32_t side, uin
             continue;
         if (EF_U8(obj + 0x1au) != (uint8_t)type && (uint8_t)type != 0u)
             continue;
-        if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)i * 0xca) + 0x3fu) != 0u)
+        if (EF_U8(g_world_grid_base + (uint32_t)((int32_t)i * 0xca) + 0x3fu) != 0u)
             continue;
         best = d;
         result = (uint32_t)(uint16_t)i;
@@ -7744,7 +7744,7 @@ void build_unit_name_7548c(uint32_t dest, uint32_t index)
         }
         return;
     }
-    copy_string_9d749(dest, EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(rec + 0x26u) >> 16) * 0xca) + 1u);
+    copy_string_9d749(dest, g_world_grid_base + (uint32_t)(((int32_t)EF_U32(rec + 0x26u) >> 16) * 0xca) + 1u);
     strcat_9ca57(dest, 0x00186c10u);
     if (name != 0u) {
         copy_string_9d749((uint32_t)(uintptr_t)tmp, name);
@@ -8847,17 +8847,17 @@ void assign_group_slots_49fd4(uint32_t p)
         uint32_t row = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(p + 0x10u) * 0x11);
         uint16_t w = EF_U16(row + (uint32_t)i * 2u + 1u);
         int32_t obj = (int16_t)w;
-        uint8_t type = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca) + 0x1bu);
+        uint8_t type = EF_U8(g_world_grid_base + (uint32_t)(obj * 0xca) + 0x1bu);
         uint32_t orec;
         if (type == 0u || type == 7u || type == 9u) {
             uint32_t ent = EF_U32(p + 0x13u) + (uint32_t)i * 0x7cu;
             uint32_t r0 = EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x6eu) * 0x11)
                         + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x70u) * 2);
-            orec = EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca);
+            orec = g_world_grid_base + (uint32_t)(obj * 0xca);
             EF_U16(orec + 0xb9u) = EF_U16(r0 + 1u);
             EF_U8(orec + 0xbbu) = EF_U8(EF_U32(0x001fcb40u) + (uint32_t)((int32_t)(int16_t)EF_U16(ent + 0x6eu) * 0x11));
         } else {
-            orec = EF_U32(0x0019bb58u) + (uint32_t)(obj * 0xca);
+            orec = g_world_grid_base + (uint32_t)(obj * 0xca);
             EF_U16(orec + 0xb9u) = 0xffu;
             EF_U8(orec + 0xbbu) = 0xffu;
         }
@@ -9701,7 +9701,7 @@ void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub)
     if (u == 0u)
         return;
     cls = (int32_t)EF_U32(u + 0x26u) >> 16;
-    rec = EF_U32(0x0019bb58u) + (uint32_t)(cls * 0xca);
+    rec = g_world_grid_base + (uint32_t)(cls * 0xca);
     if (EF_U32(rec + 0x8au) == 0u)
         guest_callptr3_x(EF_U32(0x00132a74u), 0x00189bf8u, (uint32_t)u16, (uint32_t)cls);
     off = (sub & 0xffu) * 25u;
@@ -10704,7 +10704,7 @@ void refresh_unit_roster_76e2c(uint32_t a, uint32_t b)
     if (u == 0u)
         return;
     row = EF_U32(0x001f8918u) + (uint32_t)EF_U8(u + 0x187u) * 25u;
-    crec = EF_U32(0x0019bb58u) + (uint32_t)(cls * 0xca);
+    crec = g_world_grid_base + (uint32_t)(cls * 0xca);
     if (EF_U8(crec + 0x1au) == 0xeu)
         return;
     n = EF_U8(crec + 0x4fu);
@@ -11523,7 +11523,7 @@ void rebuild_angle_record_rev_94370(void)
 /* 0x16b0c, 159 bytes. Range test between table entries A (EAX) and B (EDX) of the 0xca-byte records at [0x19bb58]: the type byte at +0x19 selects a 0xe5-byte class record; the threshold is pow(double at class(B)+0x128637, 0.25) * 1000 * dword at class(A)+0x12863f, stored as a float. The grid distance 0x2bb3c(A, B) is saved in the float 0x197df0 and the result is 1 when it does not exceed the threshold. */
 uint32_t within_range_16b0c(uint32_t a, uint32_t b)
 {
-    uint32_t tab = EF_U32(0x0019bb58u);
+    uint32_t tab = g_world_grid_base;
     uint32_t ca = (uint32_t)EF_U8(tab + a * 0xcau + 0x19u) * 0xe5u;
     uint32_t cb = (uint32_t)EF_U8(tab + b * 0xcau + 0x19u) * 0xe5u;
     double base;
@@ -11546,7 +11546,7 @@ void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip)
     double value;
     if (!within_range_16b0c(a, b))
         return;
-    b_kind = EF_U8(EF_U32(0x0019bb58u) + b * 0xcau + 0x1bu);
+    b_kind = EF_U8(g_world_grid_base + b * 0xcau + 0x1bu);
     value = pick_best_weapon_16bac((int32_t)a, (ef_addr32)(uintptr_t)kind, (ef_addr32)(uintptr_t)id);
     if (value < (double)*(float *)ef_guest_memory_ptr(0x00197df0u))
         return;
@@ -11566,7 +11566,7 @@ void try_engagement_168d8(uint32_t a, uint32_t b, uint32_t skip)
 /* 0x16c7c, 226 bytes. Strip the missile-like stores (types 7, 9..0xf, 0x15..0x1c) from record A (EAX) in the table at [0x19bb58]: for each of its seven object words at +0x50 (0xff skips), walk the 20 three-byte slots at obj+0x19b; a matching slot gets its count word cleared, after first calling 0x8f22c (and 0x56f0c when byte 0x127da9 is set) with the owner (obj+0x14 high word) and the running slot counter, unless byte 0x125847 is clear or the type is 9. The slot counter is not reset between objects (original behaviour). */
 void clear_missile_slots_16c7c(uint32_t a)
 {
-    uint32_t rec = EF_U32(0x0019bb58u) + a * 0xcau;
+    uint32_t rec = g_world_grid_base + a * 0xcau;
     uint16_t counter = 0u;
     uint32_t k;
     for (k = 0u; k != 0xeu; k += 2u) {
@@ -12320,7 +12320,7 @@ void check_target_range_2d9a4(uint32_t id)
     ef_addr32 lim;
     if (sid == 0xff)
         return;
-    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    rec = g_world_grid_base + (uint32_t)sid * 0xcau;
     tw = (int32_t)EF_U32(rec + 0xb7u) >> 16;
     if (tw == 0xff)
         return;
@@ -12331,7 +12331,7 @@ void check_target_range_2d9a4(uint32_t id)
         d = scaled_pair_distance_37bc8(rec + 0x61u, (int16_t)tw);
     else
         d = guest_fn_2bae0_x(rec + 0x61u, tw);
-    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    rec = g_world_grid_base + (uint32_t)sid * 0xcau;
     if (EF_U8(rec + 0x1bu) < 6u || EF_U8(rec + 0x1bu) > 7u)
         return;
     lim = EF_U32(rec + 0xbdu);
@@ -12408,7 +12408,7 @@ void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b)
         if (id == 0xff)
             return;
     }
-    rec = EF_U32(0x0019bb58u) + (uint32_t)id * 0xcau;
+    rec = g_world_grid_base + (uint32_t)id * 0xcau;
     if (rec == 0u || EF_U8(rec + 0x1au) == 0u)
         return;
     memcpy(&scale, ef_guest_memory_ptr(0x001803b4u), sizeof scale);
@@ -12427,7 +12427,7 @@ void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b)
 /* 0x172b4, 211 bytes. Release one pending item of record ID (EAX; 0xca byte table at [0x19bb58]): needs a nonzero count byte +0x4f and flag byte +0x1a, otherwise (and when the item word at +0x50 is 0xff, or its object is gone) returns 0xff. The item word is cleared; its object (0x7489c) gets bit 3 of +0x24 set, with 0x6a1d0(item, 0) and 0x741f0, and 0x56444(item, 0x64, -1) when byte 0x127da9 is set. Then the count is decremented, at zero 0x2b0b4(ID, 0) runs and the count byte is cleared; finally 0x2b708(ID). Returns the item word. */
 uint32_t release_pending_item_172b4(uint32_t id)
 {
-    ef_addr32 rec = EF_U32(0x0019bb58u) + id * 0xcau;
+    ef_addr32 rec = g_world_grid_base + id * 0xcau;
     uint16_t item;
     int32_t sitem;
     ef_addr32 obj;
@@ -12449,12 +12449,12 @@ uint32_t release_pending_item_172b4(uint32_t id)
         if (EF_U8(0x00127da9u) != 0u)
             send_unit_options_56444((int16_t)sitem, 0x64u, 0xffffu);
     }
-    rec = EF_U32(0x0019bb58u) + id * 0xcau;
+    rec = g_world_grid_base + id * 0xcau;
     cnt = (uint8_t)(EF_U8(rec + 0x4fu) - 1u);
     EF_U8(rec + 0x4fu) = cnt;
     if (cnt == 0u) {
         set_record_state_2b0b4((int16_t)id, 0u);
-        EF_U8(EF_U32(0x0019bb58u) + id * 0xcau + 0x4fu) = 0u;
+        EF_U8(g_world_grid_base + id * 0xcau + 0x4fu) = 0u;
     }
     compact_slot_list_2b708((int16_t)id);
     return item;
@@ -12651,7 +12651,7 @@ uint32_t position_clear_2dee4(uint32_t id)
     int16_t i;
     if (sid == 0xff)
         return 1u;
-    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    rec = g_world_grid_base + (uint32_t)sid * 0xcau;
     if (EF_U8(rec + 0x1au) == 2u)
         return 0u;
     memcpy(&limit, ef_guest_memory_ptr(0x001252a4u), sizeof limit);
@@ -12668,7 +12668,7 @@ uint32_t position_clear_2dee4(uint32_t id)
             return 1u;
         obj = lookup_filtered_indexed_object(oid);
         if (obj != 0u) {
-            ef_addr32 r2 = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+            ef_addr32 r2 = g_world_grid_base + (uint32_t)sid * 0xcau;
             if (limit > distance_2d_b415c(r2 + 0x61u, obj + 0x49u))
                 ok = 0u;
         }
@@ -12698,7 +12698,7 @@ void next_target_65d24(void)
         }
         cur = EF_U32(0x001a820cu);
         if (cur != 0u) {
-            uint32_t side = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(obj + 0x26u) >> 16) * 0xcau + 0x15u);
+            uint32_t side = EF_U8(g_world_grid_base + (uint32_t)((int32_t)EF_U32(obj + 0x26u) >> 16) * 0xcau + 0x15u);
             if ((uint8_t)guest_fn_2e910_x(side, EF_U8(cur + 0x3eu)) != 0u && (EF_U8(cur + 0x30u) & 2u) == 0u &&
                 (int32_t)abs_a28f2((int32_t)(EF_U32(cur) - EF_U32(obj))) < 0x486c00 &&
                 (int32_t)abs_a28f2((int32_t)(EF_U32(cur + 8u) - EF_U32(obj + 8u))) < 0x486c00 &&
@@ -12765,7 +12765,7 @@ void hail_next_unit_73c38(uint32_t unit)
     other = lookup_filtered_indexed_object((int32_t)EF_U8(obj + 0x142u));
     if (other == 0u)
         return;
-    tab = EF_U32(0x0019bb58u);
+    tab = g_world_grid_base;
     if ((uint8_t)guest_fn_2e910_x(EF_U8(tab + (uint32_t)((int32_t)EF_U32(other + 0x26u) >> 16) * 0xcau + 0x15u),
                                   EF_U8(tab + (uint32_t)((int32_t)EF_U32(obj + 0x26u) >> 16) * 0xcau + 0x15u)) == 0u)
         return;
@@ -12777,7 +12777,7 @@ void hail_next_unit_73c38(uint32_t unit)
 /* 0x6f48, 229 bytes. Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+0x20 (nothing when missing); it must have the same side word (+0x15) as A. If the word 0x197264 differs from its word +0x24 or its byte +0x26 is set, B's word +0x22 is set to 0xff and nothing is sent. Otherwise, with probability 1/byte(0x197269), send message 0x3c with 0x46254(A's id, owner's id, 0x3c, angle from the distance 0x2bab0, the rounded value 0x2bae0 * double 0x18039c, the byte derived from the double at B+0x71). */
 void maybe_radio_call_6f48(ef_addr32 a, ef_addr32 b)
 {
-    ef_addr32 owner = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(b + 0x20u) >> 16) * 0xcau;
+    ef_addr32 owner = g_world_grid_base + (uint32_t)((int32_t)EF_U32(b + 0x20u) >> 16) * 0xcau;
     ef_addr32 pos;
     int32_t angle;
     int32_t hw;
@@ -12930,7 +12930,7 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode)
     uint8_t m = (uint8_t)mode;
     ef_addr32 rec;
     guest_fn_2afcc_x(sid, m);
-    rec = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
+    rec = g_world_grid_base + (uint32_t)sid * 0xcau;
     switch (m) {
     case 0: case 10: case 12:
         EF_U32(rec + 0x79u) = 0u;
@@ -12940,7 +12940,7 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode)
         break;
     case 2:
         guest_fn_2b95c_x(sid);
-        EF_U8(EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau + 0xc9u) = 0u;
+        EF_U8(g_world_grid_base + (uint32_t)sid * 0xcau + 0xc9u) = 0u;
         command_linked_units_2b3b0((int16_t)sid, 2u);
         break;
     case 3:
@@ -12962,7 +12962,7 @@ void set_record_state_2b0b4(uint32_t id, uint32_t mode)
     default:
         break;
     }
-    EF_U8(EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau + 0x1au) = m;
+    EF_U8(g_world_grid_base + (uint32_t)sid * 0xcau + 0x1au) = m;
 }
 
 /* 0x711f0, 248 bytes. Altitude check of the player ship (record at [0x1f71bc]; altitude double at +0x59): below the double 0x1868d1 the ship is dropped from its roster slot (0x740e4(.., 0xff, 0xff, 0, 0xff) and 0x6a1d0(.., 1) for the id in the high word of 0x1f71c6). The double 0x1f6f68 is set to (double 0x1868d9 - altitude) * double 0x1868e1; below the double 0x1284fc the byte +0x18d is cleared. When bit 6 of +0x24 is set and the altitude is below 0x1284fc - 0x12847c, send 0x46168(id, 0x5b, 0, 0, 0) and clear that bit. Always finish by zeroing the controls (dwords 0x1f7100/04/10/14 and 0x1f70b0/b4) and running 0x6eaf4(1.3) and 0x6e8d8(2.5). */
@@ -13061,11 +13061,11 @@ uint32_t any_nearby_flagged_2c358(void)
     if (EF_U8(0x00196fe8u) != 1u)
         return 0u;
     p = (int32_t)EF_U32(0x0019bb5cu) >> 16;
-    group = EF_U16(EF_U32(0x0019bb58u) + (uint32_t)p * 0xcau + 0x1cu);
+    group = EF_U16(g_world_grid_base + (uint32_t)p * 0xcau + 0x1cu);
     start = p - 4 > 0 ? p - 4 : 0;
     end = p + 4 < (int32_t)EF_U32(0x0019bb54u) ? p + 4 : (int32_t)EF_U32(0x0019bb54u);
     for (i = start; (int16_t)i <= (int16_t)end && (int16_t)start <= (int16_t)end; i++) {
-        if (EF_U16(EF_U32(0x0019bb58u) + (uint32_t)(int32_t)(int16_t)i * 0xcau + 0x1cu) == (uint16_t)group &&
+        if (EF_U16(g_world_grid_base + (uint32_t)(int32_t)(int16_t)i * 0xcau + 0x1cu) == (uint16_t)group &&
             (uint8_t)row_needs_attention_2c224((int32_t)(int16_t)i) != 0u)
             found = 1u;
     }
@@ -13281,7 +13281,7 @@ void assign_task_71fc(ef_addr32 a, ef_addr32 b)
     int16_t amount;
     if (id == 0xff)
         return;
-    rec = EF_U32(0x0019bb58u) + idw * 0xcau;
+    rec = g_world_grid_base + idw * 0xcau;
     if (rec == 0u || EF_U8(rec + 0x1au) == 0u)
         return;
     {
@@ -15159,7 +15159,7 @@ void draw_map_cursor_5a2d0(void)
     half = ((int32_t)EF_U32(0x00128172u + idx * 15u) >> 16) >> sh;
     store_four_dwords_17cf9c((uint32_t)((int32_t)EF_U32(0x001a6cf0u) >> 16), (uint32_t)((int32_t)EF_U32(0x001a6cf6u) >> 16),
                    (uint32_t)(((int32_t)EF_U32(0x001a6ceeu) >> 16) - half), (uint32_t)((int32_t)EF_U32(0x001a6cf4u) >> 16));
-    owner = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)EF_U32(0x0019bb5cu) >> 16) * 0xcau + 0x8eu);
+    owner = EF_U8(g_world_grid_base + (uint32_t)((int32_t)EF_U32(0x0019bb5cu) >> 16) * 0xcau + 0x8eu);
     fetch_entry_pair_84e3c((ef_addr32)(uintptr_t)pos, (uint32_t)((int32_t)EF_U32(0x001f71c8u) >> 16), owner);
     d = cell_distance_at_7b16c(0u, (int32_t)pos[0], (int32_t)pos[1]);
     if (guest_fn_5cb1c_x((uint32_t)(uintptr_t)pr, (int32_t)pos[0], (int32_t)(0u - d), (int32_t)pos[1]) == 0u)
@@ -15425,7 +15425,7 @@ void measure_view_range_67d4(void)
         }
     } else {
         idx = (int32_t)EF_U32(0x0019bb5cu) >> 16;
-        flag = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(idx * 0xca) + 0x8eu);
+        flag = EF_U8(g_world_grid_base + (uint32_t)(idx * 0xca) + 0x8eu);
         fetch_entry_pair_84e3c((ef_addr32)(uintptr_t)pt, (uint32_t)((int32_t)EF_U32(0x001f71c8u) >> 16), flag);
     }
     dy = (int32_t)pt[1] - (int32_t)EF_U32(0x001a5be8u);
@@ -15698,7 +15698,7 @@ void populate_slots_2aa34(uint32_t ax, uint32_t dl, uint32_t bl, ef_addr32 recs,
 	uint32_t row, t, rem1, rem2;
 
 	memcpy(buf_u, ef_guest_memory_ptr(0x0002a9e0u), sizeof buf_u);
-	EF_U8(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)idx * 0xca) + 0x4fu) = 0u;
+	EF_U8(g_world_grid_base + (uint32_t)((int32_t)idx * 0xca) + 0x4fu) = 0u;
 	for (si = 0; si < (int16_t)(dl & 0xffu); si++) {
 		if ((dl & 0xffu) > 1u) {
 			if (si == 0)
@@ -17022,7 +17022,7 @@ uint32_t advance_to_nearby_object_6aa70(uint32_t ax)
 			obj = guest_lookup_object_8ffe8(cur);
 			if (obj != 0u) {
 				kind = EF_U8(EF_U32(0x001a14f8u) + (uint32_t)(((int32_t)EF_U32(obj + 0x36u) >> 16) * 0x45) + 0x1du);
-				rec = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+				rec = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 				cls = EF_U8(rec + 0x15u);
 				if ((guest_fn_2e910_x(cls, kind) & 0xffu) != 0u) {
 					d = scaled_pair_distance_37bc8(unit + 0x49u, (int16_t)((int32_t)EF_U32(obj + 0x36u) >> 16));
@@ -17333,7 +17333,7 @@ void propagate_target_record_242b8(uint32_t ax, uint32_t dx)
 
 	if (a == 0u || b == 0u)
 		return;
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	rb = (uint32_t)(((int32_t)EF_U32(b + 0x26u) >> 16) * 0xca) + rows;
 	ra = (uint32_t)(((int32_t)EF_U32(a + 0x26u) >> 16) * 0xca) + rows;
 	if (EF_U16(rb + 0x15u) == EF_U16(ra + 0x15u))
@@ -17359,7 +17359,7 @@ void propagate_target_record_242b8(uint32_t ax, uint32_t dx)
 void compact_slot_list_2b708(uint32_t ax)
 {
 	int32_t row = (int32_t)(int16_t)ax;
-	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t rows = g_world_grid_base;
 	int32_t i = 0, j = 0, k;
 	uint32_t base, ptr, u;
 
@@ -17387,7 +17387,7 @@ void compact_slot_list_2b708(uint32_t ax)
 	for (k = 0; k < 7; k++) {
 		base = rows + (uint32_t)(row * 0xca);
 		u = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
-		rows = EF_U32(0x0019bb58u);
+		rows = g_world_grid_base;
 		if (u != 0u)
 			EF_U8(u + 0x2au) = (uint8_t)k;
 	}
@@ -17397,7 +17397,7 @@ void compact_slot_list_2b708(uint32_t ax)
 uint8_t row_needs_attention_2c224(uint32_t ax)
 {
 	int32_t cx = (int32_t)(int16_t)ax;
-	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t rows = g_world_grid_base;
 	uint32_t r = rows + (uint32_t)(cx * 0xca);
 	uint8_t bl = 0u;
 	uint8_t al = EF_U8(r + 0x1au);
@@ -17406,7 +17406,7 @@ uint8_t row_needs_attention_2c224(uint32_t ax)
 
 	if (al == 2u || al == 5u || al == 6u)
 		bl = 1u;
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	r = rows + (uint32_t)(cx * 0xca);
 	k = EF_U8(r + 0x8eu);
 	tab = EF_U32(r + 0x8au);
@@ -17421,7 +17421,7 @@ uint8_t row_needs_attention_2c224(uint32_t ax)
 		if (d < scale)
 			bl = 1u;
 	}
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	r = rows + (uint32_t)(cx * 0xca);
 	other = (uint32_t)((int32_t)EF_U32(r + 0x20u) >> 16);
 	if ((int32_t)other != 0xff) {
@@ -17450,14 +17450,14 @@ uint8_t row_has_active_unit_2bfcc(uint32_t ax)
 	if (row == 0xff)
 		return 0u;
 	for (k = 0; k < 6; k++) {
-		base = EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca);
+		base = g_world_grid_base + (uint32_t)(row * 0xca);
 		u = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
 		if (u == 0u)
 			continue;
 		t = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(u + 0x146u));
 		memcpy(&v, ef_guest_memory_ptr(u + 0x15au), 8);
 		memcpy(&c, ef_guest_memory_ptr(0x0018253au), 8);
-		if (v > c && EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca) + 0x1bu) == 2u) {
+		if (v > c && EF_U8(g_world_grid_base + (uint32_t)(row * 0xca) + 0x1bu) == 2u) {
 			bl = 1u;
 		} else {
 			memcpy(&c, ef_guest_memory_ptr(0x00182542u), 8);
@@ -17477,7 +17477,7 @@ uint8_t row_has_active_unit_2bfcc(uint32_t ax)
 		memcpy(&c, ef_guest_memory_ptr(0x00182552u), 8);
 		if (v <= c)
 			continue;
-		r2 = EF_U32(0x0019bb58u);
+		r2 = g_world_grid_base;
 		if (EF_U16(r2 + (uint32_t)(row * 0xca) + 0x15u) != EF_U16(r2 + (uint32_t)(((int32_t)EF_U32(t + 0x26u) >> 16) * 0xca) + 0x15u))
 			bl = 1u;
 	}
@@ -17505,7 +17505,7 @@ void update_threat_value_24074(uint32_t ax, uint32_t dx)
 		return;
 	}
 	if (((int32_t)EF_U32(ub + 0x26u) >> 16) != 0xff) {
-		rows = EF_U32(0x0019bb58u);
+		rows = g_world_grid_base;
 		rb = (uint32_t)(((int32_t)EF_U32(ub + 0x26u) >> 16) * 0xca) + rows;
 		ra = (uint32_t)(((int32_t)EF_U32(ua + 0x26u) >> 16) * 0xca) + rows;
 		if (EF_U16(rb + 0x15u) == EF_U16(ra + 0x15u)) {
@@ -18034,7 +18034,7 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 	} else {
 		other = lookup_filtered_indexed_object((int32_t)EF_U32(0x00197c26u) >> 16);
 		if (other != 0u) {
-			rows = EF_U32(0x0019bb58u);
+			rows = g_world_grid_base;
 			rowa = rows + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 			rowb = rows + (uint32_t)(((int32_t)EF_U32(other + 0x26u) >> 16) * 0xca);
 			if (EF_U16(rowa + 0x15u) != EF_U16(rowb + 0x15u))
@@ -18544,7 +18544,7 @@ void update_atmosphere_e6c54(void)
 void aim_chase_camera_6f2bc(void)
 {
 	uint32_t unit = EF_U32(0x001f71bcu);
-	uint32_t row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	uint32_t row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	double p[3], lim, v, w, h;
 
 	memcpy(&p[0], ef_guest_memory_ptr(row + 0x27u), 8);
@@ -18581,12 +18581,12 @@ void aim_camera_fixed_6f3e0(void)
 	if (1.0 > lim)
 		return;
 	unit = EF_U32(0x001f71bcu);
-	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	memcpy(&p[0], ef_guest_memory_ptr(row + 0x27u), 8);
 	memcpy(&p[1], ef_guest_memory_ptr(row + 0x2fu), 8);
 	p[2] = -5000.0;
 	if (EF_U8(unit + 0x2au) == 1u || EF_U8(unit + 0x2au) == 3u) {
-		row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+		row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 		if ((uint8_t)apply_step_6e390(0u, EF_U8(row + 0x5eu)) != 0u)
 			return;
 	}
@@ -18605,14 +18605,14 @@ void aim_camera_fixed_6f3e0(void)
 void check_row_target_85604(uint32_t id, double scale)
 {
 	int32_t ib = (int32_t)(int16_t)id;
-	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t rows = g_world_grid_base;
 	uint32_t row = rows + (uint32_t)(ib * 0xca);
 	uint32_t k, tbl, kind;
 	double pt[3], dist, h, hd, c;
 
 	if (EF_U32(row + 0x8au) == 0u)
 		guest_callptr2_x(EF_U32(0x00132a74u), 0x00189cb0u, (uint32_t)ib);
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	k = EF_U8(rows + (uint32_t)(ib * 0xca) + 0x8eu);
 	if ((uint16_t)id == EF_U16(0x0019bb5eu) && EF_U16(0x00126516u) == 0u && EF_U8(0x00132ac2u) == 0u &&
 	    EF_U8(0x00125847u) != 0u) {
@@ -18620,14 +18620,14 @@ void check_row_target_85604(uint32_t id, double scale)
 		if (EF_U8(EF_U32(row + 0x8au) + k * 25u + 0x18u) == 5u)
 			return;
 	}
-	row = EF_U32(0x0019bb58u) + (uint32_t)(ib * 0xca);
+	row = g_world_grid_base + (uint32_t)(ib * 0xca);
 	tbl = EF_U32(row + 0x8au);
 	pt[0] = (double)(int32_t)EF_U32(tbl + k * 25u) * 2.4384;
 	tbl = EF_U32(row + 0x8au);
 	pt[1] = (double)(int32_t)EF_U32(tbl + k * 25u + 4u) * 2.4384;
 	pt[2] = 0.0;
 	dist = distance_2d_b415c(row + 0x61u, (ef_addr32)(uintptr_t)pt);
-	row = EF_U32(0x0019bb58u) + (uint32_t)(ib * 0xca);
+	row = g_world_grid_base + (uint32_t)(ib * 0xca);
 	memcpy(&hd, ef_guest_memory_ptr(row + 0x79u), 8);
 	h = hd * 20.0;
 	if (hd * scale > dist) {
@@ -18793,7 +18793,7 @@ uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
 {
 	int32_t x = (int32_t)(int16_t)ax;
 	int32_t s = (int32_t)(int16_t)guest_fn_2bbd0(x);
-	uint32_t rows = EF_U32(0x0019bb58u);
+	uint32_t rows = g_world_grid_base;
 	uint32_t rx, rs, tab;
 	uint8_t cl, ch;
 	uint32_t k;
@@ -18824,7 +18824,7 @@ uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
 	pt[1] = (double)(int32_t)EF_U32(tab + k * 25u + 4u) * 2.4384;
 	pt[2] = 0.0;
 	dx = distance_2d_b415c(rx + 0x61u, (ef_addr32)(uintptr_t)pt);
-	rs = EF_U32(0x0019bb58u) + (uint32_t)(s * 0xca);
+	rs = g_world_grid_base + (uint32_t)(s * 0xca);
 	k = EF_U8(rs + 0x8eu);
 	tab = EF_U32(rs + 0x8au);
 	pt[0] = (double)(int32_t)EF_U32(tab + k * 25u) * 2.4384;
@@ -18832,12 +18832,12 @@ uint8_t row_wins_over_neighbour_2bcb8(uint32_t ax)
 	pt[1] = (double)(int32_t)EF_U32(tab + k * 25u + 4u) * 2.4384;
 	pt[2] = 0.0;
 	ds = distance_2d_b415c(rs + 0x61u, (ef_addr32)(uintptr_t)pt);
-	if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(x * 0xca) + 0x1bu) == 2u) {
+	if (EF_U8(g_world_grid_base + (uint32_t)(x * 0xca) + 0x1bu) == 2u) {
 		if (ds + -3000.0 > dx)
 			return 1u;
 		return 0u;
 	}
-	if (EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(x * 0xca) + 0x1bu) == 0xbu) {
+	if (EF_U8(g_world_grid_base + (uint32_t)(x * 0xca) + 0x1bu) == 0xbu) {
 		if (ds + -9000.0 > dx)
 			return 1u;
 	}
@@ -18864,7 +18864,7 @@ void update_gun_mount_70278(void)
 		}
 	}
 	unit = EF_U32(0x001f71bcu);
-	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
 	if (EF_U8(row + 0x1bu) == 0xbu) {
 		ok = (query_indexed_object_feature((int32_t)EF_U32(unit + 0x14u) >> 16, EF_U8(row + 0xbcu)) & 0xffu) == 0x14u;
 		for (i = 0; ok && i < 4; i++)
@@ -18875,7 +18875,7 @@ void update_gun_mount_70278(void)
 	v[0] = (double)(int32_t)EF_U32(m + 8u) * 2.4384 * 0.00390625;
 	v[1] = (double)(int32_t)EF_U32(m) * 2.4384 * 0.00390625;
 	v[2] = (double)(int32_t)EF_U32(m + 4u) * 2.4384 * 0.00390625;
-	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	guest_fn_6f758_x((ef_addr32)(uintptr_t)v, EF_U8(row + 0xbcu), EF_U32(row + 0xc1u), EF_U32(row + 0xc5u));
 }
 
@@ -19017,7 +19017,7 @@ void focus_camera_on_unit_24c40(uint32_t ax)
 	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
 	if (h > lim)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
-	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
 		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 2u) == 0u && (EF_U8(v + 0x24u) & 4u) == 0u) {
@@ -19074,7 +19074,7 @@ void focus_camera_side_2611c(uint32_t ax)
 	memcpy(&h, ef_guest_memory_ptr(0x001f7088u), 8);
 	if (h > lim)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
-	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
+	row = g_world_grid_base + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
 		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 4u) == 0u && (EF_U8(v + 0x24u) & 8u) == 0u &&
@@ -19904,7 +19904,7 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b)
 	pos[0] = (double)(int32_t)EF_U32(entry + 0xfu) * k;
 	pos[1] = (double)(int32_t)EF_U32(entry + 7u) * k;
 	pos[2] = (double)(int32_t)EF_U32(entry + 0xbu) * k;
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	row_a = rows + (uint32_t)(ia * 0xca);
 	found = (uint32_t)(int32_t)(int16_t)find_nearest_object_2c454((uint32_t)(uintptr_t)pos, (uint32_t)((int32_t)EF_U32(row_a + 0x13u) >> 16), 6u, 1u);
 	if (found == 0xffu)
@@ -19912,12 +19912,12 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b)
 	EF_U32(0x00126354u) = EF_U32(0x00126354u) - (uint32_t)EF_U16(0x00127d92u);
 	if ((int32_t)EF_U32(0x00126354u) >= 0)
 		return;
-	row_b = EF_U32(0x0019bb58u) + found * 0xcau;
+	row_b = g_world_grid_base + found * 0xcau;
 	EF_U32(0x00126354u) = 0x226u;
 	angle = (uint32_t)scale_to_angle_45fc4(report_point_offset_37c0c(row_b + 0x61u, (int16_t)ib));
-	dist = scaled_pair_distance_37bc8(EF_U32(0x0019bb58u) + found * 0xcau + 0x61u, (int16_t)ib);
+	dist = scaled_pair_distance_37bc8(g_world_grid_base + found * 0xcau + 0x61u, (int16_t)ib);
 	d = (int32_t)truncate_9d72c(dist * 0.0005393743257820927);
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	guest_fn_46254((uint32_t)((int32_t)EF_U32(row_a + 0x4eu) >> 16),
 	               (int32_t)((int32_t)EF_U32(rows + found * 0xcau + 0x4eu) >> 16), 0x64u, (uint32_t)ib,
 	               (uint32_t)(int32_t)(int16_t)angle, (uint32_t)(int32_t)(int16_t)d);
@@ -19927,7 +19927,7 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b)
 uint8_t row_within_reach_85420(int32_t unit)
 {
 	int32_t u = (int32_t)(int16_t)unit;
-	ef_addr32 rows = EF_U32(0x0019bb58u);
+	ef_addr32 rows = g_world_grid_base;
 	ef_addr32 row = rows + (uint32_t)(u * 0xca);
 	uint32_t t = EF_U8(row + 0x5fu);
 	double vec[3], dist, x, a, b, c99, cls;
@@ -19939,7 +19939,7 @@ uint8_t row_within_reach_85420(int32_t unit)
 	dist = distance_2d_b415c(row + 0x61u, (ef_addr32)(uintptr_t)vec);
 	if (EF_U8(row + 0x20u) == 1u)
 		recompute_grid_limit(u);
-	rows = EF_U32(0x0019bb58u);
+	rows = g_world_grid_base;
 	row = rows + (uint32_t)(u * 0xca);
 	cl = EF_U8(row + 0x19u);
 	memcpy(&a, ef_guest_memory_ptr(row + 0x71u), 8);
