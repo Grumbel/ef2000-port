@@ -6298,7 +6298,7 @@ void integrate_drift_539e0(void);
 
 void assign_task_71fc(ef_addr32 a, ef_addr32 b);
 void guest_fn_2b634_x(int32_t id); /* 0x2b634 EAX */
-void guest_fn_407c4_x(ef_addr32 clock, int32_t delta); /* 0x407c4 EAX/EDX */
+ef_addr32 advance_clock_ticks_407c4(ef_addr32 clock, int32_t delta); /* EAX preserved, EDX scratch */
 
 uint8_t wander_view_point_843b0(void);
 

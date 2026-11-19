@@ -197,7 +197,7 @@ extern double g_grid_reference_position[2]; /* 0x001a3020 */
 extern double g_grid_visibility_distance; /* 0x001252a4 */
 extern double g_grid_distance_scale; /* 0x0018251a, 2D distance conversion */
 extern uint8_t g_object_kind_modes[]; /* 0x00128568, stride 0xe5 */
-extern uint8_t g_reference_clock[6]; /* 0x0012583c, three packed signed words */
+extern uint8_t g_reference_clock[8]; /* 0x0012583c, hours/minutes/seconds/ticks */
 extern ef_addr32 g_scene_head; /* 0x00211ad4, singly linked scene nodes */
 extern uint8_t g_scene_kind_child_counts[]; /* 0x00123819, stride 0xa4 */
 extern ef_addr32 g_scene_query_pair[2]; /* 0x0021444c, 0x214450 */

@@ -3057,7 +3057,7 @@ void replay_elapsed_steps_c630(void)
     int16_t i, count;
     int32_t secs;
 
-    secs = clock_words_to_seconds(0x0012583cu);
+    secs = clock_words_to_seconds((ef_addr32)(uintptr_t)g_reference_clock);
     steps = (int32_t)EF_U32(0x0019766cu) - secs / 60;
     if (steps > 0) {
         store_runtime_control_word(0x0bb8u);
@@ -3093,7 +3093,7 @@ void replay_elapsed_steps_c630(void)
                 i++;
                 update_tracked_pair_759c(v);
             }
-            guest_fn_407c4_x(0x0012583cu, 0x0bb8);
+            advance_clock_ticks_407c4((ef_addr32)(uintptr_t)g_reference_clock, 0x0bb8);
         }
         store_runtime_control_word(0u);
     }

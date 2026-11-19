@@ -13301,7 +13301,8 @@ void assign_task_71fc(ef_addr32 a, ef_addr32 b)
     EF_U16(EF_U32(rec + 0x8au) + 0x14u) = (uint16_t)(EF_U16(0x00125840u) + 3u);
     EF_U16(EF_U32(rec + 0x8au) + 0x16u) = EF_U16(0x00125842u);
     amount = (int16_t)((((int16_t)(EF_U16(0x00121e82u) * 0x1eu)) + 3) * 0x32);
-    guest_fn_407c4_x(EF_U32(rec + 0x8au) + 0x10u, amount);
+    advance_clock_ticks_407c4(
+        ((const ef_world_grid_cell *)(uintptr_t)rec)->clock_base + 0x10u, amount);
     EF_U8(rec + 0x26u) = 0u;
     EF_U16(rec + 0x24u) = EF_U16(0x00197264u);
     if (g_world_grid_mode == 0u || g_world_grid_marker == EF_U8(b))
