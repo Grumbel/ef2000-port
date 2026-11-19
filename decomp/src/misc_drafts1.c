@@ -392,9 +392,9 @@ void load_effect_list_8bad4(uint32_t first, uint32_t second)
     ef_addr32 b = (uint32_t)(uintptr_t)buf;
     ef_addr32 rec;
     build_default_path_9c980(b);
-    guest_fn_9ca57(b, 0x0018a86cu);
-    guest_fn_9ca57(b, first);
-    guest_fn_9ca57(b, second);
+    strcat_9ca57(b, 0x0018a86cu);
+    strcat_9ca57(b, first);
+    strcat_9ca57(b, second);
     rec = select_validated_ui_record(b);
     if (rec != 0u)
         walk_effect_records_8ba98(rec);
@@ -2281,8 +2281,8 @@ void reload_text_file_f819c(ef_addr32 name)
     uint32_t b = (uint32_t)(uintptr_t)buf;
     uint32_t r;
     build_default_path_abaf0(b);
-    guest_fn_9ca57(b, name);
-    guest_fn_9ca57(b, 0x0019322cu);
+    strcat_9ca57(b, name);
+    strcat_9ca57(b, 0x0019322cu);
     r = (load_text_file_e94ec(b, EF_U8(0x0041f2dfu)) & 0xffu) != 0u;
     if (r == 1u) {
         guest_callptr3_x(EF_U32(0x00132a74u), 0x00193234u, name, b);
@@ -3291,8 +3291,8 @@ uint32_t open_numbered_log_9a544(void)
         frame[0x14u + i] = EF_U8(0x00098be4u + i);
     EF_U16(0x0012dda8u) = (uint16_t)(n + 1);
     signed_to_digits_cbd0f(n, f + 0x1cu, 10u);
-    guest_fn_9ca57(f, f + 0x1cu);
-    guest_fn_9ca57(f, f + 0x14u);
+    strcat_9ca57(f, f + 0x1cu);
+    strcat_9ca57(f, f + 0x14u);
     h = guest_fn_bc36a_w(f, 0x0018b0f0u);
     if (h == 0u)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x0018b0f4u);
@@ -3964,14 +3964,14 @@ uint32_t write_status_lines_101ba8(void)
     d = EF_U32(0x004dd640u);
     guest_tail_110dd9(0u);
     if (EF_U32(0x004dd634u) == 1u) {
-        guest_fn_bc400(EF_U32(0x004dd620u), 0x0019378cu, value, b, c, d);
+        stream_printf_bc400(EF_U32(0x004dd620u), 0x0019378cu, value, b, c, d);
     } else {
         for (i = 0u; i < 14u; i++)
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x001937a8u);
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x001937a8u);
     }
     n = EF_U32(0x004dd634u);
     for (i = 1u; i < n; i++) {
-        guest_fn_bc400(EF_U32(0x004dd620u), 0x001937acu);
+        stream_printf_bc400(EF_U32(0x004dd620u), 0x001937acu);
         n = EF_U32(0x004dd634u);
     }
     return 1u;
@@ -4959,16 +4959,16 @@ void init_video_mode_cdb20(void)
 /* 0x9ab6c, 280 bytes. Dump the page header table at 0x40d006..0x40d024 as text lines to the stream STREAM through 0xbc400 (formats 0x13179b..0x131846 and the closing line 0x18b128); the values are the signed words of the table. */
 void dump_page_header_9ab6c(uint32_t stream)
 {
-    guest_fn_bc400(stream, 0x0013179bu);
-    guest_fn_bc400(stream, 0x001317b8u, (int32_t)(int16_t)EF_U16(0x0040d008u));
-    guest_fn_bc400(stream, 0x001317cau, (int32_t)(int16_t)EF_U16(0x0040d00au));
-    guest_fn_bc400(stream, 0x001317e0u, (int32_t)(int16_t)EF_U16(0x0040d00cu));
-    guest_fn_bc400(stream, 0x0013180cu);
-    guest_fn_bc400(stream, 0x001317f9u, (int32_t)(int16_t)EF_U16(0x0040d00eu), (int32_t)(int16_t)EF_U16(0x0040d016u), (int32_t)(int16_t)EF_U16(0x0040d01eu));
-    guest_fn_bc400(stream, 0x00131823u, (int32_t)(int16_t)EF_U16(0x0040d010u), (int32_t)(int16_t)EF_U16(0x0040d018u), (int32_t)(int16_t)EF_U16(0x0040d020u));
-    guest_fn_bc400(stream, 0x00131835u, (int32_t)(int16_t)EF_U16(0x0040d012u), (int32_t)(int16_t)EF_U16(0x0040d01au), (int32_t)(int16_t)EF_U16(0x0040d022u));
-    guest_fn_bc400(stream, 0x00131846u, (int32_t)(int16_t)EF_U16(0x0040d014u), (int32_t)(int16_t)EF_U16(0x0040d01cu), (int32_t)(int16_t)EF_U16(0x0040d024u));
-    guest_fn_bc400(stream, 0x0018b128u);
+    stream_printf_bc400(stream, 0x0013179bu);
+    stream_printf_bc400(stream, 0x001317b8u, (int32_t)(int16_t)EF_U16(0x0040d008u));
+    stream_printf_bc400(stream, 0x001317cau, (int32_t)(int16_t)EF_U16(0x0040d00au));
+    stream_printf_bc400(stream, 0x001317e0u, (int32_t)(int16_t)EF_U16(0x0040d00cu));
+    stream_printf_bc400(stream, 0x0013180cu);
+    stream_printf_bc400(stream, 0x001317f9u, (int32_t)(int16_t)EF_U16(0x0040d00eu), (int32_t)(int16_t)EF_U16(0x0040d016u), (int32_t)(int16_t)EF_U16(0x0040d01eu));
+    stream_printf_bc400(stream, 0x00131823u, (int32_t)(int16_t)EF_U16(0x0040d010u), (int32_t)(int16_t)EF_U16(0x0040d018u), (int32_t)(int16_t)EF_U16(0x0040d020u));
+    stream_printf_bc400(stream, 0x00131835u, (int32_t)(int16_t)EF_U16(0x0040d012u), (int32_t)(int16_t)EF_U16(0x0040d01au), (int32_t)(int16_t)EF_U16(0x0040d022u));
+    stream_printf_bc400(stream, 0x00131846u, (int32_t)(int16_t)EF_U16(0x0040d014u), (int32_t)(int16_t)EF_U16(0x0040d01cu), (int32_t)(int16_t)EF_U16(0x0040d024u));
+    stream_printf_bc400(stream, 0x0018b128u);
 }
 
 /* 0x77a8, 280 bytes. Initialise the roster state for N units: word 0x1972e4 = N, the table 0x1972e0 from 0x7780(N, 0x22), the anchor/limit longs 0x197270..0x1972bc (0xc0200000, 0xc0240000, 0xc0490000, 0x40200000, 0xc04e0000, ... zeros elsewhere; 0x1972b4 and 0x1972bc are stored twice, the later values win) and the mode bytes 0x1972e8..ed (1, 1, 2, 2, 3, 3). */
@@ -5012,22 +5012,22 @@ uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
     uint32_t s;
     (void)u0; (void)u1; (void)u2; (void)u3;
     if (EF_U32(0x0017d2c8u) == 1u)
-        guest_fn_bc400(EF_U32(0x004dd620u), 0x001939e4u, p1, p2);
+        stream_printf_bc400(EF_U32(0x004dd620u), 0x001939e4u, p1, p2);
     r = guest_fn_103f04_x(p1, p2);
     if (r != 0u) {
         if (EF_U32(0x0017d2c8u) == 1u) {
             s = EF_U32(0x004dd620u);
-            guest_fn_bc400(s, 0x00193a00u, p1 + 0x80u);
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a10u, p1);
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a20u, (int32_t)(int16_t)EF_U16(p1 + 0x100u));
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a30u, (int32_t)(int16_t)EF_U16(p1 + 0x102u));
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a40u, (int32_t)(int16_t)EF_U16(p1 + 0x104u));
-            guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a50u, (int32_t)(int16_t)EF_U16(p1 + 0x106u));
+            stream_printf_bc400(s, 0x00193a00u, p1 + 0x80u);
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a10u, p1);
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a20u, (int32_t)(int16_t)EF_U16(p1 + 0x100u));
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a30u, (int32_t)(int16_t)EF_U16(p1 + 0x102u));
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a40u, (int32_t)(int16_t)EF_U16(p1 + 0x104u));
+            stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a50u, (int32_t)(int16_t)EF_U16(p1 + 0x106u));
         }
         return r;
     }
     if (EF_U32(0x0017d2c8u) == 1u)
-        guest_fn_bc400(EF_U32(0x004dd620u), 0x00193a60u, r);
+        stream_printf_bc400(EF_U32(0x004dd620u), 0x00193a60u, r);
     return r;
 }
 
@@ -5497,9 +5497,9 @@ void nudge_view_orientation_91df4(void)
     if (b != 0)
         EF_U8(0x001a6d1fu) = 1u;
     if (EF_U8(0x002144aau) & 1u)
-        guest_fn_d0ebc(0x0021439cu, 0x800u);
+        update_scene_angle_first(0x0021439cu, 0x800u);
     if (EF_U8(0x002144aau) & 2u)
-        guest_fn_d0ebc(0x0021439cu, 0xf800u);
+        update_scene_angle_first(0x0021439cu, 0xf800u);
     guest_fn_d099c(0x0012dbecu, 0x0021439cu);
     copy_record9_d0858((uint32_t)(uintptr_t)saved, 0x0012dbecu);
     if ((int16_t)pitch > 0x2000) {
@@ -5529,12 +5529,12 @@ void serial_interrupt_117bfc(uint32_t rec)
     port = EF_U32(rec + 0x1cu);
     st = EF_U32(rec + 0x2cu);
     if (port == 0u || st == 0u) {
-        guest_fn_117b0c(0x20u, 0x20u);
+        outp_117b0c(0x20u, 0x20u);
         return;
     }
     EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) | 0x10u);
     for (;;) {
-        uint32_t iir = guest_fn_9c430(EF_U32(rec + 0x1cu) + 2u) & 0xffu;
+        uint32_t iir = inp_9c430(EF_U32(rec + 0x1cu) + 2u) & 0xffu;
         uint32_t id = iir & 7u;
         if (iir & 1u)
             break;
@@ -5542,7 +5542,7 @@ void serial_interrupt_117bfc(uint32_t rec)
             continue;
         switch (id) {
         case 0: {
-            uint32_t ms = guest_fn_9c430(EF_U32(rec + 0x1cu) + 6u) & 0xffu;
+            uint32_t ms = inp_9c430(EF_U32(rec + 0x1cu) + 6u) & 0xffu;
             if (EF_U32(rec + 0x14u) == 0u)
                 break;
             if ((ms & 0x10u) == 0u) {
@@ -5556,8 +5556,8 @@ void serial_interrupt_117bfc(uint32_t rec)
             guest_fn_117b18_x(rec);
             break;
         case 4:
-            while (guest_fn_9c430(EF_U32(rec + 0x1cu) + 5u) & 1u) {
-                uint32_t b = guest_fn_9c430(EF_U32(rec + 0x1cu));
+            while (inp_9c430(EF_U32(rec + 0x1cu) + 5u) & 1u) {
+                uint32_t b = inp_9c430(EF_U32(rec + 0x1cu));
                 uint32_t q = EF_U32(rec + 0xau);
                 if ((int16_t)EF_U16(q + 4u) < (int16_t)EF_U16(q + 6u)) {
                     uint16_t idx = EF_U16(q + 2u);
@@ -5570,13 +5570,13 @@ void serial_interrupt_117bfc(uint32_t rec)
             }
             break;
         case 6:
-            (void)guest_fn_9c430(EF_U32(rec + 0x1cu) + 5u);
+            (void)inp_9c430(EF_U32(rec + 0x1cu) + 5u);
             break;
         default:
             break;
         }
     }
-    guest_fn_117b0c(0x20u, 0x20u);
+    outp_117b0c(0x20u, 0x20u);
 }
 
 /* 0x57820, 315 bytes. Build the status message for the event record REC (bytes: +1 first slot, +2 second slot, signed, -1 = none; +3/+4/+5 select the message form) into the text buffer 0x1a5d20 from the 17-byte names at 0x1a62f0 (an empty name shows as "UNKNOWN"), store the matching colour byte (table 0x12584c) at 0x1a6667 and set the message timers (word 0x127dac = 300, word 0x1a662c = 200). Does nothing when a slot is out of range of the word at 0x1357b0. */
@@ -6255,7 +6255,7 @@ void set_rm_vector_111142(uint32_t num, uint32_t value)
 /* 0xdff4c, 24 bytes. Poll the serial line status register (port dword 0x15eed0 + 5): when its data-ready bit is set call the receive handler 0xdfac8. */
 void poll_serial_dff4c(void)
 {
-    if (guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 1u)
+    if (inp_9c430(EF_U32(0x0015eed0u) + 5u) & 1u)
         guest_fn_dfac8_x();
 }
 
@@ -6264,12 +6264,12 @@ void send_keyboard_byte_cd3c0(uint32_t value)
 {
     uint32_t tries;
     for (tries = 0u; tries < 3u; tries++) {
-        while (guest_fn_9c430(0x64u) & 2u)
+        while (inp_9c430(0x64u) & 2u)
             ;
-        guest_fn_117b0c(0x60u, value & 0xffu);
-        while (!(guest_fn_9c430(0x64u) & 1u))
+        outp_117b0c(0x60u, value & 0xffu);
+        while (!(inp_9c430(0x64u) & 1u))
             ;
-        if ((guest_fn_9c430(0x60u) & 0xffu) == 0xfau)
+        if ((inp_9c430(0x60u) & 0xffu) == 0xfau)
             break;
     }
 }
@@ -6886,13 +6886,13 @@ void unpack_settings_3519c(ef_addr32 src)
 void poll_modem_status_df738(void)
 {
     uint32_t base = EF_U32(0x0015eed0u);
-    uint32_t st = guest_fn_9c430(base + 6u) & 0xffu;
+    uint32_t st = inp_9c430(base + 6u) & 0xffu;
     EF_U8(0x0015eed4u) = (uint8_t)st;
     if (EF_U8(0x0013579au) == 2u && (st & 1u)) {
         if ((st & 0x10u) == 0u) {
-            guest_fn_117b0c(base + 1u, (guest_fn_9c430(base + 1u) & 0xfdu));
+            outp_117b0c(base + 1u, (inp_9c430(base + 1u) & 0xfdu));
         } else if (EF_U8(0x0015ef28u) != 0u) {
-            guest_fn_117b0c(base + 1u, (guest_fn_9c430(base + 1u) & 0xffu) | 2u);
+            outp_117b0c(base + 1u, (inp_9c430(base + 1u) & 0xffu) | 2u);
         }
     }
     if ((EF_U8(0x0015eed4u) & 0x80u) == 0u && EF_U8(0x0013578cu) != 0u)
@@ -6957,7 +6957,7 @@ void reposition_camera_31774(void)
 /* 0xdfeb8, 145 bytes. Serial line status handler: store (line status (port 0x15eed0 + 5) >> 1) & 0xf in byte 0x15eed5; when bit 3 of that is set, switch the receive state byte 0x15f089 from 1 to 2 (setting byte 0x15f08f and word 0x15f090 = 0xe) and count the error in word 0x15f0a0 while clearing word 0x15f09c; otherwise, in state 3 with byte 0x15f088 set, set dword 0x15f084 = 5 and latch the menu entry (0xdf65c). */
 void serial_status_dfeb8(void)
 {
-    uint32_t st = ((guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 0xffu) >> 1) & 0xfu;
+    uint32_t st = ((inp_9c430(EF_U32(0x0015eed0u) + 5u) & 0xffu) >> 1) & 0xfu;
     EF_U8(0x0015eed5u) = (uint8_t)st;
     if ((EF_U8(0x0015eed5u) & 8u) != 0u) {
         if (EF_U8(0x0015f089u) == 1u) {
@@ -7212,7 +7212,7 @@ void setup_external_view_95704(uint32_t a, uint32_t b, uint32_t c, uint32_t d, u
 {
     uint32_t tgt;
     init_bounds_d0b68(0x0012dbecu);
-    guest_fn_d0ebc(0x0012dbecu, (uint16_t)(0u - e));
+    update_scene_angle_first(0x0012dbecu, (uint16_t)(0u - e));
     guest_fn_d0dbc(0x0012dbecu, (uint16_t)(0u - d), 0u);
     tgt = EF_U32(0x0020f15cu);
     EF_U16(0x0012dba2u) = (uint16_t)a;
@@ -8295,9 +8295,9 @@ uint32_t read_hires_timer_fe560(void)
     if (EF_U32(0x0017cf98u) == 0u) {
         EF_U32(0x00485fc4u) = EF_U32(0x00120cc6u) + 0x46cu;
         if (EF_U8(0x0015bac5u) == 0u) {
-            guest_fn_117b0c(0x43u, 0x34u);
-            guest_fn_117b0c(0x40u, 0u);
-            guest_fn_117b0c(0x40u, 0u);
+            outp_117b0c(0x43u, 0x34u);
+            outp_117b0c(0x40u, 0u);
+            outp_117b0c(0x40u, 0u);
         }
         EF_U32(0x0017cf98u) = 1u;
         EF_U32(0x00485fc8u) = EF_U32(EF_U32(0x00485fc4u));
@@ -8305,9 +8305,9 @@ uint32_t read_hires_timer_fe560(void)
     }
     do {
         tick1 = EF_U32(EF_U32(0x00485fc4u));
-        guest_fn_117b0c(0x43u, 0u);
-        lo = guest_fn_9c430(0x40u) & 0xffu;
-        hi = guest_fn_9c430(0x40u) & 0xffu;
+        outp_117b0c(0x43u, 0u);
+        lo = inp_9c430(0x40u) & 0xffu;
+        hi = inp_9c430(0x40u) & 0xffu;
         tick2 = EF_U32(EF_U32(0x00485fc4u));
     } while (tick2 != tick1);
     count = (0u - ((hi << 8) | lo)) & 0xffffu;
@@ -8773,7 +8773,7 @@ void setup_camera_955c0(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t
 {
     uint32_t p = EF_U32(0x00214458u);
     init_bounds_d0b68(0x0012dbecu);
-    guest_fn_d0ebc(0x0012dbecu, (0u - s0) & 0xffffu);
+    update_scene_angle_first(0x0012dbecu, (0u - s0) & 0xffffu);
     guest_fn_d0dbc(0x0012dbecu, (0u - d) & 0xffffu, c);
     EF_U16(0x0012dba2u) = (uint16_t)(0u - a);
     EF_U16(0x0012dba4u) = (uint16_t)(0u - b);
@@ -11084,10 +11084,10 @@ void recompute_bounds_31d7c(void)
     memset(rec, 0, sizeof(rec));
     guest_fn_324b0_x(0x0019e560u, 0x0019e56cu, 0x0019e572u, r + 0x24u);
     init_bounds_d0b68(r);
-    guest_fn_d0ebc(r, EF_U16(0x0019e56eu));
+    update_scene_angle_first(r, EF_U16(0x0019e56eu));
     guest_fn_d0dbc(r, EF_U16(0x0019e56cu), 0x0019e572u);
     guest_fn_d0fb8(r, EF_U16(0x0019e570u), r + 0x24u);
-    guest_fn_d0ebc(r, *(uint16_t *)&rec[0x26]);
+    update_scene_angle_first(r, *(uint16_t *)&rec[0x26]);
     guest_fn_d0dbc(r, *(uint16_t *)&rec[0x24], 0x0019e572u);
     EF_U16(0x0019e5d3u) = (uint16_t)angle_d13ac(r);
     EF_U16(0x0019e5d5u) = (uint16_t)forward_pair_d13dc(r);
@@ -11355,10 +11355,10 @@ uint32_t close_handle_fa9a0(uint32_t handle)
 /* 0x110f0c, 48 bytes. cdecl: program the system timer with the reload value DIVISOR (channel 0, mode 3: command 0x36 to port 0x43, low then high byte to port 0x40) with interrupts disabled, and remember it in dword 0x17d7ae. */
 void set_timer_divisor_110f0c(uint32_t divisor)
 {
-    guest_fn_117b0c(0x43u, 0x36u);
+    outp_117b0c(0x43u, 0x36u);
     EF_U32(0x0017d7aeu) = divisor;
-    guest_fn_117b0c(0x40u, divisor & 0xffu);
-    guest_fn_117b0c(0x40u, (divisor >> 8) & 0xffu);
+    outp_117b0c(0x40u, divisor & 0xffu);
+    outp_117b0c(0x40u, (divisor >> 8) & 0xffu);
 }
 
 /* 0xe10a0, 63 bytes. Send the text at TEXT (EAX) to the serial port at base dword 0x15eed0: remember the pointer in dword 0x15f690, set byte 0x15f694 = 1 and, while characters remain, wait for the line status register (base + 5) to show the transmitter ready (bit 0x20) and write the next character. The text pointer variable itself is not advanced. */
@@ -11370,9 +11370,9 @@ void send_serial_text_e10a0(ef_addr32 text)
     if (EF_U8(p) == 0u)
         return;
     do {
-        while ((guest_fn_9c430(EF_U32(0x0015eed0u) + 5u) & 0x20u) == 0u)
+        while ((inp_9c430(EF_U32(0x0015eed0u) + 5u) & 0x20u) == 0u)
             ;
-        guest_fn_117b0c(EF_U32(0x0015eed0u), EF_U8(p));
+        outp_117b0c(EF_U32(0x0015eed0u), EF_U8(p));
         p++;
     } while (EF_U8(p) != 0u);
 }
@@ -11383,14 +11383,14 @@ void init_serial_port_e0930(void)
     uint32_t base = EF_U32(0x0015eed0u);
     if (base == 0u)
         return;
-    guest_fn_117b0c(base + 4u, 0u);
-    guest_fn_117b0c(EF_U32(0x0015eed0u) + 1u, EF_U8(0x0015eeacu));
-    guest_fn_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
+    outp_117b0c(base + 4u, 0u);
+    outp_117b0c(EF_U32(0x0015eed0u) + 1u, EF_U8(0x0015eeacu));
+    outp_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
     base = EF_U32(0x0015eed0u);
-    guest_fn_117b0c(base, EF_U8(0x0015eeaeu));
-    guest_fn_117b0c(base + 1u, EF_U8(0x0015eeafu));
-    guest_fn_117b0c(base + 3u, 0x7fu);
-    guest_fn_117b0c(base + 3u, EF_U8(0x0015eeadu));
+    outp_117b0c(base, EF_U8(0x0015eeaeu));
+    outp_117b0c(base + 1u, EF_U8(0x0015eeafu));
+    outp_117b0c(base + 3u, 0x7fu);
+    outp_117b0c(base + 3u, EF_U8(0x0015eeadu));
 }
 
 /* 0x1100d2, 81 bytes. localtime: break the time_t at TIMEP (EAX) into TM (EDX) relative to the epoch day 0x63df using the zone offset dword 0x17d554 (0x10eda1 sets the zone up), and again with the daylight saving shift dword 0x17d558 removed when 0x10e97f reports daylight time for the result. Returns TM. */
@@ -11413,11 +11413,11 @@ void set_serial_divisor_e06ac(void)
     uint32_t base;
     EF_U8(st + 5u) = 3u;
     EF_U16(st + 0xcu) = (uint16_t)div;
-    guest_fn_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
+    outp_117b0c(EF_U32(0x0015eed0u) + 3u, 0x80u);
     base = EF_U32(0x0015eed0u);
-    guest_fn_117b0c(base, div & 0xffu);
-    guest_fn_117b0c(base + 1u, (div >> 8) & 0xffu);
-    guest_fn_117b0c(base + 3u, 3u);
+    outp_117b0c(base, div & 0xffu);
+    outp_117b0c(base + 1u, (div >> 8) & 0xffu);
+    outp_117b0c(base + 3u, 3u);
 }
 
 /* 0x8fbc8, 91 bytes. Append the 24-byte record at SRC (EAX) to the ring of ten records at 0x20f460 (index word 0x2119f0), announce the high half of its dword +0x14 with 0x9e508 and advance the index, wrapping to 0 at ten. */
@@ -11489,10 +11489,10 @@ void rebuild_angle_record_942cc(void)
     guest_fn_d099c(0x0021439cu, 0x0012dbecu);
     EF_U16(0x0012db9au) = (uint16_t)guest_fn_d13dc(0x0021439cu, 0x400u);
     guest_fn_92070();
-    guest_fn_d0ebc(0x0021439cu, 0u);
+    update_scene_angle_first(0x0021439cu, 0u);
     if (((int32_t)EF_U32(0x0012db98u) >> 16) > 0x6800) {
         guest_fn_95018();
-        guest_fn_d0ebc(0x0021439cu, 0xfc00u);
+        update_scene_angle_first(0x0021439cu, 0xfc00u);
     }
     memcpy_dc832(0x002143c0u, 0x0021439cu, 36u);
     guest_fn_d0dbc(0x0021439cu, 0xf800u, 0u);
@@ -11507,10 +11507,10 @@ void rebuild_angle_record_rev_94370(void)
     guest_fn_d099c(0x0021439cu, 0x0012dbecu);
     EF_U16(0x0012db9au) = (uint16_t)guest_fn_d13dc(0x0021439cu, 0xfc00u);
     guest_fn_92070();
-    guest_fn_d0ebc(0x0021439cu, 0u);
+    update_scene_angle_first(0x0021439cu, 0u);
     if (((int32_t)EF_U32(0x0012db98u) >> 16) < -0x6800) {
         guest_fn_95018();
-        guest_fn_d0ebc(0x0021439cu, 0x400u);
+        update_scene_angle_first(0x0021439cu, 0x400u);
     }
     memcpy_dc832(0x002143c0u, 0x0021439cu, 36u);
     guest_fn_d0dbc(0x0021439cu, 0xf800u, 0u);
@@ -11847,14 +11847,14 @@ void pump_serial_transmit_117b18(ef_addr32 p)
         return;
     if (EF_U32(p + 0x14u) != 0u) {
         ef_addr32 st = EF_U32(p + 0x2cu);
-        if ((uint8_t)(guest_fn_9c430(EF_U32(p + 0x1cu) + 6u) & 0x10u) == 0u) {
+        if ((uint8_t)(inp_9c430(EF_U32(p + 0x1cu) + 6u) & 0x10u) == 0u) {
             EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) | 2u);
             return;
         }
         EF_U16(st + 4u) = (uint16_t)(EF_U16(st + 4u) & ~2u);
     }
     base = EF_U32(p + 0x1cu);
-    if ((uint8_t)(guest_fn_9c430(base + 5u) & 0x20u) == 0u)
+    if ((uint8_t)(inp_9c430(base + 5u) & 0x20u) == 0u)
         return;
     limit = EF_U32(p + 0x18u) != 0u ? 0x10u : 1u;
     ring = EF_U32(p);
@@ -11867,7 +11867,7 @@ void pump_serial_transmit_117b18(ef_addr32 p)
             EF_U16(ring) = 0u;
         EF_U16(ring + 4u) = (uint16_t)(EF_U16(ring + 4u) - 1u);
         sent = (sent + 1u) & 0xffu;
-        guest_fn_117b0c(EF_U32(p + 0x1cu), b);
+        outp_117b0c(EF_U32(p + 0x1cu), b);
         if ((int16_t)EF_U16(ring + 4u) <= 0)
             return;
         if ((int32_t)sent >= (int32_t)limit)
@@ -12175,7 +12175,7 @@ void load_camera_92e30(uint32_t unit)
     EF_U32(0x00214474u) = EF_U32(obj + 8u);
     if (EF_U8(obj + 0xe9u) == 0u)
         guest_fn_95bf4_x();
-    guest_fn_d0ebc(0x00214378u, EF_U16(obj + 0xeu));
+    update_scene_angle_first(0x00214378u, EF_U16(obj + 0xeu));
     if (EF_U8(0x0021454bu) != 0u)
         guest_fn_d0dbc(0x00214378u, EF_U16(obj + 0xcu), obj);
     guest_fn_d0fb8(0x00214378u, EF_U16(obj + 0x10u), 0u);
@@ -17560,92 +17560,92 @@ void update_threat_value_24074(uint32_t ax, uint32_t dx)
 /* 0x9ac84, 448 bytes. Debug dump (fprintf-style, 0xbc400) of the state block A: the high words of the dwords at 0x40cfb2..0x40cfd4 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
 void dump_state_block_a_9ac84(ef_addr32 stream)
 {
-	guest_fn_bc400(stream, 0x0013185cu);
-	guest_fn_bc400(stream, 0x00131871u);
-	guest_fn_bc400(stream, 0x00131894u, (uint32_t)((int32_t)EF_U32(0x0040cfb2u) >> 16));
-	guest_fn_bc400(stream, 0x001318abu, (uint32_t)((int32_t)EF_U32(0x0040cfb4u) >> 16));
-	guest_fn_bc400(stream, 0x001318c5u, (uint32_t)((int32_t)EF_U32(0x0040cfb6u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x001318deu, (uint32_t)((int32_t)EF_U32(0x0040cfb8u) >> 16));
-	guest_fn_bc400(stream, 0x001318f0u, (uint32_t)((int32_t)EF_U32(0x0040cfbau) >> 16));
-	guest_fn_bc400(stream, 0x00131905u, (uint32_t)((int32_t)EF_U32(0x0040cfbcu) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131919u, (uint32_t)((int32_t)EF_U32(0x0040cfbeu) >> 16));
-	guest_fn_bc400(stream, 0x00131930u, (uint32_t)((int32_t)EF_U32(0x0040cfc0u) >> 16));
-	guest_fn_bc400(stream, 0x0013194au, (uint32_t)((int32_t)EF_U32(0x0040cfc2u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131963u, (uint32_t)((int32_t)EF_U32(0x0040cfcau) >> 16));
-	guest_fn_bc400(stream, 0x0013197cu, (uint32_t)((int32_t)EF_U32(0x0040cfccu) >> 16));
-	guest_fn_bc400(stream, 0x00131998u, (uint32_t)((int32_t)EF_U32(0x0040cfceu) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x001319b3u, (uint32_t)((int32_t)EF_U32(0x0040cfd0u) >> 16));
-	guest_fn_bc400(stream, 0x001319c4u, (uint32_t)((int32_t)EF_U32(0x0040cfd2u) >> 16));
-	guest_fn_bc400(stream, 0x001319d8u, (uint32_t)((int32_t)EF_U32(0x0040cfd4u) >> 16));
-	guest_fn_bc400(stream, 0x0018b128u);
+	stream_printf_bc400(stream, 0x0013185cu);
+	stream_printf_bc400(stream, 0x00131871u);
+	stream_printf_bc400(stream, 0x00131894u, (uint32_t)((int32_t)EF_U32(0x0040cfb2u) >> 16));
+	stream_printf_bc400(stream, 0x001318abu, (uint32_t)((int32_t)EF_U32(0x0040cfb4u) >> 16));
+	stream_printf_bc400(stream, 0x001318c5u, (uint32_t)((int32_t)EF_U32(0x0040cfb6u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x001318deu, (uint32_t)((int32_t)EF_U32(0x0040cfb8u) >> 16));
+	stream_printf_bc400(stream, 0x001318f0u, (uint32_t)((int32_t)EF_U32(0x0040cfbau) >> 16));
+	stream_printf_bc400(stream, 0x00131905u, (uint32_t)((int32_t)EF_U32(0x0040cfbcu) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131919u, (uint32_t)((int32_t)EF_U32(0x0040cfbeu) >> 16));
+	stream_printf_bc400(stream, 0x00131930u, (uint32_t)((int32_t)EF_U32(0x0040cfc0u) >> 16));
+	stream_printf_bc400(stream, 0x0013194au, (uint32_t)((int32_t)EF_U32(0x0040cfc2u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131963u, (uint32_t)((int32_t)EF_U32(0x0040cfcau) >> 16));
+	stream_printf_bc400(stream, 0x0013197cu, (uint32_t)((int32_t)EF_U32(0x0040cfccu) >> 16));
+	stream_printf_bc400(stream, 0x00131998u, (uint32_t)((int32_t)EF_U32(0x0040cfceu) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x001319b3u, (uint32_t)((int32_t)EF_U32(0x0040cfd0u) >> 16));
+	stream_printf_bc400(stream, 0x001319c4u, (uint32_t)((int32_t)EF_U32(0x0040cfd2u) >> 16));
+	stream_printf_bc400(stream, 0x001319d8u, (uint32_t)((int32_t)EF_U32(0x0040cfd4u) >> 16));
+	stream_printf_bc400(stream, 0x0018b128u);
 }
 
 /* 0x9ae44, 517 bytes. Debug dump (fprintf-style, 0xbc400) of the state block B: the high words of the dwords at 0x40cf8e..0x40cfb0 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
 void dump_state_block_b_9ae44(ef_addr32 stream)
 {
-	guest_fn_bc400(stream, 0x001319ebu);
-	guest_fn_bc400(stream, 0x001319fdu, (uint32_t)((int32_t)EF_U32(0x0040cf8eu) >> 16));
-	guest_fn_bc400(stream, 0x00131a14u, (uint32_t)((int32_t)EF_U32(0x0040cf90u) >> 16));
-	guest_fn_bc400(stream, 0x00131a2du, (uint32_t)((int32_t)EF_U32(0x0040cf92u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131a46u, (uint32_t)((int32_t)EF_U32(0x0040cf94u) >> 16));
-	guest_fn_bc400(stream, 0x00131a5du, (uint32_t)((int32_t)EF_U32(0x0040cf96u) >> 16));
-	guest_fn_bc400(stream, 0x00131a77u, (uint32_t)((int32_t)EF_U32(0x0040cf98u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131a90u, (uint32_t)((int32_t)EF_U32(0x0040cf9au) >> 16));
-	guest_fn_bc400(stream, 0x00131aa3u, (uint32_t)((int32_t)EF_U32(0x0040cf9cu) >> 16));
-	guest_fn_bc400(stream, 0x00131ab9u, (uint32_t)((int32_t)EF_U32(0x0040cf9eu) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131aceu, (uint32_t)((int32_t)EF_U32(0x0040cfa0u) >> 16));
-	guest_fn_bc400(stream, 0x00131aedu, (uint32_t)((int32_t)EF_U32(0x0040cfa2u) >> 16));
-	guest_fn_bc400(stream, 0x00131b0fu, (uint32_t)((int32_t)EF_U32(0x0040cfa4u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131b30u, (uint32_t)((int32_t)EF_U32(0x0040cfa6u) >> 16));
-	guest_fn_bc400(stream, 0x00131b4au, (uint32_t)((int32_t)EF_U32(0x0040cfa8u) >> 16));
-	guest_fn_bc400(stream, 0x00131b66u, (uint32_t)((int32_t)EF_U32(0x0040cfaau) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131b82u, (uint32_t)((int32_t)EF_U32(0x0040cfacu) >> 16));
-	guest_fn_bc400(stream, 0x00131b9eu, (uint32_t)((int32_t)EF_U32(0x0040cfaeu) >> 16));
-	guest_fn_bc400(stream, 0x00131bbdu, (uint32_t)((int32_t)EF_U32(0x0040cfb0u) >> 16));
-	guest_fn_bc400(stream, 0x0018b128u);
+	stream_printf_bc400(stream, 0x001319ebu);
+	stream_printf_bc400(stream, 0x001319fdu, (uint32_t)((int32_t)EF_U32(0x0040cf8eu) >> 16));
+	stream_printf_bc400(stream, 0x00131a14u, (uint32_t)((int32_t)EF_U32(0x0040cf90u) >> 16));
+	stream_printf_bc400(stream, 0x00131a2du, (uint32_t)((int32_t)EF_U32(0x0040cf92u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131a46u, (uint32_t)((int32_t)EF_U32(0x0040cf94u) >> 16));
+	stream_printf_bc400(stream, 0x00131a5du, (uint32_t)((int32_t)EF_U32(0x0040cf96u) >> 16));
+	stream_printf_bc400(stream, 0x00131a77u, (uint32_t)((int32_t)EF_U32(0x0040cf98u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131a90u, (uint32_t)((int32_t)EF_U32(0x0040cf9au) >> 16));
+	stream_printf_bc400(stream, 0x00131aa3u, (uint32_t)((int32_t)EF_U32(0x0040cf9cu) >> 16));
+	stream_printf_bc400(stream, 0x00131ab9u, (uint32_t)((int32_t)EF_U32(0x0040cf9eu) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131aceu, (uint32_t)((int32_t)EF_U32(0x0040cfa0u) >> 16));
+	stream_printf_bc400(stream, 0x00131aedu, (uint32_t)((int32_t)EF_U32(0x0040cfa2u) >> 16));
+	stream_printf_bc400(stream, 0x00131b0fu, (uint32_t)((int32_t)EF_U32(0x0040cfa4u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131b30u, (uint32_t)((int32_t)EF_U32(0x0040cfa6u) >> 16));
+	stream_printf_bc400(stream, 0x00131b4au, (uint32_t)((int32_t)EF_U32(0x0040cfa8u) >> 16));
+	stream_printf_bc400(stream, 0x00131b66u, (uint32_t)((int32_t)EF_U32(0x0040cfaau) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131b82u, (uint32_t)((int32_t)EF_U32(0x0040cfacu) >> 16));
+	stream_printf_bc400(stream, 0x00131b9eu, (uint32_t)((int32_t)EF_U32(0x0040cfaeu) >> 16));
+	stream_printf_bc400(stream, 0x00131bbdu, (uint32_t)((int32_t)EF_U32(0x0040cfb0u) >> 16));
+	stream_printf_bc400(stream, 0x0018b128u);
 }
 
 /* 0x9b04c, 600 bytes. Debug dump (fprintf-style, 0xbc400) of the state block C: the high words of the dwords at 0x40cfdc..0x40d004 are printed to the stream in AX, one format string per field with a separator string (0x18b12c) after each group. */
 void dump_state_block_c_9b04c(ef_addr32 stream)
 {
-	guest_fn_bc400(stream, 0x00131bdbu);
-	guest_fn_bc400(stream, 0x00131bf6u, (uint32_t)((int32_t)EF_U32(0x0040cfdcu) >> 16));
-	guest_fn_bc400(stream, 0x00131c11u, (uint32_t)((int32_t)EF_U32(0x0040cfdeu) >> 16));
-	guest_fn_bc400(stream, 0x00131c2fu, (uint32_t)((int32_t)EF_U32(0x0040cfe0u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131c4cu, (uint32_t)((int32_t)EF_U32(0x0040cfe2u) >> 16));
-	guest_fn_bc400(stream, 0x00131c67u, (uint32_t)((int32_t)EF_U32(0x0040cfe4u) >> 16));
-	guest_fn_bc400(stream, 0x00131c85u, (uint32_t)((int32_t)EF_U32(0x0040cfe6u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131ca2u, (uint32_t)((int32_t)EF_U32(0x0040cfe8u) >> 16));
-	guest_fn_bc400(stream, 0x00131cbcu, (uint32_t)((int32_t)EF_U32(0x0040cfeau) >> 16));
-	guest_fn_bc400(stream, 0x00131cd9u, (uint32_t)((int32_t)EF_U32(0x0040cfecu) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131cf5u, (uint32_t)((int32_t)EF_U32(0x0040cfeeu) >> 16));
-	guest_fn_bc400(stream, 0x00131d0eu, (uint32_t)((int32_t)EF_U32(0x0040cff0u) >> 16));
-	guest_fn_bc400(stream, 0x00131d2au, (uint32_t)((int32_t)EF_U32(0x0040cff2u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131d45u, (uint32_t)((int32_t)EF_U32(0x0040cff4u) >> 16));
-	guest_fn_bc400(stream, 0x00131d5bu, (uint32_t)((int32_t)EF_U32(0x0040cff6u) >> 16));
-	guest_fn_bc400(stream, 0x00131d72u, (uint32_t)((int32_t)EF_U32(0x0040cff8u) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131d88u, (uint32_t)((int32_t)EF_U32(0x0040cffau) >> 16));
-	guest_fn_bc400(stream, 0x00131d99u, (uint32_t)((int32_t)EF_U32(0x0040cffcu) >> 16));
-	guest_fn_bc400(stream, 0x00131dadu, (uint32_t)((int32_t)EF_U32(0x0040cffeu) >> 16));
-	guest_fn_bc400(stream, 0x0018b12cu);
-	guest_fn_bc400(stream, 0x00131dc0u, (uint32_t)((int32_t)EF_U32(0x0040d000u) >> 16));
-	guest_fn_bc400(stream, 0x00131dd1u, (uint32_t)((int32_t)EF_U32(0x0040d002u) >> 16));
-	guest_fn_bc400(stream, 0x00131de5u, (uint32_t)((int32_t)EF_U32(0x0040d004u) >> 16));
-	guest_fn_bc400(stream, 0x0018b128u);
+	stream_printf_bc400(stream, 0x00131bdbu);
+	stream_printf_bc400(stream, 0x00131bf6u, (uint32_t)((int32_t)EF_U32(0x0040cfdcu) >> 16));
+	stream_printf_bc400(stream, 0x00131c11u, (uint32_t)((int32_t)EF_U32(0x0040cfdeu) >> 16));
+	stream_printf_bc400(stream, 0x00131c2fu, (uint32_t)((int32_t)EF_U32(0x0040cfe0u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131c4cu, (uint32_t)((int32_t)EF_U32(0x0040cfe2u) >> 16));
+	stream_printf_bc400(stream, 0x00131c67u, (uint32_t)((int32_t)EF_U32(0x0040cfe4u) >> 16));
+	stream_printf_bc400(stream, 0x00131c85u, (uint32_t)((int32_t)EF_U32(0x0040cfe6u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131ca2u, (uint32_t)((int32_t)EF_U32(0x0040cfe8u) >> 16));
+	stream_printf_bc400(stream, 0x00131cbcu, (uint32_t)((int32_t)EF_U32(0x0040cfeau) >> 16));
+	stream_printf_bc400(stream, 0x00131cd9u, (uint32_t)((int32_t)EF_U32(0x0040cfecu) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131cf5u, (uint32_t)((int32_t)EF_U32(0x0040cfeeu) >> 16));
+	stream_printf_bc400(stream, 0x00131d0eu, (uint32_t)((int32_t)EF_U32(0x0040cff0u) >> 16));
+	stream_printf_bc400(stream, 0x00131d2au, (uint32_t)((int32_t)EF_U32(0x0040cff2u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131d45u, (uint32_t)((int32_t)EF_U32(0x0040cff4u) >> 16));
+	stream_printf_bc400(stream, 0x00131d5bu, (uint32_t)((int32_t)EF_U32(0x0040cff6u) >> 16));
+	stream_printf_bc400(stream, 0x00131d72u, (uint32_t)((int32_t)EF_U32(0x0040cff8u) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131d88u, (uint32_t)((int32_t)EF_U32(0x0040cffau) >> 16));
+	stream_printf_bc400(stream, 0x00131d99u, (uint32_t)((int32_t)EF_U32(0x0040cffcu) >> 16));
+	stream_printf_bc400(stream, 0x00131dadu, (uint32_t)((int32_t)EF_U32(0x0040cffeu) >> 16));
+	stream_printf_bc400(stream, 0x0018b12cu);
+	stream_printf_bc400(stream, 0x00131dc0u, (uint32_t)((int32_t)EF_U32(0x0040d000u) >> 16));
+	stream_printf_bc400(stream, 0x00131dd1u, (uint32_t)((int32_t)EF_U32(0x0040d002u) >> 16));
+	stream_printf_bc400(stream, 0x00131de5u, (uint32_t)((int32_t)EF_U32(0x0040d004u) >> 16));
+	stream_printf_bc400(stream, 0x0018b128u);
 }
 
 /* 0xa520c, 281 bytes. Resize widget OBJ (EAX) to the given width DX and height BX (16-bit, negative values become 0; stored at +0x45 / +0x47), refresh it (0xa5070, 0xa558c) and, unless flag bit 0x10 of byte +0x3a is set, clamp it to the screen limits (words 0x15b744 / 0x15b748; origin words +0x41 / +0x43): without CL the size is shortened to fit, with CL non-zero the widget is moved instead (0xa5484). Finally update children and redraw (0xa51dc, 0xa5764, 0xa66a0, 0xa6038). */
@@ -19712,8 +19712,8 @@ void parse_command_line_a9724(ef_addr32 text)
 	EF_U8(0x001371fbu) = 0u;
 	memset(buf, 0, sizeof buf);
 	memcpy(buf, ef_guest_memory_ptr(0x0018d780u), 4);
-	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, text);
-	guest_fn_9ca57((ef_addr32)(uintptr_t)buf, 0x0018d784u);
+	strcat_9ca57((ef_addr32)(uintptr_t)buf, text);
+	strcat_9ca57((ef_addr32)(uintptr_t)buf, 0x0018d784u);
 	argv[0] = 0x00137209u;
 	argc = 1u;
 	p = buf;
@@ -23885,9 +23885,9 @@ uint32_t shutdown_serial_port_e0a90(void)
 	if (EF_U32(0x15eec0) != 0) {
 		if (EF_U8(0x15f0f6) == 0) {
 			uint32_t port = EF_U32(0x15eec4);
-			uint32_t v = guest_fn_9c430(port);
+			uint32_t v = inp_9c430(port);
 
-			guest_fn_117b0c(port, (v & 0xff) | EF_U8(0x15eec8));
+			outp_117b0c(port, (v & 0xff) | EF_U8(0x15eec8));
 		}
 		EF_U32(0x15eec0) = 0;
 	}
@@ -24538,7 +24538,7 @@ void apply_rotated_offset_95bf4(void)
 	y = EF_S16(vec + 2);
 	z = EF_S16(vec + 4);
 	init_bounds_d0b68((ef_addr32)(uintptr_t)m);
-	guest_fn_d0ebc((ef_addr32)(uintptr_t)m, EF_U16(rec + 0xe));
+	update_scene_angle_first((ef_addr32)(uintptr_t)m, EF_U16(rec + 0xe));
 	guest_fn_d0dbc((ef_addr32)(uintptr_t)m, EF_U16(rec + 0xc), vec);
 	guest_fn_d0fb8((ef_addr32)(uintptr_t)m, EF_U16(rec + 0x10), rec);
 	EF_S32(0x21446c) += (m[1] * y + m[0] * x + m[2] * z) / 0x6900;
@@ -24757,7 +24757,7 @@ void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, u
 	ef_addr32 t;
 
 	guest_fn_9d749(b, name);
-	guest_fn_9ca57(b, 0x18cc2cu);
+	strcat_9ca57(b, 0x18cc2cu);
 	switch (type) {
 	case 1:
 		guest_sprintf_a4342(b + guest_fn_b1b8b(b), 0x18cc30u, (uint32_t)EF_U8(data));
@@ -24772,17 +24772,17 @@ void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, u
 			t += 8;
 		}
 		if (found == 0) guest_report_parser_enum_error(0x18cc44u, name, data);
-		guest_fn_9ca57(b, found);
+		strcat_9ca57(b, found);
 		t = table;
 		for (;;) {
-			guest_fn_9ca57(b, 0x18cc68u);
+			strcat_9ca57(b, 0x18cc68u);
 			if (EF_U8(EF_U32(t)) == 0) break;
-			guest_fn_9ca57(b, EF_U32(t));
+			strcat_9ca57(b, EF_U32(t));
 			t += 8;
 		}
 		break;
 	case 4:
-		guest_fn_9ca57(b, data);
+		strcat_9ca57(b, data);
 		break;
 	case 5:
 		guest_sprintf_a4342(b + guest_fn_b1b8b(b), 0x18cc3cu, (uint32_t)EF_U16(data));
@@ -24790,6 +24790,6 @@ void write_config_entry_a2a90(ef_addr32 name, ef_addr32 data, ef_addr32 table, u
 	default:
 		break;
 	}
-	guest_fn_9ca57(b, 0x18cc70u);
+	strcat_9ca57(b, 0x18cc70u);
 	write_handle_a7a1c(0, 0, 0, 0, EF_U32(0x136df8u), guest_fn_b1b8b(b), b);
 }
