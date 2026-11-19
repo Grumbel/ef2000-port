@@ -154,7 +154,7 @@ uint32_t close_stream_record_bc4da(uint32_t rec, uint32_t extra)
 void project_position_5ca88(uint32_t pos, uint32_t arg)
 {
     int32_t x = (EF_S32(pos) >> 8) - EF_S32(0x0021444cu);
-    int32_t y = (EF_S32(pos + 4u) >> 8) - EF_S32(0x00214448u);
+    int32_t y = (EF_S32(pos + 4u) >> 8) - g_scene_gate_limit;
     int32_t z = (EF_S32(pos + 8u) >> 8) - EF_S32(0x00214450u);
     if (abs_a28f2(x) >= 0x4000 || abs_a28f2(y) >= 0x4000 || abs_a28f2(z) >= 0x4000) {
         x >>= 4;
@@ -162,7 +162,7 @@ void project_position_5ca88(uint32_t pos, uint32_t arg)
         z >>= 4;
     }
     x += EF_S32(0x0021444cu);
-    y += EF_S32(0x00214448u);
+    y += g_scene_gate_limit;
     z += EF_S32(0x00214450u);
     guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
 }
@@ -788,7 +788,7 @@ uint32_t text_width_dd2f4(uint32_t str)
 void project_position_5cb1c(uint32_t arg, int32_t x, int32_t y, int32_t z)
 {
     x -= EF_S32(0x0021444cu);
-    y -= EF_S32(0x00214448u);
+    y -= g_scene_gate_limit;
     z -= EF_S32(0x00214450u);
     while (abs_a28f2(x) >= 0x4000 || abs_a28f2(y) >= 0x4000 || abs_a28f2(z) >= 0x4000) {
         x >>= 4;
@@ -796,7 +796,7 @@ void project_position_5cb1c(uint32_t arg, int32_t x, int32_t y, int32_t z)
         z >>= 4;
     }
     x += EF_S32(0x0021444cu);
-    y += EF_S32(0x00214448u);
+    y += g_scene_gate_limit;
     z += EF_S32(0x00214450u);
     guest_fn_15c0c4_x((uint32_t)(int32_t)(int16_t)z, (uint32_t)(int32_t)(int16_t)y, (uint32_t)(int32_t)(int16_t)x, arg);
 }
@@ -2883,7 +2883,7 @@ void claim_ui_slot_801e4(int32_t index, uint32_t arg, uint32_t flag)
     uint32_t count = 0u;
     uint32_t slot;
     uint8_t i;
-    if (EF_U8(0x0012b070u) == 0u)
+    if (g_mode_output_a == 0u)
         return;
     if ((flag & 0xffu) != 0u)
         count = EF_U32(0x0012b07cu);
@@ -7035,7 +7035,7 @@ uint32_t reserve_entries_81394(uint32_t unused, uint32_t list, uint32_t sum)
     uint32_t p = list;
     int16_t i = 1;
     (void)unused;
-    if (EF_U8(0x0012b104u) == 0u)
+    if (g_mode_output_b == 0u)
         return 0u;
     if (sum == 0u || list == 0u)
         return sum;
@@ -9071,7 +9071,7 @@ void advance_view_queue_91c98(void)
         copy_record9_d0858(0x0012dbecu, 0x0012dc10u);
     EF_U16(0x002144a2u) = 0u;
     EF_U16(0x00122c54u) = 0u;
-    EF_U8(0x0012dbc4u) = 0u;
+    g_scene_refresh_pending = 0u;
 }
 
 /* 0x47764, 259 bytes. Queue a message in the 9-slot table at 0x12668e (0x14-byte slots: word +2 = SI id, +4 = DI, dwords +0xa/+0xe/+0x12 = EBX, ECX and the stack argument, dword +6 = serial number from 0x12668c) for the unit DI (signed word, must exist or be 0x899 / 0xff) when SI is in 1..0x84 and the entry 0x126a5c[SI * 7] is not 0x12f3d2. Nothing is queued when a slot already holds the same SI / DI pair; the first free slot (id 0xff) is used. Also sets word 0x126658 to 0x6e and byte 0x126655 to 1. */
@@ -13236,7 +13236,7 @@ void refresh_map_label_5c7dc(void)
     guest_sprintf_a4342(textp, 0x00185facu, EF_U32(0x001971b0u));
     half = (int16_t)formatted_width_48da0(textp) >> 1;
     shift = g_tactical_display_mode;
-    y = (int16_t)((int32_t)pt[1] - (int32_t)((EF_U16(0x001a6ce2u) + 7u) << shift));
+    y = (int16_t)((int32_t)pt[1] - (int32_t)((g_tactical_cross_radius + 7u) << shift));
     x = (int16_t)((int32_t)pt[0] - half);
     draw_formatted_text_mode_48bb0(g_tactical_marker_code, (1u - shift) & 0xffu, x, y, textp);
 }
@@ -13974,7 +13974,7 @@ uint8_t parse_comment_line_e882c(void)
  * 18-byte-stride options table at 0x12b370. */
 static void apply_control_setting_82710(void)
 {
-    uint8_t value = EF_U8(0x001a5c0bu);
+    uint8_t value = g_tactical_indicator_source;
     EF_U8(0x001fcb30u) = value;
     EF_U8(0x00420960u) = value;
 }
@@ -16857,7 +16857,7 @@ void select_first_entry_487c(void)
 	if (num < 0)
 		guest_callptr1_x(g_gui_error_hook, 0x0017f6f4u);
 	num = (int16_t)EF_U16(0x00121e48u);
-	EF_U8(0x001970b8u + (uint32_t)((int32_t)num * 25)) = EF_U8(0x00121e44u);
+	EF_U8(0x001970b8u + (uint32_t)((int32_t)num * 25)) = g_difficulty;
 	guest_fn_40dc_x(0u);
 	guest_fn_42a4_x();
 	apply_a4cb4_a4d90(0x0017f714u);
@@ -20422,7 +20422,7 @@ void rebuild_word_map_49e00(void)
 	int32_t acc, n;
 	ef_addr32 p;
 
-	if (EF_U8(0x00125849u) == 1u) {
+	if (g_reference_copy_mode == 1u) {
 		fill_bytes_b3fb0(0x001a5290u, 0u, 0x20u);
 		n = (int16_t)EF_U16(0x001357b0u);
 		si = 0;
@@ -22035,8 +22035,8 @@ uint32_t set_timer_vector_23b(uint32_t requested, uint32_t skip, uint32_t *carry
 		EF_U32(0x132a40u) = out[0];
 		EF_U32(0x120cd0u) = out[2];
 	}
-	old = EF_U32(0x132a30u);
-	EF_U32(0x132a30u) = requested;
+	old = _curbrk;
+	_curbrk = requested;
 	*carry = 0u;
 	return old;
 }
@@ -24453,7 +24453,7 @@ uint32_t start_positional_sound_7fcdc(uint32_t eax, ef_addr32 edx)
 
 	if (bl > 0x47u)
 		guest_callptr2_x(EF_U32(0x132a74u), 0x18873cu, bl);
-	if (EF_U8(0x12b070u) == 0)
+	if (g_mode_output_a == 0)
 		return 0;
 	if (bl > 0x47u)
 		guest_callptr2_x(EF_U32(0x132a74u), 0x188758u, bl);
@@ -24570,7 +24570,7 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 	EF_U8(ub + 0x18a) = 0;
 	EF_U16(table + 0x13 + (uint32_t)idx * 2) = 0xff;
 	guest_fn_6a1d0(b, 1);
-	if (EF_U8(0x125847) != 0) {
+	if (g_tactical_action_enabled != 0) {
 		run_page_text_9e508((int16_t)EF_S16(ub + 0x20), 0xe);
 		run_page_text_9e508((int16_t)EF_S16(ub + 0x20), 0x17);
 	}
@@ -24581,7 +24581,7 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 		run_page_text_9e508((int16_t)EF_S16(ua + 0x20), 0xe);
 		run_page_text_9e508((int16_t)EF_S16(ua + 0x20), 0x10);
 	}
-	if ((uint16_t)EF_U8(0x1a666b) != EF_U16(ua + 0x18) && EF_S16(ua + 0x18) != 0xff && EF_U8(0x127da9) != 0) {
+	if ((uint16_t)g_world_grid_marker != EF_U16(ua + 0x18) && EF_S16(ua + 0x18) != 0xff && g_world_grid_mode != 0) {
 		send_word_byte_packet_3d((uint16_t)a, idx);
 	}
 }
