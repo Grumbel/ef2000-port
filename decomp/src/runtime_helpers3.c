@@ -194,7 +194,7 @@ void serial_set_dtr_118694(ef_addr32 record, uint32_t enable)
         return;
     value = guest_fn_9c430(port + 4u);
     value = enable != 0 ? (value | 1u) & 0xffu : (value & 0xfeu);
-    guest_fn_117b0c(EF_U32(record + 0x1cu) + 4u, value);
+    outp_117b0c(EF_U32(record + 0x1cu) + 4u, value);
 }
 
 /* 0x1186cc, 53 bytes. Set or clear bit 1 of the modem control register. */
@@ -207,7 +207,7 @@ void serial_set_rts_1186cc(ef_addr32 record, uint32_t enable)
         return;
     value = guest_fn_9c430(port + 4u);
     value = enable != 0 ? (value | 2u) & 0xffu : (value & 0xfdu);
-    guest_fn_117b0c(EF_U32(record + 0x1cu) + 4u, value);
+    outp_117b0c(EF_U32(record + 0x1cu) + 4u, value);
 }
 
 /* 0x11c020, 76 bytes. Allocate and clear n records of 0xd5 bytes at 0x4ddee0. */

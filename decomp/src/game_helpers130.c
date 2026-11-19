@@ -5178,8 +5178,8 @@ void draw_view_box_5f698(void)
 	e = (int32_t)(0xau << sh);
 	s = (int32_t)(4u << sh);
 	d = EF_F64(0x001a2f28u);
-	if (guest_fn_b427c_x(d) > EF_F64(0x0018601cu))
-		d = guest_fn_b42b0_x(d) * EF_F64(0x0018601cu);
+	if (abs_double_b427c(d) > EF_F64(0x0018601cu))
+		d = sign_double_b42b0(d) * EF_F64(0x0018601cu);
 	k = EF_F64(0x00186024u);
 	bx = (int32_t)guest_fn_9d72c_x((double)EF_F32(0x001a5c00u) * k);
 	EF_S32(0x002117b0u) = bx;

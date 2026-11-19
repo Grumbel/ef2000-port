@@ -35,19 +35,19 @@ void upload_vga_palette_feec8(ef_addr32 palette)
     uint8_t index = 0;
     uint8_t dac = 0;
 
-    guest_fn_117b0c(0x3c8u, 0);
+    outp_117b0c(0x3c8u, 0);
     do {
         uint32_t src = EF_U32(palette);
         uint32_t diff = (EF_U32(shadow) ^ src) & 0x00ffffffu;
         if (diff != 0) {
             EF_U32(shadow) ^= diff;
             if (index != dac) {
-                guest_fn_117b0c(0x3c8u, index);
+                outp_117b0c(0x3c8u, index);
                 dac = index;
             }
-            guest_fn_117b0c(0x3c9u, src & 0xffu);
-            guest_fn_117b0c(0x3c9u, (src >> 8) & 0xffu);
-            guest_fn_117b0c(0x3c9u, (src >> 16) & 0xffu);
+            outp_117b0c(0x3c9u, src & 0xffu);
+            outp_117b0c(0x3c9u, (src >> 8) & 0xffu);
+            outp_117b0c(0x3c9u, (src >> 16) & 0xffu);
             dac++;
         }
         palette += 3u;

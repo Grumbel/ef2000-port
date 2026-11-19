@@ -54,7 +54,7 @@ void leave_scroll_mode_c39ac(void)
     EF_U8(0x0041f3ecu) = 0;
     EF_U32(0x00164604u) = EF_U32(0x00164608u);
     EF_U32(0x0041f3d4u) = EF_U32(0x00164608u);
-    guest_fn_fc39c(EF_U32(0x0015b748u), EF_U32(0x0015b744u));
+    build_row_table_fc39c(EF_U32(0x0015b748u), EF_U32(0x0015b744u));
 }
 
 /* 0xc39f0, 54 bytes. Enter the pending-scroll mode with the given latch value. */
@@ -67,5 +67,5 @@ void enter_scroll_mode_c39f0(uint32_t value, uint32_t width, uint32_t height)
     EF_U32(0x0041f3d4u) = base;
     EF_U32(0x0015b754u) = value;
     EF_U8(0x0041f3ecu) = 1;
-    guest_fn_fc39c(height, width);
+    build_row_table_fc39c(height, width);
 }

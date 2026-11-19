@@ -23,10 +23,10 @@ int32_t set_serial_rate_117e0c(ef_addr32 obj, int32_t rate)
     divisor = 0x1c200 / rate;
     actual = 0x1c200 / divisor;
     disable_interrupts_11f2d3();
-    guest_fn_117b0c(EF_U32(obj + 0x1cu) + 3u, 0x83u);
-    guest_fn_117b0c(EF_U32(obj + 0x1cu) + 1u, (uint32_t)(divisor >> 8));
-    guest_fn_117b0c(EF_U32(obj + 0x1cu), (uint32_t)divisor & 0xffu);
-    guest_fn_117b0c(EF_U32(obj + 0x1cu) + 3u, 3u);
+    outp_117b0c(EF_U32(obj + 0x1cu) + 3u, 0x83u);
+    outp_117b0c(EF_U32(obj + 0x1cu) + 1u, (uint32_t)(divisor >> 8));
+    outp_117b0c(EF_U32(obj + 0x1cu), (uint32_t)divisor & 0xffu);
+    outp_117b0c(EF_U32(obj + 0x1cu) + 3u, 3u);
     enable_interrupts_11f2d5();
     return actual;
 }

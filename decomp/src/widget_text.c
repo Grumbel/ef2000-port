@@ -38,6 +38,6 @@ void draw_widget_text_a6c20(ef_addr32 widget)
     x += EF_U16(widget + 0x2bu);
     y += EF_U16(widget + 0x2du);
     style = EF_U8(widget + 0x8bu) >> 4;
-    guest_fn_e26bc(0, (int16_t)x, (int16_t)y,
+    draw_styled_text_e26bc(0, (int16_t)x, (int16_t)y,
                   (ef_addr32)(uintptr_t)text, style);
 }
