@@ -488,6 +488,16 @@ addr	size	type	name	evidence	notes
 0x0016062d	4	uint32_t	g_default_file_translation_mode	bc223/bc258 compare with 0x200	default binary bit only when exactly 0x200
 0x00132cd0	4	ef_addr32[]	g_attack_pattern_names	b29b9 unchecked byte-indexed name pointer read	table extent not established
 0x001379b0	4	uint32_t	g_record_pool_active_count	b01f5 clears after initialization	pool state reset
+0x00122c50	1	uint8_t	g_view_state_sync_enabled	6b608 skips the view-state copy when zero	low byte of a dword whose top byte 0x19700/0x19789 compare as a mode
+0x0019bf80	3120	ef_key_view_preset[20]	g_key_view_presets	32a8a imul 0x9c, key name at +0x3c compared by 32c04	function-key camera view presets
+0x0019cbb0	6440	ef_key_view_track[40]	g_key_view_tracks	32aec imul 0xa1, key name at +0x40 compared by 32c04	secondary function-key view records
+0x0019e543	2	int16_t	g_key_view_preset_cursor	32c0b loads, 32aac/32b1b and 2fbdc store -1	last selected preset index, signed word
+0x0019e549	2	int16_t	g_key_view_track_cursor	32ac6 loads before the track search	secondary cursor, signed word
+0x0019e5e1	2	uint8_t[2]	g_key_view_track_selected	32b0d/32b13 set both bytes to 1 on a track match	meaning otherwise unknown
+0x00212270	78	ef_camera_chain_record[]	g_camera_chain_records	97b3c imul 0x4e; 97464 walks +4 next and +8 depth	chain records; table extent unknown
+0x0012dc74	2	int16_t	g_camera_chain_head	97b26 loads, 97a4c stores -1	first chain index, -1 empty
+0x0012dc78	4	float	g_camera_chain_clock	97b1a..97b2c FLDS step, FADDS clock, FSTPS clock	chain clock accumulator
+0x00132b20	4	float	g_camera_chain_step	97464 stores 0x3e000000 (0.125)	clock step per update
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

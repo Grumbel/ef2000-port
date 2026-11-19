@@ -503,4 +503,22 @@ extern uint8_t g_scene_direction_changed; /* 0x1a6d1f */
 /* Completion array, 0xb00d0. */
 extern uint32_t g_completion_entry_count; /* 0x1379b4 */
 
+/* Selected view-state sync, 0x6b608. */
+extern uint8_t g_view_state_sync_enabled; /* 0x122c50 */
+
+/* Function-key camera views, 0x32c04. */
+#include "ef_structs/view_keys.h"
+extern ef_key_view_preset g_key_view_presets[EF_KEY_VIEW_PRESET_COUNT]; /* 0x19bf80 */
+extern ef_key_view_track g_key_view_tracks[EF_KEY_VIEW_TRACK_COUNT]; /* 0x19cbb0 */
+extern int16_t g_key_view_preset_cursor; /* 0x19e543 */
+extern int16_t g_key_view_track_cursor; /* 0x19e549 */
+extern uint8_t g_key_view_track_selected[2]; /* 0x19e5e1 */
+
+/* Camera chain, 0x97b18. */
+#include "ef_structs/camera_chain.h"
+extern ef_camera_chain_record g_camera_chain_records[]; /* 0x212270, extent unknown */
+extern int16_t g_camera_chain_head; /* 0x12dc74 */
+extern float g_camera_chain_clock; /* 0x12dc78 */
+extern float g_camera_chain_step; /* 0x132b20 */
+
 #endif

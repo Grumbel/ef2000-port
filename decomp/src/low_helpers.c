@@ -165,19 +165,19 @@ void clear_dwords_19bb38(void)
 
 /* The seven stubs below load a constant into EAX and tail-jump to 0x32c04. */
 /* 0x32b3c, 10 bytes. */
-uint32_t call_32c04_182ad8(void) { return guest_fn_32c04(0x00182ad8u); }
+uint32_t call_32c04_182ad8(void) { return select_key_view_32c04(0x00182ad8u); }
 /* 0x32b48, 10 bytes. */
-uint32_t call_32c04_182adc(void) { return guest_fn_32c04(0x00182adcu); }
+uint32_t call_32c04_182adc(void) { return select_key_view_32c04(0x00182adcu); }
 /* 0x32b54, 10 bytes. */
-uint32_t call_32c04_182ae0(void) { return guest_fn_32c04(0x00182ae0u); }
+uint32_t call_32c04_182ae0(void) { return select_key_view_32c04(0x00182ae0u); }
 /* 0x32b60, 10 bytes. */
-uint32_t call_32c04_182ae4(void) { return guest_fn_32c04(0x00182ae4u); }
+uint32_t call_32c04_182ae4(void) { return select_key_view_32c04(0x00182ae4u); }
 /* 0x32b6c, 10 bytes. */
-uint32_t call_32c04_182ae8(void) { return guest_fn_32c04(0x00182ae8u); }
+uint32_t call_32c04_182ae8(void) { return select_key_view_32c04(0x00182ae8u); }
 /* 0x32b9c, 10 bytes. */
-uint32_t call_32c04_182af8(void) { return guest_fn_32c04(0x00182af8u); }
+uint32_t call_32c04_182af8(void) { return select_key_view_32c04(0x00182af8u); }
 /* 0x32ba8, 10 bytes. */
-uint32_t call_32c04_182afc(void) { return guest_fn_32c04(0x00182afcu); }
+uint32_t call_32c04_182afc(void) { return select_key_view_32c04(0x00182afcu); }
 
 /* 0x33750, 14 bytes. Tail-call 0xa41c8 when byte 0x1357c8 is nonzero. */
 void forward_if_flag_1357c8(void)

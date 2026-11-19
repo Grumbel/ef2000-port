@@ -841,7 +841,9 @@ uint32_t code_is_0_16_or_2(uint8_t code); /* 0x41e84 AL -> EAX */
 uint32_t guest_random_word(void); /* 0x9c960 -> EAX */
 ef_addr32 guest_lookup_object_8ffe8(int32_t index); /* 0x8ffe8 EAX -> EAX */
 uint32_t guest_forward_high_word(int32_t value); /* 0x3739c EAX tail */
-uint32_t guest_fn_32c04(uint32_t table); /* 0x32c04 EAX tail */
+uint32_t select_key_view_32c04(ef_addr32 key_name); /* 0x32c04 */
+uint32_t select_key_view_f8_32b90(void); /* 0x32b90 */
+uint32_t guest_fn_2fbc4_r(ef_addr32 record); /* 0x2fbc4 EAX, EAX result */
 void guest_fn_a41c8(void); /* 0xa41c8 */
 uint32_t guest_fn_e2af4(uint32_t value); /* 0xe2af4 EAX */
 ef_addr32 guest_table_entry_3c730(ef_addr32 table, int32_t index); /* 0x3c730 EAX/EDX -> EAX */
@@ -2724,6 +2726,7 @@ void reset_slot_entries_8cae8(ef_addr32 object);
 uint32_t next_free_object_9075c(uint32_t start);
 void pair_with_target_948c4(int16_t target_id);
 void apply_camera_record_97a94(int16_t index);
+int32_t advance_camera_chain_97b18(void); /* 0x97b18 */
 void read_camera_record_97ca8(ef_addr32 out_x, ef_addr32 out_y, ef_addr32 out_z, ef_addr32 out_a,
                               ef_addr32 stack_b, ef_addr32 stack_c);
 void guest_fn_5b2f0(void); /* 0x5b2f0 */
@@ -6553,6 +6556,8 @@ void guest_fn_b3168_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s
 void assign_slot_68a60(int32_t slot, int32_t value);
 
 void copy_view_state_6b620(uint32_t ax);
+void sync_selected_view_state_6b608(void); /* 0x6b608 */
+void guest_fn_72944(void); /* 0x72944 */
 
 void age_effect_nodes_288c8(void);
 
