@@ -212,14 +212,14 @@ void run_script_conditions_a9694(uint32_t rec)
 /* 0x3237c, 150 bytes. Update two running minima (0x19e5c5 with its companion word 0x19e5a5, and 0x19e5b9) from the distances computed by 0x7b16c between pairs of fixed-point values, offset by 0x19e55b. */
 void update_distance_minima_3237c(void)
 {
-    int32_t d = -(int32_t)guest_fn_7b16c_x(0u, (uint32_t)(EF_S32(0x0019e5c1u) >> 8), (uint32_t)(EF_S32(0x0019e5c9u) >> 8));
+    int32_t d = -(int32_t)cell_distance_at_7b16c(0u, (uint32_t)(EF_S32(0x0019e5c1u) >> 8), (uint32_t)(EF_S32(0x0019e5c9u) >> 8));
     int32_t v = (int32_t)((uint32_t)d << 8) + EF_S32(0x0019e55bu);
     if (v < EF_S32(0x0019e5c5u)) {
         int32_t idx = EF_S32(0x0019e547u) >> 16;
         EF_S32(0x0019e5c5u) = v;
         EF_U16(0x0019e5a5u) = EF_U16((uint32_t)(idx * 161) + 0x0019cc33u);
     }
-    d = -(int32_t)guest_fn_7b16c_x(0u, (uint32_t)(EF_S32(0x0019e5b5u) >> 8), (uint32_t)(EF_S32(0x0019e5bdu) >> 8));
+    d = -(int32_t)cell_distance_at_7b16c(0u, (uint32_t)(EF_S32(0x0019e5b5u) >> 8), (uint32_t)(EF_S32(0x0019e5bdu) >> 8));
     v = (int32_t)((uint32_t)d << 8) + EF_S32(0x0019e55bu);
     if (v < EF_S32(0x0019e5b9u))
         EF_S32(0x0019e5b9u) = v;
@@ -363,7 +363,7 @@ void add_scaled_vector_97914(uint32_t obj)
     if (EF_U8(0x00122c5cu) != 0u)
         return;
     copy_vector3(t, obj + 0x30u);
-    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    scale_vector3_ea8cc(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
     add_vector3(obj + 0x24u, t);
 }
 
@@ -557,7 +557,7 @@ uint32_t queue_byte_118428(uint32_t obj, uint32_t ch)
     if (EF_U16(q + 2u) == EF_U16(q + 6u))
         EF_U16(q + 2u) = 0u;
     EF_U16(q + 4u) = (uint16_t)(EF_U16(q + 4u) + 1u);
-    guest_fn_117b18_x(obj);
+    pump_serial_transmit_117b18(obj);
     enable_interrupts_11f2d5();
     return 1u;
 }
@@ -702,12 +702,12 @@ void integrate_motion_97950(uint32_t obj)
     if (EF_U8(0x00122c5cu) != 0u)
         return;
     copy_vector3(t, obj + 0x18u);
-    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    scale_vector3_ea8cc(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
     add_vector3(obj + 0xcu, t);
     copy_vector3(t, obj + 0x18u);
-    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(obj + 0x48u));
+    scale_vector3_ea8cc(t, 0u, 0u, 0u, EF_U32(obj + 0x48u));
     add_vector3(t, obj + 0x3cu);
-    guest_fn_ea8cc_x(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    scale_vector3_ea8cc(t, 0u, 0u, 0u, EF_U32(0x00132b20u));
     add_vector3(obj + 0x18u, t);
 }
 
@@ -956,11 +956,11 @@ uint32_t step_animation_97860(uint32_t obj)
     case 1:
         if (object_faces_camera_97534(obj) != 0u)
             guest_fn_975f0_x(obj);
-        result = guest_fn_9775c_x(obj);
+        result = land_object_9775c(obj);
         break;
     case 2:
     case 3:
-        result = guest_fn_9775c_x(obj);
+        result = land_object_9775c(obj);
         break;
     default:
         break;
@@ -1146,7 +1146,7 @@ void init_slot_record_b5640(uint32_t obj, uint32_t src, uint32_t ecx, uint32_t e
     uint8_t flag = (uint8_t)ecx;
     EF_U16(EF_U32(obj + 0x20u) + 0xeu) = (uint16_t)find_free_slot_run_b58a8(src, (int16_t)ebx, (int16_t)need);
     rec = EF_U32(obj + 0x20u);
-    guest_fn_b54d0_x(rec + 0x10u, rec + 0x12u, rec + 0x14u, (uint32_t)(int32_t)(int16_t)EF_U16(rec + 0xeu), (uint32_t)(int32_t)(int16_t)EF_U16(src + 0x48u));
+    add_time_offset_b54d0(rec + 0x10u, rec + 0x12u, rec + 0x14u, (uint32_t)(int32_t)(int16_t)EF_U16(rec + 0xeu), (uint32_t)(int32_t)(int16_t)EF_U16(src + 0x48u));
     EF_U8(EF_U32(obj + 0x20u) + 0x18u) = flag;
     EF_U16(EF_U32(obj + 0x20u) + 0x16u) = 0u;
     EF_U16(EF_U32(obj + 0x20u) + 0xcu) = 0u;
@@ -1600,7 +1600,7 @@ void process_render_object_d23d8(uint32_t obj)
     uint32_t mesh;
     EF_U32(0x004209c8u) = EF_U32(0x004209c8u) + 1u;
     if (EF_U8(0x00158ed8u) == 0u)
-        guest_fn_d2130_x(obj);
+        classify_render_bounds_d2130(obj);
     if (EF_U8(obj + 0x2cu) & 8u)
         return;
     if (EF_U16(obj + 0x2cu) & 0x1f0u)
@@ -1611,7 +1611,7 @@ void process_render_object_d23d8(uint32_t obj)
     EF_U32(0x004209c4u) = EF_U32(0x004209c4u) + 1u;
     if ((EF_U8(obj + 0x2cu) & 1u) == 0u)
         forward_record_d2110(obj);
-    guest_fn_d2320_x(obj);
+    prepare_shape_list_d2320(obj);
     if ((int16_t)EF_U16(obj + 0x1eu) > (int16_t)EF_U16(obj + 0x1au)) {
         uint32_t tri = (EF_U32(obj + 0xcu) - 1u) * 4u + mesh + 4u;
         if (triangle_is_clockwise_d22d0(tri) == 0u) {
@@ -2011,7 +2011,7 @@ void draw_cell_text_5e1b0(int32_t a, int32_t b, ef_addr32 fmt, int32_t c)
     draw_formatted_text_mode_48bb0(EF_U8(0x00128148u), (uint8_t)(1u - EF_U8(0x0012b369u)), px, py, fmt);
     w = formatted_width_48d5c(fmt);
     a += (int32_t)w + 1;
-    guest_fn_5e21c_x((int16_t)a, (int16_t)b, (uint32_t)c);
+    odometer_text_5e21c((int16_t)a, (int16_t)b, (uint32_t)c);
 }
 
 /* 0x3bcc0, 101 bytes. Optionally (when the last stack argument is 1) draw through 0xc8ccc with the first and second words of PTR added to B and A (doubled in video mode 3), then draw a box of colour C at (A, B) (ret 4). */
@@ -2091,7 +2091,7 @@ void write_log_d1c54(ef_addr32 name, ef_addr32 src, int32_t mode)
     open_log_d1774(name);
     emit_display_list_d17d0();
     log_palette_d1894(src, (int16_t)mode);
-    guest_fn_d1afc_x();
+    write_planar_image_d1afc();
     finish_log_d1bec();
     call_a7990_420944();
 }
@@ -2335,36 +2335,36 @@ void refresh_current_object_598e8(void)
         return;
     switch ((uint8_t)(EF_U8(0x001282c5u) - 2u)) {
     case 0:
-        guest_fn_5a2d0_x();
+        draw_map_cursor_5a2d0();
         reset_unit_counter();
-        guest_fn_5a220_x();
+        refresh_map_cursor_5a220();
         break;
     case 1:
-        guest_fn_5a468_x();
+        draw_target_box_5a468();
         v = EF_U32(0x0019721cu);
         if ((int32_t)v <= 0x41 && (int32_t)v >= 0)
-            guest_fn_5e87c_x((int16_t)EF_U16(0x0019721cu));
+            draw_corner_table_5e87c((int16_t)EF_U16(0x0019721cu));
         break;
     case 2:
     case 3:
-        guest_fn_5a2d0_x();
+        draw_map_cursor_5a2d0();
         break;
     case 4:
-        guest_fn_5a2d0_x();
-        guest_fn_5c518_x();
+        draw_map_cursor_5a2d0();
+        draw_tactical_marker_5c518();
         break;
     case 5:
-        guest_fn_5a2d0_x();
+        draw_map_cursor_5a2d0();
         guest_fn_59fa4_x();
         break;
     case 7:
-        guest_fn_5a2d0_x();
+        draw_map_cursor_5a2d0();
         apply_stream_value_5ca60();
         break;
     default:
         break;
     }
-    guest_fn_59998_x();
+    draw_selected_unit_label_59998();
 }
 
 /* 0xa0174, 177 bytes. Advance the two vector pairs of the object OBJ: copy the vector at +0x3c to 0x132b28, then add the vector at +0x30 scaled by [0x132b20] to +0x24, the vector at +0x18 scaled by [0x132b20] to +0xc, and update +0x18 by (+0x18 scaled by [0x132b34]) + the vector at 0x132b28, scaled by [0x132b20] (all scaling truncates toward zero). */
@@ -2731,7 +2731,7 @@ void init_once_105230(void)
     stack_range_104908(0x004dd834u, 4u);
     stack_range_104908(0x004dd838u, 4u);
     stack_range_104908(0x004dd830u, 4u);
-    guest_fn_117ace_x();
+    register_locked_ranges_117ace();
     EF_U32(0x0017d360u) = 1u;
 }
 
@@ -2925,12 +2925,12 @@ void draw_shadowed_text_48c90(uint32_t color, int32_t x, int32_t y, ef_addr32 fm
     va_end(ap);
     if (EF_U8(0x0012b369u) == 1u) {
         if (EF_U8(0x00127b1au) != 0u)
-            guest_fn_e605c_x(3u, (int16_t)(((int16_t)x) * 2 + 1), (int16_t)(((int16_t)y) * 2 + 1), (uint32_t)(uintptr_t)buf);
-        guest_fn_e605c_x(color & 0xffu, (int16_t)(((int16_t)x) * 2), (int16_t)(((int16_t)y) * 2), (uint32_t)(uintptr_t)buf);
+            draw_clipped_text_e605c(3u, (int16_t)(((int16_t)x) * 2 + 1), (int16_t)(((int16_t)y) * 2 + 1), (uint32_t)(uintptr_t)buf);
+        draw_clipped_text_e605c(color & 0xffu, (int16_t)(((int16_t)x) * 2), (int16_t)(((int16_t)y) * 2), (uint32_t)(uintptr_t)buf);
     } else {
         if (EF_U8(0x00127b1au) != 0u)
-            guest_fn_15a14_x(3u, (int16_t)(x + 1), (int16_t)(y + 1), (uint32_t)(uintptr_t)buf);
-        guest_fn_15a14_x(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
+            draw_prop_text_15a14(3u, (int16_t)(x + 1), (int16_t)(y + 1), (uint32_t)(uintptr_t)buf);
+        draw_prop_text_15a14(color & 0xffu, (int16_t)x, (int16_t)y, (uint32_t)(uintptr_t)buf);
     }
     EF_U8(0x00127b1au) = 0u;
 }
@@ -3132,7 +3132,7 @@ uint32_t heading_to_current_object_66fc(void)
         }
     } else {
         uint32_t rec = (uint32_t)(int32_t)(int16_t)EF_U16(0x0019bb5eu) * 0xcau;
-        guest_fn_84e3c_x((uint32_t)(uintptr_t)pos, (int16_t)EF_U16(0x001f71cau), EF_U8(EF_U32(0x0019bb58u) + rec + 0x8eu));
+        fetch_entry_pair_84e3c((uint32_t)(uintptr_t)pos, (int16_t)EF_U16(0x001f71cau), EF_U8(EF_U32(0x0019bb58u) + rec + 0x8eu));
     }
     bx = pos[0] - (int32_t)EF_U32(0x001a5becu);
     dx = pos[1] - (int32_t)EF_U32(0x001a5be8u);
@@ -3317,7 +3317,7 @@ void set_record_state_14c5c(int32_t idx, uint32_t state)
     obj = lookup_filtered_indexed_object((int16_t)EF_U16(0x001f71cau));
     if (obj != 0u && (EF_U8(obj + 0x24u) & 0x10u) != 0u)
         return;
-    guest_fn_14d58_x((int16_t)idx);
+    draw_framed_box_14d58((int16_t)idx);
     if (st != 9u && st != 10u)
         return;
     if (EF_U8(rec + 0x12u) != 0u)
@@ -3652,7 +3652,7 @@ void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg)
     guest_fn_39a0c_x(obj, (uint32_t)(int32_t)(int16_t)arg);
     x = (int16_t)EF_U16(obj);
     y = (int16_t)EF_U16(obj + 2u);
-    guest_fn_dec18_x(color, (uint32_t)x, (uint32_t)y);
+    plot_byte_clipped(color, (uint32_t)x, (uint32_t)y);
     s = EF_U8(0x0012b369u);
     draw_tactical_line((uint32_t)y, (uint32_t)(x - (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x - (int32_t)(6u << s)), color);
     s = EF_U8(0x0012b369u);
@@ -3711,7 +3711,7 @@ void try_take_target_89ac0(uint32_t obj)
     uint32_t step;
     if (tgt == 0u)
         return;
-    if ((guest_fn_89b58_x(obj) & 0xffu) == 0u)
+    if ((still_aligned_89b58(obj) & 0xffu) == 0u)
         return;
     if ((guest_fn_7574c((int32_t)(EF_S32(tgt + 0x14u) >> 16)) & 0xffu) != 0u && (period_elapsed_89bf0() & 0xffu) != 0u) {
         EF_U32(obj + 0x30u) = EF_U32(cur + 0x4bu);
@@ -3833,7 +3833,7 @@ void retire_unit_8d330(int32_t index)
     run_page_text_9e508((int32_t)page, 3u);
     clear_named_references_8ef38(rec);
     EF_U8(rec + 0x24u) &= 0xebu;
-    guest_fn_8ca24_x(rec, (int32_t)(int16_t)EF_U16(rec + 0x28u));
+    init_weapon_slots_8ca24(rec, (int32_t)(int16_t)EF_U16(rec + 0x28u));
 }
 
 /* 0xeab44, 162 bytes. Timed record pump: when the clock 0x10dfe0 has advanced by at least the interval word 0x484466 since 0x484154, re-reads the data block (0xeaaf4), hands the record buffers to 0xf9ee0 and 0x10dfec, and then either steps the pass counter word 0x484468, or, when it reaches the limit word 0x484162, resets it to 2 and rewinds the stream by the position held in 0x484150. Returns 1 while running, 0 after the rewind. */
@@ -3878,7 +3878,7 @@ void draw_clipped_text_e605c(uint32_t color, int32_t x, int32_t y, uint32_t str)
         right_edge = x + 6;
         while (EF_U8(str) != 0u) {
             if (right_edge > EF_S32(0x0017cf9cu) && x < EF_S32(0x0017cfa0u))
-                guest_fn_e5f64_x((uint32_t)x, (uint32_t)gy, EF_U8(str));
+                draw_glyph_clipped_e5f64((uint32_t)x, (uint32_t)gy, EF_U8(str));
             right_edge += 8;
             x += 8;
             str++;
@@ -3890,7 +3890,7 @@ void draw_clipped_text_e605c(uint32_t color, int32_t x, int32_t y, uint32_t str)
         if (x >= EF_S32(0x0017cf9cu) && right_edge < EF_S32(0x0017cfa0u))
             draw_glyph_7x9_e5e90((uint32_t)x, (uint32_t)gy, EF_U8(str));
         else if (right_edge > EF_S32(0x0017cf9cu) && x < EF_S32(0x0017cfa0u))
-            guest_fn_e5f64_x((uint32_t)x, (uint32_t)gy, EF_U8(str));
+            draw_glyph_clipped_e5f64((uint32_t)x, (uint32_t)gy, EF_U8(str));
         right_edge += 8;
         x += 8;
         str++;
@@ -3994,7 +3994,7 @@ void update_remote_view_f2ac0(void)
     } else if (r == 1u) {
         guest_callptr1_x(EF_U32(0x00132a74u), 0x001918e8u);
     } else if (r == 2u) {
-        guest_fn_a7bd4_x();
+        set_latches_1371fc();
         apply_palette_d663c(0x00425c8cu);
         EF_U8(0x00161e20u) = 1u;
     }
@@ -4188,7 +4188,7 @@ int32_t dos_date_request_dde80(uint32_t value)
 {
     uint32_t blk = EF_U32(0x004260b0u);
     uint32_t regs;
-    uint32_t r = guest_fn_604_x(blk);
+    uint32_t r = encode_runtime_segment_offset(blk);
     int32_t v;
     EF_U8(blk) = 0x0bu;
     EF_U8(blk + 1u) = (uint8_t)value;
@@ -4199,7 +4199,7 @@ int32_t dos_date_request_dde80(uint32_t value)
     EF_U8(regs + 1u) = EF_U8(0x0015ee98u);
     EF_U16(regs + 0x10u) = (uint16_t)(r >> 16);
     EF_U16(regs + 0x0eu) = (uint16_t)(r & 0xfu);
-    r = guest_fn_604_x(regs);
+    r = encode_runtime_segment_offset(regs);
     EF_U16(0x004260d6u) = (uint16_t)(r >> 16);
     EF_U32(0x004260c4u) = r & 0xffffu;
     EF_U32(0x004260d0u) = 0x1510u;
@@ -4250,14 +4250,14 @@ void update_group_flags_cb6fc(uint32_t head, uint32_t arg)
         if (EF_U8(node + 0xbu) == 0u &&
             (guest_fn_cc1ac(0u, 1u, head) & 0xffffu) != 0u &&
             (guest_fn_cc1ac(2u, 1u, head) & 0xffffu) != 0u &&
-            (guest_fn_cc1ec_x(0u, 2u, head) & 0xffffu) != 0u &&
-            (guest_fn_cc1ec_x(2u, 0u, head) & 0xffffu) != 0u &&
+            (group_flag_zero_cc1ec(0u, 2u, head) & 0xffffu) != 0u &&
+            (group_flag_zero_cc1ec(2u, 0u, head) & 0xffffu) != 0u &&
             (int16_t)EF_U16(0x0013799eu) > 2 &&
-            (int16_t)guest_fn_b0954_x(0u, head, arg) < 7) {
-            guest_fn_cc188_x(0u, 2u, head);
-            guest_fn_cc188_x(2u, 0u, head);
-            guest_fn_cc164_x(2u, 1u, head);
-            guest_fn_cc164_x(1u, 2u, head);
+            (int16_t)count_positive_filtered_node_matches(0u, head, arg) < 7) {
+            mark_list_entry_64(0u, 2u, head);
+            mark_list_entry_64(2u, 0u, head);
+            mark_list_entry_9c(2u, 1u, head);
+            mark_list_entry_9c(1u, 2u, head);
         }
         node = EF_U32(node + 4u);
     }
@@ -4381,7 +4381,7 @@ void accumulate_samples_a35bc(void)
             pkt[4] = (uint8_t)(sum >> 8);
             pkt[5] = (uint8_t)(sum >> 16);
             pkt[6] = (uint8_t)(sum >> 24);
-            guest_fn_a3e50_x((uint32_t)(uintptr_t)pkt, 0xdu, 6u);
+            issue_request_a3e50((uint32_t)(uintptr_t)pkt, 0xdu, 6u);
             EF_U16(0x001357dau + kind * 2u) = 0u;
             EF_U32(0x001357ecu + kind * 4u) = 0u;
             EF_U16(0x0013580cu + kind * 2u) = EF_U16(0x001357d6u);
@@ -4650,7 +4650,7 @@ void dispatch_pending_key_1a47c(void)
     if (EF_U16(0x0012288au) != 0u) {
         int32_t mode = (int8_t)EF_U8(0x00122c53u);
         if (mode >= 1 && mode <= 4)
-            guest_fn_11de0_x(key);
+            find_letter_entry_11de0(key);
     } else if (EF_U16(0x0019843cu) != 0u) {
         fn = EF_U32(0x00198000u + key * 4u);
         if (fn != 0u)
@@ -4975,7 +4975,7 @@ void dump_page_header_9ab6c(uint32_t stream)
 void init_roster_state_77a8(uint32_t n)
 {
     EF_U16(0x001972e4u) = (uint16_t)(n & 0xffu);
-    EF_U32(0x001972e0u) = guest_fn_7780_x(n & 0xffu, 0x22u);
+    EF_U32(0x001972e0u) = alloc_zero_product_7780(n & 0xffu, 0x22u);
     EF_U32(0x0019727cu) = 0xc0200000u;
     EF_U32(0x00197284u) = 0xc0240000u;
     EF_U32(0x00197290u) = 0u;
@@ -5048,12 +5048,12 @@ void draw_tactical_header_3b58(void)
     if (!live)
         guest_fn_a4342_va(b, 0x0017f620u, 0x0013208fu, EF_U32(0x00121110u + (uint32_t)EF_U8(0x00197080u) * 4u));
     uppercase_string(b);
-    w = guest_fn_48d5c_x(b);
+    w = formatted_width_48d5c(b);
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(7u, (int16_t)(0x13bu - w), 10, b);
     guest_fn_a4342_va(b, 0x0017f628u, 0x00132088u, 0x00196ffbu, 0x0019702du);
     uppercase_string(b);
-    w = guest_fn_48d5c_x(b);
+    w = formatted_width_48d5c(b);
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(7u, (int16_t)(0x13bu - w), 0x12, b);
 }
@@ -5064,7 +5064,7 @@ void update_view_stages_45574(uint32_t a, uint32_t s, uint32_t b)
     if (EF_U16(0x00126554u) == 0u && EF_U16(0x00126556u) == 0u && EF_U16(0x00126558u) == 0u)
         return;
     if (EF_U16(0x00126560u) != 0u) {
-        guest_fn_447ec_x(a, s);
+        draw_hotspots_447ec(a, s);
         guest_fn_44c68_x(a, s);
         guest_fn_453f4_x(a, s);
     }
@@ -5548,12 +5548,12 @@ void serial_interrupt_117bfc(uint32_t rec)
             if ((ms & 0x10u) == 0u) {
                 EF_U16(EF_U32(rec + 0x2cu) + 4u) = (uint16_t)(EF_U16(EF_U32(rec + 0x2cu) + 4u) | 2u);
             } else if (EF_U16(EF_U32(rec + 0x2cu) + 4u) & 2u) {
-                guest_fn_117b18_x(rec);
+                pump_serial_transmit_117b18(rec);
             }
             break;
         }
         case 2:
-            guest_fn_117b18_x(rec);
+            pump_serial_transmit_117b18(rec);
             break;
         case 4:
             while (inp_9c430(EF_U32(rec + 0x1cu) + 5u) & 1u) {
@@ -12204,7 +12204,7 @@ uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out)
     EF_U32(0x0042099cu) = flags;
     flags &= EF_U32(p2 + 0x20u);
     EF_U32(0x0042099cu) = flags;
-    guest_fn_d2130_x(0x00420970u);
+    classify_render_bounds_d2130(0x00420970u);
     if ((EF_U8(0x0042099cu) & 8u) != 0u)
         return 0u;
     if ((uint8_t)clip_segment_ce9a4(0x00420970u) == 0u)
@@ -13687,7 +13687,7 @@ void show_scaled_value_5c2d8(void)
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f8cu, (double)f);
     else
         guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00185f94u, (double)f);
-    guest_fn_5e21c_x((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf);
+    odometer_text_5e21c((uint32_t)(int32_t)(int16_t)id, 0u, (uint32_t)(uintptr_t)buf);
 }
 
 /* 0x5fc80, 168 bytes. Label the box ENTRY (AX) of the table at 0x127a98 (10 byte entries: x, y, w, h words, 5th word unused): draw the double 0x1a3078 * 0x186072 with format 0x18604c at (x - w/2 + 5, y - h/2 + 2) and the dword 0x197238 with format 0x186064 at (x + w/2 - 0x1e, same y), both in colour 0xf mode 1, then run 0x5b288 with value 0xf, word x, zero. */
@@ -14437,7 +14437,7 @@ void setup_disk_request_ddd48(void)
 {
     ef_addr32 req = EF_U32(0x004260a0u);
     ef_addr32 ctl;
-    uint32_t r = guest_fn_604_x(req);
+    uint32_t r = encode_runtime_segment_offset(req);
     uint32_t r2;
     int32_t hi;
     uint32_t sector;
@@ -14450,7 +14450,7 @@ void setup_disk_request_ddd48(void)
     EF_U16(ctl + 0x12u) = 7u;
     EF_U16(ctl + 0xeu) = (uint16_t)(r & 0xfu);
     EF_U16(ctl + 0x10u) = (uint16_t)((int32_t)r >> 16);
-    r2 = guest_fn_604_x(ctl);
+    r2 = encode_runtime_segment_offset(ctl);
     EF_U16(0x004260d6u) = (uint16_t)((int32_t)r2 >> 16);
     EF_U32(0x004260c4u) = r2 & 0xffffu;
     EF_U32(0x004260d0u) = 0x1510u;
@@ -15611,7 +15611,7 @@ void draw_node_markers_44aec(uint32_t group, ef_addr32 head_addr)
 			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x0013443cu) >> 16) * 0x280)
 				+ (uint32_t)((int32_t)EF_U32(0x0013443au) >> 16);
 			have = 1;
-		} else if ((guest_fn_cc1ec_x(0u, EF_U8(node + 9u), group) & 0xffffu) != 0u && EF_U16(0x00126558u) != 0u) {
+		} else if ((group_flag_zero_cc1ec(0u, EF_U8(node + 9u), group) & 0xffffu) != 0u && EF_U16(0x00126558u) != 0u) {
 			pos = EF_U32(0x00126570u) + (uint32_t)(((int32_t)EF_U32(0x0013444eu) >> 16) * 0x280)
 				+ (uint32_t)((int32_t)EF_U32(0x0013444cu) >> 16);
 			have = 1;
