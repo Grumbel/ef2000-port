@@ -1414,6 +1414,7 @@ ef_addr32 parse_decimal(ef_addr32 text, ef_addr32 result);
 int32_t stream_getc(ef_addr32 stream);
 uint32_t call_fa95f_from_start(uint32_t handle);
 uint32_t elapsed_since_start(void);
+uint32_t elapsed_centiseconds(void);
 uint32_t call_1100d2_default(uint32_t value);
 void store_flagged_value(uint32_t index, uint32_t value);
 uint32_t lookup_slot_11024e(int32_t index);

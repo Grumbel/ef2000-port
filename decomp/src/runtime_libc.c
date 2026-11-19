@@ -115,6 +115,13 @@ uint32_t elapsed_since_start(void)
     return now - base;
 }
 
+/* 0xf8248 is a tail-jump thunk to 0x1100b1. Preserve its public entry while
+ * routing directly to the recovered implementation. */
+uint32_t elapsed_centiseconds(void)
+{
+    return elapsed_since_start();
+}
+
 /* 0x110123, 13 bytes. 0x1100d2(EAX, 0x4dd988). */
 uint32_t call_1100d2_default(uint32_t value)
 {
