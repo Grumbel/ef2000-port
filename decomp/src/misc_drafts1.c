@@ -2019,9 +2019,9 @@ void draw_marked_box_3bcc0(int32_t a, int32_t b, ef_addr32 ptr, int32_t c, uint3
 {
     if ((mode & 0xffu) == 1u) {
         if (EF_U8(0x0012635fu) == 3u)
-            guest_fn_c8ccc_x((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) * 2 + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) * 2 + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
+            draw_tactical_line((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) * 2 + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) * 2 + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
         else
-            guest_fn_c8ccc_x((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
+            draw_tactical_line((uint32_t)((int32_t)(int16_t)EF_U16(ptr + 2u) + b), (uint32_t)((int32_t)(int16_t)EF_U16(ptr) + a), (uint32_t)b, (uint32_t)a, (uint32_t)c);
     }
     draw_box_3bc90((int16_t)c, a, b);
 }
@@ -3654,9 +3654,9 @@ void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg)
     y = (int16_t)EF_U16(obj + 2u);
     guest_fn_dec18_x(color, (uint32_t)x, (uint32_t)y);
     s = EF_U8(0x0012b369u);
-    guest_fn_c8ccc_x((uint32_t)y, (uint32_t)(x - (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x - (int32_t)(6u << s)), color);
+    draw_tactical_line((uint32_t)y, (uint32_t)(x - (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x - (int32_t)(6u << s)), color);
     s = EF_U8(0x0012b369u);
-    guest_fn_c8ccc_x((uint32_t)y, (uint32_t)(x + (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x + (int32_t)(6u << s)), color);
+    draw_tactical_line((uint32_t)y, (uint32_t)(x + (int32_t)(2u << s)), (uint32_t)y, (uint32_t)(x + (int32_t)(6u << s)), color);
 }
 
 /* 0xca200, 142 bytes. Load the record file NAME: build the default path with NAME appended and the suffix 0x18f058, open it through the indirect 0x132ab4 (error 0x18f05c on failure), read it into an arena block (0x41eea8, error 0x18f084 when empty) and validate it through 0x132ab8 (error 0x18f0c0 unless it returns 1). */
@@ -9253,7 +9253,7 @@ void draw_heading_marker_5de14(uint32_t x, uint32_t y, uint32_t size, uint32_t o
     load_sincos_dc7bc((uint32_t)(uint16_t)(EF_U16(obj + 0xeu) + 0x8000u));
     rotate_point_dc7e4((uint32_t)(uintptr_t)p0, (int16_t)EF_U16(0x001281fau), (int16_t)EF_U16(0x001281fcu));
     rotate_point_dc7e4((uint32_t)(uintptr_t)p1, (int16_t)EF_U16(0x001281feu), (int16_t)EF_U16(0x00128200u));
-    guest_fn_c8ccc_x(
+    draw_tactical_line(
                      (uint32_t)(int32_t)(int16_t)(p1[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p1[0] + (int16_t)x),
                      (uint32_t)(int32_t)(int16_t)(p0[1] + (int16_t)y), (uint32_t)(int32_t)(int16_t)(p0[0] + (int16_t)x),
                      EF_U8(0x00128148u));
@@ -10265,18 +10265,18 @@ void draw_shadow_box_f3904(uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3)
     restore_saved_block_dd870();
     if (EF_U8(0x004859deu) != 0u)
         guest_fn_c386c();
-    guest_fn_c8ccc_x((uint32_t)(u0 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v0 + 1), 0u);
-    guest_fn_c8ccc_x((uint32_t)(u1 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v1 + 1), 0u);
-    guest_fn_c8ccc_x((uint32_t)(u1 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v1 + 1), 0u);
-    guest_fn_c8ccc_x((uint32_t)(u0 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v0 + 1), 0u);
+    draw_tactical_line((uint32_t)(u0 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v0 + 1), 0u);
+    draw_tactical_line((uint32_t)(u1 + 1), (uint32_t)(v1 + 1), (uint32_t)(u0 + 1), (uint32_t)(v1 + 1), 0u);
+    draw_tactical_line((uint32_t)(u1 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v1 + 1), 0u);
+    draw_tactical_line((uint32_t)(u0 + 1), (uint32_t)(v0 + 1), (uint32_t)(u1 + 1), (uint32_t)(v0 + 1), 0u);
     c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-    guest_fn_c8ccc_x((uint32_t)u0, (uint32_t)v1, (uint32_t)u0, (uint32_t)v0, c);
+    draw_tactical_line((uint32_t)u0, (uint32_t)v1, (uint32_t)u0, (uint32_t)v0, c);
     c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-    guest_fn_c8ccc_x((uint32_t)u1, (uint32_t)v1, (uint32_t)u0, (uint32_t)v1, c);
+    draw_tactical_line((uint32_t)u1, (uint32_t)v1, (uint32_t)u0, (uint32_t)v1, c);
     c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-    guest_fn_c8ccc_x((uint32_t)u1, (uint32_t)v0, (uint32_t)u1, (uint32_t)v1, c);
+    draw_tactical_line((uint32_t)u1, (uint32_t)v0, (uint32_t)u1, (uint32_t)v1, c);
     c = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-    guest_fn_c8ccc_x((uint32_t)u0, (uint32_t)v0, (uint32_t)u1, (uint32_t)v0, c);
+    draw_tactical_line((uint32_t)u0, (uint32_t)v0, (uint32_t)u1, (uint32_t)v0, c);
     save_and_draw_block_dd8dc();
     if (EF_U8(0x004859deu) != 0u)
         guest_fn_dc250();
@@ -10305,7 +10305,7 @@ void draw_arc_fe380(uint32_t colour, uint32_t cy, uint32_t cx, uint32_t lo, uint
         uint32_t x0 = (uint32_t)((int32_t)((int64_t)c0 * r / -0x8000)) + cx;
         uint32_t y1 = (uint32_t)((int32_t)((int64_t)s1 * r / 0x8000)) + cy;
         uint32_t x1 = (uint32_t)((int32_t)((int64_t)c1 * r / -0x8000)) + cx;
-        guest_fn_c8ccc_x(x1, y1, x0, y0, colour);
+        draw_tactical_line(x1, y1, x0, y0, colour);
     }
     EF_U32(0x00485fb0u) = EF_U32(0x00485fb0u) + 1u;
 }
@@ -12075,7 +12075,7 @@ void draw_scaled_rect_c95ac(uint32_t colour, uint32_t x1, uint32_t y1, uint32_t 
     r2 = (int32_t)truncate_9d72c((double)(int16_t)y1 * scale + oy + (double)(int16_t)EF_U16(vp + 0x73u) - (double)(int16_t)EF_U16(vp + 0x6bu));
     r3 = (int32_t)truncate_9d72c((double)(int16_t)x2 * scale + ox + (double)(int16_t)EF_U16(vp + 0x71u) - (double)(int16_t)EF_U16(vp + 0x69u));
     r4 = (int32_t)truncate_9d72c((double)(int16_t)y2 * scale + oy + (double)(int16_t)EF_U16(vp + 0x73u) - (double)(int16_t)EF_U16(vp + 0x6bu));
-    guest_fn_c8ccc_x((uint32_t)r4, (uint32_t)r3, (uint32_t)r2, (uint32_t)r1, colour & 0xffu);
+    draw_tactical_line((uint32_t)r4, (uint32_t)r3, (uint32_t)r2, (uint32_t)r1, colour & 0xffu);
 }
 
 /* 0xe9c00, 214 bytes. Toggle the mode byte 0x43399d (hysteresis on a distance): in mode 1 run the first constraint solver 0xe9e7c on 0x464480 (six dwords from 0x4321f0, 0x4321f4, 0x432288, 0x43228c, 0x432220, 0x432224) and 0xe9f84 and clear the mode when |double at 0x432298| drops below the double 0x191494; otherwise run 0xe9cd8 (0x432230, 0x432234, 0x432298, 0x43229c, 0x4321f8, 0x4321fc) and 0xe9dcc and set the mode when |double at 0x432298| exceeds the double 0x19148c. */
@@ -13449,13 +13449,13 @@ void draw_overlay_polys_f3378(void)
         uint32_t b = (uint32_t)((int32_t)EF_U32(p + 2u) >> 16);
         uint32_t c = (uint32_t)((int32_t)EF_U32(p + 4u) >> 16);
         uint32_t d = (uint32_t)((int32_t)EF_U32(p + 6u) >> 16);
-        guest_fn_c8ccc_x(b, c, b, a, col);
+        draw_tactical_line(b, c, b, a, col);
         col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-        guest_fn_c8ccc_x(d, c, b, c, col);
+        draw_tactical_line(d, c, b, c, col);
         col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-        guest_fn_c8ccc_x(d, a, d, c, col);
+        draw_tactical_line(d, a, d, c, col);
         col = (uint32_t)((int32_t)EF_U32(0x00161e1au) >> 16);
-        guest_fn_c8ccc_x(b, a, d, a, col);
+        draw_tactical_line(b, a, d, a, col);
     }
     guest_fn_c39ac();
 }
@@ -15166,8 +15166,8 @@ void draw_map_cursor_5a2d0(void)
     px = (int16_t)pr[0];
     py = (int16_t)pr[1];
     m = 5 << EF_U8(0x0012b369u);
-    guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), EF_U8(0x00128148u));
-    guest_fn_c8ccc_x((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), EF_U8(0x00128148u));
+    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px + m), (uint32_t)(py - m), (uint32_t)(px - m), EF_U8(0x00128148u));
+    draw_tactical_line((uint32_t)(py + m), (uint32_t)(px - m), (uint32_t)(py - m), (uint32_t)(px + m), EF_U8(0x00128148u));
 }
 
 /* 0xe9dcc, 175 bytes. Derive three view angles from the direction doubles at 0x464490, 0x4644a8, 0x4644b0, 0x4644b8 and 0x4644c0: 0x432220 = atan2(0x464490, -0x4644a8), 0x4321f0 = atan2(0x4644b0, 0x4644b8) and, with 0x4644c0 clamped to [double 0x19149c, 1.0] in place, 0x432288 = acos-style 0xe7df4 of it. */
@@ -16752,37 +16752,37 @@ void write_settings_file_a2bdc(void)
 	EF_U32(0x00136df8u) = h;
 	if (h == 0xffffffffu)
 		guest_callptr1_x(EF_U32(0x00132a74u), 0x0018cc74u);
-	guest_fn_a2a90_x(0x0018cc94u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018ccc4u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cb28u, 0x0013579bu, 0u, 4u);
-	guest_fn_a2a90_x(0x0018cb14u, 0x001357c8u, 0x00136f3cu, 3u);
-	guest_fn_a2a90_x(0x0018cb00u, 0x0013579au, 0x00136f0cu, 3u);
-	guest_fn_a2a90_x(0x0018cb44u, 0x001357b6u, 0u, 1u);
-	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018ccd4u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cb4cu, 0x001357b8u, 0u, 2u);
+	write_config_entry_a2a90(0x0018cc94u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cab0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018ccc4u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cb28u, 0x0013579bu, 0u, 4u);
+	write_config_entry_a2a90(0x0018cb14u, 0x001357c8u, 0x00136f3cu, 3u);
+	write_config_entry_a2a90(0x0018cb00u, 0x0013579au, 0x00136f0cu, 3u);
+	write_config_entry_a2a90(0x0018cb44u, 0x001357b6u, 0u, 1u);
+	write_config_entry_a2a90(0x0018cab0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018ccd4u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cb4cu, 0x001357b8u, 0u, 2u);
 	for (esi = 0u; esi != 0x10u; esi += 4u) {
 		if (EF_U32(0x0013577cu + esi) != 0u)
-			guest_fn_a2a90_x(0x0018cb38u, 0x0013577cu + esi, 0u, 5u);
+			write_config_entry_a2a90(0x0018cb38u, 0x0013577cu + esi, 0u, 5u);
 	}
-	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cce0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cab0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cce0u, zp, 0u, 0u);
 	v = EF_U8(0x0015f07fu);
 	EF_U8(0x0015f07fu) = (uint8_t)(v + 1u);
-	guest_fn_a2a90_x(0x0018cb54u, 0x0015f07fu, 0u, 1u);
+	write_config_entry_a2a90(0x0018cb54u, 0x0015f07fu, 0u, 1u);
 	EF_U8(0x0015f07fu) = (uint8_t)(EF_U8(0x0015f07fu) - 1u);
-	guest_fn_a2a90_x(0x0018cb5cu, 0x0015f07du, 0u, 1u);
-	guest_fn_a2a90_x(0x0018cb6cu, 0x0015f07eu, 0x00136f3cu, 3u);
-	guest_fn_a2a90_x(0x0018ccf0u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cb74u, 0x0015f099u, 0x00136f84u, 3u);
-	guest_fn_a2a90_x(0x0018cb7cu, 0x0015f09au, 0u, 1u);
-	guest_fn_a2a90_x(0x0018cab0u, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018ccfcu, zp, 0u, 0u);
-	guest_fn_a2a90_x(0x0018cb88u, 0x0015f4fdu, 0u, 4u);
-	guest_fn_a2a90_x(0x0018cb94u, 0x0015f688u, 0x00136f9cu, 3u);
-	guest_fn_a2a90_x(0x0018cba0u, 0x0015f53du, 0u, 4u);
-	guest_fn_a2a90_x(0x0018cbacu, 0x0015f57du, 0u, 4u);
+	write_config_entry_a2a90(0x0018cb5cu, 0x0015f07du, 0u, 1u);
+	write_config_entry_a2a90(0x0018cb6cu, 0x0015f07eu, 0x00136f3cu, 3u);
+	write_config_entry_a2a90(0x0018ccf0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cb74u, 0x0015f099u, 0x00136f84u, 3u);
+	write_config_entry_a2a90(0x0018cb7cu, 0x0015f09au, 0u, 1u);
+	write_config_entry_a2a90(0x0018cab0u, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018ccfcu, zp, 0u, 0u);
+	write_config_entry_a2a90(0x0018cb88u, 0x0015f4fdu, 0u, 4u);
+	write_config_entry_a2a90(0x0018cb94u, 0x0015f688u, 0x00136f9cu, 3u);
+	write_config_entry_a2a90(0x0018cba0u, 0x0015f53du, 0u, 4u);
+	write_config_entry_a2a90(0x0018cbacu, 0x0015f57du, 0u, 4u);
 	guest_fn_a7990(EF_U32(0x00136df8u));
 }
 
@@ -17802,12 +17802,12 @@ void draw_bearing_marker_5d080(ef_addr32 ptr)
 	XM = X - r;
 	YM = Y - r;
 	col = EF_U8(0x00128148u);
-	guest_fn_c8ccc_x((uint32_t)YM, (uint32_t)XM, (uint32_t)YP, (uint32_t)XP, col);
-	guest_fn_c8ccc_x((uint32_t)YP, (uint32_t)XM, (uint32_t)YM, (uint32_t)XP, col);
-	guest_fn_c8ccc_x((uint32_t)Y, (uint32_t)XP, (uint32_t)YM, (uint32_t)X, col);
-	guest_fn_c8ccc_x((uint32_t)YP, (uint32_t)X, (uint32_t)Y, (uint32_t)XP, col);
-	guest_fn_c8ccc_x((uint32_t)Y, (uint32_t)XM, (uint32_t)YP, (uint32_t)X, col);
-	guest_fn_c8ccc_x((uint32_t)YM, (uint32_t)X, (uint32_t)Y, (uint32_t)XM, col);
+	draw_tactical_line((uint32_t)YM, (uint32_t)XM, (uint32_t)YP, (uint32_t)XP, col);
+	draw_tactical_line((uint32_t)YP, (uint32_t)XM, (uint32_t)YM, (uint32_t)XP, col);
+	draw_tactical_line((uint32_t)Y, (uint32_t)XP, (uint32_t)YM, (uint32_t)X, col);
+	draw_tactical_line((uint32_t)YP, (uint32_t)X, (uint32_t)Y, (uint32_t)XP, col);
+	draw_tactical_line((uint32_t)Y, (uint32_t)XM, (uint32_t)YP, (uint32_t)X, col);
+	draw_tactical_line((uint32_t)YM, (uint32_t)X, (uint32_t)Y, (uint32_t)XM, col);
 }
 
 /* 0x59998, 321 bytes. Draw the label of the selected tactical unit (unit id: signed word 0x1f71ca, via 0x7489c; nothing when missing). The anchor comes from the 15-byte entry 0x128170 + 15 * byte 0x1a6d1b: X = word +0, base Y = word +2, offset word +6 (times 3, divided by 6). When byte 0x1a81e5 is set a text (format 0x185e88) is drawn first at (word +2 minus the metric of that text, 0x594a4; offset - 0x18). Then the unit's weapon slot (signed byte at unit +0x1d7, 0x14 = none) selects a name pointer at 0x12bc6c + 145 * (signed byte at unit + 3 * slot + 0x19b); with a name, the count (word at unit + 3 * slot + 0x19c for slot 0x13, else 0x5aa10) is formatted with "%s %d"-style format 0x185e8c and drawn at (X, offset) (without a count the name pointer itself is the aux argument), and finally 0x59adc runs. */
