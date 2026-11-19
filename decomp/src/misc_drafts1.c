@@ -422,7 +422,7 @@ void format_state_bytes_82b6c(uint32_t buf)
 /* 0x80374, 80 bytes. Create two entries with 0xd7764 (the first with the caller's EAX and parameters 1, 1, 0x5622, 0x7f, 1, 1; the second for the string 0x18878c), store them at 0x1f9020/0x1f9024, set 0x12b0f4 and process the list at 0x1f9020. */
 void init_sound_entries_80374(uint32_t eax)
 {
-    EF_U8(0x0012b0f4u) = 1u;
+    g_menu_animation_panel_active = 1u;
     EF_U32(0x001f9020u) = create_entry_d7764(eax, 1u, 1u, 0x5622u, 0x7fu, 1u, 1u);
     EF_U32(0x001f9024u) = create_entry_d7764(0x0018878cu, 0u, 0u, 0u, 0u, 0u, 0u);
     guest_fn_d6f90(0x001f9020u, 0u, 0u);
@@ -681,17 +681,17 @@ void redraw_entries_a6038(void)
 {
     uint16_t i;
     uint16_t count;
-    if (EF_U32(0x0041eeacu) != 0u && EF_U8(0x0041ef06u) != 0u)
-        put_screen_rows_eb050(0u, 0u, (uint16_t)g_video_width, (uint16_t)g_video_height, EF_U32(0x0041eeacu));
+    if (g_ui_reset_state != 0u && EF_U8(0x0041ef06u) != 0u)
+        put_screen_rows_eb050(0u, 0u, (uint16_t)g_video_width, (uint16_t)g_video_height, g_ui_reset_state);
     else
         tail_jump_c9ec4();
-    count = EF_U16(0x0041eed8u);
+    count = g_ui_state_word_41eed8;
     if (count != 0u) {
         i = 0u;
         do {
             redraw_item_a5ef8((uint32_t)EF_U16(0x0041eda8u + (uint32_t)i * 2u));
             i++;
-        } while (i < EF_U16(0x0041eed8u));
+        } while (i < g_ui_state_word_41eed8);
     }
 }
 
@@ -863,13 +863,13 @@ void append_entry_and_children_a499c(uint32_t id)
     uint32_t i;
     uint32_t rec;
     id &= 0xffffu;
-    if (id == 0u || id > EF_U16(0x0041eed8u))
+    if (id == 0u || id > g_ui_state_word_41eed8)
         return;
     rec = EF_U32(0x0041edfcu + id * 4u);
     if (rec == 0u || (EF_U8(rec + 0x3bu) & 8u) == 0u)
         return;
     append_id_a479c((uint16_t)id);
-    for (i = 1u; (int32_t)i <= (int32_t)EF_U16(0x0041eed8u); i++) {
+    for (i = 1u; (int32_t)i <= (int32_t)g_ui_state_word_41eed8; i++) {
         if (EF_U8(EF_U32(0x0041edfcu + i * 4u) + 0x11u) == id)
             guest_fn_a48ac_x(i & 0xffffu);
     }
@@ -987,7 +987,7 @@ void release_runtime_buffers_1046c4(void)
 /* Draw a glyph bitmap: rows of mask bytes starting at tbl, one pixel per set bit (starting at bit first, going down), written as colour to the row start addresses of the screen buffer. */
 static void draw_glyph_rows(uint32_t colour, uint32_t x, uint32_t y, uint32_t tbl, uint32_t rows, uint32_t width, uint32_t first_bit)
 {
-    uint32_t stride = EF_U32(0x001631f4u);
+    uint32_t stride = g_small_glyph_stride;
     uint32_t p = EF_U32(0x0015b754u) + EF_U32(0x00163200u + y * 4u) + x;
     uint32_t r;
     uint32_t b;
@@ -999,7 +999,7 @@ static void draw_glyph_rows(uint32_t colour, uint32_t x, uint32_t y, uint32_t tb
         }
         p += stride;
     }
-    EF_U32(0x001631f4u) = stride;
+    g_small_glyph_stride = stride;
 }
 
 /* 0xeaf80, 136 bytes. Draw a 6x5 glyph (index ecx, 5 mask bytes at 0x160648) in colour al at (x = edx, y row = ebx). */
@@ -1367,7 +1367,7 @@ void update_slot_texts_78a0c(void)
 /* 0x34b2c, 158 bytes. Dispatch on the state byte 0x13578e (3..19): rebuild the child dialog for the matching label, update the buttons (states 4 and 13), clear 0x15f07f and run 0xa2bdc (state 5); any other state reports an error through 0x132a74. */
 void dispatch_dialog_state_34b2c(void)
 {
-    uint8_t idx = (uint8_t)(EF_U8(0x0013578eu) - 3u);
+    uint8_t idx = (uint8_t)(g_comms_initialize_status - 3u);
     uint32_t label = 0u;
     if (idx > 16u) {
         guest_callptr2_x(g_gui_error_hook, 0x00182ed4u, EF_U32(0x00135790u));
@@ -1380,7 +1380,7 @@ void dispatch_dialog_state_34b2c(void)
         update_buttons_33e78();
         return;
     case 2:
-        EF_U8(0x0015f07fu) = 0u;
+        g_serial_port_index = 0u;
         write_settings_file_a2bdc();
         return;
     case 3: label = 0x00182e8cu; break;
@@ -1791,7 +1791,7 @@ uint8_t classify_cell_85bc8(ef_addr32 pos)
     int32_t row = (400 - (int16_t)EF_U16(pos)) / 10;
     int32_t col = (int16_t)EF_U16(pos + 2u) / 10;
     uint8_t cell = EF_U8(0x00134d8au + (uint32_t)(row * 40 + col));
-    if (EF_U8(0x00125846u) == 3u && g_world_grid_marker == 0u) {
+    if (g_frontend_connection_mode == 3u && g_world_grid_marker == 0u) {
         if ((uint16_t)group_flag_negative_cc1ac(0u, cell, 0x00137980u) != 0u)
             return 0u;
         if ((uint16_t)group_flag_positive_cc22c(0u, cell, 0x00137980u) != 0u)
@@ -1953,7 +1953,7 @@ ef_addr32 alloc_stream_slot_fa6d3(void)
 /* 0xcd957, 79 bytes. Copy a SRC block of ROWS rows of WIDTH bytes to the frame buffer at (X, Y), skipping zero (transparent) source bytes; SKIP is added to the source pointer after each row (ret 24). */
 void blit_transparent_cd957(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t skip, uint32_t rows, uint32_t width, int32_t y, int32_t x, ef_addr32 src)
 {
-    uint32_t pitch = EF_U32(0x001631f4u);
+    uint32_t pitch = g_small_glyph_stride;
     uint32_t dst = EF_U32(0x00163200u + (uint32_t)y * 4u) + EF_U32(0x0015b754u) + (uint32_t)x;
     (void)u0; (void)u1; (void)u2; (void)u3;
     rows &= 0xffffu;
@@ -2072,7 +2072,7 @@ void round_double_to_int64_10e28a(ef_addr32 p)
 void show_main_widgets_7cc5c(void)
 {
     ef_addr32 w;
-    EF_U8(0x00137a00u) = 1u;
+    g_page_value_updates_enabled = 1u;
     release_parser_buffers();
     if (EF_U8(0x00125839u) == 1u) {
         w = find_named_or_abort_a46cc(0x00187f74u);
@@ -2392,10 +2392,10 @@ void advance_object_vectors_a0174(ef_addr32 obj)
 /* 0x1a3cc, 176 bytes. Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and advance the script position (word 0x122c7e); at the script end toggle the mode word 0x198438 and push the matching event (0x18188c or 0x18189c), otherwise a mismatch rewinds to the start. Only runs while 0x41f7c8 and 0x41f833 are non-zero. */
 void step_demo_script_1a3cc(void)
 {
-    if (EF_U8(0x0041f7c8u) == 0u || EF_U8(0x0041f833u) == 0u)
+    if (EF_U8(0x0041f7c8u) == 0u || g_ui_state_flag_41f833 == 0u)
         return;
-    if (EF_U8(0x0041f833u) == EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu))) {
-        EF_U8(0x0041f833u) = 0u;
+    if (g_ui_state_flag_41f833 == EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu))) {
+        g_ui_state_flag_41f833 = 0u;
         EF_U16(0x00122c7eu) = (uint16_t)(EF_U16(0x00122c7eu) + 1u);
         if (EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu)) != 0u)
             return;
@@ -2804,7 +2804,7 @@ void draw_glyph_7x7_e5cf0(int32_t x, int32_t y, int32_t glyph)
                 mask >>= 1;
             }
         }
-        dst += EF_U32(0x001631f4u);
+        dst += g_small_glyph_stride;
     }
 }
 
@@ -2995,7 +2995,7 @@ void fill_rect_clipped_cec00(uint32_t color, int32_t x0, int32_t y0, int32_t x1,
     width = x1 - x0 + 1;
     for (; y0 <= y1; y0++) {
         fill_bytes_b3fb0(dst, (uint8_t)color, (uint32_t)width);
-        dst += EF_U32(0x001631f4u);
+        dst += g_small_glyph_stride;
     }
 }
 
@@ -3212,7 +3212,7 @@ uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
     uint16_t orient = 0u;
     uint32_t win = 0u;
     int16_t i;
-    if (g_tactical_action_enabled != 0u && EF_U8(0x00121ec6u) == 0u) {
+    if (g_tactical_action_enabled != 0u && g_runtime_coordinate_latch == 0u) {
         orient = record_flag_bits56((int16_t)EF_U16(0x001f8ec2u));
         win = script_cursor_data_cd29c();
     }
@@ -3220,7 +3220,7 @@ uint32_t find_entry_at_cursor_11014(ef_addr32 obj)
         uint32_t e = EF_U32(obj + 0x2cu) + (uint32_t)(int32_t)i * 0x15u;
         uint32_t px = EF_U16(e + 7u);
         uint32_t py = EF_U16(e + 9u);
-        if (g_tactical_action_enabled != 0u && EF_U8(0x00121ec6u) == 0u) {
+        if (g_tactical_action_enabled != 0u && g_runtime_coordinate_latch == 0u) {
             transform_runtime_word_pair(orient, (uint32_t)(uintptr_t)&px, (uint32_t)(uintptr_t)&py);
             if ((int16_t)px > (int16_t)EF_U16(win) && (int16_t)px < (int16_t)EF_U16(win + 6u)
                 && (int16_t)py > (int16_t)EF_U16(win + 4u) && (int16_t)py < (int16_t)EF_U16(win + 0xau))
@@ -3637,7 +3637,7 @@ void copy_rows_eb174(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
         return;
     do {
         copy_blocks_e9a24(len & 0xffffu, src, dst);
-        dst += EF_U32(0x001631f4u);
+        dst += g_small_glyph_stride;
         src += step & 0xffffu;
         count--;
     } while ((uint16_t)count != 0u);
@@ -3760,7 +3760,7 @@ uint8_t check_data_file_e3b7c(uint32_t name)
 /* 0xe2ba0, 157 bytes. Fill a diamond of colour COLOR (byte) into the 8-bit frame buffer: top row at Y - SIZE, starting 1 pixel wide at column X and widening by two pixels per row (shifting one column left) until 2 * SIZE, then narrowing again. */
 void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size)
 {
-    uint32_t pitch = EF_U32(0x001631f4u);
+    uint32_t pitch = g_small_glyph_stride;
     int16_t cx = (int16_t)size;
     int16_t row = (int16_t)(y - (uint32_t)(int32_t)cx);
     uint32_t p = (uint32_t)(int32_t)(int16_t)x + EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)(int32_t)row * 4u);
@@ -3778,7 +3778,7 @@ void fill_diamond_e2ba0(uint32_t color, uint32_t x, uint32_t y, uint32_t size)
         p += pitch - (uint32_t)(int32_t)n + 1u;
         w = (int16_t)(w - 2);
     }
-    EF_U32(0x001631f4u) = pitch;
+    g_small_glyph_stride = pitch;
 }
 
 /* 0xe8484, 159 bytes. Draw the outline boxes of the scene entry KEY at offset (X, Y, Z): the offset is stored in 0x464370/74/78, the entry kind byte in 0x46437c, and for every record in the entry's list (stride in words at +0, vertex index word at +4) a box is outlined with 0xe853c from the vertex table. */
@@ -3845,21 +3845,21 @@ uint32_t pump_records_eab44(void)
     uint32_t pos;
     uint16_t pass;
     EF_U32(0x00484158u) = (uint32_t)now;
-    if (now - EF_S32(0x00484154u) < (int32_t)EF_U16(0x00484466u))
+    if (now - EF_S32(0x00484154u) < (int32_t)g_data_playback_tick_interval)
         return 1u;
-    EF_U32(0x00484154u) = (uint32_t)now;
+    g_data_playback_last_tick = (uint32_t)now;
     read_data_block_eaaf4();
     guest_fn_f9ee0_x(0x00464580u, 0x00474360u);
     guest_fn_10dfec_x(EF_U32(0x0048415cu), 0x00464580u);
-    pass = EF_U16(0x00484468u);
+    pass = g_data_playback_pass;
     if (pass != EF_U16(0x00484162u)) {
-        EF_U16(0x00484468u) = (uint16_t)(pass + 1u);
+        g_data_playback_pass = (uint16_t)(pass + 1u);
         return 1u;
     }
-    EF_U16(0x00484468u) = 2u;
-    ctx = EF_U32(0x00160644u);
+    g_data_playback_pass = 2u;
+    ctx = g_data_playback_file_context;
     pos = seek_context_9cee8(0u, ctx);
-    seek_context_9cee8(EF_U32(0x00484150u) - pos, ctx);
+    seek_context_9cee8(g_data_playback_rewind_position - pos, ctx);
     return 0u;
 }
 
@@ -4118,9 +4118,9 @@ void show_splash_c90e0(void)
         EF_U8(0x0041ef06u) = 0u;
         return;
     }
-    if (EF_U32(0x0041eeacu) == 0u) {
-        EF_U32(0x0041eeacu) = arena_take_e29e8(0x0003e800u);
-        if (EF_U32(0x0041eeacu) == 0u)
+    if (g_ui_reset_state == 0u) {
+        g_ui_reset_state = arena_take_e29e8(0x0003e800u);
+        if (g_ui_reset_state == 0u)
             guest_callptr1_x(g_gui_error_hook, 0x0018efe0u);
     }
     select_buffer_146e40();
@@ -4129,7 +4129,7 @@ void show_splash_c90e0(void)
     strcat_9ca57(b, 0x0018f01cu);
     if ((start_driver_c34cc(b) & 0xffffu) == 0u)
         guest_callptr2_x(g_gui_error_hook, 0x0018f024u, b);
-    get_screen_rows_eb1f0(0u, 0u, 0x280u, 0x190u, EF_U32(0x0041eeacu));
+    get_screen_rows_eb1f0(0u, 0u, 0x280u, 0x190u, g_ui_reset_state);
     copy_blocks_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
     leave_scroll_mode_c39ac();
 }
@@ -4156,7 +4156,7 @@ void draw_planar_sprite_cdd18(uint32_t dst, uint32_t src, uint32_t xmin, uint32_
                 }
             }
             src += EF_U32(0x004201a0u);
-            row_ptr += EF_U32(0x001631f4u);
+            row_ptr += g_small_glyph_stride;
             height = EF_S32(0x004201a4u);
         }
     }
@@ -4291,7 +4291,7 @@ void draw_entry_list_78848(void)
 /* 0xa48ac, 237 bytes. Mark the item ID (1..count in 0x41eed8, flag 8 set in byte +0x3b of its record in the table 0x41edfc) as ordered with flag 4. When ID is already in the id list 0x41eda8 only the flag is set; otherwise, if the list contains AFTER, ID is inserted behind it and the tail is shifted right by one word (the last entry drops out). */
 void insert_ordered_id_a48ac(uint32_t id, uint32_t after)
 {
-    uint16_t count = EF_U16(0x0041eed8u);
+    uint16_t count = g_ui_state_word_41eed8;
     uint16_t i;
     uint16_t j;
     uint8_t found = 0u;
@@ -4362,7 +4362,7 @@ void accumulate_samples_a35bc(void)
     for (i = 0; i < (int32_t)EF_U8(EF_U32(0x00136b78u)); i++) {
         uint32_t id = EF_U8(EF_U32(0x00136b74u) + (uint32_t)i);
         uint32_t rec = EF_U32(0x00135878u + id * 32u);
-        int16_t diff = (int16_t)(EF_U16(0x001357d6u) - EF_U16(rec + 0xbu));
+        int16_t diff = (int16_t)(g_comms_initial_clock_dx - EF_U16(rec + 0xbu));
         uint32_t kind = EF_U8(rec + 6u);
         uint32_t sum;
         if (diff > 100)
@@ -4372,7 +4372,7 @@ void accumulate_samples_a35bc(void)
         EF_U16(0x001357dau + kind * 2u)++;
         sum = EF_U32(0x001357ecu + kind * 4u) + (uint32_t)(int32_t)diff;
         EF_U32(0x001357ecu + kind * 4u) = sum;
-        if ((uint32_t)(uint16_t)(EF_U16(0x001357d6u) - EF_U16(0x0013580cu + kind * 2u)) > kind + 0x1f4u) {
+        if ((uint32_t)(uint16_t)(g_comms_initial_clock_dx - EF_U16(0x0013580cu + kind * 2u)) > kind + 0x1f4u) {
             uint8_t pkt[8];
             uint16_t n = EF_U16(0x001357dau + kind * 2u);
             pkt[0] = (uint8_t)kind;
@@ -4385,7 +4385,7 @@ void accumulate_samples_a35bc(void)
             issue_request_a3e50((uint32_t)(uintptr_t)pkt, 0xdu, 6u);
             EF_U16(0x001357dau + kind * 2u) = 0u;
             EF_U32(0x001357ecu + kind * 4u) = 0u;
-            EF_U16(0x0013580cu + kind * 2u) = EF_U16(0x001357d6u);
+            EF_U16(0x0013580cu + kind * 2u) = g_comms_initial_clock_dx;
         }
     }
 }
@@ -4456,7 +4456,7 @@ void draw_glyph_clipped_e5f64(int32_t x, int32_t y, uint32_t code)
             }
         }
         if (rowptr != 0u)
-            rowptr += EF_U32(0x001631f4u);
+            rowptr += g_small_glyph_stride;
         y++;
     }
     EF_U32(0x0017cf9cu) = (uint32_t)left;
@@ -4470,7 +4470,7 @@ void tally_roster_kinds_50658(void)
     EF_U8(0x001a5534u) = 0u;
     for (i = 0; i < 4; i++)
         EF_U8(0x001a5536u + (uint32_t)i) = 0u;
-    for (i = 0; i < (int16_t)EF_U8(0x001a5531u); i++) {
+    for (i = 0; i < (int16_t)g_assignment_entry_count; i++) {
         uint8_t k;
         EF_U8(0x001a5520u + (uint32_t)i) = 0u;
         k = (uint8_t)(EF_U8(0x001a5510u + (uint32_t)i) - 1u);
@@ -4572,16 +4572,16 @@ static void start_script_record(int32_t n, uint32_t extra)
     EF_U16(0x0041718cu) = EF_U16(0x00417192u);
     EF_U32(0x001600b4u) = 0x00417188u;
     EF_U32(0x001600a8u) = (uint32_t)(int32_t)(int16_t)EF_U16(rec);
-    EF_U32(0x001600b8u) = 1u;
+    g_script_record_repeat = 1u;
     EF_U32(0x001600acu) = rec + 0x14u;
     EF_U32(0x001600b0u) = 0x00417154u;
     if (EF_U8(rec + 0x1cu) != 0u) {
         EF_U16(0x00417188u) = (uint16_t)(EF_U16(0x00417188u) + EF_U16(pos));
         EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x0041718au) + EF_U16(pos + 2u));
         EF_U16(0x0041718cu) = (uint16_t)(EF_U16(0x0041718cu) + EF_U16(pos + 4u));
-        EF_U32(0x001600b8u) = EF_U8(rec + 0x1cu);
+        g_script_record_repeat = EF_U8(rec + 0x1cu);
     }
-    EF_U32(0x001600c0u) = guest_callptr_stack1_ret_x(
+    g_script_record_lookup_result = guest_callptr_stack1_ret_x(
         EF_U32(0x00132b14u), (uint32_t)(int32_t)(int16_t)EF_U16(rec));
     guest_fn_160255_x();
 }
@@ -4595,7 +4595,7 @@ void start_script_record_a060c(int32_t n)
 /* 0x9fb00, 254 bytes. Start the script record number N of the current page, shifted down by the offset word 0x417222. */
 void start_script_record_9fb00(int32_t n)
 {
-    start_script_record(n, EF_U16(0x00417222u));
+    start_script_record(n, g_page_record_rotation_bias);
 }
 
 /* 0xfb954, 254 bytes. Allocate a 4-byte route record (tag 0x1935bc) and fill it from the class A, sub-class B and slot C: class 0xe with B = 9 gives {12, 11, 17, 17}; class 0xe with B = 0 gives {3, 5, 9, 17} for slots 0, 2, 5 and {6, 4, 7, 8} for slots 1, 3, 4; classes 0x15..0x17 with B = 2 give {0, 1, 17, 17} (slots 0, 2, 5) or {4, 2, 17, 17}, and with B = 0 give {3, 5, 9, 17} or {7, 6, 7, 8}. Any other combination leaves the record untouched. Returns the record. */
@@ -4645,10 +4645,10 @@ void dispatch_pending_key_1a47c(void)
     EF_U16(0x0019843cu) = (uint16_t)(EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u));
     EF_U16(0x00198420u) = EF_U8(0x0041f7c8u);
     EF_U16(0x00198422u) = EF_U8(0x0041f7adu);
-    if (EF_U8(0x0041f833u) == 0u)
+    if (g_ui_state_flag_41f833 == 0u)
         return;
-    key = EF_U8(0x0041f833u);
-    if (EF_U16(0x0012288au) != 0u) {
+    key = g_ui_state_flag_41f833;
+    if (g_runtime_slot_generation != 0u) {
         int32_t mode = (int8_t)EF_U8(0x00122c53u);
         if (mode >= 1 && mode <= 4)
             find_letter_entry_11de0(key);
@@ -4665,7 +4665,7 @@ void dispatch_pending_key_1a47c(void)
         if (fn != 0u)
             guest_callptr0_x(fn);
     }
-    EF_U8(0x0041f833u) = 0u;
+    g_ui_state_flag_41f833 = 0u;
 }
 
 /* 0x11de0, 155 bytes. Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): scan up to 18 entries (stride 0x1d from 0x121fcc, starting at the table's base word 0x121ec8[table]) for a first byte equal to KEY, and on a hit call 0x12d90 with the entry and table numbers, set the word 0x12288a and step the letter table (0x11d44). */
@@ -4695,7 +4695,7 @@ void find_letter_entry_11de0(uint32_t key)
     if (!found)
         return;
     guest_fn_12d90((uint32_t)(int32_t)i, (uint32_t)(int32_t)table);
-    EF_U16(0x0012288au) = 1u;
+    g_runtime_slot_generation = 1u;
     step_letter_table_11d44();
 }
 
@@ -5105,39 +5105,39 @@ void redraw_item_a5ef8(uint32_t id)
     uint32_t rec;
     uint8_t bl = 0u;
     uint8_t outer;
-    if ((uint16_t)id == 0u || (uint16_t)id > EF_U16(0x0041eed8u))
+    if ((uint16_t)id == 0u || (uint16_t)id > g_ui_state_word_41eed8)
         return;
-    if (EF_U8(0x0041f2e5u) == 1u)
+    if (g_ui_state_byte_41f2e5 == 1u)
         guest_callptr3_x(g_gui_error_hook, 0x0018d03cu, EF_U32(0x0041edfcu + (uint32_t)(uint16_t)id * 4u), EF_U32(0x0041eea0u));
     rec = EF_U32(0x0041edfcu + (uint32_t)(uint16_t)id * 4u);
     if ((EF_U8(rec + 0x3bu) & 4u) == 0u)
         return;
-    outer = EF_U8(0x0013725cu);
+    outer = g_ui_state_byte_13725c;
     if (outer == 0u) {
-        EF_U8(0x0013725cu) = 2u;
+        g_ui_state_byte_13725c = 2u;
         bl = (uint8_t)guest_fn_e5870_x(rec);
         if (bl == 1u) {
             save_rect_list_e5114();
         } else if (bl == 2u) {
-            EF_U8(0x0013725cu) = outer;
+            g_ui_state_byte_13725c = outer;
             return;
         }
     }
     guest_fn_e5960(rec);
     clip_rect_to_screen_e58a8();
     draw_widget_a5b70(rec);
-    if (EF_U8(0x00137268u) != 0u || EF_U8(0x0013725du) != 0u)
+    if (EF_U8(0x00137268u) != 0u || g_ui_state_byte_13725d != 0u)
         tail_jump_ab954(0u);
     redraw_all_children_a7260(rec);
     copy_record_words_e599c(rec);
     clip_rect_to_screen_e58a8();
     guest_fn_a5ca4_x(rec);
-    if (EF_U8(0x00137268u) != 0u || EF_U8(0x0013725du) != 0u)
+    if (EF_U8(0x00137268u) != 0u || g_ui_state_byte_13725d != 0u)
         tail_jump_ab954(0u);
-    if (EF_U8(0x0013725cu) == 2u) {
+    if (g_ui_state_byte_13725c == 2u) {
         if (bl == 1u)
             restore_rect_list_e516c();
-        EF_U8(0x0013725cu) = 0u;
+        g_ui_state_byte_13725c = 0u;
     }
 }
 
@@ -5146,7 +5146,7 @@ void draw_mission_clock_78e1c(void)
 {
     char buf[0x14];
     uint32_t b = (uint32_t)(uintptr_t)buf;
-    if (EF_U8(0x00125846u) == 1u) {
+    if (g_frontend_connection_mode == 1u) {
         uint16_t hour = 0u;
         uint16_t minute = 0u;
         uint32_t rec = EF_U32(0x001379c4u);
@@ -5197,7 +5197,7 @@ void advance_follow_slot_3a148(int32_t a)
     if (unit == 0u || EF_U16(0x001a1506u) == 0u)
         return;
     r = half_word_9c960() & 0xffffu;
-    if (r % 100u == 0u && EF_U8(0x00125846u) != 3u)
+    if (r % 100u == 0u && g_frontend_connection_mode != 3u)
         return;
     cnt = EF_U32(0x001a1860u) + (uint32_t)EF_U8(unit + 0x187u) * 4u;
     EF_U16(cnt)++;
@@ -5220,19 +5220,19 @@ void advance_follow_slot_3a148(int32_t a)
 /* 0xac2e4, 289 bytes. Register the text file NAME in the recent-file list (21-byte names at 0x41e960, count word 0x41eecc, limit 16 with error 0x18dbac; names above 8 characters give error 0x18dbe4): a name already present (0x9d524 == 0) ends the call; otherwise it is appended and, when FLAG is set, also stored in the first free slot of the second list at 0x41eab0. The file is then loaded (0xf819c), the widgets and id tables are rebuilt and the list-changed byte 0x137255 is set. */
 void add_recent_file_ac2e4(uint32_t name, uint32_t flag)
 {
-    uint16_t n = EF_U16(0x0041eeccu);
+    uint16_t n = g_registered_callback_count;
     uint16_t i;
     if (n >= 0x10u)
         guest_callptr2_x(g_gui_error_hook, 0x0018dbacu, 0x10u);
     if (guest_string_length(name) > 8u)
         guest_callptr2_x(g_gui_error_hook, 0x0018dbe4u, 8u);
-    n = EF_U16(0x0041eeccu);
+    n = g_registered_callback_count;
     for (i = 0; i < n; i++) {
         if (ascii_stricmp_9d524(0x0041e960u + (uint32_t)i * 0x15u, name) == 0u)
             return;
-        n = EF_U16(0x0041eeccu);
+        n = g_registered_callback_count;
     }
-    copy_string_9d749(0x0041e960u + (uint32_t)EF_U16(0x0041eeccu) * 0x15u, name);
+    copy_string_9d749(0x0041e960u + (uint32_t)g_registered_callback_count * 0x15u, name);
     if ((uint8_t)flag != 0u) {
         uint32_t k = 0u;
         while (EF_U8(0x0041eab0u + k * 0x15u) != 0u && k < 0x10u)
@@ -5246,7 +5246,7 @@ void add_recent_file_ac2e4(uint32_t name, uint32_t flag)
     clear_id_table_a4e6c();
     rebuild_id_table_a4e14();
     EF_U8(0x00137255u) = 1u;
-    EF_U16(0x0041eeccu) = (uint16_t)(EF_U16(0x0041eeccu) + 1u);
+    g_registered_callback_count = (uint16_t)(g_registered_callback_count + 1u);
 }
 
 /* 0x56318, 298 bytes. Tick the broadcast ring entry 0x127db8 (55-byte entries from 0x1a63c0, at most 10): its countdown word (+8) falls by the frame step 0x127d92; on expiry it restarts at 20, the repeat counter (+0xa) drops by one and, while it was nonzero, every other player (below the count byte 0x12583a, not the local player 0x1a666b) whose flag byte in the entry is clear gets the message 0x2b through 0xa3f74 (the player is recorded in +0x31). The ring position advances (wrapping at 10) and the idle word 0x127dae counts down to 0. */
@@ -5276,10 +5276,10 @@ void tick_broadcast_ring_56318(void)
     EF_S32(0x00127db8u) = EF_S32(0x00127db8u) + 1;
     if (EF_S32(0x00127db8u) >= 10)
         EF_S32(0x00127db8u) = 0;
-    if (EF_U16(0x00127daeu) != 0u)
-        EF_U16(0x00127daeu) = (uint16_t)(EF_U16(0x00127daeu) - EF_U16(0x00127d92u));
-    if ((int16_t)EF_U16(0x00127daeu) < 0)
-        EF_U16(0x00127daeu) = 0u;
+    if (g_scene_latch_b != 0u)
+        g_scene_latch_b = (uint16_t)(g_scene_latch_b - EF_U16(0x00127d92u));
+    if ((int16_t)g_scene_latch_b < 0)
+        g_scene_latch_b = 0u;
 }
 
 /* 0x89698, 300 bytes. Pick the closest enemy for the unit OBJ: for every group of the table 0x1a14f8 (0x45-byte entries, 0x1a1506 of them) whose squared distance (position longs at +7, +0xb, +0xf scaled by >> 8 against the unit's position words) is inside the squared range taken from the unit-type table 0x12bca3[type * 0x91], test its ten member slots (words at +0x28): a live record (0x8ffe8) accepted by 0x906b4 that is not flagged 2 and closer than the current best (+0x63) and approved by 0x89060 becomes the new target (+0x5b) with its distance (+0x63). Returns whether a target was found. */
@@ -5679,7 +5679,7 @@ void advance_playlist_a94e4(uint32_t list)
 {
     uint32_t flags, i;
     int16_t idx;
-    if (EF_U8(0x001371ffu) == 0u && EF_U16(list + 0x12u) != 0u) {
+    if (g_parser_state_1371ff == 0u && EF_U16(list + 0x12u) != 0u) {
         step_list_cursor_a9490(list, (int16_t)(EF_U16(list + 0x12u) - 1u));
         EF_U16(list + 0x12u) = 0u;
         return;
@@ -5804,7 +5804,7 @@ void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
     if (sy >= 0)
         dst = EF_U32(0x00163200u + (uint32_t)sy * 4u);
     else
-        dst = (uint32_t)sy * EF_U32(0x001631f4u);
+        dst = (uint32_t)sy * g_small_glyph_stride;
     dst += EF_U32(0x0015b754u) + (uint32_t)sx;
     EF_U32(0x004201a0u) = (uint32_t)((int32_t)w >> 2);
     EF_U32(0x004201a4u) = h;
@@ -5864,7 +5864,7 @@ uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
 /* 0xe1570, 337 bytes. Install the draw routine table (dwords 0x136ba0..0x136bc4, code addresses) for the renderer mode in byte 0x13579a: 0, 1 and 2 select three sets of routines (modes 1 and 2 also fill 0x136bb0, mode 2 additionally 0x136bb4/b8), any other mode only sets 0x136ba0 to the default 0xe1568. */
 void install_render_table_e1570(void)
 {
-    switch (EF_U8(0x0013579au)) {
+    switch (g_network_driver_mode) {
     case 0:
         EF_U32(0x00136ba8u) = 0x000ecb84u;
         EF_U32(0x00136bacu) = 0x000ecb80u;
@@ -6019,7 +6019,7 @@ void latch_control_bits_84788(uint32_t rec)
     EF_U16(0x001fcbd2u) = EF_U16(rec + 0x2au);
     EF_U32(rec + 0x2au) = 0u;
     EF_U32(rec + 0x26u) = 0u;
-    EF_U32(0x001fcbbcu) = EF_U32(0x00197c14u);
+    EF_U32(0x001fcbbcu) = g_runtime_current_tick;
 }
 
 /* 0x436dc, 342 bytes. Draw the map markers for the objects of the list at *LIST (nodes of type 0x0e and 0x17, link +4; group flag tables checked against HEAD): when the node's index byte (+0xb) is flagged positive (cc22c, enabled by word 0x126554), negative (cc1ac, 0x126556) or zero (cc1ec, 0x126558) the target address is the base dword 0x126570 plus the matching position word pair (0x134325/27, 0x13431c/1e or 0x13432e/30; second word times 0x280); a 20x20 marker is then drawn at the object's screen position (words +8/+0xc of the structure at +0x13, y inverted from 0x190) with 0xca620 and, when word 0x12656a is set, a label with 0x440f4. */
@@ -6357,7 +6357,7 @@ int32_t open_shared_fa4a9(ef_addr32 name, uint32_t flags, uint32_t share, uint32
             return report_dos_error_1101e8(result & 0xffffu);
         if (mode == 0u)
             mode = 0x180u;
-        request = mode ^ EF_U32(0x0017d5bcu);
+        request = mode ^ g_file_creation_permission_mask;
         run_dos_int_ex(0x21u, (request & 0xffff00ffu) | 0x3c00u, 0u,
                        (request & 0x80u) != 0u ? 0u : 1u, name, out);
         result = (out[0] & 0x7fffffffu) | (out[6] ? 0x80000000u : 0u);
@@ -6385,7 +6385,7 @@ int32_t open_shared_fa4a9(ef_addr32 name, uint32_t flags, uint32_t share, uint32
     if (access == 1u) slot |= 2u;
     if ((flags & 0x10u) != 0u) slot |= 0x80u;
     if ((flags & 0x200u) != 0u ||
-        ((flags & 0x300u) == 0u && EF_U32(0x0016062du) == 0x200u))
+        ((flags & 0x300u) == 0u && g_default_file_translation_mode == 0x200u))
         slot |= 0x40u;
     store_flagged_value(handle, slot);
     return (int32_t)handle;
@@ -6595,7 +6595,7 @@ void put_block2_feddc(uint32_t row, uint32_t x, uint32_t colour)
     uint32_t addr = x + EF_U32(0x00163200u + row * 4u) + EF_U32(0x0015b754u);
     uint16_t w = (uint16_t)(((colour & 0xffu) << 8) | (colour & 0xffu));
     EF_U16(addr) = w;
-    EF_U16(addr + EF_U32(0x001631f4u)) = w;
+    EF_U16(addr + g_small_glyph_stride) = w;
 }
 
 /* 0xc59b7, 35 bytes. Shift three consecutive dword triples left by SHIFT (CL) with implicit registers (ESI = source, EDI = destination): the three values of each triple go to destination offsets +0, +0xc and +0x18, the destination advancing by 4 and the source by 12 per triple. Parameters are given in the order source, destination, shift. */
@@ -6745,7 +6745,7 @@ void blit_masked_cd82c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
     uint32_t s = src + (uint32_t)((int32_t)(int16_t)src_y << 8) + (uint32_t)(int32_t)(int16_t)src_x;
     uint32_t d = EF_U32(0x00163200u + (uint32_t)(int32_t)(int16_t)y * 4u) + EF_U32(0x0015b754u) +
                  (uint32_t)(int32_t)(int16_t)x;
-    uint32_t stride = EF_U32(0x001631f4u);
+    uint32_t stride = g_small_glyph_stride;
     uint32_t rows = height & 0xffffu;
     (void)u0; (void)u1; (void)u2; (void)u3;
     do {
@@ -6889,15 +6889,15 @@ void poll_modem_status_df738(void)
     uint32_t base = EF_U32(0x0015eed0u);
     uint32_t st = inp_9c430(base + 6u) & 0xffu;
     EF_U8(0x0015eed4u) = (uint8_t)st;
-    if (EF_U8(0x0013579au) == 2u && (st & 1u)) {
+    if (g_network_driver_mode == 2u && (st & 1u)) {
         if ((st & 0x10u) == 0u) {
             outp_117b0c(base + 1u, (inp_9c430(base + 1u) & 0xfdu));
         } else if (EF_U8(0x0015ef28u) != 0u) {
             outp_117b0c(base + 1u, (inp_9c430(base + 1u) & 0xffu) | 2u);
         }
     }
-    if ((EF_U8(0x0015eed4u) & 0x80u) == 0u && EF_U8(0x0013578cu) != 0u)
-        EF_U8(0x0013581eu) = 1u;
+    if ((EF_U8(0x0015eed4u) & 0x80u) == 0u && g_comms_initialized != 0u)
+        g_comms_initialize_flag_2 = 1u;
 }
 
 /* 0x11458c, 138 bytes. Cdecl (REC, KEY): look KEY up in the 6-byte entry table of the animation set at REC+0xc (count: signed word +8, entries from +0xa, key word first); when found, clear REC dword +0x30, set REC +0x14 to REC +0x10 + 8 + the entry's dword +2 and, unless dword 0x4dd808 is set, reset the four dwords at REC +0x84..+0x90 to -1. Does nothing when REC or its set is missing or KEY is not found. */
@@ -7105,10 +7105,10 @@ void open_stream_369fc(uint32_t name, uint32_t mode)
     EF_U8(0x0019f5a9u) = 2u;
     guest_fn_35de0_x(0u, 0u); /* result in EDX is stored in 0x19f32c */
     EF_U8(0x0019f59fu) = 0u;
-    EF_U32(0x0019f35cu) = (uint32_t)open_slot_a7948(0u, 0u, 0u, 0u, EF_U32(0x0019f330u));
-    if (EF_U32(0x0019f35cu) == 0xffffffffu)
+    g_session_first_handle = (uint32_t)open_slot_a7948(0u, 0u, 0u, 0u, EF_U32(0x0019f330u));
+    if (g_session_first_handle == 0xffffffffu)
         guest_callptr1_x(g_gui_error_hook, 0x00183220u);
-    EF_U8(0x0019f59eu) = 1u;
+    g_session_first_handle_owned = 1u;
     EF_U32(0x0019f354u) = arena_alloc_e2a94((uint32_t)((int32_t)(int16_t)EF_U16(0x00125900u) << 3));
 }
 
@@ -7142,9 +7142,9 @@ void build_render_object_d2584(ef_addr32 list, uint32_t count)
     uint32_t obj = 0x00420970u;
     uint32_t slot = 0x004209d0u;
     int32_t i;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x004209d0u) = count;
-    EF_U32(0x00420974u) = 0u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_vertex_count = count;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = slot;
     EF_U32(0x00420990u) = 0x001016e0u;
     EF_U32(0x00420994u) = EF_U32(((EF_U32(0x0015907cu) >> 2) * 4u) + 0x0015b86cu);
@@ -7382,12 +7382,12 @@ void build_textured_object_d2634(ef_addr32 list, uint32_t count)
     uint32_t obj = 0x00420970u;
     uint32_t slot = 0x004209d0u;
     int32_t i;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x00420974u) = 0u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = slot;
-    EF_U32(0x004209d0u) = count;
+    g_current_render_vertex_count = count;
     EF_U32(0x00420990u) = 0x001016e0u;
-    EF_U32(obj + 0x24u) = EF_U32(0x00158f0cu) != 0u ? 0x000d3cb0u : 0x000ff3bcu;
+    EF_U32(obj + 0x24u) = g_renderer_fixed_texture_mode != 0u ? 0x000d3cb0u : 0x000ff3bcu;
     for (i = 0; i < (int32_t)count; i++) {
         uint32_t v = EF_U32(0x0017bf70u) + EF_U16(list);
         EF_U32(v + 0x24u) = (uint32_t)EF_U16(0x0015997cu + (uint32_t)i * 4u) << 9;
@@ -7440,14 +7440,14 @@ void find_lowest_rank_a38f8(void)
     uint32_t list_b = EF_U32(0x00136b74u);
     uint32_t list_a = EF_U32(0x00136b84u);
     uint16_t i;
-    if (EF_U8(0x00135798u) != 0u) {
+    if (g_comms_device_ready != 0u) {
         for (i = 0u; i < EF_U8(EF_U32(0x00136b88u)); i++) {
             uint32_t rec = EF_U32(0x00135878u + ((uint32_t)EF_U8(list_a + i) << 5));
             int16_t rank = (int16_t)EF_U8(rec + 5u);
             if (best >= rank)
                 continue;
             if ((((uint32_t)EF_U8(rec + 0xdu) * 2u) & 0xffu) >> 6 & 1u) {
-                EF_U8(0x0013583cu) = 1u;
+                g_device_event_scan_enabled = 1u;
                 best = rank;
             }
         }
@@ -7457,7 +7457,7 @@ void find_lowest_rank_a38f8(void)
             if (best >= rank)
                 continue;
             if ((((uint32_t)EF_U8(rec + 0xdu) * 2u) & 0xffu) >> 6 & 1u) {
-                EF_U8(0x0013583cu) = 1u;
+                g_device_event_scan_enabled = 1u;
                 best = rank;
             }
         }
@@ -7887,7 +7887,7 @@ void load_dataset_files_c8e58(void)
     } else {
         EF_U32(0x00433f30u) = 1u;
         rebuild_remap_table_e7e30(0u, 0u, 0u);
-        EF_U32(0x00160000u) = 0u;
+        g_texture_atlas_page_index = 0u;
     }
     copy_blocks_e9a24(0x2d0u, 0x00425cbcu, 0x00419600u);
 }
@@ -7958,7 +7958,7 @@ void prepare_briefing_file_35cfc(void)
     copy_counts_35bb8();
     poll_device_ready_a42c4();
     g_world_grid_mode = 1u;
-    if (EF_U8(0x00125846u) == 3u) {
+    if (g_frontend_connection_mode == 3u) {
         uint32_t r = step_generator_a45b3() & 0xffffu;
         EF_U16(0x00125844u) = (uint16_t)(r % 3u);
         for (i = 0; i < 12u; i++)
@@ -8081,7 +8081,7 @@ void append_table_entry_16018a(void)
     uint32_t src = EF_U32(0x001600b0u);
     uint32_t d0 = EF_U32(src), d1 = EF_U32(src + 4u), d2 = EF_U32(src + 8u);
     uint8_t value = EF_U8(EF_U32(0x001600acu));
-    uint32_t idx = EF_U16(0x00146e52u);
+    uint32_t idx = g_script_queue_slot;
     uint32_t wp;
     uint16_t w0, w1, w2;
     int16_t hi = (int16_t)(d2 >> 16);
@@ -8104,9 +8104,9 @@ void append_table_entry_16018a(void)
     EF_U16(0x0014de58u + idx * 2u) = w2;
     EF_U16(0x0014ee58u + idx * 2u) = (uint16_t)EF_U32(0x001600bcu);
     if ((uint16_t)(w0 | w1 | w2) == 0u)
-        guest_fn_c552e_x(EF_U16(0x00146e52u));
+        guest_fn_c552e_x(g_script_queue_slot);
     else
-        guest_fn_c565e_x(EF_U16(0x00146e52u));
+        guest_fn_c565e_x(g_script_queue_slot);
 }
 
 /* 0xebee4, 231 bytes. Stack (ret 0xc): scale the double X by 2^N-style factors from a table. The special values at 0x195bfc / 0x195c04 are first replaced by the constants at 0x195c0c / 0x195c14; then for |N| above 0x134 X is multiplied (N >= 0) or divided (N < 0) by the double at 0x195c62 and the count reduced by 0xd8; the remainder is consumed greedily against the (word count, double factor) 10-byte table at 0x195c60 and X is multiplied (N >= 0) or divided (N < 0) by the product. Returns X in ST0. */
@@ -8553,7 +8553,7 @@ void build_row_table_fc39c(uint32_t count, uint32_t step)
         v += step;
     } while (--i != 0u);
     EF_U32(0x00164600u) = v;
-    EF_U32(0x001631f4u) = step;
+    g_small_glyph_stride = step;
     v -= step;
     EF_U32(p) = v;
     EF_U32(p + 4u) = v;
@@ -8801,7 +8801,7 @@ void load_fixed_files_c8f38(void)
     } else {
         EF_U32(0x00433f30u) = 1u;
         rebuild_remap_table_e7e30(0u, 0u, 0u);
-        EF_U32(0x00160000u) = 0u;
+        g_texture_atlas_page_index = 0u;
     }
 }
 
@@ -8932,15 +8932,15 @@ void draw_displaced_span_ffe78(void)
     int32_t x1 = (int32_t)EF_U32(0x00485fd0u) >> 16;
     int32_t lim = (int32_t)EF_U32(0x0015bdc4u) - 3;
     int32_t n, du, dv, k;
-    uint32_t u = EF_U32(0x00485ff0u), v = EF_U32(0x00485ff4u), dst;
+    uint32_t u = g_texture_left_u, v = g_texture_left_v, dst;
     if (x1 > lim)
         x1 = lim;
     n = x1 - x0;
     if (n <= 0)
         return;
     dst = EF_U32(0x0015b754u) + EF_U32(0x00163200u + (uint32_t)y * 4u) + (uint32_t)x0;
-    du = ((int32_t)EF_U32(0x00485fd8u) - (int32_t)u) / n;
-    dv = ((int32_t)EF_U32(0x00485fdcu) - (int32_t)v) / n;
+    du = ((int32_t)g_texture_right_u - (int32_t)u) / n;
+    dv = ((int32_t)g_texture_right_v - (int32_t)v) / n;
     for (k = 0; k <= n; k++) {
         uint32_t off = ((uint32_t)((int32_t)v >> 8) & 0xff00u) + ((uint32_t)((int32_t)u >> 16));
         uint32_t t = EF_U8(EF_U32(0x00159080u) + off) & 3u;
@@ -8957,8 +8957,8 @@ void build_render_list_d2500(uint32_t list, uint32_t count)
     uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
     EF_U32(tbl) = count;
     EF_U32(0x00420990u) = 0x001016e0u;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x00420974u) = 0u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = tbl;
     EF_U32(0x00420994u) = EF_U32(0x0015b800u + EF_U32(0x0015918cu) * 4u);
     if ((int32_t)count > 0) {
@@ -8978,8 +8978,8 @@ void build_render_list_d2500(uint32_t list, uint32_t count)
 void build_render_list_d2704(uint32_t list, uint32_t count)
 {
     uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x00420974u) = 0u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = tbl;
     EF_U32(tbl) = count;
     EF_U32(0x00420990u) = 0x001016e0u;
@@ -9005,9 +9005,9 @@ void build_render_list_d2704(uint32_t list, uint32_t count)
 static void build_render_list_shifted(uint32_t list, uint32_t count, uint32_t handler)
 {
     uint32_t ro = 0x00420970u, tbl = 0x004209d0u, i, obj, t = tbl;
-    uint32_t sh = EF_U32(0x00158f0cu) != 0u ? 9u : 0x10u;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x00420974u) = 0u;
+    uint32_t sh = g_renderer_fixed_texture_mode != 0u ? 9u : 0x10u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = tbl;
     EF_U32(tbl) = count;
     EF_U32(ro + 0x20u) = 0x001016e0u;
@@ -9038,7 +9038,7 @@ void build_render_list_d2c84(uint32_t list, uint32_t count)
 /* 0xd2d7c, 267 bytes. As 0xd2c84 but the handler value is the dword 0x15b884 when dword 0x158f0c is set, else 0x15b888. */
 void build_render_list_d2d7c(uint32_t list, uint32_t count)
 {
-    build_render_list_shifted(list, count, EF_U32(0x00158f0cu) != 0u ? EF_U32(0x0015b884u) : EF_U32(0x0015b888u));
+    build_render_list_shifted(list, count, g_renderer_fixed_texture_mode != 0u ? EF_U32(0x0015b884u) : EF_U32(0x0015b888u));
 }
 
 /* 0x91c98, 257 bytes. Advance the camera-preset queue: when the read index (word 0x2144ae) has not caught up with the write index (word 0x2144ac), switch the viewpoint byte 0x12db9e to the queued entry (byte table 0x214428, 2 bytes per entry; the previous value is remembered in 0x214486), set byte 0x1f88fc to 3, move the pending words 0x122c7a / 0x122c7c to 0x1f88f4 / 0x1f88f2 (unless -1), reset them to -1 and set word 0x2144b2 to 0xfa; otherwise reset both indices. Then apply a pending roll (word 0x122c54 into 0x12dba0) and, if word 0x2144a2 is set, copy the record 0x12dc10 over 0x12dbec; finally clear 0x2144a2, 0x122c54 and byte 0x12dbc4. */
@@ -9111,7 +9111,7 @@ void refresh_list_widget_348e4(void)
     uint32_t root, a, b, item, i;
     uint8_t active = 0u;
     int32_t limit;
-    if (EF_U8(0x0013578cu) == 0u)
+    if (g_comms_initialized == 0u)
         return;
     root = find_named_or_abort_a46cc(0x00182d48u);
     a = find_widget_checked_a78bc(root, 0x00182e5cu);
@@ -9136,7 +9136,7 @@ void refresh_list_widget_348e4(void)
         resize_widget_a520c(root, (int32_t)EF_U32(root + 0x43u) >> 16, (uint32_t)(int32_t)h, 1u);
     }
     if ((uint16_t)active == (uint16_t)g_tactical_lookup_count)
-        EF_U8(0x0019f59bu) = EF_U8(0x001357b0u);
+        g_session_state_byte = EF_U8(0x001357b0u);
 }
 
 /* 0x440f4, 262 bytes. Draw a sprite from the table selected by SEL (EAX low byte; EDX, EBX, ECX, then the two stack arguments S0, S1, ret 8; the implicit ESI input is the last parameter and is used unchanged for SEL > 5): the sprite address is word x + word y * 640 + the frame base dword 0x126570, where x/y are the words at BASE and BASE + 2 with BASE = 0x134565, 0x134553, 0x134541, 0x13454a, 0x13456e, 0x13455c for SEL 0..5. Calls 0xca620 with the address, the sign-extended EDX, EBX, ECX and the low words of S0 (signed) and S1. */
@@ -9229,15 +9229,15 @@ void redraw_widget_a60a8(uint32_t obj)
         }
     }
     EF_U32(0x0041eea0u) = obj;
-    EF_U8(0x0041f2e5u) = 1u;
+    g_ui_state_byte_41f2e5 = 1u;
     guest_callptr_eax_ret_x(EF_U32(obj + 0xb5u), obj);
     EF_U32(0x0041eea0u) = 0u;
-    EF_U8(0x0041f2e5u) = 0u;
+    g_ui_state_byte_41f2e5 = 0u;
     init_view_corners_c9ecc();
-    saved = EF_U8(0x0013725cu);
-    EF_U8(0x0013725cu) = 1u;
+    saved = g_ui_state_byte_13725c;
+    g_ui_state_byte_13725c = 1u;
     tidy_chain_a7204(obj);
-    EF_U8(0x0013725cu) = saved;
+    g_ui_state_byte_13725c = saved;
     if (mode == 1u)
         restore_rect_list_e516c();
 }
@@ -9270,7 +9270,7 @@ void update_item_dialog_34298(void)
         redraw_widget_ac9a0(w);
         return;
     }
-    if (EF_U8(0x0019f5aeu) != 0u || EF_U8(0x00125902u) != 0u || EF_U8(0x001357c8u) != 0u)
+    if (g_session_activity_flag != 0u || g_network_service_clear_gate != 0u || g_device_event_mode != 0u)
         return;
     (void)unsupported_query_e1758();
     if (EF_U32(0x00429210u) == 0u) {
@@ -9387,14 +9387,14 @@ void fill_button_widgets_4f7d0(void)
     uint32_t root = find_named_or_abort_a46cc(0x00184a8cu);
     int16_t n;
     g_tactical_reset_mode = 0u;
-    for (n = 0; n < (int16_t)EF_U8(0x001a5531u); n++) {
+    for (n = 0; n < (int16_t)g_assignment_entry_count; n++) {
         (void)guest_sprintf_a4342(nm, 0x00184a9cu, (int32_t)n);
         show_widget_a7588(find_widget_checked_a78bc(root, nm), 0x001a53e3u + (uint32_t)n * 0x11u);
         select_button_state_4f718((uint32_t)n, EF_U8(0x001a5510u + (uint32_t)n));
         if (EF_U8(0x001a5510u + (uint32_t)n) == 3u || EF_U8(0x001a5510u + (uint32_t)n) == 4u)
             g_tactical_reset_mode = 1u;
     }
-    n = (int16_t)EF_U8(0x001a5531u);
+    n = (int16_t)g_assignment_entry_count;
     while (n < 0x10) {
         (void)guest_sprintf_a4342(nm, 0x00184a9cu, (int32_t)n);
         show_widget_a7588(find_widget_checked_a78bc(root, nm), 0x00184e44u);
@@ -9418,7 +9418,7 @@ void read_selector_ab174(uint32_t handle)
         return;
     }
     EF_U8(0x0041955fu) = c;
-    if ((int16_t)b >= (int16_t)EF_U16(0x004194c2u)) {
+    if ((int16_t)b >= (int16_t)g_parser_group_count) {
         EF_U8(0x0041955fu) = 0u;
         return;
     }
@@ -9507,7 +9507,7 @@ void refresh_button_dialog_4f8a8(void)
     (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)EF_U8(0x001a5530u));
     show_widget_a7588(w, b);
     w = find_widget_checked_a78bc(root, 0x00184e54u);
-    (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)EF_U8(0x001a5531u));
+    (void)guest_sprintf_a4342(b, 0x00184c94u, (uint32_t)g_assignment_entry_count);
     show_widget_a7588(w, b);
     w = find_widget_checked_a78bc(root, 0x00184e60u);
     show_widget_a7588(w, EF_U32(EF_U32(0x001a5506u) + 0xcu));
@@ -9725,10 +9725,10 @@ void queue_record_entry_9f850(uint32_t index)
     ef_addr32 list = EF_U32(0x0041717cu) + (uint32_t)(((int32_t)EF_U32(rec + 0x10u) >> 16) * 2);
     guest_callptr2r_x(EF_U32(0x00132af4u), 0, 0);
     EF_U16(0x00417188u) = EF_U16(0x0041718eu);
-    EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x00417190u) + EF_U16(0x00417222u));
+    EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x00417190u) + g_page_record_rotation_bias);
     EF_U16(0x0041718cu) = EF_U16(0x00417192u);
     EF_U32(0x001600b4u) = 0x00417188u;
-    EF_U32(0x001600b8u) = 1u;
+    g_script_record_repeat = 1u;
     EF_U32(0x001600a8u) = (uint32_t)(int32_t)(int16_t)EF_U16(rec);
     EF_U32(0x001600acu) = rec + 0x14u;
     EF_U32(0x001600b0u) = 0x00417154u;
@@ -9736,7 +9736,7 @@ void queue_record_entry_9f850(uint32_t index)
         EF_U16(0x00417188u) = (uint16_t)(EF_U16(0x00417188u) + EF_U16(list));
         EF_U16(0x0041718au) = (uint16_t)(EF_U16(0x0041718au) + EF_U16(list + 2u));
         EF_U16(0x0041718cu) = (uint16_t)(EF_U16(0x0041718cu) + EF_U16(list + 4u));
-        EF_U32(0x001600b8u) = EF_U8(rec + 0x1cu);
+        g_script_record_repeat = EF_U8(rec + 0x1cu);
     }
     append_table_entry_16018a();
 }
@@ -9760,16 +9760,16 @@ void handle_event_record_a348c(uint32_t index)
         return;
     case 4:
         if (EF_U8(ptr) == EF_U16(0x001357aeu))
-            EF_U32(0x00136dd4u) = EF_U32(0x00136dd4u) - 1u;
+            g_comms_initial_tick = g_comms_initial_tick - 1u;
         return;
     case 5:
         if (EF_U8(ptr) == EF_U16(0x001357aeu))
-            EF_U32(0x00136dd4u) = EF_U32(0x00136dd4u) + 1u;
+            g_comms_initial_tick = g_comms_initial_tick + 1u;
         return;
     case 6:
         if (EF_U8(ptr) == EF_U16(0x001357aeu)) {
-            EF_U16(0x001357d6u) = EF_U16(rec + 0xbu);
-            EF_U32(0x00136dd4u) = ((uint32_t (*)(void))EF_U32(0x0015b620u))() - EF_U16(0x001357d6u);
+            g_comms_initial_clock_dx = EF_U16(rec + 0xbu);
+            g_comms_initial_tick = ((uint32_t (*)(void))EF_U32(0x0015b620u))() - g_comms_initial_clock_dx;
         }
         return;
     default:
@@ -9788,17 +9788,17 @@ uint32_t run_choice_prompt_7a194(void)
     uint8_t key;
     latch_values_ce328(0u, w, 0u, h);
     store_four_dwords_17cf9c(0u, w, 0u, h);
-    if (EF_U8(0x00125846u) == 1u)
+    if (g_frontend_connection_mode == 1u)
         page = 0x0012aeb8u;
-    else if (EF_U8(0x00125846u) == 2u)
+    else if (g_frontend_connection_mode == 2u)
         page = 0x0012aef0u;
     else
         page = 0x0012af28u;
     (void)guest_fn_79ff0(page);
     while (!done) {
-        EF_U8(0x0041f833u) = 0u;
+        g_ui_state_flag_41f833 = 0u;
         do {
-            key = EF_U8(0x0041f833u);
+            key = g_ui_state_flag_41f833;
         } while (key == 0u);
         switch (key) {
         case 0x01: case 0x2e:
@@ -9806,13 +9806,13 @@ uint32_t run_choice_prompt_7a194(void)
             result = 0u;
             break;
         case 0x12:
-            if (EF_U8(0x00125846u) != 1u) {
+            if (g_frontend_connection_mode != 1u) {
                 done = 1u;
                 result = 3u;
             }
             break;
         case 0x1e:
-            if (EF_U8(0x00125846u) == 1u) {
+            if (g_frontend_connection_mode == 1u) {
                 done = 1u;
                 result = 3u;
             }
@@ -9953,7 +9953,7 @@ void close_widget_a4b80(uint32_t id)
     ef_addr32 obj;
     int32_t idx;
     int32_t k;
-    if (w == 0u || (uint16_t)w > EF_U16(0x0041eed8u))
+    if (w == 0u || (uint16_t)w > g_ui_state_word_41eed8)
         return;
     obj = EF_U32(0x0041edfcu + w * 4u);
     if ((EF_U8(obj + 0x3bu) & 4u) == 0u)
@@ -10082,7 +10082,7 @@ uint32_t find_paired_node_b49b4(ef_addr32 a, ef_addr32 b, uint32_t group, ef_add
 void uncount_side_tallies_9b780(void)
 {
     int16_t k;
-    for (k = 0; (int32_t)k < (int32_t)EF_U32(0x001379b0u); k++) {
+    for (k = 0; (int32_t)k < (int32_t)g_record_pool_active_count; k++) {
         ef_addr32 rec = EF_U32(0x001379bcu) + (uint32_t)((int32_t)k * 0x36);
         ef_addr32 node;
         uint16_t found = 0u;
@@ -10412,7 +10412,7 @@ void refresh_status_widgets_d550(void)
     uint32_t w;
     uint32_t child;
     int32_t idx;
-    if (EF_U16(0x001f71d2u) == 0u || EF_U8(0x00126576u) != 0u)
+    if (EF_U16(0x001f71d2u) == 0u || g_frontend_network_active != 0u)
         return;
     w1 = find_named_or_abort_a46cc(0x00180850u);
     refresh_flagged_object_a4b08(w1);
@@ -10534,9 +10534,9 @@ void select_mode_byte_9338(uint32_t kind)
     c = (col == 2) ? 0u : (col == 1) ? 1u : 2u;
     {
         static const uint8_t mode[3][3] = { { 9u, 7u, 8u }, { 3u, 1u, 2u }, { 6u, 4u, 5u } };
-        EF_U8(0x0012583bu) = mode[cls][c];
+        g_marker_selection_value = mode[cls][c];
     }
-    EF_U32(lookup_key_a7ec4(0x00180548u)) = EF_U8(0x0012583bu);
+    EF_U32(lookup_key_a7ec4(0x00180548u)) = g_marker_selection_value;
 }
 
 /* 0xd72b4, 259 bytes. Start the sample OBJ (EDX; data pointer at +0x1c) of SIZE bytes (EBX) on voice IDX (AL): nothing happens (returns 0) unless byte 0x15bac4 is set, OBJ is non-null and 0xd7594 accepts the voice. Touch one byte per 0x1000 of the data, lock the range (0x104908), then program the voice handle from dword table 0x420dd0 (0x102670 reset, 0x102738 clear, 0x102824 rate 0x5622, 0x102858 volume 0x78, 0x102dbc callback 0xd7138, 0x1026fc data and length, 0x102774 start) and return 1. */
@@ -10736,7 +10736,7 @@ void poll_pointer_device_ac854(void)
     uint16_t old = EF_U16(0x0041eec2u);
     uint32_t t;
     uint32_t s;
-    if (EF_U8(0x0041f2e1u) != 0u) {
+    if (g_ui_pointer_device_enabled != 0u) {
         uint8_t bt;
         mouse_read_motion_ce02c((uint32_t)(uintptr_t)&dx, (uint32_t)(uintptr_t)&dy);
         bt = (uint8_t)mouse_read_buttons_ce064();
@@ -10758,7 +10758,7 @@ void poll_pointer_device_ac854(void)
         EF_U16(0x0041eec2u) = 0u;
     if ((int16_t)EF_U16(0x0041eec2u) > 0x2ff)
         EF_U16(0x0041eec2u) = 0x2ffu;
-    if ((int16_t)(old & 0x300u) != (int16_t)(EF_U16(0x0041eec2u) & 0x300u) && EF_U16(0x0041eedeu) == 0u)
+    if ((int16_t)(old & 0x300u) != (int16_t)(EF_U16(0x0041eec2u) & 0x300u) && g_default_entry_override == 0u)
         select_default_video_aca14();
     clamp_cursor_ac7f0();
 }
@@ -10914,9 +10914,9 @@ void select_page_a1d00(uint32_t id)
     if ((EF_U8(rec + 0xau) & 0x80u) != 0u) {
         write_checked_a1b28(0x00417160u, 4u);
         v = write_page_record_a1d50();
-        EF_U32(0x00417160u) = v;
+        g_page_load_remaining = v;
     }
-    EF_U32(0x00417160u) = EF_U32(0x00417160u) + 1u;
+    g_page_load_remaining = g_page_load_remaining + 1u;
 }
 
 /* 0xf118d, 340 bytes. mktime: convert the broken-down time at TM (EAX; sec, min, hour, mday, mon, year since 1900 at +0..+0x14, isdst at +0x20) to seconds since 1970. The month is normalised into the year (tables 0x195cb0 and 0x195cca for leap years), the day count and the seconds of the day are built, the structure is normalised (0x10ec62), the zone offset dword 0x17d554 is added (0x10eda1 sets it up, 0x10e97f resolves a negative isdst) and the daylight saving shift dword 0x17d558 is removed when isdst is positive; returns -1 when the date is before the epoch or out of range. */
@@ -11172,10 +11172,10 @@ void draw_widget_a5b70(ef_addr32 w)
     if (EF_U32(w + 0xb1u) != 0u) {
         compute_view_window_abb00(w);
         set_view_rect_c9f28(w);
-        EF_U8(0x0041f2e5u) = 1u;
+        g_ui_state_byte_41f2e5 = 1u;
         EF_U32(0x0041eea0u) = w;
         guest_callptr_eax_x(EF_U32(w + 0xb1u), w);
-        EF_U8(0x0041f2e5u) = 0u;
+        g_ui_state_byte_41f2e5 = 0u;
         EF_U32(0x0041eea0u) = 0u;
         init_view_corners_c9ecc();
     }
@@ -11220,7 +11220,7 @@ uint32_t expand_placeholders_a80b0(ef_addr32 text)
                && cx < (int16_t)EF_U16(0x004194c4u))
             cx++;
         if (cx >= (int16_t)EF_U16(0x004194c4u)) {
-            if (EF_U8(0x001371f9u) != 0u) {
+            if (g_script_condition_automatic != 0u) {
                 (void)guest_sprintf_a4342(l, 0x0018d634u, l + 0x50u);
                 guest_callptr1_x(g_gui_error_hook, l);
             } else {
@@ -11367,7 +11367,7 @@ void send_serial_text_e10a0(ef_addr32 text)
 {
     ef_addr32 p = text;
     EF_U32(0x0015f690u) = text;
-    EF_U8(0x0015f694u) = 1u;
+    g_serial_command_pending = 1u;
     if (EF_U8(p) == 0u)
         return;
     do {
@@ -11454,7 +11454,7 @@ void dump_list_b2d04(ef_addr32 list, uint32_t e, uint32_t file, ef_addr32 fmt, u
 void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, double scale)
 {
     (void)u0; (void)u1; (void)u2; (void)u3;
-    ef_addr32 root = find_named_or_abort_a46cc(EF_U8(0x001357c8u) != 0u ? 0x001830f8u : 0x00182fb0u);
+    ef_addr32 root = find_named_or_abort_a46cc(g_device_event_mode != 0u ? 0x001830f8u : 0x00182fb0u);
     if (root != 0u) {
         ef_addr32 w = find_widget_checked_a78bc(root, 0x00183104u);
         if (w != 0u) {
@@ -11471,15 +11471,15 @@ void rescale_dialog_widgets_35de0(uint32_t u0, uint32_t u1, uint32_t u2, uint32_
 /* 0xc594, 155 bytes. Close out the current trace: unless byte 0x126576 or either word 0x137998/0x13799a is set, dump the pending record (0xb3084 with text 0x18086c and the records at 0x137988, 0x137970, 0x137980 plus six signed high words), then reset the view tables, clear bytes 0x121e8c, 0x126576 and 0x126577 and set the pending name 0x18099c. */
 void finish_trace_c594(void)
 {
-    if (EF_U8(0x00126576u) == 0u && EF_U16(0x00137998u) == 0u && EF_U16(0x0013799au) == 0u) {
+    if (g_frontend_network_active == 0u && EF_U16(0x00137998u) == 0u && EF_U16(0x0013799au) == 0u) {
         guest_fn_b3084_x(0x0018086cu, 0x00137988u, 0x00137970u, 0x00137980u, 0x00134d8au,
                          (uint32_t)((int32_t)EF_U32(0x0013799cu) >> 16), (uint32_t)((int32_t)EF_U32(0x0013799eu) >> 16),
                          (uint32_t)((int32_t)EF_U32(0x001379a0u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32cu) >> 16),
                          (uint32_t)((int32_t)EF_U32(0x0041f328u) >> 16), (uint32_t)((int32_t)EF_U32(0x0041f32au) >> 16));
     }
     reset_view_tables_b1b10();
-    EF_U8(0x00121e8cu) = 0u;
-    EF_U8(0x00126576u) = 0u;
+    g_runtime_input_byte_c = 0u;
+    g_frontend_network_active = 0u;
     EF_U8(0x00126577u) = 0u;
     set_pending_name_ac7a8(0x0018099cu);
 }
@@ -12193,18 +12193,18 @@ uint8_t clip_segment_points_d299c(uint32_t a, uint32_t b, ef_addr32 out)
     ef_addr32 p2 = base + (b & 0xffffu);
     uint32_t flags;
     ef_addr32 pts;
-    EF_U32(0x0042099cu) = 1u;
-    EF_U32(0x00420974u) = 0u;
+    g_current_render_object_clip_mask = 1u;
+    g_current_render_object_flags = 0u;
     EF_U32(0x004209bcu) = 0x004209d0u;
-    EF_U32(0x004209d0u) = 2u;
+    g_current_render_vertex_count = 2u;
     EF_U32(0x004209d4u) = p1;
     EF_U32(0x004209d8u) = p2;
     EF_U8(p1 + 0x20u) = (uint8_t)(EF_U8(p1 + 0x20u) & 0xf9u);
     EF_U8(p2 + 0x20u) = (uint8_t)(EF_U8(p2 + 0x20u) & 0xf9u);
-    flags = EF_U32(0x0042099cu) & EF_U32(p1 + 0x20u);
-    EF_U32(0x0042099cu) = flags;
+    flags = g_current_render_object_clip_mask & EF_U32(p1 + 0x20u);
+    g_current_render_object_clip_mask = flags;
     flags &= EF_U32(p2 + 0x20u);
-    EF_U32(0x0042099cu) = flags;
+    g_current_render_object_clip_mask = flags;
     classify_render_bounds_d2130(0x00420970u);
     if ((EF_U8(0x0042099cu) & 8u) != 0u)
         return 0u;
@@ -12550,7 +12550,7 @@ uint32_t load_group_records_fecc(ef_addr32 countp, uint32_t arg, ef_addr32 name)
     uint32_t state = 0u;
     int32_t i;
     EF_U32(0x00121ebcu) = 0xe764u;
-    EF_U32(0x00121eacu) = 0u;
+    g_parser_error_context = 0u;
     if (guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name) == 0u)
         guest_callptr2_x(g_gui_error_hook, 0x00181174u, name);
     EF_U32(0x00197ab0u) = open_resource_9ccb8(name);
@@ -12847,7 +12847,7 @@ void update_sound_mode_98198(void)
     ef_addr32 obj;
     uint32_t pair[2];
     uint8_t mode;
-    if (g_ui_status_flag_c == 0u || EF_U8(0x00420a70u) != 1u)
+    if (g_ui_status_flag_c == 0u || g_sound_slot_mode != 1u)
         return;
     obj = lookup_filtered_indexed_object((int32_t)g_grid_secondary_selector >> 16);
     guest_fn_d5fa8_x((ef_addr32)(uintptr_t)&pair[1], (ef_addr32)(uintptr_t)&pair[0]);
@@ -12869,14 +12869,14 @@ void update_sound_mode_98198(void)
             }
         }
     }
-    if (mode == EF_U8(0x0012dd0du))
+    if (mode == g_active_sound_slot)
         return;
-    if (!(pair[1] == 0u && pair[0] != 0u && (int32_t)pair[0] % 8 == 0) && EF_U8(0x0012dd0cu) != 0u)
+    if (!(pair[1] == 0u && pair[0] != 0u && (int32_t)pair[0] % 8 == 0) && g_sound_slot_selected != 0u)
         return;
-    reset_sound_slot_980e8(EF_U8(0x0012dd0du));
+    reset_sound_slot_980e8(g_active_sound_slot);
     select_sound_slot_98050(mode);
-    EF_U8(0x0012dd0du) = mode;
-    EF_U8(0x0012dd0cu) = 1u;
+    g_active_sound_slot = mode;
+    g_sound_slot_selected = 1u;
 }
 
 /* 0xc0534, 240 bytes. Twin of 0xc02ec for the kinds 0xe and 0x16: for the first two indices J (0 and 1) of the list LIST (EDX, count by 0xbc5d0) try the two kinds in turn (starting with 0xe, the kind byte toggles on every attempt), find the node (0xcc51c) and fold it into the running value with 0xc0624 (EAX = running value, EDX = kind, EBX = J, ECX = LIST, stack: B, C, S0..S3). Returns the final running value (starts as AX = A). */
@@ -13345,7 +13345,7 @@ void init_runtime_globals_9d834(void)
     EF_U32(0x00132b0cu) = 0u;
     EF_U32(0x00411080u) = 0x0018b22cu;
     EF_U8(0x00132ac2u) = 0u;
-    EF_U32(0x00417160u) = 0xffffffffu;
+    g_page_load_remaining = 0xffffffffu;
     EF_U32(0x00132b18u) = 0xffffffffu;
     EF_U8(0x00132b1cu) = 0u;
     EF_U32(0x00132ad4u) = 0x0009d778u;
@@ -13468,7 +13468,7 @@ int32_t hit_test_markers_45a54(uint32_t x, uint32_t y)
     int32_t py = (int16_t)y;
     int32_t result = -1;
     uint8_t kind = 0u; /* ORIGINAL BUG: uninitialised stack byte when the table is not scanned */
-    if (EF_U8(0x00121e8cu) == 0u && EF_U8(0x00126576u) == 0u) {
+    if (g_runtime_input_byte_c == 0u && g_frontend_network_active == 0u) {
         ef_addr32 map = EF_U32(0x001a4a9cu);
         EF_U16(0x001a4b9cu) = EF_U16(map + 0x1cu);
         if (EF_U32(map + 0x20u) != 0u) {
@@ -14482,7 +14482,7 @@ uint8_t point_in_window_10f70(ef_addr32 base, uint32_t index)
     int16_t x, y;
     v[0] = EF_U16(p + 0x18u);
     v[1] = EF_U16(p + 0x1au);
-    if (EF_U8(0x00121ec6u) == 0u) {
+    if (g_runtime_coordinate_latch == 0u) {
         uint32_t mode = record_flag_bits56((int16_t)((int32_t)EF_U32(0x001f8ec0u) >> 16));
         transform_runtime_word_pair((uint16_t)(int16_t)mode, (ef_addr32)(uintptr_t)&v[1], (ef_addr32)(uintptr_t)&v[0]);
         r = script_cursor_data_cd29c();
@@ -15453,7 +15453,7 @@ void refresh_node_progress_1e28c(void)
     uint32_t b;
 
     node = EF_U32(0x00137988u);
-    EF_U8(0x00137a00u) = 1u;
+    g_page_value_updates_enabled = 1u;
     while (node != 0u) {
         w = (int16_t)guest_fn_7b2f4(0u, (int32_t)EF_U32(node + 0x16u), (int32_t)EF_U32(node + 0x1au));
         if (open_entry_cd150((int32_t)w) == 0u)
@@ -15500,7 +15500,7 @@ void unit_damage_tick_29dd0(uint32_t ax)
         if (EF_U16(unit + 0x1d8u) != 0u) {
             unit_event_88664(unit, 0u);
             EF_U16(unit + 0x1d8u) = (uint16_t)(EF_U16(unit + 0x1d8u) - 1u);
-        } else if (EF_U8(0x0041f833u) == 0x74u) {
+        } else if (g_ui_state_flag_41f833 == 0x74u) {
             trigger_sound_8160c(0x42u);
         }
         return;
@@ -15642,16 +15642,16 @@ void read_button_selection_7cf64(void)
 
 	for (i = 0; i < 6; i++)
 		f[i] = (EF_U8(find_widget_checked_a78bc(dlg, names[i]) + 0x1du) & 1u) ? 1u : 0u;
-	if (f[0] && f[3]) EF_U8(0x0012583bu) = 9u;
-	if (f[0] && f[4]) EF_U8(0x0012583bu) = 7u;
-	if (f[0] && f[5]) EF_U8(0x0012583bu) = 8u;
-	if (f[1] && f[3]) EF_U8(0x0012583bu) = 3u;
-	if (f[1] && f[4]) EF_U8(0x0012583bu) = 1u;
-	if (f[1] && f[5]) EF_U8(0x0012583bu) = 2u;
-	if (f[2] && f[3]) EF_U8(0x0012583bu) = 6u;
-	if (f[2] && f[4]) EF_U8(0x0012583bu) = 4u;
-	if (f[2] && f[5]) EF_U8(0x0012583bu) = 5u;
-	EF_U32(guest_fn_a7ec4(0x00187ee0u)) = EF_U8(0x0012583bu);
+	if (f[0] && f[3]) g_marker_selection_value = 9u;
+	if (f[0] && f[4]) g_marker_selection_value = 7u;
+	if (f[0] && f[5]) g_marker_selection_value = 8u;
+	if (f[1] && f[3]) g_marker_selection_value = 3u;
+	if (f[1] && f[4]) g_marker_selection_value = 1u;
+	if (f[1] && f[5]) g_marker_selection_value = 2u;
+	if (f[2] && f[3]) g_marker_selection_value = 6u;
+	if (f[2] && f[4]) g_marker_selection_value = 4u;
+	if (f[2] && f[5]) g_marker_selection_value = 5u;
+	EF_U32(guest_fn_a7ec4(0x00187ee0u)) = g_marker_selection_value;
 	EF_U8(0x001f9005u) = (uint8_t)f[3];
 	EF_U8(0x001f8fffu) = (uint8_t)f[5];
 	EF_U8(0x001f9000u) = (uint8_t)f[0];
@@ -15730,24 +15730,24 @@ uint32_t run_frame_step_ac5f8(uint32_t al)
 	uint8_t loop = (uint8_t)al;
 
 	EF_U32(0x0041eea0u) = 0u;
-	if (EF_U8(0x0041f2e4u) != 0u) {
+	if (g_ui_state_byte_41f2e4 != 0u) {
 		tail_jump_c9ec4();
 		apply_palette_d663c(0x004195d0u);
 		redraw_ca17c();
-		EF_U8(0x0041f2e4u) = 0u;
+		g_ui_state_byte_41f2e4 = 0u;
 	}
-	EF_U8(0x0041f2e8u) = 0u;
+	g_frontend_pending_latch = 0u;
 	if (loop != 0u)
-		EF_U8(0x0041f833u) = 0u;
-	EF_U8(0x0041f2e6u) = 0u;
+		g_ui_state_flag_41f833 = 0u;
+	g_ui_state_flag_41f2e6 = 0u;
 	do {
-		if (EF_U8(0x0041f833u) != 0u) {
-			EF_U8(0x0041f2e6u) = EF_U8(0x0041f833u);
-			EF_U8(0x0041f833u) = 0u;
+		if (g_ui_state_flag_41f833 != 0u) {
+			g_ui_state_flag_41f2e6 = g_ui_state_flag_41f833;
+			g_ui_state_flag_41f833 = 0u;
 		}
 		result = 0u;
 		EF_U16(0x0041eed2u) = 0u;
-		if (EF_U16(0x0041eedau) != 0u) {
+		if (g_named_entry_enabled != 0u) {
 			latch_previous_acb68(0x0041f284u);
 			EF_U32(0x0041eea4u) = elapsed_centiseconds();
 			guest_fn_acbe4_x(0x0041f284u);
@@ -15755,29 +15755,29 @@ uint32_t run_frame_step_ac5f8(uint32_t al)
 			switch_active_object_f1c58(0x0041f284u);
 			result = guest_fn_f18a4_x(0x0041f284u);
 		}
-		if (EF_U8(0x0041f2e6u) != 0u) {
-			if (EF_U8(0x0041f2e6u) == 0x58u && ((EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u)) != 0u))
+		if (g_ui_state_flag_41f2e6 != 0u) {
+			if (g_ui_state_flag_41f2e6 == 0x58u && ((EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u)) != 0u))
 				find_free_save_slot_ac57c();
 			t = guest_fn_f1a70_x();
 			if (result == 0u)
 				result = t;
-			EF_U8(0x0041f2e6u) = 0u;
+			g_ui_state_flag_41f2e6 = 0u;
 		}
-		if (EF_U16(0x0041eedau) != 0u) {
+		if (g_named_entry_enabled != 0u) {
 			apply_selection_f1d54();
 			if (EF_U8(0x0041f2e3u) != 0u)
 				relabel_named_widget_abc34();
 			if (EF_U8(0x0013727cu) != 0u)
 				redraw_entries_a6038();
 		}
-		if (EF_U8(0x0041f2deu) == 0u)
+		if (g_ui_state_byte_41f2de == 0u)
 			run_entry_callbacks_abde4();
 		if (EF_U16(0x0041eed2u) != 0u)
 			show_status_ac780();
 		guest_fn_c9fc4();
-		if (EF_U8(0x0041f2e8u) != 0u)
-			result = EF_U8(0x0041f2e8u);
-		EF_U8(0x0041f2e4u) = 0u;
+		if (g_frontend_pending_latch != 0u)
+			result = g_frontend_pending_latch;
+		g_ui_state_byte_41f2e4 = 0u;
 	} while (result == 0u && loop != 0u);
 	if (loop != 0u)
 		reset_engine_e4264();
@@ -15806,7 +15806,7 @@ void show_text_ac408(ef_addr32 text)
 		for (i = 0; i < 0x10u && EF_U8(0x0041eab0u + i * 0x15u) != 0u; i++)
 			run_page_callbacks_ac240(0x0041eab0u + i * 0x15u, 0u);
 	} else {
-		if (EF_U8(0x0041f2e7u) != 0u)
+		if (g_ui_reset_flag != 0u)
 			clear_block_abe24();
 		while (EF_U8(text) != 0u) {
 			n = 0u;
@@ -15816,7 +15816,7 @@ void show_text_ac408(ef_addr32 text)
 				n++;
 			}
 			word[n < sizeof word - 1u ? n : sizeof word - 1u] = 0;
-			run_page_callbacks_ac240((ef_addr32)(uintptr_t)word, EF_U8(0x0041f2e7u));
+			run_page_callbacks_ac240((ef_addr32)(uintptr_t)word, g_ui_reset_flag);
 			text += n;
 			while ((EF_U8(0x00195af0u + (uint8_t)(EF_U8(text) + 1u)) & 2u) != 0u)
 				text++;
@@ -15834,8 +15834,8 @@ void show_text_ac408(ef_addr32 text)
 	EF_U8(0x0041f2e0u) = 0u;
 	if (EF_U8(0x0041f2e3u) != 0u)
 		guest_fn_abc98_x();
-	EF_U8(0x0041f833u) = 0u;
-	EF_U8(0x0041f2e6u) = 0u;
+	g_ui_state_flag_41f833 = 0u;
+	g_ui_state_flag_41f2e6 = 0u;
 	while ((guest_fn_ce064_x() & 0xffffu) != 0u)
 		;
 }
@@ -15891,7 +15891,7 @@ uint32_t parse_record_fcf4(ef_addr32 rec)
 		EF_U8(rec + 0xcu) = (uint8_t)read_parser_enum_27_names();
 		break;
 	default:
-		guest_callptr3_x(g_gui_error_hook, 0x0018113cu, 0x00197abeu, EF_U32(0x00121eacu));
+		guest_callptr3_x(g_gui_error_hook, 0x0018113cu, 0x00197abeu, g_parser_error_context);
 		break;
 	}
 	EF_U8(rec + 0xdu) = (uint8_t)read_parser_enum_10_names();
@@ -15946,7 +15946,7 @@ uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent)
 		EF_U16(0x00197ab6u) = (uint16_t)(EF_U16(0x00197ab6u) + EF_U8(rec + 1u));
 		EF_U8(rec) = (uint8_t)read_parser_enum_27_names();
 	} else {
-		guest_callptr3_x(g_gui_error_hook, 0x00180f74u, 0x00197abeu, EF_U32(0x00121eacu));
+		guest_callptr3_x(g_gui_error_hook, 0x00180f74u, 0x00197abeu, g_parser_error_context);
 	}
 	EF_U8(rec + 2u) = (uint8_t)parse_enum_ec3c();
 	EF_U8(rec + 3u) = (uint8_t)read_parser_enum_10_names();
@@ -15964,10 +15964,10 @@ uint32_t parse_component_record_f314(ef_addr32 rec, uint32_t parent)
 	EF_U16(rec + 0x1au) = (uint16_t)read_parser_integer();
 	EF_U16(rec + 0x1eu) = (uint16_t)read_parser_integer();
 	if (EF_U16(rec + 0x1cu) == 0u)
-		guest_callptr2_x(g_gui_error_hook, 0x00180facu, EF_U32(0x00121eacu));
+		guest_callptr2_x(g_gui_error_hook, 0x00180facu, g_parser_error_context);
 	lim = (int16_t)EF_U16(rec + 0x1cu);
 	if ((int16_t)EF_U16(rec + 0x1eu) >= lim)
-		guest_callptr2_x(g_gui_error_hook, 0x00180fd4u, EF_U32(0x00121eacu));
+		guest_callptr2_x(g_gui_error_hook, 0x00180fd4u, g_parser_error_context);
 	cnt = (int16_t)EF_U16(rec + 0x1cu);
 	EF_U32(rec + 0x20u) = guest_callptr_eax_ret_x(EF_U32(0x00121ebcu), (uint32_t)((int32_t)cnt * 25));
 	for (i = 0, n = 0u; (int32_t)i < (int16_t)EF_U16(rec + 0x1cu); i++, n += 0x19u)
@@ -16023,7 +16023,7 @@ uint32_t load_data_file_f6a8(ef_addr32 count_a, ef_addr32 owner_a, ef_addr32 cou
 	uint32_t i, p;
 
 	EF_U32(0x00121ebcu) = 0x0000e744u;
-	EF_U32(0x00121eacu) = 0u;
+	g_parser_error_context = 0u;
 	EF_U16(0x00197ab4u) = 0u;
 	EF_U16(0x00197ab8u) = 0u;
 	EF_U16(0x00197ab6u) = 0u;
@@ -16249,7 +16249,7 @@ void step_setup_screen_36f84(void)
 			pack_settings_record_35c08();
 			break;
 		case 3:
-			if (EF_U8(0x00125846u) == 3u)
+			if (g_frontend_connection_mode == 3u)
 				EF_U8(0x0019f5a8u) = 4u;
 			else if (guest_strcmp(0x00125828u, 0x00182f7cu) == 0u)
 				EF_U8(0x0019f5a8u) = 5u;
@@ -16265,8 +16265,8 @@ void step_setup_screen_36f84(void)
 		case 6:
 			guest_fn_aca88_w();
 			refresh_all_widgets_a4c84();
-			apply_a4cb4_a4d90(EF_U8(0x00125846u) == 3u ? 0x00182f94u : 0x00182fa0u);
-			EF_U8(0x0041f2e8u) = 1u;
+			apply_a4cb4_a4d90(g_frontend_connection_mode == 3u ? 0x00182f94u : 0x00182fa0u);
+			g_frontend_pending_latch = 1u;
 			break;
 		default:
 			break;
@@ -16317,7 +16317,7 @@ void step_menu_screen_35590(void)
 			commit_mode_selection_35b2c();
 			mirror_reference_state();
 			EF_U8(0x0019f5abu) = 1u;
-			if (EF_U8(0x00125846u) == 3u)
+			if (g_frontend_connection_mode == 3u)
 				EF_U8(0x0019f5a7u) = 3u;
 			else if (guest_strcmp(0x00125828u, 0x00182f7cu) == 0u)
 				EF_U8(0x0019f5a7u) = 4u;
@@ -16333,8 +16333,8 @@ void step_menu_screen_35590(void)
 		case 5:
 			guest_fn_aca88_w();
 			refresh_all_widgets_a4c84();
-			apply_a4cb4_a4d90(EF_U8(0x00125846u) == 3u ? 0x00182f94u : 0x00182fa0u);
-			EF_U8(0x0041f2e8u) = 1u;
+			apply_a4cb4_a4d90(g_frontend_connection_mode == 3u ? 0x00182f94u : 0x00182fa0u);
+			g_frontend_pending_latch = 1u;
 			copy_last_token_abe44(0x00182f2cu);
 			break;
 		default:
@@ -16382,7 +16382,7 @@ void step_transfer_36ad8(void)
 		process_packets_3527c();
 		if (EF_U8(0x0019f59fu) == 1u) {
 			EF_U8(0x0019f5a9u) = 7u;
-			guest_fn_a7a1c(EF_U32(0x0019f35cu), EF_U32(0x0019f33cu), EF_U32(0x0019f354u));
+			guest_fn_a7a1c(g_session_first_handle, EF_U32(0x0019f33cu), EF_U32(0x0019f354u));
 			EF_U32(0x0019f32cu) += EF_U32(0x0019f33cu);
 			reset_state_35528();
 			ratio = (double)(int32_t)EF_U32(0x0019f32cu) / (double)(int32_t)EF_U32(0x0019f344u);
@@ -16402,9 +16402,9 @@ void step_transfer_36ad8(void)
 	case 9:
 		d = 0.0;
 		rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, d);
-		if (EF_U8(0x0019f59eu) != 0u) {
-			EF_U8(0x0019f59eu) = 0u;
-			guest_fn_a7990(EF_U32(0x0019f35cu));
+		if (g_session_first_handle_owned != 0u) {
+			g_session_first_handle_owned = 0u;
+			guest_fn_a7990(g_session_first_handle);
 		}
 		EF_U8(0x0019f5a9u) = 0xau;
 		EF_U16(0x0019f58eu) = 10u;
@@ -16568,7 +16568,7 @@ void step_host_transfer_36438(void)
 		break;
 	case 5:
 		EF_U16(0x001357b2u) = 2u;
-		n = guest_fn_a79d4_ret(EF_U32(0x0019f360u), (uint32_t)(((int32_t)EF_U32(0x001258feu) >> 16) << 3), EF_U32(0x0019f34cu));
+		n = guest_fn_a79d4_ret(g_session_second_handle, (uint32_t)(((int32_t)EF_U32(0x001258feu) >> 16) << 3), EF_U32(0x0019f34cu));
 		EF_U32(0x0019f368u) = n;
 		EF_U32(0x0019f350u) = EF_U32(0x0019f350u) - n;
 		recompute_total_a4030();
@@ -16589,8 +16589,8 @@ void step_host_transfer_36438(void)
 		sync_list_363c4();
 		remaining = (int32_t)EF_U32(0x0019f350u);
 		if (remaining <= 0) {
-			guest_fn_a7990(EF_U32(0x0019f360u));
-			EF_U8(0x0019f5a3u) = 0u;
+			guest_fn_a7990(g_session_second_handle);
+			g_session_second_handle_owned = 0u;
 			arena_free_e2af4(EF_U32(0x0019f34cu));
 			EF_U8(0x0019f5aau) = 8u;
 			rescale_dialog_widgets_35de0(0u, 0u, 0u, 0u, 0.0);
@@ -16670,12 +16670,12 @@ uint32_t find_session_entry_a312c(uint32_t packet)
 		name = EF_U32(0x0013587cu + packet * 32u) + 6u;
 		if (guest_strcmp(ent, name) == 0u)
 			a = (int8_t)i;
-		if (EF_U8(0x00136f04u + EF_U8(0x0013579au)) != 0u) {
+		if (EF_U8(0x00136f04u + g_network_driver_mode) != 0u) {
 			if ((forward_if_clear_a3108((uint16_t)i, (uint16_t)packet) & 0xffu) != 0u)
 				b = (int8_t)i;
 		}
 	}
-	if (a > 0 && (a == b || EF_U8(0x00136f04u + EF_U8(0x0013579au)) == 0u)) {
+	if (a > 0 && (a == b || EF_U8(0x00136f04u + g_network_driver_mode) == 0u)) {
 		ent = EF_U32(0x001368bcu + (uint32_t)(int32_t)a * 4u);
 		EF_U8(ent + 0x1cu) |= 1u;
 		EF_U8(ent + 0x1cu) |= 2u;
@@ -16715,8 +16715,8 @@ uint32_t discover_session_a2f70(void)
 					continue;
 				if (guest_memcmp(pay, 0x00137158u, 8u) != 0)
 					continue;
-				EF_U16(0x001357d6u) = EF_U16(desc + 0xbu);
-				EF_U32(0x00136dd4u) = guest_read_runtime_tick() - EF_U16(0x001357d6u);
+				g_comms_initial_clock_dx = EF_U16(desc + 0xbu);
+				g_comms_initial_tick = guest_read_runtime_tick() - g_comms_initial_clock_dx;
 				EF_U16(0x001357aeu) = EF_U16(pay + 8u);
 				format_entry_a2e90(EF_U16(0x001357aeu));
 				EF_U8(0x001357c9u) = 1u;
@@ -16769,10 +16769,10 @@ void write_settings_file_a2bdc(void)
 	}
 	write_config_entry_a2a90(0x0018cab0u, zp, 0u, 0u);
 	write_config_entry_a2a90(0x0018cce0u, zp, 0u, 0u);
-	v = EF_U8(0x0015f07fu);
-	EF_U8(0x0015f07fu) = (uint8_t)(v + 1u);
+	v = g_serial_port_index;
+	g_serial_port_index = (uint8_t)(v + 1u);
 	write_config_entry_a2a90(0x0018cb54u, 0x0015f07fu, 0u, 1u);
-	EF_U8(0x0015f07fu) = (uint8_t)(EF_U8(0x0015f07fu) - 1u);
+	g_serial_port_index = (uint8_t)(g_serial_port_index - 1u);
 	write_config_entry_a2a90(0x0018cb5cu, 0x0015f07du, 0u, 1u);
 	write_config_entry_a2a90(0x0018cb6cu, 0x0015f07eu, 0x00136f3cu, 3u);
 	write_config_entry_a2a90(0x0018ccf0u, zp, 0u, 0u);
@@ -16793,12 +16793,12 @@ void report_fatal_text_a9aa8(ef_addr32 text)
 	char buf[0x64];
 	uint8_t key;
 
-	if (EF_U8(0x001371ffu) != 0u) {
-		EF_U8(0x00137200u) = 1u;
+	if (g_parser_state_1371ff != 0u) {
+		g_parser_state_137200 = 1u;
 		return;
 	}
-	EF_U8(0x001371eeu) = 0u;
-	if (EF_U8(0x001371f9u) == 0u) {
+	g_menu_presentation_disabled = 0u;
+	if (g_script_condition_automatic == 0u) {
 		clear_buffer_dc2c0();
 		set_black_palette_d65e8();
 		guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018d818u, uppercase_string(text));
@@ -16807,14 +16807,14 @@ void report_fatal_text_a9aa8(ef_addr32 text)
 		load_page_palette_f2660(0x0018d698u);
 		toggle_page_dc250();
 		apply_palette_d663c(0x00464060u);
-		EF_U8(0x0041f833u) = 0u;
+		g_ui_state_flag_41f833 = 0u;
 		for (;;) {
-			key = EF_U8(0x0041f833u);
+			key = g_ui_state_flag_41f833;
 			if (key == 0x15u || key == 0x31u)
 				break;
 		}
 		set_black_palette_d65e8();
-		if (EF_U8(0x0041f833u) == 0x31u)
+		if (g_ui_state_flag_41f833 == 0x31u)
 			guest_callptr1_x(g_gui_error_hook, 0x0018d840u);
 	}
 	if (EF_U8(0x00137206u) != 0u)
@@ -16879,7 +16879,7 @@ void load_saved_state_a99c0(uint32_t number)
 	char alt[0x98];
 	uint32_t h;
 
-	if (EF_U8(0x001371edu) != 0u)
+	if (g_parser_state_1371ed != 0u)
 		guest_callptr1_x(g_gui_error_hook, 0x0018d798u);
 	if (call_9c858_18d57c() != 0u) {
 		uint32_t r80 = call_9c858_18d57c();
@@ -16899,7 +16899,7 @@ void load_saved_state_a99c0(uint32_t number)
 	guest_fn_aaa50_x(h);
 	close_request_9ce84(h);
 	EF_U32(0x004191f8u) = EF_U32(0x00419200u);
-	EF_U8(0x001371edu) = 2u;
+	g_parser_state_1371ed = 2u;
 }
 
 
@@ -16943,7 +16943,7 @@ void rebuild_tactical_screen_69fac(void)
 	EF_U8(0x00159130u) = (uint8_t)(EF_U8(0x00159130u) & 0xbbu);
 	install_handlers_d1f10();
 	EF_U8(0x001f6f4fu) = 0u;
-	EF_U8(0x00137a00u) = 1u;
+	g_page_value_updates_enabled = 1u;
 	reset_view_6900c();
 	load_word_0x1282dc();
 	load_halfword_pair();
@@ -17188,7 +17188,7 @@ void update_cursor_window_69740(void)
 /* 0x69d10, 524 bytes. Refresh the slot bytes of the list at dword 0x137960 (next link +4) and redraw it through 0xb3168. For every node that is selected (mode byte 0x125846 equal to 1, the first node, or the second node when more than four players are present in the high half of dword 0x1357ae) the twenty bytes at node-data +0x55 (rows of 0x7c bytes, row byte 0x125837, data pointer at node +0x13) are cleared for unused slots (byte 0x1f6ef4 + 3 * slot clear) and otherwise set from the mapping 0x8ac64 of the slot's top byte (dword 0x1f6ef1 + 3 * slot >> 24). Mode 3 only updates the node whose index equals the high half of dword 0x125833. The list is then drawn with 0xb3168 using the table 0x186284 (modes 1 and 2) or 0x186348 (mode 3) and the four window words 0x1f6f32, 0x1f6f2e, 0x1f6f30 and 0x1f6f34 (high halves). */
 void refresh_slot_list_69d10(void)
 {
-	uint32_t mode = EF_U8(0x00125846u), p, i, k, row;
+	uint32_t mode = g_frontend_connection_mode, p, i, k, row;
 	int32_t hi_players;
 	uint32_t w34 = (uint32_t)((int32_t)EF_U32(0x001f6f34u) >> 16);
 	uint32_t w30 = (uint32_t)((int32_t)EF_U32(0x001f6f30u) >> 16);
@@ -18008,7 +18008,7 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 
 	if (unit == 0u)
 		return;
-	if (EF_U16(0x001f71cau) == EF_U16(unit + 0x16u) && EF_U8(0x00127da8u) != 0u && EF_U16(0x00127daeu) != 0u)
+	if (EF_U16(0x001f71cau) == EF_U16(unit + 0x16u) && EF_U8(0x00127da8u) != 0u && g_scene_latch_b != 0u)
 		return;
 	before = (uint8_t)((EF_U16(unit + 0x24u) >> 2) & 1u);
 	g_packet_2b_word = EF_U16(rec + 5u);
@@ -18016,7 +18016,7 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 	EF_U16(0x00197c2cu) = EF_U16(rec + 9u);
 	EF_U16(0x00197c24u) = EF_U16(rec + 0xbu);
 	EF_U16(0x00197c26u) = EF_U16(rec + 0xdu);
-	EF_U8(0x00121ec6u) = EF_U8(rec + 0xfu);
+	g_runtime_coordinate_latch = EF_U8(rec + 0xfu);
 	guest_fn_74970(id, 0u, 0u, EF_U8(rec + 3u));
 	if (EF_U8(0x00127da8u) == 0u)
 		return;
@@ -18045,7 +18045,7 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 		}
 	}
 	EF_U16(0x001a6378u + player * 2u) = (uint16_t)(EF_U16(0x001a6378u + player * 2u) + 1u);
-	EF_U16(0x00127daeu) = 0x5dcu;
+	g_scene_latch_b = 0x5dcu;
 }
 
 /* 0x3c790, 441 bytes. Load the placement list of page AX (signed 16-bit) from the table at 0x1836d8 (0x3c730): allocate (0xcc6c0, tag 0x1836e0) one 21-byte record per count entry (word +0x2a of the record at dword 0x1264c8) into dword 0x1a2e84 and fill them from the 16-bit word stream. Each entry starts with its marker string (0x1836f4 is compared, 0x9d524, and a mismatch reports 0x1836fc with the entry number through the error hook); the zero words after the string are skipped, then a kind byte (+0), three coordinate words and an angle word follow. The coordinates are stored at +7, +0x9, +0xb rotated according to the view angle word 0x1a2ea4 (0x5a: +9 = -w1, +0xb = w2, +7 = w3; 0xb4: +7 = -w1, +0xb = w2, +9 = -w3; 0x10e: +9 = w1, +0xb = w2, +7 = -w3; otherwise +7 = w1, +0xb = w2, +9 = w3). The record's angle (+0x11) is the last word plus the view angle, wrapped by 0x168. */
@@ -18348,8 +18348,8 @@ void advance_object_position_724a8(uint32_t index, uint32_t obj)
 
 	if (obj == 0u || EF_U8(0x00122c5cu) != 0u)
 		return;
-	diff = (int32_t)(int16_t)(EF_U16(0x001357d6u) - EF_U16(obj + 0x234u));
-	EF_U16(obj + 0x234u) = EF_U16(0x001357d6u);
+	diff = (int32_t)(int16_t)(g_comms_initial_clock_dx - EF_U16(obj + 0x234u));
+	EF_U16(obj + 0x234u) = g_comms_initial_clock_dx;
 	dt = (uint32_t)(uint16_t)diff;
 	if ((dt & 0x8000u) != 0u)
 		dt = 0u;
@@ -18735,9 +18735,9 @@ void select_list_entry_at_cursor_4ce4c(uint32_t a, ef_addr32 head)
 				p2 = EF_U32(rec + 0x37u);
 				EF_U32(0x001a550au) = rec;
 				d = (uint32_t)(uint8_t)(EF_U8(p1) - EF_U8(p2));
-				EF_U8(0x001a5531u) = (uint8_t)d;
+				g_assignment_entry_count = (uint8_t)d;
 				if (d > 0x10u)
-					EF_U8(0x001a5531u) = 0x10u;
+					g_assignment_entry_count = 0x10u;
 				EF_U16(0x001a550eu) = (uint16_t)guest_lookup_value(EF_U32(EF_U32(0x001a5506u) + 0x10u));
 				reset_tactical_slots();
 				refresh_button_dialog_4f8a8();
@@ -19704,13 +19704,13 @@ void parse_command_line_a9724(ef_addr32 text)
 	uint32_t argc;
 	uint8_t *p;
 
-	if (EF_U8(0x001371ffu) != 0u) {
+	if (g_parser_state_1371ff != 0u) {
 		if (EF_U8(text) == 0x25u)
-			EF_U8(0x00137200u) = 1u;
+			g_parser_state_137200 = 1u;
 		return;
 	}
-	EF_U8(0x001371eeu) = 0u;
-	EF_U8(0x001371fbu) = 0u;
+	g_menu_presentation_disabled = 0u;
+	g_parser_state_1371fb = 0u;
 	memset(buf, 0, sizeof buf);
 	memcpy(buf, ef_guest_memory_ptr(0x0018d780u), 4);
 	strcat_9ca57((ef_addr32)(uintptr_t)buf, text);
@@ -19745,9 +19745,9 @@ void parse_command_line_a9724(ef_addr32 text)
 		clear_buffer_dc2c0();
 		toggle_page_dc250();
 	}
-	if (EF_U8(0x001371fbu) != 0u) {
+	if (g_parser_state_1371fb != 0u) {
 		open_named_file_28744();
-		EF_U8(0x001371fbu) = 0u;
+		g_parser_state_1371fb = 0u;
 	}
 }
 
@@ -19957,7 +19957,7 @@ void update_random_effect_81680(void)
 	uint32_t old;
 	int32_t s;
 
-	if (EF_U8(0x00137a00u) == 0u)
+	if (g_page_value_updates_enabled == 0u)
 		return;
 	EF_U16(0x0012b254u) = (uint16_t)(EF_U16(0x0012b254u) - 1u);
 	if (EF_U16(0x0012b254u) != 0u)
@@ -20088,7 +20088,7 @@ void enter_hiscore_screen_4e14(void)
 	ef_addr32 root, widget, src, node;
 	uint32_t i;
 
-	EF_U8(0x00137a00u) = 1u;
+	g_page_value_updates_enabled = 1u;
 	guest_fn_41fc_x();
 	guest_fn_42a4_x();
 	g_tactical_action_enabled = 1u;
@@ -20285,11 +20285,11 @@ ef_addr32 queue_effect_slot_d35b0(ef_addr32 p)
 	int32_t iv;
 	double d, scale;
 
-	EF_U32(0x0042099cu) = 1u;
-	EF_U32(0x00420974u) = 0u;
+	g_current_render_object_clip_mask = 1u;
+	g_current_render_object_flags = 0u;
 	EF_U32(0x004209bcu) = 0x004209d0u;
 	EF_U8(p + 0x20u) = (uint8_t)(EF_U8(p + 0x20u) & 0xf9u);
-	EF_U32(0x004209d0u) = 1u;
+	g_current_render_vertex_count = 1u;
 	EF_U32(0x004209d4u) = p;
 	n = EF_U8(0x0017d2c0u);
 	if (n >= 0xc8u) {
@@ -20520,11 +20520,11 @@ uint32_t alloc_object_entry_d36c4(uint32_t s0)
 	uint64_t bits;
 	double d, k;
 
-	EF_U32(0x0042099cu) = 1u;
-	EF_U32(0x00420974u) = 0u;
+	g_current_render_object_clip_mask = 1u;
+	g_current_render_object_flags = 0u;
 	EF_U32(0x004209bcu) = 0x004209d0u;
 	EF_U8(s0 + 0x20u) = (uint8_t)(EF_U8(s0 + 0x20u) & 0xf9u);
-	EF_U32(0x004209d0u) = 1u;
+	g_current_render_vertex_count = 1u;
 	EF_U32(0x004209d4u) = s0;
 	n = EF_U8(0x0017d2c0u);
 	if ((int32_t)n >= 0xc8) {
@@ -21139,7 +21139,7 @@ void draw_disc_fdf60(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_
         return;
     if (yt > (int32_t)EF_U32(0x0015bdccu))
         return;
-    EF_U32(0x00485ff4u) = (uint32_t)xs;
+    g_texture_left_v = (uint32_t)xs;
     EF_U32(0x00485fecu) = (uint32_t)yt << 16;
     if (xr > (int32_t)EF_U32(0x0015bdc4u))
         return;
