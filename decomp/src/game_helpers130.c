@@ -420,7 +420,7 @@ void init_nodes_from_grids_caa28(ef_addr32 head, ef_addr32 table_a, ef_addr32 ta
 /* 0x65a88, 402 bytes. Advance the current target selection (word 0x1a823e, mirrored to 0x1a8238): starting from the retry budget 0x2119f4 (decremented by 0x1a822a per round), step to the next unit with 0x663a4 (mode 0 when 0x1a8246 is set, or 0x127da8 with 0x12584b == 1; otherwise mode 2 keeping the old value on failure) and reject the candidate object (0x7489c of the index in the high word of 0x1a823c) when it is the player's own record (+0x16 == 0x1f71ca), has byte +0x18d set, its record is inactive or farther than 0x2800 (0x23760 of the position >> 8), has flag 8 at +0x24, or is refused by 0x66bf4. Ends with 0xffff when no candidate is left. */
 void select_next_target_65a88(void)
 {
-    uint16_t budget = EF_U16(0x002119f4u);
+    uint16_t budget = g_ui_record_pool_count;
     ef_addr32 obj = guest_fn_7489c((int16_t)((int32_t)EF_S32(0x001f71c8u) >> 16));
 
     if (obj == 0u) {
@@ -1089,7 +1089,7 @@ void draw_unit_info_78f3c(void)
     if (key == 0x2du) {
         id = EF_U32(0x001a8234u);
     } else if (key == 0x3eu) {
-        id = EF_U32(0x001a823au);
+        id = g_position_bin_packed;
     } else if (key == 0x2bu) {
         if (lookup_filtered_indexed_object((int16_t)(EF_S32(0x001f71c8u) >> 16)) == 0u)
             return;
@@ -1189,16 +1189,16 @@ void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled)
     EF_U16(0x002143e6u) = 0u;
     prepare_navigation_component(object, enabled);
     a = EF_U16(0x002143e4u);
-    EF_U16(0x002144b0u) = 0u;
-    EF_U16(0x002144b6u) = a;
+    g_scene_angle_saved_third = 0u;
+    g_scene_angle_saved_first = a;
     b = EF_U16(0x002143e6u);
-    EF_U16(0x002144b4u) = b;
+    g_scene_angle_saved_second = b;
     negPitch = (uint16_t)(0u - b);
     negYaw = (uint16_t)(0u - a);
-    EF_U16(0x002144b4u) = negPitch;
-    EF_U16(0x002144b6u) = negYaw;
+    g_scene_angle_saved_second = negPitch;
+    g_scene_angle_saved_first = negYaw;
     update_scene_angle_first(0x00214404u, negPitch);
-    update_scene_angle_second(0x00214404u, EF_U16(0x002144b6u));
+    update_scene_angle_second(0x00214404u, g_scene_angle_saved_first);
     if (EF_U8(0x002144aau) & 0x10u) {
         int16_t z = (int16_t)EF_U16(0x0012dba0u);
 
@@ -1228,9 +1228,9 @@ void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled)
         EF_U32(0x00214448u) = (uint32_t)metric;
         EF_U32(0x0021436cu) = (uint32_t)metric << 16;
     }
-    request_scene_pair((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b0u)));
-    set_scene_angles((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b4u)),
-                     (int16_t)(0u - EF_U16(0x002144b0u)));
+    request_scene_pair((int16_t)(0u - g_scene_angle_saved_first), (int16_t)(0u - g_scene_angle_saved_third));
+    set_scene_angles((int16_t)(0u - g_scene_angle_saved_first), (int16_t)(0u - g_scene_angle_saved_second),
+                     (int16_t)(0u - g_scene_angle_saved_third));
     set_scene_input_triplet((int32_t)EF_U32(0x00214370u), (int32_t)EF_U32(0x0021436cu),
                             (int32_t)EF_U32(0x00214374u));
 }
@@ -1665,7 +1665,7 @@ void draw_debug_overlay_58714(void)
     EF_U8(0x00127b1au) = 1u;
     draw_shadowed_text_48c90(0x0cu, 0, 0, 0x00185d30u);
     EF_U8(0x00127b1au) = 1u;
-    draw_shadowed_text_48c90(0x0fu, 0, 8, 0x00185d40u, g_world_grid_mode, EF_U8(0x0012583au), EF_U8(0x00127da4u));
+    draw_shadowed_text_48c90(0x0fu, 0, 8, 0x00185d40u, g_world_grid_mode, g_external_grid_count, g_external_grid_marked_count);
     if (obj != 0u) {
         uint16_t flags;
         int32_t owner;
@@ -1974,9 +1974,9 @@ void update_scene_camera_node_92984(void)
     EF_U16(0x0021454cu) = 0u;
     update_scene_angle_first(0x00214404u, EF_U16(0x0021454eu));
     update_scene_angle_second(0x00214404u, EF_U16(0x00214550u));
-    EF_U16(0x002144b6u) = (uint16_t)angle_d13ac(0x00214404u);
-    EF_U16(0x002144b4u) = (uint16_t)forward_pair_d13dc(0x00214404u);
-    EF_U16(0x002144b0u) = (uint16_t)angle_d13ec(0x00214404u);
+    g_scene_angle_saved_first = (uint16_t)angle_d13ac(0x00214404u);
+    g_scene_angle_saved_second = (uint16_t)forward_pair_d13dc(0x00214404u);
+    g_scene_angle_saved_third = (uint16_t)angle_d13ec(0x00214404u);
     if (EF_U8(0x002144aau) & 0x10u)
         EF_U16(0x0012db9cu) = (uint16_t)(EF_U16(0x0012db9cu) - EF_U16(0x00127d92u));
     if (EF_U8(0x002144aau) & 0x20u)
@@ -2001,9 +2001,9 @@ void update_scene_camera_node_92984(void)
         EF_U32(0x00214448u) = (uint32_t)metric;
         EF_U32(0x0021436cu) = (uint32_t)metric << 16;
     }
-    request_scene_pair((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b0u)));
-    set_scene_angles((int16_t)(0u - EF_U16(0x002144b6u)), (int16_t)(0u - EF_U16(0x002144b4u)),
-                     (int16_t)(0u - EF_U16(0x002144b0u)));
+    request_scene_pair((int16_t)(0u - g_scene_angle_saved_first), (int16_t)(0u - g_scene_angle_saved_third));
+    set_scene_angles((int16_t)(0u - g_scene_angle_saved_first), (int16_t)(0u - g_scene_angle_saved_second),
+                     (int16_t)(0u - g_scene_angle_saved_third));
     set_scene_input_triplet((int32_t)EF_U32(0x00214370u), (int32_t)EF_U32(0x0021436cu),
                             (int32_t)EF_U32(0x00214374u));
 }
@@ -4525,7 +4525,7 @@ void draw_map_layers_4bf1c(uint32_t a, uint32_t b, uint32_t c)
 	draw_group_markers3_441fc(a, b);
 	if (EF_U8(0x001a553au) != 0u)
 		draw_group_icons_433fc(a, c);
-	if (EF_U8(0x001a53dcu) == 4u) {
+	if (g_ui_alternate_message == 4u) {
 		EF_U16(0x00126558u) = 0u;
 		EF_U16(0x00126554u) = 1u;
 		EF_U16(0x00126556u) = 0u;
@@ -4972,7 +4972,7 @@ void refresh_selected_label_5c354(void)
 	shift = g_tactical_display_mode;
 	draw_formatted_text_mode_48bb0(g_tactical_marker_code, (1u - shift) & 0xffu,
 	                               (int16_t)((int32_t)pt[0] - half),
-	                               (int16_t)((((uint32_t)EF_U16(0x001a6ce2u) + 2u) << shift) + (uint32_t)(int32_t)pt[1]),
+	                               (int16_t)((((uint32_t)g_tactical_cross_radius + 2u) << shift) + (uint32_t)(int32_t)pt[1]),
 	                               textp);
 	if (EF_U8(0x00127da8u) == 0)
 		return;
@@ -5501,7 +5501,7 @@ void draw_tactical_marker_5c518(void)
 		int32_t half = ((int16_t)guest_fn_48da0(lp)) >> 1;
 		uint32_t shl;
 		cl = g_tactical_display_mode & 31;
-		shl = ((uint32_t)EF_U16(0x001a6ce2u) + 2u) << cl;
+		shl = ((uint32_t)g_tactical_cross_radius + 2u) << cl;
 		t = (int16_t)(shl + (uint32_t)(int32_t)LS(0x12));
 		guest_fn_48bb0(g_tactical_marker_code, (uint32_t)((1 - cl) & 0xff),
 		               (int16_t)((int32_t)LS(0x10) - half), t, lp);
@@ -5641,7 +5641,7 @@ void draw_contact_labels_5d1c4(void)
 					y = LS(2);
 					LS(0x14) = (int16_t)x;
 					guest_fn_5d87c((uint32_t)x, (uint32_t)y, obj);
-					ex = (int16_t)(((uint32_t)EF_U16(0x001a6ce2u) + 2u) << (g_tactical_display_mode & 31));
+					ex = (int16_t)(((uint32_t)g_tactical_cross_radius + 2u) << (g_tactical_display_mode & 31));
 					*(int32_t *)(L + 4) = x;
 					guest_fn_5de14((uint32_t)x, (uint32_t)y, (uint32_t)ex, obj);
 					if (EF_U32(obj + 0x1cu) != 0)
@@ -5676,7 +5676,7 @@ void draw_contact_labels_5d1c4(void)
 		int32_t x = LS(0), y = LS(2);
 		guest_fn_5d520_x(x, y, obj);
 		guest_fn_5de14((uint32_t)x, (uint32_t)y,
-		               (uint32_t)(int16_t)(((uint32_t)EF_U16(0x001a6ce2u) + 2u) << (g_tactical_display_mode & 31)),
+		               (uint32_t)(int16_t)(((uint32_t)g_tactical_cross_radius + 2u) << (g_tactical_display_mode & 31)),
 		               obj);
 		if (EF_U32(obj + 0x1cu) != 0)
 			guest_fn_5dbc8_x(x, y);
@@ -6033,7 +6033,7 @@ void draw_object_marker_5d520(int32_t a0, int32_t b0, ef_addr32 obj)
 	int32_t a = (int16_t)a0, b = (int16_t)b0, S;
 	int32_t xl, xr, yt, yb;
 	uint32_t edi = 0u, esi = obj;
-	S = (int16_t)(uint16_t)((uint32_t)EF_U16(0x001a6ce2u) << (g_tactical_display_mode & 31u));
+	S = (int16_t)(uint16_t)((uint32_t)g_tactical_cross_radius << (g_tactical_display_mode & 31u));
 	xl = a - S;
 	xr = a + S;
 	yt = b - S;
@@ -6736,7 +6736,7 @@ void update_player_weapon_86110(void)
     uint32_t t;
     if (EF_U8(0x00122c5cu) != 0u)
         return;
-    p = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    p = guest_fn_7489c((int32_t)g_grid_secondary_selector >> 16);
     if (p == 0u || EF_U8(0x001a363au) != 0u || EF_U8(0x00127d42u) != 0u || EF_U8(0x00132ac2u) != 0u)
         return;
     idx = (int32_t)EF_U32(p + 0x1d4u) >> 24;
@@ -6767,9 +6767,9 @@ void update_player_weapon_86110(void)
                          EF_U32(0x001a8210u), p);
         kind = KIND_86110(p);
         if (kind != 9 && kind != 0x14) {
-            guest_fn_8f22c((int32_t)EF_U32(0x001f71c8u) >> 16, EF_U8(p + 0x1d7u));
+            guest_fn_8f22c((int32_t)g_grid_secondary_selector >> 16, EF_U8(p + 0x1d7u));
             if (g_world_grid_mode != 0u)
-                guest_fn_56f0c_x((int32_t)EF_U32(0x001f71c8u) >> 16, EF_U8(p + 0x1d7u));
+                guest_fn_56f0c_x((int32_t)g_grid_secondary_selector >> 16, EF_U8(p + 0x1d7u));
         }
         if (EF_U8(0x0012b368u) == 0u)
             EF_U16(SLOT_86110(p) + 0x19cu) = (uint16_t)(EF_U16(SLOT_86110(p) + 0x19cu) - 1u);
