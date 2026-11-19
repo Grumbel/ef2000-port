@@ -3084,7 +3084,7 @@ void scan_triggers_3d950(void)
 /* 0x6e74, 211 bytes. Bind the object ID (looked up with 0x7489c) to the first free entry of the 5-byte table at [0x197260] (0x121e55 entries; free means the id word at +1 is 0xff while the object's slot byte at +0x187 is still 0xff): clear the entry, store the id and the slot number in the object. Errors through 0x132a74 when no entry was free. Afterwards bump the counter byte 0x19726a and flag the owner (byte 0x1fcc63 + word at +0x15 of its record) as used. */
 void bind_object_slot_6e74(uint32_t id)
 {
-    uint32_t obj = guest_fn_7489c((int16_t)id);
+    uint32_t obj = lookup_filtered_indexed_object((int16_t)id);
     uint8_t i;
     uint32_t table;
     uint32_t rec;
@@ -3119,7 +3119,7 @@ uint32_t heading_to_current_object_66fc(void)
     int32_t bx;
     int32_t dx;
     uint8_t mode;
-    if (guest_fn_7489c((int16_t)EF_U16(0x001f71cau)) == 0u)
+    if (lookup_filtered_indexed_object((int16_t)EF_U16(0x001f71cau)) == 0u)
         return 0u;
     mode = EF_U8(0x0012814cu);
     if (mode == 2u) {
@@ -3314,7 +3314,7 @@ void set_record_state_14c5c(int32_t idx, uint32_t state)
     EF_U8(rec) = st;
     if (old == st)
         return;
-    obj = guest_fn_7489c((int16_t)EF_U16(0x001f71cau));
+    obj = lookup_filtered_indexed_object((int16_t)EF_U16(0x001f71cau));
     if (obj != 0u && (EF_U8(obj + 0x24u) & 0x10u) != 0u)
         return;
     guest_fn_14d58_x((int16_t)idx);
@@ -3815,7 +3815,7 @@ void draw_entry_boxes_e8484(int32_t key, uint32_t x, uint32_t y, uint32_t z)
 void retire_unit_8d330(int32_t index)
 {
     int16_t i = (int16_t)index;
-    uint32_t rec = guest_fn_7489c(i);
+    uint32_t rec = lookup_filtered_indexed_object(i);
     int16_t page;
     if (EF_U8(0x001a666bu) == EF_U16(rec + 0x18u))
         return;
@@ -4216,12 +4216,12 @@ void set_unit_target_73734(int32_t a, int32_t b)
 {
     int16_t ia = (int16_t)a;
     int16_t ib = (int16_t)b;
-    uint32_t ra = guest_fn_7489c(ia);
+    uint32_t ra = lookup_filtered_indexed_object(ia);
     uint32_t rb;
     uint32_t t;
     if (ra == 0u)
         return;
-    rb = guest_fn_7489c(ib);
+    rb = lookup_filtered_indexed_object(ib);
     if (rb == 0u)
         return;
     if ((uint16_t)ia == EF_U16(0x001f71cau)) {
@@ -4326,8 +4326,8 @@ void insert_ordered_id_a48ac(uint32_t id, uint32_t after)
 /* 0x39cb4, 238 bytes. Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) scaled by >> 8; any axis difference above 0x444 (or a negative sum) saturates the squared distance at 0x123210. Stores 100 * sqrt / 0x444 as a word at OUT_PCT and asks 0x86968 to fill the two-word result at OUT; when it declines both words become 0xffff. */
 void compute_unit_distance_39cb4(uint32_t out, uint32_t out_pct)
 {
-    uint32_t a = guest_fn_7489c((int16_t)EF_U16(0x001f71cau));
-    uint32_t b = guest_fn_7489c((int16_t)EF_U16(0x001a823eu));
+    uint32_t a = lookup_filtered_indexed_object((int16_t)EF_U16(0x001f71cau));
+    uint32_t b = lookup_filtered_indexed_object((int16_t)EF_U16(0x001a823eu));
     int32_t dx;
     int32_t dy;
     int32_t dz;
@@ -4422,7 +4422,7 @@ void rebuild_group_tables_49bdc(uint32_t p)
             uint32_t off = (uint32_t)(int32_t)j * 2u + (uint32_t)(int32_t)i * 16u;
             uint32_t u;
             EF_U16(0x001a5330u + off) = EF_U16(rec + 0x50u + (uint32_t)(int32_t)j * 2u);
-            u = guest_fn_7489c((int16_t)EF_U16(0x001a5330u + off));
+            u = lookup_filtered_indexed_object((int16_t)EF_U16(0x001a5330u + off));
             EF_U16(0x001a52b0u + off) = EF_U16(u + 0x47u);
         }
         groups = (int16_t)EF_U16(0x001a53c0u);
@@ -4709,8 +4709,8 @@ void credit_hit_74480(int32_t a)
     uint32_t flags;
     if (tgt == -1 || tgt == 0xff || ia == 0xff)
         return;
-    ra = guest_fn_7489c(ia);
-    rb = guest_fn_7489c(tgt);
+    ra = lookup_filtered_indexed_object(ia);
+    rb = lookup_filtered_indexed_object(tgt);
     if (ra == 0u || rb == 0u)
         return;
     flags = EF_U8(ra + 0x24u);
@@ -4879,7 +4879,7 @@ uint32_t pack_bit_planes_d19ec(uint32_t dst, uint32_t src)
 /* 0x740e4, 263 bytes. Assign the unit A to the slot SLOT (stack byte, 0xff = none) of its owner's roster: the unit's previous slot (byte +0x20b) is cleared (word +0xd of the 25-byte slot entry in the owner's table 0x1972e0[owner byte +0x5f]) when the new slot is 0xff, a new slot receives the unit number; then the bytes +0x209 (B), +0x20a (C) and +0x16d (D) and the slot number are stored in the unit record. (Registers EAX/EDX/EBX/ECX plus one stack byte, ret 4.) */
 void assign_roster_slot_740e4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t slot)
 {
-    uint32_t rec = guest_fn_7489c((int16_t)a);
+    uint32_t rec = lookup_filtered_indexed_object((int16_t)a);
     uint32_t owner;
     uint32_t prev;
     uint32_t table;
@@ -5188,7 +5188,7 @@ void advance_follow_slot_3a148(int32_t a)
 {
     int16_t ia = (int16_t)a;
     uint32_t owner = (uint32_t)((int32_t)ia * 0xca) + EF_U32(0x0019bb58u);
-    uint32_t unit = guest_fn_7489c((int16_t)EF_U16(owner + 0x50u));
+    uint32_t unit = lookup_filtered_indexed_object((int16_t)EF_U16(owner + 0x50u));
     uint32_t r;
     uint32_t cnt;
     uint32_t e;
@@ -5660,7 +5660,7 @@ void bind_unit_entry_76b80(uint32_t id)
     }
     if (slot == 0xffu)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x00186d44u);
-    unit = guest_fn_7489c((int16_t)id);
+    unit = lookup_filtered_indexed_object((int16_t)id);
     if (unit == 0u)
         guest_callptr2_x(EF_U32(0x00132a74u), 0x00186d58u, (uint32_t)(int32_t)(int16_t)id);
     tbl = EF_U32(0x001f8918u);
@@ -5818,7 +5818,7 @@ void draw_table_sprite_cde00(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3,
 /* 0x6abac, 331 bytes. Pick a free object for the unit ID (16-bit) from candidate list K (word index into the 69-byte table at dword 0x1a14f8, ten object IDs at +0x28): the first object that exists, has flags 1 and 2 clear in byte +0x30, no owner (dword +0x1c) is stored in the unit's word +0x16a (the object's word +0x16); in the first pass the choice is undone (word 0xff) when one of the seven peers listed in the 202-byte table at dword 0x19bb58 (indexed by the unit's word +0x28, IDs at +0x50) already uses the same value, and the scan continues; a second pass without the peer check follows when nothing was chosen. Returns 1 when an object was assigned, 0 otherwise (also when the unit does not exist). */
 uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
 {
-    uint32_t unit = guest_fn_7489c((int16_t)id);
+    uint32_t unit = lookup_filtered_indexed_object((int16_t)id);
     int16_t i, j;
     uint16_t found = 0u;
     if (unit == 0u)
@@ -5836,7 +5836,7 @@ uint32_t assign_unit_object_6abac(uint32_t id, uint32_t k)
         EF_U16(unit + 0x16au) = EF_U16(p + 0x16u);
         for (j = 0; j < 7; j++) {
             uint32_t t2 = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(unit + 0x28u) * 0xca);
-            uint32_t peer = guest_fn_7489c((int16_t)EF_U16(t2 + 0x50u + (uint32_t)j * 2u));
+            uint32_t peer = lookup_filtered_indexed_object((int16_t)EF_U16(t2 + 0x50u + (uint32_t)j * 2u));
             if (peer != 0u && peer != unit && EF_U16(peer + 0x16au) == EF_U16(p + 0x16u)) {
                 EF_U16(unit + 0x16au) = 0xffu;
                 found = 0u;
@@ -7727,7 +7727,7 @@ void normalise_angles_6bca8(void)
 void build_unit_name_7548c(uint32_t dest, uint32_t index)
 {
     char tmp[0x50];
-    uint32_t rec = guest_fn_7489c((int32_t)(int16_t)index);
+    uint32_t rec = lookup_filtered_indexed_object((int32_t)(int16_t)index);
     uint32_t name, kind;
     if (rec == 0u)
         return;
@@ -7836,7 +7836,7 @@ void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
 /* 0x18a68, 222 bytes. Advance the scene-node scan cursor (word 0x211ae2, starting at 0x2001) for the unit whose index is the signed word at 0x1f71ca: step through the nodes (0x8ffe8) until one has its position (three ints scaled by the double at 0x181830, taken from the 0x45-byte records at 0x1a14f8 indexed by the high word of node +0x36) within the distance (double 0x181838) of the unit's position at +0x49, or the node list runs out (cursor reset to 0x2001, at most twice). */
 void scan_nodes_near_unit_18a68(void)
 {
-    uint32_t unit = guest_fn_7489c((int32_t)(int16_t)EF_U16(0x001f71cau));
+    uint32_t unit = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(0x001f71cau));
     uint8_t left = 2u, found = 0u;
     double pos[3];
     if (unit == 0u)
@@ -9079,7 +9079,7 @@ void queue_message_47764(uint32_t di, uint32_t si, uint32_t ebx, uint32_t ecx, u
     int32_t unit = (int16_t)di;
     int32_t id = (int16_t)si;
     uint8_t dl, done = 0u;
-    if (!(guest_fn_7489c(unit) != 0u || unit == 0x899 || unit == 0xff))
+    if (!(lookup_filtered_indexed_object(unit) != 0u || unit == 0x899 || unit == 0xff))
         return;
     if (id <= 0 || id >= 0x85)
         return;
@@ -9690,7 +9690,7 @@ void build_mode_label_326d8(void)
 void fetch_entry_pair_84e3c(ef_addr32 out, uint32_t unit, uint32_t sub)
 {
     int32_t u16 = (int16_t)unit;
-    ef_addr32 u = guest_fn_7489c(u16);
+    ef_addr32 u = lookup_filtered_indexed_object(u16);
     int32_t cls;
     ef_addr32 rec;
     ef_addr32 tbl;
@@ -9986,7 +9986,7 @@ uint32_t pick_roster_slot_7bc0(uint32_t unit, uint32_t group)
     int32_t id = (int16_t)unit;
     uint8_t g = (uint8_t)group;
     uint8_t best = 0xffu;
-    ef_addr32 u = guest_fn_7489c(id);
+    ef_addr32 u = lookup_filtered_indexed_object(id);
     ef_addr32 rec;
     int16_t i;
     if (u == 0u)
@@ -10180,7 +10180,7 @@ void apply_pending_notices_6563c(void)
         EF_U8(node + 0xdu) = 1u;
         switch (kind) {
         case 1:
-            o = guest_fn_7489c(id);
+            o = lookup_filtered_indexed_object(id);
             if (o != 0u)
                 EF_U8(o + 0x13fu) = 1u;
             break;
@@ -10692,7 +10692,7 @@ void refresh_unit_roster_76e2c(uint32_t a, uint32_t b)
 {
     int32_t cls = (int16_t)a;
     int32_t unit = (int16_t)b;
-    ef_addr32 u = guest_fn_7489c(unit);
+    ef_addr32 u = lookup_filtered_indexed_object(unit);
     ef_addr32 row;
     ef_addr32 crec;
     uint8_t matched = 0u;
@@ -11575,7 +11575,7 @@ void clear_missile_slots_16c7c(uint32_t a)
         uint32_t i;
         if (wid == 0xffu)
             continue;
-        obj = guest_fn_7489c((int32_t)(int16_t)wid);
+        obj = lookup_filtered_indexed_object((int32_t)(int16_t)wid);
         if (obj == 0u)
             continue;
         p = obj + 0x19bu;
@@ -11980,7 +11980,7 @@ void jitter_offset_322ac(void)
     int32_t half;
     if (EF_U8(0x0019e557u) == 1u || EF_U8(0x0019e5deu) == 0u)
         return;
-    obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    obj = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     if (obj == 0u || EF_U8(obj + 0x18du) == 0u)
         return;
     memcpy(&a, ef_guest_memory_ptr(0x001a3078u), sizeof a);
@@ -12105,7 +12105,7 @@ void update_mode_e9c00(void)
 /* 0x872c8, 217 bytes. Spawn a unit at the current position of the selected object: look up the object named by the high word of 0x1f71c8 (nothing if missing), build the position vector from the dwords 0x1a5bec, 0x1a5bf0 and 0x1a5be8 shifted left by 8, run 0xe9b38 with the vector, the three signed high words at 0x127d3a, 0x127d3c, 0x127d3e and 0x85c90 of the top byte of object+0x1d4, then (with the flag word 0x20f194 set around it) create the unit record at 0x20f1a0 through 0x87a20 with the vector and the stack values: the three high words, 0x1a5be4, the signed word A (EAX), B (EDX) and the object. */
 void spawn_at_selected_872c8(uint32_t a, uint32_t b)
 {
-    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 obj = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     uint32_t vec[3];
     uint32_t w3a;
     uint32_t w3c;
@@ -12164,7 +12164,7 @@ void load_camera_92e30(uint32_t unit)
     EF_U32(0x001a5bf0u) = (uint32_t)(int32_t)truncate_9d72c(v);
     guest_fn_d0b68(0x00214404u, 0u);
     guest_fn_d0b68(0x00214378u, 0u);
-    obj = guest_fn_7489c((int32_t)(int16_t)unit);
+    obj = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
     if (obj == 0u) {
         EF_U16(0x0021449cu) = 1u;
         EF_U8(0x0012db9eu) = EF_U8(0x00214486u);
@@ -12277,7 +12277,7 @@ void refresh_map_cursor_5a220(void)
 void select_view_object_24e58(uint32_t id)
 {
     int32_t sid = (int16_t)id;
-    ef_addr32 obj = guest_fn_7489c(sid);
+    ef_addr32 obj = lookup_filtered_indexed_object(sid);
     ef_addr32 cur;
     double dx, dy, bearing, v, limit, t;
     double ox, oy, cx, cy;
@@ -12438,7 +12438,7 @@ uint32_t release_pending_item_172b4(uint32_t id)
         return 0xffu;
     sitem = (int16_t)item;
     EF_U16(rec + 0x50u) = 0xffu;
-    obj = guest_fn_7489c(sitem);
+    obj = lookup_filtered_indexed_object(sitem);
     if (obj == 0u)
         return 0xffu;
     if ((EF_U8(obj + 0x24u) & 8u) == 0u) {
@@ -12601,7 +12601,7 @@ void fill_scaled_rect_c99ac(uint32_t colour, uint32_t x0, uint32_t y0, uint32_t 
 /* 0x293b0, 236 bytes. Choose which of the 19 three-byte slots (+0x198 of the unit UNIT, AX) to fire at the range D (double 0x1f7000): a slot qualifies when its type byte (+0x19b, class record of 0x91 bytes at 0x12bc94) has class byte 1, a nonzero count word (+0x19c), a maximum range (dword +0x12bca3 times the double 0x18246c) above D and a minimum range (word +0x12bca1 times the same factor) below D; the qualifying slot with the largest dword wins and its index is returned. Without a winner return 0x13 when D is positive, the double 0x1f70a0 is below the double 0x182464 and the square of the double 0x1f7018 is below 20 squared, else 0x14. */
 uint32_t pick_weapon_slot_293b0(uint32_t unit)
 {
-    ef_addr32 obj = guest_fn_7489c((int32_t)(int16_t)unit);
+    ef_addr32 obj = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
     uint32_t best = 0xffu;
     int32_t bestv = 0;
     uint32_t i;
@@ -12665,7 +12665,7 @@ uint32_t position_clear_2dee4(uint32_t id)
         ef_addr32 obj;
         if (oid == 0xff)
             return 1u;
-        obj = guest_fn_7489c(oid);
+        obj = lookup_filtered_indexed_object(oid);
         if (obj != 0u) {
             ef_addr32 r2 = EF_U32(0x0019bb58u) + (uint32_t)sid * 0xcau;
             if (limit > distance_2d_b415c(r2 + 0x61u, obj + 0x49u))
@@ -12678,7 +12678,7 @@ uint32_t position_clear_2dee4(uint32_t id)
 /* 0x65d24, 235 bytes. Advance the target cursor 0x1a820c to the next visible candidate for the selected object (high word of 0x1f71c8, looked up with 0x7489c; when it is missing the cursor is cleared). Step through the ring (0x907f0, wrapping at most once more) until a node passes: 0x2e910(side byte of the owner record, node byte +0x3e) is true, bit 2 of node+0x30 is clear, both |dx| and |dz| to the object are below 0x486c00 and the line of sight request 0x66bf4 is false. If none passes the previous cursor is restored. */
 void next_target_65d24(void)
 {
-    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 obj = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     ef_addr32 saved;
     uint8_t wraps = 0u;
     uint8_t found = 0u;
@@ -12712,7 +12712,7 @@ void next_target_65d24(void)
 /* 0x597d8, 237 bytes. Refresh the weapon readout for the selected object (high word of 0x1f71c8, 0x7489c; nothing if missing): take its current slot (signed byte at +0x1d4 >> 24, 0x14 means none), the slot's type byte (signed word, 0 for none) and the word at the high half of the class dword at class*0x91 + 0x12bc9f (stored to 0x197240), store the rounded value of 0x8a6d4 times the double 0x185e80 in 0x197234, and then: byte 0x12814c == 6 only runs 0x58d04; otherwise type 4 or 0x12 runs 0x58d24 (mode 1), type 5 runs 0x58d04 (mode 2) and anything else 0x58d44 (mode 0), recording the mode in byte 0x1a6d1c. */
 void refresh_weapon_readout_597d8(void)
 {
-    ef_addr32 obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 obj = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     int32_t slot;
     int16_t type;
     int32_t cls;
@@ -12751,7 +12751,7 @@ void refresh_weapon_readout_597d8(void)
 void hail_next_unit_73c38(uint32_t unit)
 {
     int32_t sid = (int16_t)unit;
-    ef_addr32 obj = guest_fn_7489c(sid);
+    ef_addr32 obj = lookup_filtered_indexed_object(sid);
     ef_addr32 other;
     uint32_t tab;
     int16_t cursor;
@@ -12761,7 +12761,7 @@ void hail_next_unit_73c38(uint32_t unit)
     cursor = (int16_t)EF_U8(obj + 0x142u);
     if (cursor >= (int16_t)EF_U16(0x002119f4u))
         EF_U8(obj + 0x142u) = 0u;
-    other = guest_fn_7489c((int32_t)EF_U8(obj + 0x142u));
+    other = lookup_filtered_indexed_object((int32_t)EF_U8(obj + 0x142u));
     if (other == 0u)
         return;
     tab = EF_U32(0x0019bb58u);
@@ -12817,7 +12817,7 @@ uint32_t run_unit_setup_7e670(void)
     do {
         count = 0u;
         for (i = 0; i < (int16_t)EF_U16(0x002119f4u); i++) {
-            ef_addr32 u = guest_fn_7489c((int32_t)i);
+            ef_addr32 u = lookup_filtered_indexed_object((int32_t)i);
             if (u == 0u)
                 continue;
             if (((int32_t)EF_U32(u + 0x16u) >> 16) == 0xfe)
@@ -12848,7 +12848,7 @@ void update_sound_mode_98198(void)
     uint8_t mode;
     if (EF_U8(0x00420a72u) == 0u || EF_U8(0x00420a70u) != 1u)
         return;
-    obj = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    obj = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     guest_fn_d5fa8_x((ef_addr32)(uintptr_t)&pair[1], (ef_addr32)(uintptr_t)&pair[0]);
     if (obj == 0u) {
         mode = 2u;
@@ -13015,7 +13015,7 @@ void check_player_altitude_711f0(void)
 /* 0x65c1c, 249 bytes. Pick the nearest unit of kind 3 (0x6acc) to the viewpoint (dwords 0x1a5bec, 0x1a5bf0, 0x1a5be8 divided by 256) among the ring of units walked with 0x663a4(.., 1), starting from the first, and store its id in word 0x1a8242 (0xffff when there is none or the selected object, high word of 0x1f71c8, is missing). The squared distance uses the signed high words of the unit's first three dwords. */
 void pick_nearest_unit_65c1c(void)
 {
-    ef_addr32 sel = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 sel = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     int32_t first = -1;
     int32_t best = -1;
     int32_t bestd = 0x7fffffff;
@@ -13028,7 +13028,7 @@ void pick_nearest_unit_65c1c(void)
         ef_addr32 u;
         if (first == -1)
             first = id;
-        u = guest_fn_7489c(id);
+        u = lookup_filtered_indexed_object(id);
         if ((uint8_t)guest_fn_6acc_x(u) == 3u) {
             int32_t x = (int32_t)EF_U32(u) >> 16;
             int32_t y = (int32_t)EF_U32(u + 4u) >> 16;
@@ -13073,7 +13073,7 @@ uint32_t any_nearby_flagged_2c358(void)
         found = 1u;
     if (EF_U8(0x00127da9u) != 0u) {
         for (n = 0u; n < EF_U8(0x0012583au); n++) {
-            ef_addr32 u = guest_fn_7489c((int32_t)EF_U32((uint32_t)n * 0x1bu + 0x001a5c2eu) >> 16);
+            ef_addr32 u = lookup_filtered_indexed_object((int32_t)EF_U32((uint32_t)n * 0x1bu + 0x001a5c2eu) >> 16);
             if (u != 0u && (uint8_t)guest_fn_2c224_x((int32_t)EF_U32(u + 0x26u) >> 16) != 0u)
                 found = 1u;
         }
@@ -13533,9 +13533,9 @@ void check_contact_254e4(void)
     uint32_t flags;
     uint32_t code;
     double m150, m15a;
-    if (guest_fn_7489c((int32_t)EF_U32(p + 0x144u) >> 16) == 0u)
+    if (lookup_filtered_indexed_object((int32_t)EF_U32(p + 0x144u) >> 16) == 0u)
         return;
-    u = guest_fn_7489c((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+    u = lookup_filtered_indexed_object((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
     if (u == 0u || EF_U8(u + 0x16cu) != 2u)
         return;
     flags = EF_U8(u + 0x24u);
@@ -13808,8 +13808,8 @@ void update_drag_terms_6c2a4(void)
 /* 0x6e0b0, 273 bytes. Place a table offset in the frame of unit B (EBX): both units A (EDX) and B must exist. Copy B's dwords +0x71, +0x75, +0x69, +0x6d to 0x1f6fd0, 0x1f6fd4, 0x1f7060, 0x1f7064 and its double +0x61 (heading) to 0x1f6ff0, then take the offset (x, y, z doubles at 0x1252ac, 0x125304, 0x12535c plus 279 * ECX + 8 * S0) and write OUT (EAX) = (cos(h) * x - sin(h) * y + B.x, sin(h) * x + cos(h) * y + B.y, z + B.z) with B's position at +0x49, +0x51, +0x59. Returns 1 on success, 0 when a unit is missing. */
 uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, uint32_t index, uint32_t sel)
 {
-    ef_addr32 ua = guest_fn_7489c((int16_t)a_id);
-    ef_addr32 ub = guest_fn_7489c((int16_t)b_id);
+    ef_addr32 ua = lookup_filtered_indexed_object((int16_t)a_id);
+    ef_addr32 ub = lookup_filtered_indexed_object((int16_t)b_id);
     ef_addr32 row;
     double heading, mx, my, mz, c, s, x, y, z, px, py, pz;
     if (ua == 0u || ub == 0u)
@@ -13844,7 +13844,7 @@ uint8_t offset_in_unit_frame_6e0b0(ef_addr32 out, int32_t a_id, int32_t b_id, ui
 /* 0x72390, 277 bytes. Move unit ID (AX) one tick: dt = word 0x127d92 * double 0x186a69 (stored at 0x1f7188); the velocity (doubles +0xa1, +0xb9, +0xd1 times the double +0x91, stored at 0x1f7170, 0x1f7178, 0x1f7180) gains the second set +0xb1, +0xc9, +0xe1 times the double +0x99 when the type table byte 0x1285a1 + 0xe5 * (byte +0xe9) is set. Unless bit 0x10 of byte +0x26 is set the position doubles +0x49, +0x51, +0x59 advance by velocity * dt; the bit is then cleared and 0x73d50(ID) runs. */
 void move_unit_72390(uint32_t id)
 {
-    ef_addr32 u = guest_fn_7489c((int16_t)id);
+    ef_addr32 u = lookup_filtered_indexed_object((int16_t)id);
     double dt, k, m, s, vx, vy, vz, px, py, pz;
     uint32_t type;
     if (u == 0u)
@@ -14853,14 +14853,14 @@ void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
     EF_U16(u + 0x10u) = EF_U16(r + 0x11u);
     if (EF_U8(r + 0x18u) == 0x20u || EF_U8(r + 0x18u) == 0x1fu) {
         EF_U16(u + 0x56u) = 0xffu;
-        EF_U32(u + 0x4bu) = guest_fn_7489c((int32_t)EF_U32(r + 0x14u) >> 16);
+        EF_U32(u + 0x4bu) = lookup_filtered_indexed_object((int32_t)EF_U32(r + 0x14u) >> 16);
     } else {
         EF_U16(u + 0x56u) = EF_U16(r + 0x16u);
     }
     {
         int32_t link = (int32_t)EF_U32(u + 0x54u) >> 16;
         if (link != 0xff) {
-            ef_addr32 other = guest_fn_7489c(link);
+            ef_addr32 other = lookup_filtered_indexed_object(link);
             if (other != 0u) {
                 EF_U32(u + 0x30u) = other;
                 EF_U32(other + 0x1cu) = u;
@@ -14884,7 +14884,7 @@ void build_unit_from_record_55928(ef_addr32 r, uint32_t type)
 void destroy_unit_74718(uint32_t id)
 {
     int32_t uid = (int16_t)id;
-    ef_addr32 u = guest_fn_7489c(uid);
+    ef_addr32 u = lookup_filtered_indexed_object(uid);
     if (u == 0u)
         return;
     if (object_uses_secondary_grid((int16_t)uid) != 0u) {
@@ -14894,7 +14894,7 @@ void destroy_unit_74718(uint32_t id)
             send_packet_2b((int16_t)uid, 2, 0x5f);
     } else {
         if (EF_U16(u + 0x146u) != 0xffu) {
-            ef_addr32 p = guest_fn_7489c((int32_t)EF_U32(u + 0x144u) >> 16);
+            ef_addr32 p = lookup_filtered_indexed_object((int32_t)EF_U32(u + 0x144u) >> 16);
             if (p != 0u && EF_U16(p + 0x158u) == (uint16_t)uid) {
                 EF_U32(p + 0x15au) = 0u;
                 EF_U32(p + 0x15eu) = 0u;
@@ -15145,7 +15145,7 @@ void draw_map_cursor_5a2d0(void)
     uint32_t d;
     uint32_t owner;
     int32_t px, py, m;
-    u = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    u = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     if (u == 0u)
         return;
     idx = EF_U8(0x001a6d1bu);
@@ -15258,7 +15258,7 @@ void draw_status_overlay_59334(void)
 void track_closest_link_88574(ef_addr32 rec)
 {
     uint8_t buf[0x30];
-    ef_addr32 player = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+    ef_addr32 player = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
     ef_addr32 t = EF_U32(0x0020f150u);
     uint8_t cls;
     int32_t dx, dy, dz, d2;
@@ -15408,7 +15408,7 @@ void measure_view_range_67d4(void)
     int32_t hi = (int32_t)EF_U32(0x001f71c8u) >> 16;
 
     EF_U32(0x0019721cu) = 0xffffffffu;
-    unit = guest_fn_7489c(hi);
+    unit = lookup_filtered_indexed_object(hi);
     if (unit == 0u)
         return;
     pt[0] = 0u;
@@ -15491,7 +15491,7 @@ void unit_damage_tick_29dd0(uint32_t ax)
     int16_t level;
     double d;
 
-    unit = guest_fn_7489c((int32_t)(int16_t)ax);
+    unit = lookup_filtered_indexed_object((int32_t)(int16_t)ax);
     if (unit == 0u)
         return;
     target = EF_U32(unit + 0x1cu);
@@ -17009,7 +17009,7 @@ uint32_t advance_to_nearby_object_6aa70(uint32_t ax)
 	double d, limit;
 	int16_t cur;
 
-	unit = guest_fn_7489c((int32_t)(int16_t)ax);
+	unit = lookup_filtered_indexed_object((int32_t)(int16_t)ax);
 	if (unit == 0u)
 		return 0u;
 	remembered = next_free_object_9075c((uint32_t)((int32_t)EF_U32(unit + 0x168u) >> 16));
@@ -17052,7 +17052,7 @@ uint32_t pick_nearest_candidate_6a8fc(uint32_t ax)
 	double a, b;
 	int k, skip;
 
-	unit = guest_fn_7489c((int32_t)(int16_t)ax);
+	unit = lookup_filtered_indexed_object((int32_t)(int16_t)ax);
 	if (unit == 0u)
 		return 0u;
 	for (j = 0; j < 8; j++) {
@@ -17062,7 +17062,7 @@ uint32_t pick_nearest_candidate_6a8fc(uint32_t ax)
 			continue;
 		if (is_valid_target_6a82c((int16_t)ax, (int16_t)other) == 0u)
 			continue;
-		other_u = guest_fn_7489c(other);
+		other_u = lookup_filtered_indexed_object(other);
 		if (EF_U32(other_u + 0x1cu) != 0u || (EF_U8(other_u + 0x24u) & 2u) != 0u)
 			continue;
 		skip = 0;
@@ -17262,7 +17262,7 @@ void assign_slot_68a60(int32_t slot, int32_t value)
 /* 0x6b620, 196 bytes. Copy the pending view state into unit AX (signed): dwords 0x1f71b0/0x1f71b4 to +0x91/+0x95, 0x12850c/0x128510 to +0x16f/+0x173, the double at 0x1284cc to +0x79, dwords 0x1284c4/0x1284c8 to +0x81/+0x85 and 0x1f71a8/0x1f71ac to +0x89/+0x8d (after normalising the angles with 0x6bca8). Bit 0 of byte +0x24 is set when the double at 0x1f6f50 is nonzero (ignoring its sign) and cleared otherwise; dwords 0x1f7018/0x1f701c are stored at +0x148/+0x14c. Nothing happens for a missing unit. */
 void copy_view_state_6b620(uint32_t ax)
 {
-	uint32_t unit = guest_fn_7489c((int32_t)(int16_t)ax);
+	uint32_t unit = lookup_filtered_indexed_object((int32_t)(int16_t)ax);
 
 	if (unit == 0u)
 		return;
@@ -17325,8 +17325,8 @@ void propagate_target_record_242b8(uint32_t ax, uint32_t dx)
 {
 	int32_t ua = (int32_t)(int16_t)ax;
 	int32_t ub = (int32_t)(int16_t)dx;
-	uint32_t a = guest_fn_7489c(ua);
-	uint32_t b = guest_fn_7489c(ub);
+	uint32_t a = lookup_filtered_indexed_object(ua);
+	uint32_t b = lookup_filtered_indexed_object(ub);
 	uint32_t rows, ra, rb;
 	double d1, d2, c;
 
@@ -17385,7 +17385,7 @@ void compact_slot_list_2b708(uint32_t ax)
 	}
 	for (k = 0; k < 7; k++) {
 		base = rows + (uint32_t)(row * 0xca);
-		u = guest_fn_7489c((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
+		u = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
 		rows = EF_U32(0x0019bb58u);
 		if (u != 0u)
 			EF_U8(u + 0x2au) = (uint8_t)k;
@@ -17450,10 +17450,10 @@ uint8_t row_has_active_unit_2bfcc(uint32_t ax)
 		return 0u;
 	for (k = 0; k < 6; k++) {
 		base = EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca);
-		u = guest_fn_7489c((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
+		u = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(base + (uint32_t)(k * 2) + 0x50u));
 		if (u == 0u)
 			continue;
-		t = guest_fn_7489c((int32_t)(int16_t)EF_U16(u + 0x146u));
+		t = lookup_filtered_indexed_object((int32_t)(int16_t)EF_U16(u + 0x146u));
 		memcpy(&v, ef_guest_memory_ptr(u + 0x15au), 8);
 		memcpy(&c, ef_guest_memory_ptr(0x0018253au), 8);
 		if (v > c && EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(row * 0xca) + 0x1bu) == 2u) {
@@ -17819,7 +17819,7 @@ void draw_selected_unit_label_59998(void)
 	int32_t off = (int32_t)EF_U32(0x00128174u + row) >> 16;
 	int16_t x = (int16_t)EF_U16(0x00128170u + row);
 	int32_t esi = (off * 3) / 6;
-	uint32_t unit = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+	uint32_t unit = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
 	int32_t k, slot;
 	uint32_t name, count;
 
@@ -18000,7 +18000,7 @@ void update_effect_entries_90f50(void)
 void handle_unit_state_packet_564f4(ef_addr32 rec)
 {
 	int32_t id = (int32_t)(int16_t)EF_U16(rec + 1u);
-	uint32_t unit = guest_fn_7489c(id);
+	uint32_t unit = lookup_filtered_indexed_object(id);
 	uint32_t other, rowa, rowb, rows;
 	uint8_t before;
 	uint32_t player;
@@ -18031,7 +18031,7 @@ void handle_unit_state_packet_564f4(ef_addr32 rec)
 	if (EF_U8(0x0012584bu) == 1u) {
 		send_packet_2c(EF_U8(rec + 4u), (uint8_t)player, 0u, 0u, 0u);
 	} else {
-		other = guest_fn_7489c((int32_t)EF_U32(0x00197c26u) >> 16);
+		other = lookup_filtered_indexed_object((int32_t)EF_U32(0x00197c26u) >> 16);
 		if (other != 0u) {
 			rows = EF_U32(0x0019bb58u);
 			rowa = rows + (uint32_t)(((int32_t)EF_U32(unit + 0x26u) >> 16) * 0xca);
@@ -18148,7 +18148,7 @@ void apply_total_adjustment_4430(uint32_t sel, uint32_t id, uint32_t level, uint
 /* 0x85d00, 369 bytes. Select the next weapon slot of the selected unit (signed word 0x1f71ca) whose weapon class byte (0x12bc94 + 0x91 * type) equals TAG (AL). The current slot is the signed byte at unit +0x1d7 (0x14 = none: the slot becomes 0x13 and 0x14 is returned); slots 0..0x13 are tried cyclically after it (slot 0x13 stores TAG in byte 0x12bd25 and is returned immediately). A slot qualifies when its count word (+0x19c) is non-zero, no earlier slot holds the same type with a count, its type differs from the current slot's and is not 0x21 or 0x22. Returns the slot number in BX, or 0x14 when the search wrapped round to the current slot. */
 uint32_t next_weapon_slot_85d00(uint32_t tag)
 {
-	uint32_t unit = guest_fn_7489c((int32_t)EF_U32(0x001f71c8u) >> 16);
+	uint32_t unit = lookup_filtered_indexed_object((int32_t)EF_U32(0x001f71c8u) >> 16);
 	int32_t cur = (int32_t)(int8_t)EF_U8(unit + 0x1d7u);
 	int16_t bx = (int16_t)cur;
 	int16_t cursel, ax;
@@ -18469,8 +18469,8 @@ double unit_bearing_6a3e4(uint32_t a, uint32_t b)
 {
 	int32_t ia = (int32_t)(int16_t)a;
 	int32_t ib = (int32_t)(int16_t)b;
-	uint32_t ua = guest_fn_7489c(ia);
-	uint32_t ub = guest_fn_7489c(ib);
+	uint32_t ua = lookup_filtered_indexed_object(ia);
+	uint32_t ub = lookup_filtered_indexed_object(ib);
 	double d[3], o[3], v, w, r;
 
 	if (ua == 0u || ub == 0u)
@@ -18882,7 +18882,7 @@ void update_gun_mount_70278(void)
 void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb)
 {
 	int32_t id = (int32_t)(int16_t)ax;
-	uint32_t unit = guest_fn_7489c(id);
+	uint32_t unit = lookup_filtered_indexed_object(id);
 	double t0[3], t1[3], o[3], g, m, c1, v, w, inv;
 
 	if (unit == 0u)
@@ -19018,7 +19018,7 @@ void focus_camera_on_unit_24c40(uint32_t ax)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
 	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
-		v = guest_fn_7489c((int32_t)EF_U32(row + 0x4eu) >> 16);
+		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 2u) == 0u && (EF_U8(v + 0x24u) & 4u) == 0u) {
 			EF_U32(0x001f7088u) = EF_U32(v + 0x59u);
 			EF_U32(0x001f708cu) = EF_U32(v + 0x5du);
@@ -19075,7 +19075,7 @@ void focus_camera_side_2611c(uint32_t ax)
 		memcpy(ef_guest_memory_ptr(0x001f7088u), &lim, 8);
 	row = EF_U32(0x0019bb58u) + (uint32_t)(((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x26u) >> 16) * 0xca);
 	if ((int32_t)EF_U16(row + 0x50u) != ((int32_t)EF_U32(0x001f71c6u) >> 16)) {
-		v = guest_fn_7489c((int32_t)EF_U32(row + 0x4eu) >> 16);
+		v = lookup_filtered_indexed_object((int32_t)EF_U32(row + 0x4eu) >> 16);
 		if (v != 0u && (EF_U8(v + 0x24u) & 4u) == 0u && (EF_U8(v + 0x24u) & 8u) == 0u &&
 		    ((EF_U8(v + 0x24u) & 2u) == 0u || (uint8_t)guest_fn_7574c((int32_t)EF_U32(v + 0x14u) >> 16) != 0u)) {
 			EF_U32(0x001f7088u) = EF_U32(v + 0x59u);
@@ -19169,7 +19169,7 @@ void update_record_speed_26960(ef_addr32 rec)
 void camera_follow_target_255f0(void)
 {
 	uint32_t p = EF_U32(0x001f71bcu);
-	uint32_t t = guest_fn_7489c((int32_t)EF_U32(p + 0x144u) >> 16);
+	uint32_t t = lookup_filtered_indexed_object((int32_t)EF_U32(p + 0x144u) >> 16);
 	uint32_t u, k;
 	double dist, wgt, dx, dy, c, h, lim, base;
 	uint8_t kind, sub, fl;
@@ -19189,7 +19189,7 @@ void camera_follow_target_255f0(void)
 	dy = dy - c;
 	h = wrap_angle_b42f0(atan2_b4620(dy, dx) + wgt * 3.1415926536);
 	memcpy(ef_guest_memory_ptr(0x001f70f8u), &h, 8);
-	u = guest_fn_7489c((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
+	u = lookup_filtered_indexed_object((int32_t)EF_U32(EF_U32(0x001f71bcu) + 0x41u) >> 16);
 	if (u == 0u) {
 		update_current_mode_2546c();
 		return;
@@ -19395,7 +19395,7 @@ void store_fixed_point_state_73d50(int32_t unit)
 	const double c1 = 0.3183098861827565, c2 = 0.4101049868766404;
 	const double k1 = 3.483428571428572, k2 = -1.068251428571429;
 
-	u = guest_fn_7489c((int32_t)(int16_t)unit);
+	u = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
 	if (u == 0u)
 		return;
 	t20 = rd_f64_73d50(u, 0x91u) * 65536.0 * 1.942;
@@ -19630,7 +19630,7 @@ void euler_to_matrix_e9e7c(ef_addr32 out, double x, double y, double z)
 /* 0x72f68, 283 bytes. Predict the position of unit UNIT (AX, sign extended) after time DT (stack double): when the turn rate +0x79 exceeds 0.01745 the point moves on an arc (X = q*sin(w*dt), Z = q*(cos(w*dt) - 1) with q = speed(+0x91)/rate), otherwise on a straight line X = speed*dt. The local offset (X, 0, Z) is rotated by the matrix at +0xa1.. and added to the position at +0x49; the three result doubles go to OUT (ret 0xc). */
 void predict_unit_position_72f68(int32_t unit, double dt, ef_addr32 out)
 {
-	ef_addr32 u = guest_fn_7489c((int32_t)(int16_t)unit);
+	ef_addr32 u = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
 	double v79, v91, ang, q, x, y, z, r[3];
 
 	if (u == 0u)
@@ -19753,7 +19753,7 @@ void parse_command_line_a9724(ef_addr32 text)
 /* 0x8cf10, 287 bytes. Remove unit UNIT (AX, sign extended) from play unless its flag +0x24 bit 2 is set. When it is the local player's unit (word 0x1f71ce) the working state is reset and, in a network game (0x127da8), the owner's loss counter (word array 0x1a6378) is bumped, its score (0x1a6398) lowered by 4 (8 in game mode 3) and the owner summary and a packet are sent. Then the unit's +0x12/+0x91/+0x95 are cleared, bit 3 of +0x26 dropped, 0x7ef14 run, the position packed and a kind-0x64 message sent; a linked panel strip (+0x20b) is cleared. */
 void destroy_unit_8cf10(int32_t unit)
 {
-	ef_addr32 u = guest_fn_7489c((int32_t)(int16_t)unit);
+	ef_addr32 u = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
 	int32_t player;
 
 	if (u == 0u)
@@ -23654,7 +23654,7 @@ void build_curve_tables_d6340(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 /* 0x7215c, 205 bytes. For the unit record found by 0x7489c (index in AX, sign-extended), build the 3x3 rotation matrix from the angles at +0x61 (A), +0x69 (C) and +0x71 (B) and store its nine doubles at +0xa1..+0xe1. Does nothing when no record is found. */
 void unit_rotation_matrix_7215c(int32_t unit)
 {
-	ef_addr32 p = guest_fn_7489c((int32_t)(int16_t)unit);
+	ef_addr32 p = lookup_filtered_indexed_object((int32_t)(int16_t)unit);
 	double cA, sA, cB, sB, cC, sC, t;
 	if (p == 0)
 		return;
@@ -24551,7 +24551,7 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 {
 	int16_t a = (int16_t)eax;
 	int16_t b = (int16_t)edx;
-	ef_addr32 ua = guest_fn_7489c(a);
+	ef_addr32 ua = lookup_filtered_indexed_object(a);
 	ef_addr32 ub;
 	ef_addr32 table;
 	uint8_t idx;
@@ -24559,7 +24559,7 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 	if (ua == 0) {
 		return;
 	}
-	ub = guest_fn_7489c(b);
+	ub = lookup_filtered_indexed_object(b);
 	if (ub == 0) {
 		return;
 	}
@@ -24719,7 +24719,7 @@ void guest_fn_8b8(uint32_t code, ef_addr32 block)
 /* 0x75344, 327 bytes. AX = unit index. Looks up the unit object and sets its integer vector fields at +0x1e8, +0x1ec and +0x1f0 (and zeroes +0x1f4, +0x1f8, +0x1fc) from a per-type offset record, scaled by constants. */
 void update_unit_vector_75344(int16_t unit)
 {
-	ef_addr32 obj = guest_fn_7489c((int32_t)unit);
+	ef_addr32 obj = lookup_filtered_indexed_object((int32_t)unit);
 	double d0 = 0.0, d8 = 0.0, d10 = 0.0;
 	double k1, k2;
 
