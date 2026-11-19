@@ -4,6 +4,7 @@
 #include "ef_abi.h"
 #include "ef_globals.h"
 #include "ef_mem.h"
+#include "ef_structs/group_flags.h"
 
 /* Mouse-driver wrappers, table and string helpers, 0x9c980..0xdcc54. */
 
@@ -58,14 +59,19 @@ void clear_record_flags_ca5e4(void)
     } while (offset < 0x659);
 }
 
-/* Shared walker for the three lookups below: nonzero if the entry for group has a matching byte. */
-static ef_addr32 find_group_entry(ef_addr32 head_addr, uint8_t group)
+/* The three flag predicates share a record walk. Only the first matching
+ * group is inspected, and indices 9 and 10 are always rejected. Match the
+ * original AL input and low-byte index; the original may clobber EDX. The
+ * arena linker removes the old in-place function-size restriction. */
+static ef_group_flag_record *find_group_entry(ef_addr32 head_addr, uint8_t group)
 {
-    ef_addr32 p;
+    ef_addr32 address = EF_U32(head_addr);
 
-    for (p = EF_U32(head_addr); p != 0; p = EF_U32(p + 4u)) {
-        if (EF_U8(p + 0xbu) == group)
-            return p;
+    while (address != 0) {
+        ef_group_flag_record *record = (ef_group_flag_record *)ef_guest_memory_ptr(address);
+        if (record->group == group)
+            return record;
+        address = record->next;
     }
     return 0;
 }
@@ -73,34 +79,34 @@ static ef_addr32 find_group_entry(ef_addr32 head_addr, uint8_t group)
 /* 0xcc1ac, 61 bytes. Is the flag byte for index negative? */
 uint32_t group_flag_negative_cc1ac(uint8_t group, uint32_t index, ef_addr32 head_addr)
 {
-    ef_addr32 p = find_group_entry(head_addr, group);
+    ef_group_flag_record *record = find_group_entry(head_addr, group);
 
     index &= 0xffu;
-    if (p == 0 || index == 10 || index == 9)
+    if (record == 0 || index == 10 || index == 9)
         return 0;
-    return (int8_t)EF_U8(EF_U32(p + 0xcu) + index) < 0;
+    return (int8_t)EF_U8(record->flags + index) < 0;
 }
 
 /* 0xcc1ec, 61 bytes. Is the flag byte for index zero? */
 uint32_t group_flag_zero_cc1ec(uint8_t group, uint32_t index, ef_addr32 head_addr)
 {
-    ef_addr32 p = find_group_entry(head_addr, group);
+    ef_group_flag_record *record = find_group_entry(head_addr, group);
 
     index &= 0xffu;
-    if (p == 0 || index == 10 || index == 9)
+    if (record == 0 || index == 10 || index == 9)
         return 0;
-    return EF_U8(EF_U32(p + 0xcu) + index) == 0;
+    return EF_U8(record->flags + index) == 0;
 }
 
 /* 0xcc22c, 61 bytes. Is the flag byte for index positive? */
 uint32_t group_flag_positive_cc22c(uint8_t group, uint32_t index, ef_addr32 head_addr)
 {
-    ef_addr32 p = find_group_entry(head_addr, group);
+    ef_group_flag_record *record = find_group_entry(head_addr, group);
 
     index &= 0xffu;
-    if (p == 0 || index == 10 || index == 9)
+    if (record == 0 || index == 10 || index == 9)
         return 0;
-    return (int8_t)EF_U8(EF_U32(p + 0xcu) + index) > 0;
+    return (int8_t)EF_U8(record->flags + index) > 0;
 }
 
 /* 0xcd20c, 63 bytes. Store value into the output table and step the script cursor. */
