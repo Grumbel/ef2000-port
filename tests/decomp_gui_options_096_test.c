@@ -130,7 +130,7 @@ static void test_real_reader_with_dispatcher(void)
     for (i = 0u; i < sizeof(keywords) / sizeof(keywords[0]); ++i)
         strcpy((char *)ef_guest_memory_ptr(keywords[i].name), keywords[i].word);
     set_script(";ignore\r\n  HEADER:\r\n NOBOX\r\n nofade\r\n DISPlay\r\n");
-    gui_options_dispatch_f3b78();
+    process_command_dispatch_loop();
     assert(EF_U8(0x4859dbu) == 1u);
     assert(EF_U8(0x4859dcu) == 1u);
     assert(read_count == 3u);
@@ -161,7 +161,7 @@ static void test_all_dispatch_commands_from_script(void)
                " LINEPOINT 5\r\n BOXCOL 6\r\n NoBoX\r\n NOFADE\r\n"
                " DRAW_ALL_BOXES\r\n GOTO elsewhere\r\n MOUSE 1\r\n"
                " unrecognized_keyword\r\n display\r\n return\r\n");
-    gui_options_dispatch_f3b78();
+    process_command_dispatch_loop();
     assert(read_count == 13u); /* The return after display is never read. */
     assert(EF_U8(0x1616ecu) == 13u);
     assert(EF_U8(0x4859dbu) == 1u);
@@ -179,7 +179,7 @@ static void test_all_dispatch_commands_from_script(void)
                 strcpy((char *)ef_guest_memory_ptr(keywords[j].address), keywords[j].word);
         }
         set_script(i == 0u ? " RETURN\r\n display\r\n" : " eof\r\n display\r\n");
-        gui_options_dispatch_f3b78();
+        process_command_dispatch_loop();
         assert(read_count == 1u);
         assert(call_count == 0u);
     }
@@ -190,7 +190,7 @@ static void test_indirect_format_wrapper(void)
     reset();
     EF_U32(0x464390u) = 0x12345678u;
     EF_U16(0x16007cu) = 0xabcd;
-    assert(gui_options_format_global_f6124() == 0xfaceu);
+    format_global_option_line();
     assert(format_args[0] == 0x192c4cu);
     assert(format_args[1] == 0x12345678u);
     assert(format_args[2] == 0xabcdu);

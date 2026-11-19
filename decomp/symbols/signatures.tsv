@@ -3677,3 +3677,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000da4b0	env_ceiling_da4b0			ebx,ecx,edx,esi,edi,ebp	0	Scan the ceiling directly into its word and negate it after scanning.
 0x000da518	env_planet_number_da518			ebx,ecx,edx,esi,edi,ebp	0	Scan the planet index directly into its word and negate it after scanning.
 0x000da580	env_game_type_da580			ebx,ecx,edx,esi,edi,ebp	0	Scan the game type directly into its original destination word.
+0x000f6124	format_global_option_line			ebx,ecx,edx,esi,edi,ebp	0	0x132a74 cdecl formatter receives four stack arguments; EDX is saved/restored; callers f7518/f79b0/f8010 ignore EAX.

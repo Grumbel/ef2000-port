@@ -39,11 +39,18 @@ void gui_options_read_command_f2d74(void)
     }
 }
 
-/* 0x000f6124, 38 bytes. One four-argument call through the original global
- * printf-like callback. EDX is saved/restored by the original wrapper; the
- * callback's EAX is returned to the caller. No format ABI is assumed. */
-uint32_t gui_options_format_global_f6124(void)
+/* 0x000f6124, 38 bytes. Call the current cdecl formatter with the four
+ * outgoing arguments in their original stack order. Its return value is
+ * unused by all callers; the wrapper preserves EDX around the callback. */
+void format_global_option_line(void)
 {
-    return gui_options_format_096(0x192c4cu, EF_U32(0x464390u),
-                                  EF_U16(0x16007cu), 0x464396u);
+#ifdef EF_DECOMP_HOST_TEST
+    (void)gui_options_format_096(0x192c4cu, EF_U32(0x464390u),
+                                 EF_U16(0x16007cu), 0x464396u);
+#else
+    typedef void (EF_CDECL *GuiOptionFormatter)(ef_addr32, uint32_t,
+                                                uint32_t, ef_addr32);
+    GuiOptionFormatter formatter = (GuiOptionFormatter)(uintptr_t)EF_U32(0x132a74u);
+    formatter(0x192c4cu, EF_U32(0x464390u), EF_U16(0x16007cu), 0x464396u);
+#endif
 }

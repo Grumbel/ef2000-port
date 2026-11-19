@@ -10,12 +10,17 @@
 extern "C" {
 #endif
 
-/* Original indirect formatter at [0x132a74]; this remains a host adapter. */
+void gui_options_read_command_f2d74(void);
+void format_global_option_line(void);
+
+#ifdef EF_DECOMP_HOST_TEST
 uint32_t gui_options_format_096(ef_addr32 format, uint32_t first,
                                 uint32_t second, ef_addr32 suffix);
+#endif
 
-void gui_options_read_command_f2d74(void);
-uint32_t gui_options_format_global_f6124(void);
+#ifdef __WATCOMC__
+#pragma aux format_global_option_line modify [eax ebx ecx]
+#endif
 
 #ifdef __cplusplus
 }
