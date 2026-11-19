@@ -14,18 +14,18 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
-    0xF4DB8: (281, "SIZE", "gui_script_properties_094"),
-    0xF4ED4: (281, "FROM", "gui_script_properties_094"),
-    0xF4FF0: (249, "BACKDROP", "gui_script_properties_094"),
-    0xF50EC: (145, "ACTION", "gui_script_properties_094"),
-    0xF5180: (145, "POINTER", "gui_script_properties_094"),
-    0xF5214: (423, "GADGETRY", "gui_script_assets_094"),
-    0xF53BC: (200, "NAME", "gui_script_assets_094"),
+    0xF4DB8: (281, "gui_script_size_f4db8", "gui_script_properties_094"),
+    0xF4ED4: (281, "gui_script_from_f4ed4", "gui_script_properties_094"),
+    0xF4FF0: (249, "gui_script_backdrop_f4ff0", "gui_script_properties_094"),
+    0xF50EC: (145, "gui_script_action_f50ec", "gui_script_properties_094"),
+    0xF5180: (145, "gui_script_pointer_f5180", "gui_script_properties_094"),
+    0xF5214: (423, "gui_script_gadgetry_f5214", "gui_script_assets_094"),
+    0xF53BC: (200, "gui_script_name_f53bc", "gui_script_assets_094"),
 }
 
 
 class Inventory094(unittest.TestCase):
-    def test_seven_original_entries_are_drafted(self):
+    def test_seven_original_entries_have_compiled_handlers(self):
         with (ROOT / "decomp/symbols/functions.tsv").open(newline="") as stream:
             rows = {int(row["addr"], 16): row
                     for row in csv.DictReader(stream, delimiter="\t")}
@@ -35,12 +35,9 @@ class Inventory094(unittest.TestCase):
                 self.assertEqual(int(row["size"]), size)
                 self.assertEqual(row["name"], name)
                 self.assertEqual(row["module"], module)
-                self.assertIn(row["state"],
-                              ("drafted", "blocked", "compiles", "spliced", "verified"))
-                if row["state"] == "blocked":
-                    self.assertTrue(row["notes"].startswith("Blocked:"))
+                self.assertIn(row["state"], ("compiles", "spliced", "verified"))
                 self.assertEqual(row["kind"], "game")
-                self.assertEqual(row["sig_status"], "unverified")
+                self.assertEqual(row["sig_status"], "confirmed")
 
 
 class OriginalBytes094(unittest.TestCase):

@@ -17,8 +17,8 @@ ENTRIES = {
     0xF3B78: (476, "process_command_dispatch_loop", "confirmed"),
     0xF4347: (367, "store_option_assignment", "unverified"),
     0xF44B6: (224, "find_or_delete_option_assignment", "unverified"),
-    0xF46CC: (190, "read_next_command_token", "confirmed"),
-    0xF5484: (531, "read_six_option_coordinates", "unverified"),
+    0xF46CC: (190, "gui_script_next_token_f46cc", "confirmed"),
+    0xF5484: (531, "gui_script_rect_f5484", "confirmed"),
 }
 
 

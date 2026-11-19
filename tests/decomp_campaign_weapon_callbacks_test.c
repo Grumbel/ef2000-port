@@ -28,26 +28,85 @@ static void record(uint32_t address, uint32_t eax, uint32_t edx)
     events[event_count++].edx = edx;
 }
 
-uint32_t gc_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx)
-{
-    record(entry, eax, edx);
-    if (entry == 0xabcdfu)
-        return availability;
-    if (entry == 0x9d4cdu)
-        return 0x42u;
-    if (entry == 0xa46ccu)
-        return 0x1000u;
-    if (entry == 0xa78bcu)
-        return edx == 0x184388u ? 0x2030u : 0x2010u;
-    return eax;
-}
-
 uint32_t gpw_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx)
 {
     record(entry, eax, edx);
     if (entry == 0xa78bcu)
         return 0x1000u;
     return eax;
+}
+
+int32_t parse_int(ef_addr32 text)
+{
+    record(0x9d4cdu, text, 0);
+    return 0x42;
+}
+
+uint32_t guest_callptr_eax_ret_x(ef_addr32 callback, uint32_t argument)
+{
+    record(callback, argument, 0);
+    return availability;
+}
+
+ef_addr32 find_named_or_abort_a46cc(ef_addr32 name)
+{
+    record(0xa46ccu, name, 0);
+    return 0x1000u;
+}
+
+ef_addr32 find_widget_checked_a78bc(ef_addr32 root, ef_addr32 name)
+{
+    record(0xa78bcu, root, name);
+    if (name == 0x184388u)
+        return 0x2030u;
+    return name == 0x184384u ? 0x2010u : 0x1000u;
+}
+
+void clear_paired_object_marks(int16_t index)
+{
+    record(0x68c18u, (uint16_t)index, 0);
+}
+
+void refresh_all_widgets_a4c84(void)
+{
+    record(0xa4c84u, 0, 0);
+}
+
+void refresh_campaign_view_c9fc4(void)
+{
+    record(0xc9fc4u, 0, 0);
+}
+
+void clear_word_41eeda(void)
+{
+    record(0xaca88u, 0, 0);
+}
+
+void enable_widget_a72d8(ef_addr32 argument)
+{
+    record(0xa72d8u, argument, 0);
+}
+
+void clear_widget_dirty(ef_addr32 argument)
+{
+    record(0xa7380u, argument, 0);
+}
+
+void set_pending_name_ac7a8(ef_addr32 argument)
+{
+    record(0xac7a8u, argument, 0);
+}
+
+ef_addr32 apply_a4cb4_a4d90(ef_addr32 argument)
+{
+    record(0xa4d90u, argument, 0);
+    return argument;
+}
+
+ef_addr32 apply_a4b80_a4db0(ef_addr32 argument)
+{
+    record(0xa4db0u, argument, 0);
+    return argument;
 }
 
 static void reset(void)
@@ -78,9 +137,9 @@ static void test_campaign_mode(void)
     reset();
     gc_start_new_campaign_40ebc();
     assert(EF_U8(0x1a364cu) == 1u);
-    gc_performance_yes_40ec4();
+    assert(gc_performance_yes_40ec4(0x12345678u) == 0x12340078u);
     assert(EF_U8(0x1a364cu) == 0u);
-    gc_performance_no_40ed0(0x300u);
+    assert(gc_performance_no_40ed0(0x300u) == 0x42);
     expect(0, 0x9d4cdu, 0x33fu, 0u);
     assert(EF_U8(0x1264e2u) == 0x42u);
     assert(EF_U8(0x12584au) == 0x42u);
@@ -94,12 +153,12 @@ static void test_campaign_mode(void)
     expect(0, 0xa4c84u, 0, 0);
     expect(1, 0xa4d90u, 0x18436cu, 0);
     expect(2, 0xa4d90u, 0x184374u, 0);
-    expect(3, 0xa46ccu, 0x184374u, 0x184384u);
+    expect(3, 0xa46ccu, 0x184374u, 0);
     expect(4, 0xa78bcu, 0x1000u, 0x184384u);
-    expect(5, 0xa72d8u, 0x2010u, 0x184384u);
+    expect(5, 0xa72d8u, 0x2010u, 0);
     expect(6, 0xa78bcu, 0x1000u, 0x184388u);
-    expect(7, 0xa7380u, 0x2030u, 0x2030u);
-    expect(8, 0xa72d8u, 0x2030u, 0x0630u);
+    expect(7, 0xa7380u, 0x2030u, 0);
+    expect(8, 0xa72d8u, 0x2030u, 0);
 
     clear_calls();
     EF_U32(0x132ab4u) = 0xabcdfu;
@@ -127,8 +186,8 @@ static void test_campaign_mode(void)
     gc_load_old_campaign_40ee4();
     assert(event_count == 3);
     expect(0, 0xa4c84u, 0, 0);
-    expect(1, 0xa4d90u, 0x18438cu, 1u);
-    expect(2, 0xc9fc4u, 0, 1u);
+    expect(1, 0xa4d90u, 0x18438cu, 0);
+    expect(2, 0xc9fc4u, 0, 0);
     assert(EF_U16(0x137992u) == 1u);
     assert(memcmp(&ram[0x41f30c], &ram[0x184358], 12) == 0);
     clear_calls();
@@ -183,13 +242,13 @@ static void test_view_rotation_and_weapon(void)
 {
     unsigned i;
     reset();
-    gpw_check_hit_pylon_69354();
+    assert(gpw_check_hit_pylon_69354() == 13u);
     assert(event_count == 13);
     for (i = 0; i < event_count; ++i)
-        expect(i, 0x68c18u, 0u, i);
+        expect(i, 0x68c18u, i, 0);
     clear_calls();
 
-    EF_U16(0x200u + 0xcu) = 0x0010u;
+    EF_U16(0x200u + 0xcu) = 0x1010u;
     EF_U16(0x1f6f3cu) = 0x1920u;
     gpw_turn_y_plane_69920(0x200u);
     assert(EF_U16(0x1f6f3cu) == 0x1920u); /* +0x600 then -0x600 */

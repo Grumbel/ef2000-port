@@ -22,6 +22,7 @@ void adjust_route_view_4dcd8(ef_addr32 widget); /* 0x4dcd8 */
 void rebuild_waypoint_speed_4ec70(void); /* 0x4ec70 */
 void open_hiscores_a870(ef_addr32 widget); /* 0xa870 */
 void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
+void refresh_campaign_view_c9fc4(void); /* 0xc9fc4 */
 uint8_t hiscore_load_41fc(void); /* 0x41fc */
 void hiscore_refresh_display_40dc(uint32_t widget); /* 0x40dc */
 
@@ -174,7 +175,7 @@ uint32_t gpw_ui_guest_call_085(uint32_t entry, uint32_t eax, uint32_t edx);
 void gc_set_difficulty_40e50(void);
 void gc_start_new_campaign_40ebc(void);
 uint32_t gc_performance_yes_40ec4(uint32_t eax);
-void gc_performance_no_40ed0(ef_addr32 widget);
+int32_t gc_performance_no_40ed0(ef_addr32 widget);
 void gc_load_old_campaign_40ee4(void);
 void gc_loadfile_accepted_40f18(void);
 void gc_init_main_menu_40f64(void);
@@ -186,7 +187,7 @@ void gpw_use_defaults_68fbc(void);
 void gpw_place_missile_68fe0(void);
 void gpw_set_clear_missile_6931c(void);
 void gpw_set_clear_all_missiles_69338(void);
-void gpw_check_hit_pylon_69354(void);
+uint32_t gpw_check_hit_pylon_69354(void);
 void gpw_show_current_69914(void);
 void gpw_turn_y_plane_69920(ef_addr32 widget);
 void gpw_arcade_accepted_69978(ef_addr32 widget);

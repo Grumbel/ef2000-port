@@ -983,6 +983,7 @@
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
             ${source}/tests/decomp_campaign_weapon_callbacks_test.c \
+            ${source}/decomp/src/campaign_flags.c \
             ${source}/decomp/src/campaign_callbacks.c \
             ${source}/decomp/src/weapons_panel_callbacks.c \
             ${source}/decomp/src/weapons_panel_actions.c \

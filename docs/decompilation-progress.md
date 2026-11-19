@@ -14,3 +14,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-19  B1  recover seventeen GUI jumps, two quit callbacks and the debrief redraw route  blocked -20 (163 bytes), compiles +20, hybrid-candidates +20  literal -4, named globals +3  :/^decomp: recover more GUI callback routes$
 2026-11-19  B1  finish the tracked GUI thunks and route nine mission callbacks  blocked -20 (376 bytes), compiles +20, hybrid-candidates +20  no readability change  :/^decomp: finish tracked GUI thunks and route mission callbacks$
 2026-11-19  B1  recover twenty mission, GUI and environment callback routes  blocked -20 (1,088 bytes), compiles +20, hybrid-candidates +20  literal +2, computed -2  :/^decomp: replace the mission and GUI callback adapters$
+2026-11-19  B1  recover twenty campaign, weapons and GUI script routes  blocked -20 (3,132 bytes), compiles +20, hybrid-candidates +20  literal +2, computed -7  :/^decomp: replace campaign, weapon and GUI script adapters$

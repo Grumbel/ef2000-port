@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
+#include "ef_abi.h"
 #include "ef_gui_script_095.h"
 #include "ef_mem.h"
 
@@ -50,24 +51,24 @@ uint32_t gui_script_next_token_f46cc(void)
     return length;
 }
 
-static uint32_t guest(uint32_t target, uint32_t eax, uint32_t edx)
+static void report(ef_addr32 format, unsigned arguments)
 {
-    return gui_script_guest_call_095(target, eax, edx);
-}
-
-static void report(uint32_t message, unsigned arguments)
-{
-    gui_script_report_095(message, arguments, TOKEN, EF_U32(LINE_NUMBER));
+    ef_addr32 callback = EF_U32(0x132a74u);
+    uint32_t line = EF_U32(LINE_NUMBER);
+    if (arguments == 3u)
+        guest_callptr3_x(callback, format, TOKEN, line);
+    else
+        guest_callptr2_x(callback, format, line);
 }
 
 static int32_t read_integer(uint32_t error_format)
 {
     uint32_t error;
     int32_t value;
-    error = guest(0xebd30u, 0u, 0u);
+    error = get_address_ebd30();
     EF_U32(error) = 0u;
-    value = (int32_t)guest(0x9d4cdu, TOKEN, 0u);
-    error = guest(0xebd30u, 0u, 0u);
+    value = parse_int(TOKEN);
+    error = get_address_ebd30();
     if (EF_U32(error) != 0u)
         report(error_format, 3u);
     return value;
@@ -75,15 +76,13 @@ static int32_t read_integer(uint32_t error_format)
 
 static int token_equals(uint32_t reference)
 {
-    return guest(0x9d524u, TOKEN, reference) == 0u;
+    return ascii_stricmp_9d524(TOKEN, reference) == 0u;
 }
 
 /* 0x000f5484, 531 bytes. Original script syntax is:
  *   [FROM] x y [SIZE] width height [HOTSPOT] x y
  * The markers are optional, but the six numeric tokens are not. Every
- * conversion clears errno independently, unlike SIZE/FROM/BACKDROP in 094.
- * The last call to f5e6c merely writes six words and installs the handler
- * address f5eac; those effects are modeled directly here. */
+ * conversion clears errno independently, unlike SIZE/FROM/BACKDROP. */
 void gui_script_rect_f5484(void)
 {
     static const uint32_t errors[6] = {
@@ -91,7 +90,6 @@ void gui_script_rect_f5484(void)
         0x19257cu, 0x1925b4u, 0x1925e8u
     };
     int32_t values[6];
-    unsigned i;
     gui_script_next_token_f46cc();
     if (token_equals(0x191bf8u))
         gui_script_next_token_f46cc();
@@ -115,9 +113,17 @@ void gui_script_rect_f5484(void)
     if (values[2] <= 0 || values[3] <= 0)
         report(0x19261cu, 2u);
 
-    for (i = 0u; i < 6u; ++i)
-        EF_U16(0x485de8u + i * 2u) = (uint16_t)values[i];
-    EF_U32(0x161ea4u) = 0xf5eacu;
+    latch_words_f5e6c((uint16_t)values[0], (uint16_t)values[1],
+                     (uint16_t)values[2], (uint16_t)values[3],
+                     (uint32_t)(int32_t)(int16_t)values[4],
+                     (uint32_t)(int32_t)(int16_t)values[5]);
+}
+
+#ifdef EF_DECOMP_HOST_TEST
+
+static uint32_t guest(uint32_t target, uint32_t eax, uint32_t edx)
+{
+    return gui_script_guest_call_095(target, eax, edx);
 }
 
 /* OPTIONS command table from f3b78; token comparator a4380 returns zero
@@ -172,3 +178,4 @@ void gui_options_dispatch_f3b78(void)
             guest(0xf3b58u, 0u, 0u);
     }
 }
+#endif

@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
 /* SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception */
 
+#include "ef_abi.h"
 #include "ef_gui_script_095.h"
 #include "ef_mem.h"
 
@@ -73,6 +74,43 @@ void gui_script_report_095(ef_addr32 format, unsigned arguments,
     ++report_count;
 }
 
+uint32_t get_address_ebd30(void)
+{
+    return gui_script_guest_call_095(0xebd30u, 0, 0);
+}
+
+int32_t parse_int(ef_addr32 token)
+{
+    return (int32_t)gui_script_guest_call_095(0x9d4cdu, token, 0);
+}
+
+int32_t ascii_stricmp_9d524(ef_addr32 first, ef_addr32 second)
+{
+    return (int32_t)gui_script_guest_call_095(0x9d524u, first, second);
+}
+
+void guest_callptr2_x(ef_addr32 callback, uint32_t format, uint32_t line)
+{
+    assert(callback == 0x4200u);
+    gui_script_report_095(format, 2, TOKEN, line);
+}
+
+void guest_callptr3_x(ef_addr32 callback, uint32_t format, uint32_t token, uint32_t line)
+{
+    assert(callback == 0x4200u);
+    gui_script_report_095(format, 3, token, line);
+}
+
+void latch_words_f5e6c(uint16_t a, uint16_t b, uint16_t c, uint16_t d,
+                     uint32_t e, uint32_t f)
+{
+    const uint16_t fields[] = {a, b, c, d, (uint16_t)e, (uint16_t)f};
+    unsigned i;
+    for (i = 0; i < sizeof(fields) / sizeof(fields[0]); ++i)
+        EF_U16(0x485de8u + i * 2u) = fields[i];
+    EF_U32(0x161ea4u) = 0xf5eacu;
+}
+
 static void reset(void)
 {
     memset(ram, 0, sizeof(ram));
@@ -81,6 +119,7 @@ static void reset(void)
     memset(option_input, 0, sizeof(option_input));
     calls = report_count = option_position = 0u;
     EF_U32(0x161ea8u) = 87u;
+    EF_U32(0x132a74u) = 0x4200u;
     strcpy((char *)ef_guest_memory_ptr(0x191bf8u), "FROM");
     strcpy((char *)ef_guest_memory_ptr(0x192544u), "size");
     strcpy((char *)ef_guest_memory_ptr(0x1925acu), "hotspot");

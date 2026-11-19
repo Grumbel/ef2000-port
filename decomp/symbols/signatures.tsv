@@ -3634,3 +3634,22 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004ec44	mp_mission_1_click_4ec44			ebx,ecx,edx,esi,edi,ebp	0	Wrap the speed word before clamping to 120; use the named original waypoint refresh.
 0x00050c2c	mp_change_mode_50c2c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Forward EAX to map zoom or the original high-score callback according to the view byte.
 0x000dbdd0	env_normal_dbdd0			ebx,ecx,edx,esi,edi,ebp	0	Use a 100-byte stack message and the original variadic formatter and one-argument cdecl error callback.
+0x00040e50	gc_set_difficulty_40e50			ebx,ecx,edx,esi,edi,ebp	0	Open and enable the named campaign difficulty widgets in original order.
+0x00040ed0	gc_performance_no_40ed0	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Parse the widget text, mirror AL into both selection bytes and return the original EAX result.
+0x00040ee4	gc_load_old_campaign_40ee4			ebx,ecx,edx,esi,edi,ebp	0	Refresh the original campaign view and copy the 12-byte campaign key.
+0x00040f18	gc_loadfile_accepted_40f18			ebx,ecx,edx,esi,edi,ebp	0	Replace the guest router with named widget, campaign and view calls in original order.
+0x00040f64	gc_init_main_menu_40f64			ebx,ecx,edx,esi,edi,ebp	0	Use the named pending-name setter after copying the campaign key.
+0x00040f9c	gc_set_campaign_difficulty_40f9c			ebx,ecx,edx,esi,edi,ebp	0	Keep the original EAX availability callback and use named operations for both outcomes.
+0x00069354	gpw_check_hit_pylon_69354		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Clear thirteen pylon marks through the AX-indexed helper and return thirteen.
+0x00069914	gpw_show_current_69914			eax,ebx,ecx,edx,esi,edi,ebp	0	Latch current weapon visibility. Original is a word store and RET, preserving EAX.
+0x00069920	gpw_turn_y_plane_69920	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Read the original widget flags and update the first angle in the original order.
+0x00069978	gpw_arcade_accepted_69978	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Read the original widget flags and update the second angle in the original order.
+0x000699d4	gpw_open_big_current_weapon_699d4	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Use the named widget lookup before clearing the selected text.
+0x000f4db8	gui_script_size_f4db8			ebx,ecx,edx,esi,edi,ebp	0	Use named token reader and numeric parse with the original two- and three-argument cdecl reporting.
+0x000f4ed4	gui_script_from_f4ed4			ebx,ecx,edx,esi,edi,ebp	0	Use the same direct parser calls as SIZE and preserve the per-mode field order.
+0x000f4ff0	gui_script_backdrop_f4ff0			ebx,ecx,edx,esi,edi,ebp	0	Use the same direct parser calls as SIZE, with two allowed modes and original field order.
+0x000f50ec	gui_script_action_f50ec			ebx,ecx,edx,esi,edi,ebp	0	Use the named token and string-copy calls, reloading the current widget after diagnostics.
+0x000f5180	gui_script_pointer_f5180			ebx,ecx,edx,esi,edi,ebp	0	Use the named token and string-copy calls, preserving the original POINTER flag test.
+0x000f5214	gui_script_gadgetry_f5214			ebx,ecx,edx,esi,edi,ebp	0	Use the original 100-byte path buffer and named graphics calls. Palette extrema start at index zero.
+0x000f53bc	gui_script_name_f53bc			ebx,ecx,edx,esi,edi,ebp	0	Use the original 100-byte path buffer and the second named graphics-buffer selector.
+0x000f5484	gui_script_rect_f5484			ebx,ecx,edx,esi,edi,ebp	0	Parse six coordinates by named calls and use the original mixed register and stack setter.

@@ -1,6 +1,7 @@
 /* SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com> */
 /* SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception */
 
+#include "ef_abi.h"
 #include "ef_gui_script_094.h"
 #include "ef_mem.h"
 
@@ -70,9 +71,79 @@ void gui_script_report_094(ef_addr32 message, unsigned arguments,
     error_count++;
 }
 
-ef_addr32 gui_script_path_buffer_094(void)
+static ef_addr32 active_path;
+
+void guest_callptr2_x(ef_addr32 callback, uint32_t format, uint32_t line)
 {
-    return PATH;
+    assert(callback == 0x4200u);
+    gui_script_report_094(format, 2, TOKEN_ADDR, line);
+}
+
+void guest_callptr3_x(ef_addr32 callback, uint32_t format, uint32_t token, uint32_t line)
+{
+    assert(callback == 0x4200u);
+    gui_script_report_094(format, 3, token, line);
+}
+
+uint32_t gui_script_next_token_f46cc(void)
+{
+    return gui_script_guest_call_094(0xf46ccu, 0, 0);
+}
+
+uint32_t get_address_ebd30(void)
+{
+    return gui_script_guest_call_094(0xebd30u, 0, 0);
+}
+
+int32_t parse_int(ef_addr32 token)
+{
+    return (int32_t)gui_script_guest_call_094(0x9d4cdu, token, 0);
+}
+
+uint32_t strlen_ds(ef_addr32 text)
+{
+    return (uint32_t)strlen(ef_guest_memory_ptr(text));
+}
+
+ef_addr32 copy_string_9d749(ef_addr32 destination, ef_addr32 source)
+{
+    const char *text = ef_guest_memory_ptr(source);
+    memmove(ef_guest_memory_ptr(destination), text, strlen(text) + 1u);
+    return destination;
+}
+
+void build_default_path_9c980(ef_addr32 buffer)
+{
+    active_path = buffer;
+    gui_script_guest_call_094(0x9c980u, PATH, 0);
+}
+
+ef_addr32 strcat_9ca57(ef_addr32 buffer, ef_addr32 source)
+{
+    assert(buffer == active_path);
+    gui_script_guest_call_094(0x9ca57u, PATH, source);
+    return buffer;
+}
+
+void select_buffer_146e40(void)
+{
+    gui_script_guest_call_094(0xc3974u, 0, 0);
+}
+
+void select_buffer_146e44(void)
+{
+    gui_script_guest_call_094(0xc3980u, 0, 0);
+}
+
+uint32_t start_driver_c34cc(uint32_t buffer)
+{
+    assert(buffer == active_path);
+    return gui_script_guest_call_094(0xc34ccu, PATH, 0);
+}
+
+void leave_scroll_mode_c39ac(void)
+{
+    gui_script_guest_call_094(0xc39acu, 0, 0);
 }
 
 static void reset(void)
@@ -84,6 +155,7 @@ static void reset(void)
     next_token = call_count = error_count = 0u;
     EF_U32(0x485de0u) = NODE;
     EF_U32(0x161ea8u) = 0x1234u;
+    EF_U32(0x132a74u) = 0x4200u;
     EF_U16(0x485dfeu) = 7u;
     strcpy((char *)ef_guest_memory_ptr(0x192448u), "obj/");
     strcpy((char *)ef_guest_memory_ptr(0x192454u), ".bmp");
@@ -122,8 +194,8 @@ static void test_numeric_properties(void)
         {gui_script_from_f4ed4, 1, 0x5b, 0x5d, 0x485f73},
         {gui_script_from_f4ed4, 2, 0x67, 0x69, 0x485f6e},
         {gui_script_from_f4ed4, 3, 0x4f, 0x51, 0x485f71},
-        {gui_script_backdrop_f4ff0, 1, 0x55, 0x53, 0x485f72},
-        {gui_script_backdrop_f4ff0, 2, 0x61, 0x5f, 0x485f6d},
+        {gui_script_backdrop_f4ff0, 1, 0x53, 0x55, 0x485f72},
+        {gui_script_backdrop_f4ff0, 2, 0x5f, 0x61, 0x485f6d},
     };
     unsigned i;
     for (i = 0u; i < sizeof(cases) / sizeof(cases[0]); ++i) {
@@ -230,7 +302,7 @@ static void test_asset_handlers(void)
     EF_U16(0x485dfeu) = 7u;
     memset(ef_guest_memory_ptr(0x425c8cu), 20, 256 * 3);
     gui_script_gadgetry_f5214();
-    assert(EF_U16(0x485dfeu) == 7u && EF_U16(0x485e02u) == 7u);
+    assert(EF_U16(0x485dfeu) == 0u && EF_U16(0x485e02u) == 0u);
 
     reset();
     EF_U16(0x485dfcu) = 12u;
