@@ -7,10 +7,10 @@
 
 #include <stdint.h>
 
-/* B2 implicit-register recipe: declare the original register inputs,
- * caller-live outputs and clobbers in ef_abi.h #pragma aux; keep register
- * flags needed by C callers as explicit return values or out parameters.
- * These are host-tested C models of four original renderer queue entries.
+/* B2 recipe: declare original register inputs, caller-live outputs and
+ * clobbers in ef_abi.h #pragma aux; return any flags needed by C callers as
+ * explicit values or out parameters. These functions preserve the renderer
+ * queue's guest-memory effects, including its self-modified branch byte.
  * The x86 queue has TWO associated 16-bit arrays, indexed from one. A
  * self-modified displacement at c41c4 selects its overflow policy; the C
  * model keeps that byte in guest memory, without writing into executable
@@ -38,20 +38,12 @@ static void swap_pair(uint32_t a, uint32_t b)
 
 static void queue_partial_quicksort(uint32_t low, uint32_t high)
 {
-#ifdef EF_DECOMP_HOST_TEST
     renderer_partial_quicksort_c3fd4((int32_t)low, (int32_t)high);
-#else
-    guest_callptr2_x(0x000c3fd4u, low, high);
-#endif
 }
 
 static void queue_insertion_sort(void)
 {
-#ifdef EF_DECOMP_HOST_TEST
     renderer_insertion_sort_c409c();
-#else
-    guest_callptr0_x(0x000c409cu);
-#endif
 }
 
 /* c3fd4, 200 bytes. The source uses the final element as the pivot and
@@ -113,12 +105,7 @@ void renderer_finish_queue_c4167(void)
 #ifdef EF_DECOMP_HOST_TEST
     renderer_frame_callback_c4167(g_renderer_frame_callback);
 #else
-    {
-        typedef void (EF_CDECL *RendererFrameCallback)(void);
-        RendererFrameCallback callback =
-            (RendererFrameCallback)(uintptr_t)g_renderer_frame_callback;
-        callback();
-    }
+    guest_callptr0_x(g_renderer_frame_callback);
 #endif
 }
 

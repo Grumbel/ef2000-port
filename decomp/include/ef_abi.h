@@ -217,8 +217,8 @@ void mp_change_mode_50c2c(ef_addr32 widget);
 void mp_redraw_target_view_50c40(ef_addr32 widget);
 
 /* Renderer depth queue and endianness helpers, original entries c3fd4..c53cf.
- * The original EBX cursor and indirect frame callback are explicit in these
- * host-only drafts, until their guest ABI can be reproduced and spliced. */
+ * The queue routines preserve guest-memory state, including the patched
+ * branch displacement at c41c4. */
 void renderer_partial_quicksort_c3fd4(int32_t low, int32_t high);
 void renderer_insertion_sort_c409c(void);
 void renderer_finish_queue_c4167(void);
@@ -233,8 +233,9 @@ uint16_t renderer_index_absolute_c53cf(ef_addr32 cursor);
 #pragma aux renderer_swap_word_c5384 parm [ebx] value [ax] modify [eax ebx]
 #pragma aux renderer_index_biased_c53b4 parm [ebx] value [ax] modify [eax ebx]
 #pragma aux renderer_index_absolute_c53cf parm [ebx] value [ax] modify [eax ebx]
-#pragma aux renderer_partial_quicksort_c3fd4 parm caller [] modify [eax ebx ecx edx edi]
+#pragma aux renderer_partial_quicksort_c3fd4 parm caller [] modify [eax ebx ecx edi]
 #pragma aux renderer_insertion_sort_c409c parm [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux renderer_finish_queue_c4167 parm [] modify []
 #pragma aux renderer_enqueue_c41b0 parm [eax] modify [eax ebx ecx]
 #endif
 
