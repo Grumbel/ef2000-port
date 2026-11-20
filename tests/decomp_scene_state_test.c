@@ -26,7 +26,6 @@ static int group_calls;
 static int entry_calls;
 static int metric_calls;
 static int32_t metric_return;
-static int32_t observed_full_key;
 static int16_t observed_key;
 static ef_addr32 observed_group;
 static int32_t observed_metric_args[3];
@@ -45,12 +44,11 @@ void *ef_guest_memory_ptr(ef_addr32 address)
     return guest + address;
 }
 
-ef_addr32 find_scene_named_group(ef_addr32 name, int32_t key)
+int32_t lookup_name_value_a1a40(ef_addr32 name)
 {
     assert(name == 0x18ab30);
     ++group_calls;
-    observed_full_key = key;
-    return named_group;
+    return (int32_t)named_group;
 }
 
 ef_addr32 find_scene_named_entry(int16_t key, ef_addr32 group)
@@ -109,9 +107,8 @@ int main(void)
     assert(scene_lookup_named_word(42) == -149);
     assert(group_calls == 1 && entry_calls == 1);
     assert(observed_key == 42 && observed_group == 0x200);
-    assert(observed_full_key == 42);
     assert(scene_lookup_named_word(0x1234002a) == -149);
-    assert(observed_full_key == 0x1234002a && observed_key == 42);
+    assert(observed_key == 42);
     assert(scene_lookup_named_word(-1) == 0);
     assert(scene_lookup_named_word(0) == 0);
     assert(group_calls == 4 && entry_calls == 2);

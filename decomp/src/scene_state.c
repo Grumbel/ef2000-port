@@ -5,6 +5,7 @@
 #include "ef_globals.h"
 #include "ef_guest_memory.h"
 
+#ifdef __WATCOMC__
 static void call_c4654_stack3(uint32_t first, uint32_t second, uint32_t third);
 #pragma aux call_c4654_stack3 parm [eax] [edx] [ebx] \
     modify [eax ebx ecx edx] = \
@@ -13,6 +14,13 @@ static void call_c4654_stack3(uint32_t first, uint32_t second, uint32_t third);
     "push edx" \
     "push eax" \
     "call ecx"
+#else
+/* Host tests observe the stack-argument matrix routine through its C name. */
+static void call_c4654_stack3(uint32_t first, uint32_t second, uint32_t third)
+{
+    configure_scene_angles((int16_t)first, (int16_t)second, (int16_t)third);
+}
+#endif
 
 /* 0x0009125c, size 0x3c, 16 distinct caller functions. 0x18ab30 is
  * passed as the *address* of the directory name, never dereferenced here.
