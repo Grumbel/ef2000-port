@@ -506,7 +506,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0002e08c	201	recompute_grid_limit	world_grid_limits	compiles	game	confirmed	decomp/tests/0x0002e08c.json	x87 per-type threshold and seven filtered-object lookups; NaN host cases only
 0x0002e184	783			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x0002e494	681	record_track_sample_2e494	game_helpers130	compiles	game	confirmed	decomp/tests/0x0002e494.json	Original 0x2e494 (681 bytes)
-0x0002e740	461			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
+0x0002e740	461	step_grid_cell_2e740	grid_cell_step	spliced	game	confirmed	decomp/tests/0x0002e740.json	docs/compiler-abi.md; Step one active grid cell with a rate: pick the advance helper, update it and report it in multiplayer.
 0x0002e910	57	grid_event_matches	world_grid_queries	compiles	game	confirmed	decomp/tests/0x0002e910.json	AL/DL truth table tested across all 65536 byte pairs
 0x0002f740	160	draw_markers_2f740	game_helpers17	compiles	game	confirmed	decomp/tests/0x0002f740.json	docs/compiler-abi.md; Draw every marker of the 16-byte table that is in range.; callers 3dd30@3e1e4; guest pending
 0x0002fbc4	895			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.

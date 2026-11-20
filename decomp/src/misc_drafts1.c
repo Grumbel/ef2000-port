@@ -11786,7 +11786,7 @@ void tick_cycle_list_5414c(void)
             EF_U16(0x001a5c18u) = 0u;
         cur = (double)(int16_t)EF_U16(0x001a5c18u);
         memcpy(ef_guest_memory_ptr(0x001a3148u), &cur, sizeof cur);
-        guest_fn_2e740_x((int32_t)(int16_t)EF_U16(0x001a5c18u), scale, 0u);
+        step_grid_cell_2e740((int32_t)(int16_t)EF_U16(0x001a5c18u), scale, 0u);
     }
 }
 

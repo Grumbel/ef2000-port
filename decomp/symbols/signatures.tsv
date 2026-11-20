@@ -3769,3 +3769,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00031514	advance_key_view_31514			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00031514 (420 bytes); pushes EBX..EBP; no inputs; callers 31230 (jump-table code, EAX unused)
 0x0000ba5c	return_to_campaign_ba5c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000ba5c (445 bytes); pushes EBX..EDI, EBP unused; no inputs; EAX result not used by caller 42ef0
 0x00009114	check_base_contact_9114			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00009114 (461 bytes); pushes EBX..EDI, EBP unused; no inputs; caller 3df8c@3dfbd
+0x0002e740	step_grid_cell_2e740	EAX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t		ebx,ecx,edx,esi,edi,ebp	12	Original 0x0002e740 (461 bytes); pushes EBX..EBP; double rate and dword flag on the stack, ret 0xc; callers c66c, 42d30, 541ec, 7eb40

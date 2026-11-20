@@ -168,6 +168,7 @@ extern ef_addr32 g_renderer_frame_callback; /* 0x000fc8a8, indirect frame callba
 extern uint32_t g_filtered_object_lookup_calls; /* 0x001a3580 */
 extern int16_t g_excluded_object_index; /* 0x001f71d0 */
 extern uint8_t g_object_type_flags[]; /* 0x00128636, 0xe5-byte stride */
+extern double g_grid_cell_step_rate; /* 0x1a3140, rate of the current 0x2e740 step */
 extern ef_addr32 g_world_grid_base; /* 0x0019bb58, pointer to 0xca-byte records */
 extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
 extern uint16_t g_simulation_tick_step; /* 0x00127d92 */

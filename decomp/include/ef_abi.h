@@ -6152,7 +6152,12 @@ void guest_fn_2461c_x(int32_t a, ef_addr32 vec); /* 0x2461c EAX/EDX */
 
 void tick_cycle_list_5414c(void);
 void tick_cycle_list_54274(void);
-void guest_fn_2e740_x(int32_t a, double x, uint32_t z); /* 0x2e740 EAX + stack double and dword, ret 0xc */
+void step_grid_cell_2e740(int32_t cell_index, double rate, uint32_t immediate); /* EAX + stack double and dword, ret 0xc */
+#pragma aux step_grid_cell_2e740 parm routine [eax]
+void guest_fn_2ced4(int32_t cell, double rate); /* 0x2ced4 EAX + stack double, ret 8 */
+void guest_fn_2d488(int32_t cell, double rate); /* 0x2d488 EAX + stack double, ret 8 */
+void guest_fn_2e184(int32_t cell); /* 0x2e184 EAX */
+void guest_fn_2c778(int32_t cell); /* 0x2c778 EAX */
 void update_follower_37eac(int16_t index, double value, uint32_t immediate); /* 0x37eac AX + stack double and dword, ret 0xc */
 void guest_fn_37fe4_x(int16_t index, double value); /* 0x37fe4 AX + stack double, ret 8 */
 void guest_fn_37934(ef_addr32 record); /* 0x37934 EAX, preserves all */

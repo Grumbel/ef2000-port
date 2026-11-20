@@ -3065,7 +3065,7 @@ void replay_elapsed_steps_c630(void)
             i = 0;
             if ((int16_t)EF_U16(0x0019bb5cu) > 0) {
                 do {
-                    guest_fn_2e740_x((int32_t)i, 60.0, 1u);
+                    step_grid_cell_2e740((int32_t)i, 60.0, 1u);
                     i++;
                     if (i == 0xff) i++;
                 } while (i < (int16_t)EF_U16(0x0019bb5cu));
