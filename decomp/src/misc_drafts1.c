@@ -11919,7 +11919,7 @@ void check_data_files_284ec(void)
     }
     answer = (int16_t)guest_fn_27d18_x((ef_addr32)(uintptr_t)req);
     if (answer == 1) {
-        r = (int16_t)guest_fn_28224_x(1u);
+        r = scan_save_slots_28224(1u);
         if (r < 0) {
             check_data_file_283c8();
             r = (int16_t)(-r - 1);
@@ -11928,7 +11928,7 @@ void check_data_files_284ec(void)
         open_named_file_287bc();
     } else {
         check_data_file_283c8();
-        r = (int16_t)guest_fn_28224_x(0u);
+        r = scan_save_slots_28224(0u);
         if (r < 0)
             r = (int16_t)(-r - 1);
         guest_sprintf_a4342(0x00125208u, 0x001822ecu, (uint32_t)(int32_t)r);

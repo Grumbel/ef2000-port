@@ -411,7 +411,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000278c0	1112			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
 0x00027d18	721			blocked	game	unverified		Skipped as too difficult: dispatches through indirect calls whose targets and register conventions are unrecovered.
 0x00027fec	567			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
-0x00028224	418			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads ebp on entry) or carry-flag results that the C ABI cannot express.
+0x00028224	418	scan_save_slots_28224	save_slot_scan	spliced	game	confirmed	decomp/tests/0x00028224.json	docs/compiler-abi.md; Read the ten save file summaries into the slot table and return the slot picked by 0x278c0 (negative when empty).
 0x000283c8	289	check_data_file_283c8	game_helpers43	compiles	game	confirmed	decomp/tests/0x000283c8.json	docs/compiler-abi.md; Draw the splash buttons and probe the data file for its magic word.; callers 284ec@28553,284ec@28578; guest pending
 0x000284ec	204	check_data_files_284ec	misc_drafts1	compiles	game	confirmed	decomp/tests/0x000284ec.json	docs/compiler-abi.md; Startup of the data-file check: initialise the subsystems (0xd65e8, 0xc3980, 0xc34cc with 0x18235c, 0xc39ac, 0xc3888, 0x; callers 3ea0c@3ec82; guest pending
 0x000285b8	132	write_save_header_285b8	runtime_helpers28	compiles	game	confirmed	decomp/tests/0x000285b8.json	docs/compiler-abi.md; Write the save file header block for the current game file.; callers 3ea0c@3ec95; guest pending

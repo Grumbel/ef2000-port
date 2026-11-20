@@ -6167,7 +6167,8 @@ uint16_t fold_slot_nodes_c03b4(int16_t cur, uint8_t kind, uint8_t j, ef_addr32 l
 
 void check_data_files_284ec(void);
 uint16_t guest_fn_27d18_x(ef_addr32 req); /* 0x27d18 EAX -> AX */
-uint16_t guest_fn_28224_x(uint32_t mode); /* 0x28224 AL -> AX */
+int16_t scan_save_slots_28224(uint8_t mode);
+uint16_t guest_fn_278c0(uint8_t mode); /* 0x278c0 AL -> AX */
 
 void load_directory_list_7a66c(ef_addr32 path);
 int32_t EF_CDECL guest_fn_df26f_x(ef_addr32 src, ef_addr32 fmt, ...); /* 0xdf26f cdecl, sscanf-like */
