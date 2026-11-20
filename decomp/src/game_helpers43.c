@@ -25,9 +25,9 @@ void check_data_file_283c8(void)
     guest_fn_c386c();
     guest_fn_dc250();
     fill_entries_a8060();
-    guest_fn_27fec(0x00182308u, 0x00182300u, 0x78u, 0x50u);
-    guest_fn_27fec(0x00182324u, 0x00182314u, 0x96u, 0x50u);
-    value = guest_fn_27fec(0x00182338u, 0x00182330u, 0xb4u, 0x50u);
+    prompt_name_27fec(0x00182308u, 0x00182300u, 0x78u, 0x50u);
+    prompt_name_27fec(0x00182324u, 0x00182314u, 0x96u, 0x50u);
+    value = prompt_name_27fec(0x00182338u, 0x00182330u, 0xb4u, 0x50u);
     EF_S32(result) = (int16_t)value;
     if (EF_U16(0x0015ee9au) == 0) {
         uint32_t text = guest_fn_9c858(0x001822d8u);

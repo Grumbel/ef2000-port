@@ -2396,10 +2396,10 @@ void advance_object_vectors_a0174(ef_addr32 obj)
 /* 0x1a3cc, 176 bytes. Step the demo script at 0x122c80: when the expected key code 0x41f833 matches the current script byte, clear it and advance the script position (word 0x122c7e); at the script end toggle the mode word 0x198438 and push the matching event (0x18188c or 0x18189c), otherwise a mismatch rewinds to the start. Only runs while 0x41f7c8 and 0x41f833 are non-zero. */
 void step_demo_script_1a3cc(void)
 {
-    if (EF_U8(0x0041f7c8u) == 0u || g_ui_state_flag_41f833 == 0u)
+    if (EF_U8(0x0041f7c8u) == 0u || g_key_scancode == 0u)
         return;
-    if (g_ui_state_flag_41f833 == EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu))) {
-        g_ui_state_flag_41f833 = 0u;
+    if (g_key_scancode == EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu))) {
+        g_key_scancode = 0u;
         EF_U16(0x00122c7eu) = (uint16_t)(EF_U16(0x00122c7eu) + 1u);
         if (EF_U8(0x00122c80u + (uint32_t)(int32_t)(int16_t)EF_U16(0x00122c7eu)) != 0u)
             return;
@@ -4649,9 +4649,9 @@ void dispatch_pending_key_1a47c(void)
     EF_U16(0x0019843cu) = (uint16_t)(EF_U8(0x0041f7bau) | EF_U8(0x0041f7c6u));
     EF_U16(0x00198420u) = EF_U8(0x0041f7c8u);
     EF_U16(0x00198422u) = EF_U8(0x0041f7adu);
-    if (g_ui_state_flag_41f833 == 0u)
+    if (g_key_scancode == 0u)
         return;
-    key = g_ui_state_flag_41f833;
+    key = g_key_scancode;
     if (g_runtime_slot_generation != 0u) {
         int32_t mode = (int8_t)EF_U8(0x00122c53u);
         if (mode >= 1 && mode <= 4)
@@ -4669,7 +4669,7 @@ void dispatch_pending_key_1a47c(void)
         if (fn != 0u)
             guest_callptr0_x(fn);
     }
-    g_ui_state_flag_41f833 = 0u;
+    g_key_scancode = 0u;
 }
 
 /* 0x11de0, 155 bytes. Look the key KEY up in the letter table of the current mode (mode byte 0x122c53: 1, 2 and 4 select table 0, 1 and 2): scan up to 18 entries (stride 0x1d from 0x121fcc, starting at the table's base word 0x121ec8[table]) for a first byte equal to KEY, and on a hit call 0x12d90 with the entry and table numbers, set the word 0x12288a and step the letter table (0x11d44). */
@@ -9800,9 +9800,9 @@ uint32_t run_choice_prompt_7a194(void)
         page = 0x0012af28u;
     (void)draw_menu_box_79ff0(page);
     while (!done) {
-        g_ui_state_flag_41f833 = 0u;
+        g_key_scancode = 0u;
         do {
-            key = g_ui_state_flag_41f833;
+            key = g_key_scancode;
         } while (key == 0u);
         switch (key) {
         case 0x01: case 0x2e:
@@ -15505,7 +15505,7 @@ void unit_damage_tick_29dd0(uint32_t ax)
         if (EF_U16(unit + 0x1d8u) != 0u) {
             unit_event_88664(unit, 0u);
             EF_U16(unit + 0x1d8u) = (uint16_t)(EF_U16(unit + 0x1d8u) - 1u);
-        } else if (g_ui_state_flag_41f833 == 0x74u) {
+        } else if (g_key_scancode == 0x74u) {
             trigger_sound_8160c(0x42u);
         }
         return;
@@ -15743,12 +15743,12 @@ uint32_t run_frame_step_ac5f8(uint32_t al)
 	}
 	g_frontend_pending_latch = 0u;
 	if (loop != 0u)
-		g_ui_state_flag_41f833 = 0u;
+		g_key_scancode = 0u;
 	g_ui_state_flag_41f2e6 = 0u;
 	do {
-		if (g_ui_state_flag_41f833 != 0u) {
-			g_ui_state_flag_41f2e6 = g_ui_state_flag_41f833;
-			g_ui_state_flag_41f833 = 0u;
+		if (g_key_scancode != 0u) {
+			g_ui_state_flag_41f2e6 = g_key_scancode;
+			g_key_scancode = 0u;
 		}
 		result = 0u;
 		EF_U16(0x0041eed2u) = 0u;
@@ -15839,7 +15839,7 @@ void show_text_ac408(ef_addr32 text)
 	EF_U8(0x0041f2e0u) = 0u;
 	if (EF_U8(0x0041f2e3u) != 0u)
 		draw_named_widget_abc98();
-	g_ui_state_flag_41f833 = 0u;
+	g_key_scancode = 0u;
 	g_ui_state_flag_41f2e6 = 0u;
 	while ((guest_fn_ce064_x() & 0xffffu) != 0u)
 		;
@@ -16812,14 +16812,14 @@ void report_fatal_text_a9aa8(ef_addr32 text)
 		load_page_palette_f2660(0x0018d698u);
 		toggle_page_dc250();
 		apply_palette_d663c(0x00464060u);
-		g_ui_state_flag_41f833 = 0u;
+		g_key_scancode = 0u;
 		for (;;) {
-			key = g_ui_state_flag_41f833;
+			key = g_key_scancode;
 			if (key == 0x15u || key == 0x31u)
 				break;
 		}
 		set_black_palette_d65e8();
-		if (g_ui_state_flag_41f833 == 0x31u)
+		if (g_key_scancode == 0x31u)
 			guest_callptr1_x(g_gui_error_hook, 0x0018d840u);
 	}
 	if (EF_U8(0x00137206u) != 0u)

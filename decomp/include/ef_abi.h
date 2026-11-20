@@ -2856,7 +2856,7 @@ uint32_t guest_fn_105a4(ef_addr32 a, ef_addr32 b, ef_addr32 c, ef_addr32 d, ef_a
 void check_data_file_283c8(void);
 void draw_debug_counters_404bc(void);
 void guest_fn_275a4(void); /* 0x275a4 */
-uint32_t guest_fn_27fec(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x27fec EAX/EDX/EBX/ECX */
+uint16_t prompt_name_27fec(ef_addr32 key, ef_addr32 fallback, int32_t row, int32_t half_width);
 void EF_CDECL guest_fn_a4342_plain(ef_addr32 destination, ef_addr32 format); /* 0xa4342 cdecl */
 uint32_t guest_fn_a7900(ef_addr32 name); /* 0xa7900 cdecl */
 void EF_CDECL guest_fn_48c90(uint32_t color, uint32_t x, uint32_t y, ef_addr32 text); /* 0x48c90 cdecl, caller cleanup */

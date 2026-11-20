@@ -439,7 +439,7 @@ addr	size	type	name	evidence	notes
 0x0013725e	2	int16_t	g_ui_cursor_x	ac133 writes signed width/2 minus one	word-narrowed cursor coordinate
 0x00137260	2	int16_t	g_ui_cursor_y	ac148 writes signed height/2 minus one	word-narrowed cursor coordinate
 0x0041f2e7	1	uint8_t	g_ui_reset_flag	ac152 sets before ac16c	meaning otherwise unestablished
-0x0041f833	1	uint8_t	g_ui_state_flag_41f833	ac15d clears after ac16c	also cleared by ac16c
+0x0041f833	1	uint8_t	g_key_scancode	ac15d clears after ac16c	last keyboard scancode, stored by the keyboard interrupt; pollers clear it and wait
 0x0041f2e6	1	uint8_t	g_ui_state_flag_41f2e6	ac163 clears after ac16c	also cleared by ac16c
 0x0041eeb6	2	uint16_t	g_ui_state_word_41eeb6	ac16c ordered reset or device query	neutral name where meaning unresolved
 0x0041eed8	2	uint16_t	g_ui_state_word_41eed8	ac16c ordered reset or device query	neutral name where meaning unresolved
@@ -792,3 +792,4 @@ addr	size	type	name	evidence	notes
 0x0041ec0a	2	int16_t	g_element_clip_y	0xe59cc writes	visible part y
 0x0041ec0c	2	int16_t	g_element_clip_w	0xe59cc writes	visible width; 0 when hidden
 0x0041ec0e	2	int16_t	g_element_clip_h	0xe59cc writes	visible height
+0x0015b62c	256	uint8_t[256]	g_scancode_ascii	0x27fec reads	scancode to ASCII character table

@@ -77,7 +77,7 @@ extern uint32_t g_small_glyph_stride; /* 0x001631f4 */
 extern uint16_t g_default_entry_override; /* 0x0041eede */
 extern uint32_t g_ui_reset_state; /* 0x0041eeac */
 extern uint8_t g_ui_reset_flag; /* 0x0041f2e7 */
-extern uint8_t g_ui_state_flag_41f833; /* 0x0041f833 */
+extern uint8_t g_key_scancode; /* 0x0041f833 */
 extern uint8_t g_ui_state_flag_41f2e6; /* 0x0041f2e6 */
 extern uint16_t g_ui_state_word_41eed8; /* 0x0041eed8 */
 extern uint8_t g_ui_pointer_device_enabled; /* 0x0041f2e1 */
@@ -427,7 +427,7 @@ extern uint32_t g_small_glyph_stride; /* 0x001631f4 */
 extern uint16_t g_default_entry_override; /* 0x0041eede */
 extern uint32_t g_ui_reset_state; /* 0x0041eeac */
 extern uint8_t g_ui_reset_flag; /* 0x0041f2e7 */
-extern uint8_t g_ui_state_flag_41f833; /* 0x0041f833 */
+extern uint8_t g_key_scancode; /* 0x0041f833 */
 extern uint8_t g_ui_state_flag_41f2e6; /* 0x0041f2e6 */
 extern uint16_t g_ui_state_word_41eed8; /* 0x0041eed8 */
 extern uint8_t g_ui_pointer_device_enabled; /* 0x0041f2e1 */
@@ -766,5 +766,6 @@ extern int16_t g_element_clip_x; /* 0x41ec08 */
 extern int16_t g_element_clip_y; /* 0x41ec0a */
 extern int16_t g_element_clip_w; /* 0x41ec0c */
 extern int16_t g_element_clip_h; /* 0x41ec0e */
+extern uint8_t g_scancode_ascii[256]; /* 0x15b62c */
 
 #endif
