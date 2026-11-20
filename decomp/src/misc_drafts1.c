@@ -18636,7 +18636,7 @@ void check_row_target_85604(uint32_t id, double scale)
 	memcpy(&hd, ef_guest_memory_ptr(row + 0x79u), 8);
 	h = hd * 20.0;
 	if (hd * scale > dist) {
-		guest_fn_857bc_x(ib);
+		refresh_row_target_857bc((int16_t)ib);
 		return;
 	}
 	kind = EF_U8(0x00128568u + (uint32_t)EF_U8(row + 0x19u) * 0xe5u);
@@ -18656,7 +18656,7 @@ void check_row_target_85604(uint32_t id, double scale)
 		if (!(h * 1.5 > dist))
 			return;
 	}
-	guest_fn_857bc_x(ib);
+	refresh_row_target_857bc((int16_t)ib);
 }
 
 /* 0x89c64, 418 bytes. Load the flight model of aircraft record REC (EAX; type byte +0x18 selects the 145-byte row at 0x12bc99 + 145 * type): double 0x1fcca0 = frame time word 0x127d92 * 0.02, double 0x1fcf50 = row double +0, the dword pairs 0x1fcef8, 0x1fcc80 (or the row's alternates when byte 0x20f230 is set), 0x1fcf08, 0x1fcc88 are copied from the row, double 0x1fcee8 = row double (+0x3c) * pi * (1/180). The derived blocks are then computed (0x88c54 -> 0x1fcf58, 0x88c80 -> 0x1fcf88/0x1fcfd0, 0x88d4c -> 0x1fd020, 0x88d84 -> 0x1fcf48), the coefficient 0x1fcc90 = 0x6c1f0(double 0x1fcf68), the doubles 0x1fcc98 and 0x1fcf10 are set to constants (the latter 9.81 unless the type is 1, 9 or 0x14 and byte 0x20f230 is clear: then 0.0). */
