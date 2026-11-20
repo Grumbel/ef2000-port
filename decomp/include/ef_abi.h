@@ -6606,6 +6606,7 @@ uint32_t gpwRedrawPlaneWindow(void); /* 0x69f1c */
 uint32_t onopenCurrentMission(ef_addr32 root); /* 0x7cad4 */
 void gpwTurnXPlane(ef_addr32 widget); /* 0x7cb70 */
 void RedrawEnemyView(ef_addr32 widget); /* 0x7d138 */
+void AcceptCustom(void); /* 0x7d1f0, gpw_windows.c */
 void simSyncSlots(ef_addr32 widget); /* 0x7de5c */
 void InitArcade(void); /* 0x4c50 */
 void gpwAcceptHiscore(ef_addr32 widget); /* 0x4d4c */

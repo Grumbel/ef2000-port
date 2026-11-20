@@ -125,6 +125,38 @@ void RedrawEnemyView(ef_addr32 widget)
     simSyncSlots(widget);
 }
 
+/* Enemy-view model angles: three words, the yaw advances by 0x200 per frame. */
+#define VIEW_ANGLE_YAW       0x0012b05au
+#define VIEW_ANGLE_PITCH     0x0012b05cu
+#define VIEW_ANGLE_ROLL      0x0012b05eu
+
+/* 0x7d1f0, 263 bytes, enemy-view frame. Reset the view and place the
+ * camera 2/3 of the detail distance from the model, raised by a fifth of
+ * it, centred on the model's "CENTRE_GRAVITY" point when the page has one.
+ * Then draw the page at its current angles and turn it a little further. */
+void AcceptCustom(void)
+{
+    ef_addr32 centre = 0;
+    int32_t key;
+    int32_t lift;
+    uint32_t centre_x;
+
+    reset_view_c4105();
+    key = lookup_name_value_a1a40(0x0018806cu); /* "CENTRE_GRAVITY" */
+    if (key != 0)
+        centre = find_page_pair_a1a90(g_enemy_view_page, key);
+    lift = -(int32_t)g_enemy_view_detail / 5;
+    centre_x = centre != 0 ? (uint32_t)(int32_t)EF_S16(centre) << 16 : 0u;
+    rotate_offset_c8d30(centre_x, (uint32_t)lift << 16, 0xfffb0000u, 0xea02u, 0u,
+                        (uint32_t)(int32_t)truncate_9d72c((double)g_enemy_view_detail * (2.0 / 3.0)));
+    guest_fn_c4654(0u, 0u, 0xea02u);
+    set_record_words(g_enemy_view_page, EF_U16(VIEW_ANGLE_ROLL), EF_U16(VIEW_ANGLE_YAW),
+                     EF_U16(VIEW_ANGLE_PITCH));
+    render_page_9e0c4((uint32_t)(int32_t)g_enemy_view_page, 0u, (uint32_t)lift << 16, 0u);
+    renderer_finish_queue_c4167();
+    EF_U8(VIEW_ANGLE_YAW + 1u) += 2u;
+}
+
 /* 0xb5d0, 204 bytes, redraw callback for the dialog named NAME. While a
  * target group is selected (index word 0x1976a0 not -1, window word
  * 0x19769a set, group list non-empty) and NAME is "targview", walk to
