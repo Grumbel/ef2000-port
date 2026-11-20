@@ -784,6 +784,11 @@ extern uint8_t g_cockpit_mode; /* 0x0012814c */
 extern uint8_t g_linked_session; /* 0x00127da8 */
 extern double g_gauge_fraction; /* 0x001a30d0 */
 extern double g_link_range_scale; /* 0x001a5b30 */
+extern uint8_t g_mission_sections; /* 0x001a5a9a */
+extern uint8_t g_waypoint_extension[5]; /* 0x001a5a1c */
+extern uint32_t g_mission_file_block; /* 0x001a58b0 */
+extern int32_t g_mission_start_x; /* 0x001a58f4 */
+extern int32_t g_mission_start_y; /* 0x001a58f0 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */

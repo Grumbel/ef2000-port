@@ -6721,6 +6721,8 @@ void guest_fn_6ebe0_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32
 
 void check_row_target_85604(uint32_t id, double scale);
 void refresh_row_target_857bc(int16_t row); /* 0x857bc AX */
+void guest_fn_d9e50(ef_addr32 name); /* 0xd9e50 EAX */
+int16_t load_mission_init_52164(void); /* 0x52164 -> AX */
 
 void load_flight_model_89c64(ef_addr32 rec);
 

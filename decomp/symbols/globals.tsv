@@ -831,3 +831,8 @@ addr	size	type	name	evidence	notes
 0x00127da8	1	uint8_t	g_linked_session	set when 0x125846 == 1	linked session flag; hides the target id in solo play
 0x001a30d0	8	double	g_gauge_fraction	0x6460 and 0x21e04 read	fraction shown as a 0..100 percentage
 0x001a5b30	8	double	g_link_range_scale	0x772d0 reads	scales the watched unit link range (20 * scale)
+0x001a5a9a	1	uint8_t	g_mission_sections	0x52164 clears and checks	INIT: items seen: 1 waypoint file, 2 level file, 4 world type, 8 start position
+0x001a5a1c	5	uint8_t[5]	g_waypoint_extension	0x52164 sets to ".WAY"	waypoint file extension
+0x001a58b0	4	uint32_t	g_mission_file_block	0x52164 frees via 0xe2af4	arena block holding the loaded mission text
+0x001a58f4	4	int32_t	g_mission_start_x	0x52164 copies g_player_x	mission starting x
+0x001a58f0	4	int32_t	g_mission_start_y	0x52164 copies g_player_y	mission starting y
