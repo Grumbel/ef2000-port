@@ -694,5 +694,7 @@ extern ef_ref_point g_ref_points[256]; /* 0x421a48 */
 extern uint8_t g_ref_point_count; /* 0x425c87, wraps after 256 */
 extern ef_addr32 g_crater_ring; /* 0x425b88, first of g_crater_records */
 extern ef_addr32 g_crater_slot_ring; /* 0x425b24, first of g_crater_slots */
+extern ef_addr32 g_environ; /* 0x160a18, null-terminated "NAME=value" pointers */
+extern ef_addr32 g_environ_owned; /* 0x160a1c, one heap-ownership flag per environment entry */
 
 #endif

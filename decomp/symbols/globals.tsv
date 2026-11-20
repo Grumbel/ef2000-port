@@ -617,6 +617,8 @@ addr	size	type	name	evidence	notes
 0x00425c87	1	uint8_t	g_ref_point_count	dac65 reads, dad19 increments	ref_point lines read
 0x00425b88	4	ef_addr32	g_crater_ring	daf28 clears, db054 stores	first crater record of the ring
 0x00425b24	4	ef_addr32	g_crater_slot_ring	daf2e clears, db09b stores	first crater slot of the ring
+0x00160a18	4	ef_addr32	g_environ	getenv 9c858 and putenv f4347/f44b6	environment table: null-terminated array of "NAME=value" pointers
+0x00160a1c	4	ef_addr32	g_environ_owned	putenv f4347/f44b6	one flag byte per environment entry, nonzero when the string is a heap block
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

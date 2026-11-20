@@ -15,8 +15,8 @@ ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
     0xF3B78: (476, "process_command_dispatch_loop", "confirmed"),
-    0xF4347: (367, "store_option_assignment", "unverified"),
-    0xF44B6: (224, "find_or_delete_option_assignment", "unverified"),
+    0xF4347: (367, "putenv_f4347", "confirmed"),
+    0xF44B6: (224, "find_env_entry_f44b6", "confirmed"),
     0xF46CC: (190, "gui_script_next_token_f46cc", "confirmed"),
     0xF5484: (531, "gui_script_rect_f5484", "confirmed"),
 }
@@ -32,7 +32,7 @@ class Inventory095(unittest.TestCase):
                 row = rows[address]
                 self.assertEqual(int(row["size"]), size)
                 self.assertEqual(row["name"], name)
-                module = ("gui_options_labels_095" if address in (0xF4347, 0xF44B6)
+                module = ("runtime_environ" if address in (0xF4347, 0xF44B6)
                           else "gui_script_pipeline_095")
                 self.assertEqual(row["module"], module)
                 self.assertIn(row["state"],

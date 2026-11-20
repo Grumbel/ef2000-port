@@ -3744,3 +3744,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000da644	env_load_pal_da644			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_pal" (table 0x15bbc0); preserves all six, EAX not meaningful
 0x000dac2c	env_ref_point_dac2c			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "ref_point" (table 0x15bc08); preserves all six, EAX not meaningful
 0x000daef4	env_load_craters_daef4			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_craters" (table 0x15bc20); preserves all six, EAX not meaningful
+0x000e8651	reallocate_heap_e8651	EAX:ef_addr32,EDX:uint32_t	EAX:ef_addr32	ebx,ecx,esi,edi,ebp	0	realloc; pushes EBX, ECX, ESI, EDI, EBP; EDX not preserved
+0x000f44b6	find_env_entry_f44b6	EAX:ef_addr32,EDX:int32_t	EAX:int32_t	ebx,ecx,esi,edi,ebp	0	environment lookup or delete; EDX is clobbered
+0x000f4347	putenv_f4347	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	putenv; saves all six

@@ -6591,6 +6591,9 @@ void env_game_type_da5cc(void); /* 0xda5cc */
 void env_load_pal_da644(void); /* 0xda644 */
 void env_ref_point_dac2c(void); /* 0xdac2c */
 void env_load_craters_daef4(void); /* 0xdaef4 */
+ef_addr32 reallocate_heap_e8651(ef_addr32 block, uint32_t size); /* 0xe8651 EAX/EDX -> EAX */
+int32_t find_env_entry_f44b6(ef_addr32 assignment, int32_t remove); /* 0xf44b6 */
+int32_t putenv_f4347(ef_addr32 assignment); /* 0xf4347 */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */

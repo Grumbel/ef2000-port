@@ -260,11 +260,6 @@
             decomp/src/gui_script_pipeline_095.c \
             -o objects/ef2000-decomp-gui-script-095-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
-            -DEF_DECOMP_HOST_TEST=1 -Idecomp/include \
-            tests/decomp_gui_options_095_test.c \
-            decomp/src/gui_options_labels_095.c \
-            -o objects/ef2000-decomp-gui-options-095-test
-          $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -DEF_DECOMP_HOST_TEST=1 -ffunction-sections -fdata-sections \
             -Idecomp/include \
             tests/decomp_gui_options_096_test.c \
@@ -314,7 +309,6 @@
           objects/ef2000-decomp-hiscore-093-test
           objects/ef2000-decomp-gui-script-094-test
           objects/ef2000-decomp-gui-script-095-test
-          objects/ef2000-decomp-gui-options-095-test
           objects/ef2000-decomp-gui-options-096-test
           objects/ef2000-decomp-gui-cursor-097-test
           objects/ef2000-decomp-gui-display-097-test
