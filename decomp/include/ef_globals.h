@@ -229,8 +229,8 @@ extern int16_t g_scene_event_armed; /* 0x00214492 */
 extern uint8_t g_scene_control_code; /* 0x0012db9e */
 extern ef_addr32 g_scene_node_table; /* 0x00211ad0, index table pointer */
 extern int16_t g_scene_node_count; /* 0x00211ae0, signed count */
-extern int32_t g_object_control_reset_word; /* 0x00128550 */
-extern int16_t g_object_link_reset_fields[2]; /* 0x001f88ee, 0x1f88f0 */
+extern float g_g_stress; /* 0x00128550, G-load vision stress */
+extern int16_t g_vision_fade[2]; /* 0x001f88ee black-out, 0x1f88f0 red-out */
 extern ef_addr32 g_object_link_record_base; /* 0x001f8918, 25-byte rows */
 extern ef_navigation_record g_navigation_record; /* 0x001f8d00 */
 extern ef_object_pair_mark g_object_pair_marks[]; /* 0x001f6ef4, 3-byte rows */
@@ -769,6 +769,9 @@ extern int16_t g_burst_zone_count; /* 0x001a5a8e */
 extern int32_t g_player_x; /* 0x001a5bec */
 extern int32_t g_player_y; /* 0x001a5be8 */
 extern int32_t g_player_height; /* 0x001a5bf0, negative is up */
+extern double g_load_factor; /* 0x001a3040 */
+extern uint8_t g_vision_fade_mode; /* 0x001f88fb */
+extern uint8_t g_vision_tint_changed; /* 0x00128548 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */

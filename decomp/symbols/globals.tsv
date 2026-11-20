@@ -54,8 +54,8 @@ addr	size	type	name	evidence	notes
 0x0012db9e	1	uint8_t	g_scene_control_code	0x91c4c reads	Controls event history restart for modes 15/16
 0x00211ad0	4	ef_addr32	g_scene_node_table	0x8ffff read	Guest pointer to four-byte scene node addresses; signed bound 0x211ae0
 0x00211ae0	2	int16_t	g_scene_node_count	0x8fff6 signed comparison	Count of scene nodes for 0x8ffe8 signed low-word index lookup
-0x00128550	4	int32_t	g_object_control_reset_word	0x75c87 clears	Zeroed together with two 0x1f88ee control words
-0x001f88ee	4	int16_t[2]	g_object_link_reset_fields	0x75c8f/0x75c96 clears	Adjacent words at +0x00/+0x02
+0x00128550	4	float	g_g_stress	0x75c87 clears; 0x75ca0 updates	G-load vision stress, -50 (red-out) .. 50 (black-out)
+0x001f88ee	4	int16_t[2]	g_vision_fade	0x75c8f/0x75c96 clear; 0x75ca0 sets	black-out level (+0x00) and red-out level (+0x02)
 0x001f8918	4	ef_addr32	g_object_link_record_base	0x76b49 loads	Pointer to 25-byte rows; slot words at +3+2*DL
 0x001f8d00	0x58	ef_navigation_record	g_navigation_record	0x78aab passes address/0x78ab5 writes	Guest-owned navigation record; marker at +0x56
 0x001f6ef4	3 * count	ef_object_pair_mark[]	g_object_pair_marks	0x68c3a/0x68c4b/0x68c53/0x68c5c writes	3-byte rows: state byte, 16-bit option
@@ -816,3 +816,6 @@ addr	size	type	name	evidence	notes
 0x001a5be8	4	int32_t	g_player_y	0x2a4a0/0x2a4c8 read	player map position
 0x001a5bec	4	int32_t	g_player_x	0x2a4a0/0x2a4c8 read	player map position
 0x001a5bf0	4	int32_t	g_player_height	0x2a4c8 reads	negative is up
+0x001a3040	8	double	g_load_factor	0x75ca0 reads	G load driving the vision effect
+0x001f88fb	1	uint8_t	g_vision_fade_mode	0x75ca0 sets	0 clear, 1 red-out, 2 black-out
+0x00128548	1	uint8_t	g_vision_tint_changed	0x75ca0 and others set	set when the screen tint must be rebuilt

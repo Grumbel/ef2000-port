@@ -47,9 +47,9 @@ uint8_t object_uses_secondary_grid(int16_t index)
 /* 0x75c84, 0x1b bytes, three callers. Preserves EDX in the original. */
 void reset_object_link_controls(void)
 {
-    g_object_control_reset_word = 0;
-    g_object_link_reset_fields[1] = 0;
-    g_object_link_reset_fields[0] = 0;
+    g_g_stress = 0.0f;
+    g_vision_fade[1] = 0;
+    g_vision_fade[0] = 0;
 }
 
 /* 0x76b30, 0x4f bytes, three callers. The owner number is the parent's
