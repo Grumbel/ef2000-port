@@ -3654,7 +3654,7 @@ void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg)
     int32_t y;
     uint32_t color = g_tactical_marker_code;
     uint32_t s;
-    guest_fn_39a0c_x(obj, (uint32_t)(int32_t)(int16_t)arg);
+    draw_percent_ring_39a0c(obj, (int16_t)arg);
     x = (int16_t)EF_U16(obj);
     y = (int16_t)EF_U16(obj + 2u);
     plot_byte_clipped(color, (uint32_t)x, (uint32_t)y);

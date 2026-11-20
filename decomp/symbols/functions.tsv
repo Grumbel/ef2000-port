@@ -678,7 +678,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00039744	303	centre_view_sample_39744	game_helpers130	compiles	game	confirmed	decomp/tests/0x00039744.json	Original 0x39744 (303 bytes)
 0x00039874	227	update_proximity_39874	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039874.json	docs/compiler-abi.md; Proximity level of the point (X = EAX word, Y = EDX word signed, Z = EBX word) to the reference position (dwords 0x19e5b; callers 39548@395d6,39548@396fd,39548@39726; guest pending
 0x00039960	170	build_circle_39960	game_helpers17	compiles	game	confirmed	decomp/tests/0x00039960.json	docs/compiler-abi.md; Build the 0x1a17c0/0x1a1810 ellipse tables (radii 10 and 8).; callers 39a0c@39a1f; guest pending
-0x00039a0c	677			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
+0x00039a0c	677	draw_percent_ring_39a0c	game_helpers17	spliced	game	confirmed	decomp/tests/0x00039a0c.json	
 0x00039cb4	238	compute_unit_distance_39cb4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00039cb4.json	docs/compiler-abi.md; Distance between the player unit (word 0x1f71ca) and the unit named by 0x1a823e, from the position longs (+0, +4, +8) sc; callers 5c518@5c5ca; guest pending
 0x00039db0	20	alloc_slot_table_39db0	allocation_wrappers	compiles	game	confirmed		docs/compiler-abi.md; Allocate the four-byte slot table of the given length.; callers 39dc4@39dd4; guest pending
 0x00039dc4	72	reset_table_39dc4	game_state_helpers2	compiles	game	confirmed	decomp/tests/0x00039dc4.json	docs/compiler-abi.md; Reset the ten-entry table at dword 0x1a1860.; callers 49228@495b7; guest pending

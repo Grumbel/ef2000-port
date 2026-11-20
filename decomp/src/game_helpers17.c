@@ -85,6 +85,59 @@ void build_circle_39960(void)
     }
 }
 
+#define RING_TABLES_READY 0x00126350u /* byte, set by 0x39960 */
+#define RING_COLOR        0x00128148u /* byte */
+#define RING_SHIFT        0x0012b369u /* byte, left shift applied to ring offsets */
+#define RING_OUTER        0x001a17c0u /* 20 (x, y) word offsets, radius 10 */
+#define RING_INNER        0x001a1810u /* 20 (x, y) word offsets, radius 8 */
+#define RING_SEGMENTS     20
+
+/* Screen coordinate of ring point index on one axis (0 x, 1 y), scaled and moved to origin. */
+static int32_t ring_coordinate(ef_addr32 table, int32_t index, uint32_t axis, int32_t origin)
+{
+    int32_t offset = (int16_t)EF_U16(table + (uint32_t)(index * 4) + axis * 2u);
+
+    return (int32_t)((uint32_t)offset << (EF_U8(RING_SHIFT) & 31u)) + origin;
+}
+
+static void ring_line(ef_addr32 table_a, int32_t a, ef_addr32 table_b, int32_t b, int32_t x, int32_t y)
+{
+    uint32_t color = EF_U8(RING_COLOR);
+
+    guest_fn_c8ccc_x((uint32_t)ring_coordinate(table_b, b, 1, y), (uint32_t)ring_coordinate(table_b, b, 0, x),
+                     (uint32_t)ring_coordinate(table_a, a, 1, y), (uint32_t)ring_coordinate(table_a, a, 0, x), color);
+}
+
+/* 0x39a0c, 677 bytes. Draw a percentage ring around the (x, y) word pair at point: a center
+ * dot, a spoke at segment 0, the inner arc up to percent of 20 segments, dots on every other
+ * unlit segment, the closing segment at 100%, and a spoke at the last lit segment. */
+void draw_percent_ring_39a0c(ef_addr32 point, int16_t percent)
+{
+    int16_t x, y, i, lit, last = 0;
+
+    if (EF_U8(RING_TABLES_READY) == 0)
+        build_circle_39960();
+    y = (int16_t)EF_U16(point + 2u);
+    x = (int16_t)EF_U16(point);
+    lit = (int16_t)((int32_t)percent * RING_SEGMENTS / 100);
+    plot_byte_clipped(EF_U8(RING_COLOR), x, y);
+    for (i = 0; i < RING_SEGMENTS; i++) {
+        if (i == 0) {
+            ring_line(RING_OUTER, 0, RING_INNER, 0, x, y);
+        } else if (i <= lit) {
+            ring_line(RING_INNER, i - 1, RING_INNER, i, x, y);
+            last = i;
+        } else if ((i & 1) == 0) {
+            plot_byte_clipped(EF_U8(RING_COLOR), ring_coordinate(RING_INNER, i - 1, 0, x),
+                              ring_coordinate(RING_INNER, i - 1, 1, y));
+        }
+    }
+    if (RING_SEGMENTS <= lit)
+        ring_line(RING_INNER, RING_SEGMENTS - 1, RING_INNER, 0, x, y);
+    if (last != 0)
+        ring_line(RING_OUTER, last, RING_INNER, last, x, y);
+}
+
 /* 0x40428, 145 bytes. Clear the 320x200 view and refresh the unit selected by the current key. */
 void refresh_selected_unit_40428(void)
 {

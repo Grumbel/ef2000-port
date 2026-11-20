@@ -2342,6 +2342,7 @@ void draw_markers_2f740(void);
 uint32_t find_record_at_cell_37b44(int16_t x, int16_t y);
 void set_scaled_table_38750(uint16_t a, uint16_t b, uint16_t scale, uint8_t d, uint8_t stack_e, uint8_t stack_f, uint8_t stack_g);
 void build_circle_39960(void);
+void draw_percent_ring_39a0c(ef_addr32 point, int16_t percent); /* 0x39a0c EAX/DX */
 void refresh_selected_unit_40428(void);
 uint32_t classify_entry_48ae8(int16_t unit_id, int16_t entry);
 void guest_fn_a0ea8(int32_t a, uint32_t b, int32_t c, uint32_t d); /* 0xa0ea8 EAX/EDX/EBX/ECX */
@@ -5466,7 +5467,6 @@ uint32_t guest_fn_fb87c_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x
 
 void draw_cursor_ticks_5c9d4(uint32_t obj, uint32_t arg);
 void load_record_file_ca200(uint32_t name);
-void guest_fn_39a0c_x(uint32_t a, uint32_t b); /* 0x39a0c EAX/EDX */
 void guest_fn_dec18_x(uint32_t a, uint32_t b, uint32_t c); /* 0xdec18 EAX/EDX/EBX */
 uint32_t guest_callptr_eaxedx_ret_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect call, arguments in EAX and EDX, result in EAX */
 

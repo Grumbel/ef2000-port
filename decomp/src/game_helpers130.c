@@ -5492,7 +5492,7 @@ void draw_tactical_marker_5c518(void)
 	compute_unit_distance_39cb4(lp + 0xcu, lp + 0x14u);
 	if (guest_fn_5c8e0(lp + 0xcu) == 0)
 		return;
-	guest_fn_39a0c_x(lp + 0xcu, (uint32_t)(int32_t)LS(0x14));
+	draw_percent_ring_39a0c(lp + 0xcu, LS(0x14));
 	if (guest_fn_5ca88_ret_x(obj, lp + 0x10u) == 0)
 		return;
 	draw_object_marker_5d520(LS(0x10), LS(0x12), obj);
