@@ -4105,6 +4105,9 @@ void bind_dialog_values_4f388(ef_addr32 first, ef_addr32 second);
 ef_addr32 rebuild_child_dialog_34a98(ef_addr32 text);
 int32_t list_directory_names_32de8(ef_addr32 path, ef_addr32 mask);
 void guest_fn_6e1c4_x(uint32_t a); /* 0x6e1c4 EAX */
+uint8_t guest_fn_6e1c4(ef_addr32 point); /* 0x6e1c4 EAX -> AL */
+void guest_fn_772d0(uint32_t object, uint32_t unit); /* 0x772d0 AX/EDX */
+void place_link_point_70438(void); /* 0x70438 */
 void guest_fn_106b0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0x106b0 EAX/EDX/EBX/ECX + stack */
 void guest_fn_10750_x(int32_t a, int32_t b, int32_t c); /* 0x10750 EAX/EDX/EBX */
 void guest_fn_a4dd0_x(uint32_t a); /* 0xa4dd0 EAX */
