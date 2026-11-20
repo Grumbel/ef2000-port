@@ -499,6 +499,13 @@ extern uint16_t g_scene_direction_words[2]; /* 0x2143e4 */
 extern int32_t g_scene_combined_matrix[9]; /* 0x214404 */
 extern ef_addr32 g_scene_target; /* 0x214454 */
 extern ef_addr32 g_scene_subject; /* 0x214458 */
+extern int16_t g_scene_intro_timer; /* 0x12dc88, intro camera countdown */
+extern ef_addr32 g_scene_follow_object; /* 0x214338, object the intro camera follows */
+extern int32_t g_scene_focus_position[3]; /* 0x21432c */
+extern int32_t g_scene_start_position[3]; /* 0x214320 */
+extern int32_t g_scene_camera_position[3]; /* 0x21446c */
+extern uint16_t g_scene_follow_angles[2]; /* 0x214464 */
+extern int32_t g_scene_camera_matrix[9]; /* 0x214378 */
 extern int32_t g_scene_offset_x; /* 0x214460 */
 extern int32_t g_scene_offset_y; /* 0x2143fc */
 extern int32_t g_scene_offset_z; /* 0x21445c */

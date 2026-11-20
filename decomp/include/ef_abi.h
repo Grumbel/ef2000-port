@@ -3423,6 +3423,7 @@ void reset_scene_record_92f10(void);
 uint8_t object_faces_camera_97534(ef_addr32 object);
 void guest_fn_18a68(void); /* 0x18a68 */
 void guest_fn_9357c(void); /* 0x9357c */
+void update_scene_intro_9596c(void);
 void guest_fn_d0ebc(ef_addr32 record, uint32_t value); /* 0xd0ebc EAX/EDX */
 void guest_fn_d0dbc(ef_addr32 record, uint32_t value, uint32_t scale); /* 0xd0dbc EAX/EDX/EBX */
 void guest_fn_d0fb8(ef_addr32 record, uint32_t value, uint32_t flag); /* 0xd0fb8 EAX/EDX/ECX */

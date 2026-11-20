@@ -741,3 +741,10 @@ addr	size	type	name	evidence	notes
 0x00127dc4	2	int16_t	g_grid_event_pending	0x295b5 sets after 0x73210 succeeds, 0x8dd48 clears	no reader found
 0x0015b738	4	ef_addr32	g_blit_src_row	0xcd9a6 stores and advances by the stride	packed blit source row
 0x0015b73c	4	ef_addr32	g_blit_dst_row	0xcd9a6 stores and advances by the video width word	packed blit destination row
+0x0012dc88	2	int16_t	g_scene_intro_timer	0x95ae0 sets 0xc8, 0x9596c counts down by the tick step	intro camera countdown
+0x00214338	4	ef_addr32	g_scene_follow_object	0x95ae0 stores target +0x30, 0x9596c reads	object the intro camera follows
+0x0021432c	12	int32_t[3]	g_scene_focus_position	0x9596c stores	intro camera focus
+0x00214320	12	int32_t[3]	g_scene_start_position	0x95ae0 stores the target position	intro camera fallback focus
+0x0021446c	12	int32_t[3]	g_scene_camera_position	0x95704, 0x9596c and others store	camera position copied from the focus or target
+0x00214464	4	uint16_t[2]	g_scene_follow_angles	0x95ae0 stores 0x2000/0, 0x9596c copies object +0xc/+0xe	angle words of the followed object
+0x00214378	36	int32_t[9]	g_scene_camera_matrix	0x9596c, 0x95ae0 reset and rotate it	camera matrix
