@@ -17,7 +17,7 @@ static void run_unit_pass(enum grid_unit_pass pass, int16_t unit)
         guest_fn_8d59c(unit);
         break;
     case SECOND_UNIT_PASS:
-        guest_fn_8d3d4(unit);
+        update_unit_pass_8d3d4(unit);
         break;
     default:
         maybe_retarget_8d554(unit);
@@ -48,7 +48,7 @@ static void for_each_armed_unit(enum grid_unit_pass pass)
 }
 
 /* 0x8dd48, 339 bytes. Per-frame unit passes over the armed grid cells:
- * clear g_grid_event_pending, run 0x8d59c, then 0x8d3d4, then
+ * clear g_grid_event_pending, run 0x8d59c, then update_unit_pass_8d3d4, then
  * maybe_retarget_8d554 over every armed unit, and finally check the cell
  * triggers. */
 void run_grid_unit_passes_8dd48(void)

@@ -3871,7 +3871,7 @@ void setup_scene_camera_95ae0(void);
 void guest_fn_cd20c_w(uint32_t a); /* 0xcd20c EAX */
 void run_grid_unit_passes_8dd48(void);
 void guest_fn_8d59c(int16_t unit); /* 0x8d59c */
-void guest_fn_8d3d4(int16_t unit); /* 0x8d3d4 */
+void update_unit_pass_8d3d4(int16_t unit);
 void guest_fn_90828_w(void); /* 0x90828 */
 void guest_fn_7eccc_w(void); /* 0x7eccc */
 void guest_fn_7e8c0_w(uint32_t a); /* 0x7e8c0 EAX */
