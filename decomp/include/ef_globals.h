@@ -546,7 +546,7 @@ extern int16_t g_enemy_view_detail; /* 0x1f8fdc */
 extern int16_t g_hiscore_new_rank; /* 0x121e48 */
 extern uint16_t g_difficulty_word; /* 0x121e44, word store over g_difficulty */
 extern int16_t g_difficulty_selection; /* 0x121e46 */
-extern uint8_t g_arcade_score_file[11]; /* 0x1f8fc8, "arcXXX.txt" */
+extern uint8_t g_score_file_name[13]; /* 0x1f8fc8, "arcXXX.txt" or a training file */
 
 /* "kots" base selection, 0x5110. */
 #include "ef_structs/kots.h"
@@ -625,6 +625,13 @@ extern uint8_t g_custom_slot_skill[5]; /* 0x1f8ff9, 0 high, 1 medium, 2 low */
 extern int16_t g_aircraft_type_text[]; /* 0x12afdc, text index per aircraft type */
 extern ef_addr32 g_text_strings[]; /* 0x132dd0, localized text pointers */
 extern ef_addr32 g_skill_names[3]; /* 0x12b028 */
+extern int16_t g_training_mission_flag; /* 0x1f8fde, 0 for the free flight */
+
+/* Training-mission accept, 0x7c574. */
+#include "ef_structs/session_rows.h"
+extern ef_addr32 g_training_row_pool; /* 0x1f8f74, ef_session_row[] */
+extern int16_t g_training_selection; /* 0x12b026, 0-based row */
+extern char g_config_file_name[0x12]; /* 0x125828, current mission config name */
 
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */

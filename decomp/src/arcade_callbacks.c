@@ -51,8 +51,8 @@ void gpwAcceptHiscore(ef_addr32 widget)
         g_difficulty_word = 3u;
         file = 0x0017f7d0u;                              /* "arctop.txt" */
     }
-    for (i = 0; i < sizeof g_arcade_score_file; ++i)
-        g_arcade_score_file[i] = EF_U8(file + i);
+    for (i = 0; i < 11u; ++i)                           /* "arcXXX.txt" and NUL */
+        g_score_file_name[i] = EF_U8(file + i);
     guest_fn_7bee8_x(0x00121e40u);
     dialog = find_named_or_abort_a46cc(0x0017f7a4u);    /* "summary" */
     set_session_text_7c4fc(g_difficulty_row_pool + 0x28u +

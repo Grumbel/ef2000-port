@@ -515,7 +515,7 @@ addr	size	type	name	evidence	notes
 0x0019e5a5	2	int16_t	g_sam_coverage_width	4d984/4d98d stores	0x800..0x37ff or 0x2000
 0x0019e597	4	int32_t	g_sam_coverage_range	4d9be stores	10000..39999
 0x00121e44	2	uint16_t	g_difficulty_word	4d73/4d9b/4db3 word stores	same storage as g_difficulty; the byte above is cleared
-0x001f8fc8	11	uint8_t[11]	g_arcade_score_file	4dba movs of 11 bytes	arcade score file name for the chosen level
+0x001f8fc8	13	uint8_t[13]	g_score_file_name	4dba movs of 11 bytes; 7c351.. movs up to 13	arcade score file or training mission file name
 0x0012584b	1	uint8_t	g_kots_lock	511a compares with 1	base buttons ignored when 1
 0x00197098	variable	uint8_t[]	g_kots_base_side	5136/5154 read-modify-write	side 0/1 per base, wraps at 2
 0x0012584c	variable	uint8_t[]	g_kots_base_side_mirror	5144 increments, 5167 clears	advanced and reset together with g_kots_base_side
@@ -569,6 +569,10 @@ addr	size	type	name	evidence	notes
 0x0012afdc	2 * count	int16_t[]	g_aircraft_type_text	7dfd9 reads via dword 0x12afda shifted 16	index into g_text_strings
 0x00132dd0	4 * count	ef_addr32[]	g_text_strings	7dfe3 reads	localized text pointers
 0x0012b028	12	ef_addr32[3]	g_skill_names	7dfa9 reads	indexed by g_custom_slot_skill
+0x001f8fde	2	int16_t	g_training_mission_flag	7c35b/7c386.. stores	0 for "first" (free.txt), 1 otherwise
+0x001f8f74	4	ef_addr32	g_training_row_pool	7c5bd reads; filled by 0x7bee8	76-byte ef_session_row entries
+0x0012b026	2	int16_t	g_training_selection	7c58f/7c5a0 stores; read via dword 0x12b024 shifted 16	0-based training row
+0x00125828	18	char[18]	g_config_file_name	7c5d0 copies the row config name	current mission config file
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
