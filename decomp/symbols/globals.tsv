@@ -761,3 +761,6 @@ addr	size	type	name	evidence	notes
 0x0019e5b5	12	int32_t[3]	g_key_view_eye	0x31514 distance, game_state_helpers2 stores	key view eye position
 0x0019e5e4	1	uint8_t	g_key_view_from_preset	0x31514 clears before 0x2fbc4	key view selection flag
 0x00198408	4	uint32_t	g_key_view_stepped_in_scene_8	0x31514 sets 1 when scene code is 8	key view step ended during scene code 8
+0x001972ef	1	uint8_t	g_base_contact_blocked	0x9114 clears, sets when object dword +0x12 >= 6	base contact blocked
+0x001972f0	1	uint8_t	g_base_contact	0x9114 clears each call, sets on contact	base area contact this frame
+0x001972f1	1	uint8_t	g_base_contact_latched	0x9114 sets on first contact, clears for inactive objects	base contact latch

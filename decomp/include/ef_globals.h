@@ -577,6 +577,9 @@ extern uint8_t g_score_file_name[13]; /* 0x1f8fc8, "arcXXX.txt" or a training fi
 
 /* "kots" base selection, 0x5110. */
 #include "ef_structs/kots.h"
+extern uint8_t g_base_contact_blocked; /* 0x1972ef, contact while +0x12 of the object is 6 or more */
+extern uint8_t g_base_contact; /* 0x1972f0, object touches a base area this frame */
+extern uint8_t g_base_contact_latched; /* 0x1972f1, contact already handled */
 extern uint8_t g_kots_lock; /* 0x12584b, play mode set by 0x522c: 1 solo (base buttons ignored), 2 team, 3 bases */
 extern uint8_t g_kots_base_side[]; /* 0x197098, 0/1 per base */
 extern uint8_t g_kots_base_side_mirror[]; /* 0x12584c, advanced and reset with the side */

@@ -3768,3 +3768,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00028224	scan_save_slots_28224	AL:uint8_t	AX:int16_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00028224 (418 bytes); pushes EBX..EBP; mode in AL; EBP is a slot offset counter set to 0, not an input; callers 284ec
 0x00031514	advance_key_view_31514			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00031514 (420 bytes); pushes EBX..EBP; no inputs; callers 31230 (jump-table code, EAX unused)
 0x0000ba5c	return_to_campaign_ba5c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000ba5c (445 bytes); pushes EBX..EDI, EBP unused; no inputs; EAX result not used by caller 42ef0
+0x00009114	check_base_contact_9114			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00009114 (461 bytes); pushes EBX..EDI, EBP unused; no inputs; caller 3df8c@3dfbd
