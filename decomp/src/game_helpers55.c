@@ -22,7 +22,7 @@ void step_activity_slot_8654(uint8_t group, uint8_t slot)
     {
         ef_addr32 obj = guest_fn_7489c(EF_S32(rec + (uint32_t)EF_U8(entry + 0x22u) * 2u + 0x4eu) >> 16);
         if (obj != 0 && EF_U8(obj + 0x18du) == 0 && EF_U8(obj + 0x16cu) != 9)
-            guest_fn_6a1d0(EF_S32(obj + 0x14u) >> 16, 9);
+            transition_indexed_object_state(EF_S32(obj + 0x14u) >> 16, 9);
     }
     entry = EF_U32(EF_U32(0x001972e0u) + (uint32_t)group * 0x22u + 0x16u) + (uint32_t)slot * 0x38u;
     EF_U8(entry + 0x22u) = (uint8_t)(EF_U8(entry + 0x22u) + 1);

@@ -11741,12 +11741,12 @@ void follow_target_6be28(void)
     target = (int32_t)EF_U32(0x001f71c6u) >> 16;
     if (obj == 0u) {
         if ((uint8_t)guest_fn_6ae30_x(target) == 0u)
-            guest_fn_6a1d0(target, 1u);
+            transition_indexed_object_state(target, 1u);
     } else {
         uint8_t fl = EF_U8(obj + 0x30u);
         if (EF_U32(obj + 0x1cu) != 0u || (fl & 1u) != 0u || (fl & 2u) != 0u) {
             if ((uint8_t)guest_fn_6ae30_x(target) == 0u)
-                guest_fn_6a1d0(target, 1u);
+                transition_indexed_object_state(target, 1u);
         }
     }
     if (obj == 0u)
@@ -12448,7 +12448,7 @@ uint32_t release_pending_item_172b4(uint32_t id)
         return 0xffu;
     if ((EF_U8(obj + 0x24u) & 8u) == 0u) {
         EF_U8(obj + 0x24u) = (uint8_t)(EF_U8(obj + 0x24u) | 8u);
-        guest_fn_6a1d0(sitem, 0u);
+        transition_indexed_object_state(sitem, 0u);
         guest_fn_741f0(obj);
         if (g_world_grid_mode != 0u)
             send_unit_options_56444((int16_t)sitem, 0x64u, 0xffffu);
@@ -12983,7 +12983,7 @@ void check_player_altitude_711f0(void)
     memcpy(&lim, ef_guest_memory_ptr(0x001868d1u), sizeof lim);
     if (alt < lim) {
         assign_roster_slot_740e4(id, 0xffu, 0xffu, 0u, 0xffu);
-        guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+        transition_indexed_object_state((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
     }
     cur = g_current_object;
     memcpy(&a, ef_guest_memory_ptr(0x001868d9u), sizeof a);
@@ -18864,7 +18864,7 @@ void update_gun_mount_70278(void)
 		return;
 	if ((EF_U8(m + 0x30u) & 2u) != 0u || EF_U32(m + 0x1cu) != 0u) {
 		if (guest_fn_6ae30_x((int32_t)EF_U32(unit + 0x14u) >> 16) == 0u) {
-			guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+			transition_indexed_object_state((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
 			return;
 		}
 	}
@@ -18875,7 +18875,7 @@ void update_gun_mount_70278(void)
 		for (i = 0; ok && i < 4; i++)
 			ok = (query_indexed_object_feature((int32_t)EF_U32(g_current_object + 0x14u) >> 16, feats[i]) & 0xffu) == 0x14u;
 		if (ok)
-			guest_fn_6a1d0((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
+			transition_indexed_object_state((int32_t)EF_U32(0x001f71c6u) >> 16, 1u);
 	}
 	v[0] = (double)(int32_t)EF_U32(m + 8u) * 2.4384 * 0.00390625;
 	v[1] = (double)(int32_t)EF_U32(m) * 2.4384 * 0.00390625;
@@ -24574,7 +24574,7 @@ void reset_unit_slot_775f0(uint32_t eax, uint32_t edx)
 	EF_U8(ub + 0x25) &= 0xfb;
 	EF_U8(ub + 0x18a) = 0;
 	EF_U16(table + 0x13 + (uint32_t)idx * 2) = 0xff;
-	guest_fn_6a1d0(b, 1);
+	transition_indexed_object_state(b, 1);
 	if (g_tactical_action_enabled != 0) {
 		run_page_text_9e508((int16_t)EF_S16(ub + 0x20), 0xe);
 		run_page_text_9e508((int16_t)EF_S16(ub + 0x20), 0x17);

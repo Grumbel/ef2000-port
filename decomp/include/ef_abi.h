@@ -1639,7 +1639,7 @@ void toggle_flag_8db80(int16_t unit);
 void toggle_flag_8dbe0(int16_t unit);
 void toggle_flag_8dc40(int16_t unit);
 void toggle_flag_8dc94(int16_t unit);
-void guest_fn_6a1d0(int32_t a, uint32_t b); /* 0x6a1d0 */
+void transition_indexed_object_state(int16_t index, uint8_t state); /* 0x6a1d0 AX/DL */
 void guest_fn_710a4(void); /* 0x710a4 */
 void guest_fn_73500(int32_t a); /* 0x73500 */
 void guest_fn_73c38(int32_t a); /* 0x73c38 */

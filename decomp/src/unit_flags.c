@@ -29,7 +29,7 @@ void notify_player_unit_6c3d0(void)
     if (kind == 1 || kind == 3) {
         player = EF_U32(0x001f71bcu);
         type = EF_U8(EF_U32(0x0019bb58u) + (uint32_t)(EF_S32(player + 0x26u) >> 16) * 0xcau + 0x1au);
-        guest_fn_6a1d0(EF_S32(0x001f71c6u) >> 16, type);
+        transition_indexed_object_state(EF_S32(0x001f71c6u) >> 16, type);
     }
 }
 

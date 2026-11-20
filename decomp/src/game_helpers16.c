@@ -34,7 +34,7 @@ void command_linked_units_2b3b0(int16_t owner, uint8_t kind)
         if (unit == 0)
             continue;
         if (EF_U8(unit + 0x18du) == 0 || kind == 1 || kind == 7)
-            guest_fn_6a1d0((int32_t)id, kind);
+            transition_indexed_object_state((int32_t)id, kind);
     }
 }
 
@@ -46,7 +46,7 @@ void command_unit_and_peers_2b444(int16_t unit_id, uint8_t kind)
 
     if (unit == 0)
         return;
-    guest_fn_6a1d0((int32_t)unit_id, kind);
+    transition_indexed_object_state((int32_t)unit_id, kind);
     for (i = 0; i < 7; i++) {
         ef_addr32 record = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)EF_U16(unit + 0x28u) * 0xca);
         int16_t peer_id = (int16_t)EF_U16(record + (uint32_t)((int32_t)i * 2) + 0x50u);

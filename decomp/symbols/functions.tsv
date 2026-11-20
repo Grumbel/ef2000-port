@@ -1273,7 +1273,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0006a0f8	22	lookup_record_value	marker_packets	compiles	game	confirmed	decomp/tests/0x0006a0f8.json	docs/compiler-abi.md; Tail call 0x9ddfc with dword at 0x128564+0xe5*AL; sole direct caller 8c49c@8c54c; guest pending
 0x0006a148	100	next_unit_6a148	game_helpers9	compiles	game	confirmed	decomp/tests/0x0006a148.json	docs/compiler-abi.md; Next unit after start that belongs to a record of kind 1, or 0xff.; callers 73500@7355a; guest pending
 0x0006a1b4	26	lookup_indexed_object	indexed_objects	compiles	game	confirmed	decomp/tests/0x0006a1b4.json	docs/compiler-abi.md; C draft and host-model test; waiting for Watcom compile, splice and guest differential
-0x0006a1d0	388	transition_indexed_object_state	unk_geometry	blocked	game	confirmed		Triage classification, not yet individually attempted (CS-relative jump table and 16-bit register inputs; ABI only, no confirmed C structure).
+0x0006a1d0	388	transition_indexed_object_state	object_state	spliced	game	confirmed	decomp/tests/0x0006a1d0.json	Object state transition with per-state entry actions; compare tree, not a jump table
 0x0006a354	34	set_indexed_object_activation	object_state	compiles	game	confirmed	decomp/tests/0x0006a354.json	C wrapper draft; +0x140 guard and +0x141/+0x142 stores; Watcom compile and guest differential pending
 0x0006a378	27	clear_indexed_object_activation	object_state	compiles	game	confirmed	decomp/tests/0x0006a378.json	Two original callers; C wrapper draft, clears +0x141 only when +0x140 nonzero; Watcom/diff pending
 0x0006a394	57	set_indexed_object_state	object_state	compiles	game	confirmed	decomp/tests/0x0006a394.json	C wrapper draft; kind byte +0xe9 and 0xe5-stride flag table; Watcom/diff pending

@@ -126,7 +126,7 @@ void trigger_linked_event_77534(uint32_t id)
     if (linked == 0)
         return;
     EF_U8(unit + 0x18au) = 1;
-    guest_fn_6a1d0(index, 0x0e);
+    transition_indexed_object_state(index, 0x0e);
     if (EF_U8(0x00125847u) != 0)
         guest_fn_9e508((int32_t)EF_U32(unit + 0x1eu) >> 16, 0x16);
     if ((uint16_t)id != EF_U16(0x001f71cau))

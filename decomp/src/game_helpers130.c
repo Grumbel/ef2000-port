@@ -5730,7 +5730,7 @@ void update_player_target_6bee8(void)
 		}
 		if (guest_fn_6aeb4(HI(0x001f71c6u)) != 0)
 			return;
-		guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+		transition_indexed_object_state(HI(0x001f71c6u), 1u);
 		P = EF_U32(0x001f71bcu);
 		EF_U16(P + 0x146u) = 0xffu;
 		EF_U32(P + 0x150u) = 0;
@@ -5760,7 +5760,7 @@ void update_player_target_6bee8(void)
 		P = EF_U32(0x001f71bcu);
 		si = EF_U16(P + 0x146u);
 		if (guest_fn_6aeb4(HI(0x001f71c6u)) == 0) {
-			guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+			transition_indexed_object_state(HI(0x001f71c6u), 1u);
 			P = EF_U32(0x001f71bcu);
 			EF_U16(P + 0x146u) = 0xffu;
 			EF_U32(P + 0x150u) = 0;
@@ -5783,7 +5783,7 @@ void update_player_target_6bee8(void)
 			goto clear;
 	}
 call_clear:
-	guest_fn_6a1d0(HI(0x001f71c6u), 1u);
+	transition_indexed_object_state(HI(0x001f71c6u), 1u);
 clear:
 	P = EF_U32(0x001f71bcu);
 	EF_U16(P + 0x146u) = 0xffu;

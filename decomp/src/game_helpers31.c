@@ -65,7 +65,7 @@ void update_current_mode_2546c(void)
     if (guest_fn_7489c(index) == 0)
         return;
     if ((guest_fn_6aeb4(index) & 0xffu) == 0) {
-        guest_fn_6a1d0(index, 1);
+        transition_indexed_object_state(index, 1);
         EF_U16(g_current_object + 0x146u) = 0xff;
         EF_U32(g_current_object + 0x150u) = 0;
         EF_U32(g_current_object + 0x154u) = 0;

@@ -90,7 +90,7 @@ void check_link_contact_772d0(int16_t object, int16_t unit)
     if (g_world_grid_mode != 0 && EF_U16(obj + UNIT_SIDE) != (uint16_t)g_world_grid_marker
         && EF_S16(obj + UNIT_SIDE) != SIDE_NONE) {
         send_two_word_byte_packet_3b((uint16_t)object, (uint16_t)unit, EF_U8(rec + UNIT_LINK_SLOT));
-        guest_fn_6a1d0(unit, STATE_LINKED);
+        transition_indexed_object_state(unit, STATE_LINKED);
         EF_U8(rec + UNIT_LINK_DONE) = 1;
         return;
     }

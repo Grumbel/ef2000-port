@@ -83,5 +83,5 @@ void send_unit_command_7ae4(int16_t unit_id, uint8_t a, uint8_t b, uint8_t kind)
     else
         extra = EF_U8(unit + 0x20bu);
     guest_fn_740e4((int32_t)unit_id, a, b, kind, extra);
-    guest_fn_6a1d0((int32_t)unit_id, 0xb);
+    transition_indexed_object_state((int32_t)unit_id, 0xb);
 }
