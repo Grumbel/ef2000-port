@@ -3475,6 +3475,7 @@ double guest_fn_dc1e9(double a, double b); /* 0xdc1e9 ST1/ST0 -> ST0 */
 
 /* leaf_helpers1.c */
 ef_addr32 log_alloc_e764(uint32_t a);
+void build_marker_rects_f918(ef_addr32 head);
 uint32_t constant_44_35218(void);
 uint32_t store_word_39300(ef_addr32 name);
 double scale_float_52eb0(float value);
