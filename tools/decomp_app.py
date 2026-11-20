@@ -39,7 +39,8 @@ def build_patch(executable, object_dir, output):
         objects, functions, globals_, {}, image,
         hybrid_link.load_abi_aliases(abi_header),
         explicit_excludes=exclusions, signatures=signatures,
-        variadic_names=hybrid_link.load_variadic_names(abi_header), allow_english=english)
+        variadic_names=hybrid_link.load_variadic_names(abi_header), allow_english=english,
+        routine_pragmas=hybrid_link.load_routine_pragmas(abi_header))
     output.write_bytes(blob)
     print('ef2000-hybrid: %d recovered C functions, %d redirect bytes, '
           '%d arena bytes; %d/%d modules linked' % (

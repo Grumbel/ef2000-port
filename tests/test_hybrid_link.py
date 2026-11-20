@@ -43,6 +43,26 @@ class AbiAliasTests(unittest.TestCase):
 
             self.assertEqual(hybrid_link.load_abi_aliases(header), {})
 
+    def test_routine_pragma_must_match_register_and_stack_inputs(self):
+        with tempfile.TemporaryDirectory() as directory:
+            header = Path(directory) / 'abi.h'
+            header.write_text(
+                '#pragma aux mixed parm routine [eax] modify [ebx]\n'
+                '#pragma aux stack_only parm routine []\n'
+                '#pragma aux caller_cleans parm caller [eax]\n')
+            pragmas = hybrid_link.load_routine_pragmas(header)
+
+        self.assertEqual(pragmas, {'mixed': ['eax'], 'stack_only': []})
+        mixed = {'inputs': 'AX:int16_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t',
+                 'stack_bytes': '12'}
+        self.assertEqual(hybrid_link.routine_stack_bytes(mixed, ['eax']), 12)
+        self.assertEqual(hybrid_link.routine_stack_bytes(mixed, ['edx']), 0)
+        self.assertEqual(hybrid_link.routine_stack_bytes(mixed, None), 0)
+        short = dict(mixed, stack_bytes='16')
+        self.assertEqual(hybrid_link.routine_stack_bytes(short, ['eax']), 0)
+        named = {'inputs': 'DX:int16_t,stack_index:uint32_t', 'stack_bytes': '4'}
+        self.assertEqual(hybrid_link.routine_stack_bytes(named, ['edx']), 0)
+
     def test_real_header_does_not_alias_helpers_to_referenced_data_or_stubs(self):
         aliases = hybrid_link.load_abi_aliases(hybrid_link.ABI_HEADER)
 
@@ -155,6 +175,57 @@ class SignatureExclusionTests(unittest.TestCase):
                     self.assertEqual(cpu.mem_read(stack, len(frame)), frame)
                     for reg, value in saved.items():
                         self.assertEqual(cpu.reg_read(getattr(x86, 'UC_X86_REG_' + reg)), value)
+
+    def test_routine_trampoline_forwards_and_removes_stack_arguments(self):
+        try:
+            import unicorn as uc
+            from unicorn import x86_const as x86
+        except ImportError:
+            self.skipTest('requires Unicorn')
+        # Synthetic parm routine [eax] body: EAX += two stack words, ret 8,
+        # clobbering ECX/EDX, which the original entry preserves.
+        code = bytes.fromhex('8b4c240401c88b54240801d0c20800')
+        with tempfile.TemporaryDirectory() as directory:
+            path = Path(directory) / 'routine.obj'
+            path.write_bytes(b'fixture')
+            module = Module(segments=[None, Segment('text', 'CODE', len(code), 1, True)],
+                            publics=[Public('routine_', 1, 0)])
+            module.segments[1].data[:] = code
+            functions = [dict(addr='0x20', size='8', name='routine',
+                              state='compiles', sig_status='confirmed')]
+            signatures = [dict(addr='0x20', name='routine',
+                               inputs='EAX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t',
+                               outputs='EAX:uint32_t', preserved='ebx,ecx,edx,esi,edi,ebp',
+                               stack_bytes='8')]
+            source = bytes(128)
+            with patch.object(hybrid_link, 'read_module', return_value=module), \
+                    patch.object(hybrid_link, 'IMAGE_SHA256', hashlib.sha256(source).hexdigest()):
+                blob, report = hybrid_link.link(
+                    [(path, 'hand')], functions, [], {}, source, {},
+                    signatures=signatures, routine_pragmas={'routine': ['eax']})
+                _, unmatched = hybrid_link.link(
+                    [(path, 'hand')], functions, [], {}, source, {},
+                    signatures=signatures, routine_pragmas={'routine': ['edx']})
+        self.assertEqual(report['abi_trampolines'], 1)
+        self.assertIn({'addr': '0x00000020',
+                       'reason': 'stack arguments need a stack-aware trampoline'},
+                      unmatched['excluded'])
+        cpu = uc.Uc(uc.UC_ARCH_X86, uc.UC_MODE_32)
+        cpu.mem_map(0, hybrid_link.GUEST_SIZE)
+        cpu.mem_write(0, source)
+        for address, data in efpatch.decode(blob, source, hybrid_link.GUEST_SIZE):
+            cpu.mem_write(address, data)
+        stack, sentinel = 0x3fff000, 0x3ffe000
+        cpu.mem_write(stack, struct.pack('<III', sentinel, 5, 7))
+        cpu.reg_write(x86.UC_X86_REG_ESP, stack)
+        cpu.reg_write(x86.UC_X86_REG_EAX, 1)
+        cpu.reg_write(x86.UC_X86_REG_ECX, 0x11111111)
+        cpu.reg_write(x86.UC_X86_REG_EDX, 0x22222222)
+        cpu.emu_start(0x20, sentinel, count=1000)
+        self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EAX), 13)
+        self.assertEqual(cpu.reg_read(x86.UC_X86_REG_ESP), stack + 12)
+        self.assertEqual(cpu.reg_read(x86.UC_X86_REG_ECX), 0x11111111)
+        self.assertEqual(cpu.reg_read(x86.UC_X86_REG_EDX), 0x22222222)
 
     def test_unsupported_abi_keeps_entry_and_external_calls_original(self):
         # A supported compiled caller calls an unsupported callee in another

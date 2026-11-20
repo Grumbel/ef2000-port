@@ -110,6 +110,54 @@ def load_abi_aliases(path):
     return aliases
 
 
+REGISTER_PARAMETERS = {'al': 'eax', 'ax': 'eax', 'eax': 'eax', 'bl': 'ebx', 'bx': 'ebx',
+                       'ebx': 'ebx', 'cl': 'ecx', 'cx': 'ecx', 'ecx': 'ecx',
+                       'dl': 'edx', 'dx': 'edx', 'edx': 'edx', 'si': 'esi', 'esi': 'esi',
+                       'di': 'edi', 'edi': 'edi', 'bp': 'ebp', 'ebp': 'ebp'}
+
+
+def routine_stack_bytes(signature, pragma_registers):
+    """Stack bytes a ``parm routine`` body removes, or 0 when it does not match.
+
+    The signature must list its register inputs first, in the pragma's order,
+    followed by consecutive dword stack slots that add up to ``stack_bytes``.
+    """
+    if pragma_registers is None:
+        return 0
+    inputs = [item.strip().split(':', 1)[0] for item in signature['inputs'].split(',')
+              if item.strip()]
+    registers = []
+    slots = []
+    for item in inputs:
+        stack = re.fullmatch(r'\[ESP\+(\d+)\]', item, re.I)
+        if stack:
+            slots.append(int(stack.group(1)))
+        elif slots or item.lower() not in REGISTER_PARAMETERS:
+            return 0
+        else:
+            registers.append(REGISTER_PARAMETERS[item.lower()])
+    total = int(signature['stack_bytes'])
+    if registers != pragma_registers or slots != list(range(4, total + 4, 4)):
+        return 0
+    return total
+
+
+def load_routine_pragmas(path):
+    """Map names to the register list of an explicit ``parm routine`` pragma.
+
+    Such a body takes its remaining arguments on the stack and removes them
+    itself (``ret N``), which a trampoline can forward without knowing more
+    about the C prototype.
+    """
+    pragmas = {}
+    for match in re.finditer(r'(?m)^[ \t]*#pragma\s+aux\s+([A-Za-z_]\w*)\s+parm\s+routine\s*'
+                             r'((?:\[\s*\w*\s*\]\s*)*)', path.read_text()):
+        pragmas[match.group(1)] = [item.strip().lower() for item in
+                                   re.findall(r'\[([^\]]*)\]', match.group(2))
+                                   if item.strip()]
+    return pragmas
+
+
 def align(value, boundary):
     return (value + boundary - 1) // boundary * boundary
 
@@ -149,7 +197,8 @@ def load_objects(hand_dirs, mechanical_dir, report_path):
 
 def link(objects, functions, globals_, mechanical_selected, image,
          abi_aliases, arena_base=DEFAULT_ARENA, explicit_excludes=None,
-         signatures=None, variadic_names=(), *, allow_english=False):
+         signatures=None, variadic_names=(), *, allow_english=False,
+         routine_pragmas=None):
     digest = hashlib.sha256(image).digest()
     english = allow_english and digest.hex() == ENGLISH_IMAGE_SHA256
     if digest.hex() != IMAGE_SHA256 and not english:
@@ -293,9 +342,13 @@ def link(objects, functions, globals_, mechanical_selected, image,
         if not signature:
             signature_skip_reasons[address] = 'confirmed signature row missing'
             continue
+        callee_pop = 0
         if signature['stack_bytes'] not in ('', '0'):
-            signature_skip_reasons[address] = 'stack arguments need a stack-aware trampoline'
-            continue
+            callee_pop = routine_stack_bytes(signature, (routine_pragmas or {}).get(
+                function_by_addr[address]['name']))
+            if not callee_pop:
+                signature_skip_reasons[address] = 'stack arguments need a stack-aware trampoline'
+                continue
         preserved = {item.strip().lower() for item in signature['preserved'].split(',')
                      if item.strip()}
         if not preserved <= set(register_codes):
@@ -334,6 +387,8 @@ def link(objects, functions, globals_, mechanical_selected, image,
         # nothing to save, a direct jump to the body is already correct.
         stack_arg_count = len(re.findall(r'\[ESP\+\d+\]', signature['inputs'], re.I))
         if stack_arg_count and not regs:
+            # The body removes or leaves its stack arguments exactly as the
+            # original did, so the entry can jump to it directly.
             continue
         start = trampoline_cursor
         code = bytearray(0x50 + register_codes[reg] for reg in regs)
@@ -347,10 +402,13 @@ def link(objects, functions, globals_, mechanical_selected, image,
             signature_skip_reasons[address] = 'trampoline call target is out of range'
             continue
         code.extend(b'\xe8' + (displacement & 0xffffffff).to_bytes(4, 'little'))
-        if stack_arg_count:
+        if stack_arg_count and not callee_pop:
             code.extend(b'\x83\xc4' + bytes([4 * stack_arg_count]))
         code.extend(0x58 + register_codes[reg] for reg in reversed(regs))
-        code.append(0xc3)
+        if callee_pop:
+            code.extend(b'\xc2' + callee_pop.to_bytes(2, 'little'))
+        else:
+            code.append(0xc3)
         trampoline_records.append((start, bytes(code), address))
         trampoline_targets[address] = start
         trampoline_cursor += len(code)
@@ -630,7 +688,8 @@ def main(argv=None):
                             selected, source,
                             load_abi_aliases(args.abi_header), args.arena_base,
                             explicit_excludes, read_tsv(args.signatures),
-                            load_variadic_names(args.abi_header))
+                            load_variadic_names(args.abi_header),
+                            routine_pragmas=load_routine_pragmas(args.abi_header))
         args.output.parent.mkdir(parents=True, exist_ok=True)
         with args.output.open('xb') as stream:
             stream.write(blob)
