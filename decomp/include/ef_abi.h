@@ -4106,7 +4106,7 @@ ef_addr32 rebuild_child_dialog_34a98(ef_addr32 text);
 int32_t list_directory_names_32de8(ef_addr32 path, ef_addr32 mask);
 void guest_fn_6e1c4_x(uint32_t a); /* 0x6e1c4 EAX */
 uint8_t guest_fn_6e1c4(ef_addr32 point); /* 0x6e1c4 EAX -> AL */
-void guest_fn_772d0(uint32_t object, uint32_t unit); /* 0x772d0 AX/EDX */
+void check_link_contact_772d0(int16_t object, int16_t unit); /* 0x772d0 AX/DX */
 void place_link_point_70438(void); /* 0x70438 */
 void update_g_vision_75ca0(void); /* 0x75ca0 */
 void guest_fn_6924(void); /* 0x6924 */

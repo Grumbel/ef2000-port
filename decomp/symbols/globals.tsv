@@ -830,3 +830,4 @@ addr	size	type	name	evidence	notes
 0x0012814c	1	uint8_t	g_cockpit_mode	0x6460 reads; set to 3/4 elsewhere	cockpit mode; entering 3 adjusts runtime slots
 0x00127da8	1	uint8_t	g_linked_session	set when 0x125846 == 1	linked session flag; hides the target id in solo play
 0x001a30d0	8	double	g_gauge_fraction	0x6460 and 0x21e04 read	fraction shown as a 0..100 percentage
+0x001a5b30	8	double	g_link_range_scale	0x772d0 reads	scales the watched unit link range (20 * scale)
