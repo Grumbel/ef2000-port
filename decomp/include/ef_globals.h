@@ -550,7 +550,7 @@ extern uint8_t g_score_file_name[13]; /* 0x1f8fc8, "arcXXX.txt" or a training fi
 
 /* "kots" base selection, 0x5110. */
 #include "ef_structs/kots.h"
-extern uint8_t g_kots_lock; /* 0x12584b, 1 = base buttons ignored */
+extern uint8_t g_kots_lock; /* 0x12584b, play mode set by 0x522c: 1 solo (base buttons ignored), 2 team, 3 bases */
 extern uint8_t g_kots_base_side[]; /* 0x197098, 0/1 per base */
 extern uint8_t g_kots_base_side_mirror[]; /* 0x12584c, advanced and reset with the side */
 extern ef_addr32 g_kots_side_labels[2]; /* 0x121e28, "GRUN" (0x9a umlaut) / "ROT" */
@@ -632,6 +632,7 @@ extern int16_t g_training_mission_flag; /* 0x1f8fde, 0 for the free flight */
 extern ef_addr32 g_training_row_pool; /* 0x1f8f74, ef_session_row[] */
 extern int16_t g_training_selection; /* 0x12b026, 0-based row */
 extern char g_config_file_name[0x12]; /* 0x125828, current mission config name */
+extern uint8_t g_custom_player_mode; /* 0x125839, 1 numbers the first custom slot from 0x1357b0 */
 
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */

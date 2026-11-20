@@ -3721,3 +3721,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004bcd4	mpTargetListSelected	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI list callback
 0x0007c328	gpwMissionSelected	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX widget; GUI list callback
 0x0007c574	gpwMissionAccepted	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; callees preserve ESI/EDI; EAX widget; GUI accept callback
+0x0007e0a4	simNextFlight	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; 4-byte digit buffer; EAX widget; GUI open callback
+0x0000522c	kotsAccept	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; GUI accept callback

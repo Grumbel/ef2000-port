@@ -6571,6 +6571,8 @@ void gpwOnOpenTargetWindow(ef_addr32 widget); /* 0x431a4 */
 void mpTargetListSelected(ef_addr32 widget); /* 0x4bcd4 */
 void gpwMissionSelected(ef_addr32 widget); /* 0x7c328 */
 void gpwMissionAccepted(ef_addr32 widget); /* 0x7c574 */
+void simNextFlight(ef_addr32 widget); /* 0x7e0a4 */
+void kotsAccept(ef_addr32 widget); /* 0x522c */
 void guest_fn_9820(void); /* 0x9820 */
 void guest_fn_9ea0(void); /* 0x9ea0 */
 void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */

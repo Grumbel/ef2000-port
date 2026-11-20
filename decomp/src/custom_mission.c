@@ -186,3 +186,73 @@ void gpwMissionAccepted(ef_addr32 widget)
         check_params_widget(0x00187ec4u);                  /* "wgood" */
     check_params_widget(0x00187eccu);                      /* "pro" */
 }
+
+/* Widget of DIALOG named by the decimal VALUE. */
+static ef_addr32 numbered_widget(ef_addr32 dialog, int32_t value)
+{
+    char digits[4];
+
+    signed_to_digits_cbd0f(value, (ef_addr32)(uintptr_t)digits, 10u);
+    return find_widget_checked_a78bc(dialog, (ef_addr32)(uintptr_t)digits);
+}
+
+/* Move the numbered widgets "1".."8" of DIALOG vertically by DY unless
+ * widget "1" already sits at row STOP. */
+static void shift_slot_rows(ef_addr32 dialog, int16_t stop, int16_t dy)
+{
+    int16_t i;
+
+    if ((int16_t)EF_U16(find_widget_checked_a78bc(dialog, 0x00187c98u)) == stop) /* "1" */
+        return;
+    for (i = 1; i < 9; ++i) {
+        ef_addr32 row = numbered_widget(dialog, i);
+
+        EF_U16(row) = (uint16_t)(EF_U16(row) + dy);
+    }
+}
+
+/* 0x7e0a4, 516 bytes, open callback of a custom-mission slot page; the
+ * slot number is the widget name at +0x43. Slots 1-2 move the rows of
+ * "Custom" up to 100 and slot 3+ down to 120. The "enemysel" list is
+ * rebuilt for the slot: the first slot (numbered from the count word
+ * 0x1357b0 when the mode byte is 1, else from 1) closes it, the others open it. Then the
+ * slot's count, armament and skill widgets and its aircraft type in
+ * "enemysel" are checked, and the enemy view is redrawn. */
+void simNextFlight(ef_addr32 widget)
+{
+    ef_addr32 dialog = find_named_or_abort_a46cc(0x00188034u);      /* "Custom" */
+    int16_t slot = (int16_t)(parse_int(widget + 0x43u) - 1);
+    ef_addr32 skill_name;
+
+    if (slot <= 1) {
+        shift_slot_rows(dialog, 100, -20);
+        if (slot == 0) {
+            place_numbered_widgets_7e01c(g_custom_player_mode == 1u ? g_tactical_lookup_count : 1, 8);
+            close_widget_a4b80(EF_U8(find_named_or_abort_a46cc(0x00187f88u) + 0x10u)); /* "enemysel" */
+        } else {
+            place_numbered_widgets_7e01c(1, 6);
+            activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(0x00187f88u) + 0x10u));
+        }
+    } else {
+        shift_slot_rows(dialog, 120, 20);
+        place_numbered_widgets_7e01c(0, 6);
+        activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(0x00187f88u) + 0x10u));
+    }
+    guest_fn_a72d8(numbered_widget(dialog, g_custom_slot_count[slot]));
+    guest_fn_a72d8(find_widget_checked_a78bc(dialog, g_custom_slot_guns_only[slot] != 0u
+                                                         ? 0x001880b8u      /* "gunsyes" */
+                                                         : 0x00188604u));   /* "gunsno" */
+    switch (g_custom_slot_skill[slot]) {
+    case 0: skill_name = 0x00187eecu; break;                        /* "high" */
+    case 1: skill_name = 0x00187fc0u; break;                        /* "medium" */
+    case 2: skill_name = 0x00187ee8u; break;                        /* "low" */
+    default: skill_name = 0u; break;
+    }
+    if (skill_name != 0u)
+        guest_fn_a72d8(find_widget_checked_a78bc(dialog, skill_name));
+    guest_fn_a5ef8(EF_U8(dialog + 0x10u));
+    guest_fn_a72d8(numbered_widget(find_named_or_abort_a46cc(0x00187f88u),
+                                   g_custom_slot_type[slot] + 1));
+    RedrawEnemyView(numbered_widget(find_named_or_abort_a46cc(0x00187f88u),
+                                    g_custom_slot_type[slot] + 1));
+}

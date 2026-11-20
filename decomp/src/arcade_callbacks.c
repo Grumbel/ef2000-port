@@ -88,3 +88,48 @@ void kotsClickBase(ef_addr32 widget)
                       g_kots_side_bases[g_kots_base_side[base]].name);
     apply_a5ef8_a6018(0x0017f7f8u);
 }
+
+/* 0x522c, 601 bytes, accept callback of the "kots" setup dialog. For
+ * each of the count-word (0x1357b0) rows, walk the team1/ateam1/base1/
+ * abase1 widget chains (+0x21) together while team1 and ateam1 rows
+ * exist: "soloplay" shows team1 and abase1 with team "Keine Angaben";
+ * "teamplay" shows ateam1 and abase1 with the row's side label; any
+ * other name shows ateam1 and base1 with the side label and the side's
+ * home base. The chosen mode 1/2/3 is stored in the kots mode byte. */
+void kotsAccept(ef_addr32 widget)
+{
+    ef_addr32 team = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x0017f7f8u), 0x0017f824u);  /* "kots", "team1" */
+    ef_addr32 ateam = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x0017f7f8u), 0x0017f83cu); /* "ateam1" */
+    ef_addr32 base = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x0017f7f8u), 0x0017f82cu);  /* "base1" */
+    ef_addr32 abase = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x0017f7f8u), 0x0017f844u); /* "abase1" */
+    ef_addr32 name = widget + 0x3fu;
+    uint8_t mode;
+    int16_t i;
+
+    if (guest_strcmp(name, 0x0017f800u) == 0)              /* "soloplay" */
+        mode = 1u;
+    else if (guest_strcmp(name, 0x0017f854u) == 0)         /* "teamplay" */
+        mode = 2u;
+    else
+        mode = 3u;
+    for (i = 0; i < g_tactical_lookup_count; ++i) {
+        uint8_t side;
+
+        if (team == 0u || ateam == 0u)
+            continue;
+        side = g_kots_base_side[i];
+        set_widget_bit6(team, mode == 1u);
+        set_widget_bit6(ateam, mode != 1u);
+        set_widget_bit6(base, mode == 3u);
+        set_widget_bit6(abase, mode != 3u);
+        show_widget_a7588(team, mode == 1u ? 0x0012f69du      /* "Keine Angaben" */
+                                           : g_kots_side_labels[side]);
+        if (mode == 3u)
+            show_widget_a7588(abase, g_kots_side_bases[side].name);
+        team = EF_U32(team + 0x21u);
+        ateam = EF_U32(ateam + 0x21u);
+        base = EF_U32(base + 0x21u);
+        abase = EF_U32(abase + 0x21u);
+    }
+    g_kots_lock = mode;
+}
