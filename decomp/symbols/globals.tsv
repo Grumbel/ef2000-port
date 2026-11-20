@@ -849,3 +849,4 @@ addr	size	type	name	evidence	notes
 0x00197694	2	int16_t	g_route_origin_y	0xe490 sets	y of the route slot before the target
 0x001a559c	1	uint8_t	g_route_side	0xe490 reads	side of the route events; 1 picks codes 9..14, else 3/6/9
 0x0041f328	2	uint16_t	g_last_route_event	0xe490 chains through 0xbefb8	latest spawned route event record
+0x004dd670	64	uint32_t[16]	g_ail_drivers	0x104200 assigns the first free slot	installed AIL driver descriptors, indexed by handle

@@ -824,4 +824,5 @@ extern int16_t g_element_clip_w; /* 0x41ec0c */
 extern int16_t g_element_clip_h; /* 0x41ec0e */
 extern uint8_t g_scancode_ascii[256]; /* 0x15b62c */
 
+extern uint32_t g_ail_drivers[16]; /* 0x004dd670 */
 #endif

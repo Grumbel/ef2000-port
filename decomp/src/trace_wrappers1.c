@@ -110,7 +110,7 @@ uint32_t trace_call_10242c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, u
     (void)u0; (void)u1; (void)u2; (void)u3;
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193bdcu, a0, a1);
-    result = guest_fn_104200_t(a0, a1);
+    result = install_driver_104200(a0, a1);
     if (EF_U32(0x0017d2c8u) == 1u)
         guest_fn_bc400(EF_U32(0x004dd620u), 0x00193940u, result);
     return result;
