@@ -3447,7 +3447,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000bf70	onleaveOptions			ebx,ecx,edx,esi,edi,ebp	0	Original 0xbf70 (91 bytes); dumps pending record via 0xb3084
 0x000ab908	gnInitSettingsWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xab908 (54 bytes); formats 0x137278 into "number" widget
 0x0004c33c	mpClickMap			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4c33c (126 bytes); cycles preview page byte 1a53dd, calls 41314 then 42548
-0x000426a4	guest_fn_426a4	EAX:uint32_t			0	callee of 0x42b04@42b25; registers unknown, assumed clobbered
 0x000456e8	guest_fn_456e8				0	callee of 0x42b04@42b71; registers unknown, assumed clobbered
 0x00042b04	WarWonLostStartup	EAX:uint32_t		ebx,ecx,edx,edi	0	Original 0x00042b04 (131 bytes); mission start refresh; pushes ebx,ecx,edx,edi
 0x0004f0d4	guest_fn_4f0d4				0	callee of 0x4eb8c@4ec09; registers unknown, assumed clobbered
@@ -3723,3 +3722,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007c574	gpwMissionAccepted	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX; callees preserve ESI/EDI; EAX widget; GUI accept callback
 0x0007e0a4	simNextFlight	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; 4-byte digit buffer; EAX widget; GUI open callback
 0x0000522c	kotsAccept	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; GUI accept callback
+0x000426a4	gpwUpdateMap	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; GUI update callback
+0x00041b98	guest_fn_41b98	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EBP not written in the prologue; called by 0x426a4 per map row
+0x00041998	guest_fn_41998	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; called by 0x426a4 per unit
+0x00042004	guest_fn_42004			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; called by 0x426a4

@@ -3707,7 +3707,6 @@ void draw_active_marker_e5088(void);
 void mpWPZoomToggle(void); /* 0x4eb8c */
 void guest_fn_4f0d4(void); /* 0x4f0d4 */
 void WarWonLostStartup(uint32_t arg); /* 0x42b04 EAX */
-void guest_fn_426a4(uint32_t arg); /* 0x426a4 EAX */
 void guest_fn_456e8(void); /* 0x456e8 */
 uint8_t guest_fn_e93dc_r(uint32_t a, uint32_t b); /* 0xe93dc EAX/EDX -> AL */
 uint32_t guest_fn_106be8_w(uint32_t a, uint32_t b, uint32_t c); /* 0x106be8 EAX/EDX/EBX -> EAX */
@@ -6573,6 +6572,10 @@ void gpwMissionSelected(ef_addr32 widget); /* 0x7c328 */
 void gpwMissionAccepted(ef_addr32 widget); /* 0x7c574 */
 void simNextFlight(ef_addr32 widget); /* 0x7e0a4 */
 void kotsAccept(ef_addr32 widget); /* 0x522c */
+void gpwUpdateMap(ef_addr32 widget); /* 0x426a4 */
+void guest_fn_41b98(int16_t row); /* 0x41b98 */
+void guest_fn_41998(int16_t unit); /* 0x41998 */
+void guest_fn_42004(void); /* 0x42004 */
 void guest_fn_9820(void); /* 0x9820 */
 void guest_fn_9ea0(void); /* 0x9ea0 */
 void mpSamCoverage(ef_addr32 widget); /* 0x4d920 */

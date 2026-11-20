@@ -574,6 +574,7 @@ addr	size	type	name	evidence	notes
 0x0012b026	2	int16_t	g_training_selection	7c58f/7c5a0 stores; read via dword 0x12b024 shifted 16	0-based training row
 0x00125828	18	char[18]	g_config_file_name	7c5d0 copies the row config name	current mission config file
 0x00125839	1	uint8_t	g_custom_player_mode	7e11c compares with 1	selects the first numbered widget of slot 1
+0x001a1506	2	int16_t	g_map_row_count	427fc/42812 bound the 0x41b98 loop	rows updated per network map update
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

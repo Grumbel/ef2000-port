@@ -14,7 +14,7 @@ void WarWonLostStartup(uint32_t arg)
 {
     if (EF_U8(0x0012654cu) != 0u || EF_U8(0x001a559eu) != 0u) {
         draw_active_marker_e5088();
-        guest_fn_426a4(arg);
+        gpwUpdateMap(arg);
         EF_U8(0x0012654cu) = 0u;
     }
     if (EF_S32(0x0012661au) >> 16 > 12 ||

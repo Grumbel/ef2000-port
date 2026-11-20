@@ -399,3 +399,76 @@ void gpwOnOpenTargetWindow(ef_addr32 widget)
     guest_fn_421c0_w();
     ui_emit_selected_message();
 }
+
+/* Size of a group member record (group record +0x13 points at them). */
+#define GROUP_MEMBER_SIZE 0x7cu
+
+/* 0x426a4, 477 bytes, update callback of the campaign map; clears bits
+ * 1-2 of WIDGET +0xc4. With groups present: rebuild the view stages
+ * (unless byte 0x121e8c is set) and the cell grid, then either draw
+ * every group member (in flight-info mode; side 1 in colour 1, others
+ * 9) or find the selected one. The selection is the selected unit's
+ * group and row slot (a slot past 7 reports "Failed to find expected
+ * group!!") or, with no unit, the selected target group and member. A
+ * missing group or member ends the update; otherwise that member
+ * becomes the current map record and is drawn, except for a target
+ * selection while the network is active. In network mode the per-row
+ * and per-unit updates (unit 0xff skipped) run before the map nodes are
+ * rebuilt. */
+void gpwUpdateMap(ef_addr32 widget)
+{
+    ef_addr32 node;
+    ef_addr32 member;
+    int16_t group;
+    int16_t slot;
+    int16_t i;
+
+    EF_U8(widget + 0xc4u) &= 0xf9u;
+    if (g_group_list_head != 0u) {
+        if (g_runtime_input_byte_c == 0u)
+            update_view_stages_45574(0x00137980u, 0x00137988u, 0x00137960u);
+        node = g_group_list_head;
+        draw_cell_grid_42568();
+        if (g_flightinfo_mode != 0u) {
+            for (; node != 0u; node = EF_U32(node + 4u)) {
+                for (i = 0; i < (int16_t)EF_U8(node + 0x12u); ++i)
+                    draw_segment_records_418c4(EF_U32(node + 0x13u) + (uint32_t)((int32_t)i * (int32_t)GROUP_MEMBER_SIZE),
+                                               EF_U8(node + 0xbu) == 1u ? 1 : 9);
+            }
+        } else {
+            if (g_adjacency_selected_value > -1) {
+                ef_addr32 unit = g_world_grid_base + (uint32_t)((int32_t)g_adjacency_selected_value * 0xca);
+
+                group = (int16_t)EF_U16(unit + (uint32_t)offsetof(ef_world_grid_cell, adjacency_group));
+                slot = find_row_slot_821f8((uint16_t)g_adjacency_selected_value, group);
+                /* ORIGINAL: EDX (the slot) is not reloaded after the message call. */
+                if (slot > 7)
+                    guest_callptr1_x(EF_U32(0x00132a74u), 0x001844f0u); /* "Failed to find expected group!!" */
+            } else {
+                group = g_target_group_index;
+                slot = g_target_member_index;
+            }
+            for (i = 0; node != 0u && i < group; ++i)
+                node = EF_U32(node + 4u);
+            if (node == 0u || slot >= (int16_t)EF_U8(node + 0x12u))
+                return;
+            member = EF_U32(node + 0x13u) + (uint32_t)((int32_t)slot * (int32_t)GROUP_MEMBER_SIZE);
+            g_current_map_record = member;
+            if (g_adjacency_selected_value > -1 || g_frontend_network_active == 0u)
+                draw_segment_records_418c4(member, 9);
+        }
+    }
+    if (g_group_list_head != 0u && g_frontend_network_active != 0u) {
+        for (i = 0; i < g_map_row_count; ++i)
+            guest_fn_41b98(i);
+        for (i = 0; i < g_unit_count;) {
+            guest_fn_41998(i);
+            ++i;
+            if (i == 0xff)
+                ++i;
+        }
+        guest_fn_42004();
+    }
+    guest_fn_4c120_x(0x00137980u, 0x00137960u);
+    draw_map_nodes_4c3bc(0x00137980u, 0x00137988u);
+}

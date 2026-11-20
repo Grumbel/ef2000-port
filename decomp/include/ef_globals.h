@@ -634,6 +634,9 @@ extern int16_t g_training_selection; /* 0x12b026, 0-based row */
 extern char g_config_file_name[0x12]; /* 0x125828, current mission config name */
 extern uint8_t g_custom_player_mode; /* 0x125839, 1 numbers the first custom slot from 0x1357b0 */
 
+/* Campaign map update, 0x426a4. */
+extern int16_t g_map_row_count; /* 0x1a1506 */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */
