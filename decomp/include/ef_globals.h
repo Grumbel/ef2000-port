@@ -173,6 +173,8 @@ extern ef_addr32 g_current_object; /* 0x001f71bc, pointer to active object */
 extern uint16_t g_simulation_tick_step; /* 0x00127d92 */
 extern uint8_t g_combat_skill_level; /* 0x001264e2 */
 extern uint32_t g_video_width; /* 0x0015b744 */
+extern ef_addr32 g_blit_src_row; /* 0x0015b738, packed blit source row */
+extern ef_addr32 g_blit_dst_row; /* 0x0015b73c, packed blit destination row */
 extern uint32_t g_video_height; /* 0x0015b748 */
 extern uint32_t g_view_clip_left; /* 0x0015bdc0, inclusive bounds */
 extern uint32_t g_view_clip_right; /* 0x0015bdc4 */

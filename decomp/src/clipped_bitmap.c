@@ -64,12 +64,12 @@ void blit_bitmap_clipped_ca290(ef_addr32 bitmap, ef_addr32 clip,
     if ((uint16_t)stride == 256u) {
         guest_masked_blit_cd82c(y, x, height, width, sy, sx, bitmap);
     } else {
-        guest_packed_blit_cd9a6((uint16_t)stride,
-                               (uint32_t)(int32_t)(int16_t)y,
-                               (uint32_t)(int32_t)(int16_t)x,
-                               (uint32_t)(int32_t)(int16_t)height,
-                               (uint32_t)(int32_t)(int16_t)width,
-                               (uint32_t)(int32_t)(int16_t)sy,
-                               (uint32_t)(int32_t)(int16_t)sx, bitmap);
+        packed_blit_cd9a6((uint16_t)stride,
+                         (uint32_t)(int32_t)(int16_t)y,
+                         (uint32_t)(int32_t)(int16_t)x,
+                         (uint32_t)(int32_t)(int16_t)height,
+                         (uint32_t)(int32_t)(int16_t)width,
+                         (uint32_t)(int32_t)(int16_t)sy,
+                         (uint32_t)(int32_t)(int16_t)sx, bitmap);
     }
 }

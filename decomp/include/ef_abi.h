@@ -3251,11 +3251,11 @@ void guest_fn_e26bc(uint32_t a, int32_t x, int32_t y, ef_addr32 text, uint32_t c
 void draw_styled_text_e26bc(uint32_t unused, uint32_t x, uint32_t y, ef_addr32 text, uint32_t style);
 void blit_bitmap_clipped_ca290(ef_addr32 bitmap, ef_addr32 clip, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t x, uint32_t y, uint32_t stride);
 void guest_masked_blit_cd82c(uint32_t y, uint32_t x, uint32_t height, uint32_t width, uint32_t sy, uint32_t sx, ef_addr32 bitmap); /* 0xcd82c */
-void guest_packed_blit_cd9a6(uint32_t stride, uint32_t y, uint32_t x, uint32_t height, uint32_t width, uint32_t sy, uint32_t sx, ef_addr32 bitmap); /* 0xcd9a6 */
+void packed_blit_cd9a6(uint32_t stride, uint32_t y, uint32_t x, uint32_t height, uint32_t width, uint32_t sy, uint32_t sx, ef_addr32 bitmap);
 #ifdef __WATCOMC__
 #pragma aux blit_bitmap_clipped_ca290 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #pragma aux guest_masked_blit_cd82c parm routine [] modify [eax ebx ecx edx]
-#pragma aux guest_packed_blit_cd9a6 parm routine [] modify [eax ebx ecx edx]
+#pragma aux packed_blit_cd9a6 parm routine [] modify [eax ebx ecx edx]
 #endif
 void guest_blit_clip_ca290(ef_addr32 bitmap, ef_addr32 clip, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t x, uint32_t y, uint32_t stride); /* 0xca290 */
 #ifdef __WATCOMC__
