@@ -547,7 +547,8 @@ extern int16_t g_enemy_view_detail; /* 0x1f8fdc */
 /* Arcade high-score entry, 0x4c50. */
 extern int16_t g_hiscore_new_rank; /* 0x121e48 */
 extern uint16_t g_difficulty_word; /* 0x121e44, word store over g_difficulty */
-extern int16_t g_difficulty_selection; /* 0x121e46 */
+extern int16_t g_arcade_mission; /* 0x121e46, 1..12 within a difficulty */
+extern uint8_t g_arcade_mission_won; /* 0x121ec5 */
 extern uint8_t g_score_file_name[13]; /* 0x1f8fc8, "arcXXX.txt" or a training file */
 
 /* "kots" base selection, 0x5110. */

@@ -4591,6 +4591,7 @@ void draw_waypoint_boxes_5f220(void);
 uint32_t guest_fn_5f588(uint32_t a, uint32_t b, uint32_t c); /* 0x5f588 EAX/EDX/EBX -> AL */
 void guest_fn_59420_w(uint32_t a, uint32_t b, uint32_t c); /* 0x59420 EAX/EDX/EBX */
 void guest_fn_5c0cc(void); /* 0x5c0cc */
+void guest_fn_4aa0(void); /* 0x4aa0, start the next arcade mission */
 void select_view_target_92290(uint32_t edxin);
 uint32_t guest_fn_92668(void); /* 0x92668 -> EAX */
 void guest_fn_d0fb8_q(uint32_t record, uint32_t value); /* 0xd0fb8 EAX/EDX */
@@ -7599,6 +7600,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_5f588 modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_59420_w modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_5c0cc modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_4aa0 modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dc21c_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dc334_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d86e0_w modify [eax ebx ecx edx esi edi ebp]

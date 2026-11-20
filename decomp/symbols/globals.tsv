@@ -654,7 +654,7 @@ addr	size	type	name	evidence	notes
 0x001a5558	4	uint32_t	g_assignment_values_first	4da90 dword-stride save	table extent unresolved
 0x00425c88	1	uint8_t	g_clouds_enabled	0xda2b0	cloud command stores one; all GPRs preserved
 0x00121e40	4	ef_addr32	g_difficulty_row_pool	0x4cf4	row pool base; signed high-word selection uses 76-byte stride
-0x00121e46	2	int16_t	g_difficulty_selection	0x4cf4	parsed AX; read via overlapping signed dword 121e44 shifted 16
+0x00121e46	2	int16_t	g_arcade_mission	0x4cf4 0x494c	current arcade mission 1..12; 0x494c advances it and wraps to the next difficulty
 0x00121e8e	2	uint16_t	g_map_zoom_mode	0xa974	16-bit one-minus toggle; non-Boolean values retained
 0x00121e95	1	uint8_t	g_target_view_mode	0xb574	stores 2 on first mismatch, 1 on second mismatch, 0 on both equal; same compared strings
 0x004ddee8	4	uint32_t	g_heap_dos_reservation_size	0x10d6d7..0x10d703 tests upper bits, caps to 0xfffff, converts to paragraphs	Mode-1 fallback temporary DOS allocation size; initialized value and other writers pending
@@ -736,3 +736,4 @@ addr	size	type	name	evidence	notes
 0x0021436c	12	int32_t[3]	g_scene_eye_position	0x94a74 original assembly	Camera position in Y/X/Z order
 0x0021449c	2	uint16_t	g_scene_change_pending	0x94a74 original assembly	Set when target selection fails
 0x001a6d1f	1	uint8_t	g_scene_direction_changed	0x94a74 original assembly	Set when either view direction angle is nonzero
+0x00121ec5	1	uint8_t	g_arcade_mission_won	0x1192b 0x3d0dc 0x494c	set by 0x11900 when the arcade mission goal is met

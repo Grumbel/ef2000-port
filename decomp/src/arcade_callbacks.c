@@ -55,7 +55,7 @@ void gpwAcceptHiscore(ef_addr32 widget)
     guest_fn_7bee8_x(0x00121e40u);
     dialog = find_named_or_abort_a46cc(0x0017f7a4u);    /* "summary" */
     set_session_text_7c4fc(g_difficulty_row_pool + 0x28u +
-                               (uint32_t)(((int32_t)g_difficulty_selection - 1) * 76),
+                               (uint32_t)(((int32_t)g_arcade_mission - 1) * 76),
                            dialog);
     redraw_item_a5ef8(EF_U8(dialog + 0x10u));
 }
@@ -131,4 +131,48 @@ void kotsAccept(ef_addr32 widget)
         abase = EF_U32(abase + 0x21u);
     }
     g_kots_lock = mode;
+}
+
+/* 0x494c, 323 bytes, behind the "gpwSelectLevel" thunk: end of an arcade mission. Show the
+ * score; if the player was lost (0x11770 finds the player entry) or the
+ * mission goal was not met, open the high scores and either take a new
+ * entry or report the lost aircraft. Otherwise advance to the next
+ * mission, wrapping after twelve to the next difficulty or, after the
+ * last one, to the final screen. */
+void select_arcade_level_494c(void)
+{
+    char text[40];
+    ef_addr32 widget;
+
+    widget = find_widget_checked_a78bc(find_named_or_abort_a46cc(0x0017f75cu), /* "score" */
+                                       0x0017f764u);                          /* "scoreval" */
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)text, 0x0012f65eu,              /* "Punktestand %0.8d" */
+                        (uint32_t)g_hiscore_current);
+    show_widget_a7588(widget, (ef_addr32)(uintptr_t)text);
+    if ((uint16_t)find_entry_11770(0u, 0u, 0u) != 0u || g_arcade_mission_won == 0u) {
+        hiscore_load_41fc();
+        apply_a4cb4_a4d90(0x0017f770u);                                       /* "Hiscores" */
+        if (hiscore_qualifies() != 0u) {
+            select_first_entry_487c();
+        } else {
+            widget = find_widget_checked_a78bc(apply_a4cb4_a4d90(0x0017f740u), /* "gameoverwin" */
+                                               0x0017f74cu);                  /* "gameovertext" */
+            show_widget_a7588(widget, 0x00130bceu);    /* "Ihr Flugzeug ist zerstört" */
+            apply_a4b80_a4db0(0x0017f734u);            /* "Arcadewin" */
+            apply_a4cb4_a4d90(0x0017f77cu);            /* "Arcadewin2" */
+        }
+    } else if (g_arcade_mission == 12) {
+        refresh_all_widgets_a4c84();
+        if ((int16_t)g_difficulty_word == 3) {
+            apply_a4cb4_a4d90(0x0017f790u);            /* "topendgame" */
+        } else {
+            apply_a4cb4_a4d90(0x0017f788u);            /* "endgame" */
+            g_arcade_mission = 1;
+            ++g_difficulty_word;
+        }
+    } else {
+        ++g_arcade_mission;
+        guest_fn_4aa0();
+    }
+    release_pointer_b1a10(0x001379bcu);
 }
