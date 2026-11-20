@@ -283,7 +283,7 @@ extern uint32_t g_tactical_runtime_count; /* 0x00127b20 */
 extern uint8_t g_tactical_slots[16]; /* 0x001a5544 */
 extern uint8_t g_tactical_reset_mode; /* 0x001a5532 */
 extern uint8_t g_tactical_low_flag; /* 0x001a5598 */
-extern uint8_t g_tactical_status_entries[25]; /* 0x001a5672, indices 1..24 */
+extern uint8_t g_tactical_status_entries[26]; /* 0x001a5672, indices 1..25 */
 extern uint8_t g_tactical_status_changed; /* 0x001a5708 */
 extern uint8_t g_external_grid_marked_count; /* 0x00127da4 */
 extern int16_t g_tactical_min_x; /* 0x001a6cf2 */
@@ -747,6 +747,10 @@ extern uint8_t g_watched_unit_alert; /* 0x1f9011, set by 0x46254 */
 
 extern uint8_t g_route_selected_slot; /* 0x1a559f, 0x32 when none */
 extern int16_t g_route_slot_x[26]; /* 0x1a55a2 */
+extern uint16_t g_route_speed; /* 0x001a56f4, knots */
+extern float g_route_total_hours; /* 0x001a56fc */
+extern float g_route_target_hours; /* 0x001a5700 */
+extern uint32_t g_route_before_target; /* 0x001a5704 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */

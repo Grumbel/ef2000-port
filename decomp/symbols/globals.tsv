@@ -103,7 +103,7 @@ addr	size	type	name	evidence	notes
 0x001a5544	16	uint8_t[16]	g_tactical_slots	0x4d8fd writes	Indexes zero through fifteen
 0x001a5532	1	uint8_t	g_tactical_reset_mode	0x4d90b reads	Low-flag reset gate
 0x001a5598	1	uint8_t	g_tactical_low_flag	0x4d915 writes	Conditional clear
-0x001a5672	25	uint8_t[25]	g_tactical_status_entries	0x4dcac/0x4dcb7	1..24 byte status search
+0x001a5672	26	uint8_t[26]	g_tactical_status_entries	0x4dcac/0x4dcb7	1..24 byte status search
 0x001a5708	1	uint8_t	g_tactical_status_changed	0x4dcc0 writes	Clear on first conversion
 0x00127da4	1	uint8_t	g_external_grid_marked_count	0x544ed writes	8-bit count of probe +4 flags
 0x001a6cf0	2	int16_t	g_tactical_min_y	0x5cbae	Inclusive signed Y minimum
@@ -794,3 +794,7 @@ addr	size	type	name	evidence	notes
 0x0041ec0e	2	int16_t	g_element_clip_h	0xe59cc writes	visible height
 0x0015b62c	256	uint8_t[256]	g_scancode_ascii	0x27fec reads	scancode to ASCII character table
 0x0019b378	1	uint8_t	g_spatial_label_mode	0x26424 reads; 2 numbers the route markers
+0x001a56f4	2	uint16_t	g_route_speed	0x4ec70 reads	route speed in knots
+0x001a56fc	4	float	g_route_total_hours	0x4ec70 writes	flight time of the whole route
+0x001a5700	4	float	g_route_target_hours	0x4ec70 writes	flight time to the target waypoint
+0x001a5704	4	uint32_t	g_route_before_target	0x4ec70 writes	distance (nm) before the leg to the target, 100 without one

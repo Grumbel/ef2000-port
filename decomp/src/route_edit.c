@@ -34,7 +34,7 @@ static void place_selected_waypoint(int16_t x, int16_t y)
     click_panel_slot_4e0d0((uint32_t)(int32_t)x, (uint32_t)(int32_t)y);
     pick_target_at_4e204(x, y);
     update_counter_widget_4e7b8(1);
-    rebuild_waypoint_speed_4ec70();
+    update_route_summary_4ec70();
 }
 
 /* 0x4dcd8, 520 bytes. Route editing on the mission map (map mode 4) at
@@ -60,7 +60,7 @@ void adjust_route_view_4dcd8(ef_addr32 widget)
                 g_route_selected_slot = (uint8_t)(slot - 1);
                 insert_midpoint_4e5bc();
                 update_counter_widget_4e7b8(1);
-                rebuild_waypoint_speed_4ec70();
+                update_route_summary_4ec70();
                 return;
             }
             g_route_selected_slot = ROUTE_NO_SLOT;
@@ -78,7 +78,7 @@ void adjust_route_view_4dcd8(ef_addr32 widget)
         g_target_list_changed = 1;
         g_route_selected_slot = (uint8_t)slot;
         shift_queue_4e6bc();
-        rebuild_waypoint_speed_4ec70();
+        update_route_summary_4ec70();
         return;
     }
     g_target_list_changed = 1;

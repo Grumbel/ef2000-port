@@ -132,5 +132,5 @@ void mp_dec_speed_4ec14(void)
     EF_U16(0x1a56f4u) = speed;
     if (speed > 900u)
         EF_U16(0x1a56f4u) = 900u;
-    rebuild_waypoint_speed_4ec70();
+    update_route_summary_4ec70();
 }

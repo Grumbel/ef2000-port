@@ -12,7 +12,7 @@ void mp_mission_1_click_4ec44(void)
     EF_U16(0x1a56f4u) = speed;
     if (speed < 120u)
         EF_U16(0x1a56f4u) = 120u;
-    rebuild_waypoint_speed_4ec70();
+    update_route_summary_4ec70();
 }
 
 static void close_warning(ef_addr32 identifier)
