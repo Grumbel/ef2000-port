@@ -819,3 +819,14 @@ addr	size	type	name	evidence	notes
 0x001a3040	8	double	g_load_factor	0x75ca0 reads	G load driving the vision effect
 0x001f88fb	1	uint8_t	g_vision_fade_mode	0x75ca0 sets	0 clear, 1 red-out, 2 black-out
 0x00128548	1	uint8_t	g_vision_tint_changed	0x75ca0 and others set	set when the screen tint must be rebuilt
+0x00197230	4	uint32_t	g_info_waypoint_value	0x6460 sets	value for the displayed waypoint kind (table 0x12bc3c)
+0x00197238	4	int32_t	g_info_altitude	0x6460 sets	displayed altitude, rounded to 10 (100 above 1000 barometric)
+0x0019724a	2	int16_t	g_info_heading	0x6460 sets from 0x66fc	displayed heading
+0x0019724c	2	uint16_t	g_info_waypoint_num	0x6460 sets and checks 0xff	display_wp_num of avionics.c GetStandardInfo
+0x0019724e	2	int16_t	g_info_percent	0x6460 sets; cleared by other setup code	percentage readout 0..100 from g_gauge_fraction
+0x00197250	2	uint16_t	g_info_target_id	0x6460 sets; game_helpers39 compares to owner+0x15	watched unit target id or 0xffff
+0x00197255	1	uint8_t	g_info_radar_altitude	0x6460 sets	1 when g_info_altitude is above ground, 0 barometric
+0x001a6d1e	1	uint8_t	g_info_cockpit_mode	0x6460 compares and copies	last g_cockpit_mode seen by 0x6460
+0x0012814c	1	uint8_t	g_cockpit_mode	0x6460 reads; set to 3/4 elsewhere	cockpit mode; entering 3 adjusts runtime slots
+0x00127da8	1	uint8_t	g_linked_session	set when 0x125846 == 1	linked session flag; hides the target id in solo play
+0x001a30d0	8	double	g_gauge_fraction	0x6460 and 0x21e04 read	fraction shown as a 0..100 percentage

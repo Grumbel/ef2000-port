@@ -4109,6 +4109,8 @@ uint8_t guest_fn_6e1c4(ef_addr32 point); /* 0x6e1c4 EAX -> AL */
 void guest_fn_772d0(uint32_t object, uint32_t unit); /* 0x772d0 AX/EDX */
 void place_link_point_70438(void); /* 0x70438 */
 void update_g_vision_75ca0(void); /* 0x75ca0 */
+void guest_fn_6924(void); /* 0x6924 */
+void get_standard_info_6460(void); /* 0x6460 */
 void guest_fn_106b0_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s); /* 0x106b0 EAX/EDX/EBX/ECX + stack */
 void guest_fn_10750_x(int32_t a, int32_t b, int32_t c); /* 0x10750 EAX/EDX/EBX */
 void guest_fn_a4dd0_x(uint32_t a); /* 0xa4dd0 EAX */

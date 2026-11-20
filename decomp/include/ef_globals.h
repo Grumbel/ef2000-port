@@ -772,6 +772,17 @@ extern int32_t g_player_height; /* 0x001a5bf0, negative is up */
 extern double g_load_factor; /* 0x001a3040 */
 extern uint8_t g_vision_fade_mode; /* 0x001f88fb */
 extern uint8_t g_vision_tint_changed; /* 0x00128548 */
+extern uint32_t g_info_waypoint_value; /* 0x00197230 */
+extern int32_t g_info_altitude; /* 0x00197238 */
+extern int16_t g_info_heading; /* 0x0019724a */
+extern uint16_t g_info_waypoint_num; /* 0x0019724c */
+extern int16_t g_info_percent; /* 0x0019724e */
+extern uint16_t g_info_target_id; /* 0x00197250 */
+extern uint8_t g_info_radar_altitude; /* 0x00197255 */
+extern uint8_t g_info_cockpit_mode; /* 0x001a6d1e */
+extern uint8_t g_cockpit_mode; /* 0x0012814c */
+extern uint8_t g_linked_session; /* 0x00127da8 */
+extern double g_gauge_fraction; /* 0x001a30d0 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */
