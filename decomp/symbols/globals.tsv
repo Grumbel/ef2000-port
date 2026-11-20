@@ -807,3 +807,12 @@ addr	size	type	name	evidence	notes
 0x00420930	12	int16_t[6]	g_projectile_segment	0x8de9c writes	new x, y, z then old x, y, z as words
 0x00425bdc	2	int16_t	g_projectile_ground_event	0x8de9c reads (high word of 0x425bda)	event raised when a projectile hits the ground
 0x00425be0	2	int16_t	g_projectile_cell_event	0x8de9c reads (high word of 0x425bde)	event raised over a plane-map cell
+0x00125250	4	int32_t	g_burst_origin_x	0x2a4c8 writes	player x at the last zone burst
+0x00125254	4	int32_t	g_burst_origin_y	0x2a4c8 writes	player y at the last zone burst
+0x0012525a	2	uint16_t	g_burst_cooldown	0x2a4c8 counts down	zone bursts wait while nonzero
+0x0012525c	2	uint16_t	g_burst_seed	0x2a4c8 advances	burst angle sequence
+0x0012525e	2	int16_t	g_burst_angle	0x2a4c8 advances	burst angle sequence; low 7 bits are the range
+0x001a5a8e	2	int16_t	g_burst_zone_count	0x2a4c8 reads	16-byte rectangles at g_secondary_parser_text
+0x001a5be8	4	int32_t	g_player_y	0x2a4a0/0x2a4c8 read	player map position
+0x001a5bec	4	int32_t	g_player_x	0x2a4a0/0x2a4c8 read	player map position
+0x001a5bf0	4	int32_t	g_player_height	0x2a4c8 reads	negative is up

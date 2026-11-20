@@ -6400,7 +6400,7 @@ uint32_t cell_distance_at_7b16c(uint32_t mode, int32_t x, int32_t y);
 void update_view_target_817a8(void);
 void guest_fn_15be10_x(void); /* 0x15be10, works on globals 0x15bddc.. */
 void guest_fn_81680_x(void); /* 0x81680 */
-void guest_fn_2a4c8_x(void); /* 0x2a4c8 */
+void spawn_zone_burst_2a4c8(void); /* 0x2a4c8 */
 
 void update_follower_381a0(uint32_t index);
 

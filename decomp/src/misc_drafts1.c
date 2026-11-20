@@ -14551,7 +14551,7 @@ void update_view_target_817a8(void)
         update_random_effect_81680();
     }
     if (EF_U16(0x001a5a8eu) != 0u)
-        guest_fn_2a4c8_x();
+        spawn_zone_burst_2a4c8();
 }
 
 /* 0x381a0, 225 bytes. Update the follower record INDEX (AX; 69 byte records at 0x1a14f8): fetch the scene object of the word +0x26 >> 16 (0x8ffe8), copy its position >> 8 into +7, +0xb, +0xf and, if the record has a link (+0x18) with the position at its +0, +4, +8, measure the squared distance (saturated to 0x7fffffff when any axis differs by 0x8000 or more). Within 0x800 the link is refreshed with 0x3856c, except that a link of kind 1 (+0xc) is skipped when its stamp +0xd is -1 or above the clock 0x1a14f0. */

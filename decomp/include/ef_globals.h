@@ -760,6 +760,15 @@ extern int32_t g_projectile_old_z; /* 0x0042091c */
 extern int16_t g_projectile_segment[6]; /* 0x00420930 */
 extern int16_t g_projectile_ground_event; /* 0x00425bdc */
 extern int16_t g_projectile_cell_event; /* 0x00425be0 */
+extern int32_t g_burst_origin_x; /* 0x00125250 */
+extern int32_t g_burst_origin_y; /* 0x00125254 */
+extern uint16_t g_burst_cooldown; /* 0x0012525a */
+extern uint16_t g_burst_seed; /* 0x0012525c */
+extern int16_t g_burst_angle; /* 0x0012525e */
+extern int16_t g_burst_zone_count; /* 0x001a5a8e */
+extern int32_t g_player_x; /* 0x001a5bec */
+extern int32_t g_player_y; /* 0x001a5be8 */
+extern int32_t g_player_height; /* 0x001a5bf0, negative is up */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */
