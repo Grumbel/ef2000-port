@@ -47,7 +47,6 @@ addr	reason
 0x000b3fd0	Single-redirect culprit for cockpit replay (bisect m2-bisect-044); cause unreviewed; keep original.
 0x0007a38c	Single-redirect culprit for cockpit replay (bisect m2-bisect-045); cause unreviewed; keep original.
 0x00073500	Single-redirect culprit for cockpit replay (bisect m2-bisect-046); cause unreviewed; keep original.
-0x0005f634	Single-redirect culprit for cockpit replay (bisect m2-bisect-047); cause unreviewed; keep original.
 0x00022e98	Single-redirect culprit for cockpit replay (bisect m2-bisect-048); cause unreviewed; keep original.
 0x0001f960	Single-redirect culprit for cockpit replay (bisect m2-bisect-049); cause unreviewed; keep original.
 0x00003ea8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).

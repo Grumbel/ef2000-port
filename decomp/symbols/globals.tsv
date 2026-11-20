@@ -748,3 +748,10 @@ addr	size	type	name	evidence	notes
 0x0021446c	12	int32_t[3]	g_scene_camera_position	0x95704, 0x9596c and others store	camera position copied from the focus or target
 0x00214464	4	uint16_t[2]	g_scene_follow_angles	0x95ae0 stores 0x2000/0, 0x9596c copies object +0xc/+0xe	angle words of the followed object
 0x00214378	36	int32_t[9]	g_scene_camera_matrix	0x9596c, 0x95ae0 reset and rotate it	camera matrix
+0x001a6670	0x118	int16_t[0x8c]	g_menu_ring_points	0x5e4c4 stores	menu ring x/y pairs at the radius, 0x46 points
+0x001a6788	0x118	int16_t[0x8c]	g_menu_ring_inner	0x5e4c4 stores	menu ring x/y pairs at radius - width
+0x001a68a0	0x118	int16_t[0x8c]	g_menu_ring_outer	0x5e4c4 stores	menu ring x/y pairs at radius + width
+0x001a6cc8	2	uint16_t	g_menu_ring_style	0x5e4c4 stores the first stack argument	menu ring style word
+0x001a6cd0	2	uint16_t	g_menu_ring_cursor	0x5e4c4 clears	menu ring cursor
+0x001a6cd2	2	uint16_t	g_menu_ring_count	0x5e4c4 stores the count	menu ring point count
+0x001a6cd4	2	uint16_t	g_menu_ring_shown	0x5e4c4 stores the count	second copy of the menu ring count

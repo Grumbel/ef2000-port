@@ -184,6 +184,13 @@ extern uint32_t g_view_latched_width; /* 0x0015b76c */
 extern uint32_t g_view_latched_height; /* 0x0015b770 */
 extern uint8_t g_world_grid_mode; /* 0x00127da9, gates alternate grid lookup */
 extern uint8_t g_world_grid_marker; /* 0x001a666b, compares neighboring rows */
+extern int16_t g_menu_ring_points[0x8c]; /* 0x1a6670, x/y pairs at the ring radius */
+extern int16_t g_menu_ring_inner[0x8c]; /* 0x1a6788, x/y pairs at radius - width */
+extern int16_t g_menu_ring_outer[0x8c]; /* 0x1a68a0, x/y pairs at radius + width */
+extern uint16_t g_menu_ring_style; /* 0x1a6cc8 */
+extern uint16_t g_menu_ring_cursor; /* 0x1a6cd0 */
+extern uint16_t g_menu_ring_count; /* 0x1a6cd2 */
+extern uint16_t g_menu_ring_shown; /* 0x1a6cd4 */
 extern uint8_t g_external_grid_count; /* 0x0012583a, number of external rows */
 extern int16_t g_active_grid_index; /* 0x0019bb5e, current selected grid row */
 extern ef_addr32 g_external_grid_base; /* 0x001a14f8, pointer to 0x45-byte nodes */

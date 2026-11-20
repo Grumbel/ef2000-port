@@ -17,7 +17,7 @@ void reset_menu_page_5f634(void)
     EF_U32(0x001a820cu) = 0;
     EF_U8(0x00128148u) = EF_U8(index * 2u + 0x00128142u);
     EF_U32(0x001a8224u) = 0;
-    guest_fn_5e4c4_w(0, 0, 0x1e, 0x41, 3);
+    layout_menu_ring_5e4c4(0, 0, 0x1e, 0x41, 0u, 3);
     EF_U8(0x0012814cu) = 3;
     EF_U8(0x001a6d1eu) = 0;
     EF_U8(0x001a3637u) = 0;

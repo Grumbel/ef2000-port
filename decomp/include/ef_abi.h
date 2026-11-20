@@ -3681,7 +3681,7 @@ void request_entry_details_a334c(uint16_t index);
 void run_pending_callbacks_a5abc(void);
 void step_list_cursor_a9490(ef_addr32 list, int16_t n);
 void guest_fn_5e658_w(void); /* 0x5e658 */
-void guest_fn_5e4c4_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x5e4c4 EAX/EDX/EBX/ECX/stack */
+void layout_menu_ring_5e4c4(int16_t x, int16_t y, int16_t radius, int16_t count, uint32_t style, int16_t width);
 void guest_fn_5ea64_w(void); /* 0x5ea64 */
 void guest_fn_86920_w(void); /* 0x86920 */
 uint8_t guest_fn_6e320_w(uint32_t a, uint32_t b); /* 0x6e320 EAX/EDX -> AL */
