@@ -4898,7 +4898,8 @@ uint32_t guest_fn_8bad4_x(uint32_t a, uint32_t b); /* 0x8bad4 EAX/EDX, returns E
 void guest_fn_eb174_x(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3, uint32_t a4, uint32_t a5, uint32_t a6, uint32_t a7); /* 0xeb174 cdecl, eight stack arguments */
 
 void draw_page_entries_c8e8(void);
-void guest_fn_11560_x(int32_t a, int32_t b, int32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3); /* 0x11560 EAX/EDX/EBX/ECX + 4 stack, callee cleanup */
+void tally_unit_records_11560(int32_t side, int32_t group, int32_t member, ef_addr32 idle,
+                              ef_addr32 home, ef_addr32 percent, ef_addr32 ready, ef_addr32 match); /* 0x11560, unit_tally.c; ret 0x10 */
 
 /* state_reset1.c */
 void reset_input_state_a29f8(void);

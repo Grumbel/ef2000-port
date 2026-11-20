@@ -65,7 +65,7 @@ void draw_page_entries_c8e8(void)
         slot2 = (int32_t)i * 2;
         colour = (int16_t)EF_U16(0x001a52b0u + page * 16u + (uint32_t)slot2);
         i++;
-        guest_fn_11560_x((int32_t)EF_S16(0x00197696u),
+        tally_unit_records_11560((int32_t)EF_S16(0x00197696u),
                          (int32_t)EF_S16(0x001a5280u + off),
                          (int32_t)colour,
                          0x00197330u + (uint32_t)slot2,

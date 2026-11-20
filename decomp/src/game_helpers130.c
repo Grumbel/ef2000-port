@@ -4282,7 +4282,7 @@ void print_page_entries_ca5c(ef_addr32 fp)
 			uint32_t j2 = (uint32_t)((int32_t)(int16_t)j * 2);
 			int16_t k = (int16_t)EF_U16(0x001a52b0u + pg * 16u + j2);
 
-			guest_fn_11560_x((int32_t)EF_S16(0x00197696u), (int32_t)EF_S16(0x001a5280u + pg * 2u),
+			tally_unit_records_11560((int32_t)EF_S16(0x00197696u), (int32_t)EF_S16(0x001a5280u + pg * 2u),
 			                 (int32_t)k, 0x00197330u + j2, 0x00197300u + j2, 0x00197340u + j2,
 			                 0x00197360u + j2, 0x00197350u + j2);
 			guest_fn_bc400(fp, 0x001809d8u, (uint32_t)(int32_t)EF_S16(0x00197696u),

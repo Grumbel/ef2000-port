@@ -773,3 +773,4 @@ addr	size	type	name	evidence	notes
 0x001a559f	1	uint8_t	g_route_selected_slot	0x4dcd8 writes; 0x4e204 reads	selected route waypoint slot; 0x32 when none
 0x001a55a2	52	int16_t[26]	g_route_slot_x	0x4dcd8/0x4e204 write	waypoint map x per slot
 0x001a55d6	52	int16_t[26]	g_route_slot_y	0x4dcd8/0x4e204 write	waypoint map y per slot
+0x00121ec0	1	uint8_t	g_unit_tally_member_seen	0x11560 clears and sets	an active unit based at the tallied member was found
