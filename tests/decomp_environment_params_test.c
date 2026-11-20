@@ -117,7 +117,7 @@ static void test_environment_flags(void)
     reset();
     env_unfix_horizon_db8a8();
     assert(EF_U8(0x425c86u) == 1u);
-    env_load_horizon_db8b0();
+    assert(env_load_horizon_db8b0(0x1234ff56u) == 0x12340056u);
     assert(EF_U8(0x425c86u) == 0u);
 
     EF_U8(0x425bc4u) = 0x80u;

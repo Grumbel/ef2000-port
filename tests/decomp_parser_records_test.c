@@ -221,7 +221,7 @@ static void check_enums(void)
 static void check_record(void)
 {
     reset_test();
-    memcpy(memory + input_at, "12 -4 6 7 -8 65535", sizeof("12 -4 6 7 -8 65535"));
+    memcpy(memory + input_at, "LABEL 12 -4 6 7 -8 65535", sizeof("LABEL 12 -4 6 7 -8 65535"));
     assert(read_parser_six_field_record(0x1a2000) == 1);
     assert(get32(0x1a2000) == 12u);
     assert(get32(0x1a2004) == (uint32_t)-4);
