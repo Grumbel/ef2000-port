@@ -6573,6 +6573,8 @@ void gpwMissionAccepted(ef_addr32 widget); /* 0x7c574 */
 void simNextFlight(ef_addr32 widget); /* 0x7e0a4 */
 void kotsAccept(ef_addr32 widget); /* 0x522c */
 void gpwUpdateMap(ef_addr32 widget); /* 0x426a4 */
+void guiUpdateMemoryUse(ef_addr32 widget); /* 0xab95c */
+void env_sun_flare_db4d4(void); /* 0xdb4d4 */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */

@@ -637,6 +637,19 @@ extern uint8_t g_custom_player_mode; /* 0x125839, 1 numbers the first custom slo
 /* Campaign map update, 0x426a4. */
 extern int16_t g_map_row_count; /* 0x1a1506 */
 
+/* Active widget area and pointer, 0xab95c. */
+extern int16_t g_active_area_x; /* 0x41eef6 */
+extern int16_t g_active_area_y; /* 0x41eef8 */
+extern int16_t g_active_area_width; /* 0x41eefa */
+extern int16_t g_pointer_y; /* 0x41eefc, stored by the hit test */
+extern int16_t g_pointer_x; /* 0x41eefe, stored by the hit test */
+extern int16_t g_active_area_height; /* 0x41ef00 */
+extern uint16_t g_magnifier_zoom; /* 0x137210 */
+
+/* Sun flare script entries, 0xdb4d4. */
+extern ef_addr32 g_sun_flares; /* 0x425b20, ef_sun_flare list head */
+extern int16_t g_sine_table[0x2000]; /* 0x141e08, full turn; cosine at +0x800 */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */

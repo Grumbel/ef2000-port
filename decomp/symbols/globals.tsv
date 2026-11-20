@@ -575,6 +575,15 @@ addr	size	type	name	evidence	notes
 0x00125828	18	char[18]	g_config_file_name	7c5d0 copies the row config name	current mission config file
 0x00125839	1	uint8_t	g_custom_player_mode	7e11c compares with 1	selects the first numbered widget of slot 1
 0x001a1506	2	int16_t	g_map_row_count	427fc/42812 bound the 0x41b98 loop	rows updated per network map update
+0x0041eef6	2	int16_t	g_active_area_x	ab967 reads; e5088 fill origin	active widget area
+0x0041eef8	2	int16_t	g_active_area_y	ab97e reads; e5088 fill origin	active widget area
+0x0041eefa	2	int16_t	g_active_area_width	aba95 reads via dword 0x41eef8 shifted 16	active widget area
+0x0041eefc	2	int16_t	g_pointer_y	ab9ab reads via dword 0x41eefa shifted 16; hit test stores	pointer position
+0x0041eefe	2	int16_t	g_pointer_x	ab991 reads via dword 0x41eefc shifted 16; hit test stores	pointer position
+0x0041ef00	2	int16_t	g_active_area_height	abad6 reads via dword 0x41eefe shifted 16	active widget area
+0x00137210	2	uint16_t	g_magnifier_zoom	ab96d/ab9dd reads	magnifier block size
+0x00425b20	4	ef_addr32	g_sun_flares	db549 reads, db55d stores	ef_sun_flare list head, next at +0xc
+0x00141e08	0x4000	int16_t[0x2000]	g_sine_table	db5f2/db620 reads via dwords at -2 shifted 16	Q15 sine over a full turn; cosine 0x800 entries later
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
