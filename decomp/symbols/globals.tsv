@@ -850,3 +850,14 @@ addr	size	type	name	evidence	notes
 0x001a559c	1	uint8_t	g_route_side	0xe490 reads	side of the route events; 1 picks codes 9..14, else 3/6/9
 0x0041f328	2	uint16_t	g_last_route_event	0xe490 chains through 0xbefb8	latest spawned route event record
 0x004dd670	64	uint32_t[16]	g_ail_drivers	0x104200 assigns the first free slot	installed AIL driver descriptors, indexed by handle
+0x00126570	4	ef_addr32	g_map_sprite_sheet	0x456e8 and hotspot_draw.c blit from it with pitch 0x280	campaign map sprite sheet
+0x00126550	2	int16_t	g_war_track_count	0x456e8 draws track points 1..count-1	war replay front-line point count
+0x0012654e	2	int16_t	g_war_event_count	0x456e8 iterates the event records	war replay event count
+0x001a4a98	4	ef_addr32	g_war_events	0x456e8 reads 12-byte event records	war replay event records
+0x001a4b9c	2	int16_t	g_war_marker_count	0x456e8 draws 5-byte markers at 0x1a4aa0	war replay final marker count
+0x001a4b9e	2	int16_t	g_war_end_minute	0x456e8 and 0x42b04 compare the replay clock	war replay end minute
+0x001a4ba0	2	int16_t	g_war_minute	0x456e8 advances it	war replay clock minute
+0x001a4ba2	2	int16_t	g_war_hour	0x456e8 wraps it at 24	war replay clock hour
+0x001a4ba4	2	int16_t	g_war_end_hour	0x456e8 and 0x42b04 compare the replay clock	war replay end hour
+0x001a4baa	2	int16_t	g_war_start_minute	0x456e8 copies the first track point	war replay start minute
+0x001a4bac	2	int16_t	g_war_start_hour	0x456e8 copies the first track point	war replay start hour

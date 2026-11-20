@@ -825,4 +825,15 @@ extern int16_t g_element_clip_h; /* 0x41ec0e */
 extern uint8_t g_scancode_ascii[256]; /* 0x15b62c */
 
 extern uint32_t g_ail_drivers[16]; /* 0x004dd670 */
+extern ef_addr32 g_map_sprite_sheet; /* 0x00126570 */
+extern int16_t g_war_track_count; /* 0x00126550 */
+extern int16_t g_war_event_count; /* 0x0012654e */
+extern ef_addr32 g_war_events; /* 0x001a4a98 */
+extern int16_t g_war_marker_count; /* 0x001a4b9c */
+extern int16_t g_war_end_minute; /* 0x001a4b9e */
+extern int16_t g_war_minute; /* 0x001a4ba0 */
+extern int16_t g_war_hour; /* 0x001a4ba2 */
+extern int16_t g_war_end_hour; /* 0x001a4ba4 */
+extern int16_t g_war_start_minute; /* 0x001a4baa */
+extern int16_t g_war_start_hour; /* 0x001a4bac */
 #endif

@@ -22,7 +22,7 @@ void WarWonLostStartup(uint32_t arg)
          EF_U16(0x001a4ba0u) == EF_U16(0x001a4b9eu))) {
         EF_U16(0x0012661cu) = 0u;
         if (EF_U8(0x00121e8cu) != 0u)
-            guest_fn_456e8();
+            draw_war_replay_456e8();
     } else {
         EF_U16(0x0012661cu) = (uint16_t)(EF_U16(0x0012661cu) + 1u);
     }

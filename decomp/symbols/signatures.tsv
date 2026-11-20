@@ -35,6 +35,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b0208	list_has_matching_node	EAX:ef_addr32,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	0xb0208..0xb0236; callers 0xb0258/0xc149d; docs/compiler-abi.md
 0x000b1b8b	strlen_ds	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xb1b8b..0xb1ba3; callers 0x82eab/0xe896b; DS to ES, DF clear required; docs/compiler-abi.md
 0x000b2560	write_flight_record_b2560	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x000b2560 (504 bytes); EDX clobbered; ESI/EDI hold the flight and handle; docs/compiler-abi.md
+0x000456e8	draw_war_replay_456e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000456e8 (625 bytes); docs/compiler-abi.md
 0x00104200	install_driver_104200	[ESP+4]:ef_addr32,[ESP+8]:uint32_t	EAX:uint32_t	esi,edi,ebp	0	Original 0x00104200 (609 bytes); docs/compiler-abi.md
 0x000cb9f4	purge_groups_cb9f4	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t		esi,edi,ebp	8	Original 0x000cb9f4 (608 bytes); docs/compiler-abi.md
 0x0000e490	spawn_route_events_e490			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000e490 (625 bytes); docs/compiler-abi.md
@@ -3469,7 +3470,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000bf70	onleaveOptions			ebx,ecx,edx,esi,edi,ebp	0	Original 0xbf70 (91 bytes); dumps pending record via 0xb3084
 0x000ab908	gnInitSettingsWindow	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0xab908 (54 bytes); formats 0x137278 into "number" widget
 0x0004c33c	mpClickMap			ebx,ecx,edx,esi,edi,ebp	0	Original 0x4c33c (126 bytes); cycles preview page byte 1a53dd, calls 41314 then 42548
-0x000456e8	guest_fn_456e8				0	callee of 0x42b04@42b71; registers unknown, assumed clobbered
 0x00042b04	WarWonLostStartup	EAX:uint32_t		ebx,ecx,edx,edi	0	Original 0x00042b04 (131 bytes); mission start refresh; pushes ebx,ecx,edx,edi
 0x0004f0d4	guest_fn_4f0d4				0	callee of 0x4eb8c@4ec09; registers unknown, assumed clobbered
 0x0004eb8c	mpWPZoomToggle			ebx,ecx,edx,esi	0	Original 0x0004eb8c (135 bytes); waypoint slot from cursor; pushes ebx,ecx,edx,esi
