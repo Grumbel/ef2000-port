@@ -1789,7 +1789,7 @@ uint32_t guest_fn_c3f50(int32_t x, int32_t y); /* 0xc3f50 */
 void guest_fn_c4a50(ef_addr32 a); /* 0xc4a50 */
 void guest_fn_c9fc4(void); /* 0xc9fc4 */
 void guest_fn_ca874(ef_addr32 a, ef_addr32 b); /* 0xca874 */
-void guest_fn_cb9f4(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0xcb9f4 */
+void purge_groups_cb9f4(ef_addr32 head, ef_addr32 tail, ef_addr32 list, uint32_t extra, ef_addr32 updates, int32_t update_count); /* 0xcb9f4 EAX/EDX/EBX/ECX + 2 stack, ret 8 */
 void guest_fn_d663c(ef_addr32 a); /* 0xd663c */
 void guest_fn_d7bf0(void); /* 0xd7bf0 */
 uint32_t guest_fn_d8170(ef_addr32 a); /* 0xd8170 */

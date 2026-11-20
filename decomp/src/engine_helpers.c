@@ -45,7 +45,7 @@ void rebuild_tables_ca7e0(void)
 {
     uint32_t block;
     guest_fn_f8f8();
-    guest_fn_cb9f4(0x00137960u, 0x00137964u, 0x00137958u, 0x00137980u, EF_U32(0x001379b4u), EF_U32(0x001379c0u));
+    purge_groups_cb9f4(0x00137960u, 0x00137964u, 0x00137958u, 0x00137980u, EF_U32(0x001379b4u), (int32_t)EF_U32(0x001379c0u));
     guest_fn_ca874(0x00137970u, 0x00137960u);
     block = EF_U32(0x0041f324u);
     if (block != 0)
