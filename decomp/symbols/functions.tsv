@@ -2655,7 +2655,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000bc594	59	unlink_node_bc594	list_helpers	compiles	game	confirmed	decomp/tests/0x000bc594.json	docs/compiler-abi.md; Unlink node from a list whose head slot is *head_a (edx) / *head_b (ebx).; callers ca838@ca85c,cb9f4@cba68,cb9f4@cbb84; guest pending
 0x000bc5d0	21	list_count	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc5d0.json	docs/compiler-abi.md; Count nodes of the list at *EAX (next at +4).; callers 49228@494f9,49228@49509,b0f5c@b1505; guest pending
 0x000bc5e8	27	list_nth	list_lookup	compiles	game	confirmed	decomp/tests/0x000bc5e8.json	docs/compiler-abi.md; Node number EDX of the list at *EAX, or 0.; callers a3dc@a418,ab74@abc9,ab74@af46; guest pending
-0x000bc610	475			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
+0x000bc610	475	run_node_passes_bc610	node_passes	spliced	game	confirmed	decomp/tests/0x000bc610.json	Seven node passes threading a 16-bit accumulator; the day counter picks the 0xbf444/0xc1034 order. No flag-returning callee
 0x000bc7ec	711			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000bcb08	28	record_is_strong	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcb08.json	docs/compiler-abi.md; Byte +5 at least 0x32 (signed) and byte +6 nonzero.; callers bcc2c@bcc85,bcc2c@bccd4,bcc2c@bcd44; guest pending
 0x000bcb24	43	record_is_elite	list_lookup	compiles	game	confirmed	decomp/tests/0x000bcb24.json	docs/compiler-abi.md; Byte +6 at least 0x55 and byte +0 not 0xff or 0xfe.; callers cac4c@cacc2,faafc@fab29; guest pending
