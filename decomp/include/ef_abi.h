@@ -4415,6 +4415,8 @@ void dump_point_list_b2e28(uint32_t handle, ef_addr32 list_ptr, int16_t value, e
 void guest_fn_b1f80_x(ef_addr32 node, uint32_t handle); /* 0xb1f80 EAX/EDX */
 void guest_fn_b2e98_x(ef_addr32 node, uint32_t handle); /* 0xb2e98 EAX/EDX */
 
+/* flight_record_write.c */
+void write_flight_record_b2560(ef_addr32 flight, uint32_t handle);
 /* game_helpers128.c */
 void dump_record_b23bc(ef_addr32 rec, int16_t index, uint32_t handle, int16_t fallback);
 void classify_entries_b059c(ef_addr32 list_holder, ef_addr32 head_a, ef_addr32 list_b);
