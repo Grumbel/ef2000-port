@@ -798,3 +798,12 @@ addr	size	type	name	evidence	notes
 0x001a56fc	4	float	g_route_total_hours	0x4ec70 writes	flight time of the whole route
 0x001a5700	4	float	g_route_target_hours	0x4ec70 writes	flight time to the target waypoint
 0x001a5704	4	uint32_t	g_route_before_target	0x4ec70 writes	distance (nm) before the leg to the target, 100 without one
+0x00420904	4	int32_t	g_projectile_new_y	0x8de9c writes	position after the last projectile step
+0x00420908	4	int32_t	g_projectile_old_y	0x8de9c writes	position before the last projectile step
+0x00420910	4	int32_t	g_projectile_new_x	0x8de9c writes	position after the last projectile step
+0x00420914	4	int32_t	g_projectile_old_x	0x8de9c writes	position before the last projectile step
+0x00420918	4	int32_t	g_projectile_new_z	0x8de9c writes	position after the last projectile step
+0x0042091c	4	int32_t	g_projectile_old_z	0x8de9c writes	position before the last projectile step
+0x00420930	12	int16_t[6]	g_projectile_segment	0x8de9c writes	new x, y, z then old x, y, z as words
+0x00425bdc	2	int16_t	g_projectile_ground_event	0x8de9c reads (high word of 0x425bda)	event raised when a projectile hits the ground
+0x00425be0	2	int16_t	g_projectile_cell_event	0x8de9c reads (high word of 0x425bde)	event raised over a plane-map cell

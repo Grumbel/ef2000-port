@@ -751,6 +751,15 @@ extern uint16_t g_route_speed; /* 0x001a56f4, knots */
 extern float g_route_total_hours; /* 0x001a56fc */
 extern float g_route_target_hours; /* 0x001a5700 */
 extern uint32_t g_route_before_target; /* 0x001a5704 */
+extern int32_t g_projectile_new_x; /* 0x00420910 */
+extern int32_t g_projectile_new_y; /* 0x00420904 */
+extern int32_t g_projectile_new_z; /* 0x00420918 */
+extern int32_t g_projectile_old_x; /* 0x00420914 */
+extern int32_t g_projectile_old_y; /* 0x00420908 */
+extern int32_t g_projectile_old_z; /* 0x0042091c */
+extern int16_t g_projectile_segment[6]; /* 0x00420930 */
+extern int16_t g_projectile_ground_event; /* 0x00425bdc */
+extern int16_t g_projectile_cell_event; /* 0x00425be0 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */

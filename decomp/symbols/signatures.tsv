@@ -35,6 +35,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b0208	list_has_matching_node	EAX:ef_addr32,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	0xb0208..0xb0236; callers 0xb0258/0xc149d; docs/compiler-abi.md
 0x000b1b8b	strlen_ds	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xb1b8b..0xb1ba3; callers 0x82eab/0xe896b; DS to ES, DF clear required; docs/compiler-abi.md
 0x000b2560	write_flight_record_b2560	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x000b2560 (504 bytes); EDX clobbered; ESI/EDI hold the flight and handle; docs/compiler-abi.md
+0x0008de9c	advance_projectile_8de9c	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008de9c (596 bytes); EAX clobbered; x87 step length via 0x9d72c; docs/compiler-abi.md
 0x0004ec70	update_route_summary_4ec70			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004ec70 (591 bytes); EAX clobbered; x87 via 0xa4470 and 0x9d72c; docs/compiler-abi.md
 0x00026424	draw_spatial_route_26424	AX:uint16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Original 0x00026424 (586 bytes); EAX and EDX clobbered; docs/compiler-abi.md
 0x00027fec	prompt_name_27fec	EAX:ef_addr32,EDX:ef_addr32,BX:int16_t,CX:int16_t	AX:uint16_t	esi,edi,ebp	0	Original 0x00027fec (567 bytes); EBX, ECX and EDX clobbered; polls the keyboard scancode 0x41f833; docs/compiler-abi.md

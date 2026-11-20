@@ -5925,6 +5925,7 @@ void assign_group_slots_49fd4(uint32_t p);
 void insert_midpoint_4e5bc(void);
 
 void advance_position_cef3c(uint32_t v, uint32_t ang, uint32_t scale);
+void advance_projectile_8de9c(int32_t id);
 
 void draw_displaced_span_ffe78(void);
 
