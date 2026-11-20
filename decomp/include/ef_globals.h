@@ -740,4 +740,8 @@ extern char g_directplay_rows[][64]; /* 0x4288f0, one 64-byte name per DirectPla
 extern uint8_t g_mouse_button_down; /* 0x15ba2c */
 extern ef_addr32 g_input_poll_hook; /* 0x15bab8, called without arguments before reading the motion */
 
+extern int16_t g_watched_unit; /* 0x1f71ca, unit whose events raise alerts and player messages */
+extern uint8_t g_message_filter; /* 0x1f9010, only event kinds 0x4d/0x4f reach the player while set */
+extern uint8_t g_watched_unit_alert; /* 0x1f9011, set by 0x46254 */
+
 #endif

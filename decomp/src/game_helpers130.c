@@ -4139,17 +4139,17 @@ void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
 	EF_U8(base + off + 0x5fu) = best;
 	if (EF_U8(0x001285a1u + (uint32_t)EF_U8(base + off + 0x19u) * 0xe5u) != 0u) {
 		for (i = 0; i < 6; i++)
-			guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u + (uint32_t)(2 * i)),
+			dispatch_unit_event_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u + (uint32_t)(2 * i)),
 			               0x55u, 0u, 0u, 0u);
 		return;
 	}
 	slot = find_free_slot_825c(best);
 	if (slot == 0xfe) {
-		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x57u, esi_in, 0xfeu, 0u);
+		dispatch_unit_event_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x57u, esi_in, 0xfeu, 0u);
 		return;
 	}
 	if (slot == 0xff) {
-		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x56u, esi_in, 0xffu, 0u);
+		dispatch_unit_event_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + off + 0x50u), 0x56u, esi_in, 0xffu, 0u);
 		return;
 	}
 	rec = EF_U32(0x001972e0u) + (uint32_t)best * 34u;
@@ -4163,7 +4163,7 @@ void assign_object_sub_entry_84b8(int16_t obj, uint32_t esi_in)
 	EF_U8(EF_U32(rec + 0x16u) + (uint32_t)slot * 56u + 0x26u) = 1;
 	{
 		int32_t h = sub_entry_heading_8424(best, slot);
-		guest_fn_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u),
+		dispatch_unit_event_46254(0x899u, (int32_t)EF_S16(g_world_grid_base + (uint32_t)((int32_t)obj * 0xca) + 0x50u),
 		               0x54u, (uint32_t)(int32_t)(int16_t)h, (uint32_t)slot, 0u);
 	}
 }
@@ -5831,7 +5831,7 @@ void report_contact_73964(int16_t a, int16_t b)
 				EF_U8(RECB(obj) + 0xbbu) = 1u;
 				return;
 			}
-			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
+			dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
 			return;
 		} else {
 			int32_t u = (int16_t)guest_fn_2bb64(((int32_t)EF_U32(obj + 0x26u)) >> 16);
@@ -5844,7 +5844,7 @@ void report_contact_73964(int16_t a, int16_t b)
 			r = (int32_t)(uint16_t)half_word_9c960() % (d + 1);
 			if (r != 0)
 				return;
-			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, si, 0x30u, (uint32_t)di, 0u, 0u);
+			dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)cx, si, 0x30u, (uint32_t)di, 0u, 0u);
 			return;
 		}
 	} else {
@@ -5854,7 +5854,7 @@ void report_contact_73964(int16_t a, int16_t b)
 			if (EF_U8(rec + 0x1bu) == 0xbu) {
 				uint16_t dx = EF_U16(rec + 0x50u);
 				if (dx != cx) {
-					guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
+					dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)cx, (int16_t)dx, 0x30u, (uint32_t)di, 0u, 0u);
 					return;
 				}
 				if (EF_U8(rec + 0x1au) == 6u) {
@@ -5885,7 +5885,7 @@ void report_contact_73964(int16_t a, int16_t b)
 				if ((uint8_t)guest_fn_7574c(bx) != 0)
 					return;
 			}
-			guest_fn_46254((uint32_t)(int32_t)(int16_t)cx, bx, 0x30u, (uint32_t)di, 0u, 0u);
+			dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)cx, bx, 0x30u, (uint32_t)di, 0u, 0u);
 		}
 	}
 #undef RECB

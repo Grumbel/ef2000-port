@@ -2150,7 +2150,8 @@ int32_t count_live_38674(int16_t index);
 uint32_t node_position_386f8(int16_t index);
 uint8_t guest_fn_7d20(ef_addr32 a, ef_addr32 b); /* 0x7d20 EAX/EDX -> AL */
 void guest_fn_8cc4(uint32_t a, uint32_t b); /* 0x8cc4 EAX/EDX */
-void guest_fn_46254(uint32_t a, int32_t b, uint32_t c, uint32_t d, uint32_t e, uint32_t f); /* 0x46254 EAX/EDX/EBX/ECX/stack */
+void dispatch_unit_event_46254(uint32_t source, int32_t target, uint32_t kind, uint32_t arg,
+                               uint32_t stack_a, uint32_t stack_b); /* 0x46254, unit_event_dispatch.c; ret 8 */
 void guest_fn_b39ec(uint32_t a, uint32_t b, uint32_t c); /* 0xb39ec EAX/EDX/EBX */
 void guest_fn_26744(ef_addr32 object); /* 0x26744 EAX */
 void guest_fn_26960(ef_addr32 object); /* 0x26960 EAX */

@@ -13,7 +13,7 @@ void draw_record_entries_461e8(uint32_t x, uint32_t index, uint32_t y, uint32_t 
     uint32_t i;
     uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)index * 0xca);
     for (i = 0; i < 7u; i++) {
-        guest_fn_46254((uint32_t)(int32_t)(int16_t)x,
+        dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)x,
                        (int32_t)EF_S16(rec + 0x50u + i * 2u),
                        (uint32_t)(int32_t)(int16_t)y, c, s0, s1);
     }
@@ -29,7 +29,7 @@ void draw_object_entries_46168(uint32_t key, uint32_t b, uint32_t c, uint32_t d,
     for (i = 0; i < 7u; i++) {
         uint32_t rec = EF_U32(0x0019bb58u) + (uint32_t)(EF_S16(obj + 0x28u) * 0xca) + i * 2u;
         if (EF_U16(rec + 0x50u) != (uint32_t)(int32_t)(int16_t)key) {
-            guest_fn_46254((uint32_t)(int32_t)(int16_t)key,
+            dispatch_unit_event_46254((uint32_t)(int32_t)(int16_t)key,
                            (int32_t)EF_S16(rec + 0x50u),
                            (uint32_t)(int32_t)(int16_t)b, c, d, s0);
         }
@@ -48,7 +48,7 @@ void draw_linked_pages_2c600(uint32_t page, uint32_t arg)
         uint32_t list = EF_U32(0x001fcb40u) + (uint32_t)(EF_S16(rec + 0x1cu) * 0x11);
         uint16_t other = EF_U16(list + (uint32_t)i * 2u + 1u);
         if ((int16_t)other != 0xff && other != (uint16_t)p) {
-            guest_fn_46254((uint32_t)(int32_t)EF_S16(rec + 0x50u), (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)other * 0xca) + 0x50u),
+            dispatch_unit_event_46254((uint32_t)(int32_t)EF_S16(rec + 0x50u), (int32_t)EF_S16(EF_U32(0x0019bb58u) + (uint32_t)((int32_t)(int16_t)other * 0xca) + 0x50u),
                            0x3eu, (uint32_t)(int32_t)a, 0u, 0u);
             found = 1u;
         }
@@ -82,7 +82,7 @@ static void transfer_link_common(uint32_t a, uint32_t b, uint32_t link_off, uint
         return;
     EF_U16(u2 + 0x146u) = EF_U16(u1 + copy_off);
     set_indexed_object_mode(sb, 0u);
-    guest_fn_46254((uint32_t)(int32_t)sb, (int32_t)sa, colour, 0u, 0u, 0u);
+    dispatch_unit_event_46254((uint32_t)(int32_t)sb, (int32_t)sa, colour, 0u, 0u, 0u);
 }
 
 /* 0x485a8, 245 bytes. Transfer the unit's link word (+0x158) from a to b. */

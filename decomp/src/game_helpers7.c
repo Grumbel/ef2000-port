@@ -64,7 +64,7 @@ void run_unit_slots_8f9c(int16_t unit_id)
     for (offset = 0; offset != 0xe; offset += 2u) {
         ef_addr32 unit = EF_U32(0x0019bb58u) + (uint32_t)((int32_t)unit_id * 0xca);
 
-        guest_fn_46254(0x899, EF_S16(unit + offset + 0x50u), 0x4f, 0, 0, 0);
+        dispatch_unit_event_46254(0x899, EF_S16(unit + offset + 0x50u), 0x4f, 0, 0, 0);
     }
 }
 

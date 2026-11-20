@@ -95,5 +95,5 @@ void send_slot_command_77034(int16_t unit_id, int16_t value, uint8_t kind)
         command = 0x43;
     else
         return;
-    guest_fn_46254((uint32_t)(int32_t)unit_id, (int32_t)value, command, kind, 0, 0);
+    dispatch_unit_event_46254((uint32_t)(int32_t)unit_id, (int32_t)value, command, kind, 0, 0);
 }

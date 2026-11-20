@@ -123,7 +123,7 @@ void unit_owner_update_6b344(uint32_t unit)
     {
         int16_t idx2 = EF_S16(g_current_object + 0x28u);
         int32_t w = (int32_t)EF_S16(tbl + (uint32_t)((int32_t)idx2 * 0xca) + 0x50u);
-        guest_fn_46254((uint32_t)id, w, 0x1bu, 0u, 0u, 0u);
+        dispatch_unit_event_46254((uint32_t)id, w, 0x1bu, 0u, 0u, 0u);
     }
 }
 
@@ -7493,7 +7493,7 @@ void assign_table_slot_8fe4(uint32_t index, uint32_t table)
     ent = EF_U32(0x001972e0u) + tbl * 34u;
     EF_U16(base + EF_U32(ent + 0x16u) + 0x20u) = (uint16_t)idx;
     EF_U8(EF_U32(ent + 0x16u) + base + 0x22u) = 0u;
-    guest_fn_46254(0x899u, (int32_t)EF_U32(obj + 0x4eu) >> 16, 0x4eu, slot, 0u, 0u);
+    dispatch_unit_event_46254(0x899u, (int32_t)EF_U32(obj + 0x4eu) >> 16, 0x4eu, slot, 0u, 0u);
 }
 
 /* 0xdc43e, 219 bytes. Implicit-register fragment (EBX, ESI, EDI = three angles; params in that order). Builds eight rotation-matrix words at 0xdc597 (inside the code segment, patched in place) from the sine table at 0x137e08 and cosine table at 0x139e08 (dword entries indexed by (angle >> 1) & 0x7ffc). The three reduced angles are also stored in 0xdc438/0xdc43a/0xdc43c. */
@@ -12424,7 +12424,7 @@ void maybe_fire_message_7308(ef_addr32 a, ef_addr32 b)
     div = EF_U8(0x00197268u);
     if (r % div != 0u)
         return;
-    guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(rec + 0x4eu) >> 16, 0x3au,
+    dispatch_unit_event_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(rec + 0x4eu) >> 16, 0x3au,
                    (uint32_t)target, 0u, 0u);
 }
 
@@ -12775,7 +12775,7 @@ void hail_next_unit_73c38(uint32_t unit)
         return;
     if (!(guest_fn_6a5f0_x(sid, (int32_t)EF_U8(obj + 0x142u)) < (double)(int32_t)((uint32_t)EF_U8(obj + 0x140u) * 0x9c40u)))
         return;
-    guest_fn_46254((uint32_t)sid, (int32_t)EF_U8(obj + 0x142u), 0x72u, EF_U8(obj + 0x140u), 0u, 0u);
+    dispatch_unit_event_46254((uint32_t)sid, (int32_t)EF_U8(obj + 0x142u), 0x72u, EF_U8(obj + 0x140u), 0u, 0u);
 }
 
 /* 0x6f48, 229 bytes. Maybe fire a radio call from unit A (EAX) in answer to B (EDX): B's owner record is the one named by the high word of B+0x20 (nothing when missing); it must have the same side word (+0x15) as A. If the word 0x197264 differs from its word +0x24 or its byte +0x26 is set, B's word +0x22 is set to 0xff and nothing is sent. Otherwise, with probability 1/byte(0x197269), send message 0x3c with 0x46254(A's id, owner's id, 0x3c, angle from the distance 0x2bab0, the rounded value 0x2bae0 * double 0x18039c, the byte derived from the double at B+0x71). */
@@ -12808,7 +12808,7 @@ void maybe_radio_call_6f48(ef_addr32 a, ef_addr32 b)
     ctl = scale_to_byte_4600c(b71);
     if ((half_word_9c960() & 0xffffu) % EF_U8(0x00197269u) != 0u)
         return;
-    guest_fn_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(owner + 0x4eu) >> 16, 0x3cu,
+    dispatch_unit_event_46254((uint32_t)((int32_t)EF_U32(a + 0x4eu) >> 16), (int32_t)EF_U32(owner + 0x4eu) >> 16, 0x3cu,
                    (uint32_t)angle, (uint32_t)rounded, ctl & 0xffu);
 }
 
@@ -13563,12 +13563,12 @@ void check_contact_254e4(void)
         if (um150 <= m150) {
             code = 0x13u;
         } else {
-            guest_fn_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, 0x14u, 0u, 0u, 0u);
+            dispatch_unit_event_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, 0x14u, 0u, 0u, 0u);
             guest_fn_2541c_x((int32_t)EF_U32(0x001f71c6u) >> 16, 3u);
             return;
         }
     }
-    guest_fn_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, code, 0u, 0u, 0u);
+    dispatch_unit_event_46254((uint32_t)((int32_t)EF_U32(0x001f71c6u) >> 16), (int32_t)EF_U32(p + 0x41u) >> 16, code, 0u, 0u, 0u);
 }
 
 /* 0xd6b80, 268 bytes. Read an axis from the latched position 0x420dac against the calibration words 0x420db8 (centre), 0x420da8 (max) and 0x420dc0 (min) when bit 4 of byte 0x15bac0 is set (otherwise return 0): ratio = (centre - pos) / (pos <= centre ? max - pos : pos - min), squared with its sign kept (-ratio * |ratio|) times the double 0x18f914; if that float is not above the float 0x18f91c the value becomes -1.0, it is capped at 1.0, negated and stored as a float at OUT (EAX). Returns 1 when written. */
@@ -19923,7 +19923,7 @@ void report_nearest_object_39edc(uint32_t a, uint32_t b)
 	dist = scaled_pair_distance_37bc8(g_world_grid_base + found * 0xcau + 0x61u, (int16_t)ib);
 	d = (int32_t)truncate_9d72c(dist * 0.0005393743257820927);
 	rows = g_world_grid_base;
-	guest_fn_46254((uint32_t)((int32_t)EF_U32(row_a + 0x4eu) >> 16),
+	dispatch_unit_event_46254((uint32_t)((int32_t)EF_U32(row_a + 0x4eu) >> 16),
 	               (int32_t)((int32_t)EF_U32(rows + found * 0xcau + 0x4eu) >> 16), 0x64u, (uint32_t)ib,
 	               (uint32_t)(int32_t)(int16_t)angle, (uint32_t)(int32_t)(int16_t)d);
 }
