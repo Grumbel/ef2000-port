@@ -744,4 +744,8 @@ extern int16_t g_watched_unit; /* 0x1f71ca, unit whose events raise alerts and p
 extern uint8_t g_message_filter; /* 0x1f9010, only event kinds 0x4d/0x4f reach the player while set */
 extern uint8_t g_watched_unit_alert; /* 0x1f9011, set by 0x46254 */
 
+extern uint8_t g_route_selected_slot; /* 0x1a559f, 0x32 when none */
+extern int16_t g_route_slot_x[26]; /* 0x1a55a2 */
+extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
+
 #endif

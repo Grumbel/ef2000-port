@@ -770,3 +770,6 @@ addr	size	type	name	evidence	notes
 0x001f71ca	2	int16_t	g_watched_unit	0x46254 compares the source unit	unit whose events raise alerts and player messages
 0x001f9010	1	uint8_t	g_message_filter	0x46254 reads; 0x8bb50 clears	while set only event kinds 0x4d and 0x4f reach the player
 0x001f9011	1	uint8_t	g_watched_unit_alert	0x46254 sets	event of a notify kind touched the watched unit
+0x001a559f	1	uint8_t	g_route_selected_slot	0x4dcd8 writes; 0x4e204 reads	selected route waypoint slot; 0x32 when none
+0x001a55a2	52	int16_t[26]	g_route_slot_x	0x4dcd8/0x4e204 write	waypoint map x per slot
+0x001a55d6	52	int16_t[26]	g_route_slot_y	0x4dcd8/0x4e204 write	waypoint map y per slot
