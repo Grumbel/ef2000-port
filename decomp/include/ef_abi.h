@@ -3619,7 +3619,7 @@ void run_table_initialisers_1196a0(void);
 void store_derived_pair_11f538(ef_addr32 out, uint32_t value);
 void guest_fn_c868_w(ef_addr32 widget); /* 0xc868 EAX */
 void guest_fn_c768_w(uint32_t value); /* 0xc768 EAX */
-void guest_fn_7bc40_w(ef_addr32 widget); /* 0x7bc40 EAX */
+void show_debrief_status_7bc40(ef_addr32 widget); /* 0x7bc40 EAX, debrief_status.c */
 void guest_fn_abf8c_w(uint32_t a, uint32_t b, uint32_t c); /* 0xabf8c EAX/EDX/EBX */
 void guest_fn_ab838_w(uint32_t callback); /* 0xab838 EAX */
 void guest_fn_cdc38_w(void); /* 0xcdc38 */

@@ -3807,3 +3807,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000f918	build_marker_rects_f918	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000f918 (504 bytes); pushes EBX..EBP; ESI is the rectangle index set to 0, not an input; callers b1e0@b273, 505cf
 
 0x000b9aa4	build_path_slot_records_b9aa4	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,CX:uint16_t,[ESP+4]:uint32_t		esi,edi,ebp	4	Original 0x000b9aa4 (450 bytes); Build per-slot records for a single-path node; caller b48d3; docs/compiler-abi.md
+0x0007bc40	show_debrief_status_7bc40	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007bc40 (679 bytes); Fill the debrief panel: player name, unit tally, status and overall score; callers 7bc36/7cc54; docs/compiler-abi.md

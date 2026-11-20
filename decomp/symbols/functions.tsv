@@ -1488,7 +1488,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0007baa4	91	adjust_zoom_7baa4	unit_flags	compiles	game	confirmed	decomp/tests/0x0007baa4.json	docs/compiler-abi.md; ; callers 3dd30@3e255; guest pending
 0x0007bb00	251	terrain_slope_at_7bb00	misc_drafts1	compiles	game	confirmed	decomp/tests/0x0007bb00.json	docs/compiler-abi.md; Look up the terrain record under a world position and publish its slope and heading in a global triple.; callers 1d5f4@1d616; guest pending
 0x0007bc00	61	toggle_named_widget_7bc00	leaf_helpers3	compiles	game	confirmed	decomp/tests/0x0007bc00.json	docs/compiler-abi.md; Toggle a flag word, then run 0x7bc40 on a named widget.; callers none direct; guest pending
-0x0007bc40	679	simUpdateSlot		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
+0x0007bc40	679	show_debrief_status_7bc40	debrief_status	spliced	game	confirmed	decomp/tests/0x0007bc40.json	
 0x0007bee8	1085			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
 0x0007c328	465	gpwMissionSelected	custom_mission	spliced	game	confirmed	decomp/tests/0x0007c328.json	Plain register-ABI GUI list callback; structured C maps the training entry name through a table to its mission file and flags.
 0x0007c4fc	119	set_session_text_7c4fc	game_helpers45	compiles	game	confirmed	decomp/tests/0x0007c4fc.json	docs/compiler-abi.md; Build a path from a name, remember it and hand a copy to the loader.; callers 4aa0@4aee,4cf4@4d38,4d4c@4dfe; guest pending

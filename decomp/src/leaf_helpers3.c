@@ -37,7 +37,7 @@ void toggle_named_widget_7bc00(void)
 {
     EF_U16(0x001f8fd6u) = (uint16_t)(1 - EF_U16(0x001f8fd6u));
     guest_fn_c768_w(EF_S32(0x001f8fd4u) >> 16);
-    guest_fn_7bc40_w(find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00187c90u), 0x00187c98u));
+    show_debrief_status_7bc40(find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00187c90u), 0x00187c98u));
 }
 
 /* 0x844b0, 51 bytes. Refresh the view when a cursor offset is set, else reset it. */

@@ -44,7 +44,7 @@ void run_named_widget_a5bc(void)
 void run_named_widget_7cc38(void)
 {
     guest_fn_c768_w(0);
-    guest_fn_7bc40_w(find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00187c90u), 0x00187c98u));
+    show_debrief_status_7bc40(find_widget_checked_a78bc(find_named_or_abort_a46cc(0x00187c90u), 0x00187c98u));
 }
 
 /* 0x84d94, 37 bytes. Register the 0x84dbc callback through 0xab838 after 0xabf8c. */
