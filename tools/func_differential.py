@@ -142,6 +142,13 @@ def validate_spec(spec, signature, image_size, default_guest_size=0x4000000):
             not 0 < function_size <= 0x10000 or
             signature.address + function_size > image_size):
         raise ValueError('invalid guest memory, stack, sentinel or instruction budget')
+    # The live x87 control word of the game (0x127f: 53-bit precision, round
+    # to nearest) when the spec gives one; Unicorn otherwise starts at 0x37f.
+    fpu_control = spec.get('fpu_control')
+    if fpu_control is not None:
+        fpu_control = number(fpu_control, 'fpu control word')
+        if not 0 <= fpu_control < 0x10000:
+            raise ValueError('invalid fpu control word')
     cases = spec.get('cases')
     if not isinstance(cases, list) or not cases:
         raise ValueError('spec must contain at least one case')
@@ -155,6 +162,8 @@ def validate_spec(spec, signature, image_size, default_guest_size=0x4000000):
             if key not in INITIAL_REGS:
                 raise ValueError(f'case {name}: only full input GPRs are supported: {key}')
             registers[key] = number(value, key)
+        if fpu_control is not None:
+            registers['fpu_control'] = fpu_control
         args = [number(item, 'stack argument') for item in case.get('stack_args', [])]
         if len(args) != signature.stack_args_bytes // 4:
             raise ValueError(f'case {name}: expected {signature.stack_args_bytes // 4} stack arguments')
@@ -232,6 +241,8 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
     for reg, value in registers.items():
         cpu.reg_write(getattr(x86_const, 'UC_X86_REG_' + reg.upper()), value)
     cpu.reg_write(UC_X86_REG_EFLAGS, inputs.get('eflags', 0x202))
+    if 'fpu_control' in inputs:
+        cpu.reg_write(x86_const.UC_X86_REG_FPCW, inputs['fpu_control'])
 
     if flat_segments:
         # Separate from guest RAM and stack; descriptors are setup, not payload.
