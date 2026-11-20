@@ -81,3 +81,65 @@ void update_route_summary_4ec70(void)
     guest_sprintf_a4342((ef_addr32)(uintptr_t)text, TIME_FORMAT, (double)g_route_total_hours);
     show_value(dialog, TIME_WIDGET, text);
 }
+
+/* Route gauge: a float from 0x4f0d4, at most 7000, drawn as a bar of up to
+ * 150 columns (one per 47 units). The two 17x6 end icons are copied from a
+ * 640-byte wide sheet. */
+#define GAUGE_VALUE           0x001a56f8u /* float */
+#define GAUGE_SCALE           0x00184da3u /* float 1/47 */
+#define GAUGE_COLUMNS         146
+#define GAUGE_MAX_LEVEL       150
+#define GAUGE_X               12
+#define GAUGE_TOP             0x73
+#define GAUGE_BOTTOM          0x82
+#define ICON_SHEET            0x00126570u /* pointer to the 640-byte wide icon sheet */
+#define ICON_A_POS            0x00134727u /* x, y words */
+#define ICON_B_POS            0x00134730u
+
+static void draw_gauge_tick(uint32_t colour, uint32_t x)
+{
+    draw_scaled_rect_c95ac(colour, x, 0x72, x + 6u, GAUGE_BOTTOM);
+}
+
+static void draw_gauge_icon(ef_addr32 pos, int32_t a, int32_t b)
+{
+    int32_t source = (int32_t)EF_U32(ICON_SHEET) + (int16_t)EF_U16(pos + 2u) * 0x280 + (int16_t)EF_U16(pos);
+
+    guest_fn_ca620(source, a, b, 0x11u, 6u, 0x280u);
+}
+
+/* 0x4eec0, 532 bytes. Draw the route gauge: a framed bar of 146 one-pixel
+ * columns, colour 3 up to the level, switching to 1 at column 110 when the
+ * level is beyond it and to 10 past the level; then dark and light tick
+ * marks at three positions and the two end icons. */
+void mpToggleIcons(void)
+{
+    int16_t level;
+    int16_t colour = 3;
+    int16_t i;
+
+    guest_fn_c9a98_x(8, 0x0b, 0x72, 0xa1, 0x84);
+    guest_fn_c9a98_x(0xf, 0x0a, 0x71, 0xa0, 0x83);
+    level = (int16_t)(int32_t)truncate_9d72c((double)*(float *)ef_guest_memory_ptr(GAUGE_VALUE) *
+                                             (double)*(float *)ef_guest_memory_ptr(GAUGE_SCALE));
+    if (level > GAUGE_MAX_LEVEL)
+        level = GAUGE_MAX_LEVEL;
+
+    for (i = 0; i < GAUGE_COLUMNS; i++) {
+        draw_scaled_rect_c95ac((uint8_t)colour, (uint32_t)(GAUGE_X + i), GAUGE_TOP,
+                               (uint32_t)(GAUGE_X + i), GAUGE_BOTTOM);
+        if (i == 110 && i < level)
+            colour = 1;
+        if (i > level)
+            colour = 10;
+    }
+
+    draw_gauge_tick(8, 0x66);
+    draw_gauge_tick(8, 0x7b);
+    draw_gauge_tick(8, 0x50);
+    draw_gauge_tick(0xf, 0x65);
+    draw_gauge_tick(0xf, 0x7a);
+    draw_gauge_tick(0xf, 0x4f);
+    draw_gauge_icon(ICON_A_POS, 0x0d, 0x74);
+    draw_gauge_icon(ICON_B_POS, 0x8a, 0x7c);
+}

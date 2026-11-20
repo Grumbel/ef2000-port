@@ -3814,3 +3814,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00099660	draw_site_summary_99660	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099660 (1493 bytes); Draw the ground site summary: bars and counts for radar sites, choke points, political/industrial sites, oil rigs, airfields, ports and dams per side; docs/compiler-abi.md
 0x0000a870	open_hiscores_a870	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000a870 (237 bytes); Zoom the map widget one step around the GUI cursor; docs/compiler-abi.md
 0x0007d1f0	AcceptCustom			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007d1f0 (263 bytes); Enemy-view frame: place the camera, draw the page, advance the yaw; docs/compiler-abi.md
+0x0004eec0	mpToggleIcons			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0004eec0 (532 bytes); Draw the route gauge bar, ticks and end icons; docs/compiler-abi.md

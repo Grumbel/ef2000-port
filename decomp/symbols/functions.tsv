@@ -914,7 +914,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0004ec14	46	mp_dec_speed_4ec14	mission_map_callbacks	compiles	game	confirmed		mpDecSpeed. Wrap the speed word before clamping to 900; use the named original waypoint refresh.
 0x0004ec44	44	mp_mission_1_click_4ec44	mission_menu_callbacks	compiles	game	confirmed		mpMission1Click. Wrap the speed word before clamping to 120; use the named original waypoint refresh.
 0x0004ec70	591	update_route_summary_4ec70	route_summary	spliced	game	confirmed	decomp/tests/0x0004ec70.json	docs/compiler-abi.md; Sum the route legs in nautical miles, store the flight times and show distance, speed and time in mp_wp_set; callers 4b6a0@4bba6,4dcd8@4ddf1,4dcd8@4deae,4dcd8@4ded1
-0x0004eec0	532	mpToggleIcons		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
+0x0004eec0	532	mpToggleIcons	route_summary	spliced	game	confirmed	decomp/tests/0x0004eec0.json	Route gauge: framed 146-column bar from float 0x1a56f8 / 47 (capped at 150), tick marks and two end icons; targeted differential.
 0x0004f0d4	547			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0004f2f8	28	mp_click_v8_okay_4f2f8	mission_menu_callbacks	compiles	game	confirmed		mpClickV8Okay. Find the warning widget, close its ID, then tail-call the view reset.
 0x0004f314	88	update_dialog_bindings	event_wrappers	compiles	game	confirmed	decomp/tests/0x004f314.json	Open, find two named widgets, bind, emit flag and destroy; callers 4b6a0@4b761/4ca90@4cad5; guest pending
