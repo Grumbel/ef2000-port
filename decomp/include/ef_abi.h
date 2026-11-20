@@ -5080,6 +5080,10 @@ void reload_game_data_8b2d8(void);
 void guest_fn_97dcc_x(void); /* 0x97dcc no arguments */
 
 void draw_bar_9bca4(uint32_t colour, uint32_t unused, uint32_t x, uint32_t h);
+void draw_class_summary_98eac(ef_addr32 screen); /* 0x98eac EAX, summary_screen.c */
+void draw_air_summary_9921c(ef_addr32 screen); /* 0x9921c EAX, summary_screen.c */
+void draw_site_summary_99660(ef_addr32 screen); /* 0x99660 EAX, summary_screen.c */
+void draw_summary_key_99c38(ef_addr32 screen); /* 0x99c38 EAX, summary_screen.c */
 
 
 

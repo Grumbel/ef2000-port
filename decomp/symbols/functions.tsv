@@ -1996,10 +1996,10 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x00098b68	104	save_and_draw_strip_98b68	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00098b68.json	docs/compiler-abi.md; Save the 0x23x0x1e screen strip at (X, Y) (negative values clamp to 0) into 0x12dda4, remember the position at 0x40cd74/; callers 98658@987f2,98658@98a19; guest pending
 0x00098bec	160			blocked	unclassified	unverified		Skipped as too difficult: mid-function entry/x87 region reached by jmp; not a clean function
 0x00098c1c	654	sumgengraph		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
-0x00098eac	878	sumairbar		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
-0x0009921c	1091	sumstatbar		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
-0x00099660	1493	sumgroundbar		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
-0x00099c38	683	sumdrawkey		blocked	game	unverified		Triage classification, not yet individually attempted (GUI/UI event or drawing handler using Watcom register ABI and host-side widget/draw calls; no confirmed signature or differential).
+0x00098eac	878	draw_class_summary_98eac	summary_screen	spliced	game	confirmed	decomp/tests/0x00098eac.json	
+0x0009921c	1091	draw_air_summary_9921c	summary_screen	spliced	game	confirmed	decomp/tests/0x0009921c.json	
+0x00099660	1493	draw_site_summary_99660	summary_screen	spliced	game	confirmed	decomp/tests/0x00099660.json	
+0x00099c38	683	draw_summary_key_99c38	summary_screen	spliced	game	confirmed	decomp/tests/0x00099c38.json	
 0x00099ee4	251	draw_box_rows_99ee4	box_rows	compiles	game	confirmed	decomp/tests/0x00099ee4.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cdf6 (count word at 0x40d02a).; callers none direct; guest pending
 0x00099fe0	251	draw_box_rows_99fe0	box_rows	compiles	game	confirmed	decomp/tests/0x00099fe0.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cefe (count word at 0x40d02c).; callers none direct; guest pending
 0x0009a0dc	251	draw_box_rows_9a0dc	box_rows	compiles	game	confirmed	decomp/tests/0x0009a0dc.json	docs/compiler-abi.md; Draw the box rows for the table at 0x40cd7e (count word at 0x40d026).; callers none direct; guest pending

@@ -3808,3 +3808,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 
 0x000b9aa4	build_path_slot_records_b9aa4	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,CX:uint16_t,[ESP+4]:uint32_t		esi,edi,ebp	4	Original 0x000b9aa4 (450 bytes); Build per-slot records for a single-path node; caller b48d3; docs/compiler-abi.md
 0x0007bc40	show_debrief_status_7bc40	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0007bc40 (679 bytes); Fill the debrief panel: player name, unit tally, status and overall score; callers 7bc36/7cc54; docs/compiler-abi.md
+0x00099c38	draw_summary_key_99c38	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099c38 (683 bytes); Draw the ground summary key: bars and counts for flak, battleships and supply ships per side; docs/compiler-abi.md
+0x00098eac	draw_class_summary_98eac	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00098eac (878 bytes); Draw the target class summary: bars and counts for air, ground-based, ship and static targets per side; docs/compiler-abi.md
+0x0009921c	draw_air_summary_9921c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009921c (1091 bytes); Draw the air summary: bars and counts for fighters, bombers, transports, tankers and AWACS per side; docs/compiler-abi.md
+0x00099660	draw_site_summary_99660	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00099660 (1493 bytes); Draw the ground site summary: bars and counts for radar sites, choke points, political/industrial sites, oil rigs, airfields, ports and dams per side; docs/compiler-abi.md
