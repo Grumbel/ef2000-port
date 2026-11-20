@@ -754,5 +754,9 @@ extern int16_t g_cursor_screen_shift_y; /* 0x1fcbd2 */
 extern int32_t g_cursor_target_x; /* 0x1f8eb0 */
 extern int32_t g_cursor_target_y; /* 0x1f8eac */
 extern int32_t g_cursor_target_z; /* 0x1f8ea8 */
+extern int32_t g_draw_clip_left; /* 0x17cf9c */
+extern int32_t g_draw_clip_right; /* 0x17cfa0 */
+extern int32_t g_draw_clip_top; /* 0x17cfa4 */
+extern int32_t g_draw_clip_bottom; /* 0x17cfa8 */
 
 #endif

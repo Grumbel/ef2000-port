@@ -780,3 +780,7 @@ addr	size	type	name	evidence	notes
 0x001f8eb0	4	int32_t	g_cursor_target_x	0x832b8/0x834e8 read	cursor target position, ray units >> 8
 0x001f8eac	4	int32_t	g_cursor_target_y	0x832b8/0x834e8 read	cursor target height; 0 disables the bound test
 0x001f8ea8	4	int32_t	g_cursor_target_z	0x832b8/0x834e8 read	cursor target position, ray units >> 8
+0x0017cf9c	4	int32_t	g_draw_clip_left	0xcdf48 writes; 0xe2c40 reads	2D draw clip rectangle, inclusive
+0x0017cfa0	4	int32_t	g_draw_clip_right	0xcdf48 writes; 0xe2c40 reads	2D draw clip rectangle, inclusive
+0x0017cfa4	4	int32_t	g_draw_clip_top	0xcdf48 writes; 0xe2c40 reads	2D draw clip rectangle, inclusive
+0x0017cfa8	4	int32_t	g_draw_clip_bottom	0xcdf48 writes; 0xe2c40 reads	2D draw clip rectangle, inclusive

@@ -162,10 +162,10 @@ void reset_handler_cd6fc(void)
 /* 0xcdf48, 24 bytes. Dwords 0x17cf9c..a8 = EAX, EDX, EBX, ECX. */
 void store_four_dwords_17cf9c(uint32_t a, uint32_t b, uint32_t c, uint32_t d)
 {
-    EF_U32(0x0017cf9cu) = a;
-    EF_U32(0x0017cfa0u) = b;
-    EF_U32(0x0017cfa4u) = c;
-    EF_U32(0x0017cfa8u) = d;
+    g_draw_clip_left = (int32_t)a;
+    g_draw_clip_right = (int32_t)b;
+    g_draw_clip_top = (int32_t)c;
+    g_draw_clip_bottom = (int32_t)d;
 }
 
 /* 0xcdc38, 44 bytes. Run 0xc37ec, then release dword 0x15b758 as 0xc3a48 does. */
