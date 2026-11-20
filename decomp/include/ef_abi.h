@@ -34,7 +34,7 @@ int16_t hiscore_insert_433c(ef_addr32 name); /* 0x433c */
  * flow. These C interfaces are not yet Watcom splice-verified. */
 int32_t ascii_stricmp_9d524(ef_addr32 left, ef_addr32 right);
 uint32_t strlen_ds(ef_addr32 s); /* 0xb1b8b EAX */
-uint32_t count_filtered_node_matches(uint8_t kind, ef_addr32 list_addr, ef_addr32 aux); /* 0xb0850 AL/EDX/EBX */
+uint32_t count_filtered_node_matches(uint8_t kind, ef_addr32 list_addr, ef_addr32 aux); /* 0xb0850 AL/EBX/EDX */
 uint32_t count_positive_filtered_node_matches(uint8_t kind, ef_addr32 list_addr, ef_addr32 aux); /* 0xb0954 AL/EBX/EDX */
 ef_addr32 allocate_weighted_node_records(ef_addr32 list_addr, ef_addr32 count_addr); /* 0xb0018 EAX/EDX */
 int32_t guest_fn_b39ec_q(int32_t a, int32_t b, int32_t c); /* 0xb39ec EAX/EDX/EBX */
@@ -3460,6 +3460,8 @@ double guest_fn_b3fd0(double value); /* 0xb3fd0 stack -> ST0 */
 void dispatch_entry_ratio_a3824(uint8_t index);
 double match_ratio_b0718(uint8_t type, uint32_t arg, ef_addr32 listp);
 double match_ratio_b07b4(uint8_t type, uint32_t arg, ef_addr32 listp);
+uint16_t first_goal_met_b0c34(uint8_t kind, ef_addr32 list, ef_addr32 head, ef_addr32 listp, uint32_t arg); /* 0xb0c34 AL/EDX/EBX/ECX + stack, float_helpers6.c */
+uint16_t second_goal_met_b0c9c(uint8_t kind, ef_addr32 list, ef_addr32 head, ef_addr32 listp); /* 0xb0c9c AL/EDX/EBX/ECX, float_helpers6.c */
 double dot_product_b43dc(ef_addr32 a, ef_addr32 b);
 uint8_t normalize_vector_b4424(ef_addr32 out, ef_addr32 in);
 void project_vector_b4468(ef_addr32 out, ef_addr32 dir, ef_addr32 vec);

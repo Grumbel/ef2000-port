@@ -146,3 +146,32 @@ double scale_view_y_ce0cc(float value, float factor)
 {
     return ((double)value - (double)EF_S32(0x0015bdbcu)) * (double)factor / (double)EF_S32(0x0015bdd8u);
 }
+
+/* 0xb0c34, 102 bytes (ret 4). Nonzero when no node matches the kind filter
+ * while the typed node count is not negative, or when more than 3/4 of the
+ * matching entries are listed. */
+uint16_t first_goal_met_b0c34(uint8_t kind, ef_addr32 list, ef_addr32 head, ef_addr32 listp, uint32_t arg)
+{
+    uint16_t matches = (uint16_t)count_filtered_node_matches(kind, head, list);
+    int16_t typed = (int16_t)count_typed_nodes_b0b00(kind, head, arg);
+    double ratio = match_ratio_b0718(kind, list, listp);
+
+    if (matches == 0 && typed >= 0)
+        return 1;
+    return ratio > 0.75;
+}
+
+/* 0xb0c9c, 95 bytes. Nonzero when at least 12 nodes match the kind filter
+ * or more than 95% of the matching entries pass the second predicate. The
+ * positive match count is computed and discarded, as in the original. */
+uint16_t second_goal_met_b0c9c(uint8_t kind, ef_addr32 list, ef_addr32 head, ef_addr32 listp)
+{
+    int16_t matches = (int16_t)count_filtered_node_matches(kind, head, list);
+    double ratio;
+
+    count_positive_filtered_node_matches(kind, head, list);
+    ratio = match_ratio_b07b4(kind, list, listp);
+    if (matches >= 12)
+        return 1;
+    return ratio > 0.95;
+}
