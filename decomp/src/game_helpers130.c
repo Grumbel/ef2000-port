@@ -6253,6 +6253,45 @@ void build_slot_records_b97a4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint
 #undef BASE
 }
 
+/* 0xb9aa4, 450 bytes. As 0xb97a4 for nodes with a single path table: the
+ * slot size is twice the first path word plus three, the buffer is tagged
+ * 0x18eb14, 0xb8cf8 gets the path for both ends and no source position, and
+ * the leading fields are not copied back out of the buffer. */
+void build_path_slot_records_b9aa4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint32_t cxin, uint32_t arg)
+{
+#define BASE() EF_U32(obj + 0x13u)
+	uint32_t node;
+	uint16_t size, j;
+	node = guest_fn_b55f8(arg, edxin, ebxin, 0x49u);
+	if (node == 0u)
+		return;
+	size = (uint16_t)(EF_U16(EF_U32(EF_U32(node + 0x20u) + 6u)) * 2u + 3u);
+	for (j = 0; (int32_t)EF_U8(obj + 0x12u) > (int16_t)j; j++) {
+		uint32_t rec = (uint32_t)((int32_t)(int16_t)j * 0x7c);
+		uint32_t path, buf;
+		int32_t w = (int16_t)size;
+		EF_U16(BASE() + rec + 0x1cu) = size;
+		EF_U16(BASE() + rec + 0x1au) = 0u;
+		EF_U16(BASE() + rec + 0x1eu) = 0u;
+		EF_U32(BASE() + rec + 0x20u) = guest_fn_cc6c0_q((uint32_t)(w * 0x19), 0x0018eb14u, (uint32_t)(w * 0x19), (uint32_t)w);
+		path = EF_U32(EF_U32(node + 0x20u) + 6u);
+		guest_fn_b8cf8_x(BASE() + rec, path, path, 0u, 0u, 0u, 0u, 0u, EF_U8(obj + 9u), 0u);
+		init_slot_record_b5640(BASE() + rec, edxin, (uint32_t)(int32_t)(int16_t)cxin, 0x10u, EF_U8(obj + 0x12u));
+		guest_fn_b52bc_x(BASE() + rec, (uint32_t)(int32_t)(int16_t)(EF_U8(BASE() + rec + 2u) == 9u ? 0x19 : 0x23), 0u);
+		guest_fn_b5800(BASE() + rec, edxin, EF_U8(obj + 0x12u));
+		guest_fn_b570c(BASE() + rec, edxin, 2u);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		guest_fn_b4e74((int16_t)EF_U16(buf + 0xeu), EF_U8(obj + 0xau), 0x10u, (uint16_t)(int32_t)(int16_t)j,
+			       (uint32_t)(((int32_t)EF_U32(obj + 0xeu)) >> 16), edxin);
+		w = (int16_t)EF_U16(BASE() + rec + 0x1cu);
+		buf = EF_U32(BASE() + rec + 0x20u);
+		guest_fn_b4e74((int16_t)EF_U16(buf + (uint32_t)((w - 1) * 0x19) + 0xeu), EF_U8(obj + 0xau), 2u,
+			       (uint16_t)(int32_t)(int16_t)j,
+			       (uint32_t)(((int32_t)EF_U32(obj + 0xeu)) >> 16), edxin);
+	}
+#undef BASE
+}
+
 /* 0x63d5c, 820 bytes. Render one entry of the 10-byte table at 0x127a98
  * (centre X/Y, half-extents Z/W, kind): clear the clip box, scan-convert
  * it with the saved camera (list head 0x20f15c or the defaults), then

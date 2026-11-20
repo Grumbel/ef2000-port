@@ -4594,6 +4594,7 @@ void guest_fn_5dc20(int32_t a, int32_t b, int32_t s, uint32_t obj); /* 0x5dc20 E
 void update_flight_options_widgets_7e2a8(void);
 void guest_fn_7e0a4(uint32_t widget); /* 0x7e0a4 EAX */
 void build_slot_records_b97a4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint32_t cxin, uint32_t arg);
+void build_path_slot_records_b9aa4(uint32_t obj, uint32_t edxin, uint32_t ebxin, uint32_t cxin, uint32_t arg);
 uint32_t guest_fn_b55f8(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xb55f8 EAX/EDX/EBX/CL */
 uint32_t guest_fn_b5580(uint32_t a); /* 0xb5580 EAX */
 uint32_t guest_fn_b55a4(uint32_t a); /* 0xb55a4 EAX */
