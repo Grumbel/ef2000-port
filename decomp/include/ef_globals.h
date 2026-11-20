@@ -364,11 +364,11 @@ extern ef_addr32 g_ui_record_cursor; /* 0x0020f168 */
 extern uint16_t g_ui_record_pool_count; /* 0x002119f4 */
 extern uint32_t g_ui_record_pool_pointer; /* 0x002119e8 */
 extern uint16_t g_tactical_cross_radius; /* 0x001a6ce2 */
-extern uint32_t g_ui_composite_arg_d; /* 0x001fcc2c */
-extern uint32_t g_ui_composite_arg_b; /* 0x001fcc30 */
-extern uint32_t g_ui_composite_arg_c; /* 0x001fcc34 */
-extern uint32_t g_ui_reference_x; /* 0x001fcc14 */
-extern uint32_t g_ui_reference_y; /* 0x001fcc1c */
+extern uint32_t g_cursor_ray_to_x; /* 0x001fcc2c */
+extern uint32_t g_cursor_ray_to_y; /* 0x001fcc30 */
+extern uint32_t g_cursor_ray_to_z; /* 0x001fcc34 */
+extern uint32_t g_cursor_ray_from_x; /* 0x001fcc14 */
+extern uint32_t g_cursor_ray_from_z; /* 0x001fcc1c */
 extern uint16_t g_ui_composite_offset_x; /* 0x001fcc44 */
 extern uint16_t g_ui_composite_offset_y; /* 0x001fcc46 */
 extern uint16_t g_ui_component_enabled; /* 0x0012b4a6 */
@@ -748,5 +748,11 @@ extern uint8_t g_route_selected_slot; /* 0x1a559f, 0x32 when none */
 extern int16_t g_route_slot_x[26]; /* 0x1a55a2 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
+extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */
+extern int16_t g_cursor_screen_shift_x; /* 0x1fcbd0 */
+extern int16_t g_cursor_screen_shift_y; /* 0x1fcbd2 */
+extern int32_t g_cursor_target_x; /* 0x1f8eb0 */
+extern int32_t g_cursor_target_y; /* 0x1f8eac */
+extern int32_t g_cursor_target_z; /* 0x1f8ea8 */
 
 #endif

@@ -178,11 +178,11 @@ addr	size	type	name	evidence	notes
 0x002119e8	4	uint32_t	g_ui_record_pool_pointer	0x8f612 writes	Reset to zero
 0x001a6ce2	2	uint16_t	g_tactical_cross_radius	0x5dbcd reads	Radius pre-shifted by display mode
 0x0012d7b4	variable	ef_addr32[]	g_ui_active_record_slots	0x866ed reads	Null-terminated pointer array
-0x001fcc2c	4	uint32_t	g_ui_composite_arg_d	0x84384 reads	Forwarded via EDX to 83708
-0x001fcc30	4	uint32_t	g_ui_composite_arg_b	0x8437e reads	Forwarded via EBX to 83708
-0x001fcc34	4	uint32_t	g_ui_composite_arg_c	0x84378 reads	Forwarded via ECX to 83708
-0x001fcc14	4	uint32_t	g_ui_reference_x	0x8329c reads	Metric x reference
-0x001fcc1c	4	uint32_t	g_ui_reference_y	0x83296 reads	Metric y reference
+0x001fcc2c	4	uint32_t	g_cursor_ray_to_x	0x84384 reads	cursor ray end x; 0x834e8 moves it onto the ground or to the target distance
+0x001fcc30	4	uint32_t	g_cursor_ray_to_y	0x8437e reads	cursor ray end y (height)
+0x001fcc34	4	uint32_t	g_cursor_ray_to_z	0x84378 reads	cursor ray end z
+0x001fcc14	4	uint32_t	g_cursor_ray_from_x	0x8329c reads	cursor ray start (eye) x
+0x001fcc1c	4	uint32_t	g_cursor_ray_from_z	0x83296 reads	cursor ray start (eye) z
 0x001fcc44	2	uint16_t	g_ui_composite_offset_x	0x83710 reads	Offset after preparation callback
 0x001fcc46	2	uint16_t	g_ui_composite_offset_y	0x83720 reads	Offset after preparation callback
 0x0012b4a6	2	uint16_t	g_ui_component_enabled	0x84525 writes	Set to one on initialization
@@ -774,3 +774,9 @@ addr	size	type	name	evidence	notes
 0x001a55a2	52	int16_t[26]	g_route_slot_x	0x4dcd8/0x4e204 write	waypoint map x per slot
 0x001a55d6	52	int16_t[26]	g_route_slot_y	0x4dcd8/0x4e204 write	waypoint map y per slot
 0x00121ec0	1	uint8_t	g_unit_tally_member_seen	0x11560 clears and sets	an active unit based at the tallied member was found
+0x001fcc18	4	uint32_t	g_cursor_ray_from_y	0x834e8 reads; 0x832b8 latches	cursor ray start (eye) height
+0x001fcbd0	2	int16_t	g_cursor_screen_shift_x	0x845c0 tests; 0x834e8 adds	pending cursor shift in screen units
+0x001fcbd2	2	int16_t	g_cursor_screen_shift_y	0x845c0 tests; 0x834e8 adds	pending cursor shift in screen units
+0x001f8eb0	4	int32_t	g_cursor_target_x	0x832b8/0x834e8 read	cursor target position, ray units >> 8
+0x001f8eac	4	int32_t	g_cursor_target_y	0x832b8/0x834e8 read	cursor target height; 0 disables the bound test
+0x001f8ea8	4	int32_t	g_cursor_target_z	0x832b8/0x834e8 read	cursor target position, ray units >> 8

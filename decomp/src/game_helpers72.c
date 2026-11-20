@@ -19,7 +19,7 @@ uint8_t forward_cursor_vector_845c0(void)
     dx = EF_U16(0x001fcc40u);
     guest_fn_84394_x(0x001fcbd4u, dx, bx);
     if (EF_U16(0x001fcbd0u) != 0 || EF_U16(0x001fcbd2u) != 0) {
-        if (guest_fn_834e8_w((int16_t)bx, (int16_t)dx) != 0) {
+        if (shift_cursor_ray_834e8((int16_t)bx, (int16_t)dx) != 0) {
             guest_fn_842b4_x();
             guest_fn_84394_x(0x001fcbd4u, dx, bx);
         }

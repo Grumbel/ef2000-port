@@ -13316,7 +13316,7 @@ uint8_t wander_view_point_843b0(void)
     if (EF_U16(0x001fcbd0u) != 0u || EF_U16(0x001fcbd2u) != 0u) {
         center_view_842b4();
         update_ui_composite();
-        if (guest_fn_834e8_w((int32_t)EF_U32(0x001fcc3cu) >> 16, (int32_t)EF_U32(0x001fcc3eu) >> 16) != 0u) {
+        if (shift_cursor_ray_834e8((int32_t)EF_U32(0x001fcc3cu) >> 16, (int32_t)EF_U32(0x001fcc3eu) >> 16) != 0u) {
             center_view_842b4();
             update_ui_composite();
         }
@@ -13333,9 +13333,9 @@ uint8_t wander_view_point_843b0(void)
         dy = (int32_t)(step_generator_a45b3() & 0x1ffu);
         if ((EF_U16(0x0012b4bcu) & 0x2u) != 0u)
             dy = -dy;
-        if (ui_point_near_reference((int32_t)g_ui_composite_arg_d + dx, (int32_t)g_ui_composite_arg_c + dy) != 0u) {
-            g_ui_composite_arg_d = g_ui_composite_arg_d + (uint32_t)dx;
-            g_ui_composite_arg_c = g_ui_composite_arg_c + (uint32_t)dy;
+        if (ui_point_near_reference((int32_t)g_cursor_ray_to_x + dx, (int32_t)g_cursor_ray_to_z + dy) != 0u) {
+            g_cursor_ray_to_x = g_cursor_ray_to_x + (uint32_t)dx;
+            g_cursor_ray_to_z = g_cursor_ray_to_z + (uint32_t)dy;
         }
         center_view_842b4();
         update_ui_composite();
@@ -13716,9 +13716,9 @@ void label_box_5fc80(uint32_t entry)
 /* 0x83200, 145 bytes. Convert the world point (EDX, EBX, ECX) to camera-relative 8.8 fixed point for OUT (EAX): subtract the camera dwords 0x1fcc14, 0x1fcc18, 0x1fcc1c, halve all three differences until none needs more than 16 bits, add the camera back and pass the values shifted left by 8 to 0x15c0ea (z, y, x order of the stack arguments, result pointer last). */
 void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z)
 {
-    int32_t cx = (int32_t)g_ui_reference_x;
+    int32_t cx = (int32_t)g_cursor_ray_from_x;
     int32_t cy = (int32_t)EF_U32(0x001fcc18u);
-    int32_t cz = (int32_t)g_ui_reference_y;
+    int32_t cz = (int32_t)g_cursor_ray_from_z;
     int32_t dx = x - cx;
     int32_t dy = y - cy;
     int32_t dz = z - cz;
@@ -13731,9 +13731,9 @@ void to_camera_space_83200(ef_addr32 out, int32_t x, int32_t y, int32_t z)
             t >>= 1;
         } while (t != 0u);
     }
-    guest_fn_15c0ea_x((uint32_t)((dz + (int32_t)g_ui_reference_y) << 8),
+    guest_fn_15c0ea_x((uint32_t)((dz + (int32_t)g_cursor_ray_from_z) << 8),
                       (uint32_t)((dy + (int32_t)EF_U32(0x001fcc18u)) << 8),
-                      (uint32_t)((dx + (int32_t)g_ui_reference_x) << 8), out);
+                      (uint32_t)((dx + (int32_t)g_cursor_ray_from_x) << 8), out);
 }
 
 /* 0x89b58, 151 bytes. Is the unit U (EAX) still pointing at its target? Take the target word at [[U+0x30]+0x4b] (0 gives 0), convert the navigation vector with 0x8fa58, subtract it from 0x1fcf58, normalise and compare the angle to the aim vector 0x1fcfd8 against the double at 0x12bcd5 + 145 * (byte U+0x18) scaled by 0x18a5c0 and 0x18a5c8. A degenerate vector counts as aligned (1); within the limit returns 1; outside it clears byte U+0x59 and returns 0. */
@@ -13916,7 +13916,7 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     EF_U8(rec + 0x22u) = (uint8_t)(EF_U8(rec + 0x22u) & 0xfeu);
     if (active != 0u && EF_U16(0x001fcbd0u) == 0u && EF_U16(0x001fcbd2u) == 0u) {
         if ((EF_U8(0x001fcbe2u) & 0x80u) != 0u
-            || box_outside_bounds_832b8((int32_t)g_ui_composite_arg_d, (int32_t)g_ui_composite_arg_b, (int32_t)g_ui_composite_arg_c) != 0u) {
+            || box_outside_bounds_832b8((int32_t)g_cursor_ray_to_x, (int32_t)g_cursor_ray_to_y, (int32_t)g_cursor_ray_to_z) != 0u) {
             EF_U8(0x001fcbe2u) = (uint8_t)(EF_U8(0x001fcbe2u) & 0xc7u);
             initialize_ui_component();
             run_12d90_pair_13950();
@@ -13926,9 +13926,9 @@ void refresh_view_cursor_848e0(ef_addr32 src, ef_addr32 rec)
     if ((flags & 0x40u) != 0u && (flags & 0x80u) == 0u && g_ui_component_latch != 0u) {
         EF_U8(0x001fcbe3u) = (uint8_t)(EF_U8(0x001fcbe3u) | 1u);
         EF_U8(rec + 0x22u) = (uint8_t)((EF_U8(rec + 0x22u) & 0xfeu) | 1u);
-        EF_U32(rec) = g_ui_composite_arg_d;
-        EF_U32(rec + 4u) = g_ui_composite_arg_b;
-        EF_U32(rec + 8u) = g_ui_composite_arg_c;
+        EF_U32(rec) = g_cursor_ray_to_x;
+        EF_U32(rec + 4u) = g_cursor_ray_to_y;
+        EF_U32(rec + 8u) = g_cursor_ray_to_z;
         return;
     }
     EF_U32(rec + 4u) = 0x80000000u;
@@ -14597,9 +14597,9 @@ void classify_view_axis_83a40(void)
     build_rotation_e994c(0u, (uint32_t)((int32_t)EF_U32(0x001fcc1eu) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc20u) >> 16), (uint32_t)((int32_t)EF_U32(0x001fcc22u) >> 16));
     scale_vector_down_16((ef_addr32)(uintptr_t)fwd, 0, 0x4000, 0);
     store_scaled_vector_831a4((ef_addr32)(uintptr_t)off,
-                              (int32_t)(g_ui_composite_arg_d - g_ui_reference_x),
-                              (int32_t)(g_ui_composite_arg_b - EF_U32(0x001fcc18u)),
-                              (int32_t)(g_ui_composite_arg_c - g_ui_reference_y));
+                              (int32_t)(g_cursor_ray_to_x - g_cursor_ray_from_x),
+                              (int32_t)(g_cursor_ray_to_y - EF_U32(0x001fcc18u)),
+                              (int32_t)(g_cursor_ray_to_z - g_cursor_ray_from_z));
     dot = (int32_t)((uint32_t)fwd[1] * (uint32_t)off[1] + (uint32_t)fwd[0] * (uint32_t)off[0] + (uint32_t)fwd[2] * (uint32_t)off[2]);
     len = (int32_t)length_3d_decc4(off[0], off[1], off[2]);
     q = (int32_t)((uint32_t)dot * 2u) / len;

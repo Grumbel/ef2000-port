@@ -44,8 +44,8 @@ ef_addr32 next_ui_fragment(ef_addr32 string)
  * two global reference coordinates before calling the metric sink. */
 uint8_t ui_point_near_reference(int32_t x, int32_t y)
 {
-    int32_t delta_x = (int32_t)((uint32_t)x - g_ui_reference_x);
-    int32_t delta_y = (int32_t)((uint32_t)y - g_ui_reference_y);
+    int32_t delta_x = (int32_t)((uint32_t)x - g_cursor_ray_from_x);
+    int32_t delta_y = (int32_t)((uint32_t)y - g_cursor_ray_from_z);
     return guest_ui_distance_metric(delta_x, delta_y) <= 0x3b4c00;
 }
 

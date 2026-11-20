@@ -72,7 +72,7 @@ uint8_t refresh_panel_84544(void)
     center_view_842b4();
     update_ui_composite();
     if ((EF_U16(0x001fcbd0u) != 0 || EF_U16(0x001fcbd2u) != 0)
-        && guest_fn_834e8_w(EF_S32(0x001fcc3cu) >> 16, EF_S32(0x001fcc3eu) >> 16) != 0) {
+        && shift_cursor_ray_834e8(EF_S32(0x001fcc3cu) >> 16, EF_S32(0x001fcc3eu) >> 16) != 0) {
         center_view_842b4();
         update_ui_composite();
     }

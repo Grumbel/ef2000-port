@@ -3695,7 +3695,7 @@ void guest_fn_7fe8c_w(void); /* 0x7fe8c */
 void guest_fn_810d0_w(uint32_t a); /* 0x810d0 EAX */
 void guest_fn_810f4_w(uint32_t a); /* 0x810f4 EAX */
 void guest_fn_dc334_w(void); /* 0xdc334 */
-uint8_t guest_fn_834e8_w(int32_t a, int32_t b); /* 0x834e8 EAX/EDX -> AL */
+uint8_t shift_cursor_ray_834e8(int32_t screen_x, int32_t screen_y);
 void guest_fn_dc832_w(uint32_t a, uint32_t b, uint32_t c); /* 0xdc832 EAX/EDX/EBX */
 void guest_fn_ac7c0_w(void); /* 0xac7c0 */
 void guest_fn_ac0e0_w(void); /* 0xac0e0 */
