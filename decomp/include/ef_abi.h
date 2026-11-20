@@ -6723,6 +6723,7 @@ void check_row_target_85604(uint32_t id, double scale);
 void refresh_row_target_857bc(int16_t row); /* 0x857bc AX */
 void guest_fn_d9e50(ef_addr32 name); /* 0xd9e50 EAX */
 int16_t load_mission_init_52164(void); /* 0x52164 -> AX */
+void reset_view_97064(void); /* 0x97064 */
 
 void load_flight_model_89c64(ef_addr32 rec);
 

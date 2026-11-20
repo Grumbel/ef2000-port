@@ -789,6 +789,13 @@ extern uint8_t g_waypoint_extension[5]; /* 0x001a5a1c */
 extern uint32_t g_mission_file_block; /* 0x001a58b0 */
 extern int32_t g_mission_start_x; /* 0x001a58f4 */
 extern int32_t g_mission_start_y; /* 0x001a58f0 */
+extern int16_t g_view_scene_camera; /* 0x0012dc76 */
+extern uint16_t g_view_data_word; /* 0x0021448a */
+extern int16_t g_view_data_page; /* 0x0021448c */
+extern int16_t g_view_offset[3]; /* 0x0012dba2 */
+extern int32_t g_view_motion[3]; /* 0x0012dba8 */
+extern int16_t g_view_shake_ticks; /* 0x0012dbc6 */
+extern uint32_t g_view_update_mode; /* 0x0012dc7c */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */

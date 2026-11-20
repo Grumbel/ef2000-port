@@ -836,3 +836,10 @@ addr	size	type	name	evidence	notes
 0x001a58b0	4	uint32_t	g_mission_file_block	0x52164 frees via 0xe2af4	arena block holding the loaded mission text
 0x001a58f4	4	int32_t	g_mission_start_x	0x52164 copies g_player_x	mission starting x
 0x001a58f0	4	int32_t	g_mission_start_y	0x52164 copies g_player_y	mission starting y
+0x0012dc76	2	int16_t	g_view_scene_camera	0x97064 tests	nonzero: reset the view from the COLS_CAM1 scene camera
+0x0021448a	2	uint16_t	g_view_data_word	0x97064 clears	low word beside the view data page
+0x0021448c	2	int16_t	g_view_data_page	0x97064 passes to 0xa1a90	page holding the view data pairs
+0x0012dba2	6	int16_t[3]	g_view_offset	0x97064 sets or clears	view offset words from the camera view data
+0x0012dba8	12	int32_t[3]	g_view_motion	0x97064 clears	view motion
+0x0012dbc6	2	int16_t	g_view_shake_ticks	0x97064 counts down	remaining view shake steps
+0x0012dc7c	4	uint32_t	g_view_update_mode	0x97064 sets 0x200 around 0x9357c	scene update mode
