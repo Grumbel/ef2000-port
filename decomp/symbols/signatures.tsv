@@ -3771,3 +3771,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00009114	check_base_contact_9114			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00009114 (461 bytes); pushes EBX..EDI, EBP unused; no inputs; caller 3df8c@3dfbd
 0x0002e740	step_grid_cell_2e740	EAX:int32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t		ebx,ecx,edx,esi,edi,ebp	12	Original 0x0002e740 (461 bytes); pushes EBX..EBP; double rate and dword flag on the stack, ret 0xc; callers c66c, 42d30, 541ec, 7eb40
 0x000e2374	draw_text_node_e2374	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x000e2374 (493 bytes); pushes EBX,ECX,ESI,EDI,EBP; EDX clobbered; ESI is the x accumulator set from EAX/EDX fields, not an input; caller e2564
+0x0001e480	collapse_screen_1e480	AL:uint8_t,EDX:int32_t		ebx,ecx,esi,edi,ebp	0	Original 0x0001e480 (499 bytes); pushes EBX,ECX,ESI,EDI, EBP unused; EDX clobbered; callers 3ef00 (AL 0/1, EDX 0/0x1f)

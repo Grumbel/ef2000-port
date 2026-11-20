@@ -765,3 +765,5 @@ addr	size	type	name	evidence	notes
 0x001972f0	1	uint8_t	g_base_contact	0x9114 clears each call, sets on contact	base area contact this frame
 0x001972f1	1	uint8_t	g_base_contact_latched	0x9114 sets on first contact, clears for inactive objects	base contact latch
 0x001a3140	8	double	g_grid_cell_step_rate	0x2e740 stores its stack double before the step helpers	grid cell step rate
+0x0015bdb8	4	uint32_t	g_view_origin_x	0xdc21c stores the low word; 0x1e480 reads the dword	view origin x
+0x0015bdbc	4	uint32_t	g_view_origin_y	0xdc21c stores the low word; 0x1e480 reads the dword	view origin y

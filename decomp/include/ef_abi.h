@@ -1904,6 +1904,7 @@ uint32_t mouse_button_count_cdf60(void);
 void mouse_read_motion_ce02c(ef_addr32 out_x, ef_addr32 out_y);
 uint32_t mouse_read_buttons_ce064(void);
 void latch_values_ce328(uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+void collapse_screen_1e480(uint8_t mode, int32_t colour);
 ef_addr32 apply_pending_events_ce944(ef_addr32 object);
 void forward_record_cf78c(void);
 ef_addr32 copy_record9_d0858(ef_addr32 destination, ef_addr32 source);
