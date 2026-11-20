@@ -99,7 +99,7 @@ def load_abi_aliases(path):
     aliases = {}
     declaration = re.compile(
         r'(?m)^[ \t]*[A-Za-z_][\w \t\*]*?\b([A-Za-z_]\w*)\s*'
-        r'\([^;]*\)\s*;\s*/\*([^*]*(?:\*(?!/)[^*]*)*)\*/')
+        r'\([^;]*\)\s*;[ \t]*/\*([^*]*(?:\*(?!/)[^*]*)*)\*/')
     for match in declaration.finditer(path.read_text()):
         # The address annotation is an alias only when it leads the comment.
         # Other hexadecimal values may describe an indirect function pointer,

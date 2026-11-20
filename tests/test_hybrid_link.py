@@ -33,6 +33,16 @@ class AbiAliasTests(unittest.TestCase):
             self.assertEqual(hybrid_link.load_abi_aliases(header),
                              {'direct_entry': 0x1234})
 
+    def test_comment_on_a_following_line_is_not_an_alias(self):
+        with tempfile.TemporaryDirectory() as directory:
+            header = Path(directory) / 'abi.h'
+            header.write_text(
+                'unsigned char qualifies(void);\n\n'
+                '/* 0x263e0: preserves all registers. */\n'
+                'void reset_count(void);\n')
+
+            self.assertEqual(hybrid_link.load_abi_aliases(header), {})
+
     def test_real_header_does_not_alias_helpers_to_referenced_data_or_stubs(self):
         aliases = hybrid_link.load_abi_aliases(hybrid_link.ABI_HEADER)
 
