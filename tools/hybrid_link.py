@@ -121,9 +121,15 @@ def routine_stack_bytes(signature, pragma_registers):
 
     The signature must list its register inputs first, in the pragma's order,
     followed by consecutive dword stack slots that add up to ``stack_bytes``.
+    A default-watcall declaration (a tuple of its registers and the bytes of
+    its stack parameters) must also declare exactly that many stack bytes.
     """
     if pragma_registers is None:
         return 0
+    if isinstance(pragma_registers, tuple):
+        pragma_registers, declared_bytes = pragma_registers
+        if str(declared_bytes) != signature['stack_bytes']:
+            return 0
     inputs = [item.strip().split(':', 1)[0] for item in signature['inputs'].split(',')
               if item.strip()]
     registers = []
@@ -142,16 +148,59 @@ def routine_stack_bytes(signature, pragma_registers):
     return total
 
 
+WATCALL_REGISTERS = ['eax', 'edx', 'ebx', 'ecx']
+REGISTER_SIZED_TYPE = re.compile(
+    r'(?:const\s+)?(?:u?int(?:8|16|32)_t|ef_addr32|char|short|int|long|unsigned)'
+    r'(?:\s+(?:int|long|char))?\s*(?:\*\s*)*\w*|[\w\s]*\*\s*\w*')
+
+
+def default_watcall_stack_bytes(parameters):
+    """Stack bytes of a default-watcall prototype with all four registers used.
+
+    Watcom passes the first four register-sized arguments in EAX, EDX, EBX
+    and ECX and the rest on the stack, removed by the callee. Only that
+    shape is accepted; None for anything else (fewer than five parameters,
+    doubles or aggregates in the register part, variadic lists).
+    """
+    parts = [part.strip() for part in parameters.split(',')]
+    if len(parts) < 5 or '...' in parameters:
+        return None
+    for part in parts[:4]:
+        if 'double' in part or 'float' in part or not REGISTER_SIZED_TYPE.fullmatch(part):
+            return None
+    total = 0
+    for part in parts[4:]:
+        if 'double' in part:
+            total += 8
+        elif 'float' in part or REGISTER_SIZED_TYPE.fullmatch(part):
+            total += 4
+        else:
+            return None
+    return total
+
+
 def load_routine_pragmas(path):
     """Map names to the register list of an explicit ``parm routine`` pragma.
 
     Such a body takes its remaining arguments on the stack and removes them
     itself (``ret N``), which a trampoline can forward without knowing more
-    about the C prototype.
+    about the C prototype. Declarations without any pragma whose prototype
+    has the default-watcall stack shape map to ``(registers, stack_bytes)``.
     """
+    text = path.read_text()
     pragmas = {}
+    with_pragma = set(re.findall(r'(?m)^[ \t]*#pragma\s+aux\s+([A-Za-z_]\w*)', text))
+    declarations = re.sub(r'/\*.*?\*/|//[^\n]*', '', text, flags=re.S)
+    for match in re.finditer(r'(?m)^[ \t]*([A-Za-z_][\w \t*]*?)\s*\b([A-Za-z_]\w*)\s*'
+                             r'\(([^;{}()]*)\)\s*;', declarations):
+        prefix, name, parameters = match.groups()
+        if name in with_pragma or re.search(r'\b(?:EF_CDECL|__cdecl|typedef)\b', prefix):
+            continue
+        stack_bytes = default_watcall_stack_bytes(parameters)
+        if stack_bytes:
+            pragmas.setdefault(name, (WATCALL_REGISTERS, stack_bytes))
     for match in re.finditer(r'(?m)^[ \t]*#pragma\s+aux\s+([A-Za-z_]\w*)\s+parm\s+routine\s*'
-                             r'((?:\[\s*\w*\s*\]\s*)*)', path.read_text()):
+                             r'((?:\[\s*\w*\s*\]\s*)*)', text):
         pragmas[match.group(1)] = [item.strip().lower() for item in
                                    re.findall(r'\[([^\]]*)\]', match.group(2))
                                    if item.strip()]

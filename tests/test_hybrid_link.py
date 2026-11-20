@@ -63,6 +63,27 @@ class AbiAliasTests(unittest.TestCase):
         named = {'inputs': 'DX:int16_t,stack_index:uint32_t', 'stack_bytes': '4'}
         self.assertEqual(hybrid_link.routine_stack_bytes(named, ['edx']), 0)
 
+    def test_default_watcall_declarations_use_four_registers_then_the_stack(self):
+        with tempfile.TemporaryDirectory() as directory:
+            header = Path(directory) / 'abi.h'
+            header.write_text(
+                'void five(int16_t a, uint32_t b, ef_addr32 c, uint32_t d, double e); /* 0x10 */\n'
+                'void four(uint32_t a, uint32_t b, uint32_t c, uint32_t d);\n'
+                'void wide(double a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);\n'
+                'void EF_CDECL stacked(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);\n'
+                'void listed(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e, ...);\n'
+                'void pragma(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e);\n'
+                '#pragma aux pragma parm caller []\n')
+            pragmas = hybrid_link.load_routine_pragmas(header)
+
+        self.assertEqual(pragmas, {'five': (['eax', 'edx', 'ebx', 'ecx'], 8)})
+        signature = {'inputs': 'AX:int16_t,EDX:uint32_t,EBX:ef_addr32,ECX:uint32_t,'
+                               '[ESP+4]:uint32_t,[ESP+8]:uint32_t', 'stack_bytes': '8'}
+        self.assertEqual(hybrid_link.routine_stack_bytes(signature, pragmas['five']), 8)
+        signature['stack_bytes'] = '4'
+        signature['inputs'] = signature['inputs'].rsplit(',', 1)[0]
+        self.assertEqual(hybrid_link.routine_stack_bytes(signature, pragmas['five']), 0)
+
     def test_real_header_does_not_alias_helpers_to_referenced_data_or_stubs(self):
         aliases = hybrid_link.load_abi_aliases(hybrid_link.ABI_HEADER)
 

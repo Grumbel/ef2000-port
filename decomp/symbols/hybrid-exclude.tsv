@@ -671,3 +671,7 @@ addr	reason
 0x0003396c	Recovered service-window initializer; scoped checks retain original string helpers but model widgets/formatter; integration and splice/replay pending.
 0x000371b0	Recovered credits loader; scoped checks model file hooks and UI with original path/allocator/returning-error branch; integration and splice/replay pending.
 0x00033630	Recovered noncontiguous control refresh; scoped comparisons model refresh/apply/status callbacks; integration and splice/replay pending.
+0x000a7990	default-watcall stack link (four dummy registers + handle): alone it faults the main-menu startup at IP 4; keep original until the close path is checked
+0x000cfa9c	default-watcall stack link: alone it breaks quick-fight-flight (0x80a18 later gets a null page pair from 0xa1a90); keep original until checked with a differential
+0x0010d9e3	default-watcall stack link: alone it breaks quick-fight-flight (same 0x80a18 fault as 0xcfa9c); keep original until checked with a differential
+0x000bf81c	default-watcall stack link: its guest_fn_bdbf8 call passes no stack argument although 0xbdbf8 pops 4 bytes; breaks german-campaign-map; link once 0xbdbf8 is recovered
