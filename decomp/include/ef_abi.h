@@ -4805,7 +4805,6 @@ void get_screen_rows_eb1f0(uint32_t x, uint32_t y, uint32_t width, uint32_t rows
 void run_text_script_1093d8(ef_addr32 text, uint32_t table, uint32_t count);
 uint32_t try_handlers_9cbc4(uint32_t a, uint32_t b); /* 0x9cbc4 EAX/EDX */
 void guest_callptr_eax_x(ef_addr32 fn, ef_addr32 arg); /* indirect call with the argument in EAX */
-uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
 uint32_t guest_fn_b3c04_x(uint32_t a, uint32_t b); /* 0xb3c04 EAX/EDX, returns EAX */
 
 /* fill_rects1.c */
@@ -6597,6 +6596,9 @@ ef_addr32 reallocate_heap_e8651(ef_addr32 block, uint32_t size); /* 0xe8651 EAX/
 int32_t find_env_entry_f44b6(ef_addr32 assignment, int32_t remove); /* 0xf44b6 */
 int32_t putenv_f4347(ef_addr32 assignment); /* 0xf4347 */
 void gui_cursor_step_f3d54(ef_addr32 x_out, ef_addr32 y_out, ef_addr32 button_out); /* 0xf3d54 */
+void opengamesell_34218(ef_addr32 widget); /* 0x34218 */
+uint8_t load_archive_entry_eba64(ef_addr32 name, ef_addr32 dest, ef_addr32 context); /* 0xeba64 */
+uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */
@@ -6771,7 +6773,7 @@ void update_random_effect_81680(void);
 ef_addr32 terrain_slope_at_7bb00(ef_addr32 pos);
 uint8_t load_file_unpacked_b3c04(ef_addr32 name, ef_addr32 dest);
 ef_addr32 guest_fn_cfc68_x(int32_t a, int32_t b, int32_t c, int32_t d, int32_t e); /* 0xcfc68 EAX,EDX,EBX,ECX + 1 stack, callee cleanup */
-void guest_fn_fa02c_x(uint32_t handle, uint32_t dest); /* 0xfa02c 2 stack, callee cleanup */
+uint32_t guest_fn_fa02c_x(uint32_t handle, uint32_t dest); /* 0xfa02c 2 stack, callee cleanup; AL nonzero on success */
 
 uint32_t read_device_angles_d9cb4(ef_addr32 out1, ef_addr32 out2, ef_addr32 out3);
 

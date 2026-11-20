@@ -3752,3 +3752,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000041fc	hiscore_load_41fc		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Loads hiscores.dat with the original one-byte checksum bug, falling back to defaults; refreshes the window.
 0x000042a4	hiscore_save_42a4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Saves checksum and table to hiscores.dat.
 0x000f3d54	gui_cursor_step_f3d54	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		ecx,esi,edi,ebp	0	GUI cursor step; pushes ECX, ESI, EDI, EBP; EBX and EDX are clobbered
+0x00034218	opengamesell_34218	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	GUI callback; pushes EBX, EDX, ESI; ECX/EDI/EBP untouched; EAX not meaningful
+0x000eba64	load_archive_entry_eba64	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32	AL:uint8_t	ecx,esi,edi,ebp	0	Archive entry load; pushes ECX, ESI, EDI, EBP; EBX and EDX clobbered

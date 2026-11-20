@@ -629,6 +629,7 @@ addr	size	type	name	evidence	notes
 0x00161e28	4	int32_t	g_cursor_repeat_y	f3eab counts down, f3ece resets to 30	ticks until the next one-pixel step for small motion
 0x0015ba2c	1	uint8_t	g_mouse_button_down	f3f6c reads	nonzero while the button is held
 0x0015bab8	4	ef_addr32	g_input_poll_hook	f3d6a calls	input poll called before the motion is read
+0x0042920c	4	int32_t	g_directplay_selected_game	34226 stores, 3423a reads	zero-based game row chosen by opengamesell
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
@@ -707,7 +708,7 @@ addr	size	type	name	evidence	notes
 0x00125958	8	ef_addr32[2]	g_modem_initialization_labels	33760 original indexed dword load	Two intended choices; original allows all byte indices without bounds check
 0x0015f07d	1	uint8_t	g_serial_parity_index	3361c calls df2e4 to increment and mask to 7	Counter helper preserves upper EAX bits, callback treats EAX as scratch
 0x00429210	4	int32_t	g_directplay_row_count	341d8 signed CMP/SETL each loop	Reloaded after each display callback
-0x004288f0	64	char[]	g_directplay_first_row	341d8 starts row pointer here, advances 64 bytes	Minimum observed first-row extent; overall capacity unestablished
+0x004288f0	64	char[][64]	g_directplay_rows	341d8 starts row pointer here, advances 64 bytes	Minimum observed first-row extent; overall capacity unestablished
 0x0019f320	4	ef_addr32	g_network_loop_widget	0x349ec original ASM	Lookup result retained before refresh_list_widget_348e4
 0x00121e98	2	uint16_t	g_debrief_group	c838 and c868	current group index compared as a signed word
 0x00189b78	5	char[5]	g_quit_confirmation_name	84ac4	widget name used by the quit confirmation callback

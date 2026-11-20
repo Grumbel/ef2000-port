@@ -87,7 +87,6 @@ addr	reason
 0x000340a4	Recovered network service list; emitted-body comparisons use modeled callees; actual integration and splice/replay pending.
 0x00034140	Recovered provider selection; comparisons use explicit callee models, including returning error model; actual integration and splice/replay pending.
 0x000341d8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x00034218	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00034480	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000344a0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000344bc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).

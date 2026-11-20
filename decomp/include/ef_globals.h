@@ -704,6 +704,8 @@ extern int16_t g_menu_cursor_y; /* 0x425fc6, menu cursor on the 320x200 screen *
 extern int16_t g_menu_cursor_x; /* 0x425fc8 */
 extern int32_t g_cursor_repeat_x; /* 0x161e24, ticks until the next slow step */
 extern int32_t g_cursor_repeat_y; /* 0x161e28 */
+extern int32_t g_directplay_selected_game; /* 0x42920c, zero-based row of g_directplay_rows */
+extern char g_directplay_rows[][64]; /* 0x4288f0, one 64-byte name per DirectPlay game */
 extern uint8_t g_mouse_button_down; /* 0x15ba2c */
 extern ef_addr32 g_input_poll_hook; /* 0x15bab8, called without arguments before reading the motion */
 
