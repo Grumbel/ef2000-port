@@ -162,6 +162,7 @@ extern char g_hiscore_name_pool[48][20]; /* 0x121292, names for generated defaul
 extern ef_spatial_slot g_spatial_slots[29]; /* 0x0019b2e0 */
 extern uint8_t g_spatial_slot_tags[29]; /* 0x0019b358..0x0019b374 */
 extern int16_t g_spatial_slot_count; /* 0x0019b376, high word of 0x0019b374 */
+extern uint8_t g_spatial_label_mode; /* 0x0019b378 */
 extern ef_addr32 g_indexed_object_table[]; /* 0x0020f550, 4-byte guest pointers */
 extern int16_t g_indexed_object_count; /* 0x002119f4, signed 16-bit bound */
 extern ef_addr32 g_renderer_frame_callback; /* 0x000fc8a8, indirect frame callback */

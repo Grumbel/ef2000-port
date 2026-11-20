@@ -793,3 +793,4 @@ addr	size	type	name	evidence	notes
 0x0041ec0c	2	int16_t	g_element_clip_w	0xe59cc writes	visible width; 0 when hidden
 0x0041ec0e	2	int16_t	g_element_clip_h	0xe59cc writes	visible height
 0x0015b62c	256	uint8_t[256]	g_scancode_ascii	0x27fec reads	scancode to ASCII character table
+0x0019b378	1	uint8_t	g_spatial_label_mode	0x26424 reads; 2 numbers the route markers
