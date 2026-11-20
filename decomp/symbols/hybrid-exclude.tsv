@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: LicenseRef-EF2000-Derived
 addr	reason
 0x000c4755	Self-modifying origin dwords at c4756/c475c/c4762 overlap this entry: camera updates overwrite the redirect displacement, causing fetch 0x180c7e5a at tick 5214. C also replaces ESI/EDI/EBP outputs with an unprovided pointer. Keep original bytes until both SMC and multi-register ABI are represented.
+0x000da5cc	Stores the address of its stack name buffer in the sentinel entry 0x15bdb0; the C frame places that buffer elsewhere, so guest RAM differs; keep original.
 0x000e9a24	Manual source recovery confirms stack count/source/destination and RET 12; scoped source and Watcom-object checks preserve chunked overlap semantics, EAX, preserved registers and nonstack RAM. Keep original until stack scratch/flags and splice/replay evidence exists; prior mechanical replacement faulted in the menu at tick 695.
 0x000c4db4	Cockpit replay bisector: compiled replacement causes unmapped fetch at IP 0x15918c05/tick 3188. Original bytes avoid the fetch but cockpit counters, framebuffer and guest RAM still diverge; leave original pending ABI/behavior fix.
 0x000c36b4	Mechanical replacement loses the EAX/EDX/EBX/ECX plus two-stack-argument ABI; automatic M1 bisector identifies this entry alone as sufficient for the startup read fault. Keep original bytes pending manual recovery.
@@ -34,7 +35,6 @@ addr	reason
 0x0000e774	Single-redirect culprit for cockpit replay (bisect m2-bisect-021, late-Accept manifest); cause unreviewed; keep original.
 0x0002a720	Single-redirect culprit: replay ends executing data at 0x17f73d (bisect m2-bisect-022); logic matches original on inspection, cause unreviewed; keep original.
 0x00004738	Single-redirect culprit for cockpit replay (bisect m2-bisect-023); cause unreviewed; keep original.
-0x000da5cc	Single-redirect culprit for cockpit replay (bisect m2-bisect-025); cause unreviewed; keep original.
 0x000d2110	Single-redirect culprit for cockpit replay (bisect m2-bisect-034); cause unreviewed; keep original.
 0x00090a70	Single-redirect culprit for cockpit replay (bisect m2-bisect-036); cause unreviewed; keep original.
 0x00080d40	Single-redirect culprit for cockpit replay (bisect m2-bisect-037); cause unreviewed; keep original.
@@ -308,8 +308,6 @@ addr	reason
 0x000cbff0	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000d66c2	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000d6960	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x000da644	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x000dac2c	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000ddce8	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000de864	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000e0bcc	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)

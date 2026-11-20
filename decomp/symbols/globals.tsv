@@ -606,6 +606,17 @@ addr	size	type	name	evidence	notes
 0x0017d368	13	char[13]	g_coltab_name	dc066 copies, dc075 appends ".dat"	colour table file name, at most eight characters plus ".dat"
 0x0015bb64	13	char[13]	g_init3d_name	dc102 copies, dc10c passes to 0xe4010	init3d pattern file name, at most twelve characters
 0x0015bb74	1	uint8_t	g_east_west_palettes_loaded	dc1c4 stores 1	set once both east/west palettes are loaded
+0x0015bd40	0x78	ef_env_keyword[15]	g_game_type_keywords	da60a scans, da61c stores the sentinel name	game_type names and handlers; da5cc points the 15th name at its input so the scan always ends
+0x00425bca	2	int16_t	g_palette_count	da68f/da703 read (da703 via the dword at 425bc8), da738 increments	load_pal lines read
+0x00422760	0x2400	uint8_t[12][0x300]	g_palette_banks	da6a4/da6f9 load	palettes loaded by load_pal
+0x00433f30	0x30030	uint8_t[12][0x4004]	g_shade_tables	da69d/da6e1 load	shade tables loaded with each palette
+0x00424e60	0x30	int32_t[12]	g_palette_values	da6cb/da710 store	load_pal value per palette
+0x00425b98	4	int32_t	g_first_palette_value	da6c6 stores	load_pal value of palette 0
+0x00464060	0x300	uint8_t[0x300]	g_current_palette	da6bd copies palette 0	active palette
+0x00421a48	0x900	ef_ref_point[256]	g_ref_points	dac8c scans into it, dacc6/dad01 store	ref_point records, 9 bytes each
+0x00425c87	1	uint8_t	g_ref_point_count	dac65 reads, dad19 increments	ref_point lines read
+0x00425b88	4	ef_addr32	g_crater_ring	daf28 clears, db054 stores	first crater record of the ring
+0x00425b24	4	ef_addr32	g_crater_slot_ring	daf2e clears, db09b stores	first crater slot of the ring
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

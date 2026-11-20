@@ -3740,3 +3740,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000dbff8	env_coltab_dbff8			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "coltab" (table 0x15bd18); preserves all six, EAX not meaningful
 0x000dc094	env_init3d_file_dc094			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "init3d_file" (table 0x15bd20); preserves all six, EAX not meaningful
 0x000dc124	env_east_west_palettes_dc124			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "east_west_palettes" (table 0x15bd28); preserves all six, EAX not meaningful
+0x000da5cc	env_game_type_da5cc			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "game_type" (table 0x15bbb8); preserves all six, EAX not meaningful
+0x000da644	env_load_pal_da644			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_pal" (table 0x15bbc0); preserves all six, EAX not meaningful
+0x000dac2c	env_ref_point_dac2c			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "ref_point" (table 0x15bc08); preserves all six, EAX not meaningful
+0x000daef4	env_load_craters_daef4			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_craters" (table 0x15bc20); preserves all six, EAX not meaningful

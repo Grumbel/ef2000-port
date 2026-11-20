@@ -683,5 +683,16 @@ extern ef_addr32 g_env_script_cursor; /* 0x425af8, next unread environment scrip
 extern char g_coltab_name[13]; /* 0x17d368, "coltab" name with ".dat" */
 extern char g_init3d_name[13]; /* 0x15bb64, "init3d_file" name */
 extern uint8_t g_east_west_palettes_loaded; /* 0x15bb74, set by "east_west_palettes" */
+extern ef_env_keyword g_game_type_keywords[15]; /* 0x15bd40, 14 game types and a sentinel */
+extern int16_t g_palette_count; /* 0x425bca, "load_pal" lines read */
+extern uint8_t g_palette_banks[12][0x300]; /* 0x422760 */
+extern uint8_t g_shade_tables[12][0x4004]; /* 0x433f30, loaded with each palette */
+extern int32_t g_palette_values[12]; /* 0x424e60, "load_pal" value per palette */
+extern int32_t g_first_palette_value; /* 0x425b98 */
+extern uint8_t g_current_palette[0x300]; /* 0x464060 */
+extern ef_ref_point g_ref_points[256]; /* 0x421a48 */
+extern uint8_t g_ref_point_count; /* 0x425c87, wraps after 256 */
+extern ef_addr32 g_crater_ring; /* 0x425b88, first of g_crater_records */
+extern ef_addr32 g_crater_slot_ring; /* 0x425b24, first of g_crater_slots */
 
 #endif

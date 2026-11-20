@@ -18,15 +18,15 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
-    0xDA5CC: ("load_pal", 119, 0x190000, "environment_palette_092"),
-    0xDA644: ("load_cock_pal", 258, 0x190004, "environment_palette_092"),
-    0xDAC2C: ("lightning_point", 286, 0x1901E4, "environment_dynamic_092"),
-    0xDAEF4: ("load_smoke", 448, 0x190004, "environment_dynamic_092"),
+    0xDA5CC: ("env_game_type_da5cc", 119, 0x190000, "environment_keywords"),
+    0xDA644: ("env_load_pal_da644", 258, 0x190004, "environment_keywords"),
+    0xDAC2C: ("env_ref_point_dac2c", 286, 0x1901E4, "environment_keywords"),
+    0xDAEF4: ("env_load_craters_daef4", 448, 0x190004, "environment_keywords"),
 }
 
 
 class Inventory092(unittest.TestCase):
-    def test_all_entries_are_drafts(self):
+    def test_all_entries_are_tracked(self):
         with (ROOT / "decomp/symbols/functions.tsv").open(newline="") as file:
             rows = {int(row["addr"], 16): row for row in csv.DictReader(file, delimiter="\t")}
         self.assertEqual(len(ENTRIES), 4)
@@ -41,7 +41,7 @@ class Inventory092(unittest.TestCase):
                 if row["state"] == "blocked":
                     self.assertTrue(row["notes"].startswith("Blocked:"))
                 self.assertEqual(row["kind"], "game")
-                self.assertEqual(row["sig_status"], "unverified")
+                self.assertIn(row["sig_status"], ("unverified", "confirmed"))
 
 
 class OriginalBytes092(unittest.TestCase):

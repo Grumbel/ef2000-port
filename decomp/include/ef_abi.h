@@ -6587,6 +6587,10 @@ void env_heavenly_body_db28c(void); /* 0xdb28c */
 void env_coltab_dbff8(void); /* 0xdbff8 */
 void env_init3d_file_dc094(void); /* 0xdc094 */
 void env_east_west_palettes_dc124(void); /* 0xdc124 */
+void env_game_type_da5cc(void); /* 0xda5cc */
+void env_load_pal_da644(void); /* 0xda644 */
+void env_ref_point_dac2c(void); /* 0xdac2c */
+void env_load_craters_daef4(void); /* 0xdaef4 */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */

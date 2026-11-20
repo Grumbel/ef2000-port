@@ -14,7 +14,7 @@
 #include "ef_mem.h"
 
 #define MAX_LIGHTNING_AREAS 20
-#define MAX_CRATER_TYPES 43
+#define MAX_CRATER_TYPES EF_CRATER_TYPES
 #define CRATER_RECORD_SIZE 110u
 #define MAX_CLOUD_LEVELS 2
 #define MAX_HEAVENLY_BODIES 40
@@ -235,4 +235,138 @@ void env_east_west_palettes_dc124(void)
     load_colour_file(first, 0x00420f90u);
     load_colour_file(env_take_line_090(), 0x00421290u);
     g_east_west_palettes_loaded = 1u;
+}
+
+#define GAME_TYPE_COUNT 14
+#define PALETTE_COUNT 12
+
+/* 0xda5cc, 119 bytes, "game_type". Point the sentinel entry after the
+ * fourteen game types at the name just read, so the scan always ends;
+ * an unknown name reaches the sentinel's handler, which reports it. The
+ * sentinel keeps pointing at this stack buffer afterwards, as in the
+ * original. */
+void env_game_type_da5cc(void)
+{
+    char name[80];
+    const ef_env_keyword *keyword = g_game_type_keywords;
+
+    guest_fn_df26f_x(env_take_line_090(), 0x00190000u, (uintptr_t)name);  /* "%s" */
+    g_game_type_keywords[GAME_TYPE_COUNT].name = (ef_addr32)(uintptr_t)name;
+    while (guest_strcmp(keyword->name, (ef_addr32)(uintptr_t)name) != 0)
+        ++keyword;
+    guest_callptr0_x(keyword->handler);
+}
+
+/* 0xda644, 258 bytes, "load_pal". Load the named palette and its shade
+ * table into the next of twelve banks and keep the line's value. The
+ * first palette also becomes the current palette. Past twelve the
+ * error hook gets the number and the limit; the count still grows. */
+void env_load_pal_da644(void)
+{
+    char name[80];
+    int32_t value;
+    int16_t index;
+
+    guest_fn_df26f_x(env_take_line_090(), 0x00190004u,      /* "%s %d" */
+                     (uintptr_t)name, (uintptr_t)&value);
+    index = g_palette_count;
+    if (index == 0) {
+        load_companion_files_dbf3c((ef_addr32)(uintptr_t)g_palette_banks[0],
+                                   (ef_addr32)(uintptr_t)name,
+                                   (ef_addr32)(uintptr_t)g_shade_tables[0]);
+        memcpy_dc832((ef_addr32)(uintptr_t)g_current_palette,
+                     (ef_addr32)(uintptr_t)g_palette_banks[0], sizeof(g_current_palette));
+        g_first_palette_value = value;
+        g_palette_values[0] = value;
+    } else if (index < PALETTE_COUNT) {
+        load_companion_files_dbf3c((ef_addr32)(uintptr_t)g_palette_banks[index],
+                                   (ef_addr32)(uintptr_t)name,
+                                   (ef_addr32)(uintptr_t)g_shade_tables[index]);
+        g_palette_values[index] = value;
+    } else {
+        guest_callptr3_x(g_gui_error_hook, 0x0019000cu,     /* "Palette number %d ... Only %d" */
+                         (uint32_t)(int32_t)index, PALETTE_COUNT);
+    }
+    ++g_palette_count;
+}
+
+/* 0xdac2c, 286 bytes, "ref_point". The two "%i" coordinates are
+ * scanned as ints straight into the record, so Y overwrites the high
+ * half of X and the name pointer later overwrites the high half of Y.
+ * Only kinds 1 and 2 are kept. The uppercased name is copied to the
+ * heap; the 257th point is reported after the count wraps to 0. */
+void env_ref_point_dac2c(void)
+{
+    char name[80];
+    ef_addr32 text = (ef_addr32)(uintptr_t)name;
+    ef_addr32 line = env_take_line_090();
+    int32_t kind = 0;
+    ef_ref_point *point = &g_ref_points[g_ref_point_count];
+    ef_addr32 copy;
+
+    guest_fn_df26f_x(line, 0x001901e4u,                     /* "%i,%i,%i %[^)]" */
+                     (uintptr_t)&point->x, (uintptr_t)&point->y,
+                     (uintptr_t)&kind, (uintptr_t)name);
+    point->kind = (int16_t)kind == 1 || (int16_t)kind == 2 ? (uint8_t)kind : 0u;
+    uppercase_string(text);
+    copy = guest_fn_e29e8(strlen_ds(text) + 1u);
+    point->name = copy;
+    copy_string_9d749(copy, text);
+    if (++g_ref_point_count == 0u)
+        guest_callptr1_x(g_gui_error_hook, 0x001901f4u);  /* "Too many refpoints" */
+    fill_bytes_b3fb0(text, 0u, sizeof(name));
+}
+
+/* Store SHAPE for crater type TYPE in each of COUNT records and mark
+ * them with state -1. */
+static void set_crater_shapes(ef_addr32 records, int32_t count, ef_addr32 name, int32_t type)
+{
+    int32_t i;
+
+    for (i = 0; i < count; ++i) {
+        ef_addr32 record = records + (uint32_t)i * (uint32_t)sizeof(ef_crater_record);
+        int16_t shape = (int16_t)guest_lookup_value(name);
+
+        EF_U16(record + offsetof(ef_crater_record, shapes) + (uint32_t)type * 2u) = (uint16_t)shape;
+        EF_U16(record + offsetof(ef_crater_record, state)) = 0xffffu;
+    }
+}
+
+/* Link COUNT records into a ring and return the first. With COUNT 0
+ * the original still writes the link of record -1. */
+static ef_addr32 link_crater_ring(ef_addr32 records, int32_t count)
+{
+    int32_t i;
+
+    for (i = 0; i < count - 1; ++i)
+        EF_U32(records + (uint32_t)i * (uint32_t)sizeof(ef_crater_record) +
+               offsetof(ef_crater_record, next)) =
+            records + (uint32_t)(i + 1) * (uint32_t)sizeof(ef_crater_record);
+    EF_U32(records + (uint32_t)(count - 1) * (uint32_t)sizeof(ef_crater_record) +
+           offsetof(ef_crater_record, next)) = records;
+    return records;
+}
+
+/* 0xdaef4, 448 bytes, "load_craters". One "name type" line per crater
+ * type: every crater record and slot gets the shape of that name for
+ * the type. Both arrays then become rings. An unset type count (-1) is
+ * reported and reads no lines. */
+void env_load_craters_daef4(void)
+{
+    char name[80];
+    int32_t type;
+    int32_t line;
+
+    if (g_crater_type_count == -1)
+        guest_callptr1_x(g_gui_error_hook, 0x0019029cu);  /* "Nb Craters not specified" */
+    g_crater_ring = 0u;
+    g_crater_slot_ring = 0u;
+    for (line = 0; line < g_crater_type_count; ++line) {
+        guest_fn_df26f_x(env_take_line_090(), 0x00190004u,  /* "%s %d" */
+                         (uintptr_t)name, (uintptr_t)&type);
+        set_crater_shapes(g_crater_records, g_crater_count, (ef_addr32)(uintptr_t)name, type);
+        set_crater_shapes(g_crater_slots, g_crater_slot_count, (ef_addr32)(uintptr_t)name, type);
+    }
+    g_crater_ring = link_crater_ring(g_crater_records, g_crater_count);
+    g_crater_slot_ring = link_crater_ring(g_crater_slots, g_crater_slot_count);
 }

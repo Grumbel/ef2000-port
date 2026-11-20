@@ -31,4 +31,35 @@ typedef struct EF_PACKED ef_heavenly_body {
 } ef_heavenly_body;
 EF_STATIC_ASSERT(ef_heavenly_body_size, sizeof(ef_heavenly_body) == 5);
 
+/* One (name, handler) pair of a keyword table: the READCOLS keywords at
+ * 0x15bb80 and the "game_type" values at 0x15bd40. */
+typedef struct EF_PACKED ef_env_keyword {
+    ef_addr32 name;
+    ef_addr32 handler;
+} ef_env_keyword;
+EF_STATIC_ASSERT(ef_env_keyword_size, sizeof(ef_env_keyword) == 8);
+
+/* One "ref_point" script line (0xdac2c). 256 of them at 0x421a48. */
+typedef struct EF_PACKED ef_ref_point {
+    int16_t x;                       /* +0x00 */
+    int16_t y;                       /* +0x02 */
+    ef_addr32 name;                  /* +0x04, uppercased heap copy */
+    uint8_t kind;                    /* +0x08, 1 or 2, else 0 */
+} ef_ref_point;
+EF_STATIC_ASSERT(ef_ref_point_size, sizeof(ef_ref_point) == 9);
+
+#define EF_CRATER_TYPES 43
+
+/* One 110-byte crater record of g_crater_records or g_crater_slots
+ * ("set_nb_craters"). "load_craters" (0xdaef4) fills one shape per
+ * crater type and links the records into a ring. */
+typedef struct EF_PACKED ef_crater_record {
+    uint8_t unknown_00[0x12];
+    int16_t state;                   /* +0x12, set to -1 by load_craters */
+    int16_t shapes[EF_CRATER_TYPES]; /* +0x14, per crater type */
+    ef_addr32 next;                  /* +0x6a, ring link */
+} ef_crater_record;
+EF_STATIC_ASSERT(ef_crater_record_next_off, offsetof(ef_crater_record, next) == 0x6a);
+EF_STATIC_ASSERT(ef_crater_record_size, sizeof(ef_crater_record) == 110);
+
 #endif
