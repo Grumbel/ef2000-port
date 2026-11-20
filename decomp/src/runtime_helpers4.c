@@ -25,7 +25,7 @@ uint8_t refresh_slot_e5830(ef_addr32 object)
 {
     uint8_t flag = EF_U8(0x0013725cu) != 2u;
 
-    guest_fn_e59cc(EF_U32(0x0041edfcu + (uint32_t)EF_U8(object + 0x50u) * 4u), object);
+    place_window_element_e59cc(EF_U32(0x0041edfcu + (uint32_t)EF_U8(object + 0x50u) * 4u), object);
     return clip_against_windows_e52a4(EF_U8(object + 0x50u), flag);
 }
 

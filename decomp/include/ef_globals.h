@@ -758,5 +758,13 @@ extern int32_t g_draw_clip_left; /* 0x17cf9c */
 extern int32_t g_draw_clip_right; /* 0x17cfa0 */
 extern int32_t g_draw_clip_top; /* 0x17cfa4 */
 extern int32_t g_draw_clip_bottom; /* 0x17cfa8 */
+extern int16_t g_element_rect_x; /* 0x41ec00 */
+extern int16_t g_element_rect_y; /* 0x41ec02 */
+extern int16_t g_element_rect_w; /* 0x41ec04 */
+extern int16_t g_element_rect_h; /* 0x41ec06 */
+extern int16_t g_element_clip_x; /* 0x41ec08 */
+extern int16_t g_element_clip_y; /* 0x41ec0a */
+extern int16_t g_element_clip_w; /* 0x41ec0c */
+extern int16_t g_element_clip_h; /* 0x41ec0e */
 
 #endif

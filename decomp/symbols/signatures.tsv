@@ -35,6 +35,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b0208	list_has_matching_node	EAX:ef_addr32,DL:uint8_t,BL:uint8_t	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	0xb0208..0xb0236; callers 0xb0258/0xc149d; docs/compiler-abi.md
 0x000b1b8b	strlen_ds	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xb1b8b..0xb1ba3; callers 0x82eab/0xe896b; DS to ES, DF clear required; docs/compiler-abi.md
 0x000b2560	write_flight_record_b2560	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x000b2560 (504 bytes); EDX clobbered; ESI/EDI hold the flight and handle; docs/compiler-abi.md
+0x000e59cc	place_window_element_e59cc	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x000e59cc (562 bytes); EAX and EDX clobbered; docs/compiler-abi.md
 0x000e2c40	fill_clipped_diamond_e2c40	AL:uint8_t,DX:int16_t,BX:int16_t,CX:int16_t		esi,edi,ebp	0	Original 0x000e2c40 (546 bytes); EBX, ECX and EDX clobbered; docs/compiler-abi.md
 0x000834e8	shift_cursor_ray_834e8	AX:int16_t,DX:int16_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Original 0x000834e8 (541 bytes); EDX clobbered; docs/compiler-abi.md
 0x00011560	tally_unit_records_11560	AX:int16_t,DX:int16_t,BX:int16_t,ECX:ef_addr32,[ESP+4]:ef_addr32,[ESP+8]:ef_addr32,[ESP+12]:ef_addr32,[ESP+16]:ef_addr32		esi,edi,ebp	16	Original 0x00011560 (527 bytes); EBX, ECX and EDX clobbered; callee cleans four stack pointers; docs/compiler-abi.md

@@ -26,7 +26,6 @@ addr	reason
 0x000ebea3	Mechanical body guesses a uint64_t stack parameter and call args (bisect m2-bisect-014); keep original.
 0x000e5830	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
 0x000e5960	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
-0x000e59cc	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
 0x000e5bfe	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
 0x000e5c03	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
 0x000e5c30	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.

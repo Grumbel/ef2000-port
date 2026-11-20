@@ -1944,7 +1944,7 @@ void release_list_node_fa77b(ef_addr32 object);
 uint8_t classify_kind_fc050(uint8_t kind);
 void query_video_fc6c8(uint32_t value);
 void guest_fn_e10e0(void); /* 0xe10e0 */
-void guest_fn_e59cc(ef_addr32 target, ef_addr32 source); /* 0xe59cc EAX/EDX */
+void place_window_element_e59cc(ef_addr32 window, ef_addr32 element);
 void guest_fn_eb25a(uint32_t value); /* 0xeb25a EAX */
 void guest_fn_f6124(void); /* 0xf6124 */
 uint16_t guest_fn_bd4e0(uint32_t value); /* 0xbd4e0 EAX -> AX */
