@@ -207,7 +207,7 @@ void draw_segment_records_418c4(ef_addr32 obj, int16_t arg)
     }
 }
 
-/* 0xbfa58, 212 bytes. Walk the list whose head pointer is at HEAD (next at +4); for each node of type 0x31 (byte +0xc) with sign word +0x4e equal to 1 and count byte +0x32 above 4, create a slot record (0xfc0ec), and if 0xbdbf8 accepts it call 0xbe59c with the node and the arguments, replacing VALUE with its result; the slot record is then freed (0xb16c0). Returns VALUE. */
+/* 0xbfa58, 212 bytes. Walk the list whose head pointer is at HEAD (next at +4); for each node of type 0x31 (byte +0xc) with sign word +0x4e equal to 1 and count byte +0x32 above 4, create a slot record (0xfc0ec), and if fit_slot_record_bdbf8 accepts it call 0xbe59c with the node and the arguments, replacing VALUE with its result; the slot record is then freed (0xb16c0). Returns VALUE. */
 uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32_t arg_c, uint32_t s1, uint32_t s2, uint32_t s3)
 {
     uint32_t node = EF_U32(head);
@@ -218,7 +218,7 @@ uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32
             int32_t hi = (int32_t)(int16_t)value;
             uint32_t rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), 1u);
 
-            if (guest_fn_bdbf8(rec, node, hi, s3) != 0u)
+            if ((uint16_t)fit_slot_record_bdbf8(rec, node, (int16_t)hi, s2, s3) != 0u)
                 value = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)hi, 0u, 1u, arg_c, s1, 0u, s2, head, arg_b, 0u, s3);
             free_entry_array_b16c0(rec);
         }
@@ -3366,7 +3366,7 @@ uint16_t process_pending_nodes_bf81c(uint16_t acc, ef_addr32 list, uint32_t p3, 
 
                 rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), k);
                 acc32 = (int16_t)acc;
-                if (guest_fn_bdbf8(rec, node, acc32, p9) != 0u)
+                if ((uint16_t)fit_slot_record_bdbf8(rec, node, (int16_t)acc32, p6, p9) != 0u)
                     acc = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)acc32, 0u, 1u, p4, p5, p7, p6, list, p3, 0u, p9);
                 free_entry_array_b16c0(rec);
             }

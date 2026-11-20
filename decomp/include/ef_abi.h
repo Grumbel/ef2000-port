@@ -4435,7 +4435,7 @@ uint32_t position_in_box_bfb88(ef_addr32 obj, ef_addr32 b, ef_addr32 head);
 uint32_t guest_fn_c1210(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6); /* 0xc1210, ret 0x18 */
 void guest_fn_4161c(int32_t a, int32_t b, uint32_t c, int32_t d, int32_t s1); /* 0x4161c, ret 4 */
 void draw_segment_records_418c4(ef_addr32 obj, int16_t arg);
-uint16_t guest_fn_bdbf8(uint32_t a, uint32_t node, int32_t c, uint32_t s1); /* 0xbdbf8, ret 4, result AX */
+uint32_t fit_slot_record_bdbf8(ef_addr32 record, ef_addr32 node, int16_t limit, ef_addr32 requirements, ef_addr32 group);
 uint16_t guest_fn_be59c(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6, uint32_t s7, uint32_t s8, uint32_t s9, uint32_t s10, uint32_t s11); /* 0xbe59c, ret 0x2c, result AX */
 uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32_t arg_c, uint32_t s1, uint32_t s2, uint32_t s3);
 void guest_fn_b3648(uint32_t a, uint32_t handle, ef_addr32 header); /* 0xb3648 */
