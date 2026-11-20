@@ -3399,7 +3399,7 @@ void assign_slot_flags_b0df4(ef_addr32 ptr, ef_addr32 list, ef_addr32 head)
     } while (d == 7 || d == 10 || d == 8);
     rec = list_nth(list, (uint32_t)d);
     EF_U8(rec + 9u) = 1;
-    guest_fn_cb3c4_x(EF_U32(rec + 0x16u), EF_U32(rec + 0x1au), EF_U8(rec + 9u), 0x00134d8au, 0x00137980u);
+    claim_map_cells_cb3c4((int32_t)EF_U32(rec + 0x16u), (int32_t)EF_U32(rec + 0x1au), EF_U8(rec + 9u), 0x00134d8au, 0x00137980u);
     lookup_tiles_cbc54(0x00134d8au, 0x00137988u);
     node = EF_U32(list);
     while (node != 0u) {
