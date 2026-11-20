@@ -3756,3 +3756,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000eba64	load_archive_entry_eba64	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32	AL:uint8_t	ecx,esi,edi,ebp	0	Archive entry load; pushes ECX, ESI, EDI, EBP; EBX and EDX clobbered
 0x0000494c	select_arcade_level_494c			ebx,ecx,edx,esi,edi,ebp	0	GUI callback; pushes EBX, ECX, EDX; EAX result ignored by the dispatcher
 0x00037eac	update_follower_37eac	AX:int16_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t		ebx,ecx,edx,esi,edi,ebp	12	Pushes EBX, ECX, EDX, ESI, EDI; double at [ESP+4], immediate byte at [ESP+12]; ret 0xc; callers 0x3010 and 0x54274
+0x0008dd48	run_grid_unit_passes_8dd48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0008dd48 (339 bytes); pushes EBX, ECX, EDX, ESI, EDI, EBP untouched; no inputs, EAX clobbered; callers 8bb50

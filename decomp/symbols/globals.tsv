@@ -738,3 +738,4 @@ addr	size	type	name	evidence	notes
 0x001a6d1f	1	uint8_t	g_scene_direction_changed	0x94a74 original assembly	Set when either view direction angle is nonzero
 0x00121ec5	1	uint8_t	g_arcade_mission_won	0x1192b 0x3d0dc 0x494c	set by 0x11900 when the arcade mission goal is met
 0x001a14f0	4	int32_t	g_follower_clock	0x37eac stores, 0x381a0 compares link stamps	reference clock hours*3600 + minutes*60 + seconds
+0x00127dc4	2	int16_t	g_grid_event_pending	0x295b5 sets after 0x73210 succeeds, 0x8dd48 clears	no reader found

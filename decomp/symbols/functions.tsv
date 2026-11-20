@@ -1833,7 +1833,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0008dc40	82	toggle_flag_8dc40	unit_flags	compiles	game	confirmed	decomp/tests/0x0008dc40.json	docs/compiler-abi.md; Copy flag bit 0 of word +0x24 into bit 5.; callers 8d59c@8d9be; guest pending
 0x0008dc94	95	toggle_flag_8dc94	unit_flags	compiles	game	confirmed	decomp/tests/0x0008dc94.json	docs/compiler-abi.md; Copy flag bit 12 of word +0x24 into bit 14.; callers 8d59c@8da49; guest pending
 0x0008dcf4	83	toggle_flag_8dcf4	camera_helpers	compiles	game	confirmed	decomp/tests/0x0008dcf4.json	docs/compiler-abi.md; Copy flag bit 15 of word +0x24 into bit 0 of word +0x26.; callers 8d59c@8da67; guest pending
-0x0008dd48	339			blocked	game	unverified		Skipped as too difficult: assembly-style routine with implicit register inputs (reads esi on entry) or carry-flag results that the C ABI cannot express.
+0x0008dd48	339	run_grid_unit_passes_8dd48	world_grid_passes	spliced	game	confirmed	decomp/tests/0x0008dd48.json	docs/compiler-abi.md; Per-frame unit passes over armed grid cells (0x8d59c, 0x8d3d4, 0x8d554 for the six unit words), then the cell trigger check.
 0x0008de9c	596			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0008e494	132			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x0008e5f0	115	draw_record_8e5f0	game_helpers21	compiles	game	confirmed	decomp/tests/0x0008e5f0.json	docs/compiler-abi.md; Draw a record: low records use the primary routine, deeper ones the offset one.; callers 8e664@8e909; guest pending

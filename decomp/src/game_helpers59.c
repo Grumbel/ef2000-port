@@ -34,7 +34,7 @@ void store_descriptor_entry_57480(ef_addr32 src)
 void refresh_selection_frame_8bb50(void)
 {
     copy_selected_object();
-    guest_fn_8dd48_w();
+    run_grid_unit_passes_8dd48();
     guest_fn_90828_w();
     if (EF_U16(0x00198444u) != 0) {
         if (EF_U8(0x00127da4u) == EF_U8(0x0012583au) || EF_U8(0x001a666bu) == 0)
