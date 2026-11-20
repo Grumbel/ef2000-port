@@ -531,6 +531,12 @@ extern uint8_t g_view_state_sync_enabled; /* 0x122c50 */
 extern ef_key_view_preset g_key_view_presets[EF_KEY_VIEW_PRESET_COUNT]; /* 0x19bf80 */
 extern ef_key_view_track g_key_view_tracks[EF_KEY_VIEW_TRACK_COUNT]; /* 0x19cbb0 */
 extern int16_t g_key_view_preset_cursor; /* 0x19e543 */
+extern int16_t g_key_view_step; /* 0x19e545, step within the preset */
+extern int16_t g_key_view_hold; /* 0x19e547, frames left in the step */
+extern int32_t g_key_view_focus[3]; /* 0x19e560 */
+extern int32_t g_key_view_eye[3]; /* 0x19e5b5 */
+extern uint8_t g_key_view_from_preset; /* 0x19e5e4, cleared before 0x2fbc4 in 0x31514 */
+extern uint32_t g_key_view_stepped_in_scene_8; /* 0x198408, set when a step ends in scene code 8 */
 extern int16_t g_key_view_track_cursor; /* 0x19e549 */
 extern uint8_t g_key_view_track_selected[2]; /* 0x19e5e1 */
 

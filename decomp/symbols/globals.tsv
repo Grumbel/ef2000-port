@@ -755,3 +755,9 @@ addr	size	type	name	evidence	notes
 0x001a6cd0	2	uint16_t	g_menu_ring_cursor	0x5e4c4 clears	menu ring cursor
 0x001a6cd2	2	uint16_t	g_menu_ring_count	0x5e4c4 stores the count	menu ring point count
 0x001a6cd4	2	uint16_t	g_menu_ring_shown	0x5e4c4 stores the count	second copy of the menu ring count
+0x0019e545	2	int16_t	g_key_view_step	0x31514 increments and indexes the preset step arrays	key view script step
+0x0019e547	2	int16_t	g_key_view_hold	0x31514 counts down by the tick step, reloads from preset hold	frames left in the key view step
+0x0019e560	12	int32_t[3]	g_key_view_focus	0x31514 distance, 0x32xxx adds to 0x19e5c1	key view focus position
+0x0019e5b5	12	int32_t[3]	g_key_view_eye	0x31514 distance, game_state_helpers2 stores	key view eye position
+0x0019e5e4	1	uint8_t	g_key_view_from_preset	0x31514 clears before 0x2fbc4	key view selection flag
+0x00198408	4	uint32_t	g_key_view_stepped_in_scene_8	0x31514 sets 1 when scene code is 8	key view step ended during scene code 8
