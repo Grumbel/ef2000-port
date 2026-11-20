@@ -6698,7 +6698,7 @@ uint32_t spawn_event_record_befb8(uint32_t a, uint32_t b, uint32_t c, uint32_t d
 	}
 	if (kind == 0x1bu)
 		init_event_record_bb324(sub + 0x55u, (uint32_t)EF_U8(sub), s4);
-	guest_fn_b5d8c_x(rec, (uint32_t)(int32_t)px, (uint32_t)(int32_t)py, (uint32_t)(int32_t)(int16_t)s8);
+	build_waypoint_route_b5d8c(rec, (int16_t)px, (int16_t)py, (int16_t)s8);
 	guest_fn_bc570_x(rec, a, b);
 	return s9 + 1u;
 }

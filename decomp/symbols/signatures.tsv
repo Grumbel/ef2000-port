@@ -36,6 +36,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000b1b8b	strlen_ds	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	0xb1b8b..0xb1ba3; callers 0x82eab/0xe896b; DS to ES, DF clear required; docs/compiler-abi.md
 0x000b2560	write_flight_record_b2560	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	Original 0x000b2560 (504 bytes); EDX clobbered; ESI/EDI hold the flight and handle; docs/compiler-abi.md
 0x00059fa4	update_tactical_cursor_59fa4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00059fa4 (633 bytes); docs/compiler-abi.md
+0x000b5d8c	build_waypoint_route_b5d8c	EAX:ef_addr32,DX:int16_t,BX:int16_t,CX:int16_t		esi,edi,ebp	0	Original 0xb5d8c: object EAX, X DX, Y BX, time CX; clobbers EAX/EBX/ECX/EDX; plain RET; caller 0xbf410
 0x000de864	load_shape_de864	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de864 (620 bytes); docs/compiler-abi.md
 0x000f8e44	create_mission_f8e44	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t,[ESP+28]:uint32_t,[ESP+32]:uint32_t,[ESP+36]:uint32_t,[ESP+40]:uint32_t	EAX:uint32_t	esi,edi,ebp	40	Original 0x000f8e44 (615 bytes); docs/compiler-abi.md
 0x000456e8	draw_war_replay_456e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000456e8 (625 bytes); docs/compiler-abi.md
