@@ -105,7 +105,7 @@ void submit_view_5a8d0(void)
     if (guest_fn_7489c(EF_S32(0x001f71c8u) >> 16) == 0)
         return;
     guest_fn_5af50(EF_U8(0x001a6d1cu));
-    guest_fn_5aa64(EF_U8(0x001a6d1cu));
+    draw_tactical_status_5aa64(EF_U8(0x001a6d1cu));
     if (EF_U8(0x001a6d20u) == 0)
         return;
     EF_U16(0x004208e4u) = EF_U8(0x00128148u);

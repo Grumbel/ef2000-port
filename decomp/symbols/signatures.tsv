@@ -23,6 +23,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0002e910	grid_event_matches	AL:uint8_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	0x2e910..0x2e948; caller functions 0x270d0 and 0x65da1; AH and EDX scratch; docs/compiler-abi.md
 0x000263e0	reset_spatial_slot_count			eax,ebx,ecx,edx,esi,edi,ebp	0	0x263e0..0x263eb; callers 0x1f624/0x3ab19; docs/compiler-abi.md
 0x000263ec	append_spatial_slot	AX:int16_t,DX:int16_t,BL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x263ec..0x26422; callers 0x1f6ef/0x2ef50/0x2f0fa/0x3ac33; EDX clobbered on append; docs/compiler-abi.md
+0x0005aa64	draw_tactical_status_5aa64	AL:uint8_t		ebx,ecx,edx,esi,edi,ebp	0	0x5aa64..0x5acee; caller 0x5a8fb passes byte 0x1a6d1c
 0x0006a1b4	lookup_indexed_object	AX:int16_t	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	0x6a1b4..0x6a1cd; callers 0x24087/0x247af consume EAX; docs/compiler-abi.md
 0x0006a354	set_indexed_object_activation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a354..0x6a375; callers 0x2ba3f/0x473cc ignore EAX; docs/compiler-abi.md
 0x0006a378	clear_indexed_object_activation	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	0x6a378..0x6a392; callers 0x2b9e9/0x47394 ignore EAX; docs/compiler-abi.md

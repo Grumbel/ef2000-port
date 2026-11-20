@@ -1688,7 +1688,7 @@ void submit_view_5a8d0(void);
 uint8_t request_los_66bf4(ef_addr32 object);
 uint8_t request_los_66cd4(int16_t unit, ef_addr32 object);
 uint8_t request_los_66d80(ef_addr32 object);
-void guest_fn_5aa64(uint32_t a); /* 0x5aa64 */
+void draw_tactical_status_5aa64(uint8_t marker); /* 0x5aa64 AL */
 void guest_fn_5af50(uint32_t a); /* 0x5af50 */
 uint32_t guest_fn_7574c(int32_t a); /* 0x7574c */
 uint32_t guest_fn_7b7d8(void); /* 0x7b7d8 */
