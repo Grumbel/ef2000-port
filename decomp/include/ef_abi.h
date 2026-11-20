@@ -3715,6 +3715,12 @@ void mpWPZoomToggle(void); /* 0x4eb8c */
 void guest_fn_4f0d4(void); /* 0x4f0d4 */
 void WarWonLostStartup(uint32_t arg); /* 0x42b04 EAX */
 void draw_war_replay_456e8(void); /* 0x456e8 */
+uint32_t create_mission_f8e44(ef_addr32 template_, uint32_t arg_edx, ef_addr32 owner, uint32_t arg_ecx,
+                              ef_addr32 formation, uint32_t id, ef_addr32 head, ef_addr32 tail,
+                              uint32_t arg_s4, ef_addr32 ships, uint32_t weights, uint32_t arg_s7,
+                              uint32_t arg_s8, uint32_t arg_s9); /* 0xf8e44, ret 0x28 */
+void guest_fn_b47e4(ef_addr32 mission, uint32_t a, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1,
+                    uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5, uint32_t s6); /* 0xb47e4, ret 0x1c */
 uint8_t guest_fn_e93dc_r(uint32_t a, uint32_t b); /* 0xe93dc EAX/EDX -> AL */
 uint32_t guest_fn_106be8_w(uint32_t a, uint32_t b, uint32_t c); /* 0x106be8 EAX/EDX/EBX -> EAX */
 uint8_t guest_fn_107004_w(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x107004 EAX/EDX/EBX/ECX -> AL */
@@ -7610,6 +7616,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_1123a4_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_cc6c0_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_cc6c0_z parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_b47e4 modify [eax ebx ecx edx]
 #pragma aux guest_fn_117a0f_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_112808_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux write_handle_10f26a parm [eax] [edx] [ebx] value [eax] modify [eax ebx edx]
