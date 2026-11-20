@@ -616,6 +616,16 @@ extern uint8_t g_target_list_changed; /* 0x1a54f3 */
 extern int16_t g_target_type; /* 0x1a54f4 */
 extern uint8_t g_target_ship_class; /* 0x1a559b, 1 awacs, 2 refueller, 3 supply, 4 kill ship */
 
+/* Custom-mission flight slots, 0x7de5c. */
+extern uint8_t g_custom_slot; /* 0x1f9009 */
+extern uint8_t g_custom_slot_count[5]; /* 0x1f8ff4 */
+extern int16_t g_custom_slot_type[5]; /* 0x1f8fb4, 0-based aircraft type */
+extern uint8_t g_custom_slot_guns_only[5]; /* 0x1f8fea */
+extern uint8_t g_custom_slot_skill[5]; /* 0x1f8ff9, 0 high, 1 medium, 2 low */
+extern int16_t g_aircraft_type_text[]; /* 0x12afdc, text index per aircraft type */
+extern ef_addr32 g_text_strings[]; /* 0x132dd0, localized text pointers */
+extern ef_addr32 g_skill_names[3]; /* 0x12b028 */
+
 /* SAM coverage, 0x4d920. */
 extern ef_addr32 g_assignment_selected_record; /* 0x1a54f6 */
 extern uint8_t g_sam_full_coverage; /* 0x1a5599 */

@@ -561,6 +561,14 @@ addr	size	type	name	evidence	notes
 0x001a54f3	1	uint8_t	g_target_list_changed	4bcdf sets	also set by the target-list scans
 0x001a54f4	2	int16_t	g_target_type	4bd04.. stores per list entry	compared with node byte +0xb
 0x001a559b	1	uint8_t	g_target_ship_class	4bceb clears, list entries store 1-4	1 awacs, 2 refueller, 3 supply ship, 4 kill ship
+0x001f9009	1	uint8_t	g_custom_slot	7de6a clears, 7de9b increments	current custom-mission slot
+0x001f8ff4	5	uint8_t[5]	g_custom_slot_count	7ded4 stores	aircraft count per slot
+0x001f8fb4	10	int16_t[5]	g_custom_slot_type	7def6 stores; read via dword 0x1f8fb2 shifted 16	0-based aircraft type per slot
+0x001f8fea	5	uint8_t[5]	g_custom_slot_guns_only	7df16/7df39 stores	gunsyes/gunsno
+0x001f8ff9	5	uint8_t[5]	g_custom_slot_skill	7df58.. stores	0 high, 1 medium, 2 low
+0x0012afdc	2 * count	int16_t[]	g_aircraft_type_text	7dfd9 reads via dword 0x12afda shifted 16	index into g_text_strings
+0x00132dd0	4 * count	ef_addr32[]	g_text_strings	7dfe3 reads	localized text pointers
+0x0012b028	12	ef_addr32[3]	g_skill_names	7dfa9 reads	indexed by g_custom_slot_skill
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller
