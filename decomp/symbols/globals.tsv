@@ -843,3 +843,9 @@ addr	size	type	name	evidence	notes
 0x0012dba8	12	int32_t[3]	g_view_motion	0x97064 clears	view motion
 0x0012dbc6	2	int16_t	g_view_shake_ticks	0x97064 counts down	remaining view shake steps
 0x0012dc7c	4	uint32_t	g_view_update_mode	0x97064 sets 0x200 around 0x9357c	scene update mode
+0x0019768c	2	int16_t	g_route_target_x	0xe490 sets	x of the first route slot with status 8
+0x0019768e	2	int16_t	g_route_target_y	0xe490 sets	y of the first route slot with status 8
+0x00197692	2	int16_t	g_route_origin_x	0xe490 sets	x of the route slot before the target
+0x00197694	2	int16_t	g_route_origin_y	0xe490 sets	y of the route slot before the target
+0x001a559c	1	uint8_t	g_route_side	0xe490 reads	side of the route events; 1 picks codes 9..14, else 3/6/9
+0x0041f328	2	uint16_t	g_last_route_event	0xe490 chains through 0xbefb8	latest spawned route event record

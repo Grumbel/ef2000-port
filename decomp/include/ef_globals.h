@@ -796,6 +796,12 @@ extern int16_t g_view_offset[3]; /* 0x0012dba2 */
 extern int32_t g_view_motion[3]; /* 0x0012dba8 */
 extern int16_t g_view_shake_ticks; /* 0x0012dbc6 */
 extern uint32_t g_view_update_mode; /* 0x0012dc7c */
+extern int16_t g_route_target_x; /* 0x0019768c */
+extern int16_t g_route_target_y; /* 0x0019768e */
+extern int16_t g_route_origin_x; /* 0x00197692 */
+extern int16_t g_route_origin_y; /* 0x00197694 */
+extern uint8_t g_route_side; /* 0x001a559c */
+extern uint16_t g_last_route_event; /* 0x0041f328 */
 extern int16_t g_route_slot_y[26]; /* 0x1a55d6 */
 extern uint8_t g_unit_tally_member_seen; /* 0x121ec0 */
 extern uint32_t g_cursor_ray_from_y; /* 0x1fcc18 */
