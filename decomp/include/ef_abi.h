@@ -2361,6 +2361,7 @@ void guest_fn_548e0(int32_t unit); /* 0x548e0 EAX */
 void apply_params_message_566b4(ef_addr32 message);
 void forward_command_message_572b4(ef_addr32 message);
 void send_table_entry_573d0(int16_t index, uint8_t value);
+void place_map_entry_90ac4(int16_t id, int32_t x, int32_t z, int32_t y);
 void guest_fn_900c0(int32_t id, uint32_t a, int32_t b); /* 0x900c0 EAX/EDX/EBX */
 
 /* game_helpers20.c */
