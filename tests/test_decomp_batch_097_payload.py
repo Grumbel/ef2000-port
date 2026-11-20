@@ -13,7 +13,7 @@ import unittest
 
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
-ENTRIES = {0xF3D54: (560, "gui_cursor_step_f3d54", "gui_cursor_097"),
+ENTRIES = {0xF3D54: (560, "gui_cursor_step_f3d54", "gui_cursor"),
            0xF3F84: (497, "gui_options_display_f3f84", "gui_display_097")}
 
 
@@ -32,7 +32,7 @@ class Inventory097(unittest.TestCase):
                               ("drafted", "blocked", "compiles", "spliced", "verified"))
                 if row["state"] == "blocked":
                     self.assertTrue(row["notes"].startswith("Blocked:"))
-                self.assertEqual(row["sig_status"], "unverified")
+                self.assertIn(row["sig_status"], ("unverified", "confirmed"))
 
 
 class OriginalBytes097(unittest.TestCase):

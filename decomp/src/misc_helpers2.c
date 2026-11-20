@@ -284,10 +284,10 @@ void reset_flags_f4178(void)
     guest_fn_f3b78();
 }
 
-/* 0xf9ed2, 13 bytes. */
-ef_addr32 call_f9dcb(uint32_t value)
+/* 0xf9ed2, 13 bytes. asctime: format TIME into the static buffer. */
+ef_addr32 asctime_f9ed2(ef_addr32 time)
 {
-    return format_time_f9dcb(value, 0x00485f80u);
+    return format_time_f9dcb(time, 0x00485f80u);
 }
 
 /* 0xf9d98, 51 bytes. Store the two decimal digits of EAX at EBX+EDX. */

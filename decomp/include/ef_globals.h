@@ -698,5 +698,13 @@ extern ef_addr32 g_crater_ring; /* 0x425b88, first of g_crater_records */
 extern ef_addr32 g_crater_slot_ring; /* 0x425b24, first of g_crater_slots */
 extern ef_addr32 g_environ; /* 0x160a18, null-terminated "NAME=value" pointers */
 extern ef_addr32 g_environ_owned; /* 0x160a1c, one heap-ownership flag per environment entry */
+extern int32_t g_mouse_motion_x; /* 0x420dc4, motion since the last poll */
+extern int32_t g_mouse_motion_y; /* 0x420dc8 */
+extern int16_t g_menu_cursor_y; /* 0x425fc6, menu cursor on the 320x200 screen */
+extern int16_t g_menu_cursor_x; /* 0x425fc8 */
+extern int32_t g_cursor_repeat_x; /* 0x161e24, ticks until the next slow step */
+extern int32_t g_cursor_repeat_y; /* 0x161e28 */
+extern uint8_t g_mouse_button_down; /* 0x15ba2c */
+extern ef_addr32 g_input_poll_hook; /* 0x15bab8, called without arguments before reading the motion */
 
 #endif

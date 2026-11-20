@@ -1888,7 +1888,7 @@ void initialize_ail_trace_101c54(void)
         set_default_file_buffer_11159a(EF_U32(0x004dd620u), 0u);
     get_time_seconds_a4574((ef_addr32)(uintptr_t)&now);
     copy_string_9d749(0x004dd644u,
-        call_f9dcb(call_1100d2_default((uint32_t)(uintptr_t)&now)));
+        asctime_f9ed2(localtime_110123((uint32_t)(uintptr_t)&now)));
     EF_U8(0x004dd65cu) = 0u;
     stream_printf_bc400(EF_U32(0x004dd620u), 0x001937d0u);
     stream_printf_bc400(EF_U32(0x004dd620u), 0x0019382cu, 0x00193824u);

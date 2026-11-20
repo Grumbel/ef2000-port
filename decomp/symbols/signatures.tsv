@@ -602,7 +602,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000f3b40	load_path_value_f3b40			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3b40 (22 bytes); As 0xf35d8, storing word 0x161e1e.; callers f3b78@f3cf6; docs/compiler-abi.md
 0x000f3b58	load_path_pointer_f3b58			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f3b58 (32 bytes); ; callers f3b78@f3d43; docs/compiler-abi.md
 0x000f4178	reset_flags_f4178			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f4178 (47 bytes); ; callers f41dc@f42af; docs/compiler-abi.md
-0x000f9ed2	call_f9dcb	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f9ed2 (13 bytes); ; callers 101c54@101ce6; docs/compiler-abi.md
+0x000f9ed2	asctime_f9ed2	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f9ed2 (13 bytes); asctime into the static buffer 0x485f80 (format_time_f9dcb); returns the buffer.; callers 101c54@101ce6; docs/compiler-abi.md
 0x000f9d98	store_two_digits	EAX:int32_t,EDX:ef_addr32,EBX:int32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000f9d98 (51 bytes); Store the two decimal digits of EAX at EBX+EDX.; callers f9dcb@f9e23,f9dcb@f9e40,f9dcb@f9e53; docs/compiler-abi.md
 0x000fa7d2	update_flags_fa7d2	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fa7d2 (49 bytes); ; callers bc287@bc345,f22af@f22e5,10f071@10f075; docs/compiler-abi.md
 0x000fba54	call_fba6c	EAX:uint32_t,EDX:ef_addr32	EAX:uint32_t	ebx,ecx,esi,edi,ebp	0	Original 0x000fba54 (24 bytes); 0xfba6c(dword +0x16, dword +0x1a) with EBX = EAX.; callers fbad8@fbb2b,fbad8@fbc83; docs/compiler-abi.md
@@ -685,7 +685,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0010f190	stream_getc	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010f190 (47 bytes); Read one byte from a counted buffer stream; -1 at the end.; callers 10f107@10f13a,10f107@10f165; docs/compiler-abi.md
 0x0010f4df	call_fa95f_from_start	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010f4df (17 bytes); 0xfa95f(EAX, 0, 1).; callers f2183@f2227,f227f@f2287; docs/compiler-abi.md
 0x001100b1	elapsed_since_start		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x001100b1 (33 bytes); Elapsed value of 0x11004b relative to dword 0x4dd984, wrapping at 0x83d600.; callers none direct; docs/compiler-abi.md
-0x00110123	call_1100d2_default	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00110123 (13 bytes); 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; docs/compiler-abi.md
+0x00110123	localtime_110123	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00110123 (13 bytes); 0x1100d2(EAX, 0x4dd988).; callers f9ecd@f9ecd,101c54@101ce1; docs/compiler-abi.md
 0x001102a3	store_flagged_value	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001102a3 (21 bytes); Store value / 0x4000 in dword table 0x17d614[index].; callers fa4a9@fa65e,fa9a0@fa9b6; docs/compiler-abi.md
 0x0011024e	lookup_slot_11024e	EAX:int32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0011024e (85 bytes); Look up dword table 0x17d614[index], marking the first six slots as seen.; callers fa4a9@fa5fa,10f26a@10f276,110393@1103a1; docs/compiler-abi.md
 0x00110dcc	increment_17d7ba			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00110dcc (13 bytes); ; callers 101ba8@101bb1; docs/compiler-abi.md
@@ -3751,3 +3751,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000040dc	hiscore_refresh_display_40dc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Writes names, difficulty labels and scores into the widget chains of the hiscores window (or the given window).
 0x000041fc	hiscore_load_41fc		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Loads hiscores.dat with the original one-byte checksum bug, falling back to defaults; refreshes the window.
 0x000042a4	hiscore_save_42a4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Saves checksum and table to hiscores.dat.
+0x000f3d54	gui_cursor_step_f3d54	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		ecx,esi,edi,ebp	0	GUI cursor step; pushes ECX, ESI, EDI, EBP; EBX and EDX are clobbered

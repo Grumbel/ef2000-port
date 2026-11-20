@@ -621,6 +621,14 @@ addr	size	type	name	evidence	notes
 0x00160a1c	4	ef_addr32	g_environ_owned	putenv f4347/f44b6	one flag byte per environment entry, nonzero when the string is a heap block
 0x00121198	250	ef_hiscore_entry[10]	g_default_hiscores	40c0 reads the scores	default table Steve..Titbit with scores 10000..1000; 4050 uses only the scores
 0x00121292	960	char[48][20]	g_hiscore_name_pool	4096 indexes it	names picked at random for generated default high scores
+0x00420dc4	4	int32_t	g_mouse_motion_x	f3d70 reads	input motion since the last poll, divided by 8 for the GUI cursor
+0x00420dc8	4	int32_t	g_mouse_motion_y	f3d84 reads	input motion since the last poll
+0x00425fc6	2	int16_t	g_menu_cursor_y	f3eee/f3f2c/f3f53 store	menu cursor row, clamped to 0..199
+0x00425fc8	2	int16_t	g_menu_cursor_x	f3ee4/f3f14/f3f41 store	menu cursor column, clamped to 0..319
+0x00161e24	4	int32_t	g_cursor_repeat_x	f3e09 counts down, f3e2c resets to 30	ticks until the next one-pixel step for small motion
+0x00161e28	4	int32_t	g_cursor_repeat_y	f3eab counts down, f3ece resets to 30	ticks until the next one-pixel step for small motion
+0x0015ba2c	1	uint8_t	g_mouse_button_down	f3f6c reads	nonzero while the button is held
+0x0015bab8	4	ef_addr32	g_input_poll_hook	f3d6a calls	input poll called before the motion is read
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

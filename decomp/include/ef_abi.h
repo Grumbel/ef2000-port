@@ -1258,7 +1258,7 @@ void load_path_f3b1c(void);
 void load_path_value_f3b40(void);
 void load_path_pointer_f3b58(void);
 void reset_flags_f4178(void);
-ef_addr32 call_f9dcb(uint32_t value);
+ef_addr32 asctime_f9ed2(ef_addr32 time); /* asctime into the static buffer 0x485f80 */
 void store_two_digits(int32_t value, ef_addr32 base, int32_t offset);
 void update_flags_fa7d2(ef_addr32 file);
 uint32_t call_fba6c(uint32_t first, ef_addr32 record);
@@ -1430,7 +1430,7 @@ int32_t stream_getc(ef_addr32 stream);
 uint32_t call_fa95f_from_start(uint32_t handle);
 uint32_t elapsed_since_start(void);
 uint32_t elapsed_centiseconds(void);
-uint32_t call_1100d2_default(uint32_t value);
+ef_addr32 localtime_110123(ef_addr32 time); /* localtime into the static record 0x4dd988 */
 void store_flagged_value(uint32_t index, uint32_t value);
 uint32_t lookup_slot_11024e(int32_t index);
 void increment_17d7ba(void);
@@ -6596,6 +6596,7 @@ void env_load_craters_daef4(void); /* 0xdaef4 */
 ef_addr32 reallocate_heap_e8651(ef_addr32 block, uint32_t size); /* 0xe8651 EAX/EDX -> EAX */
 int32_t find_env_entry_f44b6(ef_addr32 assignment, int32_t remove); /* 0xf44b6 */
 int32_t putenv_f4347(ef_addr32 assignment); /* 0xf4347 */
+void gui_cursor_step_f3d54(ef_addr32 x_out, ef_addr32 y_out, ef_addr32 button_out); /* 0xf3d54 */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */

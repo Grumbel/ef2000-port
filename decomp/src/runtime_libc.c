@@ -122,10 +122,10 @@ uint32_t elapsed_centiseconds(void)
     return elapsed_since_start();
 }
 
-/* 0x110123, 13 bytes. 0x1100d2(EAX, 0x4dd988). */
-uint32_t call_1100d2_default(uint32_t value)
+/* 0x110123, 13 bytes. localtime: break TIME down into the static record. */
+ef_addr32 localtime_110123(ef_addr32 time)
 {
-    return guest_fn_1100d2(value, 0x004dd988u);
+    return guest_fn_1100d2(time, 0x004dd988u);
 }
 
 /* 0x1102a3, 21 bytes. Store value | 0x4000 in dword table 0x17d614[index]. */
