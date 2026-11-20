@@ -127,7 +127,7 @@ void visit_overlapping_nodes_e2564(ef_addr32 obj)
             lim = EF_S16(0x0041ec0au);
             if (sz + (margin + lo) - base > lim) {
                 if (x + lo + sz - base < EF_S16(0x0041ec0eu) + lim)
-                    guest_fn_e2374_x(obj, node);
+                    draw_text_node_e2374(obj, node);
             }
         }
         node = EF_U32(node + 0xau);
