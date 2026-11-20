@@ -1,7 +1,7 @@
 # SPDX-FileCopyrightText: 2026 Ingo Ruhnke <grumbel@gmail.com>
 # SPDX-License-Identifier: GPL-3.0-or-later WITH GPL-3.0-linking-exception
 
-"""Inventory and optional original-byte audit for twelve READCOLS drafts.
+"""Inventory and optional original-byte audit for twelve READCOLS keyword handlers.
 
 The original EF2000 payload is supplied externally via EF2000_PAYLOAD;
 this test never embeds or distributes original game bytes.
@@ -18,23 +18,23 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
-    0xDA748: ("load_darkside_pal", 158, 0x190000, 0x421750, "environment_records_091"),
-    0xDA8C4: ("set_darkside_values", 158, 0x190000, 0x425190, "environment_records_091"),
-    0xDAD4C: ("set_nb_craters", 244, 0x190250, 0x4218E0, "environment_records_091"),
-    0xDAE40: ("load_craters", 179, 0x18FF74, 0x425AF4, "environment_records_091"),
-    0xDB28C: ("sun_flare", 157, 0x190310, 0x425BB8, "environment_sky_091"),
-    0xDB654: ("sun_texture", 218, 0x190374, 0x425B20, "environment_records_091"),
-    0xDB730: ("cannon_hit", 214, 0x1903A8, 0x425B8C, "environment_records_091"),
-    0xDB808: ("fix_horizon", 158, 0x190004, 0x425AFC, "environment_sky_091"),
-    0xDB8BC: ("heavenly_body", 160, 0x19043C, 0x422398, "environment_sky_091"),
-    0xDBFF8: ("init3d_file", 153, 0x190000, 0x17D368, "environment_sky_091"),
-    0xDC094: ("east_west_palettes", 143, 0x190000, 0x15BB64, "environment_sky_091"),
-    0xDC124: ("setsun", 175, None, 0x420F90, "environment_sky_091"),
+    0xDA748: ("env_load_cock_pal_da748", 158, 0x190000, 0x421750, "environment_keywords"),
+    0xDA8C4: ("env_load_missile_pal_da8c4", 158, 0x190000, 0x425190, "environment_keywords"),
+    0xDAD4C: ("env_lightning_point_dad4c", 244, 0x190250, 0x4218E0, "environment_keywords"),
+    0xDAE40: ("env_set_nb_craters_dae40", 179, 0x18FF74, 0x425AF4, "environment_keywords"),
+    0xDB28C: ("env_heavenly_body_db28c", 157, 0x190310, 0x425BB8, "environment_keywords"),
+    0xDB654: ("env_tmsun_flare_db654", 218, 0x190374, 0x425B20, "environment_flares"),
+    0xDB730: ("env_cloud_fade_db730", 214, 0x1903A8, 0x425B8C, "environment_keywords"),
+    0xDB808: ("env_load_flak_db808", 158, 0x190004, 0x425AFC, "environment_keywords"),
+    0xDB8BC: ("env_load_horizon_db8bc", 160, 0x19043C, 0x422398, "environment_keywords"),
+    0xDBFF8: ("env_coltab_dbff8", 153, 0x190000, 0x17D368, "environment_keywords"),
+    0xDC094: ("env_init3d_file_dc094", 143, 0x190000, 0x15BB64, "environment_keywords"),
+    0xDC124: ("env_east_west_palettes_dc124", 175, None, 0x420F90, "environment_keywords"),
 }
 
 
 class BatchInventory091(unittest.TestCase):
-    def test_all_twelve_entries_have_drafts(self):
+    def test_all_twelve_entries_are_tracked(self):
         with (ROOT / "decomp/symbols/functions.tsv").open(newline="") as stream:
             rows = {int(row["addr"], 16): row for row in csv.DictReader(stream, delimiter="\t")}
         self.assertEqual(len(ENTRIES), 12)
@@ -49,7 +49,7 @@ class BatchInventory091(unittest.TestCase):
                 if row["state"] == "blocked":
                     self.assertTrue(row["notes"].startswith("Blocked:"))
                 self.assertEqual(row["kind"], "game")
-                self.assertEqual(row["sig_status"], "unverified")
+                self.assertIn(row["sig_status"], ("unverified", "confirmed"))
 
 
 class OriginalBytes091(unittest.TestCase):

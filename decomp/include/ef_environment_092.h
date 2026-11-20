@@ -4,7 +4,7 @@
 #ifndef EF_ENVIRONMENT_092_H
 #define EF_ENVIRONMENT_092_H
 
-#include "ef_environment_091.h"
+#include "ef_environment_090.h"
 
 /* Further host-only READCOLS models. Guest comparison, transformation,
  * lookup and palette loader ABIs are intentionally unresolved adapters. */

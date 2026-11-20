@@ -584,6 +584,28 @@ addr	size	type	name	evidence	notes
 0x00137210	2	uint16_t	g_magnifier_zoom	ab96d/ab9dd reads	magnifier block size
 0x00425b20	4	ef_addr32	g_sun_flares	db549 reads, db55d stores	ef_sun_flare list head, next at +0xc
 0x00141e08	0x4000	int16_t[0x2000]	g_sine_table	db5f2/db620 reads via dwords at -2 shifted 16	Q15 sine over a full turn; cosine 0x800 entries later
+0x0015bb60	4	int32_t	g_sun_texture_count	db420 counts entries, db6cd compares	number of sun_texture script entries (at most 20)
+0x00425bbc	2	int16_t	g_lightning_area_count	dad75/dadc5 read the dword at 425bba shifted 16, dae1f increments	lightning_point entries read (at most 20)
+0x004218e0	0x168	ef_lightning_area[20]	g_lightning_areas	dadf2-dae19 store	lightning_point records, 18 bytes each
+0x00425ae0	4	int32_t	g_crater_count	dae69 scans, daea9 reads	set_nb_craters value 1, size of g_crater_records in 110-byte units
+0x00425ae4	4	int32_t	g_crater_type_count	dae64 scans, dae8d checks	set_nb_craters value 2, at most 43
+0x00425ae8	4	int32_t	g_crater_slot_count	dae5f scans, daec4 reads	set_nb_craters value 3, size of g_crater_slots in 110-byte units
+0x00425aec	4	ef_addr32	g_crater_slots	daeea stores	allocated by set_nb_craters
+0x00425af4	4	ef_addr32	g_crater_records	daeca stores	allocated by set_nb_craters
+0x00425afc	4	int32_t	g_flak_type_count	db21c scans, db816/db833 read	set_nb_flak value; -1 before it is read
+0x00425b64	0x24	ef_cloud_level[2]	g_cloud_levels	db7b6-db7e4 store	cloud_fade records, 18 bytes each
+0x00425b8c	4	int32_t	g_cloud_level_count	db793 checks, db7de increments	cloud_fade entries read (at most 2)
+0x00422398	0xc8	ef_heavenly_body[40]	g_heavenly_bodies	db92b-db947 store	heavenly_body records, 5 bytes each
+0x00425c86	1	uint8_t	g_horizon_fixed	db8a8 sets, db8b0 clears, db925 reads	fix_horizon flag copied into each heavenly body
+0x00425ba2	2	int16_t	g_heavenly_size_squared	db31c stores	heavenly_body value 4 squared
+0x00425ba4	2	int16_t	g_heavenly_value5	db309 stores	heavenly_body value 5
+0x00425bb0	2	int16_t	g_heavenly_value3	db2d7 clears, db2b8 scans	heavenly_body value 3
+0x00425bb4	2	int16_t	g_heavenly_value2	db2bd scans	heavenly_body value 2
+0x00425bb8	2	int16_t	g_heavenly_shape	db2ff stores AX of 0xde864	shape number found for the heavenly_body name with ".3"
+0x00425af8	4	ef_addr32	g_env_script_cursor	every READCOLS keyword handler reads and advances it	next unread line of the environment script
+0x0017d368	13	char[13]	g_coltab_name	dc066 copies, dc075 appends ".dat"	colour table file name, at most eight characters plus ".dat"
+0x0015bb64	13	char[13]	g_init3d_name	dc102 copies, dc10c passes to 0xe4010	init3d pattern file name, at most twelve characters
+0x0015bb74	1	uint8_t	g_east_west_palettes_loaded	dc1c4 stores 1	set once both east/west palettes are loaded
 0x001379b4	4	uint32_t	g_completion_entry_count	b012c clears after allocating the completion array; d520 and b1a5c store, ca7e8 passes it to cb9f4	entry count of the 27-byte completion array (provisional)
 0x001379b8	2	uint16_t	g_record_pool_state_word	b01fb clears after active count	meaning otherwise unknown
 0x001379bc	4	ef_addr32	g_active_record_pool	9a630 reads per iteration	54-byte records; allocated by b0138 caller

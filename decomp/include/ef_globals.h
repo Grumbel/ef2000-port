@@ -629,6 +629,7 @@ extern int16_t g_training_mission_flag; /* 0x1f8fde, 0 for the free flight */
 
 /* Training-mission accept, 0x7c574. */
 #include "ef_structs/session_rows.h"
+#include "ef_structs/environment_records.h"
 extern ef_addr32 g_training_row_pool; /* 0x1f8f74, ef_session_row[] */
 extern int16_t g_training_selection; /* 0x12b026, 0-based row */
 extern char g_config_file_name[0x12]; /* 0x125828, current mission config name */
@@ -657,5 +658,30 @@ extern int16_t g_sam_coverage_width; /* 0x19e5a5 */
 extern int32_t g_sam_coverage_range; /* 0x19e597 */
 extern uint8_t g_assignment_current_byte; /* 0x1a5540 */
 extern uint32_t g_assignment_current_value; /* 0x1a5554 */
+
+
+/* Environment script (READCOLS) keyword state, 0xdad4c-0xdb8bc. */
+extern int32_t g_sun_texture_count; /* 0x15bb60, "sun_texture" entries read, at most 20 */
+extern int16_t g_lightning_area_count; /* 0x425bbc, at most 20 */
+extern ef_lightning_area g_lightning_areas[20]; /* 0x4218e0 */
+extern int32_t g_crater_count; /* 0x425ae0, "set_nb_craters" value 1 */
+extern int32_t g_crater_type_count; /* 0x425ae4, value 2, at most 43 */
+extern int32_t g_crater_slot_count; /* 0x425ae8, value 3 */
+extern ef_addr32 g_crater_slots; /* 0x425aec, 110 bytes per slot */
+extern ef_addr32 g_crater_records; /* 0x425af4, 110 bytes per crater */
+extern int32_t g_flak_type_count; /* 0x425afc, -1 until "set_nb_flak" */
+extern ef_cloud_level g_cloud_levels[2]; /* 0x425b64 */
+extern int32_t g_cloud_level_count; /* 0x425b8c */
+extern ef_heavenly_body g_heavenly_bodies[40]; /* 0x422398 */
+extern uint8_t g_horizon_fixed; /* 0x425c86, set by "fix_horizon", cleared by "unfix_horizon" */
+extern int16_t g_heavenly_size_squared; /* 0x425ba2, "heavenly_body" value 4 squared */
+extern int16_t g_heavenly_value5; /* 0x425ba4, "heavenly_body" value 5 */
+extern int16_t g_heavenly_value3; /* 0x425bb0, "heavenly_body" value 3 */
+extern int16_t g_heavenly_value2; /* 0x425bb4, "heavenly_body" value 2 */
+extern int16_t g_heavenly_shape; /* 0x425bb8, shape number of "<name>.3" */
+extern ef_addr32 g_env_script_cursor; /* 0x425af8, next unread environment script line */
+extern char g_coltab_name[13]; /* 0x17d368, "coltab" name with ".dat" */
+extern char g_init3d_name[13]; /* 0x15bb64, "init3d_file" name */
+extern uint8_t g_east_west_palettes_loaded; /* 0x15bb74, set by "east_west_palettes" */
 
 #endif

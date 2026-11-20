@@ -6575,6 +6575,18 @@ void kotsAccept(ef_addr32 widget); /* 0x522c */
 void gpwUpdateMap(ef_addr32 widget); /* 0x426a4 */
 void guiUpdateMemoryUse(ef_addr32 widget); /* 0xab95c */
 void env_sun_flare_db4d4(void); /* 0xdb4d4 */
+void env_lightning_point_dad4c(void); /* 0xdad4c */
+void env_set_nb_craters_dae40(void); /* 0xdae40 */
+void env_tmsun_flare_db654(void); /* 0xdb654 */
+void env_cloud_fade_db730(void); /* 0xdb730 */
+void env_load_flak_db808(void); /* 0xdb808 */
+void env_load_horizon_db8bc(void); /* 0xdb8bc */
+void env_load_cock_pal_da748(void); /* 0xda748 */
+void env_load_missile_pal_da8c4(void); /* 0xda8c4 */
+void env_heavenly_body_db28c(void); /* 0xdb28c */
+void env_coltab_dbff8(void); /* 0xdbff8 */
+void env_init3d_file_dc094(void); /* 0xdc094 */
+void env_east_west_palettes_dc124(void); /* 0xdc124 */
 void guest_fn_41b98(int16_t row); /* 0x41b98 */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */

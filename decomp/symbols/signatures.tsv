@@ -3728,3 +3728,15 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00042004	guest_fn_42004			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; called by 0x426a4
 0x000ab95c	guiUpdateMemoryUse	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; magnifier draw callback
 0x000db4d4	env_sun_flare_db4d4			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; script keyword handler (table 0x15bc78), EAX not meaningful
+0x000dad4c	env_lightning_point_dad4c			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "lightning_point" (table 0x15bc10); preserves all six, EAX not meaningful
+0x000dae40	env_set_nb_craters_dae40			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "set_nb_craters" (table 0x15bc18); preserves all six, EAX not meaningful
+0x000db654	env_tmsun_flare_db654			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "tmsun_flare" (table 0x15bc80); preserves all six, EAX not meaningful
+0x000db730	env_cloud_fade_db730			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "cloud_fade" (table 0x15bc90); preserves all six, EAX not meaningful
+0x000db808	env_load_flak_db808			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_flak" (table 0x15bc50); preserves all six, EAX not meaningful
+0x000db8bc	env_load_horizon_db8bc			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_horizon" (table 0x15bc68); preserves all six, EAX not meaningful
+0x000da748	env_load_cock_pal_da748			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_cock_pal" (table 0x15bbc8); preserves all six, EAX not meaningful
+0x000da8c4	env_load_missile_pal_da8c4			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "load_missile_pal" (table 0x15bbd8); preserves all six, EAX not meaningful
+0x000db28c	env_heavenly_body_db28c			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "heavenly_body" (table 0x15bc70); preserves all six, EAX not meaningful
+0x000dbff8	env_coltab_dbff8			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "coltab" (table 0x15bd18); preserves all six, EAX not meaningful
+0x000dc094	env_init3d_file_dc094			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "init3d_file" (table 0x15bd20); preserves all six, EAX not meaningful
+0x000dc124	env_east_west_palettes_dc124			ebx,ecx,edx,esi,edi,ebp	0	Script keyword handler "east_west_palettes" (table 0x15bd28); preserves all six, EAX not meaningful

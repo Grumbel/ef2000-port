@@ -1035,14 +1035,6 @@
           work/environment_090_host_test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
             -I${source}/decomp/include \
-            ${source}/tests/decomp_environment_091_test.c \
-            ${source}/decomp/src/environment_scanner_090.c \
-            ${source}/decomp/src/environment_records_091.c \
-            ${source}/decomp/src/environment_sky_091.c \
-            -o work/environment_091_host_test
-          work/environment_091_host_test
-          $CC -std=c11 -O2 -Wall -Wextra -Werror -DEF_DECOMP_HOST_TEST=1 \
-            -I${source}/decomp/include \
             ${source}/tests/decomp_environment_092_test.c \
             ${source}/decomp/src/environment_scanner_090.c \
             ${source}/decomp/src/environment_palette_092.c \

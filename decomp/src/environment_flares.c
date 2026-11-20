@@ -44,7 +44,7 @@ void env_sun_flare_db4d4(void)
     EF_U8(flare + offsetof(ef_sun_flare, colour)) = (uint8_t)colour;
     EF_U16(flare + offsetof(ef_sun_flare, value4)) = (uint16_t)value4;
     EF_U16(flare + offsetof(ef_sun_flare, value5)) = (uint16_t)value5;
-    EF_U16(flare + offsetof(ef_sun_flare, reserved_08)) = 0u;
+    EF_U16(flare + offsetof(ef_sun_flare, textured)) = 0u;
     EF_U8(flare + offsetof(ef_sun_flare, count)) = (uint8_t)count;
     points = flare + (uint32_t)sizeof(ef_sun_flare);
     for (i = 0; i < count; ++i) {
@@ -54,4 +54,35 @@ void env_sun_flare_db4d4(void)
         EF_U8(points + (uint32_t)i * 2u + 1u) =
             (uint8_t)(((int32_t)-radius * (int32_t)g_sine_table[angle + 0x800u]) >> 15);
     }
+}
+
+/* 0xdb654, 218 bytes, the "tmsun_flare" script keyword (keyword table
+ * 0x15bc80; the tracker called it sun_texture). Read five "%hd" values
+ * and push a textured flare entry, without points, on the flare list.
+ * A texture number past the sun textures read so far is reported
+ * through the error hook, after the entry is already linked. */
+void env_tmsun_flare_db654(void)
+{
+    int16_t radius;
+    int16_t value2;
+    int16_t texture;
+    int16_t value4;
+    int16_t value5;
+    ef_addr32 flare;
+
+    guest_fn_df26f_x(env_take_line_090(), 0x00190374u,       /* "%hd %hd %hd %hd %hd" */
+                     (uintptr_t)&radius, (uintptr_t)&value2, (uintptr_t)&texture,
+                     (uintptr_t)&value4, (uintptr_t)&value5);
+    flare = guest_fn_e29e8((uint32_t)sizeof(ef_sun_flare));
+    EF_U32(flare + offsetof(ef_sun_flare, next)) = g_sun_flares;
+    g_sun_flares = flare;
+    if (texture >= g_sun_texture_count)
+        guest_callptr2_x(g_gui_error_hook, 0x00190388u,      /* "Unknown flare texture id %hd" */
+                         (uint32_t)(int32_t)texture);
+    EF_U8(flare + offsetof(ef_sun_flare, radius)) = (uint8_t)radius;
+    EF_U8(flare + offsetof(ef_sun_flare, value2)) = (uint8_t)value2;
+    EF_U16(flare + offsetof(ef_sun_flare, texture)) = (uint16_t)texture;
+    EF_U16(flare + offsetof(ef_sun_flare, value4)) = (uint16_t)value4;
+    EF_U16(flare + offsetof(ef_sun_flare, textured)) = 1u;
+    EF_U16(flare + offsetof(ef_sun_flare, value5)) = (uint16_t)value5;
 }
