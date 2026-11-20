@@ -20,7 +20,7 @@ void open_directplay_settings_98bec(void); /* 0x98bec */
 /* Named original implementations used by the map and menu callbacks. */
 void adjust_route_view_4dcd8(ef_addr32 widget); /* 0x4dcd8 */
 void update_route_summary_4ec70(void); /* 0x4ec70 */
-void open_hiscores_a870(ef_addr32 widget); /* 0xa870 */
+void open_hiscores_a870(ef_addr32 map); /* 0xa870 EAX, float_helpers5.c */
 void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
 void refresh_campaign_view_c9fc4(void); /* 0xc9fc4 */
 uint8_t hiscore_load_41fc(void); /* 0x41fc */

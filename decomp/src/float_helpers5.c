@@ -197,3 +197,33 @@ void gnInitSettingsWindow(ef_addr32 root)
 	guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x0018da74u, EF_U32(0x00137278u));
 	apply_to_widget_a75b4(root, 0x0018da78u, (uint32_t)(uintptr_t)buf);
 }
+
+/* 0xa870, 237 bytes. Zoom the map widget one 0.2 step around the cursor:
+ * in while widget flag 0x10 at +0xa7 is set and the scale is below 4.0, out
+ * while flag 0x10 at +0xa8 is set and the scale is above 1.0. The zoom level
+ * (scale - 1) / 2 + 1 is published as a word, or as a float in the mission
+ * planner. */
+void open_hiscores_a870(ef_addr32 map)
+{
+    int16_t x = g_gui_cursor_x;
+    int16_t y = g_gui_cursor_y;
+    double level;
+
+    if ((EF_U8(map + 0xa7u) & 0x10u) != 0) {
+        if (EF_F64(map + 0x9fu) < 4.0) {
+            set_record_scale_a56b0(map, EF_F64(map + 0x9fu) + 0.2);
+            set_record_offsets_a5508(map, x, y);
+        }
+    } else if ((EF_U8(map + 0xa8u) & 0x10u) != 0) {
+        if (1.0 < EF_F64(map + 0x9fu)) {
+            set_record_scale_a56b0(map, EF_F64(map + 0x9fu) - 0.2);
+            set_record_offsets_a5508(map, x, y);
+        }
+    }
+
+    level = (EF_F64(map + 0x9fu) - 1.0) * 0.5 + 1.0;
+    if (EF_U8(0x001a53dcu) == 0)
+        EF_U16(0x0019769eu) = (uint16_t)(int32_t)truncate_9d72c(level);
+    else
+        *(float *)ef_guest_memory_ptr(0x001a53dfu) = (float)level;
+}
