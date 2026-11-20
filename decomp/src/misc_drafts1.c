@@ -11815,7 +11815,7 @@ void tick_cycle_list_54274(void)
         if ((int16_t)pos >= (int16_t)EF_U16(0x001a1506u))
             pos = 0u;
         EF_U16(0x001a5c1cu) = pos;
-        guest_fn_37eac_x((int32_t)(int16_t)pos, scale, 0u);
+        update_follower_37eac((int16_t)pos, scale, 0u);
         pos = EF_U16(0x001a5c1cu);
     }
     EF_U16(0x001a5c1cu) = pos;

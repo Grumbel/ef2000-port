@@ -3073,7 +3073,7 @@ void replay_elapsed_steps_c630(void)
             i = 0;
             if ((int16_t)EF_U16(0x001a1506u) > 0) {
                 do {
-                    guest_fn_37eac_x((int32_t)i, 60.0, 1u);
+                    update_follower_37eac((int16_t)i, 60.0, 1u);
                     i++;
                     if (i == 0xff) i++;
                 } while (i < (int16_t)EF_U16(0x001a1506u));

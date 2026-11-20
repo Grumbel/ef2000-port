@@ -42,6 +42,25 @@ Layout:
 - `tests/`: per-function differential test specifications.
 - `build/`: ignored OpenWatcom object files and other generated outputs.
 
+Recipe for blocked class 2 (callee flags, implicit registers, carry
+chains; rev 5 Stream B):
+
+- Recheck the triage first. Most entries labelled "branches on CPU flags"
+  or "implicit register inputs" test an explicit value (`test al,al`,
+  `cmp`) or take arguments in non-Watcom registers. Write them as
+  ordinary C and record the actual registers in `signatures.tsv`. The
+  pragma generator then builds the matching `#pragma aux`. Test only the
+  bits the original tests, for example `(uint16_t)f() != 0` after
+  `test ax,ax`.
+- When a callee really returns a flag (`stc`/`clc`, `setg` into AL only)
+  or an extra register, declare it with that value as an explicit return
+  or out-parameter. Callers that are recovered together then call each
+  other in C. An entry whose original callers still expect CF stays
+  original until all of those callers are recovered.
+- Callees in the hybrid resolve by name through `functions.tsv` and a
+  same-line leading address comment in `ef_abi.h`. A comment on the next
+  line is not an alias.
+
 There is no standalone **playable game** build yet. The flake now produces
 two executable bootstraps from `standalone/main.c` and recovered
 `src/hiscore.c`: `.#ef2000-decomp` (native GCC/Linux) and

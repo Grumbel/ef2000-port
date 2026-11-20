@@ -6146,7 +6146,9 @@ void guest_fn_2461c_x(int32_t a, ef_addr32 vec); /* 0x2461c EAX/EDX */
 void tick_cycle_list_5414c(void);
 void tick_cycle_list_54274(void);
 void guest_fn_2e740_x(int32_t a, double x, uint32_t z); /* 0x2e740 EAX + stack double and dword, ret 0xc */
-void guest_fn_37eac_x(int32_t a, double x, uint32_t z); /* 0x37eac EAX + stack double and dword, ret 0xc */
+void update_follower_37eac(int16_t index, double value, uint32_t immediate); /* 0x37eac AX + stack double and dword, ret 0xc */
+void guest_fn_37fe4_x(int16_t index, double value); /* 0x37fe4 AX + stack double, ret 8 */
+void guest_fn_37934(ef_addr32 record); /* 0x37934 EAX, preserves all */
 
 void create_unit_87db8(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5);
 ef_addr32 guest_fn_879c4_x(void); /* 0x879c4 -> EAX */
@@ -7601,6 +7603,9 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_59420_w modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_5c0cc modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_4aa0 modify [eax ebx ecx edx esi edi ebp]
+#pragma aux update_follower_37eac parm routine [eax] /* AX + 12 stack bytes, ret 0xc */
+#pragma aux guest_fn_37fe4_x parm routine [eax] modify [eax] /* AX + 8 stack bytes, ret 8 */
+#pragma aux guest_fn_37934 parm [eax] modify [eax]
 #pragma aux guest_fn_dc21c_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_dc334_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_d86e0_w modify [eax ebx ecx edx esi edi ebp]
