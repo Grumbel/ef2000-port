@@ -7628,7 +7628,6 @@ uint16_t guest_fn_bf444(int32_t value, ef_addr32 list, uint32_t arg_b, uint32_t 
 #pragma aux guest_fn_bf444 modify [eax ebx ecx edx]
 uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, uint32_t arg_c,
                                uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xbc610, ret 0x14 */
-#pragma aux run_node_passes_bc610 modify [eax ebx ecx edx]
 #pragma aux build_waypoint_route_b5d8c modify [eax ebx ecx edx]
 #pragma aux guest_fn_117a0f_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_112808_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
