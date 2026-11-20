@@ -170,7 +170,17 @@ def validate_spec(spec, signature, image_size, default_guest_size=0x4000000):
         ranges = sorted((address, address + len(data)) for address, data in memory)
         if any(a[1] > b[0] for a, b in zip(ranges, ranges[1:])):
             raise ValueError(f'case {name}: overlapping memory initialization')
-        validated.append((name, registers, args, memory))
+        feed = case.get('read_feed')
+        if feed is None:
+            validated.append((name, registers, args, memory))
+            continue
+        # A byte that an interrupt handler would fill: whenever the code
+        # reads it while it is zero, the next queued value is stored first.
+        feed_address = number(feed['address'], 'read feed address')
+        feed_values = tuple(number(item, 'read feed value') for item in feed['values'])
+        if feed_address >= guest_size or not all(0 < value < 0x100 for value in feed_values):
+            raise ValueError(f'case {name}: invalid read feed')
+        validated.append((name, registers, args, memory, (feed_address, feed_values)))
     return guest_size, stack, sentinel, scratch, budget, function_size, validated
 
 
@@ -204,11 +214,12 @@ def visible_ranges(writes, stack, scratch):
 def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
             function_size, flat_segments=False):
     # Deferred so pure unit tests do not require Python Unicorn installed.
-    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_MEM_WRITE, UC_HOOK_BLOCK
+    from unicorn import Uc, UC_ARCH_X86, UC_MODE_32, UC_HOOK_MEM_WRITE, UC_HOOK_MEM_READ, UC_HOOK_BLOCK
     from unicorn.x86_const import UC_X86_REG_EIP, UC_X86_REG_EFLAGS
     from unicorn import x86_const
 
-    name, inputs, args, memory = scenario
+    name, inputs, args, memory = scenario[:4]
+    feed = scenario[4] if len(scenario) > 4 else None
     cpu = Uc(UC_ARCH_X86, UC_MODE_32)
     cpu.mem_map(0, memory_size)
     cpu.mem_write(0, image)
@@ -248,6 +259,15 @@ def execute(image, signature, scenario, memory_size, stack, sentinel, budget,
 
     cpu.hook_add(UC_HOOK_MEM_WRITE, write_hook)
     cpu.hook_add(UC_HOOK_BLOCK, block_hook)
+    if feed is not None:
+        feed_address, pending = feed[0], list(feed[1])
+
+        def feed_hook(uc, access, address, size, value, unused):
+            if pending and uc.mem_read(feed_address, 1)[0] == 0:
+                uc.mem_write(feed_address, bytes([pending.pop(0)]))
+                writes.append((feed_address, feed_address + 1))
+
+        cpu.hook_add(UC_HOOK_MEM_READ, feed_hook, begin=feed_address, end=feed_address)
     try:
         cpu.emu_start(signature.address, sentinel, count=budget)
     except Exception as error:
