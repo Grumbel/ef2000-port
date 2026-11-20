@@ -119,3 +119,77 @@ uint32_t create_mission_f8e44(ef_addr32 template_, uint32_t arg_edx, ef_addr32 o
     guest_fn_bc570_x(mission, head, tail);
     return id + 1u;
 }
+
+/* Request template: byte 5 is the entry count, dword 6 the 10-byte entries. */
+#define REQUEST_ENTRIES     0x05u
+#define REQUEST_ENTRY_PTR   0x06u
+
+/* Group fields set from the escort source of a type-0xb group. */
+#define GROUP_TYPE_ESCORT   0x0bu
+#define GROUP_ESCORT_BYTE   0x6du
+#define GROUP_ESCORT_WORD   0x6eu
+#define GROUP_ESCORT_PHASE  0x70u
+#define ESCORT_BYTE         0x0au
+#define ESCORT_WORD         0x10u
+#define ESCORT_PERIOD       0x12u
+
+/* 0xbe59c, 477 bytes. Create an inactive mission for request TEMPLATE_
+   when it has any used entries: one group per used entry built by
+   0xbe480, escort groups copying ESCORT's fields with a random phase in
+   its period, then set up through 0xb47e4, 0xbe7e4 and 0xbe77c and
+   inserted into the HEAD/TAIL list. Returns ID + 1, or ID when the
+   template is empty. */
+uint16_t create_request_mission_be59c(ef_addr32 template_, uint32_t arg_edx, ef_addr32 escort, ef_addr32 owner,
+                                      uint32_t id, uint32_t node_value, uint32_t node_limit, ef_addr32 head,
+                                      ef_addr32 tail, uint32_t arg_s5, uint32_t node_head, ef_addr32 weights,
+                                      uint32_t arg_s8, uint32_t arg_s9, uint32_t arg_s10)
+{
+    ef_addr32 mission;
+    ef_addr32 groups;
+    ef_addr32 entry;
+    ef_addr32 group;
+    uint32_t count;
+    int16_t index = 0;
+    int16_t e;
+
+    if ((uint16_t)count_nonzero_entries(template_) == 0)
+        return (uint16_t)id;
+
+    mission = guest_fn_cc6c0_x(MISSION_SIZE, 0x0018ec88u); /* "unable to alloc mission" */
+    EF_U8(mission + MISSION_ACTIVE) = 0;
+    EF_U8(mission + MISSION_KIND) = EF_U8(template_ + 1u);
+    EF_U8(mission + MISSION_SIDE) = EF_U8(template_);
+    EF_U8(mission + MISSION_FIELD_0C) = 0;
+    EF_U8(mission + 0x0du) = EF_U8(template_ + 4u);
+    EF_U16(mission + MISSION_OWNER_WORD) = EF_U16(owner + 9u);
+    EF_U16(mission + MISSION_ID) = (uint16_t)id;
+    EF_U8(mission + MISSION_GROUPS) = (uint8_t)count_nonzero_entries(template_);
+
+    count = EF_U8(mission + MISSION_GROUPS);
+    groups = guest_fn_cc6c0_z(count * GROUP_SIZE, 0x0018eca0u, count); /* "unable to alloc %hd groups" */
+    EF_U32(mission + MISSION_GROUP_ARRAY) = groups;
+    fill_bytes_b3fb0(groups, 0, count * GROUP_SIZE);
+
+    for (e = 0; (int16_t)EF_U8(template_ + REQUEST_ENTRIES) > e; e++) {
+        entry = EF_U32(template_ + REQUEST_ENTRY_PTR) + TEMPLATE_ENTRY_SIZE * (uint32_t)(int32_t)e;
+        if (EF_U16(entry) == 0)
+            continue;
+        group = EF_U32(mission + MISSION_GROUP_ARRAY) + GROUP_SIZE * (uint32_t)(int32_t)index;
+        build_record_be480(group, entry, owner, arg_edx, head);
+        group = EF_U32(mission + MISSION_GROUP_ARRAY) + GROUP_SIZE * (uint32_t)(int32_t)index;
+        if (EF_U8(group + GROUP_MODE) == GROUP_TYPE_ESCORT && escort != 0) {
+            EF_U8(group + GROUP_ESCORT_BYTE) = EF_U8(escort + ESCORT_BYTE);
+            EF_U16(group + GROUP_ESCORT_WORD) = EF_U16(escort + ESCORT_WORD);
+            EF_U16(group + GROUP_ESCORT_PHASE) =
+                (uint16_t)((int32_t)(uint16_t)half_word_9c960() % (int32_t)EF_U8(escort + ESCORT_PERIOD));
+        }
+        index++;
+    }
+
+    guest_fn_b47e4(mission, (uint32_t)escort, arg_s5, weights, arg_s8, (uint32_t)owner, 0, arg_edx,
+                   (uint32_t)(int32_t)(int16_t)arg_s9, arg_s10, head);
+    collect_group_nodes_be7e4(mission, node_head, (uint32_t)(int32_t)(int16_t)node_value, (uint8_t)node_limit);
+    transfer_entry_weights_be77c(mission, weights);
+    list_insert_head(mission, head, tail);
+    return (uint16_t)(id + 1u);
+}

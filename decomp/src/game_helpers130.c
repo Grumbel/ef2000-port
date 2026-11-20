@@ -219,7 +219,7 @@ uint16_t scan_nodes_bfa58(uint16_t value, ef_addr32 head, uint32_t arg_b, uint32
             uint32_t rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), 1u);
 
             if ((uint16_t)fit_slot_record_bdbf8(rec, node, (int16_t)hi, s2, s3) != 0u)
-                value = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)hi, 0u, 1u, arg_c, s1, 0u, s2, head, arg_b, 0u, s3);
+                value = create_request_mission_be59c(rec, 0u, 0u, node, (uint32_t)hi, 0u, 1u, arg_c, s1, 0u, s2, head, arg_b, 0u, s3);
             free_entry_array_b16c0(rec);
         }
         node = EF_U32(node + 4u);
@@ -3367,7 +3367,7 @@ uint16_t process_pending_nodes_bf81c(uint16_t acc, ef_addr32 list, uint32_t p3, 
                 rec = create_slot_record_fc0ec(EF_U8(node + 0xbu), k);
                 acc32 = (int16_t)acc;
                 if ((uint16_t)fit_slot_record_bdbf8(rec, node, (int16_t)acc32, p6, p9) != 0u)
-                    acc = guest_fn_be59c(rec, 0u, 0u, node, (uint32_t)acc32, 0u, 1u, p4, p5, p7, p6, list, p3, 0u, p9);
+                    acc = create_request_mission_be59c(rec, 0u, 0u, node, (uint32_t)acc32, 0u, 1u, p4, p5, p7, p6, list, p3, 0u, p9);
                 free_entry_array_b16c0(rec);
             }
         }
@@ -3517,7 +3517,7 @@ uint16_t process_group_nodes_c0624(uint16_t value, uint8_t type, uint8_t group, 
                     val = (int32_t)(int16_t)value;
                     hit = guest_fn_bdd64_x(rec, p0, p1, (uint32_t)a, (uint32_t)b, (uint32_t)val, p4, head, list);
                     if (hit != 0u)
-                        value = guest_fn_be59c(rec, 0u, node, hit, (uint32_t)val, 0u, 1u, list, p3, p5, p4, p0, p1, 0u, head);
+                        value = create_request_mission_be59c(rec, 0u, node, hit, (uint32_t)val, 0u, 1u, list, p3, p5, p4, p0, p1, 0u, head);
                     free_entry_array_b16c0(rec);
                     count++;
                 }
@@ -4923,7 +4923,7 @@ uint16_t scan_list_bed1c(ef_addr32 list, uint16_t value, uint8_t kind, uint32_t 
 					EF_U8(cur + 0x30u) = (uint8_t)(EF_U8(cur + 0x30u) + 1);
 					n = EF_S32(ebp + 0x46u) >> 16;
 					pick = (int32_t)(uint16_t)step_generator_a45b3() % (n - 1);
-					value = guest_fn_be59c(esi, cur, 0, ebp, (uint32_t)i16, 0, 1, a2, a3, a5, a4, a0, a1,
+					value = create_request_mission_be59c(esi, cur, 0, ebp, (uint32_t)i16, 0, 1, a2, a3, a5, a4, a0, a1,
 					                       (uint32_t)(int32_t)(int16_t)pick, ctx);
 				}
 				free_entry_array_b16c0(esi);
