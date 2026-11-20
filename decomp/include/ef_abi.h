@@ -751,7 +751,6 @@ uint32_t lookup_table_by_quotient(void); /* 0x77afc -> EAX */
 void reset_pair_counter(void); /* 0x7772c */
 void guest_runtime_acquire(ef_addr32 object); /* 0xd0b68 EAX */
 void guest_runtime_set(ef_addr32 object, uint32_t value); /* 0xd0ebc EAX/EDX */
-uint16_t guest_load_halfword(ef_addr32 source); /* 0xde864 EAX -> AX */
 uint32_t guest_lookup_value(ef_addr32 source); /* 0x9ddfc EAX -> EAX */
 uint16_t guest_read_selector_word(void); /* 0xa45b3 -> AX */
 
@@ -1577,7 +1576,7 @@ void guest_fn_d1e50(uint32_t v); /* 0xd1e50 */
 void guest_fn_d65e8(void); /* 0xd65e8 */
 void guest_fn_dd370(uint32_t a, uint32_t b, uint32_t c, ef_addr32 d); /* 0xdd370 */
 void guest_fn_de580(ef_addr32 p); /* 0xde580 */
-uint32_t guest_fn_de864(ef_addr32 text); /* 0xde864 */
+uint32_t load_shape_de864(ef_addr32 name); /* 0xde864 */
 void guest_fn_e1730(void); /* 0xe1730 */
 void guest_fn_e1e6c(ef_addr32 text, uint32_t flag); /* 0xe1e6c */
 
@@ -5354,7 +5353,7 @@ void guest_fn_5a220_x(void); /* 0x5a220 unknown, no arguments */
 void guest_fn_5a468_x(void); /* 0x5a468 unknown, no arguments */
 void guest_fn_5e87c_x(uint32_t a); /* 0x5e87c EAX */
 void guest_fn_5c518_x(void); /* 0x5c518 unknown, no arguments */
-void guest_fn_59fa4_x(void); /* 0x59fa4 unknown, no arguments */
+void update_tactical_cursor_59fa4(void); /* 0x59fa4 */
 void guest_fn_59998_x(void); /* 0x59998 unknown, no arguments */
 
 void advance_object_vectors_a0174(ef_addr32 obj);
@@ -7406,6 +7405,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
  * Their indirect-call shim uses ECX to hold the callback address. */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_callptr_eax_ret_x parm [eax] [edx] modify [eax ecx edx]
+#pragma aux guest_callptr_eaxedx_ret_x parm [eax] [edx] [ebx] modify [eax ecx edx]
 #pragma aux guest_callptr_eax_x parm [eax] [edx] modify [eax ecx edx]
 #endif
 
@@ -7694,7 +7694,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_e6120_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_fe710_w parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_fc39c_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
-#pragma aux renderer_normalize_scene_c4db4 parm routine []
+#pragma aux renderer_normalize_scene_c4db4 parm routine [] modify [eax ebx ecx edx]
 #pragma aux renderer_viewport_five_c8ccc parm routine []
 #pragma aux pair_word_dc5a9 parm routine []
 #pragma aux renderer_viewport_six_e7a34 parm routine []

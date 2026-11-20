@@ -861,3 +861,14 @@ addr	size	type	name	evidence	notes
 0x001a4ba4	2	int16_t	g_war_end_hour	0x456e8 and 0x42b04 compare the replay clock	war replay end hour
 0x001a4baa	2	int16_t	g_war_start_minute	0x456e8 copies the first track point	war replay start minute
 0x001a4bac	2	int16_t	g_war_start_hour	0x456e8 copies the first track point	war replay start hour
+0x0015eea0	2	int16_t	g_shape_count	0xde864 and 0xde7d0 take the next shape slot	loaded shapes plus the sentinel slot 0
+0x0015eea2	1	uint8_t	g_shape_dir_ready	0xde864 splits the default shape path once	shape directory initialised
+0x00426150	4000	uint32_t[1000]	g_shape_hashes	0xde864 and 0xde7d0 tree keys	shape name hashes by slot
+0x00428090	2000	uint16_t[1000]	g_shape_ids	0xde864 returns the cached id	shape ids by slot
+0x00428860	4	ef_addr32	g_shape_names	0xde864 allocates 1000 name pointers	shape name table
+0x00428864	130	uint8_t[130]	g_shape_dir	0xde864 split of the default shape path	shape directory
+0x004288e6	3	uint8_t[3]	g_shape_drive	0xde864 split of the default shape path	shape drive
+0x001a6cda	2	int16_t	g_tactical_cursor_y	0x59fa4 steps it toward the target	tactical display cursor y
+0x001a6cdc	2	int16_t	g_tactical_cursor_x	0x59fa4 steps it toward the target	tactical display cursor x
+0x001a820c	4	ef_addr32	g_tactical_target	0x59fa4 projects its position words	tactical display target object
+0x001a8224	4	ef_addr32	g_tactical_tracked	0x59fa4 locks the cursor once it reaches the target	target the cursor is locked onto

@@ -48,7 +48,7 @@ void resolve_weapon_names_68efc(void)
             return;
         guest_string_copy((uint32_t)(uintptr_t)name, EF_U32(e + 0x0012bc74u));
         i++;
-        EF_U16(e + 0x0012bc8au) = (uint16_t)guest_load_halfword((uint32_t)(uintptr_t)name);
+        EF_U16(e + 0x0012bc8au) = (uint16_t)load_shape_de864((uint32_t)(uintptr_t)name);
     }
 }
 

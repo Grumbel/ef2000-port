@@ -52,7 +52,7 @@ void set_axis_9d794(uint32_t a, uint32_t b)
 /* 0x9dde0, 27 bytes. Store the converted table entry index into the 16-bit slot at destination. */
 uint16_t store_table_entry_9dde0(ef_addr32 destination, uint32_t index)
 {
-    uint16_t value = (uint16_t)guest_fn_de864(EF_U32(EF_U32(0x00132b08u) + (index & 0xffffu) * 4u));
+    uint16_t value = (uint16_t)load_shape_de864(EF_U32(EF_U32(0x00132b08u) + (index & 0xffffu) * 4u));
 
     EF_U16(destination) = value;
     return value;

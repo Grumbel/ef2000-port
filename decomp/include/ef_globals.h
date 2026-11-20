@@ -836,4 +836,15 @@ extern int16_t g_war_hour; /* 0x001a4ba2 */
 extern int16_t g_war_end_hour; /* 0x001a4ba4 */
 extern int16_t g_war_start_minute; /* 0x001a4baa */
 extern int16_t g_war_start_hour; /* 0x001a4bac */
+extern int16_t g_shape_count; /* 0x0015eea0 */
+extern uint8_t g_shape_dir_ready; /* 0x0015eea2 */
+extern uint32_t g_shape_hashes[1000]; /* 0x00426150 */
+extern uint16_t g_shape_ids[1000]; /* 0x00428090 */
+extern ef_addr32 g_shape_names; /* 0x00428860 */
+extern uint8_t g_shape_dir[130]; /* 0x00428864 */
+extern uint8_t g_shape_drive[3]; /* 0x004288e6 */
+extern int16_t g_tactical_cursor_y; /* 0x001a6cda */
+extern int16_t g_tactical_cursor_x; /* 0x001a6cdc */
+extern ef_addr32 g_tactical_target; /* 0x001a820c */
+extern ef_addr32 g_tactical_tracked; /* 0x001a8224 */
 #endif

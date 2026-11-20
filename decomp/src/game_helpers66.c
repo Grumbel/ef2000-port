@@ -23,7 +23,7 @@ void clear_named_references_8ef38(ef_addr32 object)
     uint32_t i;
 
     for (i = 0; i < 9; i++) {
-        int16_t v = (int16_t)guest_load_halfword(names[i]);
+        int16_t v = (int16_t)load_shape_de864(names[i]);
 
         clear_object_pair_reference((int16_t)(EF_S32(object + 0x1eu) >> 16), (int16_t)(0x15u + i), v);
     }

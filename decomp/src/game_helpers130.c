@@ -273,7 +273,7 @@ void parse_angle_line_db32c(void)
     sscanf_df26f(0u, 0u, 0u, 0u, start, 0x00190328u, (uint32_t)(uintptr_t)text, (uint32_t)(uintptr_t)&a20,
                  (uint32_t)(uintptr_t)&a1c, (uint32_t)(uintptr_t)&a18);
     strcat_9ca57((ef_addr32)(uintptr_t)text, 0x00190324u);
-    EF_U16(0x425bb8u) = guest_load_halfword((ef_addr32)(uintptr_t)text);
+    EF_U16(0x425bb8u) = load_shape_de864((ef_addr32)(uintptr_t)text);
     load_sincos_dc7bc((uint32_t)((int32_t)((uint32_t)a18 << 16) / 0x168) & 0xffffu);
     rotate_point_dc7e4((ef_addr32)(uintptr_t)pt, (int16_t)a20, 0);
     load_sincos_dc7bc((uint32_t)((int32_t)((uint32_t)a1c << 16) / 0x168) & 0xffffu);
@@ -4750,7 +4750,7 @@ void load_record_a1ec8(void)
 		EF_U8(e + 0x1cu) = tmp[8];
 		memcpy_dc832(e + 2u, (ef_addr32)(uintptr_t)(tmp + 0x19), 0x10);
 		EF_U16(e + 0x12u) = *(uint16_t *)(tmp + 0x29);
-		EF_U16(e) = (uint16_t)guest_fn_de864((ef_addr32)(uintptr_t)(tmp + 9));
+		EF_U16(e) = (uint16_t)load_shape_de864((ef_addr32)(uintptr_t)(tmp + 9));
 	}
 	p = EF_U32(0x0041717cu);
 	read_checked_a1afc(EF_U32(0x00417174u) + 0xbu + (uint32_t)EF_U8(p + 1u) * 0x1du, EF_U8(p));
@@ -4996,7 +4996,7 @@ void init_record_tables_87700(void)
 	uint32_t p;
 	uint16_t node;
 
-	EF_U16(0x0020f192u) = (uint16_t)guest_fn_de864(0x0018a420u);
+	EF_U16(0x0020f192u) = (uint16_t)load_shape_de864(0x0018a420u);
 	EF_U16(0x0020f19eu) = 0x06e0u;
 	EF_U16(0x0012d7a8u) = 0u;
 	EF_U32(0x0020f15cu) = 0u;
@@ -5015,26 +5015,26 @@ void init_record_tables_87700(void)
 			break;
 		update_progress_985f4(2u, (int32_t)(int16_t)i);
 		EF_U16(0x0012bc8au + (uint32_t)rec) =
-			(uint16_t)guest_fn_de864(EF_U32(0x0012bc74u + (uint32_t)rec));
+			(uint16_t)load_shape_de864(EF_U32(0x0012bc74u + (uint32_t)rec));
 		EF_U16(0x0012bc92u + (uint32_t)rec) = 0u;
 		EF_U16(0x0012bc90u + (uint32_t)rec) = 0u;
 		EF_U16(0x0012bc8eu + (uint32_t)rec) = 0u;
 		p = EF_U32(0x0012bc70u + (uint32_t)rec);
 		EF_U16(0x0012bc88u + (uint32_t)rec) = 0u;
 		if (p != 0u)
-			EF_U16(0x0012bc88u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+			EF_U16(0x0012bc88u + (uint32_t)rec) = (uint16_t)load_shape_de864(p);
 		rec = (int16_t)i * 0x91;
 		p = EF_U32(0x0012bc7cu + (uint32_t)rec);
 		if (p != 0u)
-			EF_U16(0x0012bc8eu + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+			EF_U16(0x0012bc8eu + (uint32_t)rec) = (uint16_t)load_shape_de864(p);
 		rec = (int16_t)i * 0x91;
 		p = EF_U32(0x0012bc80u + (uint32_t)rec);
 		if (p != 0u)
-			EF_U16(0x0012bc90u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+			EF_U16(0x0012bc90u + (uint32_t)rec) = (uint16_t)load_shape_de864(p);
 		rec = (int16_t)i * 0x91;
 		p = EF_U32(0x0012bc84u + (uint32_t)rec);
 		if (p != 0u)
-			EF_U16(0x0012bc92u + (uint32_t)rec) = (uint16_t)guest_fn_de864(p);
+			EF_U16(0x0012bc92u + (uint32_t)rec) = (uint16_t)load_shape_de864(p);
 		rec = (int16_t)i * 0x91;
 		p = EF_U32(0x0012bc78u + (uint32_t)rec);
 		i++;

@@ -169,7 +169,7 @@ void env_heavenly_body_db28c(void)
                      (uintptr_t)&g_heavenly_value3, (uintptr_t)&size,
                      (uintptr_t)&value5);
     strcat_9ca57((ef_addr32)(uintptr_t)name, 0x00190324u);    /* ".3" */
-    g_heavenly_shape = (int16_t)guest_fn_de864((ef_addr32)(uintptr_t)name);
+    g_heavenly_shape = (int16_t)load_shape_de864((ef_addr32)(uintptr_t)name);
     g_heavenly_value5 = value5;
     g_heavenly_size_squared = (int16_t)(size * size);
 }

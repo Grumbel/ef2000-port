@@ -55,7 +55,7 @@ uint8_t reload_halfword_table_e3ad0(void)
             int32_t r = guest_fn_e3908_w(EF_S32(0x0014ae56u + (uint32_t)i * 2u) >> 16);
 
             EF_U16(0x0014ae58u + (uint32_t)i * 2u) =
-                guest_load_halfword(EF_U32(EF_U32(0x00429228u) + (uint32_t)(int32_t)(int16_t)r * 4u));
+                load_shape_de864(EF_U32(EF_U32(0x00429228u) + (uint32_t)(int32_t)(int16_t)r * 4u));
         }
         guest_fn_c4654_w(0, EF_U32(0x001590a8u), EF_U32(0x001590acu), EF_U32(0x001590b0u));
         EF_U16(0x0015f900u) = (uint16_t)(EF_U16(0x0015f900u) - 1);

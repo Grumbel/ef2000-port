@@ -2360,7 +2360,7 @@ void refresh_current_object_598e8(void)
         break;
     case 5:
         draw_map_cursor_5a2d0();
-        guest_fn_59fa4_x();
+        update_tactical_cursor_59fa4();
         break;
     case 7:
         draw_map_cursor_5a2d0();

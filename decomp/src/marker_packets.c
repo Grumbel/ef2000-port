@@ -305,8 +305,8 @@ void apply_runtime_word_negated(void)
 /* 0x68bf4, 33 bytes. Load two halfwords from guest routine 0xde864. */
 void load_halfword_pair(void)
 {
-    write_word(0x001f6f38u, guest_load_halfword(0x00186268u));
-    write_word(0x001f6f42u, guest_load_halfword(0x00186270u));
+    write_word(0x001f6f38u, load_shape_de864(0x00186268u));
+    write_word(0x001f6f42u, load_shape_de864(0x00186270u));
 }
 
 /* 0x69080, 17 bytes. Store the low word returned by 0x9ddfc(0x186278). */

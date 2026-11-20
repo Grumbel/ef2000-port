@@ -85,7 +85,7 @@ uint8_t set_pending_mode_two(void)
 /* 0x81794, 17 bytes. Store the halfword from 0xde864(0x1889d4). */
 void load_halfword_1fcaec(void)
 {
-    write16(0x001fcaecu, guest_load_halfword(0x001889d4u));
+    write16(0x001fcaecu, load_shape_de864(0x001889d4u));
 }
 
 /* 0x7a434, 30 bytes. Release the block at pointer 0x12afc4 if set and clear it. */

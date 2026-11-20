@@ -57,8 +57,8 @@ void init_chain_28830(void)
 {
     uint32_t previous = EF_U32(0x0019b8ccu);
     int16_t i;
-    EF_U16(0x0019b8c0u) = (uint16_t)guest_fn_de864(0x001823ccu);
-    EF_U16(0x0019b8c2u) = (uint16_t)guest_fn_de864(0x001823d8u);
+    EF_U16(0x0019b8c0u) = (uint16_t)load_shape_de864(0x001823ccu);
+    EF_U16(0x0019b8c2u) = (uint16_t)load_shape_de864(0x001823d8u);
     previous = 0;
     EF_U32(0x0019b8c4u) = 0;
     EF_U32(0x0019b8c8u) = 0;
