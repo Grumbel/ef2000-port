@@ -13,7 +13,7 @@ static uint8_t guest[0x20000];
 ef_addr32 g_world_grid_base = 0x8000;
 ef_grid_type_record g_grid_type_records[256];
 uint8_t g_object_kind_modes[256 * 0xe5];
-uint8_t g_reference_clock[6];
+uint8_t g_reference_clock[8];
 double g_grid_distance_scale = 2.0;
 static uint8_t feature_1e;
 static uint8_t feature_1d;

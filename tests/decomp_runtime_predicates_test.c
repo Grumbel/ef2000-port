@@ -7,7 +7,7 @@
 #include <assert.h>
 #include <string.h>
 
-uint8_t g_reference_clock[6];
+uint8_t g_reference_clock[8];
 uint32_t g_tactical_accumulators[3];
 uint16_t g_tactical_status_words[2];
 uint8_t g_tactical_status_byte;
