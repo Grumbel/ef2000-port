@@ -6163,7 +6163,7 @@ void guest_fn_88100_x(ef_addr32 obj); /* 0x88100 EAX */
 void pump_serial_transmit_117b18(ef_addr32 p);
 
 uint32_t fold_list_kinds_c02ec(uint32_t a, uint32_t list, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3);
-uint16_t guest_fn_c03b4_x(int32_t cur, uint32_t kind, uint32_t j, uint32_t list, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xc03b4 EAX/EDX/EBX/ECX + 6 stack, ret 0x18, -> AX */
+uint16_t fold_slot_nodes_c03b4(int16_t cur, uint8_t kind, uint8_t j, ef_addr32 list, uint32_t p0, uint32_t p1, ef_addr32 head, uint32_t p3, uint32_t p4, uint32_t p5);
 
 void check_data_files_284ec(void);
 uint16_t guest_fn_27d18_x(ef_addr32 req); /* 0x27d18 EAX -> AX */
