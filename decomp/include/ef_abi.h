@@ -3795,7 +3795,9 @@ void guest_fn_ac7a8_w(uint32_t a); /* 0xac7a8 EAX */
 void guest_fn_421c0_w(void); /* 0x421c0 */
 void guest_fn_aca88_w(void); /* 0xaca88 */
 void guest_fn_d290_w(void); /* 0xd290 */
-void guest_fn_ba5c_w(void); /* 0xba5c */
+void return_to_campaign_ba5c(void);
+void guest_fn_94fc(void); /* 0x94fc */
+void guest_fn_b0f5c(void); /* 0xb0f5c, EAX result unused */
 void guest_fn_a6018_w(uint32_t a); /* 0xa6018 EAX */
 void guest_fn_aca94_w(void); /* 0xaca94 */
 void guest_fn_a4d90_w(uint32_t a); /* 0xa4d90 EAX */

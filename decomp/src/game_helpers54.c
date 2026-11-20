@@ -36,7 +36,7 @@ void update_panel_pages_42e8c(void)
         apply_a4b80_a4db0(0x001844a4u);
         EF_U8(0x00126576u) = 0;
         guest_fn_d290_w();
-        guest_fn_ba5c_w();
+        return_to_campaign_ba5c();
         guest_fn_a6018_w(0x001843f0u);
         guest_fn_aca94_w();
         guest_fn_a4d90_w(0x00184558u);

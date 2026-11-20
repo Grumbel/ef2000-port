@@ -154,7 +154,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0000b574	89	gui_close_target_view_b574	target_close	compiles	game	confirmed		Recovered direct guest C; registry gpwCloseTargetView; preserves repeated identical comparison; Watcom/ASM/static link reviewed; docs/compiler-abi.md; runtime equivalence pending
 0x0000b5d0	204	gpwRedrawTargetWindow	gpw_windows	spliced	game	confirmed	decomp/tests/0x0000b5d0.json	Plain register-ABI GUI redraw callback; structured C walks to the selected target group and refreshes the target dialogs when its member entry is present.
 0x0000b69c	959			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
-0x0000ba5c	445			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
+0x0000ba5c	445	return_to_campaign_ba5c	campaign_return	spliced	game	confirmed	decomp/tests/0x0000ba5c.json	docs/compiler-abi.md; Return from a mission to the campaign: war won/lost screens or rebuild the node pools and reopen mission select.
 0x0000bc38	432	fill_record_dialog_bc38	game_helpers130	compiles	game	confirmed	decomp/tests/0x0000bc38.json	Original 0xbc38 (432 bytes)
 0x0000bde8	93	gui_click_pilot1_bde8	gui_callbacks_088	compiles	game	confirmed		gpwClickPilot1. Find the four named entries and close their widget IDs in order.
 0x0000be48	67	gui_click_pilot2_be48	gui_callbacks_088	compiles	game	confirmed		gpwClickPilot2. Randomize a pilot with its record pointer in EAX, then fill slot zero in DL.
