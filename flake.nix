@@ -237,17 +237,6 @@
           $CC -std=c11 -O2 -Wall -Wextra -Werror -Idecomp/include \
             tests/decomp_hiscore_test.c decomp/src/hiscore.c \
             -o objects/ef2000-decomp-hiscore-test
-          for unit in hiscore_data_093 hiscore_io_093 hiscore_display_093; do
-            $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
-              -DEF_DECOMP_HOST_TEST=1 -Idecomp/include \
-              -c "decomp/src/$unit.c" -o "objects/$unit.o"
-          done
-          $CXX -std=c++17 -O2 -Wall -Wextra -Werror -pedantic \
-            -DEF_DECOMP_HOST_TEST=1 -Idecomp/include -Iruntime \
-            tests/decomp_hiscore_093_test.cpp runtime/ef2000_highscores.cpp \
-            objects/hiscore_data_093.o objects/hiscore_io_093.o \
-            objects/hiscore_display_093.o \
-            -o objects/ef2000-decomp-hiscore-093-test
           $CC -std=c11 -O2 -Wall -Wextra -Werror -pedantic \
             -DEF_DECOMP_HOST_TEST=1 -Idecomp/include \
             tests/decomp_gui_script_094_test.c \
@@ -306,7 +295,6 @@
           objects/ef2000-efpatch-test
           objects/ef2000-call-capture-test call-capture-fixture.efcap
           objects/ef2000-decomp-hiscore-test
-          objects/ef2000-decomp-hiscore-093-test
           objects/ef2000-decomp-gui-script-094-test
           objects/ef2000-decomp-gui-script-095-test
           objects/ef2000-decomp-gui-options-096-test

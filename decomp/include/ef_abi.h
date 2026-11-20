@@ -25,7 +25,9 @@ void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
 void refresh_campaign_view_c9fc4(void); /* 0xc9fc4 */
 uint8_t hiscore_load_41fc(void); /* 0x41fc */
 uint8_t hiscore_save_42a4(void); /* 0x42a4 */
-void hiscore_refresh_display_40dc(uint32_t widget); /* 0x40dc */
+void hiscore_refresh_display_40dc(ef_addr32 window); /* 0x40dc */
+void hiscore_generate_defaults_4050(void); /* 0x4050 */
+int16_t hiscore_insert_433c(ef_addr32 name); /* 0x433c */
 
 /* Game entry path from the SHA-pinned original, recovered from instruction
  * flow. These C interfaces are not yet Watcom splice-verified. */

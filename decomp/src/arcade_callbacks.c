@@ -7,7 +7,6 @@
 #include "ef_abi.h"
 #include "ef_globals.h"
 #include "ef_mem.h"
-#include "ef_hiscore_093.h"
 
 /* 0x4c50, 162 bytes. Accept the high-score name: copy the text of
  * "nametext" in the "entername" dialog into the name of the new entry

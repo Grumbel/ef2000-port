@@ -1,6 +1,6 @@
 addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md
-0x0000433c	hiscore_insert	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x433c..0x442d; original saves and restores six GPRs, ret0; one known direct caller 0x4886 loads EAX=0x17f6f0 and stores/tests returned AX at 0x488b/0x4891; docs/compiler-abi.md
+0x0000433c	hiscore_insert_433c	EAX:ef_addr32	AX:int16_t	ebx,ecx,edx,esi,edi,ebp	0	Inserts g_hiscore_current at the first row it reaches; returns the row or -1 in AX.
 0x00023760	position_delta_metric	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x23760..0x2378f; callers 0x69de/0x92751 use EAX; docs/compiler-abi.md
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md
@@ -3747,3 +3747,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000e8651	reallocate_heap_e8651	EAX:ef_addr32,EDX:uint32_t	EAX:ef_addr32	ebx,ecx,esi,edi,ebp	0	realloc; pushes EBX, ECX, ESI, EDI, EBP; EDX not preserved
 0x000f44b6	find_env_entry_f44b6	EAX:ef_addr32,EDX:int32_t	EAX:int32_t	ebx,ecx,esi,edi,ebp	0	environment lookup or delete; EDX is clobbered
 0x000f4347	putenv_f4347	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	putenv; saves all six
+0x00004050	hiscore_generate_defaults_4050			ebx,ecx,edx,esi,edi,ebp	0	Seeds the RNG with the time and fills the table with random pool names, random difficulties and the default scores.
+0x000040dc	hiscore_refresh_display_40dc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Writes names, difficulty labels and scores into the widget chains of the hiscores window (or the given window).
+0x000041fc	hiscore_load_41fc		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Loads hiscores.dat with the original one-byte checksum bug, falling back to defaults; refreshes the window.
+0x000042a4	hiscore_save_42a4		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Saves checksum and table to hiscores.dat.

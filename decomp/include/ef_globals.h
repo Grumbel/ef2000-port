@@ -156,6 +156,8 @@ extern uint8_t _Envptr[6];           /* 0x00132a61, overlaps _Envseg */
 extern uint16_t _Envseg;              /* 0x00132a65 */
 extern int32_t g_hiscore_current;     /* 0x001970a0 */
 extern ef_hiscore_entry g_hiscore_table[10]; /* 0x001970a4, 10 packed records */
+extern ef_hiscore_entry g_default_hiscores[10]; /* 0x121198, only the scores are used */
+extern char g_hiscore_name_pool[48][20]; /* 0x121292, names for generated defaults */
 /* Provisional names; original DS locations established from code reads/writes. */
 extern ef_spatial_slot g_spatial_slots[29]; /* 0x0019b2e0 */
 extern uint8_t g_spatial_slot_tags[29]; /* 0x0019b358..0x0019b374 */

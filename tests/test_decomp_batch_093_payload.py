@@ -14,11 +14,11 @@ import unittest
 ROOT = Path(__file__).resolve().parents[1]
 SHA256 = "3fd26b189efe289feb9e6ac701d592a5d48d7c1e152527aa00c01611e87e0fdb"
 ENTRIES = {
-    0x4050: (138, "hiscore_data_093"),
-    0x40DC: (288, "hiscore_display_093"),
-    0x41FC: (165, "hiscore_io_093"),
-    0x42A4: (114, "hiscore_io_093"),
-    0x433C: (242, "hiscore_data_093"),
+    0x4050: (138, "hiscore_table"),
+    0x40DC: (288, "hiscore_table"),
+    0x41FC: (165, "hiscore_table"),
+    0x42A4: (114, "hiscore_table"),
+    0x433C: (242, "hiscore_table"),
 }
 
 
