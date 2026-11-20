@@ -1,6 +1,7 @@
 addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0000432c	hiscore_qualifies		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x432c..0x433a; callers 0x49b2/0x4b64 test AL; docs/compiler-abi.md
 0x0000433c	hiscore_insert_433c	EAX:ef_addr32	AX:int16_t	ebx,ecx,edx,esi,edi,ebp	0	Inserts g_hiscore_current at the first row it reaches; returns the row or -1 in AX.
+0x00008cc4	step_table_slot_8cc4	AL:uint8_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x8cc4..0x8f4b; caller 0x8f4c loops table slots
 0x00023760	position_delta_metric	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	0x23760..0x2378f; callers 0x69de/0x92751 use EAX; docs/compiler-abi.md
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md

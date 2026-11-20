@@ -2148,7 +2148,7 @@ void set_buttons_369ac(void);
 int32_t count_live_38674(int16_t index);
 uint32_t node_position_386f8(int16_t index);
 uint8_t guest_fn_7d20(ef_addr32 a, ef_addr32 b); /* 0x7d20 EAX/EDX -> AL */
-void guest_fn_8cc4(uint32_t a, uint32_t b); /* 0x8cc4 EAX/EDX */
+void step_table_slot_8cc4(uint8_t table, uint8_t index); /* 0x8cc4 AL/DL */
 void dispatch_unit_event_46254(uint32_t source, int32_t target, uint32_t kind, uint32_t arg,
                                uint32_t stack_a, uint32_t stack_b); /* 0x46254, unit_event_dispatch.c; ret 8 */
 void guest_fn_b39ec(uint32_t a, uint32_t b, uint32_t c); /* 0xb39ec EAX/EDX/EBX */

@@ -122,7 +122,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000084b8	410	assign_object_sub_entry_84b8	game_helpers130	compiles	game	confirmed	decomp/tests/0x000084b8.json	Original 0x84b8 (410 bytes)
 0x00008654	242	step_activity_slot_8654	game_helpers55	compiles	game	confirmed	decomp/tests/0x00008654.json	docs/compiler-abi.md; Advance a unit's activity slot, nudging the object it refers to.; callers 8cc4@8d22; guest pending
 0x00008748	1401			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
-0x00008cc4	648			blocked	game	unverified		Skipped as too difficult: branches directly on CPU flags set by a callee (flag-returning assembly helper).
+0x00008cc4	648	step_table_slot_8cc4	game_helpers7	spliced	game	confirmed	decomp/tests/0x00008cc4.json	Table slot sequencer: phase-1/phase-2 orders to the unit members via 0x46254, member cycling, slot release. No flag-returning callee
 0x00008f4c	77	update_table_slots_8f4c	game_helpers7	compiles	game	confirmed	decomp/tests/0x00008f4c.json	docs/compiler-abi.md; ; callers c630@c6f9,54210@5426a,7e8c0@7ebb6; guest pending
 0x00008f9c	69	run_unit_slots_8f9c	game_helpers7	compiles	game	confirmed	decomp/tests/0x00008f9c.json	docs/compiler-abi.md; Run 46254 for each of the seven word slots of a unit.; callers 90c0@90fa; guest pending
 0x00008fe4	220	assign_table_slot_8fe4	misc_drafts1	compiles	game	confirmed	decomp/tests/0x00008fe4.json	docs/compiler-abi.md; Assign object INDEX (sign-extended word) to a free sub-slot of table TABLE: find a slot with 0x825c, clear its byte +0x2; callers 90c0@910b; guest pending

@@ -43,6 +43,88 @@ uint8_t find_free_slot_825c(uint8_t table)
     return 0xff;
 }
 
+/* Table slot (0x38 bytes, table entries 0x22 bytes at [0x1972e0]) fields. */
+#define TSLOT_UNIT    0x20u /* int16 unit id, 0xff = free */
+#define TSLOT_MEMBER  0x22u /* byte, member index 0..6 */
+#define TSLOT_MODE    0x25u
+#define TSLOT_PHASE   0x26u
+#define UNIT_KIND     0x1au
+#define UNIT_ACTIVE   0x20u
+#define UNIT_MEMBERS  0x50u /* seven int16 object ids */
+#define LAST_ORDERED_OBJECT 0x00121e84u
+
+static ef_addr32 table_slot(uint8_t table, uint8_t index)
+{
+    return EF_U32(EF_U32(0x001972e0u) + (uint32_t)table * 34u + 0x16u) + (uint32_t)index * 56u;
+}
+
+/* 0x8cc4, 648 bytes. Advance slot INDEX of table TABLE: mode-1 slots use
+   0x8654. Otherwise the unit's current member gets the phase-1 order
+   (event 0x4d with its heading when idle) or the phase-2 order (event
+   0x4f, once per object); members advance cyclically and the slot frees
+   itself when its unit has gone inactive or lost its grid link. */
+void step_table_slot_8cc4(uint8_t table, uint8_t index)
+{
+    ef_addr32 slot = table_slot(table, index);
+    int32_t unit_id = EF_S16(slot + TSLOT_UNIT);
+    ef_addr32 unit;
+    int32_t member;
+    ef_addr32 object;
+
+    if (unit_id == 0xff)
+        return;
+    if (EF_U8(slot + TSLOT_MODE) == 1) {
+        step_activity_slot_8654(table, index);
+        return;
+    }
+    unit = EF_U32(0x0019bb58u) + (uint32_t)(unit_id * 0xca);
+    if (EF_U8(unit + UNIT_ACTIVE) == 0) {
+        if (EF_U8(unit + UNIT_KIND) != 0xb && EF_U8(unit + UNIT_KIND) != 7)
+            EF_U16(slot + TSLOT_UNIT) = 0xff;
+        return;
+    }
+    member = EF_S16(unit + UNIT_MEMBERS + 2u * EF_U8(slot + TSLOT_MEMBER));
+    object = guest_fn_7489c((int16_t)member);
+    slot = table_slot(table, index);
+
+    switch (EF_U8(slot + TSLOT_PHASE)) {
+    case 1:
+        if (object != 0 && EF_U8(object + 0x16cu) == 0xc) {
+            int16_t heading = (int16_t)sub_entry_heading_8424(table, index);
+
+            dispatch_unit_event_46254(0x899, member, 0x4d, (uint32_t)(int32_t)heading, index, 0);
+        } else if (object == 0 || EF_U8(object + 0x20au) != 0) {
+            EF_U8(slot + TSLOT_MEMBER)++;
+        }
+        slot = table_slot(table, index);
+        if (grid_has_object_mode(EF_S16(slot + TSLOT_UNIT), 0xc) == 0) {
+            slot = table_slot(table, index);
+            EF_U8(slot + TSLOT_PHASE)++;
+            EF_U8(slot + TSLOT_MEMBER) = 0;
+        }
+        break;
+    case 2:
+        if (grid_has_object_mode(EF_S16(slot + TSLOT_UNIT), 0xb) != 0)
+            break;
+        if (object != 0 && EF_U8(object + 0x16cu) == 0xa) {
+            if (EF_U16(LAST_ORDERED_OBJECT) != EF_U16(object + 0x16u)) {
+                dispatch_unit_event_46254(0x899, EF_S16(object + 0x16u), 0x4f, 0, 0, 0);
+                EF_U16(LAST_ORDERED_OBJECT) = EF_U16(object + 0x16u);
+            }
+        } else {
+            EF_U8(table_slot(table, index) + TSLOT_MEMBER)++;
+        }
+        break;
+    }
+
+    slot = table_slot(table, index);
+    if (EF_U8(slot + TSLOT_MEMBER) > 6)
+        EF_U8(slot + TSLOT_MEMBER) = 0;
+    slot = table_slot(table, index);
+    if (grid_has_active_link(EF_S16(slot + TSLOT_UNIT)) == 0)
+        EF_U16(table_slot(table, index) + TSLOT_UNIT) = 0xff;
+}
+
 /* 0x8f4c, 77 bytes. */
 void update_table_slots_8f4c(uint8_t table)
 {
@@ -53,7 +135,7 @@ void update_table_slots_8f4c(uint8_t table)
         return;
     entry = EF_U32(0x001972e0u) + (uint32_t)table * 34u;
     for (i = 0; (int32_t)i < (int32_t)EF_U8(entry + 0x13u); i++)
-        guest_fn_8cc4(table, i);
+        step_table_slot_8cc4(table, (uint8_t)i);
 }
 
 /* 0x8f9c, 69 bytes. Run 46254 for each of the seven word slots of a unit. */
