@@ -97,3 +97,30 @@ void restart_object_8d11c(int16_t index)
     set_scene_input_triplet((int32_t)(EF_U32(obj + OBJ_X) << 8), (int32_t)(EF_U32(obj + OBJ_Y) << 8),
                             (int32_t)(EF_U32(obj + OBJ_Z) << 8));
 }
+
+#define PLAYER_SLOT          0x001f71c8u /* 16.16, index of the player object */
+#define BANK_ANGLE           0x001a3088u /* double */
+#define BANK_SCALE           0x0018a933u /* double 0.41010... */
+#define BANK_UNITS           0x0018a93bu /* double 256.0 */
+
+/* 0x8e494, 132 bytes. Rotate the scene matrix for page PAGE: when the
+ * player object shows that page, its middle angle word is
+ * trunc(-angle * scale * 256) from the double at 0x1a3088, otherwise zero.
+ * The angles go through 0xc5c24, a zero rotation through 0xc5cd3, and the
+ * id 0x1b is selected with 0xc5d8f. */
+void tilt_page_matrix_8e494(int16_t page)
+{
+    uint16_t angles[3];
+    uint16_t zero[3];
+    ef_addr32 player = guest_fn_7489c(EF_S32(PLAYER_SLOT) >> 16);
+
+    angles[0] = angles[1] = angles[2] = 0;
+    zero[0] = zero[1] = zero[2] = 0;
+    if (player != 0 && (int16_t)EF_U16(player + OBJ_PAGE) == page)
+        angles[1] = (uint16_t)(int32_t)truncate_9d72c(-*(double *)ef_guest_memory_ptr(BANK_ANGLE) *
+                                                      *(double *)ef_guest_memory_ptr(BANK_SCALE) *
+                                                      *(double *)ef_guest_memory_ptr(BANK_UNITS));
+    rotate_add_patch_c5c24(0, 0, 0, 0, (ef_addr32)(uintptr_t)angles);
+    rotate_matrix_c5cd3(0, 0, 0, 0, (ef_addr32)(uintptr_t)zero);
+    guest_fn_c5d8f(0x1b);
+}

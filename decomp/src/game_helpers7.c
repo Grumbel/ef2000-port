@@ -19,6 +19,76 @@ uint32_t apply_slot_7dec(int16_t unit_id, uint8_t table, uint8_t index)
     return guest_fn_7d20(unit + 0x49u, EF_U32(entry + 0x16u) + (uint32_t)index * 56u);
 }
 
+/* 0x7e44, 164 bytes. Place unit UNIT_ID of table TABLE at its roster slot
+ * (0x7bc0, 0xff for none): the slot point from 0x7ca8 becomes the x/z position
+ * and the slot's wrapped heading (double at +4 of the 25-byte entries at
+ * table +0x1e) the heading passed to 0x6d38c, with zero rates, -1.0 and
+ * mode 0xc. */
+void place_unit_at_slot_7e44(int16_t unit_id, uint8_t table)
+{
+    double pos[3]; /* x and z from 0x7ca8; 0x6d38c fills in the height */
+    ef_addr32 entry;
+    uint8_t slot;
+
+    if (guest_fn_7489c(unit_id) == 0)
+        return;
+    slot = (uint8_t)pick_roster_slot_7bc0((uint32_t)(int32_t)unit_id, table);
+    if (slot == 0xff)
+        return;
+    scaled_entry_point_7ca8((ef_addr32)(uintptr_t)pos, table, slot);
+    entry = EF_U32(EF_U32(0x001972e0u) + (uint32_t)table * 34u + 0x1eu) + (uint32_t)slot * 25u;
+    guest_fn_6d38c(unit_id, (ef_addr32)(uintptr_t)pos,
+                   wrap_angle_b42f0(*(double *)ef_guest_memory_ptr(entry + 4u)), 0.0, 0.0, 0.0, -1.0, 0xc);
+}
+
+/* 0x7ee8, 524 bytes. Place unit UNIT_ID in its formation cell of table
+ * TABLE: the last of the table's 56-byte cells whose word +0x20 equals the
+ * unit's cell word +0x28 (cell 0 in a linked session, none: nothing). The
+ * position is the table origin (0x6/0xa through 0xb4230) plus the cell
+ * offset (+0x8/+0xc) times the scale at 0x1803f8, plus the unit type's
+ * formation offset (the 16-byte double pair at 0x197270 + 16 * type, its
+ * first value lengthened by 3/8 of the negated cell depth +0x10), rotated
+ * by the cell heading (0x81ec). 0x6d38c then places it with mode 0xa. */
+void place_unit_in_formation_7ee8(int16_t unit_id, uint8_t table)
+{
+    double pos[3]; /* x and z here; 0x6d38c fills in the height */
+    double heading, scale, c, s, along;
+    ef_addr32 unit = guest_fn_7489c(unit_id);
+    ef_addr32 entry, cells, offset;
+    int32_t depth;
+    uint8_t slot = 0xff;
+    uint8_t i;
+
+    if (unit == 0)
+        return;
+    entry = EF_U32(0x001972e0u) + (uint32_t)table * 34u;
+    for (i = 0; i < EF_U8(entry + 0x13u); i++)
+        if (EF_U16(EF_U32(entry + 0x16u) + (uint32_t)i * 0x38u + 0x20u) == EF_U16(unit + 0x28u))
+            slot = i;
+    if (EF_U8(0x00127da8u) != 0)
+        slot = 0;
+    if (slot == 0xff)
+        return;
+
+    heading = sub_entry_value_81ec(table, slot);
+    entry = EF_U32(0x001972e0u) + (uint32_t)table * 34u;
+    pos[0] = guest_fn_b4230(EF_S32(entry + 0xau) >> 16);
+    pos[1] = guest_fn_b4230(EF_S32(entry + 6u) >> 16);
+    cells = EF_U32(entry + 0x16u) + (uint32_t)slot * 0x38u;
+    scale = *(double *)ef_guest_memory_ptr(0x001803f8u);
+    pos[0] = (double)EF_S32(cells + 0xcu) * scale + pos[0];
+    pos[1] = (double)EF_S32(cells + 8u) * scale + pos[1];
+
+    depth = -EF_S32(cells + 0x10u) / 2 * 3 / 4;
+    offset = 0x00197270u + (uint32_t)EF_U8(unit + 0x2au) * 16u;
+    along = (double)depth + *(double *)ef_guest_memory_ptr(offset);
+    c = guest_fn_b45a2(heading);
+    s = guest_fn_b45ac(heading);
+    pos[0] = along * c + -s * *(double *)ef_guest_memory_ptr(offset + 8u) + pos[0];
+    pos[1] = along * s + c * *(double *)ef_guest_memory_ptr(offset + 8u) + pos[1];
+    guest_fn_6d38c(unit_id, (ef_addr32)(uintptr_t)pos, heading, 0.0, 0.0, 0.0, -1.0, 0xa);
+}
+
 /* 0x825c, 92 bytes. Find the first free slot of table al (0xfe if all are used, 0xff if none usable). */
 uint8_t find_free_slot_825c(uint8_t table)
 {

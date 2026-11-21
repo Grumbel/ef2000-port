@@ -3155,6 +3155,11 @@ uint16_t find_next_slot_8600c(uint8_t kind);
 void guest_fn_dc91c(ef_addr32 out, ef_addr32 a, ef_addr32 b); /* 0xdc91c EAX/EDX/EBX */
 void guest_fn_91afc(int32_t a, uint32_t b); /* 0x91afc EAX/EDX */
 void guest_fn_c4654(uint32_t a, uint32_t b, uint32_t c); /* 0xc4654 cdecl */
+void guest_fn_c5d8f(uint32_t id); /* 0xc5d8f stack word, callee pops 4 */
+void guest_fn_6d38c(int32_t index, ef_addr32 pos, double heading, double a, double b, double c, double d, uint32_t mode); /* 0x6d38c EAX/EDX + 0x2c stack bytes, callee pops */
+void place_unit_at_slot_7e44(int16_t unit_id, uint8_t table); /* 0x7e44, game_helpers7.c */
+void place_unit_in_formation_7ee8(int16_t unit_id, uint8_t table); /* 0x7ee8, game_helpers7.c */
+void tilt_page_matrix_8e494(int16_t page); /* 0x8e494, object_restart.c */
 
 /* game_helpers48.c */
 void step_object_883cc(ef_addr32 object);
@@ -5190,6 +5195,7 @@ void advance_text_cursor_11451c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t 
 void redraw_entries_a6038(void);
 
 void integrate_motion_97950(uint32_t obj);
+void apply_drag_979c8(uint32_t obj); /* 0x979c8, misc_drafts1.c */
 void flush_pending_a374c(uint32_t code);
 uint32_t create_entry_d7764(uint32_t name, uint32_t b13, uint32_t b14, uint32_t w15, uint32_t w17, uint32_t d19, uint32_t b23);
 uint32_t text_width_dd2f4(uint32_t str);
@@ -7716,6 +7722,7 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_fn_a7948 parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_10da50 parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_c4654 parm routine [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux guest_fn_c5d8f parm routine [] modify [eax]
 #pragma aux guest_fn_a7ae0 parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_e6120_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_fe710_w parm routine [] modify [eax ebx ecx edx esi edi ebp]

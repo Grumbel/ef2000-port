@@ -716,6 +716,28 @@ void integrate_motion_97950(uint32_t obj)
     add_vector3(obj + 0x18u, t);
 }
 
+/* 0x979c8, 129 bytes. Unless the simulation is paused (0x122c5c), damp the
+ * rate vector at +0x30: add frame time (0x132b20) times -0.5 * rate plus
+ * -5e-5 * |velocity| * velocity, where the velocity vector is at +0x24. */
+void apply_drag_979c8(uint32_t obj)
+{
+    uint8_t tmp[24];
+    ef_addr32 rate = (uint32_t)(uintptr_t)tmp;
+    ef_addr32 drag = rate + 12u;
+    union { float f; uint32_t u; } k;
+
+    if (EF_U8(0x00122c5cu) != 0u)
+        return;
+    copy_vector3(rate, obj + 0x30u);
+    scale_vector3_ea8cc(rate, 0u, 0u, 0u, 0xbf000000u); /* -0.5f */
+    copy_vector3(drag, obj + 0x24u);
+    k.f = (float)(guest_fn_ea884_x(obj + 0x24u) * -5e-05);
+    scale_vector3_ea8cc(drag, 0u, 0u, 0u, k.u);
+    add_vector3(rate, drag);
+    scale_vector3_ea8cc(rate, 0u, 0u, 0u, EF_U32(0x00132b20u));
+    add_vector3(obj + 0x30u, rate);
+}
+
 /* 0xa374c, 118 bytes. When at least 8 bytes are pending (0x1357da), send a 13-byte request built from 0x1357ae, 7 bytes of the template at [0x13587c + 32 * code + 1], the pending count and the word at 0x1357ec, then clear both pending values. */
 void flush_pending_a374c(uint32_t code)
 {
