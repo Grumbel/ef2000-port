@@ -2792,6 +2792,10 @@ uint32_t text_width_17_dd460(ef_addr32 text);
 uint32_t text_width_5_dd55c(ef_addr32 text);
 uint32_t text_width_6_dd728(ef_addr32 text);
 void init_time_constants_e7850(void);
+void guest_fn_10c1b0(void); /* 0x10c1b0 */
+void reset_flight_model_e78b4(void); /* 0xe78b4 */
+void derive_geometry_records_109ec0(void); /* 0x109ec0 */
+void update_sink_warning_10958c(void); /* 0x10958c */
 void interpolate_line_e85f0(ef_addr32 out_x, ef_addr32 out_y);
 uint8_t guest_fn_dcc98(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdcc98 AL/EDX/EBX/ECX -> AL */
 uint8_t guest_fn_dd164(uint32_t glyph, int32_t x, int32_t y, uint32_t color); /* 0xdd164 AL/EDX/EBX/ECX -> AL */

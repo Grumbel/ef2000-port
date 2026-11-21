@@ -3882,3 +3882,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0006e1c4	formation_offset_6e1c4	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006e1c4 (348 bytes); formation station error; callers link_point.c, game_helpers80.c
 0x000b513c	fill_group_slot_b513c	EAX:ef_addr32,DX:int16_t,EBX:ef_addr32,ECX:ef_addr32		esi,edi,ebp	0	Original 0x000b513c (358 bytes); group slot fill
 0x000a5070	limit_widget_size_a5070	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x000a5070 (361 bytes); widget size limits
+0x00109ec0	derive_geometry_records_109ec0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00109ec0 (365 bytes); geometry records
