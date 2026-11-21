@@ -206,3 +206,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x41b98 draw_map_row_41b98 (map_row_marker.c; clamped campaign-map position, command-code colour, side symbol, 0x4110c); differential 256; hybrid regression 4/4
 2026-11-21  B5  recover 0x41998 draw_map_unit_41998 (map_unit_marker.c; clamped campaign-map position, heading angle, visibility, side symbol, type colour, selection box 0xc9cac); differential 256; hybrid regression 4/4
 2026-11-21  B5  recover 0x6e3e0 update_chase_camera_6e3e0 (chase_camera.c; stack doubles, height/distance growth, hover minimum, atan2 heading, aircraft-type cap, tan bank, 0x6ebe0 projection call); differential 256; hybrid regression 4/4
+2026-11-21  B5  recover 0x6ebe0 update_camera_pitch_6ebe0 (chase_camera.c; five stack doubles, atan2 pitch, mode/ground/selector pitch limits via 0x82478, pi/4 clamp, lift-ratio acos bank limit, 0x6e8d8/0x6eaf4 calls); differential 256; hybrid regression 4/4

@@ -6897,6 +6897,8 @@ void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb);
 
 void update_chase_camera_6e3e0(double grow_out, double grow_in);
 #pragma aux update_chase_camera_6e3e0 parm routine [] modify [eax] /* 0x6e3e0, ret 0x10 */
+void update_camera_pitch_6ebe0(double damp_rate, double turn_rate, double bank_bias, double pitch_bias, double range);
+#pragma aux update_camera_pitch_6ebe0 parm routine [] modify [eax] /* 0x6ebe0, ret 0x28 */
 
 void focus_camera_on_unit_24c40(uint32_t ax);
 
