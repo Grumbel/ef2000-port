@@ -129,6 +129,19 @@ void guest_callptr_esi_frame_x(ef_addr32 fn, uint32_t esi, uint32_t frame_arg)
     call_esi_frame(fn, esi, frame_arg);
 }
 
+static void call_with_ebp(uint32_t fn, uint32_t arg, uint32_t context);
+#pragma aux call_with_ebp parm [ecx] [eax] [edx] \
+    modify [eax ebx ecx edx esi edi] = \
+    "push ebp" \
+    "mov ebp,edx" \
+    "call ecx" \
+    "pop ebp"
+
+void guest_callptr_ebp_x(ef_addr32 fn, uint32_t eax, uint32_t ebp)
+{
+    call_with_ebp(fn, eax, ebp);
+}
+
 static uint32_t call_register_eax(uint32_t fn, uint32_t arg);
 #pragma aux call_register_eax parm [eax] [edx] modify [eax ecx edx] = \
     "mov ecx,eax" \

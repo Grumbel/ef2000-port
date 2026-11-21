@@ -3831,3 +3831,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c54b7	renderer_toggle_opcode_b_c54b7	ESI:uint32_t		ebp	0	Original 0x000c54b7 (31 bytes); toggle object ESI hidden flag, rerun interpreter B
 0x000c54d6	renderer_reset_opcode_b_c54d6	ESI:uint32_t		ebp	0	Original 0x000c54d6 (25 bytes); object ESI type 4, rerun interpreter B
 0x000c3430	load_iff_file_c3430	EAX:ef_addr32	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000c3430 (154 bytes); find, read and classify an IFF file; AL 1 when missing
+0x000c3584	decode_iff_body_c3584	EAX:int32_t,EDX:int32_t,EBX:int32_t,ECX:int32_t,[ESP+4]:ef_addr32			4	Original 0x000c3584 (234 bytes); decode the IFF BODY rows into DEST through two alloca row buffers; DEST advances in its argument slot, so the entry must not go through a re-pushing trampoline (ESI/EDI/EBP are saved by the Watcom body itself); callee pops DEST
+0x000effb4	double_to_extended_effb4	EAX:uint32_t,EDX:uint32_t,EBX:ef_addr32,EBP:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x000effb4 (128 bytes); soft-float double EDX:EAX to 80-bit extended at [EBX]; signalling NaN raises invalid through 0xee43c on the context in EBP

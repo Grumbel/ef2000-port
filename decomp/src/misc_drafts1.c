@@ -22271,6 +22271,50 @@ uint8_t load_iff_file_c3430(ef_addr32 name)
 #define IFF_LOAD_ERROR      0x0018ee70u /* "Unable to load iff file %s" */
 #define IFF_HEADER_ERROR    0x0018ee4cu /* "%s has incorrect header" */
 
+#define IFF_ROW_BYTES       0x0041f3a8u /* bytes per row of the current picture */
+#define IFF_BODY_CHUNK      0x59444f42u /* 'BODY' */
+#define IFF_NO_STACK_ERROR  0x0018eddcu
+
+/* Stack allocation as in Watcom's alloca: the caller checks stackavail
+ * (0xdcb74) itself and keeps an EBP frame. */
+void *iff_stack_alloc(uint32_t size);
+#pragma aux iff_stack_alloc = "sub esp,eax" parm nomemory [eax] value [esp] modify exact nomemory [esp]
+
+/* 0xc3584, 234 bytes. Decode the BODY of the loaded IFF picture: two
+ * row-sized stack buffers (fatal if the stack is short), the bit pattern
+ * table, Y rows skipped, then H rows each decoded into planes (0xc1e3c),
+ * converted to bytes through the pattern table (0xc1ee8), and W bytes from
+ * column X copied to DEST, which advances by W in its argument slot. X, Y, W, H are words;
+ * callee pops DEST. */
+void decode_iff_body_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest)
+{
+	uint8_t pattern[0x200];
+	ef_addr32 planes = 0u;
+	ef_addr32 bytes = 0u;
+	volatile ef_addr32 *cursor = &dest; /* kept in the stack argument */
+	uint32_t size;
+	int16_t rows;
+
+	size = ((uint32_t)EF_U16(IFF_ROW_BYTES) + 3u) & ~3u;
+	if (size < stack_used_dcb74())
+		planes = (ef_addr32)(uintptr_t)iff_stack_alloc(size);
+	size = ((uint32_t)EF_U16(IFF_ROW_BYTES) + 3u) & ~3u;
+	if (size < stack_used_dcb74())
+		bytes = (ef_addr32)(uintptr_t)iff_stack_alloc(size);
+	if (planes == 0u || bytes == 0u)
+		guest_callptr1_x(EF_U32(0x00132a74u), IFF_NO_STACK_ERROR);
+	find_chunk_c1c24(IFF_BODY_CHUNK);
+	fill_bit_pattern_table_c2f80((ef_addr32)(uintptr_t)pattern);
+	for (rows = (int16_t)y; rows != 0; rows--)
+		decode_rle_rows_c1e3c(planes);
+	for (rows = (int16_t)h; rows != 0; rows--) {
+		decode_rle_rows_c1e3c(planes);
+		guest_fn_c1ee8(bytes, planes, (ef_addr32)(uintptr_t)pattern);
+		copy_blocks_e9a24((uint32_t)(int32_t)(int16_t)w, bytes + (uint32_t)(int32_t)(int16_t)x, *cursor);
+		*cursor += (uint32_t)(int32_t)(int16_t)w;
+	}
+}
+
 /* 0xc36b4, 95 bytes. Load the IFF picture NAME (0xc3430) and check its
  * header through the format's hook; either failure is fatal. Then decode
  * it at X, Y (words) into the W by H (words) picture DEST (0xc3584) and

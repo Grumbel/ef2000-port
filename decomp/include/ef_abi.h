@@ -2949,11 +2949,16 @@ uint8_t guest_fn_c3430(uint32_t a); /* 0xc3430 EAX -> AL */
 uint8_t load_iff_file_c3430(ef_addr32 name); /* 0xc3430, misc_drafts1.c */
 void guest_fn_c3364(ef_addr32 path, ef_addr32 name); /* 0xc3364 EAX/EDX */
 void guest_fn_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584 EAX/EDX/EBX/ECX + 1 stack, callee pops */
+void decode_iff_body_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584, misc_drafts1.c */
+void guest_fn_c1ee8(ef_addr32 bytes, ef_addr32 planes, ef_addr32 pattern); /* 0xc1ee8 EAX/EDX/EBX, keeps ECX/ESI/EDI/EBP */
 void draw_iff_to_buffer_c36b4(ef_addr32 name, uint32_t x, uint32_t y, uint32_t w, uint32_t h, ef_addr32 dest); /* 0xc36b4, misc_drafts1.c */
 void guest_fn_e3cac(ef_addr32 name); /* 0xe3cac one stack argument, callee pops */
 uint8_t guest_callptr_esi_carry_x(ef_addr32 fn, uint32_t esi); /* indirect call, ESI in, carry out as AL; EBP saved */
 void guest_callptr_esi_x(ef_addr32 fn, uint32_t esi); /* indirect call, ESI in; EBP saved */
 void guest_callptr_esi_frame_x(ef_addr32 fn, uint32_t esi, uint32_t frame_arg); /* indirect call, ESI in, [EBP+8] = frame_arg */
+void guest_callptr_ebp_x(ef_addr32 fn, uint32_t eax, uint32_t ebp); /* indirect call, EAX in, EBP = context */
+uint32_t format_nonfinite_double(uint32_t lo, uint32_t hi, ef_addr32 out); /* 0x1204dc, runtime_float.c */
+void double_to_extended_effb4(uint32_t lo, uint32_t hi, ef_addr32 out); /* 0xeffb4, runtime_float.c */
 void guest_fn_c3328(void); /* 0xc3328 */
 
 /* runtime_helpers23.c */
@@ -7732,9 +7737,14 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_fn_e3cac parm routine [] modify [eax ebx ecx edx]
 #pragma aux draw_iff_to_buffer_c36b4 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #pragma aux guest_fn_c3584 modify [eax ebx ecx edx]
+#pragma aux decode_iff_body_c3584 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#pragma aux guest_fn_c1ee8 modify [eax ebx edx]
 #pragma aux guest_callptr_esi_carry_x parm [eax] [esi] value [al] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_x parm [eax] [esi] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_frame_x parm [eax] [esi] [edx] modify [eax ebx ecx edx esi edi]
+#pragma aux guest_callptr_ebp_x parm [eax] [edx] [ebx] modify [eax ebx ecx edx esi edi]
+#pragma aux format_nonfinite_double parm routine [] modify [eax]
+#pragma aux double_to_extended_effb4 frame parm [eax] [edx] [ebx] modify [eax edx]
 #pragma aux renderer_viewport_five_c8ccc parm routine [] modify [eax ebx ecx edx]
 #pragma aux pair_word_dc5a9 parm routine []
 #pragma aux renderer_viewport_six_e7a34 parm routine [] modify [eax ebx ecx edx]
