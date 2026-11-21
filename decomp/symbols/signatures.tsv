@@ -3858,3 +3858,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000bb7c0	record_class_code_bb7c0	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Pushes EDX; returns the code in EAX
 0x000c1438	build_group_record_c1438	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t	EAX:uint32_t	esi,edi,ebp	8	Callee pops the two stack arguments; returns ID + 1.
 0x0009357c	update_chase_camera_9357c			ebx,ecx,edx,esi,edi,ebp	0	Pushes all but EAX; EAX is clobbered by the callees.
+0x000913dc	step_view_transition_913dc	AL:uint8_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Pushes EBX/ECX; EDX is clobbered.

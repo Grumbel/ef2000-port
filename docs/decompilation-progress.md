@@ -161,3 +161,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0xf2819 detect_cpu_f2819 (cpu_detect.c, EFLAGS/CPUID platform wrappers) and 0x10da50 unpack_ra_10da50 (ra_unpack.c); differential 32/32 and 64/64; hybrid regression 4/4
 2026-11-21  B5  recover jump-table functions 0xba13c fill_colour_record_ba13c, 0x640b8 draw_map_marker_640b8, 0xbbf1c roll_code_chance_bbf1c, 0xbb7c0 record_class_code_bb7c0; differential 96/160/160/200; hybrid regression 4/4
 2026-11-21  B5  recover 0xc1438 build_group_record_c1438 and 0x9357c update_chase_camera_9357c (new view_motion.c); differential 96/128; hybrid regression 4/4
+2026-11-21  B5  recover 0x913dc step_view_transition_913dc (view_motion.c; jump-table switch); differential 200; hybrid regression 4/4

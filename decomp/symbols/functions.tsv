@@ -1891,7 +1891,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x0009125c	60	scene_lookup_named_word	scene_state	compiles	game	confirmed	decomp/tests/0x0009125c.json	docs/compiler-abi.md
 0x00091298	29	scene_metric_remaining	scene_state	compiles	game	confirmed	decomp/tests/0x00091298.json	docs/compiler-abi.md
 0x000912b8	79	draw_pending_message_912b8	small_wrappers7	compiles	game	confirmed	decomp/tests/0x000912b8.json	docs/compiler-abi.md; While the pending-message count at 0x2144b2 is positive, shrink it by the limit at 0x127d92 and draw the message at row ; callers 3dd30@3e344; 5 authored differential cases pass with stack-argument logging; 48c90 alias corrected to caller-cleaned cdecl; full replay equivalence pending
-0x000913dc	1298			blocked	game	unverified		Skipped as too difficult: uses segment registers, DOS/BIOS interrupts, port I/O or segment-limit instructions that the flat C ABI cannot express without inline assembly.
+0x000913dc	1298	step_view_transition_913dc	view_motion	spliced	game	confirmed	decomp/tests/0x000913dc.json	View transition step for a slot by action 0..4 (blend towards the slot over 15 steps, blend back, query, clear, reset) with page-text events 0x18/0x19 when the progress leaves or reaches zero; the CS: jump table is a plain switch; structured C.
 0x000918f0	30	scene_metric_reaches_threshold	scene_state	compiles	game	confirmed	decomp/tests/0x000918f0.json	docs/compiler-abi.md
 0x00091910	73	set_scene_input_triplet	scene_state	compiles	game	confirmed	decomp/tests/0x00091910.json	docs/compiler-abi.md
 0x0009195c	63	set_scene_angles	scene_state	compiles	game	confirmed	decomp/tests/0x0009195c.json	docs/compiler-abi.md

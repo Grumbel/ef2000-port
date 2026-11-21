@@ -2,6 +2,7 @@
 /* SPDX-License-Identifier: LicenseRef-EF2000-Derived */
 
 #include "ef_abi.h"
+#include "ef_globals.h"
 #include "ef_mem.h"
 
 /* Chase-camera state around 0x12db9e and 0x214370..0x2144b6. */
@@ -171,4 +172,194 @@ void update_chase_camera_9357c(void)
     configure_scene_angle_triplet(view_s16(VIEW_ANGLE_B6), view_s16(VIEW_ANGLE_B4), view_s16(VIEW_ANGLE_B0));
     set_scene_input_triplet(view_s32(0x00214370u), view_s32(0x0021436cu), view_s32(0x00214374u));
     EF_U8(0x0021454au) = 1;
+}
+
+/* View transitions of 0x913dc: a progress 0..15 at 0x12dc70 blends the
+ * saved camera offset and second angle towards the view slot's offset
+ * (int16[3] at 0x12dc4a + 6 * slot) or back to zero. */
+#define TRANSITION_OFFSET   0x0012dc3cu /* int16[3] current offset */
+#define TRANSITION_ANGLE    0x0012dc48u /* int16 current second angle */
+#define TRANSITION_SLOTS    0x0012dc4au /* int16[3] per view slot */
+#define TRANSITION_STEP     0x0012dc70u /* int16 progress 0..15 */
+#define TRANSITION_ACTIVE   0x0012dc72u /* byte: frames counted after arriving */
+#define TRANSITION_SLOT     0x0012dc6eu /* byte: current slot, 0xff none */
+#define TRANSITION_RETURN   0x0012dc82u /* byte: 1 while returning */
+#define TRANSITION_INSTANT  0x0012dc83u /* byte: skip the blend */
+#define TRANSITION_STEPS    15
+#define TRANSITION_FULL_ANGLE 0x13e9
+
+/* Saved offset x, y, z (int32 each); the saved angle is at 0x21434c. */
+static const ef_addr32 saved_axis_913dc[3] = { 0x00214350u, 0x00214354u, 0x00214348u };
+
+/* VALUE * FACTOR / 15 with the original's wrapping 32-bit product. */
+static int32_t blend_913dc(uint32_t value, int32_t factor)
+{
+    return (int32_t)(value * (uint32_t)factor) / TRANSITION_STEPS;
+}
+
+static int16_t transition_step_913dc(void)
+{
+    return (int16_t)EF_U16(TRANSITION_STEP);
+}
+
+/* Remember the current offset and angle as the blend's starting point. */
+static void save_transition_913dc(void)
+{
+    EF_U32(0x00214350u) = (uint32_t)(int32_t)(int16_t)EF_U16(TRANSITION_OFFSET);
+    EF_U32(0x00214354u) = (uint32_t)(int32_t)(int16_t)EF_U16(TRANSITION_OFFSET + 2u);
+    EF_U32(0x00214348u) = (uint32_t)(int32_t)(int16_t)EF_U16(TRANSITION_OFFSET + 4u);
+    EF_U32(0x0021434cu) = (uint32_t)(int32_t)(int16_t)EF_U16(TRANSITION_ANGLE);
+}
+
+static int transition_blends_913dc(void)
+{
+    return g_mission_difficulty != 0u && EF_U8(TRANSITION_INSTANT) == 0u;
+}
+
+static int is_fixed_slot_913dc(uint8_t slot)
+{
+    return slot == 0u || slot == 1u || slot == 2u;
+}
+
+/* 0x913dc, 1298 bytes, EDX clobbered: step the view transition for SLOT
+ * (AL; 0xff keeps the current slot) by ACTION (DL) and return in AL whether
+ * the view is still moving. Action 0 blends from the saved offset and angle
+ * towards the slot (restarting when the slot changes or after a return),
+ * the fixed slots 0..2 also turning the angle by 0x13e9; once arrived it
+ * counts up to 4 more frames. Action 1 blends back to zero; action 2 only
+ * reports; action 3 clears the frame count; action 4 resets everything.
+ * Whenever the progress starts or stops being zero, event 0x18 or 0x19 is
+ * sent to the watched unit's page text (0x9e508). */
+uint8_t step_view_transition_913dc(uint8_t slot, uint8_t action)
+{
+    int16_t step = transition_step_913dc();
+    uint8_t moving = 0;
+    ef_addr32 unit;
+    int32_t angle;
+    uint32_t axis;
+
+    if (slot == 0xffu)
+        slot = EF_U8(TRANSITION_SLOT);
+
+    switch (action) {
+    case 0:
+        if (slot != EF_U8(TRANSITION_SLOT) || EF_U8(TRANSITION_RETURN) == 1u) {
+            save_transition_913dc();
+            moving = 1;
+            step = 0;
+            EF_U8(TRANSITION_ACTIVE) = 1;
+        } else if (step < TRANSITION_STEPS) {
+            step = (int16_t)(step + (int16_t)g_simulation_tick_step);
+            if (!transition_blends_913dc())
+                step = TRANSITION_STEPS;
+            EF_U16(TRANSITION_STEP) = (uint16_t)step;
+            if (step > TRANSITION_STEPS) {
+                step = TRANSITION_STEPS;
+                EF_U16(TRANSITION_STEP) = (uint16_t)step;
+            }
+            init_bounds_d0b68(0x0012dbecu);
+            step = transition_step_913dc();
+            angle = blend_913dc(EF_U32(0x0021434cu), TRANSITION_STEPS - step);
+            if (is_fixed_slot_913dc(slot))
+                angle += step * TRANSITION_FULL_ANGLE / TRANSITION_STEPS;
+            EF_U16(TRANSITION_ANGLE) = (uint16_t)angle;
+            EF_U16(TRANSITION_STEP) = (uint16_t)step;
+            update_scene_angle_second(0x0012dbecu, EF_U16(TRANSITION_ANGLE));
+            step = transition_step_913dc();
+            for (axis = 0; axis < 3u; ++axis) {
+                int32_t towards = (int16_t)EF_U16(TRANSITION_SLOTS + (uint32_t)slot * 6u + axis * 2u);
+                uint32_t from = EF_U32(saved_axis_913dc[axis]);
+
+                EF_U16(TRANSITION_OFFSET + axis * 2u)
+                    = (uint16_t)(blend_913dc(from, TRANSITION_STEPS - step) + towards * step / TRANSITION_STEPS);
+            }
+            moving = 1;
+            EF_U8(TRANSITION_ACTIVE) = 1;
+            EF_U8(TRANSITION_SLOT) = slot;
+            EF_U8(TRANSITION_RETURN) = 0;
+            break;
+        } else {
+            if (EF_U8(TRANSITION_ACTIVE) < 4u)
+                moving = 1;
+            EF_U8(TRANSITION_ACTIVE) = (uint8_t)(EF_U8(TRANSITION_ACTIVE) + 1u);
+            if (EF_U8(TRANSITION_ACTIVE) > 4u)
+                EF_U8(TRANSITION_ACTIVE) = 4;
+        }
+        EF_U8(TRANSITION_SLOT) = slot;
+        EF_U8(TRANSITION_RETURN) = 0;
+        break;
+
+    case 1:
+        if (EF_U8(TRANSITION_RETURN) != 1u) {
+            save_transition_913dc();
+            step = TRANSITION_STEPS;
+            moving = 1;
+        } else if (step != 0) {
+            step = (int16_t)(step - (int16_t)g_simulation_tick_step);
+            if (!transition_blends_913dc() || step < 0)
+                step = 0;
+            EF_U16(TRANSITION_STEP) = (uint16_t)step;
+            init_bounds_d0b68(0x0012dbecu);
+            step = transition_step_913dc();
+            EF_U16(TRANSITION_ANGLE) = (uint16_t)blend_913dc(EF_U32(0x0021434cu), step);
+            update_scene_angle_second(0x0012dbecu, EF_U16(TRANSITION_ANGLE));
+            step = transition_step_913dc();
+            for (axis = 0; axis < 3u; ++axis)
+                EF_U16(TRANSITION_OFFSET + axis * 2u) = (uint16_t)blend_913dc(EF_U32(saved_axis_913dc[axis]), step);
+            moving = 1;
+        }
+        EF_U8(TRANSITION_ACTIVE) = moving != 0u;
+        EF_U8(TRANSITION_SLOT) = slot;
+        EF_U8(TRANSITION_RETURN) = 1;
+        break;
+
+    case 2:
+        if (is_fixed_slot_913dc(slot))
+            moving = EF_U8(TRANSITION_ACTIVE);
+        else
+            moving = EF_U8(TRANSITION_ACTIVE) != 0u;
+        break;
+
+    case 3:
+        EF_U8(TRANSITION_ACTIVE) = 0;
+        break;
+
+    case 4:
+        if (step == 0)
+            break;
+        EF_U8(TRANSITION_ACTIVE) = 0;
+        EF_U16(TRANSITION_OFFSET + 4u) = 0;
+        EF_U16(TRANSITION_OFFSET + 2u) = 0;
+        EF_U16(TRANSITION_OFFSET) = 0;
+        EF_U16(TRANSITION_STEP) = 0;
+        EF_U16(TRANSITION_ANGLE) = 0;
+        EF_U32(0x0021434cu) = 0;
+        EF_U32(0x00214348u) = 0;
+        EF_U32(0x00214354u) = 0;
+        EF_U32(0x00214350u) = 0;
+        init_bounds_d0b68(0x0012dbecu);
+        EF_U8(TRANSITION_SLOT) = 0xff;
+        EF_U8(TRANSITION_RETURN) = 1;
+        step = transition_step_913dc();
+        break;
+
+    default:
+        break;
+    }
+
+    EF_U16(TRANSITION_STEP) = (uint16_t)step;
+    if (step != 0) {
+        if (EF_U8(0x00214548u) == 0u) {
+            unit = lookup_filtered_indexed_object(g_watched_unit);
+            if (unit != 0u)
+                run_page_text_9e508((int16_t)EF_U16(unit + 0x20u), 0x18u);
+            EF_U8(0x00214548u) = 1;
+        }
+    } else if (EF_U8(0x00214548u) != 0u) {
+        unit = lookup_filtered_indexed_object(g_watched_unit);
+        if (unit != 0u)
+            run_page_text_9e508((int16_t)EF_U16(unit + 0x20u), 0x19u);
+        EF_U8(0x00214548u) = 0;
+    }
+    return moving;
 }
