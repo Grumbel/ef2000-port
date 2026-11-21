@@ -6690,6 +6690,7 @@ uint32_t mpMission2Click(ef_addr32 widget); /* 0x4f3e0 */
 void mpNextAssign(void); /* 0x4d2fc */
 void mpClickWPHeight(void); /* 0x4e80c */
 void mpSetWindows(void); /* 0x4b1f0 */
+void fill_target_list_4d668(void); /* 0x4d668 */
 void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]

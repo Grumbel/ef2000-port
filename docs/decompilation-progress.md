@@ -153,3 +153,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x4d2fc mpNextAssign (mission_planner_callbacks.c; heading from the entry table, 0x3122c through guest_fn_3122c); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x4e80c mpClickWPHeight (mission_planner_callbacks.c; stale mechanical exclusion removed); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x4b1f0 mpSetWindows (mission_planner_callbacks.c); differential 160/160; hybrid regression 4/4
+2026-11-21  B5  recover 0x4d668 fill_target_list_4d668 (mission_planner_callbacks.c; jump-table triage corrected); differential 160/160; hybrid regression 4/4

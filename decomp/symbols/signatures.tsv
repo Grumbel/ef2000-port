@@ -3843,3 +3843,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004d2fc	mpNextAssign			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; no inputs, EAX left from the last callee; GUI callback, dispatcher discards EAX
 0x0004e80c	mpClickWPHeight			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; no inputs, EAX left from the last callee
 0x0004b1f0	mpSetWindows			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; no inputs, EAX left from the last callee
+0x0004d668	fill_target_list_4d668			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI and leaves EBP alone; no inputs, EAX left from the last callee

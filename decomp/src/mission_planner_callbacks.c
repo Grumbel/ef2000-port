@@ -569,3 +569,130 @@ void mpSetWindows(void)
 	show_preview_picture_41314(0x00184aa4u); /* "norgeog.lbm" */
 }
 
+
+/* Planner page widgets, by name. */
+#define MP_TARGETS        0x00184ac0u /* "mp_targets" */
+#define MP_ATC            0x00184accu /* "mp_atc" */
+#define MP_WP             0x00184adcu /* "mp_wp" */
+#define MP_STRIKE         0x00184a18u /* "mp_strike" */
+#define MP_BASE           0x00184ad4u /* "mp_base" */
+#define MP_OPTIONS        0x00184a0cu /* "mp_options" */
+#define MP_MAP            0x00184a40u /* "mp_map" */
+#define MP_MAP_OPTIONS    0x00184a48u /* "mp_map_options" */
+#define MP_STRIKE_LIST    0x00184a24u /* "mp_strike_list" */
+#define MP_STRIKE_INFO    0x00184a58u /* "mp_strike_info" */
+#define MP_BASE_SET       0x00184ae4u /* "mp_base_set" */
+#define MP_BASE_FLIGHTS   0x00184a8cu /* "mp_base_flights" */
+#define MP_AC_TYPES       0x00184af0u /* "mp_ac_types" */
+#define MP_ROLE_TYPE      0x00184afcu /* "mp_role_type" */
+#define MP_ASSIGN_TARG    0x00184b0cu /* "mp_assign_targ" */
+#define MP_TARGET_VIEW    0x001849f0u /* "mp_target_view" */
+#define MP_TARGET_LIST    0x00184b1cu /* "mp_target_list" */
+#define MP_WP_SET         0x00184a68u /* "mp_wp_set" */
+#define MP_WP_HEIGHTS     0x00184b2cu /* "mp_wp_heights" */
+#define MP_HEIGHT_OPTS    0x00184b3cu /* "mp_height_opts" */
+#define MP_ATC_SET        0x00184b4cu /* "mp_atc_set" */
+#define MP_ATC_LIST       0x00184b58u /* "mp_atc_list" */
+#define MP_ADD_MISSION    0x00184b64u /* "mp_add_mission" */
+#define MP_WARNING        0x00184b80u /* "mp_warning" */
+
+#define PLANNER_TARGET_COUNT  0x001a5541u /* byte: rows in "mp_target_list" */
+#define TARGET_KIND_NAMES     0x0013315cu /* dword string per target code */
+#define VIEW_TARGET           0x0019e5c1u /* int32[3], like g_key_view_eye */
+#define VIEW_PITCH            0x0019e5cdu /* word */
+#define VIEW_ROLL             0x0019e5cfu /* word */
+#define VIEW_EYE_FAR          (-300000)
+
+/* Shape name for a target kind without a map record, 0 for none. */
+static ef_addr32 target_kind_shape(uint8_t kind)
+{
+	switch (kind) {
+	case 1: return 0x00184d14u; /* "a50" */
+	case 2: return 0x00184d28u; /* "il78m" */
+	case 3: return 0x00184d18u; /* "oilbig" */
+	case 4: return 0x00184d20u; /* "type23" */
+	}
+	return 0;
+}
+
+/* 0x4d668, 651 bytes. Fill the "mp_target_list" widget for the target
+ * page. With a selected map record, its shape page comes from the
+ * record's name (+0x10) and the list gets one numbered row per entry of
+ * the record's 0x15-byte table that is not a 0xff/0xfe placeholder,
+ * labelled with the entry's kind name. Without one, the shape page
+ * follows the target kind (1 "a50", 2 "il78m", 3 "oilbig", 4 "type23")
+ * and the single row "1" names the patrol: AWACS (kind 1) or tanker
+ * (kind 2) with a random heading and range 5000..9999, or a ship (kinds
+ * 3 and 4) with a random width and range 10000..39999. The view is
+ * reset to look from 300000 units out, and the list is sized to its
+ * rows, at most 200 pixels. */
+void fill_target_list_4d668(void)
+{
+	ef_addr32 list = find_named_or_abort_a46cc(MP_TARGET_LIST);
+	ef_addr32 shape;
+	ef_addr32 row;
+	int16_t i;
+	char number[12];
+
+	g_assignment_current_byte = 0;
+	if (g_assignment_selected_record != 0)
+		shape = EF_U32(g_assignment_selected_record + 0x10u);
+	else
+		shape = target_kind_shape(EF_U8(PLANNER_TARGET_KIND));
+	if (g_assignment_selected_record != 0 || shape != 0)
+		EF_U16(PLANNER_ASSIGNMENT_PAGE) = (uint16_t)call_9de08_9ddfc(shape);
+
+	EF_U32(0x0019e54du) = 0;
+	EF_U32(0x0019e551u) = 0;
+	call_32c04_182afc();
+	EF_U16(VIEW_PITCH) = 0x4000;
+	g_key_view_eye[0] = 0;
+	g_key_view_eye[1] = VIEW_EYE_FAR;
+	g_key_view_eye[2] = 0;
+	EF_S32(VIEW_TARGET) = 0;
+	EF_S32(VIEW_TARGET + 4u) = VIEW_EYE_FAR;
+	EF_S32(VIEW_TARGET + 8u) = 0;
+	EF_U16(VIEW_ROLL) = 0;
+	g_sam_coverage_width = 0x2000;
+
+	if (g_assignment_selected_record != 0) {
+		EF_U8(PLANNER_TARGET_COUNT) = 0;
+		for (i = 0; i < EF_S16(g_assignment_selected_record + 0x2au); ++i) {
+			uint8_t code = EF_U8(EF_U32(g_assignment_selected_record + 0x2cu) + 21u * i);
+			if (code == 0xffu || code == 0xfeu)
+				continue;
+			++EF_U8(PLANNER_TARGET_COUNT);
+			signed_to_digits_cbd0f(EF_U8(PLANNER_TARGET_COUNT),
+				(ef_addr32)(uintptr_t)number, 10);
+			row = find_widget_checked_a78bc(list, (ef_addr32)(uintptr_t)number);
+			code = EF_U8(EF_U32(g_assignment_selected_record + 0x2cu) + 21u * i);
+			show_widget_a7588(row, EF_U32(TARGET_KIND_NAMES + 4u * code));
+		}
+	} else {
+		EF_U8(PLANNER_TARGET_COUNT) = 1;
+		row = find_widget_checked_a78bc(list, 0x00184b7cu); /* "1" */
+		switch (EF_U8(PLANNER_TARGET_KIND)) {
+		case 1:
+		case 2:
+			show_widget_a7588(row, EF_U8(PLANNER_TARGET_KIND) == 1u
+				? 0x0013058du   /* "AWACS-Patrouille" */
+				: 0x0013059eu); /* "Betankungsflugzeug- Patrouille" */
+			g_sam_coverage_width = (int16_t)((int32_t)(uint16_t)half_word_9c960() % 0x8000 - 0x4000);
+			g_sam_coverage_range = (int32_t)(uint16_t)half_word_9c960() % 5000 + 5000;
+			break;
+		case 3:
+		case 4:
+			show_widget_a7588(row, 0x0013234au); /* "Schiff" */
+			g_sam_coverage_width = (int16_t)((int32_t)(uint16_t)half_word_9c960() % 0x3000 + 0x800);
+			g_sam_coverage_range = (int32_t)(uint16_t)half_word_9c960() % 30000 + 10000;
+			break;
+		}
+	}
+
+	EF_U16(list + 0x67u) = (uint16_t)(EF_U8(PLANNER_TARGET_COUNT) * 20u);
+	if (EF_U8(PLANNER_TARGET_COUNT) < 10u)
+		resize_widget_a520c(list, (uint32_t)(int32_t)EF_S16(list + 0x45u),
+			(uint32_t)(int32_t)(int16_t)(EF_U8(PLANNER_TARGET_COUNT) * 20u + 5u), 0);
+	else
+		resize_widget_a520c(list, (uint32_t)(int32_t)EF_S16(list + 0x45u), 200, 0);
+}
