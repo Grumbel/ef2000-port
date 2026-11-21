@@ -6989,3 +6989,51 @@ void set_pylon_shapes_8f07c(ef_addr32 unit)
 		set_page_word_e7c50(EF_S16(unit + 0x20u), shape, i);
 	}
 }
+
+/* Line (X0, Y0)-(X1, Y1) in COLOUR; 0xc8ccc takes its five words in reverse. */
+static void draw_marker_line_640b8(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint16_t colour)
+{
+    renderer_viewport_five_c8ccc((uint16_t)y1, (uint16_t)x1, (uint16_t)y0, (uint16_t)x0, colour);
+}
+
+/* 0x640b8, 388 bytes. Draw the map marker of KIND at (X, Y): kinds 1 and 3
+ * a 3x3 box (colour 2, 0xc), kind 2 two short horizontal bars 3 pixels above
+ * and below (colour 2), kinds 8 and 9 a plus of radius 2 (colour 2, 0xc),
+ * kinds 4/5, 6/7 and all others a 2x2 box (colour 0xd, 0xe, 0xf). A LABEL
+ * other than 0 and 0xff is printed as a number to the right ("%hd"). */
+void draw_map_marker_640b8(int16_t x, int16_t y, uint16_t kind, uint8_t label)
+{
+    switch (kind) {
+    case 1:
+        fill_rect_clipped_cec00(0x2u, x - 1, y - 1, x + 1, y + 1);
+        break;
+    case 2:
+        draw_marker_line_640b8(x - 1, y - 3, x + 1, y - 3, 0x2u);
+        draw_marker_line_640b8(x - 1, y + 3, x + 1, y + 3, 0x2u);
+        break;
+    case 3:
+        fill_rect_clipped_cec00(0xcu, x - 1, y - 1, x + 1, y + 1);
+        break;
+    case 4:
+    case 5:
+        fill_rect_clipped_cec00(0xdu, x, y, x + 1, y + 1);
+        break;
+    case 6:
+    case 7:
+        fill_rect_clipped_cec00(0xeu, x, y, x + 1, y + 1);
+        break;
+    case 8:
+        draw_marker_line_640b8(x, y - 2, x, y + 2, 0x2u);
+        draw_marker_line_640b8(x - 2, y, x + 2, y, 0x2u);
+        break;
+    case 9:
+        draw_marker_line_640b8(x, y - 2, x, y + 2, 0xcu);
+        draw_marker_line_640b8(x - 2, y, x + 2, y, 0xcu);
+        break;
+    default:
+        fill_rect_clipped_cec00(0xfu, x, y, x + 1, y + 1);
+        break;
+    }
+    if (label != 0 && label != 0xffu)
+        draw_formatted_text_mode_48bb0(0xfu, 1u, (int16_t)(x + 3), (int16_t)(y - 2), 0x001860a8u, (uint32_t)label);
+}

@@ -3852,3 +3852,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0008f07c	set_pylon_shapes_8f07c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX left from the last callee
 0x000f2819	detect_cpu_f2819			ebx,ecx,ebp	0	Original pushes EBX ECX only; CPUID clobbers EDX, REPZ CMPSB clobbers ESI EDI, EAX left from the last step; EFLAGS AC/ID stay toggled
 0x0010da50	unpack_ra_10da50	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32	EAX:uint32_t	ebx,esi,edi,ebp	8	ENTER 0x854 frame, pushes ESI EDI EBX; RET 8; returns 1 or 0 in EAX; ECX EDX clobbered
+0x000ba13c	fill_colour_record_ba13c	EAX:ef_addr32,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	Pushes EBX ECX ESI; EDX and EAX clobbered
+0x000640b8	draw_map_marker_640b8	AX:int16_t,DX:int16_t,BX:uint16_t,CL:uint8_t		esi,edi,ebp	0	Pushes ESI EDI EBP; EAX EBX ECX EDX clobbered
+0x000bbf1c	roll_code_chance_bbf1c	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Pushes EBX ECX EDX; returns 0 or 1
+0x000bb7c0	record_class_code_bb7c0	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Pushes EDX; returns the code in EAX

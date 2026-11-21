@@ -159,3 +159,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x4aa4c spawn_record_flights_4aa4c (mission_planner_callbacks.c; jump-table triage corrected); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x5674c apply_unit_status_packet_5674c, 0x975f0 step_scene_script_975f0, 0x8f07c set_pylon_shapes_8f07c (jump-table triage corrected); differential 160/160 each; hybrid regression 4/4
 2026-11-21  B5  recover 0xf2819 detect_cpu_f2819 (cpu_detect.c, EFLAGS/CPUID platform wrappers) and 0x10da50 unpack_ra_10da50 (ra_unpack.c); differential 32/32 and 64/64; hybrid regression 4/4
+2026-11-21  B5  recover jump-table functions 0xba13c fill_colour_record_ba13c, 0x640b8 draw_map_marker_640b8, 0xbbf1c roll_code_chance_bbf1c, 0xbb7c0 record_class_code_bb7c0; differential 96/160/160/200; hybrid regression 4/4

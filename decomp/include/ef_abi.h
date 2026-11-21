@@ -6705,6 +6705,10 @@ uint32_t step_scene_script_975f0(ef_addr32 record); /* 0x975f0 */
 void set_pylon_shapes_8f07c(ef_addr32 unit); /* 0x8f07c */
 void detect_cpu_f2819(void); /* 0xf2819, ebx/ecx/ebp preserved */
 uint32_t unpack_ra_10da50(ef_addr32 packed, ef_addr32 out); /* 0x10da50, callee pops both */
+void fill_colour_record_ba13c(ef_addr32 rec, uint8_t key); /* 0xba13c */
+void draw_map_marker_640b8(int16_t x, int16_t y, uint16_t kind, uint8_t label); /* 0x640b8 */
+uint32_t roll_code_chance_bbf1c(uint8_t code); /* 0xbbf1c */
+uint32_t record_class_code_bb7c0(ef_addr32 rec); /* 0xbb7c0 */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux unpack_ra_10da50 parm routine [] modify [eax ecx edx]
 #endif

@@ -922,3 +922,60 @@ void fill_colour_record_bb1ac(ef_addr32 rec, uint8_t key)
         break;
     }
 }
+
+/* 0xba13c, 359 bytes. Fill a 13-byte colour record for a key 1..7 (key 1
+ * and other keys use the default shade). Unlike the other fillers it has
+ * bytes 6..12 as well; key 2 leaves bytes 8 and 10 untouched, and key 6
+ * picks one of two shades from the parity of the random generator. */
+static void set_colour_bytes_ba13c(ef_addr32 rec, uint32_t first, const uint8_t *values, uint32_t count)
+{
+    uint32_t i;
+
+    for (i = 0; i < count; ++i)
+        EF_U8(rec + first + i) = values[i];
+}
+
+void fill_colour_record_ba13c(ef_addr32 rec, uint8_t key)
+{
+    static const uint8_t tail[7] = { 0x3, 0x3, 0x4, 0x3, 0x4, 0x3, 0x1d };
+    static const uint8_t key2[8] = { 0x2, 0x2, 0x12, 0x12, 0x9, 0x9, 0x9, 0x9 };
+    static const uint8_t key3[13] = { 0x2, 0x2, 0x10, 0x10, 0x11, 0x11, 0x3, 0x3, 0x4, 0x1f, 0x4, 0x3, 0x1d };
+    static const uint8_t key4[6] = { 0x2, 0x2, 0x2, 0x2, 0x3, 0x3 };
+    static const uint8_t key5[6] = { 0x2, 0x2, 0x2, 0x2, 0xa, 0xa };
+    static const uint8_t key6_odd[8] = { 0x2, 0x2, 0xb, 0xb, 0x8, 0x8, 0x8, 0x8 };
+    static const uint8_t key6_even[8] = { 0x2, 0x2, 0x8, 0x8, 0x8, 0x8, 0x15, 0x15 };
+    static const uint8_t key7[6] = { 0x2, 0x2, 0x14, 0x14, 0x14, 0x14 };
+    static const uint8_t standard[6] = { 0x2, 0x2, 0x12, 0x12, 0x13, 0x13 };
+
+    switch (key) {
+    case 2:
+        set_colour_bytes_ba13c(rec, 0, key2, 8);
+        EF_U8(rec + 9u) = 0x4;
+        EF_U8(rec + 11u) = 0x4;
+        EF_U8(rec + 12u) = 0x1d;
+        return;
+    case 3:
+        set_colour_bytes_ba13c(rec, 0, key3, 13);
+        return;
+    case 4:
+        set_colour_bytes_ba13c(rec, 0, key4, 6);
+        break;
+    case 5:
+        set_colour_bytes_ba13c(rec, 0, key5, 6);
+        break;
+    case 6:
+        if ((uint16_t)step_generator_a45b3() & 1u)
+            set_colour_bytes_ba13c(rec, 0, key6_odd, 8);
+        else
+            set_colour_bytes_ba13c(rec, 0, key6_even, 8);
+        set_colour_bytes_ba13c(rec, 8, tail + 2, 5);
+        return;
+    case 7:
+        set_colour_bytes_ba13c(rec, 0, key7, 6);
+        break;
+    default:
+        set_colour_bytes_ba13c(rec, 0, standard, 6);
+        break;
+    }
+    set_colour_bytes_ba13c(rec, 6, tail, 7);
+}
