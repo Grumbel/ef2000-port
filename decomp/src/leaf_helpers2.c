@@ -125,7 +125,7 @@ void run_table_initialisers_1196a0(void)
     guest_fn_1199c8_w();
     guest_fn_119a54_w();
     guest_fn_119acc_w();
-    guest_fn_11c20c_w();
+    update_contact_points_11c20c();
 }
 
 /* 0x11f538, 28 bytes. Store two derived values for a number. */

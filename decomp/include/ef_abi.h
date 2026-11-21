@@ -3644,7 +3644,15 @@ void guest_fn_119938_w(void); /* 0x119938 */
 void guest_fn_1199c8_w(void); /* 0x1199c8 */
 void guest_fn_119a54_w(void); /* 0x119a54 */
 void guest_fn_119acc_w(void); /* 0x119acc */
-void guest_fn_11c20c_w(void); /* 0x11c20c */
+void update_contact_points_11c20c(void); /* 0x11c20c */
+void guest_fn_11c584(ef_addr32 force, ef_addr32 moment, ef_addr32 record, double a, double b, double c,
+                     double d); /* 0x11c584 EAX/EDX/EBX, four stack doubles; ret 0x20 */
+void accumulate_contact_load_11c350(ef_addr32 force, ef_addr32 moment, ef_addr32 rotation, ef_addr32 record); /* 0x11c350 EAX/EDX/EBX/ECX */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux update_contact_points_11c20c modify [eax]
+#pragma aux guest_fn_11c584 parm routine [eax] [edx] [ebx] modify [eax ebx edx]
+#pragma aux accumulate_contact_load_11c350 parm [eax] [edx] [ebx] [ecx] modify [eax ebx edx]
+#endif
 uint32_t guest_fn_11f4d8_w(uint32_t value); /* 0x11f4d8 EAX -> EAX */
 
 /* leaf_helpers3.c */

@@ -18,7 +18,6 @@ addr	reason
 0x000a6d00	Mechanical widget redraw body suspected of corrupting the stack (return lands in heap at 0xd6b6fa in cockpit replay, bisect m2-bisect-007); keep original.
 0x000c9fc4	Mechanical body has uninitialised stack locals and guessed call args (bisect m2-bisect-010); keep original.
 0x00160255	Mechanical body mis-scales uint32_t* array indices (bisect m2-bisect-011); keep original.
-0x0011c20c	Mechanical body treats 64-bit float fields as uint64_t integers and guesses call args (bisect m2-bisect-012); keep original.
 0x0011b1b0	Hand wrapper forwards 11b134 without EAX object pointer and discards the st0 double result (bisect m2-bisect-013); fix signature, then re-enable.
 0x000ebea3	Mechanical body guesses a uint64_t stack parameter and call args (bisect m2-bisect-014); keep original.
 0x000e5830	Member of an unresolved six-function cluster that fails the cockpit replay (bisect m2-bisect-016); excluded together, narrow later.
