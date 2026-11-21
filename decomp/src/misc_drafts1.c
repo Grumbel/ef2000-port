@@ -22234,6 +22234,24 @@ uint32_t decode_distance_10db7e(uint32_t *esi, uint32_t *eax, uint32_t ebp, uint
 	return ~ebx;
 }
 
+#define IFF_LOAD_ERROR      0x0018ee70u /* "Unable to load iff file %s" */
+#define IFF_HEADER_ERROR    0x0018ee4cu /* "%s has incorrect header" */
+#define IFF_HEADER_CHECK    0x0041f3c4u /* header test of the opened file's format, AL */
+
+/* 0xc36b4, 95 bytes. Load the IFF picture NAME (0xc3430) and check its
+ * header through the format's hook; either failure is fatal. Then decode
+ * it at X, Y (words) into the W by H (words) picture DEST (0xc3584) and
+ * release the file buffer. Callee pops the two stack arguments. */
+void draw_iff_to_buffer_c36b4(ef_addr32 name, uint32_t x, uint32_t y, uint32_t w, uint32_t h, ef_addr32 dest)
+{
+	if (guest_fn_c3430(name) != 0u)
+		guest_fatal_arg(IFF_LOAD_ERROR, name);
+	if ((uint8_t)guest_callptr0_ret_x(EF_U32(IFF_HEADER_CHECK)) == 0u)
+		guest_fatal_arg(IFF_HEADER_ERROR, name);
+	guest_fn_c3584((int16_t)x, (int16_t)y, (int16_t)w, (int16_t)h, dest);
+	release_mode_buffer_c3328();
+}
+
 /* 0xc3670, 68 bytes. Stack (ret 4): allocate a pool block of (int16)cx * (int16)size bytes, look its id up and draw into it with 0xc36b4 (EAX unchanged, EDX and EBX sign-extended words, ECX the sign-extended word, stack: size then block). Returns the block pointer. */
 uint32_t alloc_picture_c3670(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t ecx, uint32_t size)
 {

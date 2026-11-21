@@ -30,17 +30,18 @@ void interleave_planes_cdc90(ef_addr32 dst, ef_addr32 src)
 }
 
 /* 0xe94ec, 134 bytes. Load a text file through the size/read handlers at 0x132ab4/0x132ab8 into a new buffer at 0x1600a0, trimming a trailing ^Z; returns 0 ok, 1 empty, 2 out of memory. */
-uint32_t load_text_file_e94ec(ef_addr32 name, uint32_t flag)
+uint8_t load_text_file_e94ec(ef_addr32 name, uint32_t flag)
 {
     uint32_t n, buf, end, last;
     EF_U32(0x00464390u) = name;
     EF_U8(0x00464439u) = (uint8_t)flag;
     if (EF_U8(0x001600a4u) == 1u)
         guest_callptr1_x(EF_U32(0x00132a74u), 0x0019135cu);
-    n = (uint16_t)guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name);
-    if (n == 0u)
+    n = guest_callptr_eax_ret_x(EF_U32(0x00132ab4u), name);
+    if ((uint16_t)n == 0u)
         return 1u;
-    n++;
+    /* The size is a word: 0xffff wraps to an empty count. */
+    n = (uint16_t)(n + 1u);
     buf = arena_alloc_e2a94(n + 0x20u);
     EF_U32(0x001600a0u) = buf;
     if (buf == 0u)

@@ -78,8 +78,11 @@ uint32_t encode_runtime_segment_offset(ef_addr32 pointer)
     return encoded;
 }
 
-/* 0x12160, 84 bytes. Visit all 54 callback records (stride 29),
- * clear inactive flags, and re-evaluate each slot through 0x11e7c. */
+/* 0x12160, 84 bytes. Visit all 54 callback records (stride 29) with the
+ * refresh flag 0x122882 set: a record with a callback gets it called with
+ * EAX = its byte offset and EDX = its index (also stored at 0x122880),
+ * one without has its flag cleared; then the slot's button is redrawn
+ * (0x11e7c). Preserves EBX and EDX only. */
 void reinitialize_runtime_slots(void)
 {
     write8(0x00122882, 1);
@@ -89,11 +92,11 @@ void reinitialize_runtime_slots(void)
         ef_addr32 callback = read32(record + 25u);
         if (callback != 0) {
             write16(0x00122880, (uint16_t)i);
-            guest_invoke_runtime_slot(callback);
+            guest_callptr_eaxedx_x(callback, (uint32_t)i * 29u, (uint32_t)i);
         } else {
             write8(record, 0);
         }
-        guest_refresh_runtime_slot(i);
+        draw_button_11e7c(i);
     }
     write8(0x00122882, 0);
 }

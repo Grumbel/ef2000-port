@@ -80,6 +80,55 @@ void guest_callptr0_x(ef_addr32 fn)
     call_register0(fn);
 }
 
+static uint32_t call_register0_ret(uint32_t fn);
+#pragma aux call_register0_ret parm [eax] value [eax] modify [eax ebx ecx edx esi edi] = \
+    "call eax"
+
+uint32_t guest_callptr0_ret_x(ef_addr32 fn)
+{
+    return call_register0_ret(fn);
+}
+
+/* Native helpers that take ESI and answer in the carry flag; EBP is
+ * saved because some of them use BP as a scratch register. */
+static uint8_t call_register_esi_carry(uint32_t fn, uint32_t esi);
+#pragma aux call_register_esi_carry parm [eax] [esi] value [al] \
+    modify [eax ebx ecx edx esi edi] = \
+    "push ebp" \
+    "call eax" \
+    "pop ebp" \
+    "setc al"
+
+uint8_t guest_callptr_esi_carry_x(ef_addr32 fn, uint32_t esi)
+{
+    return call_register_esi_carry(fn, esi);
+}
+
+void guest_callptr_esi_x(ef_addr32 fn, uint32_t esi)
+{
+    (void)call_register_esi_carry(fn, esi);
+}
+
+/* Call with ESI and a fake caller frame: EBP points at a frame whose
+ * first argument slot ([EBP+8]) holds FRAME_ARG, for native helpers that
+ * read their caller's stack argument through EBP. */
+static void call_esi_frame(uint32_t fn, uint32_t esi, uint32_t frame_arg);
+#pragma aux call_esi_frame parm [eax] [esi] [edx] \
+    modify [eax ebx ecx edx esi edi] = \
+    "push ebp" \
+    "push edx" \
+    "push ebp" \
+    "push ebp" \
+    "mov ebp,esp" \
+    "call eax" \
+    "add esp,12" \
+    "pop ebp"
+
+void guest_callptr_esi_frame_x(ef_addr32 fn, uint32_t esi, uint32_t frame_arg)
+{
+    call_esi_frame(fn, esi, frame_arg);
+}
+
 static uint32_t call_register_eax(uint32_t fn, uint32_t arg);
 #pragma aux call_register_eax parm [eax] [edx] modify [eax ecx edx] = \
     "mov ecx,eax" \

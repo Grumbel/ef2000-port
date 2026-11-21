@@ -254,9 +254,6 @@ void bitstream_decode_pair_streams_fa251(uint8_t *buffer,
 
 /* BE graphics stream / video driver entry points with injected guest calls. */
 void renderer_normalize_scene_c4db4(ef_addr32 scene);
-void renderer_scene_error_c4db4(ef_addr32 message);
-void renderer_scene_zero_c4db4(ef_addr32 location);
-void renderer_scene_record_c4db4(ef_addr32 record);
 void renderer_viewport_five_c8ccc(uint16_t a, uint16_t b, uint16_t c,
                                  uint16_t d, uint16_t e);
 void renderer_viewport_six_e7a34(uint16_t a, uint16_t b, uint16_t c,
@@ -2956,6 +2953,12 @@ void guest_fn_de648(uint32_t a, uint32_t b); /* 0xde648 EAX/EDX */
 uint32_t guest_fn_a7948(ef_addr32 name); /* 0xa7948 cdecl */
 uint32_t guest_fn_e2b54(void); /* 0xe2b54 -> EAX */
 uint8_t guest_fn_c3430(uint32_t a); /* 0xc3430 EAX -> AL */
+void guest_fn_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584 EAX/EDX/EBX/ECX + 1 stack, callee pops */
+void draw_iff_to_buffer_c36b4(ef_addr32 name, uint32_t x, uint32_t y, uint32_t w, uint32_t h, ef_addr32 dest); /* 0xc36b4, misc_drafts1.c */
+void guest_fn_e3cac(ef_addr32 name); /* 0xe3cac one stack argument, callee pops */
+uint8_t guest_callptr_esi_carry_x(ef_addr32 fn, uint32_t esi); /* indirect call, ESI in, carry out as AL; EBP saved */
+void guest_callptr_esi_x(ef_addr32 fn, uint32_t esi); /* indirect call, ESI in; EBP saved */
+void guest_callptr_esi_frame_x(ef_addr32 fn, uint32_t esi, uint32_t frame_arg); /* indirect call, ESI in, [EBP+8] = frame_arg */
 void guest_fn_c3328(void); /* 0xc3328 */
 
 /* runtime_helpers23.c */
@@ -4940,7 +4943,7 @@ void draw_object_entries_46168(uint32_t key, uint32_t b, uint32_t c, uint32_t d,
 
 /* load_planes1.c */
 void interleave_planes_cdc90(ef_addr32 dst, ef_addr32 src);
-uint32_t load_text_file_e94ec(ef_addr32 name, uint32_t flag);
+uint8_t load_text_file_e94ec(ef_addr32 name, uint32_t flag); /* 0xe94ec EAX/EDX -> AL: 0 loaded, 1 missing, 2 no memory */
 uint32_t guest_callptr_eax_ret_x(ef_addr32 fn, uint32_t a); /* indirect call, argument in EAX, result in EAX */
 void guest_callptr_eaxedx_x(ef_addr32 fn, uint32_t a, uint32_t b); /* indirect call, arguments in EAX and EDX */
 
@@ -5035,8 +5038,10 @@ void run_state_handler_84678(void);
 void draw_pending_message_912b8(ef_addr32 text);
 uint32_t read_ring_bytes_106cb0(ef_addr32 rec, ef_addr32 buf, uint32_t count, uint32_t timeout);
 void guest_callptr0_x(ef_addr32 fn); /* indirect call, no arguments */
+uint32_t guest_callptr0_ret_x(ef_addr32 fn); /* indirect call, no arguments, result in EAX */
 #if defined(__WATCOMC__)
 #pragma aux guest_callptr0_x parm [eax] modify [eax ebx ecx edx esi edi]
+#pragma aux guest_callptr0_ret_x parm [eax] modify [eax ebx ecx edx esi edi]
 #endif
 
 uint32_t compare_variable_a9640(uint32_t index, uint32_t op, int32_t value);
@@ -7709,9 +7714,6 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_fn_e7df4_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_deb1a_x parm [8087] value [8087] modify [eax ebx ecx edx esi edi ebp]
 /* Pure stack-argument functions (original ends in ret 4*nargs) lacking a pragma. */
-#pragma aux renderer_scene_error_c4db4 parm routine [] modify [eax ebx ecx edx esi edi ebp]
-#pragma aux renderer_scene_zero_c4db4 parm routine [] modify [eax ebx ecx edx esi edi ebp]
-#pragma aux renderer_scene_record_c4db4 parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux draw_tactical_line parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux configure_scene_angles parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_mode_36_hook parm routine [] modify [eax ebx ecx edx esi edi ebp]
@@ -7732,6 +7734,12 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_fn_fe710_w parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_fc39c_s parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux renderer_normalize_scene_c4db4 parm routine [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_e3cac parm routine [] modify [eax ebx ecx edx]
+#pragma aux draw_iff_to_buffer_c36b4 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
+#pragma aux guest_fn_c3584 modify [eax ebx ecx edx]
+#pragma aux guest_callptr_esi_carry_x parm [eax] [esi] value [al] modify [eax ebx ecx edx esi edi]
+#pragma aux guest_callptr_esi_x parm [eax] [esi] modify [eax ebx ecx edx esi edi]
+#pragma aux guest_callptr_esi_frame_x parm [eax] [esi] [edx] modify [eax ebx ecx edx esi edi]
 #pragma aux renderer_viewport_five_c8ccc parm routine []
 #pragma aux pair_word_dc5a9 parm routine []
 #pragma aux renderer_viewport_six_e7a34 parm routine []
