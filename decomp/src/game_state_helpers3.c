@@ -76,7 +76,7 @@ void update_marker_4bc80(ef_addr32 object)
     if (EF_U8(0x001a559bu) == 0)
         guest_fn_4c78c(0x00137980u, 0x00137988u);
     else
-        guest_fn_4c900(0x00137980u, 0x00137960u);
+        pick_marker_4c900(0x00137980u, 0x00137960u);
 }
 
 /* 0x4ca90, 82 bytes. Clear the pending (==1) entries of the list at 0x1a5510 and refresh if any. */

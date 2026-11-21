@@ -1598,7 +1598,7 @@ void notify_unit_6b444(int16_t unit);
 void guest_fn_151c4(uint32_t a); /* 0x151c4 */
 void guest_fn_46168(int32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t e); /* 0x46168 */
 void guest_fn_4c78c(ef_addr32 a, ef_addr32 b); /* 0x4c78c */
-void guest_fn_4c900(ef_addr32 a, ef_addr32 b); /* 0x4c900 */
+void pick_marker_4c900(ef_addr32 groups, ef_addr32 list_head); /* 0x4c900, tactical_pick.c */
 void guest_fn_4f314(ef_addr32 a, ef_addr32 b); /* 0x4f314 */
 void guest_fn_4f7d0(void); /* 0x4f7d0 */
 void guest_fn_544c0(void); /* 0x544c0 */

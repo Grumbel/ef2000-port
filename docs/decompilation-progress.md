@@ -191,3 +191,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x73084 place_dummy_plane_73084 (dummy_plane.c; x87 orientation matrix); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0xcbff0 update_group_weights_cbff0 (group_overlap_weights.c; x87 inverse-distance weights); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x5375c integrate_drift_5375c (misc_drafts1.c; x87 drift integration); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x4c900 pick_marker_4c900 (tactical_pick.c; x87 cursor radius tests); differential 200; hybrid regression 4/4
