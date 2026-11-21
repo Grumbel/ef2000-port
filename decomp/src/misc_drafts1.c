@@ -13158,6 +13158,48 @@ void draw_roster_list_7eda4(void)
     toggle_page_dc250();
 }
 
+/* 0x5375c, 389 bytes. Powered drift mode step. The tick counter dword
+ * 0x1a5b5c advances by DT (word 0x127d92); from 150 ticks on, only byte
+ * 0x1a364e is incremented. Otherwise the positions 0x1a5c00, 0x1a5bb8 and
+ * 0x1a5bbc advance by the velocities 0x1a5ba0, 0x1a5ba4 and 0x1a5ba8 times
+ * DT, each velocity gains its scaled signed word (0x1a5bc4, 0x1a5bd0,
+ * 0x1a5bdc via 0x53308) times the float -scale(24.0) times DT * (float
+ * 0x185b68)^2, and 0x1a5ba4 finally gains scale(10.0) * DT * 0x185b68^2. */
+void integrate_drift_5375c(void)
+{
+    float *v0 = (float *)ef_guest_memory_ptr(0x001a5ba0u);
+    float *v1 = (float *)ef_guest_memory_ptr(0x001a5ba4u);
+    float *v2 = (float *)ef_guest_memory_ptr(0x001a5ba8u);
+    float *p0 = (float *)ef_guest_memory_ptr(0x001a5c00u);
+    float *p1 = (float *)ef_guest_memory_ptr(0x001a5bb8u);
+    float *p2 = (float *)ef_guest_memory_ptr(0x001a5bbcu);
+    float c = *(float *)ef_guest_memory_ptr(0x00185b68u);
+    int32_t ticks = (int32_t)EF_U32(0x001a5b5cu) + (int32_t)EF_U16(0x00127d92u);
+    double dt;
+    float thrust;
+
+    EF_U32(0x001a5b5cu) = (uint32_t)ticks;
+    if (ticks >= 0x96) {
+        EF_U8(0x001a364eu) = (uint8_t)(EF_U8(0x001a364eu) + 1u);
+        return;
+    }
+    dt = (double)EF_U16(0x00127d92u);
+    *p0 = (float)((double)*v0 * dt + (double)*p0);
+    *p1 = (float)((double)*v1 * dt + (double)*p1);
+    *p2 = (float)(dt * (double)*v2 + (double)*p2);
+    thrust = (float)-scale_float_52eb0(24.0f);
+    *v0 = (float)(convert_signed_short_scale((int16_t)EF_U16(0x001a5bc4u)) * (double)thrust
+        * (double)EF_U16(0x00127d92u) * (double)c * (double)c + (double)*v0);
+    thrust = (float)-scale_float_52eb0(24.0f);
+    *v1 = (float)(convert_signed_short_scale((int16_t)EF_U16(0x001a5bd0u)) * (double)thrust
+        * (double)EF_U16(0x00127d92u) * (double)c * (double)c + (double)*v1);
+    thrust = (float)-scale_float_52eb0(24.0f);
+    *v2 = (float)(convert_signed_short_scale((int16_t)EF_U16(0x001a5bdcu)) * (double)thrust
+        * (double)EF_U16(0x00127d92u) * (double)c * (double)c + (double)*v2);
+    *v1 = (float)(scale_float_52eb0(10.0f) * (double)EF_U16(0x00127d92u) * (double)c * (double)c
+        + (double)*v1);
+}
+
 /* 0x538e4, 252 bytes. Integrate the floating drift state for one frame of DT = word 0x127d92 ticks: the positions 0x1a5c00, 0x1a5bb8 and 0x1a5bbc (floats) advance by the velocities 0x1a5ba0, 0x1a5ba4 and 0x1a5ba8 times DT, and every velocity decays by itself * DT * the float 0x185b6c. Then 0x1a5ba4 gains scale(10.0) * DT * (float 0x185b70)^2 and, when scale(5.0) * float 0x185b70 is below it, byte 0x1a364e is incremented and dword 0x1a5b5c cleared. */
 void integrate_drift_538e4(void)
 {

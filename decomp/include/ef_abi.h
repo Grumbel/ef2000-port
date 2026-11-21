@@ -6406,6 +6406,7 @@ void draw_roster_list_7eda4(void);
 
 
 
+void integrate_drift_5375c(void); /* 0x5375c */
 void integrate_drift_538e4(void);
 
 double angle_between_88ff8(ef_addr32 a, ef_addr32 b);

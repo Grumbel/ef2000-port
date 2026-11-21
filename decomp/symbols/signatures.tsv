@@ -3888,3 +3888,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x001196c8	update_lift_coefficient_1196c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x001196c8 (377 bytes); lift coefficient
 0x00073084	place_dummy_plane_73084	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00073084 (394 bytes); dummy plane placement
 0x000cbff0	update_group_weights_cbff0	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	Original 0x000cbff0 (370 bytes); group weights
+0x0005375c	integrate_drift_5375c			ebx,ecx,edx,esi,edi,ebp	0	0x5375c..0x538e0; EAX clobbered; reads globals only
