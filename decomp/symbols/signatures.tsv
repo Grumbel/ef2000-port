@@ -3897,3 +3897,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00016034	scan_engagements_16034	EAX:uint32_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	original ASM; x87 range scan, calls 0x169b4/0x174f8/0x168d8
 0x00054c10	send_unit_state_packet_54c10	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	original ASM; x87 truncations, 0x39-byte packet 0x14 via 0xa3f74
 0x000073ec	handle_unit_contact_73ec	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	original ASM; contact between unit A and object B: x87 cell point via 0xb4250, sound 0x47764, tasks 0x71fc, message 0x7308/event 0x46254, 0x7030, 0x6f48
+0x0001d954	integrate_flight_1d954	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	original ASM; x87 flight step: cos/sin 0xb45a2/0xb45ac, calls 0x1db08/0x1dc20/0xb4364/0x1debc/0x1d8e8/0x1df90
