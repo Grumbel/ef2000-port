@@ -22234,9 +22234,42 @@ uint32_t decode_distance_10db7e(uint32_t *esi, uint32_t *eax, uint32_t ebp, uint
 	return ~ebx;
 }
 
+#define IFF_SIZE            0x0041f3c8u /* size of the file found by 0xc3364, 0 if none */
+#define IFF_BUFFER          0x0041f3bcu /* work block holding the file */
+#define IFF_DECODE_ROW      0x0041f3a4u
+#define IFF_HEADER_CHECK    0x0041f3c4u /* header test of the opened file's format, AL */
+#define IFF_CLOSE           0x0041f3ccu
+#define IFF_MAGIC           0x0018edf8u /* "war " */
+
+/* 0xc3430, 154 bytes. Find the IFF file NAME (0xc3364 builds the path and
+ * sets its size), read it whole into a work block of that size and select
+ * the format hooks: the defaults, or the second set when it starts with
+ * the four bytes "war ". AL = 1 when the file was not found, else 0. */
+uint8_t load_iff_file_c3430(ef_addr32 name)
+{
+	uint8_t path[0x50];
+	ef_addr32 path_addr = (ef_addr32)(uintptr_t)path;
+	uint32_t size;
+
+	guest_fn_c3364(path_addr, name);
+	size = EF_U32(IFF_SIZE);
+	if (size == 0u)
+		return 1u;
+	alloc_work_block_c32dc((int32_t)size);
+	guest_callptr_eaxedx_x(EF_U32(0x00132ab8u), path_addr, EF_U32(IFF_BUFFER));
+	EF_U32(IFF_HEADER_CHECK) = 0x000c1cbcu;
+	EF_U32(IFF_CLOSE) = 0x000c1d94u;
+	EF_U32(IFF_DECODE_ROW) = 0x000c3000u;
+	if (compare_strings_e5c03(EF_U32(IFF_BUFFER), IFF_MAGIC, 4u) == 0) {
+		EF_U32(IFF_HEADER_CHECK) = 0x000c3150u;
+		EF_U32(IFF_CLOSE) = 0x000c3170u;
+		EF_U32(IFF_DECODE_ROW) = 0x000c31ccu;
+	}
+	return 0u;
+}
+
 #define IFF_LOAD_ERROR      0x0018ee70u /* "Unable to load iff file %s" */
 #define IFF_HEADER_ERROR    0x0018ee4cu /* "%s has incorrect header" */
-#define IFF_HEADER_CHECK    0x0041f3c4u /* header test of the opened file's format, AL */
 
 /* 0xc36b4, 95 bytes. Load the IFF picture NAME (0xc3430) and check its
  * header through the format's hook; either failure is fatal. Then decode

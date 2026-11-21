@@ -206,7 +206,6 @@ addr	reason
 0x000dc1e9	Static ABI check (tools/abi_check.py): original takes ST0/ST1, C takes stack doubles (ret 16); fix the declaration, then re-enable.
 0x440f4	abi_check: stack/x87 convention differs from the original (original 8, compiled 12  ); declare before linking
 0xb45b6	abi_check: stack/x87 convention differs from the original (original 0, compiled 12  ); declare before linking
-0xc4412	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xc4680	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xd35b0	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xd36c4	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking

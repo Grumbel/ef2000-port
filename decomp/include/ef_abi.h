@@ -258,10 +258,6 @@ void renderer_viewport_five_c8ccc(uint16_t a, uint16_t b, uint16_t c,
                                  uint16_t d, uint16_t e);
 void renderer_viewport_six_e7a34(uint16_t a, uint16_t b, uint16_t c,
                                 uint16_t d, uint16_t e, uint16_t f);
-uint8_t renderer_viewport_check_c8ccc(ef_addr32 buffer);
-void renderer_viewport_flush_c8ccc(void);
-uint8_t renderer_viewport_check_e7a34(ef_addr32 buffer);
-void renderer_viewport_flush_e7a34(ef_addr32 buffer);
 void audio_maybe_restart_device_e0bcc(void);
 uint8_t audio_port_read_e0bcc(uint32_t port);
 void audio_port_write_e0bcc(uint32_t port, uint8_t value);
@@ -277,9 +273,6 @@ void renderer_toggle_opcode_a_c547f(uint32_t index);
 void renderer_reset_opcode_a_c549e(uint32_t index);
 void renderer_toggle_opcode_b_c54b7(uint32_t index);
 void renderer_reset_opcode_b_c54d6(uint32_t index);
-void renderer_opcode_setup_c54xx(uint32_t code);
-void renderer_opcode_dispatch_c54xx(ef_addr32 entry, uint32_t index);
-void renderer_opcode_install_c54xx(void);
 
 /* DOS INT 21 register-block adapter, native interrupt remains a guest hook. */
 uint32_t dos_regblock_int21_11f287(ef_addr32 regs, ef_addr32 environment);
@@ -2953,6 +2946,8 @@ void guest_fn_de648(uint32_t a, uint32_t b); /* 0xde648 EAX/EDX */
 uint32_t guest_fn_a7948(ef_addr32 name); /* 0xa7948 cdecl */
 uint32_t guest_fn_e2b54(void); /* 0xe2b54 -> EAX */
 uint8_t guest_fn_c3430(uint32_t a); /* 0xc3430 EAX -> AL */
+uint8_t load_iff_file_c3430(ef_addr32 name); /* 0xc3430, misc_drafts1.c */
+void guest_fn_c3364(ef_addr32 path, ef_addr32 name); /* 0xc3364 EAX/EDX */
 void guest_fn_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584 EAX/EDX/EBX/ECX + 1 stack, callee pops */
 void draw_iff_to_buffer_c36b4(ef_addr32 name, uint32_t x, uint32_t y, uint32_t w, uint32_t h, ef_addr32 dest); /* 0xc36b4, misc_drafts1.c */
 void guest_fn_e3cac(ef_addr32 name); /* 0xe3cac one stack argument, callee pops */
@@ -7740,9 +7735,15 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_callptr_esi_carry_x parm [eax] [esi] value [al] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_x parm [eax] [esi] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_frame_x parm [eax] [esi] [edx] modify [eax ebx ecx edx esi edi]
-#pragma aux renderer_viewport_five_c8ccc parm routine []
+#pragma aux renderer_viewport_five_c8ccc parm routine [] modify [eax ebx ecx edx]
 #pragma aux pair_word_dc5a9 parm routine []
-#pragma aux renderer_viewport_six_e7a34 parm routine []
+#pragma aux renderer_viewport_six_e7a34 parm routine [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_c3364 modify [eax ebx ecx edx]
+#pragma aux setup_renderer_tables_c4412 parm routine [] modify [eax]
+#pragma aux renderer_toggle_opcode_a_c547f parm [esi] modify [eax ebx ecx edx esi edi]
+#pragma aux renderer_reset_opcode_a_c549e parm [esi] modify [eax ebx ecx edx esi edi]
+#pragma aux renderer_toggle_opcode_b_c54b7 parm [esi] modify [eax ebx ecx edx esi edi]
+#pragma aux renderer_reset_opcode_b_c54d6 parm [esi] modify [eax ebx ecx edx esi edi]
 #pragma aux forward_word_cd81c parm routine []
 #pragma aux set_view_origin_dc21c parm routine []
 #pragma aux render_colour_stream_c49c4 parm routine []
