@@ -216,3 +216,124 @@ void mpTargetListSelected(ef_addr32 widget)
             g_target_ship_class = (uint8_t)entry->ship_class;
     }
 }
+
+/* Planner state used by mpNextAssign. */
+#define PLANNER_MODE           0x001a53dcu /* 3 assignment, 5 tactical target */
+#define PLANNER_PANEL_X        0x0041eee6u
+#define PLANNER_PANEL_Y        0x0041eee8u
+#define PLANNER_TARGET_KIND    0x001a559au
+#define PLANNER_TACTICAL_RECORD 0x001a5506u
+#define PLANNER_TACTICAL_ENTRY 0x001a5533u
+#define PLANNER_TACTICAL_PAGE  0x001a550eu
+#define PLANNER_ASSIGNMENT_PAGE 0x001a5542u
+#define CAMERA_YAW             0x0019e5a7u
+
+
+
+/* Position of entry INDEX (21-byte entries at dword +0x2c) of RECORD, as
+ * the three high words of the 16.16 values at +5, +7 and +9. */
+static void planner_entry_position(ef_addr32 record, uint32_t index,
+	int32_t *x, int32_t *height, int32_t *y)
+{
+	ef_addr32 entry = EF_U32(record + 0x2cu) + index * 21u;
+	*x = EF_S16(entry + 7u);
+	*y = EF_S16(entry + 9u);
+	*height = EF_S16(entry + 11u);
+}
+
+/* Heading of RECORD in degrees (0, 90, 180 or 270 turn the view): word +0x11
+ * of its entry table, which lies inside the first 21-byte entry. */
+static uint16_t planner_entry_heading(ef_addr32 record)
+{
+	return EF_U16(EF_U32(record + 0x2cu) + 0x11u);
+}
+
+/* Bracket corners drawn around the assignment preview box. */
+static void draw_preview_corners(int32_t x, int32_t y)
+{
+	int32_t top = y + 0xaa, bottom = y + 0xd2;
+	int32_t left = x + 0xbe, right = x + 0xe6;
+
+	draw_tactical_line(top, x + 0xc3, top, left, 0xf);
+	draw_tactical_line(top, right, top, x + 0xe1, 0xf);
+	draw_tactical_line(y + 0xaf, left, top, left, 0xf);
+	draw_tactical_line(y + 0xaf, right, top, right, 0xf);
+	draw_tactical_line(y + 0xcd, left, bottom, left, 0xf);
+	draw_tactical_line(y + 0xcd, right, bottom, right, 0xf);
+	draw_tactical_line(bottom, x + 0xc3, bottom, left, 0xf);
+	draw_tactical_line(bottom, right, bottom, x + 0xe1, 0xf);
+}
+
+/* 0x4d2fc, 753 bytes. Render the 3D preview of the selected assignment
+ * waypoint (mode 3) or tactical target entry (mode 5): the camera focus is
+ * the entry position turned by the record heading (multiples
+ * of 90 degrees), the yaw word steps by 0x190, and the page is drawn with
+ * the record's zoom page. An assignment without a record shows the target
+ * kind's default view, 50 units lower for kinds 1 and 2. In mode 3 the
+ * preview box gets its corner brackets. */
+void mpNextAssign(void)
+{
+	int32_t panel_x = EF_S16(PLANNER_PANEL_X);
+	int32_t panel_y = EF_S16(PLANNER_PANEL_Y);
+	int32_t x = 0, y = 0, height = 0, t;
+	uint16_t heading = 0;
+	int16_t page = 0;
+	uint8_t kind;
+
+	reset_view_c4105();
+	if (EF_U8(PLANNER_MODE) != 3u && EF_U8(PLANNER_MODE) != 5u)
+		return;
+	if (EF_U8(PLANNER_MODE) == 3u && g_assignment_selected_record == 0u
+		&& g_assignment_target_record == 0u)
+		return;
+	if (EF_U8(PLANNER_MODE) == 5u && EF_U32(PLANNER_TACTICAL_RECORD) == 0u)
+		return;
+
+	if (EF_U8(PLANNER_MODE) == 3u) {
+		ef_addr32 record = g_assignment_selected_record;
+		if (record != 0u) {
+			planner_entry_position(record, g_assignment_current_byte,
+				&x, &height, &y);
+			heading = planner_entry_heading(record);
+		} else {
+			kind = EF_U8(PLANNER_TARGET_KIND);
+			height = (kind == 1u || kind == 2u) ? -50 : 0;
+		}
+		page = EF_S16(PLANNER_ASSIGNMENT_PAGE);
+	}
+	if (EF_U8(PLANNER_MODE) == 5u) {
+		ef_addr32 record = EF_U32(PLANNER_TACTICAL_RECORD);
+		planner_entry_position(record, EF_U8(PLANNER_TACTICAL_ENTRY),
+			&x, &height, &y);
+		heading = planner_entry_heading(record);
+		page = EF_S16(PLANNER_TACTICAL_PAGE);
+	}
+
+	switch (heading) {
+	case 90:
+		t = x; x = -y; y = t;
+		break;
+	case 180:
+		x = -x; y = -y;
+		break;
+	case 270:
+		t = x; x = y; y = -t;
+		break;
+	}
+	g_key_view_focus[0] = x << 8;
+	g_key_view_focus[1] = height << 8;
+	g_key_view_focus[2] = y << 8;
+	EF_U16(CAMERA_YAW) = (uint16_t)(EF_U16(CAMERA_YAW) + 0x190u);
+	guest_fn_3122c();
+
+	kind = EF_U8(PLANNER_TARGET_KIND);
+	render_page_9e0c4((uint32_t)(int32_t)page, 0,
+		((kind == 2u || kind == 1u) && EF_U8(PLANNER_MODE) == 3u) ? 0xffce0000u : 0u, 0);
+
+	if (g_assignment_selected_record == 0u && EF_U8(PLANNER_MODE) == 3u
+		&& EF_U8(PLANNER_TARGET_KIND) == 3u)
+		set_ranges_4d5f0();
+	renderer_finish_queue_c4167();
+	if (EF_U8(PLANNER_MODE) == 3u)
+		draw_preview_corners(panel_x, panel_y);
+}

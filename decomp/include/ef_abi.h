@@ -6687,6 +6687,11 @@ ef_addr32 show_named_widget_a7318(ef_addr32 root, ef_addr32 name); /* 0xa7318 EA
 uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, EAX result, EDX clobbered */
 uint32_t show_widget_a7588_r(ef_addr32 widget, ef_addr32 text); /* 0xa7588 EAX/EDX, EAX result */
 uint32_t mpMission2Click(ef_addr32 widget); /* 0x4f3e0 */
+void mpNextAssign(void); /* 0x4d2fc */
+void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_3122c parm [] modify [eax]
+#endif
 uint32_t mpMission3Click(ef_addr32 widget); /* 0x4f494 */
 uint32_t mpMission4Click(ef_addr32 widget); /* 0x4f548 */
 uint32_t mpClickATC(ef_addr32 widget); /* 0x4f608 */
