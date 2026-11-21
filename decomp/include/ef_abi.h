@@ -6713,13 +6713,13 @@ void update_chase_camera_9357c(void); /* 0x9357c */
 uint16_t move_side_record_c0b04(ef_addr32 head_a, ef_addr32 head_b, ef_addr32 list, ef_addr32 nodes, uint32_t context, ef_addr32 box, uint32_t unused); /* 0xc0b04 */
 void get_net_data_581b0(void); /* 0x581b0 */
 void net_packet_0b_55144(ef_addr32 data, uint32_t slot); /* 0x55144 EAX/EDX; packet type 0x0b */
-void guest_fn_73ee0_x(int16_t index); /* 0x73ee0 AX; object update, still blocked */
+void update_object_orientation_73ee0(int16_t index); /* 0x73ee0 AX */
 void net_packet_14_554b0(ef_addr32 data); /* 0x554b0 EAX; packet type 0x14 */
 void net_packet_29_56084(ef_addr32 data); /* 0x56084 EAX; packet type 0x29 */
 void net_packet_42_55bf8(ef_addr32 data); /* 0x55bf8 EAX; packet type 0x42 */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_packet_0b_55144 modify [eax edx]
-#pragma aux guest_fn_73ee0_x modify [eax]
+#pragma aux update_object_orientation_73ee0 modify [eax]
 #pragma aux net_packet_14_554b0 modify [eax]
 #pragma aux net_packet_29_56084 modify [eax]
 #pragma aux net_packet_42_55bf8 modify [eax]

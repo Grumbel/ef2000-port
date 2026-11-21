@@ -63,7 +63,7 @@ void net_packet_0b_55144(ef_addr32 data, uint32_t slot)
 	EF_U32(object + 0x12) = EF_U32(data + 0x13);
 	EF_F64(object + 0x91) = (double)EF_S32(object + 0x12)
 		* EF_F64(SPEED_WORD_SCALE) * EF_F64(SPEED_SCALE);
-	guest_fn_73ee0_x(EF_S16(object + 0x16));
+	update_object_orientation_73ee0(EF_S16(object + 0x16));
 	EF_U16(object + 0x234) = EF_U16(EF_U32(NET_SLOTS + (int32_t)(int16_t)slot * 32) + 0x0b);
 	EF_U16(object + 0x236) = 0;
 	advance_object_position_724a8((uint32_t)(int32_t)EF_S16(object + 0x16), object);
