@@ -3731,7 +3731,6 @@ void layout_menu_ring_5e4c4(int16_t x, int16_t y, int16_t radius, int16_t count,
 void guest_fn_5ea64_w(void); /* 0x5ea64 */
 void guest_fn_86920_w(void); /* 0x86920 */
 uint8_t guest_fn_6e320_w(uint32_t a, uint32_t b); /* 0x6e320 EAX/EDX -> AL */
-void guest_fn_6e3e0_w(double first, double second); /* 0x6e3e0 stack */
 uint32_t guest_fn_d6e58_w(void); /* 0xd6e58 -> EAX */
 void guest_fn_82e40_w(void); /* 0x82e40 */
 void guest_fn_7fe8c_w(void); /* 0x7fe8c */
@@ -6896,7 +6895,8 @@ void guest_fn_6f758_x(ef_addr32 vec, uint32_t kind, uint32_t s0, uint32_t s1); /
 
 void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb);
 
-void update_chase_camera_6e3e0(double d1, double d2);
+void update_chase_camera_6e3e0(double grow_out, double grow_in);
+#pragma aux update_chase_camera_6e3e0 parm routine [] modify [eax] /* 0x6e3e0, ret 0x10 */
 
 void focus_camera_on_unit_24c40(uint32_t ax);
 

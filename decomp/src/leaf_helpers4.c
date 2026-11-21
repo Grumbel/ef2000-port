@@ -33,7 +33,7 @@ uint8_t apply_step_6e390(uint8_t a, uint8_t b)
     if (guest_fn_6e320_w(a, b) == 0)
         return 0;
     k = (EF_U8(EF_U32(0x001f71bcu) + 0x16cu) == 0xf) ? 0.05 : 0.2;
-    guest_fn_6e3e0_w(0.2, k);
+    update_chase_camera_6e3e0(0.2, k);
     return 1;
 }
 

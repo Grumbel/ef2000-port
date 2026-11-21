@@ -18996,64 +18996,6 @@ void apply_impulse_74d98(uint32_t ax, ef_addr32 va, ef_addr32 vb)
 	}
 }
 
-/* 0x6e3e0, 443 bytes (ret 0x10). Chase camera update with two stack doubles D1 (first) and D2 (second). Target height 0x1f7088 = player unit double +0x59 + [0x1f6f80]; distance 0x1f7100 starts as [0x1f6fe0] and grows by [0x1f6f70] * D2 (when [0x1f6f70] is positive; for unit mode byte +0x16c = 0x10 it is raised to [0x1f6fe0] + 1.0) or by [0x1f6f70] * D1 otherwise, and is capped by the aircraft limit (double 0x128599 + 0xe5 * byte unit+0xe9). Heading 0x1f70f8 = atan2([0x1f6f78], [0x1f71b0] * 15.0) + [0x1f6ff0]; 0x1f70a0 = 2000.0, 0x1f7050 = 1.0, and the camera runs through 0x6ebe0 with 3.0, 1.3, tan([0x1f6fd0]) * 9.81 / [0x1f6fe0] (0.0 when [0x1f6fe0] <= 1.0), [0x1f7060] and 2000.0 (ten stack dwords). */
-void update_chase_camera_6e3e0(double d1, double d2)
-{
-	uint32_t unit = g_current_object;
-	double g, v, w, lim, tmp, a, b;
-	uint32_t k;
-	uint32_t lo4, hi4;
-
-	memcpy(&v, ef_guest_memory_ptr(unit + 0x59u), 8);
-	memcpy(&w, ef_guest_memory_ptr(0x001f6f80u), 8);
-	v = v + w;
-	memcpy(ef_guest_memory_ptr(0x001f7088u), &v, 8);
-	EF_U32(0x001f7100u) = EF_U32(0x001f6fe0u);
-	EF_U32(0x001f7104u) = EF_U32(0x001f6fe4u);
-	memcpy(&g, ef_guest_memory_ptr(0x001f6f70u), 8);
-	if (!(0.0 >= g)) {
-		memcpy(&w, ef_guest_memory_ptr(0x001f7100u), 8);
-		v = g * d2 + w;
-		memcpy(ef_guest_memory_ptr(0x001f7100u), &v, 8);
-		if (EF_U8(unit + 0x16cu) == 0x10u) {
-			memcpy(&w, ef_guest_memory_ptr(0x001f6fe0u), 8);
-			lim = 1.0 + w;
-			if (!(v >= lim))
-				memcpy(ef_guest_memory_ptr(0x001f7100u), &lim, 8);
-		}
-	} else {
-		memcpy(&w, ef_guest_memory_ptr(0x001f7100u), 8);
-		v = g * d1 + w;
-		memcpy(ef_guest_memory_ptr(0x001f7100u), &v, 8);
-	}
-	memcpy(&a, ef_guest_memory_ptr(0x001f71b0u), 8);
-	memcpy(&b, ef_guest_memory_ptr(0x001f6f78u), 8);
-	v = atan2_b4620(b, a * 15.0);
-	memcpy(&w, ef_guest_memory_ptr(0x001f6ff0u), 8);
-	v = v + w;
-	memcpy(ef_guest_memory_ptr(0x001f70f8u), &v, 8);
-	k = EF_U8(g_current_object + 0xe9u);
-	memcpy(&lim, ef_guest_memory_ptr(0x00128599u + k * 0xe5u), 8);
-	memcpy(&v, ef_guest_memory_ptr(0x001f7100u), 8);
-	if (!(v < lim))
-		memcpy(ef_guest_memory_ptr(0x001f7100u), &lim, 8);
-	EF_U32(0x001f70a0u) = 0u;
-	EF_U32(0x001f70a4u) = 0x409f4000u;
-	EF_U32(0x001f7050u) = 0u;
-	EF_U32(0x001f7054u) = 0x3ff00000u;
-	memcpy(&w, ef_guest_memory_ptr(0x001f6fe0u), 8);
-	if (1.0 < w) {
-		memcpy(&v, ef_guest_memory_ptr(0x001f6fd0u), 8);
-		tmp = tan_b45fa(v) * 9.81 / w;
-	} else {
-		tmp = 0.0;
-	}
-	memcpy(&lo4, &tmp, 4);
-	memcpy(&hi4, (const uint8_t *)&tmp + 4, 4);
-	guest_fn_6ebe0_x(0u, 0x40080000u, 0xcccccccdu, 0x3ff4ccccu, lo4, hi4,
-	    EF_U32(0x001f7060u), EF_U32(0x001f7064u), EF_U32(0x001f70a0u), EF_U32(0x001f70a4u));
-}
-
 /* 0x24c40, 533 bytes. Point the chase camera at unit AX (signed 16-bit id; 0x6a1b4; nothing but the height clamp when missing). The target height 0x1f7088 is limited to [0x1284d4] - 200.0. The unit is registered with 0x2479c (word 0x1f71c8, id, 0), the heading 0x1f70f8 is the wrapped bearing (0xb42f0 of atan2) from the player unit (dword 0x1f71bc) to it, and the height is the unit's double +0x59 (clamped again). If the player's class row (dword +0x26) lists another current unit (word +0x50 differing from word 0x1f71c8) that is alive (byte +0x24 flags 2 and 4 clear) the height comes from that unit and the distance 0x1f7100 from its double +0x91, raised to at least [0x1f7010]. The shake value 0x1f7050 = [0x1f7058] * 3.0 + [0x1f6ff8] + 1.0 (3.0 when negative) is set and the camera starts via 0x6ebe0 (2.5, 1.3, 0.0 x4, double 0x1f70a0 as ten stack dwords). */
 void focus_camera_on_unit_24c40(uint32_t ax)
 {
