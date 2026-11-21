@@ -6709,6 +6709,8 @@ void fill_colour_record_ba13c(ef_addr32 rec, uint8_t key); /* 0xba13c */
 void draw_map_marker_640b8(int16_t x, int16_t y, uint16_t kind, uint8_t label); /* 0x640b8 */
 uint32_t roll_code_chance_bbf1c(uint8_t code); /* 0xbbf1c */
 uint32_t record_class_code_bb7c0(ef_addr32 rec); /* 0xbb7c0 */
+uint32_t build_group_record_c1438(ef_addr32 list, ef_addr32 tail, ef_addr32 collect_list, ef_addr32 nearest_list, uint32_t mask, uint32_t id); /* 0xc1438 EAX/EDX/EBX/ECX + 2 stack, ret 8 */
+void update_chase_camera_9357c(void); /* 0x9357c */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux unpack_ra_10da50 parm routine [] modify [eax ecx edx]
 #endif

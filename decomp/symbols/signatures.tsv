@@ -3856,3 +3856,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000640b8	draw_map_marker_640b8	AX:int16_t,DX:int16_t,BX:uint16_t,CL:uint8_t		esi,edi,ebp	0	Pushes ESI EDI EBP; EAX EBX ECX EDX clobbered
 0x000bbf1c	roll_code_chance_bbf1c	AL:uint8_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Pushes EBX ECX EDX; returns 0 or 1
 0x000bb7c0	record_class_code_bb7c0	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Pushes EDX; returns the code in EAX
+0x000c1438	build_group_record_c1438	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t	EAX:uint32_t	esi,edi,ebp	8	Callee pops the two stack arguments; returns ID + 1.
+0x0009357c	update_chase_camera_9357c			ebx,ecx,edx,esi,edi,ebp	0	Pushes all but EAX; EAX is clobbered by the callees.

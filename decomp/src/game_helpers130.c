@@ -7037,3 +7037,152 @@ void draw_map_marker_640b8(int16_t x, int16_t y, uint16_t kind, uint8_t label)
     if (label != 0 && label != 0xffu)
         draw_formatted_text_mode_48bb0(0xfu, 1u, (int16_t)(x + 3), (int16_t)(y - 2), 0x001860a8u, (uint32_t)label);
 }
+
+/* Group records built by 0xc1438: a 0x1b-byte header with COUNT (+0x12)
+ * 0x7c-byte slot entries at the pointer +0x13. */
+#define GROUP_COUNT(g)       EF_U8((g) + 0x12u)
+#define GROUP_ENTRY(g, i)    (EF_U32((g) + 0x13u) + (uint32_t)(int32_t)(i) * 0x7cu)
+#define GROUP_SLOT_KIND      0x001a57c5u /* bytes per slot */
+#define GROUP_SLOT_COUNT     0x001a5536u /* bytes per slot */
+#define GROUP_SLOT_TYPE      0x001a57b1u /* bytes per slot */
+#define GROUP_SLOT_ROWS      0x001a57b5u /* four row indices per slot */
+#define GROUP_SELECTED_OBJ   0x001a550au /* pointer */
+
+static void copy_bytes_c1438(ef_addr32 dst, ef_addr32 src, uint32_t count)
+{
+    while (count--)
+        EF_U8(dst++) = EF_U8(src++);
+}
+
+/* 0xc1438, 1284 bytes, two stack arguments (callee pops): build the group
+ * record for the selected object (pointer 0x1a550a) with one entry per
+ * slot 0..(byte 0x1a5535)-1, insert it into the list LIST/TAIL and return
+ * ID + 1. Each entry takes its kind, count and type from the slot tables,
+ * the first route point, its object records (0xb9c68), and, depending on
+ * the selected map entry (0x1a54f6) and the slot type, a name copy, the
+ * entry's 0x15-byte rows or a target lookup (0xbe438); then the event
+ * record at +0x55 is set up and the matching list entries are collected. */
+uint32_t build_group_record_c1438(ef_addr32 list, ef_addr32 tail, ef_addr32 collect_list,
+                                  ef_addr32 nearest_list, uint32_t mask, uint32_t id)
+{
+    ef_addr32 group = guest_fn_cc6c0_x(0x1bu, 0x0018ed58u);
+    ef_addr32 entry;
+    ef_addr32 sel;
+    ef_addr32 target;
+    uint8_t type;
+    uint8_t cls;
+    int16_t i;
+    int16_t j;
+
+    EF_U32(0x001a57c9u) = group;
+    EF_U8(group + 0x09u) = 0;
+    EF_U8(group + 0x0au) = (uint8_t)g_target_type;
+    EF_U8(group + 0x0bu) = 0;
+    EF_U8(group + 0x0cu) = 0;
+    EF_U8(group + 0x0du) = 0;
+    EF_U16(group + 0x0eu) = EF_U16(EF_U32(GROUP_SELECTED_OBJ) + 0x09u);
+    EF_U16(group + 0x10u) = (uint16_t)id;
+    EF_U16(group + 0x17u) = (uint16_t)list_has_matching_node(list, 0, 0x0fu);
+    EF_U16(group + 0x19u) = (uint16_t)list_has_matching_node(list, 0, 0x11u);
+    GROUP_COUNT(group) = EF_U8(0x001a5535u);
+    EF_U32(group + 0x13u) = guest_fn_cc6c0_x((uint32_t)GROUP_COUNT(group) * 0x7cu, 0x0018ed6cu);
+
+    for (i = 0; i < (int16_t)GROUP_COUNT(group); ++i) {
+        entry = GROUP_ENTRY(group, i);
+        type = EF_U8(GROUP_SLOT_TYPE + i);
+        EF_U8(entry) = EF_U8(GROUP_SLOT_KIND + i);
+        EF_U8(entry + 1u) = EF_U8(GROUP_SLOT_COUNT + i);
+        EF_U8(entry + 2u) = type;
+        if (g_assignment_target_record != 0u && EF_U8(entry + 2u) == 2u)
+            EF_U8(entry + 2u) = 3;
+        EF_U8(entry + 0x03u) = 0;
+        EF_U32(entry + 0x04u) = 0;
+        EF_U32(entry + 0x08u) = EF_U16(0x001a55a2u);
+        EF_U32(entry + 0x0cu) = EF_U16(0x001a55d6u);
+        EF_U32(entry + 0x10u) = 0;
+        EF_U16(entry + 0x14u) = 0;
+        EF_U16(entry + 0x16u) = 0;
+        EF_U16(entry + 0x18u) = 0;
+        EF_U16(entry + 0x1au) = 1;
+        EF_U16(entry + 0x1cu) = EF_U8(0x001a55a0u);
+        EF_U16(entry + 0x1eu) = 0;
+        EF_U32(entry + 0x20u) = build_object_records_b9c68(type, EF_U8(entry + 2u), (uint8_t)i);
+        fill_slots_from_nearest_b686c(group, EF_U32(GROUP_SELECTED_OBJ), nearest_list, mask);
+
+        sel = g_assignment_selected_record;
+        entry = GROUP_ENTRY(group, i);
+        type = EF_U8(GROUP_SLOT_TYPE + i);
+        cls = 4;
+        if (sel != 0u) {
+            switch (type) {
+            case 0:
+                EF_U32(entry + 0x3bu) = strdup_fc354(EF_U32(sel + 0x0cu));
+                entry = GROUP_ENTRY(group, i);
+                EF_U32(entry + 0x51u) = 0;
+                EF_U32(entry + 0x74u) = 0;
+                break;
+            case 1:
+                EF_U8(entry + 0x3au) = EF_U8(sel + 0x0bu);
+                EF_U32(entry + 0x3bu) = strdup_fc354(EF_U32(sel + 0x0cu));
+                entry = GROUP_ENTRY(group, i);
+                copy_bytes_c1438(entry + 0x3fu, g_assignment_selected_record + 0x16u, 18u);
+                EF_U32(entry + 0x51u) = 0;
+                EF_U32(entry + 0x74u) = 0;
+                EF_U8(entry + 0x6du) = 2;
+                sel = g_assignment_selected_record;
+                target = find_target_be438(EF_U32(sel + 0x16u), EF_U32(sel + 0x1au), list);
+                entry = GROUP_ENTRY(group, i);
+                EF_U16(entry + 0x6eu) = target != 0u ? EF_U16(target + 0x10u) : 0u;
+                EF_U16(entry + 0x70u) = 0;
+                cls = 6;
+                break;
+            case 2:
+                EF_U8(entry + 0x3au) = EF_U8(sel + 0x0bu);
+                EF_U32(entry + 0x3bu) = strdup_fc354(EF_U32(sel + 0x0cu));
+                entry = GROUP_ENTRY(group, i);
+                copy_bytes_c1438(entry + 0x3fu, g_assignment_selected_record + 0x16u, 18u);
+                EF_U32(entry + 0x51u) = guest_fn_cc6c0_z((uint32_t)EF_U8(entry + 1u) * 0x15u, 0x0018ed80u,
+                                                         EF_U8(entry + 1u));
+                for (j = 0;; ++j) {
+                    entry = GROUP_ENTRY(group, i);
+                    if (j >= (int16_t)EF_U8(entry + 1u))
+                        break;
+                    copy_bytes_c1438(EF_U32(entry + 0x51u) + (uint32_t)(int32_t)j * 0x15u,
+                                     EF_U32(g_assignment_selected_record + 0x2cu)
+                                         + (uint32_t)EF_U8(GROUP_SLOT_ROWS + (uint32_t)(int32_t)i * 4u + (uint32_t)(int32_t)j) * 0x15u,
+                                     0x15u);
+                }
+                cls = map_code_ba0e4(EF_U8(EF_U32(entry + 0x51u)));
+                break;
+            default:
+                break;
+            }
+        } else {
+            target = g_assignment_target_record;
+            EF_U8(entry + 0x6du) = EF_U8(target + 0x09u);
+            EF_U16(entry + 0x6eu) = EF_U16(target + 0x10u);
+            EF_U16(entry + 0x70u) = 0;
+            EF_U32(entry + 0x3bu) = 0;
+            EF_U32(entry + 0x51u) = 0;
+            EF_U32(entry + 0x74u) = 0;
+            if (type == 0x0bu && EF_U8(target + 0x09u) == 1u)
+                cls = 5;
+        }
+
+        entry = GROUP_ENTRY(group, i);
+        init_event_record_bb324(entry + 0x55u, EF_U8(entry), cls);
+        entry = GROUP_ENTRY(group, i);
+        EF_U16(entry + 0x72u) = EF_U8(entry + 1u);
+        if (EF_U8(entry + 2u) != 0u
+            && (g_assignment_selected_record != 0u || EF_U8(entry + 2u) == 0x0bu))
+            classify_object_b4ee0(entry);
+        collect_list_entries_c193c(GROUP_ENTRY(group, i), collect_list,
+                                   EF_U32(EF_U32(GROUP_SELECTED_OBJ) + 0x11u),
+                                   EF_U32(EF_U32(GROUP_SELECTED_OBJ) + 0x15u));
+    }
+    list_insert_head(group, list, tail);
+    EF_U8(0x00125837u) = EF_U8(0x001a57a1u);
+    EF_U16(0x00125835u) = EF_U16(group + 0x10u);
+    EF_U8(0x00125838u) = EF_U8(0x001a5791u);
+    return id + 1u;
+}
