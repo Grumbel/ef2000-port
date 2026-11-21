@@ -3281,6 +3281,12 @@ void guest_blit_clip_ca290(ef_addr32 bitmap, ef_addr32 clip, uint32_t sx, uint32
 #pragma aux draw_styled_text_e26bc parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #pragma aux guest_blit_clip_ca290 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #endif
+uint16_t guest_fn_ca290_cx(ef_addr32 bitmap, ef_addr32 clip, uint32_t sx, uint32_t sy, uint32_t width, uint32_t height, uint32_t x, uint32_t y, uint32_t stride); /* 0xca290, returns the CX it leaves */
+uint16_t draw_scaled_sprite_ca620(ef_addr32 bitmap, uint32_t x, uint32_t y, uint32_t width, uint32_t height, uint32_t stride);
+#ifdef __WATCOMC__
+#pragma aux guest_fn_ca290_cx parm routine [eax] [edx] [ebx] [ecx] value [cx] modify [eax ebx ecx edx]
+#pragma aux draw_scaled_sprite_ca620 parm routine [eax] [edx] [ebx] [ecx] value [cx] modify [eax ebx ecx edx]
+#endif
 #ifdef __WATCOMC__
 #pragma aux guest_fn_e26bc parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #endif

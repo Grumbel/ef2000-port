@@ -195,3 +195,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x7f850 update_rolling_sound_7f850 (rolling_sound.c); fix EDX argument of 0xd73b8/0xd7458; differential 200/120/120; hybrid regression 4/4
 2026-11-21  B5  recover 0x31818 place_midpoint_camera_31818 (game_helpers130.c; x87 midpoint camera offset); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x85604 check_row_target_85604 (misc_drafts1.c; x87 row target range check, stack double); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0xca620 draw_scaled_sprite_ca620 (sprite_scaled.c; x87 view-scaled sprite clip and blit, CX return); differential 200; hybrid regression 4/4
