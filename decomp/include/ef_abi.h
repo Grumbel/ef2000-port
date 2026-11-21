@@ -6733,7 +6733,8 @@ void gui_cursor_step_f3d54(ef_addr32 x_out, ef_addr32 y_out, ef_addr32 button_ou
 void opengamesell_34218(ef_addr32 widget); /* 0x34218 */
 uint8_t load_archive_entry_eba64(ef_addr32 name, ef_addr32 dest, ef_addr32 context); /* 0xeba64 */
 uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
-void guest_fn_41b98(int16_t row); /* 0x41b98 */
+void draw_map_row_41b98(int16_t row);
+void guest_fn_4110c(int32_t color, int32_t symbol, int32_t x, int32_t y, uint32_t flags); /* 0x4110c EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 void guest_fn_41998(int16_t unit); /* 0x41998 */
 void guest_fn_42004(void); /* 0x42004 */
 void guest_fn_9820(void); /* 0x9820 */

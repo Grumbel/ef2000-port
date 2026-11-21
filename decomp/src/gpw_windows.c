@@ -492,7 +492,7 @@ void gpwUpdateMap(ef_addr32 widget)
     }
     if (g_group_list_head != 0u && g_frontend_network_active != 0u) {
         for (i = 0; i < g_map_row_count; ++i)
-            guest_fn_41b98(i);
+            draw_map_row_41b98(i);
         for (i = 0; i < g_unit_count;) {
             guest_fn_41998(i);
             ++i;

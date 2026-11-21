@@ -3757,7 +3757,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0007e0a4	simNextFlight	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; 4-byte digit buffer; EAX widget; GUI open callback
 0x0000522c	kotsAccept	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; GUI accept callback
 0x000426a4	gpwUpdateMap	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; GUI update callback
-0x00041b98	guest_fn_41b98	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EBP not written in the prologue; called by 0x426a4 per map row
+0x00041b98	draw_map_row_41b98	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Draw the campaign-map marker for a network row: position clamped to the 400-pixel map, colour from the command code (0x41da4, 0x41e0c), symbol from the side word, then 0x4110c; the heading conversion through 0x9d72c is unused; callers 426a4
 0x00041998	guest_fn_41998	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; called by 0x426a4 per unit
 0x00042004	guest_fn_42004			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; called by 0x426a4
 0x000ab95c	guiUpdateMemoryUse	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; EAX widget; magnifier draw callback
