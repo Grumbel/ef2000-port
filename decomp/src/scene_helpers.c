@@ -454,3 +454,63 @@ void latch_b3f48(void)
 {
     EF_U32(0x004191c8u) = guest_fn_b3f48();
 }
+
+#define SCENE_SCRIPT_DONE 0x00126518u /* word, set by the final step */
+#define SCENE_VIEW_MATRIX 0x0012dbecu /* g_scene_view_matrix */
+
+/* 0x975f0, 363 bytes: advance a scene script record by one step. The step
+ * counter (+8) is incremented and +6 cleared; the old value selects the
+ * step (a CS-prefixed jump table in the original):
+ *   0  event 0x41 and message 0x0b for the unit named at +0x4c,
+ *   1  event 0x24, vector +0x3c = (0, 10000, 0), +0x48 = -0.001f,
+ *   2  vector +0x3c = (0, 1000, 0), +0x48 = -0.5f, message 3 for the page,
+ *   3  compare the record's height (+0x10) with the ground under it: within
+ *      10000 units the camera stays on the scene, otherwise the view is
+ *      reset to the standard orientation; either way 32 shake ticks,
+ *   5  mark the script finished and return 1.
+ * Every other step returns 0. */
+uint32_t step_scene_script_975f0(ef_addr32 record)
+{
+	uint16_t step = EF_U16(record + 8u);
+	ef_addr32 unit;
+	uint32_t ground;
+
+	EF_U16(record + 6u) = 0;
+	EF_U16(record + 8u) = (uint16_t)(step + 1u);
+	switch (step) {
+	case 0:
+		record_scene_event(0x41);
+		unit = lookup_filtered_indexed_object(EF_S16(record + 0x4cu));
+		if (unit != 0)
+			run_page_text_9e508(EF_S16(unit + 0x20u), 0x0bu);
+		break;
+	case 1:
+		record_scene_event(0x24);
+		store_triple_ea864(record + 0x3cu, 0, 10000u, 0);
+		EF_U32(record + 0x48u) = 0xba83126fu;
+		break;
+	case 2:
+		store_triple_ea864(record + 0x3cu, 0, 1000u, 0);
+		EF_U32(record + 0x48u) = 0xbf000000u;
+		run_page_text_9e508(g_view_data_page, 3u);
+		break;
+	case 3:
+		ground = cell_distance_at_7b16c(0, EF_S32(record + 0x0cu) >> 8,
+			EF_S32(record + 0x14u) >> 8) << 8;
+		if ((int32_t)(EF_U32(record + 0x10u) + 1u + ground) > -10000) {
+			g_view_scene_camera = 1;
+		} else {
+			g_view_scene_camera = 0;
+			g_scene_event_armed = 1;
+			init_bounds_d0b68(SCENE_VIEW_MATRIX);
+			update_scene_angle_first(SCENE_VIEW_MATRIX, 0xc000u);
+			update_scene_angle_second(SCENE_VIEW_MATRIX, 0xc001u);
+		}
+		g_view_shake_ticks = 0x20;
+		break;
+	case 5:
+		EF_U16(SCENE_SCRIPT_DONE) = 1;
+		return 1;
+	}
+	return 0;
+}

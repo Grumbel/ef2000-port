@@ -157,3 +157,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x4fa64 fill_atc_list_4fa64 (mission_planner_callbacks.c); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x4b6a0 mpUpdateMap (mission_planner_callbacks.c); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x4aa4c spawn_record_flights_4aa4c (mission_planner_callbacks.c; jump-table triage corrected); differential 160/160; hybrid regression 4/4
+2026-11-21  B5  recover 0x5674c apply_unit_status_packet_5674c, 0x975f0 step_scene_script_975f0, 0x8f07c set_pylon_shapes_8f07c (jump-table triage corrected); differential 160/160 each; hybrid regression 4/4

@@ -198,3 +198,51 @@ void send_player_57_570c8(void)
     emit_command_packet(bytes, sizeof(bytes));
     guest_fn_a3f30();
 }
+
+/* 0x5674c, 321 bytes: apply a 0x14-byte unit status packet. PACKET holds
+ * the unit id (word +1), twelve status bytes (+3), flags (+0x0f: bit 0
+ * selects the second message set, bit 3 marks the unit) and the remote
+ * progress word (+0x10). The progress difference to the local cursor is
+ * added, and the resulting state class decides the outcome: class 1
+ * releases the unit, 2 destroys it and classes 2..4 show a message unless
+ * the unit is muted (+0xe9). The state selection was a CS-prefixed jump
+ * table. */
+void apply_unit_status_packet_5674c(ef_addr32 packet)
+{
+	ef_addr32 unit = lookup_filtered_indexed_object(EF_S16(packet + 1u));
+	uint8_t flags;
+	uint8_t i;
+	uint16_t cursor;
+
+	if (unit == 0)
+		return;
+	for (i = 0; i < 12u; ++i)
+		EF_U8(unit + 0x18eu + i) = EF_U8(packet + 3u + i);
+	flags = EF_U8(packet + 0x0fu);
+	EF_U8(unit + 0x19au) = (uint8_t)(flags & 1u);
+
+	open_entry_cd150(EF_S16(unit + 0x20u));
+	cursor = cursor_table_word();
+	add_progress_cd2e8((uint32_t)(int32_t)(int16_t)(EF_U16(packet + 0x10u) - cursor));
+	switch ((uint8_t)classify_object_percentage((uint8_t)cursor_table_word())) {
+	case 1:
+		EF_U8(unit + 0x24u) |= 0x10u;
+		release_object_74584(EF_S16(packet + 1u));
+		break;
+	case 2:
+		if (EF_U8(unit + 0xe9u) == 0)
+			run_page_text_9e508(EF_S16(unit + 0x20u), (flags & 1u) ? 0x29u : 0x2cu);
+		destroy_unit_74718((uint32_t)(int32_t)EF_S16(packet + 1u));
+		break;
+	case 3:
+		if (EF_U8(unit + 0xe9u) == 0)
+			run_page_text_9e508(EF_S16(unit + 0x20u), (flags & 1u) ? 0x28u : 0x2bu);
+		break;
+	case 4:
+		if (EF_U8(unit + 0xe9u) == 0)
+			run_page_text_9e508(EF_S16(unit + 0x20u), (flags & 1u) ? 0x27u : 0x2au);
+		break;
+	}
+	if (EF_U8(packet + 0x0fu) & 8u)
+		EF_U8(unit + 0x24u) |= 8u;
+}

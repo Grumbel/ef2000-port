@@ -3847,3 +3847,6 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0004fa64	fill_atc_list_4fa64			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI and leaves EBP alone; no inputs, EAX left from the last callee
 0x0004b6a0	mpUpdateMap	EAX:ef_addr32		ebx,edx	0	GUI click callback; widget in EAX; original pushes only EBX and EDX, EAX left from the last callee
 0x0004aa4c	spawn_record_flights_4aa4c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; record in EAX (its caller also has it in EDI), EAX left from the last callee
+0x0005674c	apply_unit_status_packet_5674c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX EDX ESI EDI; ECX is not used; packet in EAX, EAX left from the last callee
+0x000975f0	step_scene_script_975f0	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; returns EBP (0, or 1 after the final step)
+0x0008f07c	set_pylon_shapes_8f07c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX left from the last callee

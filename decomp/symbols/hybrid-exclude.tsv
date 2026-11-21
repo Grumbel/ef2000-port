@@ -102,7 +102,6 @@ addr	reason
 0x0004c3bc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0004e360	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000548e0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x0005674c	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00058d64	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0005a468	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0005b080	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
@@ -259,7 +258,6 @@ addr	reason
 0x0008ecdc	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00092290	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00094d08	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x000975f0	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000bbf1c	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000bc7ec	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000bd39c	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)

@@ -6931,3 +6931,61 @@ void draw_heading_tape_5b2f0(void)
         guest_fn_c8ccc_x(di + (s ? 0xb : 7), X, di + (s ? 0xd : 8), X - n, col);
     }
 }
+
+/* Store-type records loaded above: 0x91 bytes each from 0x12bc68, with the
+ * main shape handle at +0x22 and alternative shapes at +0x26, +0x28 and
+ * +0x2a (zero when absent). */
+#define STORE_TYPE_RECORD(type) (0x0012bc68u + (uint32_t)((int32_t)(type) * 0x91))
+
+/* 0x8f07c, 377 bytes: show the stores of UNIT on its 20 pylons. Unless the
+ * unit is hidden (+0x24 bit 3), every pylon is first cleared to -1 and then,
+ * if it is loaded (count word +0x19c) with a real store (type byte +0x19b
+ * not 0, 1 or 0x14), set to that store's shape. Pylons 8-12 prefer the
+ * alternative shapes (8-9 the first, 10-11 the second, 12 the third) and
+ * pylons beyond 12 stay empty, except on units flagged +0xe9, which always
+ * use the main shape. Nothing is written while tactical actions are
+ * disabled. The pylon selection was a CS-prefixed jump table. */
+void set_pylon_shapes_8f07c(ef_addr32 unit)
+{
+	int16_t i;
+
+	if (unit == 0 || (EF_U8(unit + 0x24u) & 8u) != 0)
+		return;
+	for (i = 0; i < 20; ++i) {
+		ef_addr32 pylon = unit + (uint32_t)(i * 3);
+		int32_t type;
+		ef_addr32 store;
+		uint16_t shape;
+
+		if (g_tactical_action_enabled != 0)
+			set_page_word_e7c50(EF_S16(unit + 0x20u), 0xffffu, i);
+		if (EF_U16(pylon + 0x19cu) == 0)
+			continue;
+		type = (int8_t)EF_U8(pylon + 0x19bu);
+		if (type == 0 || type == 1 || type == 0x14 || g_tactical_action_enabled == 0)
+			continue;
+		store = STORE_TYPE_RECORD(type);
+		shape = EF_U16(store + 0x22u);
+		if (EF_U8(unit + 0xe9u) == 0) {
+			switch (i) {
+			case 0: case 1: case 2: case 3: case 4: case 5: case 6: case 7:
+				break;
+			case 8: case 9:
+				if (EF_U16(store + 0x26u) != 0)
+					shape = EF_U16(store + 0x26u);
+				break;
+			case 10: case 11:
+				if (EF_U16(store + 0x28u) != 0)
+					shape = EF_U16(store + 0x28u);
+				break;
+			case 12:
+				if (EF_U16(store + 0x2au) != 0)
+					shape = EF_U16(store + 0x2au);
+				break;
+			default:
+				continue;
+			}
+		}
+		set_page_word_e7c50(EF_S16(unit + 0x20u), shape, i);
+	}
+}
