@@ -58,8 +58,8 @@ double surface_coefficient_11bcc4(ef_addr32 surface, double eta, double mach)
 			query.cell[2] = 2;
 	}
 	query.axis[2] = 0.0;
-	cubic = guest_fn_11acb0(CUBIC_TABLE, FRAME_ADDR(&query.axis), FRAME_ADDR(&query.cell));
-	square = guest_fn_11acb0(SQUARE_TABLE, FRAME_ADDR(&query.axis), FRAME_ADDR(&query.cell));
+	cubic = interpolate_table_11acb0(CUBIC_TABLE, FRAME_ADDR(&query.axis), FRAME_ADDR(&query.cell));
+	square = interpolate_table_11acb0(SQUARE_TABLE, FRAME_ADDR(&query.axis), FRAME_ADDR(&query.cell));
 	cubic_term = pow_b3fec(eta, 3.0) * cubic;
 	return pow_b3fec(eta, 2.0) * square + cubic_term;
 }

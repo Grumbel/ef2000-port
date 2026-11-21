@@ -5275,13 +5275,13 @@ uint32_t read_bytes_9cde8(uint32_t dst, uint32_t count, uint32_t flags);
 double tan_b45fa(double angle);
 double atan_dc1d4(double value);
 double table_double_11ac3c(uint32_t obj, uint32_t a, uint32_t b, uint32_t c);
-double guest_fn_11acb0(ef_addr32 table, ef_addr32 point, ef_addr32 cells); /* 0x11acb0 three-axis table interpolation -> ST0 */
+double interpolate_table_11acb0(ef_addr32 table, ef_addr32 point, ef_addr32 cells); /* 0x11acb0 trilinear table interpolation -> ST0 */
 double guest_fn_dc1e9_st(double st0, double st1); /* 0xdc1e9 atan2(ST0, ST1); Watcom loads the first [8087] argument last, into ST0 */
 double surface_coefficient_11bcc4(ef_addr32 surface, double eta, double mach); /* 0x11bcc4 */
 double surface_coefficient_delta_11bdc0(ef_addr32 surface, ef_addr32 offset, ef_addr32 points, double mach,
                                         double unused); /* 0x11bdc0 */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
-#pragma aux guest_fn_11acb0 value [8087] modify [eax ebx edx]
+#pragma aux interpolate_table_11acb0 value [8087] modify [eax ebx edx]
 #pragma aux guest_fn_dc1e9_st parm [8087] [8087] value [8087] modify [eax]
 #pragma aux surface_coefficient_11bcc4 parm routine [eax] value [8087] modify [eax]
 #pragma aux surface_coefficient_delta_11bdc0 parm routine [eax] [edx] [ebx] value [8087] modify [eax]
