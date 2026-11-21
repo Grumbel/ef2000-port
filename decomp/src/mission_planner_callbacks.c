@@ -696,3 +696,125 @@ void fill_target_list_4d668(void)
 	else
 		resize_widget_a520c(list, (uint32_t)(int32_t)EF_S16(list + 0x45u), 200, 0);
 }
+
+#define PLANNER_TACTICAL_SLOTS 0x001a550au /* dword: record of the take-off slots */
+#define ATC_SLOT_TIMES       0x001a5736u /* 10 entries of 9 bytes: 0, hour, minute */
+#define ATC_SLOT_COUNTS      0x001a571au /* 4 words */
+#define MISSION_START_HOUR   0x001379a0u /* word, see 0xb54d0 */
+#define TIME_TEXT            0x00184e94u /* "%02d:%02d" */
+
+static ef_addr32 atc_slot_entry(uint8_t slot)
+{
+	return ATC_SLOT_TIMES + 9u * slot;
+}
+
+/* Find widget FORMAT SLOT ("t%d" and so on) of the ATC list. */
+static ef_addr32 atc_row_widget(ef_addr32 list, char *buf, ef_addr32 format, uint8_t slot)
+{
+	guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, format, (int32_t)slot);
+	return find_widget_checked_a78bc(list, (ef_addr32)(uintptr_t)buf);
+}
+
+/* 0x4fa64, 910 bytes. Fill the "mp_atc_list" dialog of the ATC page.
+ * The view is reset to look at "MP_TARGET" from 300000 units out with a
+ * coverage width of 0x800, the roster kinds are tallied and the four
+ * counts cleared. Ten take-off slots are placed on the tactical record
+ * (dword 0x1a550a) 20 minutes apart from minute 5, each remembering its
+ * start (0x1a5722) and clock time. Row N then shows the take-off time
+ * "tN", the time over target "sN" ("--:--" while the status is
+ * unchanged), the landing time "lN" (between asterisks and marking the
+ * slot unusable from 8 hours past the mission start) and the weather
+ * "wN" for the hour after the start, at most 9 hours on. */
+void fill_atc_list_4fa64(void)
+{
+	char buf[12];
+	uint16_t hours, minutes, seconds;
+	ef_addr32 list, row;
+	int16_t start = 5;
+	int i;
+	uint8_t slot;
+	int16_t weather_hour;
+	uint8_t weather;
+	int16_t flight;
+
+	EF_U32(0x0019e54du) = 0;
+	EF_U32(0x0019e551u) = 0;
+	guest_fn_2fbc4_r(0x00184e88u); /* "MP_TARGET" */
+	EF_U16(VIEW_ROLL) = 0;
+	g_key_view_eye[2] = 0;
+	g_key_view_eye[0] = 0;
+	g_key_view_eye[1] = VIEW_EYE_FAR;
+	EF_S32(VIEW_TARGET + 8u) = 0;
+	EF_S32(VIEW_TARGET) = 0;
+	EF_S32(VIEW_TARGET + 4u) = VIEW_EYE_FAR;
+	EF_U16(VIEW_PITCH) = 0x4000;
+	g_sam_coverage_width = 0x800;
+	g_sam_coverage_range = 0xffff;
+	tally_roster_kinds_50658();
+	for (slot = 0; slot < 4u; ++slot)
+		EF_U16(ATC_SLOT_COUNTS + 2u * slot) = 0;
+
+	for (slot = 0; slot < 10u; ++slot) {
+		flight = (int16_t)find_free_slot_run_b58a8(EF_U32(PLANNER_TACTICAL_SLOTS), (int16_t)start, 1);
+		add_time_offset_b54d0((ef_addr32)(uintptr_t)&hours, (ef_addr32)(uintptr_t)&minutes,
+			(ef_addr32)(uintptr_t)&seconds, flight,
+			(uint32_t)(int32_t)EF_S16(EF_U32(PLANNER_TACTICAL_SLOTS) + 0x48u));
+		EF_U8(atc_slot_entry(slot)) = 0;
+		EF_U8(atc_slot_entry(slot) + 1u) = (uint8_t)hours;
+		EF_U8(atc_slot_entry(slot) + 2u) = (uint8_t)minutes;
+		g_atc_slot_flights[slot] = flight;
+		start = (int16_t)(flight + 20);
+	}
+
+	list = find_named_or_abort_a46cc(MP_ATC_LIST);
+	for (slot = 0; slot < 10u; ++slot) {
+		ef_addr32 entry = atc_slot_entry(slot);
+
+		row = atc_row_widget(list, buf, 0x00184e78u, slot); /* "t%d" */
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, TIME_TEXT,
+			(int32_t)EF_U8(entry + 1u), (int32_t)EF_U8(entry + 2u));
+		show_widget_a7588(row, (ef_addr32)(uintptr_t)buf);
+
+		row = atc_row_widget(list, buf, 0x00184e7cu, slot); /* "s%d" */
+		hours = EF_U8(entry + 1u);
+		minutes = EF_U8(entry + 2u);
+		add_float_time_4fdf4((ef_addr32)(uintptr_t)&hours, (ef_addr32)(uintptr_t)&minutes,
+			g_route_target_hours);
+		if (g_tactical_status_changed == 0) {
+			for (i = 0; i < 6; ++i)
+				buf[i] = (char)EF_U8(0x00184ea0u + i); /* "--:--" */
+		} else {
+			guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, TIME_TEXT,
+				(int32_t)(int16_t)hours, (int32_t)(int16_t)minutes);
+		}
+		show_widget_a7588(row, (ef_addr32)(uintptr_t)buf);
+
+		row = atc_row_widget(list, buf, 0x00184e80u, slot); /* "l%d" */
+		hours = EF_U8(entry + 1u);
+		minutes = EF_U8(entry + 2u);
+		add_float_time_4fdf4((ef_addr32)(uintptr_t)&hours, (ef_addr32)(uintptr_t)&minutes,
+			g_route_total_hours);
+		if ((int16_t)hours >= EF_S16(MISSION_START_HOUR) + 8) {
+			guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, 0x00184ea8u, /* "*%02d:%02d*" */
+				(int32_t)(int16_t)hours, (int32_t)(int16_t)minutes);
+			g_atc_slot_flights[slot] = -1;
+		} else {
+			guest_sprintf_a4342((ef_addr32)(uintptr_t)buf, TIME_TEXT,
+				(int32_t)(int16_t)hours, (int32_t)(int16_t)minutes);
+		}
+		show_widget_a7588(row, (ef_addr32)(uintptr_t)buf);
+
+		weather_hour = (int16_t)(EF_U8(entry + 1u) - EF_U16(MISSION_START_HOUR));
+		if (weather_hour > 9)
+			weather_hour = 9;
+		row = atc_row_widget(list, buf, 0x00184e84u, slot); /* "w%d" */
+		weather = EF_U8(PLANNER_WEATHER + weather_hour);
+		if (weather == 0)
+			show_widget_a7588(row, 0x00132462u);      /* "Gut" */
+		else if (weather == 1)
+			show_widget_a7588(row, 0x00132466u);      /* "Mittel" */
+		else if (weather == 2)
+			show_widget_a7588(row, 0x0013246du);      /* "Schlecht" */
+	}
+	g_atc_selected_slot = 0x14;
+}
