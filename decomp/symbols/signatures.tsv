@@ -3868,3 +3868,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00073ee0	update_object_orientation_73ee0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	"Pushes EBX/ECX/EDX/ESI; EAX is clobbered."
 0x00073820	report_contact_73820	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	Pushes EBX/ECX/ESI/EDI/EBP; EAX and EDX are clobbered.
 0x00053ecc	advance_player_frame_53ecc			ebx,ecx,edx,esi,edi,ebp	0	Pushes EBX/ECX/EDX/ESI/EDI/EBP; EAX is clobbered.
+0x00070914	steer_onto_line_70914	EAX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t		ebx,ecx,edx,esi,edi,ebp	8	Heading double on the stack, callee pops 8; EAX is clobbered.

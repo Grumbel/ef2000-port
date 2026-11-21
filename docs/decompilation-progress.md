@@ -171,3 +171,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x73ee0 update_object_orientation_73ee0 (object_orientation.c; x87 matrix); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x73820 report_contact_73820 (object_contact.c; x87 range/bearing); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x53ecc advance_player_frame_53ecc (simulation_step.c; x87 time steps); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x70914 steer_onto_line_70914 (autopilot_steer.c; x87 stack double); differential 200; hybrid regression 4/4
