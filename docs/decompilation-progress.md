@@ -186,3 +186,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0xa5070 limit_widget_size_a5070 (widget_size_limits.c; x87 content size clamp); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x109ec0 derive_geometry_records_109ec0 (aero_geometry.c; x87 record scaling); differential 120; hybrid regression 4/4
 2026-11-21  B5  recover 0xe78b4 reset_flight_model_e78b4 (flight_model_reset.c; x87 state reset); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x10958c update_sink_warning_10958c (sink_warning.c; x87 factor and warning toggle); differential 200; hybrid regression 4/4
