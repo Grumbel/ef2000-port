@@ -1018,7 +1018,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000550b0	39	apply_marker_to_grid_row	marker_packets	compiles	game	confirmed	decomp/tests/0x000550b0.json	docs/compiler-abi.md; If record+3==marker store marker at grid row (signed word +1)*0xca byte 0; sole direct caller 581b0@582dc; guest pending
 0x000550d8	67	copy_payload_550d8	game_helpers5	compiles	game	confirmed	decomp/tests/0x000550d8.json	docs/compiler-abi.md; Copy the 0x19-byte payload of a message into object message[1].; callers 581b0@58318; guest pending
 0x0005511c	38	forward_record_to_46454	mid_helpers	compiles	game	confirmed	decomp/tests/0x0005511c.json	docs/compiler-abi.md; marshal record fields to 0x46454 (4 regs + 2 stack dwords); callers 581b0@58336; guest pending
-0x00055144	875			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
+0x00055144	875	net_packet_0b_55144	net_packet_0b	spliced	game	confirmed	decomp/tests/0x00055144.json	Packet 0x0b: remote object state; flag bits and scaled speeds.
 0x000554b0	687	net_packet_14_554b0	net_packet_14	spliced	game	confirmed	decomp/tests/0x000554b0.json	Packet 0x14: remote unit grid record state; scaled positions/angles.
 0x00055760	36	send_two_word_packet_4f	marker_packets	compiles	game	confirmed	decomp/tests/0x00055760.json	docs/compiler-abi.md; Packet 4f AX DX little-endian size 5; sole direct caller 8d59c@8d7ae; guest pending
 0x00055784	97	release_slot_55784	game_helpers8	compiles	game	confirmed	decomp/tests/0x00055784.json	docs/compiler-abi.md; Release a unit's slot if it still refers to the unit's target.; callers 581b0@58602; guest pending
