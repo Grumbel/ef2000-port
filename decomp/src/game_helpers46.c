@@ -23,7 +23,7 @@ void wait_target_count_7eccc(void)
             send_command_1f();
         guest_fn_58094();
         guest_fn_e2988(0x1e);
-        guest_fn_581b0();
+        get_net_data_581b0();
         guest_fn_58094();
         guest_fn_7eda4();
         if (EF_U8(0x0041f791u) != 0

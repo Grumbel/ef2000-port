@@ -3128,7 +3128,6 @@ void wait_round_clear_7e7e0(void);
 uint8_t guest_fn_56ba8(void); /* 0x56ba8 -> AL */
 uint8_t guest_fn_56ffc(void); /* 0x56ffc -> AL */
 void guest_fn_e2988(uint32_t ticks); /* 0xe2988 EAX */
-void guest_fn_581b0(void); /* 0x581b0 */
 void guest_fn_58094(void); /* 0x58094 */
 void guest_fn_e1e6c_3(uint32_t a, uint32_t b, uint32_t c); /* 0xe1e6c EAX/EDX/EBX */
 uint8_t guest_fn_7e670(void); /* 0x7e670 -> AL */
@@ -6712,6 +6711,17 @@ uint32_t record_class_code_bb7c0(ef_addr32 rec); /* 0xbb7c0 */
 uint32_t build_group_record_c1438(ef_addr32 list, ef_addr32 tail, ef_addr32 collect_list, ef_addr32 nearest_list, uint32_t mask, uint32_t id); /* 0xc1438 EAX/EDX/EBX/ECX + 2 stack, ret 8 */
 void update_chase_camera_9357c(void); /* 0x9357c */
 uint16_t move_side_record_c0b04(ef_addr32 head_a, ef_addr32 head_b, ef_addr32 list, ef_addr32 nodes, uint32_t context, ef_addr32 box, uint32_t unused); /* 0xc0b04 */
+void get_net_data_581b0(void); /* 0x581b0 */
+void net_packet_0b_55144(ef_addr32 data, uint32_t slot); /* 0x55144 EAX/EDX; packet type 0x0b, not yet recovered (x87) */
+void net_packet_14_554b0(ef_addr32 data); /* 0x554b0 EAX; packet type 0x14, not yet recovered (x87) */
+void net_packet_29_56084(ef_addr32 data); /* 0x56084 EAX; packet type 0x29, not yet recovered */
+void net_packet_42_55bf8(ef_addr32 data); /* 0x55bf8 EAX; packet type 0x42, not yet recovered (x87) */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux net_packet_0b_55144 modify [eax edx]
+#pragma aux net_packet_14_554b0 modify [eax]
+#pragma aux net_packet_29_56084 modify [eax]
+#pragma aux net_packet_42_55bf8 modify [eax]
+#endif
 uint8_t step_view_transition_913dc(uint8_t slot, uint8_t action); /* 0x913dc AL/DL -> AL */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux unpack_ra_10da50 parm routine [] modify [eax ecx edx]

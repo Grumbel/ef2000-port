@@ -47,7 +47,7 @@ void announce_ready_56bdc(void)
         emit_command_packet(packet, 1);
         guest_fn_a3f30();
         guest_fn_e2988(5);
-        guest_fn_581b0();
+        get_net_data_581b0();
     }
     EF_U16(0x00126518u) = 1;
 }
@@ -74,7 +74,7 @@ void announce_ready_57030(void)
         emit_command_packet(packet, 1);
         guest_fn_a3f30();
         guest_fn_e2988(2);
-        guest_fn_581b0();
+        get_net_data_581b0();
     }
 }
 
@@ -143,7 +143,7 @@ uint8_t claim_players_7e5a0(void)
                 i++;
             } while (i < (int16_t)EF_U16(0x0019bb5cu));
         }
-        guest_fn_581b0();
+        get_net_data_581b0();
         guest_fn_58094();
     } while (pending != 0 && EF_U16(0x00126518u) == 0
              && ((uint32_t (*)(void))EF_U32(0x0015b620u))() < deadline);
@@ -170,7 +170,7 @@ uint8_t sync_players_7e758(void)
             send_command_1d();
             guest_fn_58094();
             guest_fn_e2988(0x1e);
-            guest_fn_581b0();
+            get_net_data_581b0();
             if (EF_U8(0x00127da4u) == 0)
                 break;
         }
@@ -186,7 +186,7 @@ void wait_round_clear_7e7e0(void)
     if (EF_U8(0x0019bc02u) != 0) {
         while (EF_U16(0x00126518u) == 0 && ((uint32_t (*)(void))EF_U32(0x0015b620u))() < deadline) {
             guest_fn_e2988(0x1e);
-            guest_fn_581b0();
+            get_net_data_581b0();
             guest_fn_58094();
             if (EF_U8(0x0019bc02u) == 0)
                 break;

@@ -12858,7 +12858,7 @@ uint32_t run_unit_setup_7e670(void)
             count++;
             guest_fn_545b8_x((int32_t)i, 1u);
         }
-        guest_fn_581b0();
+        get_net_data_581b0();
         guest_fn_58094();
     } while ((uint16_t)count != 0u && EF_U16(0x00126518u) == 0u && ((uint32_t (*)(void))g_clock_callback)() < deadline);
     if ((uint16_t)count != 0u && EF_U16(0x00126518u) == 0u)
