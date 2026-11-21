@@ -5239,7 +5239,7 @@ void advance_follow_slot_3a148(int32_t a)
         if ((guest_fn_3a268_x((uint32_t)v) & 0xffu) != 0u)
             report_nearest_object_39edc((uint32_t)(int32_t)ia, (uint32_t)v);
     } else {
-        guest_fn_3a000_x((uint32_t)(int32_t)ia);
+        update_external_track_3a000(ia, (int16_t)v);
     }
 }
 

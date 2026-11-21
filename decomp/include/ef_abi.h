@@ -5654,7 +5654,10 @@ void draw_mission_clock_78e1c(void);
 void advance_follow_slot_3a148(int32_t a);
 uint8_t guest_fn_3a268_x(uint32_t v); /* 0x3a268 EAX -> AL */
 void guest_fn_39edc_x(uint32_t a, uint32_t v); /* 0x39edc EAX/EDX */
-void guest_fn_3a000_x(uint32_t a); /* 0x3a000 EAX */
+void update_external_track_3a000(int16_t unit, int16_t node); /* 0x3a000 AX/DX */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux update_external_track_3a000 modify [eax edx]
+#endif
 
 void add_recent_file_ac2e4(uint32_t name, uint32_t flag);
 
