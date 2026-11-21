@@ -197,3 +197,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x85604 check_row_target_85604 (misc_drafts1.c; x87 row target range check, stack double); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0xca620 draw_scaled_sprite_ca620 (sprite_scaled.c; x87 view-scaled sprite clip and blit, CX return); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x16034 scan_engagements_16034 (unit_engagement_scan.c; x87 range scan, mode-3 relation grid); differential 240; hybrid regression 4/4
+2026-11-21  B5  recover 0x54c10 send_unit_state_packet_54c10 (unit_state_packet.c; x87 truncations into packet 0x14); differential 200; hybrid regression 4/4

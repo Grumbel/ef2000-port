@@ -1004,7 +1004,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000548e0	700			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x00054b9c	1	nop_54b9c	tiny_helpers2	compiles	game	confirmed	decomp/tests/0x00054b9c.json	docs/compiler-abi.md; Empty stub (single ret).; callers 37eac@37fd4; guest pending
 0x00054ba0	109	copy_message_54ba0	game_state_helpers3	compiles	game	confirmed	decomp/tests/0x00054ba0.json	docs/compiler-abi.md; Copy three dwords and a byte from a message into record +7/+0xb/+0xf/+0x13.; callers 581b0@582fa; guest pending
-0x00054c10	426			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
+0x00054c10	426	send_unit_state_packet_54c10	unit_state_packet	spliced	game	confirmed	decomp/tests/0x00054c10.json	original ASM; owner gate, x87 truncations of unit position/velocity/heading/throttle into 0x39-byte packet 0x14 via 0xa3f74
 0x00054e5c	34	send_marker_packet_1b	marker_packets	compiles	game	confirmed	decomp/tests/0x00054e5c.json	docs/compiler-abi.md; Packet 0x1b plus marker 0x1a666b via 0xa3f74; sole direct caller 54e9c@54ea4; guest pending
 0x00054e80	26	request_name_54e80	game_helpers11	compiles	game	confirmed	decomp/tests/0x00054e80.json	docs/compiler-abi.md; ; callers 581b0@583c2; guest pending
 0x00054e9c	21	commit_marker_selection	marker_packets	compiles	game	confirmed	decomp/tests/0x00054e9c.json	docs/compiler-abi.md; Copy record+1 to 0x12583b, send 0x1b packet, set latch 0x1a5d1c; sole direct caller 581b0@583d4; guest pending
