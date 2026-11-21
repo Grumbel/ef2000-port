@@ -55,7 +55,7 @@ void integrate_flight_1d954(ef_addr32 obj)
 		climb_rate = 0.5;
 	}
 
-	guest_fn_1dc20(obj);
+	steer_pitch_to_waypoint_1dc20(obj);
 
 	if (EF_F64(obj + OBJ_SPEED) < EF_F64(obj + OBJ_MAX_SPEED))
 		EF_F64(obj + OBJ_SPEED) = accel * FRAME_DT + EF_F64(obj + OBJ_SPEED);

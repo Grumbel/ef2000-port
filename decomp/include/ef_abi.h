@@ -2703,7 +2703,7 @@ void scan_engagements_16034(uint32_t index, uint32_t skip); /* 0x16034 EAX/DL */
 void send_unit_state_packet_54c10(uint32_t index); /* 0x54c10 EAX */
 void handle_unit_contact_73ec(ef_addr32 a, ef_addr32 b); /* 0x73ec EAX/EDX */
 void integrate_flight_1d954(ef_addr32 obj); /* 0x1d954 EAX */
-void guest_fn_1dc20(ef_addr32 obj); /* 0x1dc20 EAX */
+void steer_pitch_to_waypoint_1dc20(ef_addr32 obj); /* 0x1dc20 EAX */
 void guest_fn_161d4(uint32_t slot, uint32_t extra); /* 0x161d4 EAX/EDX */
 void guest_fn_16588(uint32_t slot, uint32_t extra); /* 0x16588 EAX/EDX */
 void guest_fn_1d420(void); /* 0x1d420 */
