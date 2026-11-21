@@ -180,3 +180,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x710a4 update_approach_710a4 (autopilot_approach.c; x87 approach phase step); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x1098f0 total_forces_1098f0 (force_totals.c; x87 force/moment totals); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x6f504 fly_to_target_waypoint_6f504 (target_flight.c; x87 waypoint goal point); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x88134 check_object_contact_88134 (object_player_contact.c; x87 player contact test); differential 200; hybrid regression 4/4

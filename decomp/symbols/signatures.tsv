@@ -3878,3 +3878,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000710a4	update_approach_710a4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000710a4 (332 bytes); approach phase step called from 0x7104c
 0x001098f0	total_forces_1098f0			ebx,ecx,edx,esi,edi,ebp	0	Original 0x001098f0 (340 bytes); force and moment totals
 0x0006f504	fly_to_target_waypoint_6f504			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0006f504 (344 bytes); target flight waypoint step
+0x00088134	check_object_contact_88134	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00088134 (344 bytes); object contact checks; caller 0x8846c object ring step

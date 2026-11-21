@@ -3174,7 +3174,7 @@ void set_unit_speed_8cc40(int16_t unit_id);
 void check_cell_trigger_8d030(void);
 void guest_fn_55aac(ef_addr32 object); /* 0x55aac EAX */
 void guest_fn_89e08(ef_addr32 object); /* 0x89e08 EAX */
-void guest_fn_88134(ef_addr32 object); /* 0x88134 EAX */
+void check_object_contact_88134(ef_addr32 object); /* 0x88134 EAX */
 void guest_fn_88574(ef_addr32 object); /* 0x88574 EAX */
 uint32_t guest_fn_237c8(ef_addr32 point); /* 0x237c8 EAX */
 void guest_fn_80b14(ef_addr32 record); /* 0x80b14 EAX */

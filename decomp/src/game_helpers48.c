@@ -46,7 +46,7 @@ void step_objects_8846c(void)
             guest_fn_89e08(object);
         else
             step_object_883cc(object);
-        guest_fn_88134(object);
+        check_object_contact_88134(object);
         guest_fn_88574(object);
         if (EF_U8(object + 0x58u) != 0) {
             EF_S32(0x0020f16cu) = EF_S32(object) >> 8;
