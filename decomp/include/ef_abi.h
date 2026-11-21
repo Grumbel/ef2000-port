@@ -4088,6 +4088,7 @@ void guest_fn_34ea4_x(void); /* 0x34ea4 */
 
 /* float_helpers10.c */
 double truncate_9d72c(double value);
+void fill_group_slot_b513c(ef_addr32 owner, int16_t slot, ef_addr32 key, ef_addr32 head); /* 0xb513c EAX/DX/EBX/ECX */
 void store_scaled_angle_difference_6ebbc(void);
 double lookup_scaled_cell_7b040(ef_addr32 point);
 void direction_vector_88fb4(ef_addr32 out, uint32_t u1, uint32_t u2, uint32_t u3, double a, double b);
