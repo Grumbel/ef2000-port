@@ -3458,6 +3458,8 @@ void gpw_map_mode_selected_42a98(ef_addr32 root); /* 0x42a98 EAX */
 double distance_2d_b415c(ef_addr32 a, ef_addr32 b);
 double distance_3d_b41bc(ef_addr32 a, ef_addr32 b);
 double word_to_scaled_b4230(int16_t value);
+void fly_to_target_waypoint_6f504(void); /* 0x6f504 */
+void guest_fn_6f758(ef_addr32 point, uint8_t mode, double speed); /* 0x6f758 EAX/DL + stack double, callee cleanup */
 int32_t double_to_scaled_b4250(double value);
 double abs_double_b427c(double value);
 double sign_double_b42b0(double value);
