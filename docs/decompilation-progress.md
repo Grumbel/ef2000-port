@@ -152,3 +152,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B2/B5  recover renderer stream entries 0xc49c4, 0xc4a50, 0xc4aeb, 0xc4b95 (0xd2a7c, not 0xd2c84), 0xc4c30, 0xc4ccb, 0xc4d43 (renderer_streams.c; FS via ef_platform.h, escape ESP from forced frame); differential 96/96 x7; hybrid regression 4/4
 2026-11-21  B5  recover 0x4d2fc mpNextAssign (mission_planner_callbacks.c; heading from the entry table, 0x3122c through guest_fn_3122c); differential 160/160; hybrid regression 4/4
 2026-11-21  B5  recover 0x4e80c mpClickWPHeight (mission_planner_callbacks.c; stale mechanical exclusion removed); differential 160/160; hybrid regression 4/4
+2026-11-21  B5  recover 0x4b1f0 mpSetWindows (mission_planner_callbacks.c); differential 160/160; hybrid regression 4/4

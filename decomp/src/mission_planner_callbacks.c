@@ -419,3 +419,153 @@ void mpClickWPHeight(void)
 			x, y, 20, 13, SHEET_STRIDE);
 	}
 }
+
+/* Planner window setup. */
+#define PLANNER_SLOT_SOURCE    0x00197500u /* 12-byte entries, first 8 bytes copied */
+#define PLANNER_FLIGHT_NAMES   0x001a53e3u /* 16 names of 17 bytes */
+#define PLANNER_FLIGHT_IDS     0x001368bcu /* dword per flight */
+#define PLANNER_SCALE          0x001a53dfu /* float */
+#define PLANNER_WEATHER        0x001a570au /* 10 bytes, 0..2 */
+
+/* Fill flight name I with FORMAT (0x184a7c) and the number NUMBER. */
+static void name_spare_flight(int16_t i, int32_t number)
+{
+	guest_sprintf_a4342(PLANNER_FLIGHT_NAMES + 17u * i, 0x00184a7cu, /* "%s %d" */
+		0x0013223bu, number);
+}
+
+/* Reset the planner selection, route and waypoint state. */
+static void reset_planner_state(void)
+{
+	int16_t i;
+
+	EF_U8(0x001a53deu) = 0;
+	g_target_type = 0;
+	EF_U8(0x001a5709u) = 0;
+	g_route_speed = 0x1e0;
+	g_assignment_current_byte = 0;
+	g_target_list_changed = 1;
+	EF_U8(PLANNER_MODE) = 1;
+	g_map_mode = 0;
+	EF_U8(0x001a559du) = 0;
+	EF_U8(0x001a559eu) = 0;
+	EF_U8(WP_HEIGHT_ZOOM) = 0;
+	EF_U32(0x001a56fcu) = 0;
+	EF_U32(0x001a56f8u) = 0;
+	EF_U8(0x001a5530u) = 0;
+	g_assignment_entry_count = 0;
+	g_route_selected_slot = 0;
+	EF_U16(0x001a56f6u) = 0;
+	g_assignment_target_record = 0;
+	g_assignment_selected_record = 0;
+	EF_U32(PLANNER_TACTICAL_RECORD) = 0;
+	EF_U32(0x001a550au) = 0;
+	g_tactical_reset_mode = 0;
+	EF_U8(0x001a553au) = 1;
+	EF_U8(PLANNER_TACTICAL_ENTRY) = 0;
+	g_tactical_status_changed = 0;
+	g_route_side = 1;
+
+	for (i = 0; i < 26; ++i) {
+		EF_U8(WP_TYPES + i) = WP_TYPE_END;
+		EF_S32(WP_HEIGHTS + 4u * i) = 1000;
+	}
+	EF_S32(WP_HEIGHTS) = 0;
+	EF_S32(WP_HEIGHTS + 4u * 25u) = 0;
+	EF_U8(0x001a5535u) = 0;
+	for (i = 0; i < 4; ++i) {
+		EF_U8(0x001a5536u + i) = 0;
+		EF_U8(0x001a553cu + i) = 0;
+	}
+}
+
+/* 0x4b1f0, 1199 bytes. Open the mission planner unless it is already
+ * open: copy the scene slots, look up the zoom pages, mirror the three
+ * map layer flags, create the 480x400 map picture and show the planner
+ * widgets, set the map scale, reset the planner state, name the 16
+ * flight buttons (the roster ids, then numbered spares; without a roster
+ * the first is the 7-byte name 0x184a84), seed the ten weather bytes with
+ * a random walk over 0..2 and show the preview picture. */
+void mpSetWindows(void)
+{
+	ef_addr32 widget, list;
+	uint32_t picture;
+	int16_t i, count, value;
+	char name[20];
+
+	if (g_frontend_network_active != 0u)
+		return;
+
+	for (i = 0; i < EF_S16(g_current_map_record + 0x1cu); ++i) {
+		ef_addr32 scene = g_current_map_record;
+		ef_addr32 slot = EF_U32(scene + 0x20u) + 25u * i;
+		EF_U32(slot) = EF_U32(PLANNER_SLOT_SOURCE + 12u * i);
+		EF_U32(slot + 4u) = EF_U32(PLANNER_SLOT_SOURCE + 12u * i + 4u);
+	}
+	EF_U16(0x001a53d2u) = (uint16_t)call_9de08_9ddfc(0x001849c8u); /* "sea" */
+	EF_U16(0x001a53d6u) = (uint16_t)call_9de08_9ddfc(0x001849ccu); /* "type42" */
+	EF_U16(0x001a53d4u) = (uint16_t)call_9de08_9ddfc(0x001849d4u); /* "oilsmall" */
+	EF_U16(0x001a53d0u) = (uint16_t)call_9de08_9ddfc(0x001849d4u); /* "oilsmall" */
+	EF_U8(0x001a53d8u) = (uint8_t)g_map_show_nato;
+	EF_U8(0x001a53dau) = (uint8_t)g_map_show_neutral;
+	EF_U8(0x001a53d9u) = (uint8_t)g_map_show_russian;
+
+	picture = alloc_picture_c3670(0x001849e0u, 0, 0, 0x1e0, 0x190); /* "missplan.lbm" */
+	set_widget_params_a5b1c(find_named_or_abort_a46cc(0x001849f0u), picture, /* "mp_target_view" */
+		0x1e0, 0x190, 0x1e0);
+	activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(0x00184a00u) + 0x10u)); /* "campaign" */
+	widget = find_named_or_abort_a46cc(0x00184a0cu); /* "mp_options" */
+	activate_widget_a4cb4(EF_U8(widget + 0x10u));
+	enable_widget_a72d8(find_widget_checked_a78bc(widget, 0x00184a18u)); /* "mp_strike" */
+	widget = find_named_or_abort_a46cc(0x00184a24u); /* "mp_strike_list" */
+	activate_widget_a4cb4(EF_U8(widget + 0x10u));
+	show_named_widget_a7318(widget, 0x00184a34u); /* "ewr_site" */
+	widget = find_named_or_abort_a46cc(0x00184a40u); /* "mp_map" */
+	activate_widget_a4cb4(EF_U8(widget + 0x10u));
+	*(float *)ef_guest_memory_ptr(PLANNER_SCALE) = (float)((*(double *)ef_guest_memory_ptr(widget + 0x9fu) + *(double *)ef_guest_memory_ptr(0x00184ab0u))
+		* *(double *)ef_guest_memory_ptr(0x00184ab8u) + 1.0);
+	activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(0x00184a48u) + 0x10u)); /* "mp_map_options" */
+	activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(0x00184a58u) + 0x10u)); /* "mp_strike_info" */
+	clear_children_dirty(find_named_or_abort_a46cc(0x00184a68u)); /* "mp_wp_set" */
+
+	reset_planner_state();
+
+	if (g_tactical_lookup_count > 1) {
+		for (i = 0; i < g_tactical_lookup_count; ++i)
+			guest_sprintf_a4342(PLANNER_FLIGHT_NAMES + 17u * i, 0x00184a74u, /* "%.10s" */
+				EF_U32(PLANNER_FLIGHT_IDS + 4u * i));
+		for (i = g_tactical_lookup_count; i < 16; ++i)
+			name_spare_flight(i, i - g_tactical_lookup_count + 1);
+	} else {
+		for (i = 0; i < 7; ++i)
+			EF_U8(PLANNER_FLIGHT_NAMES + i) = EF_U8(0x00184a84u + i); /* "Player" */
+		for (i = 1; i < 16; ++i)
+			name_spare_flight(i, i);
+	}
+	list = find_named_or_abort_a46cc(0x00184a8cu); /* "mp_base_flights" */
+	for (i = 0; i < 16; ++i) {
+		guest_sprintf_a4342((ef_addr32)(uintptr_t)name, 0x00184a9cu, (int32_t)i); /* "name%d" */
+		show_widget_a7588(find_widget_checked_a78bc(list, (ef_addr32)(uintptr_t)name),
+			PLANNER_FLIGHT_NAMES + 17u * i);
+		g_tactical_slots[i] = 0xff;
+	}
+	for (i = 0; i < 16; ++i)
+		EF_U8(0x001a5510u + i) = 0;
+
+	value = (int16_t)((uint16_t)half_word_9c960() % 3u);
+	for (i = 0; i < 10; ++i) {
+		EF_U8(PLANNER_WEATHER + i) = (uint8_t)value;
+		value = (int16_t)(value + (int32_t)((uint16_t)half_word_9c960() % 3u) - 1);
+		if (value < 0)
+			value = 0;
+		if (value > 2)
+			value = 2;
+	}
+	EF_U16(0x0019e56cu) = 0;
+	EF_U16(0x0019e56eu) = 0;
+	EF_U16(0x0019e570u) = 0;
+	EF_U8(0x0019e5dfu) = 0;
+	EF_U8(0x0019e5e3u) = 1;
+	show_preview_picture_41314(0x00184aa4u); /* "norgeog.lbm" */
+}
+
