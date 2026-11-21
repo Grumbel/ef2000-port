@@ -3,6 +3,7 @@
 
 #include "ef_abi.h"
 #include "ef_mem.h"
+#include "ef_platform.h"
 
 #include <assert.h>
 #include <stdint.h>
@@ -18,6 +19,7 @@ static uint32_t draw_seen;
 static uint32_t shade_seen;
 static uint32_t depth_seen;
 static uint32_t update_value_seen;
+static uint32_t selector_seen;
 static uint16_t indices_seen[4];
 
 void *ef_guest_memory_ptr(ef_addr32 address)
@@ -32,11 +34,17 @@ uint32_t renderer_stream_saved_esp(void)
     return 0x3ffdd00u;
 }
 
-void load_vertices_c48dc(ef_addr32 src, uint32_t count)
+void guest_fn_c48dc(ef_addr32 src, uint32_t count)
 {
     ++vertices_calls;
     source_seen = src;
     count_seen = count;
+}
+
+void platform_select_texture_window(uint16_t selector)
+{
+    assert(update_calls == 1);
+    selector_seen = selector;
 }
 
 void update_fc9f8(int32_t value)
@@ -58,32 +66,32 @@ static void observe_dispatch(uint32_t list, uint32_t count, uint32_t target)
     depth_seen = EF_U32(0x159084u);
 }
 
-void build_render_object_d2584(ef_addr32 list, uint32_t count)
+void guest_fn_d2584(ef_addr32 list, uint32_t count)
 {
     observe_dispatch(list, count, 0xd2584u);
 }
 
-void build_textured_object_d2634(ef_addr32 list, uint32_t count)
+void guest_fn_d2634(ef_addr32 list, uint32_t count)
 {
     observe_dispatch(list, count, 0xd2634u);
 }
 
-void build_render_list_d2704(uint32_t list, uint32_t count)
+void guest_fn_d2704(ef_addr32 list, uint32_t count)
 {
     observe_dispatch(list, count, 0xd2704u);
 }
 
-void build_render_list_d2c84(uint32_t list, uint32_t count)
+void guest_fn_d2a7c(ef_addr32 list, uint32_t count)
 {
-    observe_dispatch(list, count, 0xd2c84u);
+    observe_dispatch(list, count, 0xd2a7cu);
 }
 
-void build_render_list_d2d7c(uint32_t list, uint32_t count)
+void guest_fn_d2d7c(ef_addr32 list, uint32_t count)
 {
     observe_dispatch(list, count, 0xd2d7cu);
 }
 
-void build_render_list_d2500(uint32_t list, uint32_t count)
+void guest_fn_d2500(ef_addr32 list, uint32_t count)
 {
     observe_dispatch(list, count, 0xd2500u);
 }
@@ -93,10 +101,11 @@ static void reset(void)
     memset(ram, 0xa5, sizeof(ram));
     calls = vertices_calls = update_calls = 0;
     source_seen = count_seen = draw_seen = shade_seen = depth_seen = 0;
-    update_value_seen = 0;
+    update_value_seen = selector_seen = 0;
     EF_U32(0x164604u) = 0x120000u;
     EF_U32(0x159080u) = 0x75ab1234u;
     EF_U32(0x158f0cu) = 9;
+    EF_U16(0x485fa8u) = 0x01a7u;
 }
 
 static void check_common(uint32_t expected_target, uint32_t source,
@@ -132,7 +141,7 @@ static void test_colours(void)
 
 static void test_textured(void)
 {
-    static const uint32_t target[] = {0xd2634u, 0xd2704u, 0xd2c84u, 0xd2d7cu};
+    static const uint32_t target[] = {0xd2634u, 0xd2704u, 0xd2a7cu, 0xd2d7cu};
     unsigned i;
     for (i = 0; i < 4; ++i) {
         reset();
@@ -155,7 +164,7 @@ static void test_textured(void)
         assert(EF_U16(0x159980u) == 0xfc00u);
         assert(EF_U16(0x159982u) == 0x6000u);
         assert(EF_U32(0x159984u) == EF_U32(0x15997cu));
-        assert(shade_seen == 0u);
+        assert(shade_seen == 0u && selector_seen == 0x01a7u);
     }
 }
 

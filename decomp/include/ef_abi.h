@@ -5761,6 +5761,13 @@ void load_vertices_c48dc(ef_addr32 src, uint32_t count);
  * RET 4. A future splice shim supplies the actual saved ESP (the word in
  * guest RAM at 0x159064); this remains a draft, not a drop-in guest ABI. */
 uint32_t renderer_stream_saved_esp(void);
+void guest_fn_c48dc(ef_addr32 src, uint32_t count); /* original 0xc48dc: ESI source, ECX count */
+void guest_fn_d2500(ef_addr32 list, uint32_t count); /* original polygon builders: ESI index list, ECX count */
+void guest_fn_d2584(ef_addr32 list, uint32_t count);
+void guest_fn_d2634(ef_addr32 list, uint32_t count);
+void guest_fn_d2704(ef_addr32 list, uint32_t count);
+void guest_fn_d2a7c(ef_addr32 list, uint32_t count);
+void guest_fn_d2d7c(ef_addr32 list, uint32_t count);
 void render_colour_stream_c49c4(ef_addr32 stream);
 void render_texture_stream_c4a50(ef_addr32 stream);
 void render_texture_stream_c4aeb(ef_addr32 stream);
@@ -6205,6 +6212,7 @@ void guest_fn_2461c_x(int32_t a, ef_addr32 vec); /* 0x2461c EAX/EDX */
 void tick_cycle_list_5414c(void);
 void tick_cycle_list_54274(void);
 void step_grid_cell_2e740(int32_t cell_index, double rate, uint32_t immediate); /* EAX + stack double and dword, ret 0xc */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux step_grid_cell_2e740 parm routine [eax]
 void guest_fn_2ced4(int32_t cell, double rate); /* 0x2ced4 EAX + stack double, ret 8 */
 void guest_fn_2d488(int32_t cell, double rate); /* 0x2d488 EAX + stack double, ret 8 */
@@ -7756,13 +7764,20 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux renderer_reset_opcode_b_c54d6 parm [esi] modify [eax ebx ecx edx esi edi]
 #pragma aux forward_word_cd81c parm routine []
 #pragma aux set_view_origin_dc21c parm routine []
-#pragma aux render_colour_stream_c49c4 parm routine []
-#pragma aux render_texture_stream_c4a50 parm routine []
-#pragma aux render_texture_stream_c4aeb parm routine []
-#pragma aux render_texture_stream_c4b95 parm routine []
-#pragma aux render_texture_stream_c4c30 parm routine []
-#pragma aux render_index_stream_c4ccb parm routine []
-#pragma aux render_index_stream_c4d43 parm routine []
+#pragma aux render_colour_stream_c49c4 parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_texture_stream_c4a50 parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_texture_stream_c4aeb parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_texture_stream_c4b95 parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_texture_stream_c4c30 parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_index_stream_c4ccb parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux render_index_stream_c4d43 parm routine [] frame modify [eax ebx ecx edx]
+#pragma aux guest_fn_c48dc parm [esi] [ecx] modify [eax ecx esi edi]
+#pragma aux guest_fn_d2500 parm [esi] [ecx] modify [ecx esi]
+#pragma aux guest_fn_d2584 parm [esi] [ecx] modify [ecx esi]
+#pragma aux guest_fn_d2634 parm [esi] [ecx] modify [ecx esi]
+#pragma aux guest_fn_d2704 parm [esi] [ecx] modify [ecx esi]
+#pragma aux guest_fn_d2a7c parm [esi] [ecx] modify [ecx esi]
+#pragma aux guest_fn_d2d7c parm [esi] [ecx] modify [ecx esi]
 #pragma aux rotate_view_test_160122 parm routine [] value [eax] modify [eax ebx ecx edx]
 #pragma aux rotate_view_test_160156 parm routine [] value [eax] modify [eax ebx ecx edx]
 #pragma aux guest_fn_10d63b parm routine [] value [eax] modify [eax ebx ecx edx esi edi ebp]
@@ -7851,35 +7866,42 @@ void draw_widget_frame_a5ca4(ef_addr32 widget);
 #endif
 
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux count_event_9aa78 parm [edx] modify [eax]
 #endif
 
 void shutdown_menu_session_34d94(void);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux shutdown_menu_session_34d94 modify [eax]
 #endif
 
 void accept_network_mission_name_34844(ef_addr32 widget);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux accept_network_mission_name_34844 parm [eax] modify [eax ecx]
 #endif
 
 void show_serial_settings_337ec(ef_addr32 root);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux show_serial_settings_337ec parm [eax] modify [eax]
 #endif
 
 void show_modem_settings_33888(ef_addr32 root);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux show_modem_settings_33888 parm [eax] modify [eax]
 #endif
 
 void show_network_service_list_340a4(ef_addr32 root);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux show_network_service_list_340a4 parm [eax] modify [eax]
 #endif
 
 void open_network_service_34140(ef_addr32 selection);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux open_network_service_34140 parm [eax] modify [eax ecx esi edi ebp]
 #endif
@@ -7887,113 +7909,136 @@ void open_network_service_34140(ef_addr32 selection);
 /* Call sites pass the selected provider in EAX. The German executable's
  * unsupported-provider stub ignores it; keep it in-register, not on stack. */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_e1744 parm [eax] value [al] modify [eax ecx edx]
 #endif
 
 void change_network_socket_33ee8(ef_addr32 widget);
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux change_network_socket_33ee8 parm [eax] modify [eax]
 #endif
 
 /* 0x117b0c replaces EDX with the port; it does not preserve the value argument. */
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux outp_117b0c parm [eax] [edx] modify [eax edx]
 #pragma aux guest_fn_117b0c parm [eax] [edx] modify [eax edx]
 #endif
 
 void change_network_channel_344bc(ef_addr32 widget);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux change_network_channel_344bc parm [eax] modify [eax]
 #endif
 
 void refresh_serial_status_33b5c(ef_addr32 root);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux refresh_serial_status_33b5c parm [eax] modify [eax]
 #endif
 
 void initialize_network_dialog_34bcc(void);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux initialize_network_dialog_34bcc modify [eax]
 #endif
 
 void initialize_players_window_33c64(ef_addr32 root);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux initialize_players_window_33c64 parm [eax] modify [eax]
 #endif
 
 void change_network_loop_345e8(ef_addr32 widget);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux change_network_loop_345e8 parm [eax] modify [eax]
 #endif
 
 void initialize_network_service_window_3396c(ef_addr32 root);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux initialize_network_service_window_3396c parm [eax] modify [eax]
 #endif
 
 void load_credits_window_371b0(ef_addr32 widget);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux load_credits_window_371b0 parm [eax] modify [eax]
 #endif
 
 void refresh_network_controls_33630(void);
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux refresh_network_controls_33630 parm [] modify [eax]
 #endif
 
 /* Modem text callbacks preserve all six non-EAX general registers. */
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_new_number_33720 parm [eax] modify [eax]
 #pragma aux net_new_pt_33738 parm [eax] modify [eax]
 #pragma aux net_open_modem_status_337ac parm [eax] modify [eax]
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_new_fifo_len_336c0 parm [] modify [eax]
 #pragma aux net_open_ipx_settings_336f0 parm [] modify [eax]
 #endif
 
-#if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_init_string_33760 parm [eax] modify [eax]
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_new_parity_3361c parm [] modify [eax]
 #pragma aux net_new_port_337c4 parm [] modify [eax]
 #endif
 
-#if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_baud_335c0 parm [eax] modify [eax]
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_start_arcade_34480 parm [] modify [eax]
 #pragma aux net_new_channel_344a0 parm [] modify [eax]
 #endif
 
-#if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_open_loops_form_33ad8 parm [eax] modify [eax]
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_directplay_game_selected_341d8 parm [eax] modify [eax]
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
 #pragma aux net_new_type_35eb8 parm [eax] modify [eax]
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_open_rx_status_35e68 parm [eax] modify [eax]
 #pragma aux net_set_nonentry_flag_35e90 parm [eax] modify [eax]
 #endif
 
 #ifdef __WATCOMC__
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_new_end_string_345d4 parm [] modify [eax];
 #pragma aux net_open_loops_347ac parm [eax] modify [eax];
 #endif
 
 #if defined(__WATCOMC__) && defined(__386__)
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_main_loop_349ec parm [eax] modify [eax]
 #pragma aux net_open_initialise_35128 parm [] modify [eax]
 #endif
