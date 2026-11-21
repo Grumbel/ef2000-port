@@ -6,6 +6,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x00023800	check_current_object_relation		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	0x23800..0x2389f; callers 0x25a97/0x25e8e test AL; docs/compiler-abi.md
 0x000238a0	sync_current_object_slot			ebx,ecx,edx,esi,edi,ebp	0	0x238a0..0x238be; callers 0x25aa0/0x26000 ignore return; docs/compiler-abi.md
 0x0002541c	set_indexed_object_mode	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x2541c..0x25468; caller 0x23a36 EAX sign extended/DL=8, 0x23bb9 EAX sign extended/DL=7; EDX scratch; docs/compiler-abi.md
+0x000291fc	weapon_usable_291fc	AL:uint8_t	AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x291fc (435 bytes); caller game_helpers130 4510; switch on weapon type, x87 compares via fabs 0xb427c; docs/compiler-abi.md
 0x0002afcc	detach_grid_link_on_mode_change	AX:int16_t,DL:uint8_t		ebx,ecx,esi,edi,ebp	0	0x2afcc..0x2b076; caller functions 0x2b0b4 at 0x2b0c8 and 0x2b1f4 at 0x2b20b; EDX scratch; docs/compiler-abi.md
 0x0002b558	link_grid_cell	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	0x2b558..0x2b5bc; caller functions 0x2b508 and 0x46454; EDX scratch; docs/compiler-abi.md
 0x0002b5c0	link_external_grid_cell	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	0x2b5c0..0x2b633; caller functions 0x46454 at 0x46f69 and 0x47764 at 0x479cb; EDX scratch; docs/compiler-abi.md

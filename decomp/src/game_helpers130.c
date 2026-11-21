@@ -4507,7 +4507,7 @@ uint8_t object_fire_request_298f0(int16_t id, uint8_t slot)
 	idx = EF_S32(obj + 0x1d4u) >> 24;
 	if (idx == 0x14)
 		return 0;
-	if (guest_fn_291fc_x(EF_U8(obj + 0x19bu + (uint32_t)idx * 3u)) == 0u)
+	if (weapon_usable_291fc(EF_U8(obj + 0x19bu + (uint32_t)idx * 3u)) == 0u)
 		return 0;
 	if ((EF_S32(obj + 0x1d4u) >> 24) < 0x13) {
 		fire_object_slot_2a1fc(id, EF_U8(obj + 0x1d7u), ebxv);
