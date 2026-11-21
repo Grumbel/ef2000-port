@@ -55,7 +55,7 @@ void place_link_point_70438(void)
     v[1] = -guest_fn_b45ac(roll) * EF_F64(p + 16u) + guest_fn_b45a2(roll) * EF_F64(p + 8u) - EF_F64(origin + 8u);
     v[2] = EF_F64(p + 8u) * guest_fn_b45a2(pitch) * guest_fn_b45ac(roll) - guest_fn_b45ac(pitch) * EF_F64(p) +
            EF_F64(p + 16u) * guest_fn_b45a2(pitch) * guest_fn_b45a2(roll) - EF_F64(origin + 16u);
-    if (guest_fn_6e1c4((ef_addr32)(uintptr_t)v))
+    if (formation_offset_6e1c4((ef_addr32)(uintptr_t)v))
         guest_fn_6e3e0_w(0.2, 0.05);
     check_link_contact_772d0((int16_t)(EF_S32(g_current_object + OBJ_LINK_KEY) >> 16), (int16_t)g_grid_secondary_selector);
 }

@@ -4145,8 +4145,7 @@ void apply_position_record_569b4(ef_addr32 rec);
 void bind_dialog_values_4f388(ef_addr32 first, ef_addr32 second);
 ef_addr32 rebuild_child_dialog_34a98(ef_addr32 text);
 int32_t list_directory_names_32de8(ef_addr32 path, ef_addr32 mask);
-void guest_fn_6e1c4_x(uint32_t a); /* 0x6e1c4 EAX */
-uint8_t guest_fn_6e1c4(ef_addr32 point); /* 0x6e1c4 EAX -> AL */
+uint8_t formation_offset_6e1c4(ef_addr32 station); /* 0x6e1c4 EAX -> AL */
 void check_link_contact_772d0(int16_t object, int16_t unit); /* 0x772d0 AX/DX */
 void place_link_point_70438(void); /* 0x70438 */
 void update_g_vision_75ca0(void); /* 0x75ca0 */

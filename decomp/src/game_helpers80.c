@@ -32,7 +32,7 @@ void forward_table_entry_6e320(uint8_t slot, uint32_t kind)
     v[3] = EF_U32(0x00125308u + off);
     v[4] = EF_U32(0x0012535cu + off);
     v[5] = EF_U32(0x00125360u + off);
-    guest_fn_6e1c4_x((uint32_t)(uintptr_t)v);
+    (void)formation_offset_6e1c4((ef_addr32)(uintptr_t)v);
 }
 
 /* 0x68efc, 66 bytes. Resolve the name of every populated weapon entry (from index 2) into its halfword id. */
