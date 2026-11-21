@@ -2701,6 +2701,7 @@ uint16_t guest_fn_16a3c(uint32_t slot); /* 0x16a3c EAX -> AX */
 void guest_fn_16034(uint32_t slot, uint32_t extra); /* 0x16034 EAX/EDX */
 void scan_engagements_16034(uint32_t index, uint32_t skip); /* 0x16034 EAX/DL */
 void send_unit_state_packet_54c10(uint32_t index); /* 0x54c10 EAX */
+void handle_unit_contact_73ec(ef_addr32 a, ef_addr32 b); /* 0x73ec EAX/EDX */
 void guest_fn_161d4(uint32_t slot, uint32_t extra); /* 0x161d4 EAX/EDX */
 void guest_fn_16588(uint32_t slot, uint32_t extra); /* 0x16588 EAX/EDX */
 void guest_fn_1d420(void); /* 0x1d420 */
