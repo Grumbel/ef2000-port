@@ -3859,3 +3859,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c1438	build_group_record_c1438	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t	EAX:uint32_t	esi,edi,ebp	8	Callee pops the two stack arguments; returns ID + 1.
 0x0009357c	update_chase_camera_9357c			ebx,ecx,edx,esi,edi,ebp	0	Pushes all but EAX; EAX is clobbered by the callees.
 0x000913dc	step_view_transition_913dc	AL:uint8_t,DL:uint8_t	AL:uint8_t	ebx,ecx,esi,edi,ebp	0	Pushes EBX/ECX; EDX is clobbered.
+0x000c0b04	move_side_record_c0b04	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:ef_addr32,[ESP+12]:uint32_t	AX:uint16_t	esi,edi,ebp	12	Epilogue is ret 0xc; the third stack argument is unused; caller 0xb134f uses AX only.

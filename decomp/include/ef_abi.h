@@ -6711,6 +6711,7 @@ uint32_t roll_code_chance_bbf1c(uint8_t code); /* 0xbbf1c */
 uint32_t record_class_code_bb7c0(ef_addr32 rec); /* 0xbb7c0 */
 uint32_t build_group_record_c1438(ef_addr32 list, ef_addr32 tail, ef_addr32 collect_list, ef_addr32 nearest_list, uint32_t mask, uint32_t id); /* 0xc1438 EAX/EDX/EBX/ECX + 2 stack, ret 8 */
 void update_chase_camera_9357c(void); /* 0x9357c */
+uint16_t move_side_record_c0b04(ef_addr32 head_a, ef_addr32 head_b, ef_addr32 list, ef_addr32 nodes, uint32_t context, ef_addr32 box, uint32_t unused); /* 0xc0b04 */
 uint8_t step_view_transition_913dc(uint8_t slot, uint8_t action); /* 0x913dc AL/DL -> AL */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux unpack_ra_10da50 parm routine [] modify [eax ecx edx]
