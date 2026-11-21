@@ -143,3 +143,80 @@ void mpToggleIcons(void)
     draw_gauge_icon(ICON_A_POS, 0x0d, 0x74);
     draw_gauge_icon(ICON_B_POS, 0x8a, 0x7c);
 }
+
+/* Fuel model for 0x4f0d4. The constants live in the data segment. */
+#define ROUTE_SLOT_ALT        0x001a560au /* int32_t[26], feet */
+#define FEET_TO_METRES        (*(double *)ef_guest_memory_ptr(0x00184da7u)) /* 0.3048 */
+#define KNOTS_TO_MPS          (*(double *)ef_guest_memory_ptr(0x00184dafu)) /* 0.515 */
+#define DRAG_FACTOR           (*(double *)ef_guest_memory_ptr(0x00184db7u)) /* 30.625 */
+#define INDUCED_FACTOR        (*(double *)ef_guest_memory_ptr(0x00184dbfu)) /* 0.133 */
+#define DENSITY_SPEED         (*(double *)ef_guest_memory_ptr(0x00184dc7u)) /* 50.0 */
+#define RANGE_FACTOR          (*(double *)ef_guest_memory_ptr(0x00184dcfu)) /* 21300.0 */
+#define METRES_PER_NM         (*(double *)ef_guest_memory_ptr(0x00184ddfu)) /* 1850.0 */
+#define FUEL_TO_GAUGE         (*(double *)ef_guest_memory_ptr(0x00184de7u)) /* 1/9.81 */
+#define DENSITY_SCALE         (*(double *)ef_guest_memory_ptr(0x00184defu)) /* 20000.0 */
+#define MIN_DENSITY           (*(double *)ef_guest_memory_ptr(0x00184df7u)) /* 0.075 */
+#define FULL_FUEL             206010
+#define SLOT_REFUEL           5u       /* g_tactical_status_entries: tanker */
+#define EMPTY_GAUGE_VALUE     7000.0f
+
+/* Same as leg_length, but the squared length is converted as a signed
+ * integer, as the original's fild does. */
+static double leg_metres(int32_t a, int32_t b)
+{
+    uint32_t dx = abs_cf94a((int32_t)(uint16_t)g_route_slot_x[a] - (int32_t)(uint16_t)g_route_slot_x[b]);
+    uint32_t dy = abs_cf94a((int32_t)(uint16_t)g_route_slot_y[a] - (int32_t)(uint16_t)g_route_slot_y[b]);
+
+    return guest_fn_a4470((double)(int32_t)(dx * dx + dy * dy)) * NM_PER_MAP_UNIT * METRES_PER_NM;
+}
+
+/* 0x4f0d4, 547 bytes. Fly the route from slot 0 with full fuel (206010)
+ * at g_route_speed: per leg the air density ratio at the slot's altitude,
+ * (20000 - h) / (20000 + h) with h in metres and at least 0.075, gives
+ * the lift coefficient and so the drag and the fuel-limited range; the
+ * leg's length is taken off the square root of the remaining fuel. A
+ * tanker slot (status 5) refills and the target (8) lowers the drag
+ * coefficient. Running dry sets the gauge at 0x1a56f8 to 7000, otherwise
+ * it gets the fuel used over g. Registers are preserved. */
+void route_fuel_4f0d4(void)
+{
+    double fuel = (double)FULL_FUEL;
+    float base_drag = 0.06f;
+    uint8_t dry = 0;
+    int16_t i;
+
+    for (i = 0; i < ROUTE_HOME_SLOT; ++i) {
+        int16_t next = i + 1;
+        double density, speed, lift, drag, range, left;
+
+        if (g_tactical_status_entries[i] == ROUTE_SLOT_FREE)
+            break;
+        if (g_tactical_status_entries[i + 1] == ROUTE_SLOT_FREE)
+            next = ROUTE_HOME_SLOT;
+        if (g_tactical_status_entries[i] == SLOT_REFUEL)
+            fuel = (double)FULL_FUEL;
+        if (g_tactical_status_entries[i] == ROUTE_SLOT_TARGET)
+            base_drag = 0.035f;
+
+        density = (double)(int32_t)EF_U32(ROUTE_SLOT_ALT + (uint32_t)i * 4u) * FEET_TO_METRES;
+        density = (DENSITY_SCALE - density) / (DENSITY_SCALE + density);
+        if (density < MIN_DENSITY)
+            density = 0.075;
+
+        speed = (double)(int32_t)g_route_speed * KNOTS_TO_MPS;
+        lift = fuel / (density * DRAG_FACTOR * speed * speed);
+        drag = lift * INDUCED_FACTOR * lift + (double)base_drag;
+        range = 1.0 / guest_fn_a4470(density * DENSITY_SPEED) * RANGE_FACTOR;
+        range = guest_fn_a4470(lift) / drag * range;
+
+        left = guest_fn_a4470(fuel) - leg_metres(i, next) / range;
+        if (0.0 > left)
+            dry = 1;
+        fuel = left * left;
+        if (dry) {
+            *(float *)ef_guest_memory_ptr(GAUGE_VALUE) = EMPTY_GAUGE_VALUE;
+            return;
+        }
+    }
+    *(float *)ef_guest_memory_ptr(GAUGE_VALUE) = (float)(((double)FULL_FUEL - fuel) * FUEL_TO_GAUGE);
+}

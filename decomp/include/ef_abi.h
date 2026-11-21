@@ -21,6 +21,7 @@ void open_directplay_settings_98bec(void); /* 0x98bec */
 void adjust_route_view_4dcd8(ef_addr32 widget); /* 0x4dcd8 */
 void update_route_summary_4ec70(void); /* 0x4ec70 */
 void mpToggleIcons(void); /* 0x4eec0, route_summary.c */
+void route_fuel_4f0d4(void); /* 0x4f0d4, route_summary.c */
 void open_hiscores_a870(ef_addr32 map); /* 0xa870 EAX, float_helpers5.c */
 void generate_gui_help_4595c(ef_addr32 widget); /* 0x4595c */
 void refresh_campaign_view_c9fc4(void); /* 0xc9fc4 */
@@ -5089,6 +5090,9 @@ void guest_fn_97dcc_x(void); /* 0x97dcc no arguments */
 
 void draw_bar_9bca4(uint32_t colour, uint32_t unused, uint32_t x, uint32_t h);
 void draw_class_summary_98eac(ef_addr32 screen); /* 0x98eac EAX, summary_screen.c */
+void sumgengraph(ef_addr32 screen); /* 0x98c1c EAX, summary_screen.c */
+void guest_fn_c9734(uint32_t colour, uint32_t cx, uint32_t cy, int32_t start, int32_t end, uint32_t rx, uint32_t ry); /* 0xc9734 pie slice, EAX/EDX/EBX/ECX + 3 stack, callee pops */
+double guest_fn_9d55d(ef_addr32 text, ef_addr32 end); /* 0x9d55d EAX/EDX -> ST0, decimal reader */
 void draw_air_summary_9921c(ef_addr32 screen); /* 0x9921c EAX, summary_screen.c */
 void draw_site_summary_99660(ef_addr32 screen); /* 0x99660 EAX, summary_screen.c */
 void draw_summary_key_99c38(ef_addr32 screen); /* 0x99c38 EAX, summary_screen.c */

@@ -127,3 +127,69 @@ void draw_summary_key_99c38(ef_addr32 screen)
     draw_summary_groups(screen, groups, 3);
     draw_summary_axis(0x77, 0x78, 5, 0x16d);
 }
+
+/* The share screen: a pie of the NATO, neutral and enemy totals with a
+ * legend and the percentages. */
+#define SHARE_NATO           0x0040cfd8u /* int16_t totals: NATO, neutral, enemy */
+#define SHARE_NEUTRAL        0x0040cfdau
+#define SHARE_ENEMY          0x0040cfdcu
+#define PIE_CENTRE           100
+#define PIE_RADIUS           50
+#define DEGREES              (*(double *)ef_guest_memory_ptr(0x0018adbeu)) /* 360.0 */
+#define PER_DEGREE           (*(double *)ef_guest_memory_ptr(0x0018adc6u)) /* 1/360 */
+#define PERCENT              (*(double *)ef_guest_memory_ptr(0x0018adceu)) /* 100.0 */
+#define PERCENT_FORMAT       0x0018ad94u /* "%.2f" */
+#define PERCENT_SUFFIX       0x0018ad9cu /* " %" */
+#define REST_FORMAT          0x0018adb0u /* "%.2f %%" */
+#define NATO_WIDGET          0x0018ada0u /* "nato" */
+#define NEUTRAL_WIDGET       0x0018ada8u /* "neutral" */
+#define ENEMY_WIDGET         0x0018adb8u /* "enemy" */
+
+static int32_t pie_degrees(double total, double share_of_one)
+{
+    return (int32_t)truncate_9d72c(total * share_of_one * DEGREES);
+}
+
+/* Print the angle as a percentage with two decimals and read the printed
+ * value back, so the shares add up to what is shown. */
+static double show_percent(ef_addr32 screen, ef_addr32 widget, int16_t degrees, char *text)
+{
+    double value;
+
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)text, PERCENT_FORMAT, (double)degrees * PER_DEGREE * PERCENT);
+    value = guest_fn_9d55d((ef_addr32)(uintptr_t)text, 0);
+    strcat_9ca57((ef_addr32)(uintptr_t)text, PERCENT_SUFFIX);
+    show_widget_a7588(find_widget_checked_a78bc(screen, widget), (ef_addr32)(uintptr_t)text);
+    return value;
+}
+
+/* 0x98c1c, 654 bytes. Draw the share pie for SCREEN: NATO (colour 3),
+ * neutral (4) and enemy (1) slices in whole degrees, each truncated, with
+ * the 16-bit sum as the whole, three framed legend squares, and the NATO
+ * and neutral percentages; the enemy one is 100 minus their printed sum. */
+void sumgengraph(ef_addr32 screen)
+{
+    char text[28];
+    double one = 1.0 / (double)(int16_t)(EF_U16(SHARE_NATO) + EF_U16(SHARE_NEUTRAL) + EF_U16(SHARE_ENEMY));
+    int32_t nato = pie_degrees((double)(int16_t)EF_U16(SHARE_NATO), one);
+    int32_t neutral = pie_degrees((double)(int16_t)EF_U16(SHARE_NEUTRAL), one);
+    int32_t enemy = pie_degrees((double)(int16_t)EF_U16(SHARE_ENEMY), one);
+    int16_t end1 = (int16_t)nato;
+    int16_t end2 = (int16_t)(nato + neutral);
+    float shown;
+
+    guest_fn_c9734(3, PIE_CENTRE, PIE_CENTRE, 0, end1, PIE_RADIUS, PIE_RADIUS);
+    guest_fn_c9734(4, PIE_CENTRE, PIE_CENTRE, end1, end2, PIE_RADIUS, PIE_RADIUS);
+    guest_fn_c9734(1, PIE_CENTRE, PIE_CENTRE, end2, (int16_t)(end2 + enemy), PIE_RADIUS, PIE_RADIUS);
+    fill_scaled_rect_c99ac(3, 5, 5, 15, 15);
+    fill_scaled_rect_c99ac(4, 5, 20, 15, 30);
+    fill_scaled_rect_c99ac(1, 5, 35, 15, 45);
+    guest_fn_c9a98_x(8, 5, 5, 15, 15);
+    guest_fn_c9a98_x(8, 5, 20, 15, 30);
+    guest_fn_c9a98_x(8, 5, 35, 15, 45);
+
+    shown = (float)show_percent(screen, NATO_WIDGET, (int16_t)nato, text);
+    shown = (float)(show_percent(screen, NEUTRAL_WIDGET, (int16_t)neutral, text) + (double)shown);
+    guest_sprintf_a4342((ef_addr32)(uintptr_t)text, REST_FORMAT, PERCENT - (double)shown);
+    show_widget_a7588(find_widget_checked_a78bc(screen, ENEMY_WIDGET), (ef_addr32)(uintptr_t)text);
+}
