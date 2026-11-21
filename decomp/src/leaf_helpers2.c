@@ -118,7 +118,7 @@ uint32_t entry_empty_118520(ef_addr32 record)
 /* 0x1196a0, 40 bytes. Run the seven table initialisers, then 0x11c20c. */
 void run_table_initialisers_1196a0(void)
 {
-    guest_fn_1196c8_w();
+    update_lift_coefficient_1196c8();
     guest_fn_119844_w();
     guest_fn_1198ec_w();
     guest_fn_119938_w();

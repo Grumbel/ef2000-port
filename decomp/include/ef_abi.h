@@ -3646,7 +3646,7 @@ void guest_fn_cdc38_w(void); /* 0xcdc38 */
 uint16_t guest_fn_fe700_w(void); /* 0xfe700 -> AX */
 void guest_fn_fe710_w(int32_t mode); /* 0xfe710 EAX */
 uint32_t guest_fn_ea20c_w(ef_addr32 descriptor, ef_addr32 text); /* 0xea20c EAX/EDX -> EAX */
-void guest_fn_1196c8_w(void); /* 0x1196c8 */
+void update_lift_coefficient_1196c8(void); /* 0x1196c8 */
 void guest_fn_119844_w(void); /* 0x119844 */
 void guest_fn_1198ec_w(void); /* 0x1198ec */
 void guest_fn_119938_w(void); /* 0x119938 */
