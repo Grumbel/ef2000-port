@@ -178,3 +178,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x11bcc4 surface_coefficient_11bcc4 and 0x11bdc0 surface_coefficient_delta_11bdc0 (surface_tables.c; x87 table lookups); differential 200+200; hybrid regression 4/4
 2026-11-21  B5  recover 0x11acb0 interpolate_table_11acb0 (table_interpolation.c; x87 trilinear lookup); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x710a4 update_approach_710a4 (autopilot_approach.c; x87 approach phase step); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x1098f0 total_forces_1098f0 (force_totals.c; x87 force/moment totals); differential 200; hybrid regression 4/4

@@ -141,7 +141,7 @@ void store_args_and_shutdown_e474c(uint32_t u0, uint32_t u1, uint32_t u2, uint32
     EF_U32(0x004330d4u) = stack_b;
     guest_fn_e6990_w();
     guest_fn_109440_w();
-    guest_fn_1098f0_w();
+    total_forces_1098f0();
     guest_fn_109a80_w();
     guest_fn_109b20_w();
     guest_fn_d6090_w();

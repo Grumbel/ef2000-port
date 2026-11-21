@@ -3688,7 +3688,9 @@ void guest_fn_9b2a4_w(uint32_t obj); /* 0x9b2a4 EAX */
 void guest_fn_bc421_w(uint32_t obj); /* 0xbc421 EAX */
 void guest_fn_e6990_w(void); /* 0xe6990 */
 void guest_fn_109440_w(void); /* 0x109440 */
-void guest_fn_1098f0_w(void); /* 0x1098f0 */
+void total_forces_1098f0(void); /* 0x1098f0 */
+void guest_fn_119be0(void); /* 0x119be0 */
+void guest_fn_11a6e4(void); /* 0x11a6e4 */
 void guest_fn_109a80_w(void); /* 0x109a80 */
 void guest_fn_109b20_w(void); /* 0x109b20 */
 void guest_fn_d6090_w(void); /* 0xd6090 */
