@@ -757,6 +757,55 @@ void update_damage_flags_6c1c(void)
         EF_U8(0x00197254u) = 0u;
 }
 
+/* 0x31818, 402 bytes. Place the camera beside the midpoint of the base
+ * point 0x19e560 and the target 0x19e572: the half differences go to
+ * 0x19e5c1/0x19e5c5/0x19e5c9, the unit-2048 vector rotated to the target
+ * heading + 90 degrees (0xdc91c, 0x32414) is scaled by the half distance
+ * times 0.00125 (at least 1.0) and its x and z components, truncated, plus
+ * the base point offset the camera sideways; the camera pitch word
+ * 0x19e5d3 is cleared and its heading 0x19e5d5 faces the line (heading -
+ * 90 degrees). */
+void place_midpoint_camera_31818(void)
+{
+    uint16_t heading[4];
+    uint16_t turn[3];
+    int32_t ahead[3];
+    int32_t side[3];
+    int32_t dx, dy, dz;
+    double dist;
+
+    direction_angles_dc91c((ef_addr32)(uintptr_t)heading, 0x0019e572u, 0x0019e560u);
+    dx = (int32_t)(EF_U32(0x0019e572u) - EF_U32(0x0019e560u)) >> 1;
+    dy = (int32_t)(EF_U32(0x0019e576u) - EF_U32(0x0019e564u)) >> 1;
+    dz = (int32_t)(EF_U32(0x0019e57au) - EF_U32(0x0019e568u)) >> 1;
+    dist = (double)dx * (double)dx;
+    dist = (double)dy * (double)dy + dist;
+    dist = guest_fn_a4470((double)dz * (double)dz + dist);
+    EF_U32(0x0019e5c1u) = (uint32_t)dx;
+    EF_U32(0x0019e5c5u) = (uint32_t)dy;
+    EF_U32(0x0019e5c9u) = (uint32_t)dz;
+
+    ahead[0] = 0;
+    ahead[1] = 0;
+    ahead[2] = 0x800;
+    turn[0] = 0;
+    turn[1] = (uint16_t)(heading[1] + 0x4000u);
+    turn[2] = 0;
+    rotate_vector_by_angles_32414((ef_addr32)(uintptr_t)turn, (ef_addr32)(uintptr_t)ahead,
+        (ef_addr32)(uintptr_t)side);
+    dist *= *(double *)ef_guest_memory_ptr(0x00182a11u); /* 0.00125 */
+    if (1.0 > dist)
+        dist = 1.0;
+    side[0] = (int32_t)truncate_9d72c((double)side[0] * dist);
+    side[2] = (int32_t)truncate_9d72c((double)side[2] * dist);
+
+    EF_U32(0x0019e5c1u) += (uint32_t)side[0] + EF_U32(0x0019e560u);
+    EF_U32(0x0019e5c5u) += EF_U32(0x0019e564u);
+    EF_U32(0x0019e5c9u) += (uint32_t)side[2] + EF_U32(0x0019e568u);
+    EF_U16(0x0019e5d3u) = 0;
+    EF_U16(0x0019e5d5u) = (uint16_t)(heading[1] - 0x4000u);
+}
+
 /* 0x31b40, 462 bytes. Rebuild the view-angle results at 0x19e5d3/0x19e5d5/0x19e5d7 from the camera state at 0x19e55f..0x19e5b5: rotate the offset vector by the camera angles, take the direction angles to the target (or the explicit target at 0x19e572), and for the tracking mode (0x19e558 != 2) or the 2 mode use a scratch scene built from the angle words to derive the angle results. */
 void update_view_angles_31b40(void)
 {

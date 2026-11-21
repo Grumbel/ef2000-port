@@ -3891,3 +3891,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005375c	integrate_drift_5375c			ebx,ecx,edx,esi,edi,ebp	0	0x5375c..0x538e0; EAX clobbered; reads globals only
 0x0004c900	pick_marker_4c900	EAX:ef_addr32,EDX:ef_addr32		ebx,ecx,esi,edi,ebp	0	0x4c900..0x4ca8c; EAX/EDX clobbered; caller 0x4bc80
 0x0007f850	update_rolling_sound_7f850	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	0x7f850..0x7f9e0; EAX clobbered; caller 0x7f9e4 region (game_helpers70.c)
+0x00031818	place_midpoint_camera_31818			ebx,ecx,edx,esi,edi,ebp	0	0x31818..0x319a9; EAX clobbered; reads globals only

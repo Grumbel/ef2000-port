@@ -4515,6 +4515,7 @@ ef_addr32 lookup_name_entry_eb520(ef_addr32 name, ef_addr32 context);
 ef_addr32 build_object_records_b9c68(uint8_t mode, uint8_t slot, uint8_t flag);
 uint32_t classify_target_flags_9a6fc(ef_addr32 request);
 void update_damage_flags_6c1c(void);
+void place_midpoint_camera_31818(void); /* 0x31818 */
 void update_view_angles_31b40(void);
 void aim_angles_to_point_324b0(ef_addr32 from, ef_addr32 angles, ef_addr32 to, ef_addr32 out);
 void apply_camera_keys_3287c(void);
