@@ -121,7 +121,7 @@ void simulation_frame_1cde8(void)
             if (EF_U8(0x001a363bu) != 0)
                 guest_fn_1cfd8_x();
             guest_fn_791e0_x();
-            guest_fn_53ecc_x();
+            advance_player_frame_53ecc();
             guest_fn_7957c_x();
         }
     }

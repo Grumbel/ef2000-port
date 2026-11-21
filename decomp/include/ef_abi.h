@@ -3992,7 +3992,16 @@ void guest_fn_53270_x(void); /* 0x53270 */
 void guest_fn_5331c_x(void); /* 0x5331c */
 void guest_fn_1cfd8_x(void); /* 0x1cfd8 */
 void guest_fn_791e0_x(void); /* 0x791e0 */
-void guest_fn_53ecc_x(void); /* 0x53ecc */
+void advance_player_frame_53ecc(void); /* 0x53ecc */
+void guest_fn_819b0_x(void); /* 0x819b0 */
+double guest_fn_82478(int16_t unit, double depth); /* 0x82478 AX, [ESP+4] double -> ST0 */
+void guest_fn_53c80_x(void); /* 0x53c80 */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux advance_player_frame_53ecc modify [eax]
+#pragma aux guest_fn_819b0_x modify [eax]
+#pragma aux guest_fn_82478 parm routine [eax] value [8087] modify [eax]
+#pragma aux guest_fn_53c80_x modify [eax esi edi ebp]
+#endif
 void guest_fn_7957c_x(void); /* 0x7957c */
 void guest_fn_1cd90_x(void); /* 0x1cd90 */
 
