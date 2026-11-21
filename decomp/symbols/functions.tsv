@@ -762,7 +762,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000413b0	68	init_screen_413b0	game_helpers11	compiles	game	confirmed	decomp/tests/0x000413b0.json	docs/compiler-abi.md; ; callers bfcc@c110,41f24@41f5b; guest pending
 0x0004161c	678			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000418c4	210	draw_segment_records_418c4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000418c4.json	Copies per-record words into the 0x1a4aa0 table and calls 0x4161c; guest differential pending
-0x00041998	509			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
+0x00041998	509	draw_map_unit_41998	map_unit_marker	spliced	game	confirmed	decomp/tests/0x00041998.json	Draws a campaign-map unit marker: side symbol, type colour, heading; highlight box for the selected unit
 0x00041b98	443	draw_map_row_41b98	map_row_marker	spliced	game	confirmed	decomp/tests/0x00041b98.json	Draw the campaign-map marker for a network row: position clamped to the 400-pixel map, colour from the command code (0x41da4, 0x41e0c), symbol from the side word, then 0x4110c; the heading conversion through 0x9d72c is unused
 0x00041da4	79	command_code_is_group_1b	runtime_predicates	compiles	game	confirmed	decomp/tests/0x00041da4.json	docs/compiler-abi.md; 256 isolated GCC32 guest cases full EAX and preserved registers pass; Watcom/OMF and replay pending
 0x00041df4	24	code_is_0b_or_0c	low_helpers	compiles	game	confirmed	decomp/tests/0x00041df4.json	docs/compiler-abi.md; AL is 0x0b or 0x0c; callers 9a998@9aa20; guest pending

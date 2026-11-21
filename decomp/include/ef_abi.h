@@ -6735,7 +6735,8 @@ uint8_t load_archive_entry_eba64(ef_addr32 name, ef_addr32 dest, ef_addr32 conte
 uint32_t guest_fn_eba64_x(ef_addr32 a, ef_addr32 b, ef_addr32 c); /* 0xeba64 EAX/EDX/EBX */
 void draw_map_row_41b98(int16_t row);
 void guest_fn_4110c(int32_t color, int32_t symbol, int32_t x, int32_t y, uint32_t flags); /* 0x4110c EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
-void guest_fn_41998(int16_t unit); /* 0x41998 */
+void draw_map_unit_41998(int16_t unit);
+void guest_fn_c9cac(int32_t color, int32_t x, int32_t y, int32_t w, uint32_t h); /* 0xc9cac EAX/EDX/EBX/ECX + 1 stack, callee cleanup */
 void guest_fn_42004(void); /* 0x42004 */
 void guest_fn_9820(void); /* 0x9820 */
 void guest_fn_9ea0(void); /* 0x9ea0 */

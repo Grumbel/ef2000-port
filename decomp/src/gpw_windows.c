@@ -494,7 +494,7 @@ void gpwUpdateMap(ef_addr32 widget)
         for (i = 0; i < g_map_row_count; ++i)
             draw_map_row_41b98(i);
         for (i = 0; i < g_unit_count;) {
-            guest_fn_41998(i);
+            draw_map_unit_41998(i);
             ++i;
             if (i == 0xff)
                 ++i;
