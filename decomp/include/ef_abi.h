@@ -1276,7 +1276,7 @@ void EF_CDECL trace_call_1021f4(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102228(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_10225c(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102824(uint32_t a, uint32_t b);
-void trace_call_102858(uint32_t a, uint32_t b);
+void EF_CDECL trace_call_102858(uint32_t a, uint32_t b);
 void trace_call_10288c(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_1028c0(uint32_t a, uint32_t b);
 void trace_call_102a98(uint32_t a, uint32_t b);
@@ -2990,8 +2990,8 @@ void open_log_d1774(ef_addr32 name);
 void set_mode_640x400_d1da8(uint32_t first, uint32_t second);
 void set_video_mode_d1de8(uint32_t mode, uint32_t mode_id, uint32_t height, uint32_t width);
 void alloc_object_text_d6fa8(ef_addr32 object);
-void channel_call_102858_d73b8(uint8_t channel);
-void channel_call_102824_d7458(uint8_t channel);
+void channel_call_102858_d73b8(uint8_t channel, uint32_t value);
+void channel_call_102824_d7458(uint8_t channel, uint32_t value);
 void channel_call_1027a0_d7490(uint8_t channel);
 void channel_start_d74d0(uint8_t channel);
 void channel_call_1027cc_d7530(uint8_t channel);
@@ -3412,6 +3412,7 @@ double guest_fn_b45fa(double value); /* 0xb45fa ST0 -> ST0 */
 double guest_fn_b45ac(double value); /* 0xb45ac ST0 sin */
 double guest_fn_b45a2(double value); /* 0xb45a2 ST0 cos */
 double guest_fn_b427c_x(double value); /* 0xb427c stack double, callee cleanup, ST0 result */
+double guest_fn_e86f7_x(double value); /* 0xe86f7 floor: stack double, callee cleanup, ST0 result */
 double guest_fn_b42b0_x(double value); /* 0xb42b0 stack double, callee cleanup, ST0 result */
 
 /* float_helpers3.c */
@@ -4027,7 +4028,7 @@ void guest_fn_1cd90_x(void); /* 0x1cd90 */
 
 /* game_helpers70.c */
 uint8_t select_contact_icon_7f9e4(ef_addr32 unit);
-void guest_fn_7f850_x(uint32_t a); /* 0x7f850 EAX */
+void update_rolling_sound_7f850(ef_addr32 unit); /* 0x7f850 EAX, rolling_sound.c */
 
 /* game_helpers71.c */
 uint8_t scan_code_weight_cbd30(uint8_t code);
@@ -7725,6 +7726,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux guest_fn_b45ac parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b45a2 parm [8087] value [8087] modify [eax]
 #pragma aux guest_fn_b427c_x modify exact []
+#pragma aux guest_fn_e86f7_x modify exact [ecx]
 #pragma aux guest_fn_b42b0_x modify exact []
 /* Fixed-point matrix products take a in ESI, b in EBX, out in EDI and clobber
  * EAX/ECX/EDX/EBP like the original (found by the cockpit bisect: 0xfcffb). */

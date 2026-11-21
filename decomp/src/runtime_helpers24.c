@@ -139,23 +139,25 @@ void alloc_object_text_d6fa8(ef_addr32 object)
     }
 }
 
-/* 0xd73b8, 55 bytes. Run channel call 0x102858 on the driver channel (0..13). */
-void channel_call_102858_d73b8(uint8_t channel)
+/* 0xd73b8, 55 bytes. Run channel call 0x102858 on the driver channel (0..13)
+ * with VALUE (EDX) as its second argument. */
+void channel_call_102858_d73b8(uint8_t channel, uint32_t value)
 {
     if (EF_U8(0x0015bac4u) != 0) {
         if (channel >= 0xe)
             ui_report_missing_record(0x0018f9c0u);
-        guest_fn_102858(EF_U32(0x00420dd0u + (uint32_t)channel * 4u));
+        trace_call_102858(EF_U32(0x00420dd0u + (uint32_t)channel * 4u), value);
     }
 }
 
-/* 0xd7458, 55 bytes. Run channel call 0x102824 on the driver channel (0..13). */
-void channel_call_102824_d7458(uint8_t channel)
+/* 0xd7458, 55 bytes. Run channel call 0x102824 on the driver channel (0..13)
+ * with VALUE (EDX) as its second argument. */
+void channel_call_102824_d7458(uint8_t channel, uint32_t value)
 {
     if (EF_U8(0x0015bac4u) != 0) {
         if (channel >= 0xe)
             ui_report_missing_record(0x0018f9f0u);
-        guest_fn_102824(EF_U32(0x00420dd0u + (uint32_t)channel * 4u));
+        trace_call_102824(EF_U32(0x00420dd0u + (uint32_t)channel * 4u), value);
     }
 }
 

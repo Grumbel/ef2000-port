@@ -46,7 +46,7 @@ uint8_t select_contact_icon_7f9e4(ef_addr32 unit)
         return flag ? 0x42 : 0x26;
     }
     if (EF_U16(0x001f71cau) == EF_U16(unit + 0x16u)) {
-        guest_fn_7f850_x(unit);
+        update_rolling_sound_7f850(unit);
         if (EF_U8(0x001a363fu) != 0 || EF_U8(0x001a3638u) != 0) {
             if ((EF_U8(unit + 0x24u) & 0x20u) == 0)
                 return flag ? 0x42 : 0x3e;
