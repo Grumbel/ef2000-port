@@ -202,3 +202,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x1d954 integrate_flight_1d954 (flight_integrate.c; waypoint pitch 0x1dc20 still guest); differential 240; hybrid regression 4/4
 2026-11-21  B5  recover 0x1dc20 steer_pitch_to_waypoint_1dc20 (waypoint_pitch.c; terrain look-ahead and rate-limited pitch); differential 240; hybrid regression 4/4
 2026-11-21  B5  recover 0x291fc weapon_usable_291fc (weapon_usable.c; per-type range and angle-off limits); differential 256; hybrid regression 4/4
+2026-11-21  B5  recover 0x37fe4 advance_follower_37fe4 (follower_update.c; node-distance step toward the target, link refresh); differential 256; hybrid regression 4/4
