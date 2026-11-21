@@ -6714,7 +6714,7 @@ uint16_t move_side_record_c0b04(ef_addr32 head_a, ef_addr32 head_b, ef_addr32 li
 void get_net_data_581b0(void); /* 0x581b0 */
 void net_packet_0b_55144(ef_addr32 data, uint32_t slot); /* 0x55144 EAX/EDX; packet type 0x0b, not yet recovered (x87) */
 void net_packet_14_554b0(ef_addr32 data); /* 0x554b0 EAX; packet type 0x14, not yet recovered (x87) */
-void net_packet_29_56084(ef_addr32 data); /* 0x56084 EAX; packet type 0x29, not yet recovered */
+void net_packet_29_56084(ef_addr32 data); /* 0x56084 EAX; packet type 0x29 */
 void net_packet_42_55bf8(ef_addr32 data); /* 0x55bf8 EAX; packet type 0x42, not yet recovered (x87) */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_packet_0b_55144 modify [eax edx]

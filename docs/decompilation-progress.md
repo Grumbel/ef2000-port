@@ -164,3 +164,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x913dc step_view_transition_913dc (view_motion.c; jump-table switch); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0xc0b04 move_side_record_c0b04 (game_helpers112.c; jump-table switches); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x581b0 get_net_data_581b0 (net_packets.c; jump-table switch); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x56084 net_packet_29_56084 (net_packet_29.c); differential 200; hybrid regression 4/4
