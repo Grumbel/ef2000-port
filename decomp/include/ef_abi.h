@@ -6223,7 +6223,7 @@ void clear_missile_slots_16c7c(uint32_t a);
 void guest_fn_56f0c_x(int32_t unit, uint32_t index); /* 0x56f0c EAX/EDX */
 
 void update_target_2631c(uint32_t flag);
-void guest_fn_73084_x(void); /* 0x73084 */
+void place_dummy_plane_73084(ef_addr32 source); /* 0x73084 */
 void guest_fn_2479c_x(int32_t a, int32_t b, uint32_t c); /* 0x2479c EAX/EDX/EBX */
 void guest_fn_24f94_x(void); /* 0x24f94 */
 double guest_fn_6a5f0_x(int32_t a, int32_t b); /* 0x6a5f0 EAX/EDX -> ST0 */

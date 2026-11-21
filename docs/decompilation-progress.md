@@ -188,3 +188,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0xe78b4 reset_flight_model_e78b4 (flight_model_reset.c; x87 state reset); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x10958c update_sink_warning_10958c (sink_warning.c; x87 factor and warning toggle); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x1196c8 update_lift_coefficient_1196c8 (lift_coefficient.c; x87 stall limit); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x73084 place_dummy_plane_73084 (dummy_plane.c; x87 orientation matrix); differential 200; hybrid regression 4/4

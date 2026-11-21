@@ -11637,7 +11637,7 @@ void update_target_2631c(uint32_t flag)
     double den;
     if (flag == 0u)
         return;
-    guest_fn_73084_x();
+    place_dummy_plane_73084(flag); /* FLAG is also the source record */
     a = (int32_t)EF_U32(0x001f71c6u) >> 16;
     b = (int32_t)EF_U32(0x001f71ceu) >> 16;
     guest_fn_2479c_x(a, b, 0u);

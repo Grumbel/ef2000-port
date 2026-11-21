@@ -3886,3 +3886,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000e78b4	reset_flight_model_e78b4			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e78b4 (366 bytes); flight model reset
 0x0010958c	update_sink_warning_10958c			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010958c (375 bytes); sink warning
 0x001196c8	update_lift_coefficient_1196c8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x001196c8 (377 bytes); lift coefficient
+0x00073084	place_dummy_plane_73084	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00073084 (394 bytes); dummy plane placement
