@@ -17685,7 +17685,7 @@ void resize_widget_a520c(ef_addr32 obj, uint32_t dx, uint32_t bx, uint32_t cl)
 
 	EF_U16(obj + 0x45u) = (uint16_t)(w > 0 ? (int32_t)w : 0);
 	EF_U16(obj + 0x47u) = (uint16_t)(h > 0 ? (int32_t)h : 0);
-	guest_fn_a5070(obj);
+	limit_widget_size_a5070(obj);
 	update_widget_extent_a558c(obj);
 	if ((EF_U8(obj + 0x3au) & 0x10u) == 0u) {
 		if ((uint8_t)cl == 0u) {

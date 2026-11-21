@@ -183,3 +183,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x88134 check_object_contact_88134 (object_player_contact.c; x87 player contact test); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x6e1c4 formation_offset_6e1c4 (formation_offset.c; x87 station error); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0xb513c fill_group_slot_b513c (group_slot_fill.c; x87 scaled speed); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0xa5070 limit_widget_size_a5070 (widget_size_limits.c; x87 content size clamp); differential 200; hybrid regression 4/4

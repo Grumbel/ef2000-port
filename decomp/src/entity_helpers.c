@@ -117,7 +117,7 @@ void init_entities_a59d8(void)
         guest_fn_a4ec0(object);
         guest_fn_a4eec(object);
         clamp_extents_a5000(object);
-        guest_fn_a5070(object);
+        limit_widget_size_a5070(object);
         guest_fn_a54f0(object);
         guest_fn_a5764(object);
         guest_fn_a66a0(object);

@@ -1713,7 +1713,7 @@ void latch_previous_acb68(ef_addr32 record);
 void guest_fn_a499c(uint32_t i); /* 0xa499c */
 void guest_fn_a4ec0(ef_addr32 object); /* 0xa4ec0 */
 void guest_fn_a4eec(ef_addr32 object); /* 0xa4eec */
-void guest_fn_a5070(ef_addr32 object); /* 0xa5070 */
+void limit_widget_size_a5070(ef_addr32 widget); /* 0xa5070 */
 void guest_fn_a51dc(ef_addr32 object); /* 0xa51dc */
 void guest_fn_a54f0(ef_addr32 object); /* 0xa54f0 */
 void guest_fn_a59ac(ef_addr32 object); /* 0xa59ac */
