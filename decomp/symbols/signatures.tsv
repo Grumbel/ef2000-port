@@ -3862,3 +3862,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c0b04	move_side_record_c0b04	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:ef_addr32,[ESP+12]:uint32_t	AX:uint16_t	esi,edi,ebp	12	Epilogue is ret 0xc; the third stack argument is unused; caller 0xb134f uses AX only.
 0x000581b0	get_net_data_581b0			ebx,ecx,edx,esi,edi,ebp	0	Pushes EBX/ECX/EDX/EDI; EAX is clobbered.
 0x00056084	net_packet_29_56084	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	"Pushes EBX/ECX/EDX/ESI/EDI/EBP; EAX is clobbered."
+0x00055bf8	net_packet_42_55bf8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	"Pushes EBX/ECX/EDX/ESI/EDI/EBP; EAX is clobbered."
