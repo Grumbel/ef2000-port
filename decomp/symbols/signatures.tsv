@@ -3872,3 +3872,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0003a000	update_external_track_3a000	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	Pushes EBX/ECX/ESI/EDI; EAX and EDX are clobbered.
 0x0011c20c	update_contact_points_11c20c			ebx,ecx,edx,esi,edi,ebp	0	Pushes EBX/ECX/EDX/ESI/EDI/EBP; EAX is clobbered; 0x90-byte frame of work vectors.
 0x0011c350	accumulate_contact_load_11c350	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:ef_addr32		ecx,esi,edi,ebp	0	Pushes ESI/EDI; EAX, EBX and EDX are clobbered; ECX is read only.
+0x0011bcc4	surface_coefficient_11bcc4	EAX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t	ST0:float10	ebx,ecx,edx,esi,edi,ebp	16	Two stack doubles (eta, Mach), callee pops 16; result in ST0; EAX is clobbered.
+0x0011bdc0	surface_coefficient_delta_11bdc0	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t	ST0:float10	ebx,ecx,edx,esi,edi,ebp	16	Two stack doubles (Mach, unused), callee pops 16; result in ST0; EAX is clobbered.

@@ -175,3 +175,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x3a000 update_external_track_3a000 (external_track.c; x87 bearing/range); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x11c350 accumulate_contact_load_11c350 (contact_load.c; x87 force/moment rotation); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x11c20c update_contact_points_11c20c (contact_points.c; five-record contact loop); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x11bcc4 surface_coefficient_11bcc4 and 0x11bdc0 surface_coefficient_delta_11bdc0 (surface_tables.c; x87 table lookups); differential 200+200; hybrid regression 4/4
