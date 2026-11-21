@@ -189,3 +189,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x10958c update_sink_warning_10958c (sink_warning.c; x87 factor and warning toggle); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x1196c8 update_lift_coefficient_1196c8 (lift_coefficient.c; x87 stall limit); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x73084 place_dummy_plane_73084 (dummy_plane.c; x87 orientation matrix); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0xcbff0 update_group_weights_cbff0 (group_overlap_weights.c; x87 inverse-distance weights); differential 200; hybrid regression 4/4
