@@ -6703,6 +6703,11 @@ uint32_t guest_fn_37498(int32_t x, int32_t y, int32_t z, uint32_t ecx, int32_t s
 void apply_unit_status_packet_5674c(ef_addr32 packet); /* 0x5674c */
 uint32_t step_scene_script_975f0(ef_addr32 record); /* 0x975f0 */
 void set_pylon_shapes_8f07c(ef_addr32 unit); /* 0x8f07c */
+void detect_cpu_f2819(void); /* 0xf2819, ebx/ecx/ebp preserved */
+uint32_t unpack_ra_10da50(ef_addr32 packed, ef_addr32 out); /* 0x10da50, callee pops both */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux unpack_ra_10da50 parm routine [] modify [eax ecx edx]
+#endif
 void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]

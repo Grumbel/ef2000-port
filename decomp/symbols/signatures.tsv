@@ -3850,3 +3850,5 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0005674c	apply_unit_status_packet_5674c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX EDX ESI EDI; ECX is not used; packet in EAX, EAX left from the last callee
 0x000975f0	step_scene_script_975f0	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; returns EBP (0, or 1 after the final step)
 0x0008f07c	set_pylon_shapes_8f07c	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI; EAX left from the last callee
+0x000f2819	detect_cpu_f2819			ebx,ecx,ebp	0	Original pushes EBX ECX only; CPUID clobbers EDX, REPZ CMPSB clobbers ESI EDI, EAX left from the last step; EFLAGS AC/ID stay toggled
+0x0010da50	unpack_ra_10da50	[ESP+4]:ef_addr32,[ESP+8]:ef_addr32	EAX:uint32_t	ebx,esi,edi,ebp	8	ENTER 0x854 frame, pushes ESI EDI EBX; RET 8; returns 1 or 0 in EAX; ECX EDX clobbered
