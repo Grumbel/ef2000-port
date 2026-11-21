@@ -6692,6 +6692,7 @@ void mpClickWPHeight(void); /* 0x4e80c */
 void mpSetWindows(void); /* 0x4b1f0 */
 void fill_target_list_4d668(void); /* 0x4d668 */
 void fill_atc_list_4fa64(void); /* 0x4fa64 */
+void mpUpdateMap(ef_addr32 widget); /* 0x4b6a0 */
 void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]

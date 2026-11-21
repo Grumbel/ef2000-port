@@ -818,3 +818,144 @@ void fill_atc_list_4fa64(void)
 	}
 	g_atc_selected_slot = 0x14;
 }
+
+#define PLANNER_FLIGHT_CURSOR 0x001a5598u /* byte, 0..15 */
+#define PLANNER_FLIGHT_STATE  0x001a5510u /* byte per flight */
+
+static int widget_named(ef_addr32 widget, ef_addr32 name)
+{
+	return guest_strcmp(widget + 0x3fu, name) == 0;
+}
+
+static void open_planner_widget(ef_addr32 name)
+{
+	activate_widget_a4cb4(EF_U8(find_named_or_abort_a46cc(name) + 0x10u));
+}
+
+static void close_planner_widget(ef_addr32 name)
+{
+	close_widget_a4b80(EF_U8(find_named_or_abort_a46cc(name) + 0x10u));
+}
+
+/* Enable the "mp_options" page button CHILD; it becomes the widget that
+ * the later name tests look at. */
+static ef_addr32 enable_option_button(ef_addr32 child)
+{
+	ef_addr32 button = find_widget_checked_a78bc(find_named_or_abort_a46cc(MP_OPTIONS), child);
+	enable_widget_a72d8(button);
+	return button;
+}
+
+/* 0x4b6a0, 1437 bytes, click callback of the planner page buttons. A
+ * page needing data that does not exist yet (targets without a selected
+ * assignment, ATC or waypoints without a tactical record) shows a notice
+ * and switches to the strike or base page instead. Then every page
+ * widget closes and the page of the button opens: strike (mode 1), base
+ * (2), targets (3), waypoints (4) or ATC (5). The original keeps the
+ * button in a register that each step reuses, so after a redirect or a
+ * page set-up the remaining name tests look at the widget found last;
+ * this is kept. */
+void mpUpdateMap(ef_addr32 widget)
+{
+	ef_addr32 list;
+
+	g_target_list_changed = 1;
+	if (widget_named(widget, MP_TARGETS) && g_assignment_selected_record == 0
+	    && g_assignment_target_record == 0) {
+		update_dialog_bindings(0x00132289u, 0x001322a2u);
+		widget = enable_option_button(MP_STRIKE);
+	}
+	if (widget_named(widget, MP_ATC) && EF_U32(PLANNER_TACTICAL_RECORD) == 0) {
+		update_dialog_bindings(0x00132244u, 0x00132264u);
+		widget = enable_option_button(MP_BASE);
+	}
+	if (widget_named(widget, MP_WP) && EF_U32(PLANNER_TACTICAL_RECORD) == 0) {
+		update_dialog_bindings(0x00132244u, 0x00132264u);
+		widget = enable_option_button(MP_BASE);
+	}
+
+	close_planner_widget(MP_MAP);
+	close_planner_widget(MP_MAP_OPTIONS);
+	close_planner_widget(MP_STRIKE_LIST);
+	close_planner_widget(MP_STRIKE_INFO);
+	close_planner_widget(MP_BASE_SET);
+	close_planner_widget(MP_BASE_FLIGHTS);
+	close_planner_widget(MP_AC_TYPES);
+	close_planner_widget(MP_ROLE_TYPE);
+	refresh_type_widgets_5086c();
+	close_planner_widget(MP_ASSIGN_TARG);
+	close_planner_widget(MP_TARGET_VIEW);
+	close_planner_widget(MP_TARGET_LIST);
+	close_planner_widget(MP_WP_SET);
+	close_planner_widget(MP_WP_HEIGHTS);
+	close_planner_widget(MP_HEIGHT_OPTS);
+	close_planner_widget(MP_ATC_SET);
+	close_planner_widget(MP_ATC_LIST);
+	close_planner_widget(MP_ADD_MISSION);
+	g_atc_selected_slot = 0x14;
+
+	if (widget_named(widget, MP_STRIKE)) {
+		EF_U8(PLANNER_MODE) = 1;
+		open_planner_widget(MP_STRIKE_LIST);
+		open_planner_widget(MP_MAP);
+		open_planner_widget(MP_MAP_OPTIONS);
+		open_planner_widget(MP_STRIKE_INFO);
+	}
+	if (widget_named(widget, MP_BASE)) {
+		EF_U8(PLANNER_MODE) = 2;
+		open_planner_widget(MP_BASE_SET);
+		open_planner_widget(MP_BASE_FLIGHTS);
+		open_planner_widget(MP_MAP);
+		open_planner_widget(MP_MAP_OPTIONS);
+		list = find_named_or_abort_a46cc(MP_ROLE_TYPE);
+		activate_widget_a4cb4(EF_U8(list + 0x10u));
+		widget = find_widget_checked_a78bc(list, 0x00184b74u); /* "role" */
+		enable_widget_a72d8(widget);
+		fill_button_widgets_4f7d0();
+	}
+	if (widget_named(widget, MP_TARGETS)) {
+		EF_U8(PLANNER_MODE) = 3;
+		fill_target_list_4d668();
+		open_planner_widget(MP_ASSIGN_TARG);
+		open_planner_widget(MP_TARGET_VIEW);
+		if (EF_U8(PLANNER_TARGET_COUNT) > 1u) {
+			list = find_named_or_abort_a46cc(MP_TARGET_LIST);
+			activate_widget_a4cb4(EF_U8(list + 0x10u));
+			clear_children_dirty(list);
+			show_named_widget_a7318(list, 0x00184b7cu); /* "1" */
+			widget = find_widget_checked_a78bc(list, 0x00184b7cu);
+			mpSamCoverage(widget);
+		}
+		/* Advance to the next flight in state 3 or 4; there must be one. */
+		if (g_tactical_reset_mode == 1u) {
+			EF_U8(PLANNER_FLIGHT_CURSOR) = 0xff;
+			do {
+				++EF_U8(PLANNER_FLIGHT_CURSOR);
+				if (EF_U8(PLANNER_FLIGHT_CURSOR) >= 16u)
+					EF_U8(PLANNER_FLIGHT_CURSOR) = 0;
+			} while (EF_U8(PLANNER_FLIGHT_STATE + EF_U8(PLANNER_FLIGHT_CURSOR)) != 3u
+			         && EF_U8(PLANNER_FLIGHT_STATE + EF_U8(PLANNER_FLIGHT_CURSOR)) != 4u);
+		}
+		fill_selection_dialog_4db60();
+	}
+	if (widget_named(widget, MP_WP)) {
+		EF_U8(PLANNER_MODE) = 4;
+		open_planner_widget(MP_WP_SET);
+		open_planner_widget(MP_WP_HEIGHTS);
+		open_planner_widget(MP_HEIGHT_OPTS);
+		open_planner_widget(MP_MAP);
+		open_planner_widget(MP_MAP_OPTIONS);
+		update_route_summary_4ec70();
+	}
+	if (widget_named(widget, MP_ATC)) {
+		EF_U8(PLANNER_MODE) = 5;
+		open_planner_widget(MP_ATC_SET);
+		list = find_named_or_abort_a46cc(MP_ATC_LIST);
+		activate_widget_a4cb4(EF_U8(list + 0x10u));
+		clear_children_dirty(list);
+		open_planner_widget(MP_TARGET_VIEW);
+		open_planner_widget(MP_ADD_MISSION);
+		fill_atc_list_4fa64();
+	}
+	refresh_flagged_object_a4b08(find_named_or_abort_a46cc(MP_WARNING));
+}
