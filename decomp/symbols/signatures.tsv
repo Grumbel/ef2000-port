@@ -3866,3 +3866,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000554b0	net_packet_14_554b0	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	"Pushes EBX/ECX/EDX/ESI/EDI/EBP; EAX is clobbered."
 0x00055144	net_packet_0b_55144	EAX:ef_addr32,EDX:uint32_t		ebx,ecx,esi,edi,ebp	0	"Pushes EBX/ECX/ESI/EDI; EAX/EDX are clobbered; EDX is used as a signed slot word."
 0x00073ee0	update_object_orientation_73ee0	AX:int16_t		ebx,ecx,edx,esi,edi,ebp	0	"Pushes EBX/ECX/EDX/ESI; EAX is clobbered."
+0x00073820	report_contact_73820	AX:int16_t,DX:int16_t		ebx,ecx,esi,edi,ebp	0	Pushes EBX/ECX/ESI/EDI/EBP; EAX and EDX are clobbered.

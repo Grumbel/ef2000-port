@@ -6717,12 +6717,14 @@ void update_object_orientation_73ee0(int16_t index); /* 0x73ee0 AX */
 void net_packet_14_554b0(ef_addr32 data); /* 0x554b0 EAX; packet type 0x14 */
 void net_packet_29_56084(ef_addr32 data); /* 0x56084 EAX; packet type 0x29 */
 void net_packet_42_55bf8(ef_addr32 data); /* 0x55bf8 EAX; packet type 0x42 */
+void report_contact_73820(int16_t index, int16_t other); /* 0x73820 AX/DX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux net_packet_0b_55144 modify [eax edx]
 #pragma aux update_object_orientation_73ee0 modify [eax]
 #pragma aux net_packet_14_554b0 modify [eax]
 #pragma aux net_packet_29_56084 modify [eax]
 #pragma aux net_packet_42_55bf8 modify [eax]
+#pragma aux report_contact_73820 modify [eax edx]
 #endif
 uint8_t step_view_transition_913dc(uint8_t slot, uint8_t action); /* 0x913dc AL/DL -> AL */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
