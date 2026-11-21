@@ -241,7 +241,6 @@ addr	reason
 0x0006c92c	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0006e3e0	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x0006e59c	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
-0x000710a4	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00072944	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x000759b8	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)
 0x00075f00	Unreviewed mechanical translation; keep original until hand-verified (bisect relink-2/3: 0x120746 and 0xf9ee0 broke the main menu)

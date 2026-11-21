@@ -54,7 +54,7 @@ void advance_state_7104c(void)
         guest_fn_7bc0(EF_S32(0x001f71c6u) >> 16, value);
         EF_U8(EF_U32(0x001f71bcu) + 0x16eu) = 2;
     } else if (state == 2 || state == 3) {
-        guest_fn_710a4();
+        update_approach_710a4();
     }
 }
 
