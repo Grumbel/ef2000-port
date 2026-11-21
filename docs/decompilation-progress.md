@@ -166,3 +166,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-21  B5  recover 0x581b0 get_net_data_581b0 (net_packets.c; jump-table switch); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x56084 net_packet_29_56084 (net_packet_29.c); differential 200; hybrid regression 4/4
 2026-11-21  B5  recover 0x55bf8 net_packet_42_55bf8 (net_packet_42.c; x87 compare); differential 200; hybrid regression 4/4
+2026-11-21  B5  recover 0x554b0 net_packet_14_554b0 (net_packet_14.c; x87 scaling); differential 200; hybrid regression 4/4
