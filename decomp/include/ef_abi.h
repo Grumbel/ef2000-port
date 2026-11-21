@@ -6693,6 +6693,13 @@ void mpSetWindows(void); /* 0x4b1f0 */
 void fill_target_list_4d668(void); /* 0x4d668 */
 void fill_atc_list_4fa64(void); /* 0x4fa64 */
 void mpUpdateMap(ef_addr32 widget); /* 0x4b6a0 */
+void spawn_record_flights_4aa4c(ef_addr32 record); /* 0x4aa4c */
+uint32_t guest_fn_37498(int32_t x, int32_t y, int32_t z, uint32_t ecx, int32_t slot, uint32_t planned,
+	uint32_t side, uint32_t kind, uint32_t type, uint32_t shape, uint32_t data, uint32_t flight,
+	int32_t owner); /* 0x37498, callee pops nine dwords */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_37498 modify [eax ebx ecx edx]
+#endif
 void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]

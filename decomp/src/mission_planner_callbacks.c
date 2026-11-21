@@ -959,3 +959,101 @@ void mpUpdateMap(ef_addr32 widget)
 	}
 	refresh_flagged_object_a4b08(find_named_or_abort_a46cc(MP_WARNING));
 }
+
+/* 0x4aa4c: place the flights of a planner record in the world. RECORD
+ * holds the mode byte (+0x09: 1 planned, 2 fixed shapes), the kind (+0x0b),
+ * the owner row (word +0x10), the flight count (+0x12) and the flight
+ * array (+0x13, 0x7c bytes each). Each flight becomes an object at its
+ * start cell with a route of 0x19-byte waypoints; in connection mode 3 the
+ * positions move to the cell centre. */
+#define SIDE_GROUP_HEAD     0x00137980u
+#define FLIGHT_SIZE         0x7cu
+#define WAYPOINT_SIZE       0x19u
+#define EXTERNAL_ROW_SIZE   0x45u
+#define CELL_CENTRE         0x400
+
+/* Side of the record: from the group flags in connection mode 3, by kind
+ * otherwise (1 is side 0; 0 and 6..8 side 1; the rest side 2). */
+static uint8_t record_side(ef_addr32 record)
+{
+	uint8_t kind = EF_U8(record + 0x0bu);
+
+	if (g_frontend_connection_mode == 3u && g_world_grid_marker == 0) {
+		if ((uint16_t)group_flag_negative_cc1ac(0, kind, SIDE_GROUP_HEAD) != 0)
+			return 0;
+		if ((uint16_t)group_flag_zero_cc1ec(0, kind, SIDE_GROUP_HEAD) == 0)
+			return 1;
+		return 2;
+	}
+	switch (kind) {
+	case 1:
+		return 0;
+	case 0: case 6: case 7: case 8:
+		return 1;
+	default:
+		return 2;
+	}
+}
+
+static uint32_t cell_position(ef_addr32 cell, ef_addr32 offset, int32_t centre)
+{
+	return (EF_U32(cell) << 11) + (uint32_t)(EF_S16(offset) + centre);
+}
+
+void spawn_record_flights_4aa4c(ef_addr32 record)
+{
+	uint8_t side = record_side(record);
+	int16_t owner = EF_S16(record + 0x10u);
+	int32_t centre = g_frontend_connection_mode == 3u ? CELL_CENTRE : 0;
+	/* The original keeps the waypoint time in EDI, which its only caller
+	 * (0x49228) enters with the record address; untimed waypoints pass on
+	 * whatever is left there. */
+	int32_t time = (int32_t)record;
+	uint8_t shape = 0;
+	uint8_t planned;
+	uint8_t i, j;
+
+	EF_U8(g_grid_adjacency_base + (uint32_t)((int32_t)owner * 17)) = 1;
+	for (i = 0; i < EF_U8(record + 0x12u); ++i) {
+		ef_addr32 flight = EF_U32(record + 0x13u) + (uint32_t)i * FLIGHT_SIZE;
+		int32_t x = (int32_t)(cell_position(flight + 0x08u, flight + 0x14u, centre) << 8);
+		int32_t z = (int32_t)(cell_position(flight + 0x0cu, flight + 0x16u, centre) << 8);
+		int16_t slot, object;
+		uint8_t links;
+
+		planned = 1;
+		if (EF_U8(record + 0x09u) == 1u) {
+			uint8_t type = EF_U8(flight);
+			shape = (uint8_t)(type > 12u ? 0x1eu : 0x1bu + type);
+		} else if (EF_U8(record + 0x09u) == 2u) {
+			shape = EF_U8(flight);
+			planned = 0;
+		}
+
+		slot = (int16_t)take_free_slot_38584();
+		for (j = 0; (int16_t)j < EF_S16(flight + 0x1cu); ++j) {
+			ef_addr32 wp = EF_U32(flight + 0x20u) + (uint32_t)j * WAYPOINT_SIZE;
+			uint32_t wx = cell_position(wp, wp + 0x08u, centre);
+			uint32_t wz = cell_position(wp + 0x04u, wp + 0x0au, centre);
+			uint8_t timed = 0;
+			uint8_t kind = EF_U8(wp + 0x18u);
+
+			if (kind == 10u || kind == 0x10u) {
+				time = EF_S16(wp + 0x10u) * 3600 + EF_S16(wp + 0x12u) * 60 + EF_S16(wp + 0x14u);
+				timed = 1;
+			}
+			if ((int32_t)j == EF_S16(flight + 0x1cu) - 1) {
+				timed = 1;
+				time = -1;
+			}
+			append_list_node_385cc((uint32_t)(int32_t)slot, timed, wx, 0, wz, (uint32_t)time);
+		}
+
+		object = (int16_t)guest_fn_37498(x, 0, z, 0, slot, planned, side,
+			EF_U8(record + 0x0bu), EF_U8(flight + 0x01u), shape,
+			EF_U32(flight + 0x78u), i, owner);
+		for (links = EF_U8(flight + 0x1eu); links != 0; --links)
+			refresh_link_pointer(g_external_grid_base + (uint32_t)((int32_t)object * EXTERNAL_ROW_SIZE));
+		claim_slot_82168(object, owner, 1);
+	}
+}
