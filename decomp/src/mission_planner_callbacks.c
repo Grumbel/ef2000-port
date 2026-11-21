@@ -337,3 +337,85 @@ void mpNextAssign(void)
 	if (EF_U8(PLANNER_MODE) == 3u)
 		draw_preview_corners(panel_x, panel_y);
 }
+
+/* Waypoint height graph of the planner. */
+#define SPRITE_SHEET           0x00126570u /* dword: 640-byte-wide sprite sheet */
+#define WP_HEIGHT_ZOOM         0x001a55a1u /* 0 = 500 units per pixel, else 10 */
+#define WP_HEIGHTS             0x001a560au /* int32 per waypoint */
+#define WP_TYPES               0x001a5672u /* byte per waypoint */
+#define WP_TYPE_END            0x11u
+#define WP_TYPE_WIDE_ICON      8u /* 28x20 icon */
+#define WP_TYPE_SQUARE_ICON    5u /* 21x21 icon */
+/* Sprite positions, (x, y) word pairs on the sheet. */
+#define SPRITE_HEIGHT_DIGITS   0x00134715u
+#define SPRITE_HEIGHT_DIGITS_ZOOMED 0x0013471eu
+#define SPRITE_WIDE_ICON       0x0013470cu
+#define SPRITE_SQUARE_ICON     0x00134739u
+#define SPRITE_WP_NUMBERS      0x001345adu
+#define SHEET_STRIDE           0x280u
+#define GRAPH_FLOOR            120
+
+/* Address of the sprite at the (x, y) pair POS, DX bytes further right. */
+static ef_addr32 sheet_sprite(ef_addr32 pos, int32_t dx)
+{
+	return EF_U32(SPRITE_SHEET) + EF_S16(pos + 2u) * SHEET_STRIDE + EF_S16(pos) + dx;
+}
+
+/* Graph row of waypoint I's height. */
+static int32_t waypoint_graph_y(int16_t i, int16_t scale)
+{
+	return GRAPH_FLOOR - EF_S32(WP_HEIGHTS + 4u * i) / scale;
+}
+
+/* 0x4e80c, 875 bytes. Draw the waypoint height graph: the grid (26
+ * columns of 20 pixels, 7 rows), the height labels on both sides and in
+ * the middle, the profile from waypoint to waypoint down to the floor
+ * after the last one, and per waypoint its type 8 or type 5 icon and its
+ * number. The height scale is 500 units per pixel, or 10 when zoomed. */
+void mpClickWPHeight(void)
+{
+	int16_t scale = EF_U8(WP_HEIGHT_ZOOM) == 0u ? 500 : 10;
+	int16_t i, x, y;
+
+	draw_active_marker_e5088();
+	for (i = 0; i < 26; ++i)
+		draw_scaled_rect_c95ac(10, 20 * i, 0, 20 * i, GRAPH_FLOOR);
+	for (i = 0; i < 7; ++i)
+		draw_scaled_rect_c95ac(10, 0, 20 * i, 500, 20 * i);
+
+	/* Six labels from the bottom up; label I is column I - 1 of the
+	 * digit strip, so the first starts 20 bytes before it. */
+	for (i = 0, y = 118; i < 6; ++i, y -= 20) {
+		ef_addr32 digits = sheet_sprite(EF_U8(WP_HEIGHT_ZOOM) == 0u
+			? SPRITE_HEIGHT_DIGITS : SPRITE_HEIGHT_DIGITS_ZOOMED, (i - 1) * 20);
+		guest_fn_ca620((int32_t)digits, 5, y, 12, 6, SHEET_STRIDE);
+		guest_fn_ca620((int32_t)digits, 0xf5, y, 12, 6, SHEET_STRIDE);
+		guest_fn_ca620((int32_t)digits, 0x1e5, y, 12, 6, SHEET_STRIDE);
+	}
+
+	for (i = 0; i < 26; ++i) {
+		if (EF_U8(WP_TYPES + 1u + i) == WP_TYPE_END)
+			break;
+		draw_scaled_rect_c95ac(1, 20 * i, (int16_t)waypoint_graph_y(i, scale),
+			20 * (i + 1), (int16_t)waypoint_graph_y(i + 1, scale));
+	}
+	draw_scaled_rect_c95ac(1, 20 * i, (int16_t)waypoint_graph_y(i, scale),
+		(int16_t)(20 * (i + 1)), GRAPH_FLOOR);
+
+	for (i = 0, x = -10; i < 26; ++i, x += 20) {
+		uint8_t type = EF_U8(WP_TYPES + i);
+		if (type == WP_TYPE_END)
+			return;
+		y = (int16_t)(waypoint_graph_y(i, scale) - 7);
+		if (y < 3)
+			y = 3;
+		if (type == WP_TYPE_WIDE_ICON)
+			guest_fn_ca620((int32_t)sheet_sprite(SPRITE_WIDE_ICON, 0),
+				(int16_t)(20 * i - 14), (int16_t)(y - 5), 28, 20, SHEET_STRIDE);
+		else if (type == WP_TYPE_SQUARE_ICON)
+			guest_fn_ca620((int32_t)sheet_sprite(SPRITE_SQUARE_ICON, 0),
+				(int16_t)(20 * i - 10), (int16_t)(y - 5), 21, 21, SHEET_STRIDE);
+		guest_fn_ca620((int32_t)sheet_sprite(SPRITE_WP_NUMBERS, 20 * i),
+			x, y, 20, 13, SHEET_STRIDE);
+	}
+}

@@ -3841,3 +3841,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c4ccb	render_index_stream_c4ccb	[ESP+4]:ef_addr32			4	Original 0x000c4ccb (120 bytes); ENTER 0,0 frame, stream pointer popped by the callee; stores ESP-at-body (EBP-12) into 0x159064
 0x000c4d43	render_index_stream_c4d43	[ESP+4]:ef_addr32			4	Original 0x000c4d43 (112 bytes); ENTER 0,0 frame, stream pointer popped by the callee; stores ESP-at-body (EBP-12) into 0x159064
 0x0004d2fc	mpNextAssign			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; no inputs, EAX left from the last callee; GUI callback, dispatcher discards EAX
+0x0004e80c	mpClickWPHeight			ebx,ecx,edx,esi,edi,ebp	0	Original pushes EBX ECX EDX ESI EDI EBP; no inputs, EAX left from the last callee

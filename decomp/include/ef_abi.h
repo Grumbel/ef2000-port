@@ -6688,6 +6688,7 @@ uint32_t set_widget_bit6_r(ef_addr32 widget, uint8_t value); /* 0xa739c EAX/DL, 
 uint32_t show_widget_a7588_r(ef_addr32 widget, ef_addr32 text); /* 0xa7588 EAX/EDX, EAX result */
 uint32_t mpMission2Click(ef_addr32 widget); /* 0x4f3e0 */
 void mpNextAssign(void); /* 0x4d2fc */
+void mpClickWPHeight(void); /* 0x4e80c */
 void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]
