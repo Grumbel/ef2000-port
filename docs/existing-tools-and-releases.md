@@ -142,6 +142,35 @@ attributing changes to localization. The mirror's README suggests generic
 3Dfx wrapper configurations, but that alone does not establish it contains
 the actual GFX+ executable or supports Glide passthrough.
 
+## Cross-version reference: EF2000 V2.0 for Windows 95
+
+A Windows-only V2.0 installer disc is available locally at
+`../EF2000_V2.0-Twilight/EF2000/`. It has no DOS or GFX+ executable. The game
+executable is `PROGRAM/superw.dat` inside `DATA.Z` (InstallShield 3, unpacked
+with nixpkgs `unshieldv3`): 1,952,768 bytes, linked 1997-05-13, SHA-256
+`35c949cbe86485f38464254a08e2af6f8c9e0e1534c3adcdc1ed92ae4f1c6436`. It is an
+unencrypted Watcom PE without symbols but with 63,008 base relocations.
+`superw.exe` is only the launcher.
+
+- **Code:** of the 4,309 tracked German DOS functions, 1,931 (28 % of bytes)
+  have the same instructions with addresses masked, and 3,123 (75 %) are at
+  least 60 % similar. Random pairs score at most 0.45, and shared global
+  addresses agree in 98.8 % of references. The 60-80 % band and DOS addresses
+  from `0x100000` up need manual review.
+- **Pointers:** the relocations confirm 8,510 distinct DOS addresses as
+  pointers. Absence from that set does not prove a constant.
+- **Self-modifying code:** the examined cases are rewritten as data access.
+  `0xc4755` reads three globals instead of patched immediates, and `0xc46bc`
+  and `0xdc34e` write globals instead of code. The code section is read-only.
+- **Data:** 7,165 of the 7,571 distinct decoded `DID.DAT` members are
+  byte-identical to the English DOS ones.
+
+Use it as a reading aid only. It is a later build, so the German DOS
+executable stays authoritative and the Windows build is not a test oracle.
+Supporting this edition is deferred until the DOS decompilation is finished.
+The function and address maps and the scripts that generate them are in the
+ignored `local/win-v2/`; its `README.txt` describes their use.
+
 ## Follow-up experiments (not yet completed)
 
 1. Preserve each independently obtained executable and archive with its own
