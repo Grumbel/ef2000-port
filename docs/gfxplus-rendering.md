@@ -2,8 +2,10 @@
 
 The aim is to find a clean **EF2000 scene/geometry -> hardware renderer**
 boundary for an eventual native accelerated renderer. This investigation is
-static and read-only. We have **not** obtained a successfully patched, running
-DOS GFX+ executable or traced its drawing commands yet. Treat a Voodoo device
+static and read-only. `tools/didpatch.py` now rebuilds the patched DOS V2.0,
+GFX+ 3Dfx and GFX+ Rendition executables from the English TACTCOM install
+(see "Rebuilding the patched installs" below). None has been run or traced
+yet. Treat a Voodoo device
 model, the game-to-Glide interface and the eventual SDL3/GPU backend as three
 different layers.
 
@@ -32,16 +34,78 @@ files supplied by the user**, without modifying or redistributing either:
 `Tactpat.exe` is a **PE32 i386 Windows executable**, not a DOS game executable.
 Its PE sections contain an unusually large `DATA` region: raw file offset
 `0x30800`, length `0xd3e600`, RVA `0x32000`, image base `0x400000`.
-The embedded data evidently contains distinct upgrade instructions for
-**TACTCOM -> 3DFX**, **TACTCOM -> Rendition**, and **TACTCOM -> DOS V2.0**.
-The last is supported by installer text, not yet by a diff of installed files.
 The historical guide says to apply the update in a Windows 9x VM to an
 existing TACTCOM installation. A community [patch discussion](https://simforums.krishty.com/viewtopic.php?p=3547)
-reports that installation creates a separate `EF2000.EXE` in some versions;
-we have not reproduced that transition. That discussion also distinguishes
-English `Tactpat.exe` from a possible German `tacpatg.exe`. **Do not assume
-the archived updater matches the supplied German patch level or language**;
-keep the installation untouched and use a disposable copy if experimenting.
+distinguishes English `Tactpat.exe` from a possible German `tacpatg.exe`.
+The archived updater is the English one: it accepts only the English
+`../EF2000-rdeprera` `_EF2000.EXE` (1,682,129 bytes) and rejects the German
+reference.
+
+## Rebuilding the patched installs
+
+`DATA` holds three 16-bit Borland DOS patchers. The Windows front end writes
+each one out as `_update.exe` and runs it. Each patcher's MZ image is
+followed by its own patch data:
+
+| Stage | Patcher MZ | Patch data | Input `_ef2000.exe` | Output `_ef2000.exe` |
+| --- | --- | --- | --- | --- |
+| `update to EF2000 V2.0` | `0x3a594c` | `0x3a8d6c`..`0xd6a7f9` | English TACTCOM, 1,682,129 bytes, CRC `13f406bc` | DOS V2.0, 1,675,537 bytes, CRC `7f0d6d3c` |
+| `Tactcom 2.0 to 3DFX update` | `0x30d78` | `0x3331c`..`0x211f5f` | DOS V2.0 | GFX+ 3Dfx, 2,569,210 bytes, CRC `23587ec1` |
+| `Tactcom 2.0 to Rendition update` | `0x211f64` | `0x214508`..`0x3a5942` | DOS V2.0 | GFX+ Rendition, 2,349,186 bytes, CRC `38bffb1a` |
+
+The format was recovered from the 3DFX patcher's code. An 8-byte trailer
+holds two u32 lengths: the opcode stream sits just before the trailer and
+the argument stream just before that. There are 32 opcodes: open, close and
+verify the target or source, rename, check for files, copy literal or source
+bytes, and seek relative to the source. Every file has an expected size and
+CRC-32 (polynomial `0xedb88320`, initial value 0, no final xor) before and
+after patching.
+
+`tools/didpatch.py` reimplements this format without running the original
+patcher. It never writes into the source install, and it checks every
+output against the patcher's own size and CRC. All three stages pass:
+
+```sh
+T=/path/to/Tactpat.exe
+python3 -I tools/didpatch.py list "$T"
+python3 -I tools/didpatch.py apply "$T" v20  ../EF2000-rdeprera local/gfxplus/3dfx
+python3 -I tools/didpatch.py apply "$T" 3dfx ../EF2000-rdeprera local/gfxplus/3dfx
+```
+
+Use `rendition` in place of `3dfx` for the Vérité build, in a separate
+output directory. The output directory holds only the files the update
+creates or changes; unchanged files remain in the source install.
+
+- **V2.0** rewrites `_ef2000.exe`, `diagnost.exe`, `did.dat` (53,124,034 ->
+  40,484,862 bytes), `navig.nav`, `iff/256/gamopts.lbm` and `readme.txt`.
+  It adds `config.dat` and new `cfg/`, `joystick/` and `missions/` files.
+  The executable still uses X-32 (`B23X` at `0x28`) and identifies itself as
+  `EF2000 V2.0 for DOS`, `$Revision: 3.32 $ by Russ on May 02 1997`.
+- **GFX+ 3Dfx** replaces `_ef2000.exe`, `config.exe`, `diagnost.exe` and the
+  `ef2000.exe` launcher, and adds `ef2000.pif` and two icons in `cfg/`. Its
+  executable is a **Watcom LE binary under the CauseWay DOS extender** (MZ
+  stub `0xb610` bytes, LE header at `0xb610`), not X-32. It identifies itself
+  as `GFX+ 3DFX version $Revision: 7.13 $ by Russ on May 16 1997` and
+  contains a statically linked Glide 2.1 (`grSstOpen`, the `FX_GLIDE_*`
+  environment switches, `fxmemmap.vxd`).
+- **GFX+ Rendition** has the same layout and adds the Vérité microcode
+  `spd3d.uc`.
+
+Rebuilt files belong in the ignored `local/` directory only. The front end
+also writes `did1st.dat` and `ef2000.bat` from its own data; `didpatch.py`
+does not reproduce those two files.
+
+The rest of the patch collection uses the same patcher layout, and
+`didpatch.py apply PATCH file SRC OUT` handles it directly:
+
+- `TACTCOM patches/TACTPAT1.ZIP` (`tactpat1.exe`, serial/modem settings in
+  `comms.cfg`) applies to the English `_ef2000.exe`.
+- `TACTCOM patches/tactpgf.zip` (French/German modem fix) applies to the
+  German reference install's `did1st.dat` only. The German `_EF2000.EXE`
+  is unaffected.
+- `EF2000 patches/` holds updates for the pre-TACTCOM release: `efpat24`
+  (to v2.4, plus an already patched `_EF2000.EXE`) and `PATCHEF` (Midlife
+  Upgrade 2.02). They don't apply to either TACTCOM install.
 
 ## Confirmed 3Dfx / Glide anchors inside the updater
 
@@ -59,22 +123,16 @@ GFX+ text rendering:
 | `VOODOO_FILE` | `0x14a80b`, `0x1cf831` | `0x54c00b`, `0x5d1031` |
 | `fxPCI for DOS` | `0x1ee620` | `0x5efe20` |
 
-These byte positions are from the exact updater hash above. They are **not**
-addresses inside the patched EF2000 executable: the patcher may embed delta
-records, compressed content and multiple alternative output fragments.
-Six plausible interior MZ headers exist at file offsets `0x30d78`,
-`0x211f64`, `0x3a594c`, `0x42525e`, `0x433524` and `0xc57701`. DOS MZ
-headers describe the *loadable DOS stub size*, not the total length of an
-appended protected-mode executable. None of these candidates has yet been
-validated as a complete standalone GFX+ game executable; blindly carving
-to the next `MZ` would be incorrect.
+These byte positions are offsets inside the updater, which stores literal
+runs from the patch data. They are **not** addresses in the patched
+executable. Of the interior MZ headers, `0x30d78`, `0x211f64` and `0x3a594c`
+are the three patchers. The others (`0x42525e`, `0x433524`, `0xc57701`) are
+fragments inside the V2.0 patch data.
 
-The original unpatched German `_EF2000.EXE` has a `B23X` loader marker at
-file offset `0x28`, but **none** of the detected 3Dfx/Glide anchors above.
-The updater has no `B23X` marker. That is useful for triage, but **does not
-prove** what loader, extender, or memory layout the post-patch game uses.
-The port's existing X-32 loader and recovered guest addresses therefore
-must not be reused for a candidate GFX+ executable without analysis.
+The port's X-32 loader and recovered guest addresses do not apply to the
+CauseWay/LE GFX+ executables. Those need their own loader and a separate
+Ghidra project. The DOS V2.0 executable is still X-32 and is close to the
+English build, so it can serve as another cross-version reference.
 
 ## Reproducible read-only probe
 
@@ -120,10 +178,9 @@ Two useful upstream implementation references are:
 
 The high-confidence next experiments are:
 
-1. **Get an installed GFX+ executable** from a properly licensed TACTCOM /
-   Evolution + 3Dfx patch (or DOS v2.0 3Dfx installer), with SHA-256 and
-   complete companion file list. Keep it outside the repository and run the
-   probe. The current updater alone does not substitute for it.
+1. **Rebuild the GFX+ install** with `tools/didpatch.py` (done; see above).
+   Keep it under `local/`. Load it in a separate Ghidra project as an LE
+   executable.
 2. **Trace first hardware access** in low-level Voodoo DOSBox-X: PCI vendor/
    device discovery, BAR assignments, memory-mapped register writes and reads,
    framebuffer and TMU writes. Capture addresses, widths, values, IPs and

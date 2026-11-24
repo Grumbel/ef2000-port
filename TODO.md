@@ -193,12 +193,11 @@ the plan (such as deferring the mission parser), the plan wins.
   database and trace its static Glide / low-level Voodoo interface under
   hardware emulation. Determine a stable polygon/texture/API boundary before
   promising an SDL3 GPU implementation. See
-  `docs/gfxplus-rendering.md`. The archived `Tactpat.exe` updater has been
-  fingerprinted and scanned for embedded Glide 2.1/Voodoo strings, but the
-  **actual installed 3Dfx game executable is still missing**. A further public
-  search found patch archives and installers but no verified, directly
-  analyzable installed GFX+ output; resume when a properly sourced 3Dfx
-  `EF2000.EXE` with its companion data files is available.
+  `docs/gfxplus-rendering.md`. `tools/didpatch.py` now rebuilds the GFX+
+  3Dfx, GFX+ Rendition and DOS V2.0 installs from `Tactpat.exe` and the
+  English TACTCOM install. Every output passes the updater's own size and
+  CRC check. GFX+ is a Watcom LE/CauseWay binary with statically linked
+  Glide 2.1. Next: a separate Ghidra project and a low-level Voodoo trace.
 
 ## Reproduce
 
