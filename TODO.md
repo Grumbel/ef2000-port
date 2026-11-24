@@ -184,10 +184,13 @@ the plan (such as deferring the mission parser), the plan wins.
   (`runtime/ef2000_mission_layout.*`, `docs/mission-layout.md`). Still to
   reconstruct: pointer lifetimes, the meaning and usage of remaining pilot/
   attack fields, and measured runtime comparisons before replacing guest code.
-- [ ] **Version-aware reference/decompilation:** fingerprint the candidate
-  `rdeprera/EF2000` v2.0 DOS executable separately; verify its actual
-  language, patch level and code/data differences from the German reference.
-  Do not apply the current executable's fixed offsets or hash to it.
+- [ ] **Version-aware reference/decompilation:** the `rdeprera/EF2000`
+  executable is the English TACTCOM build (layout in `docs/executable.md`),
+  the input of the V2.0 update. V2.0 DOS and Windows function maps exist in
+  ignored `local/dos-v2` and `local/win-v2` as reading aids; see
+  `docs/existing-tools-and-releases.md`. Supporting any build other than the
+  German reference waits until the DOS decompilation is finished. Do not
+  apply the German executable's fixed offsets or hash to another build.
 - [ ] **GFX+ as a 3D acceleration reference:** acquire a properly licensed
   TACTCOM/Evolution 3Dfx GFX+ executable, compare it in a separate Ghidra
   database and trace its static Glide / low-level Voodoo interface under

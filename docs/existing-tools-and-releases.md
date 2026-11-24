@@ -171,6 +171,52 @@ Supporting this edition is deferred until the DOS decompilation is finished.
 The function and address maps and the scripts that generate them are in the
 ignored `local/win-v2/`; its `README.txt` describes their use.
 
+## Cross-version reference: EF2000 V2.0 for DOS
+
+`tools/didpatch.py` rebuilds the DOS V2.0 executable from the English
+TACTCOM `_EF2000.EXE` and the archived GFX+ updater; see
+[gfxplus-rendering.md](gfxplus-rendering.md). It is 1,675,537 bytes, still
+FlashTek X-32 (payload at file offset `0x54a1`, as in the German and English
+builds) and identifies itself as `EF2000 V2.0 for DOS $Revision: 3.32 $ by
+Russ on May 02 1997`. It is a recompile, not a binary patch, so addresses
+shift throughout.
+
+The Windows matcher, run unchanged against the V2.0 payload, gives:
+
+- **Code:** of the 4,309 tracked German functions, 2,343 (32 % of bytes)
+  have the same instructions with addresses masked, 3,071 (63 %) are at
+  least 80 % similar and 3,439 (80 %) at least 60 % similar. This is close
+  to the Windows result (28 % exact). V2.0 is not a minor patch of TACTCOM.
+- **Consistency:** call targets of aligned calls agree in 99.7 % of
+  repeated references and global addresses in 99.0 %. 1,744 functions
+  (526 KB) are confirmed by at least two shared globals.
+- **Limits:** the build has no relocations. Function starts come only
+  from direct call targets, and the global map is a value-range test, not
+  proof of a pointer. Random pairs reach 0.84 similarity (Windows: 0.45), so
+  check every match below 0.9 by hand.
+
+Use the two V2.0 builds together. The Windows build answers
+pointer-versus-constant and self-modifying-code questions through its
+relocations. The DOS build has the same extender, memory layout and
+hardware code as the German reference. Both maps, the extracted payload and
+the scripts are in the ignored `local/dos-v2/`, which has a `README.txt`.
+
+### Version plan
+
+| Build | Format | Role now |
+| --- | --- | --- |
+| German TACTCOM DOS | X-32 | Authoritative; the decompilation target |
+| English TACTCOM DOS (`rdeprera`) | X-32 | Input to the V2.0 update; layout in [executable.md](executable.md) |
+| V2.0 DOS | X-32 | Reading aid (`local/dos-v2`) |
+| V2.0 Windows 95 | PE | Reading aid (`local/win-v2`) |
+| GFX+ 3Dfx / Rendition | LE under CauseWay | Deferred to the hardware-renderer design |
+
+The DOS decompilation stays first (rev 5). The V2.0 maps only help with
+reading. Neither V2.0 build is a test oracle. GFX+ work waits until the
+renderer needs a hardware boundary. Its next steps are in
+[gfxplus-rendering.md](gfxplus-rendering.md): an LE/CauseWay loader or a
+separate Ghidra project, then a low-level Voodoo trace in DOSBox-X.
+
 ## Follow-up experiments (not yet completed)
 
 1. Preserve each independently obtained executable and archive with its own
