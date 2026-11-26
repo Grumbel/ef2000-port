@@ -5725,6 +5725,7 @@ uint32_t guest_fn_7780_x(uint32_t count, uint32_t size); /* 0x7780 EAX/EDX -> EA
 
 uint32_t traced_lookup_102028(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t p1, uint32_t p2);
 uint32_t guest_fn_103f04_x(uint32_t a, uint32_t b); /* 0x103f04 cdecl, 2 stack arguments */
+uint32_t read_ini_103f04(ef_addr32 ini, ef_addr32 filename);
 
 void draw_tactical_header_3b58(void);
 void guest_fn_3ea8_x(void); /* 0x3ea8 */
@@ -7898,6 +7899,7 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux guest_fn_f9ee0_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_10dfec_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_103f04_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
+#pragma aux read_ini_103f04 parm caller [] value [eax] modify [eax ebx ecx edx]
 #pragma aux guest_fn_a7ac8_x parm routine [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_df26f_x parm caller [] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux guest_fn_e9b38_x parm routine [] modify [eax ebx ecx edx esi edi ebp]

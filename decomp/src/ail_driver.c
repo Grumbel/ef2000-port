@@ -555,3 +555,92 @@ uint32_t install_dig_driver_105e38(ef_addr32 driver, ef_addr32 io_params)
     guest_fn_117a0f_x(state, 1);
     return state;
 }
+
+/* AIL .INI record, 0x118 bytes. */
+#define INI_DEVICE_NAME   0x000u  /* 128 bytes */
+#define INI_DRIVER_NAME   0x080u  /* 128 bytes */
+#define INI_IO            0x100u  /* IO_PARAMS_SIZE bytes */
+#define INI_IO_ADDR       0x100u  /* word */
+#define INI_IRQ           0x102u  /* word */
+#define INI_DMA_8         0x104u  /* word */
+#define INI_DMA_16        0x106u  /* word */
+#define INI_SIZE          0x118u
+#define INI_LINE_SIZE     0x50
+
+#define STREAM_FLAGS      0x0cu
+#define STREAM_EOF        0x10u
+#define CTYPE_TABLE       0x00195af0u  /* indexed by character + 1 */
+#define CTYPE_SPACE       0x02u
+
+static int ini_is_space(ef_addr32 line, uint32_t i)
+{
+    return (EF_U8(CTYPE_TABLE + (uint8_t)(EF_U8(line + i) + 1u)) & CTYPE_SPACE) != 0;
+}
+
+/* 0x103f04, 733 bytes. AIL_read_INI (cdecl): parse the "KEY value" lines
+   of FILENAME into an .INI record (comments start with ';'; DRIVER and
+   DEVICE are names, IO_ADDR is hex, IRQ, DMA_8_bit and DMA_16_bit are
+   decimal; I/O fields not given stay 0xffff). Returns 1 and copies the
+   record to INI when both names were found, 0 when the file cannot be
+   opened, or 0 with "Corrupted .INI file" in the AIL error buffer. */
+uint32_t read_ini_103f04(ef_addr32 ini, ef_addr32 filename)
+{
+    uint8_t record_buf[INI_SIZE];
+    uint8_t line_buf[INI_LINE_SIZE];
+    ef_addr32 record = (ef_addr32)(uintptr_t)record_buf;
+    ef_addr32 line = (ef_addr32)(uintptr_t)line_buf;
+    ef_addr32 stream;
+    ef_addr32 key;
+    ef_addr32 key_end;
+    ef_addr32 value;
+    int32_t n;
+    uint32_t i;
+
+    fill_bytes_b3fb0(record, 0, INI_SIZE);
+    fill_bytes_b3fb0(record + INI_IO, 0xffu, IO_PARAMS_SIZE);
+    stream = run_if_available_bc36a(filename, 0x001947fcu); /* fopen(filename, "rt") */
+    if (stream == 0)
+        return 0;
+
+    while (stream_fgets_11580e(line, INI_LINE_SIZE, stream) != 0
+           && (EF_U8(stream + STREAM_FLAGS) & STREAM_EOF) == 0) {
+        for (n = (int32_t)strlen_ds(line) - 1; n >= 0 && ini_is_space(line, (uint32_t)n); n--)
+            EF_U8(line + (uint32_t)n) = 0;
+        for (i = 0; i < strlen_ds(line) && ini_is_space(line, i); i++)
+            ;
+        key = line + i;
+        for (; i < strlen_ds(line) && !ini_is_space(line, i); i++)
+            ;
+        key_end = line + i;
+        for (; i < strlen_ds(line) && ini_is_space(line, i); i++)
+            ;
+        value = line + i;
+        if (i >= strlen_ds(line))
+            continue;
+        EF_U8(key_end) = 0;
+        if (EF_U8(key) == ';')
+            continue;
+
+        if (compare_nocase_eb374(key, 0x00194800u, 7) == 0)        /* "DRIVER" */
+            copy_string_9d749(record + INI_DRIVER_NAME, value);
+        else if (compare_nocase_eb374(key, 0x00194808u, 7) == 0)   /* "DEVICE" */
+            copy_string_9d749(record + INI_DEVICE_NAME, value);
+        else if (compare_nocase_eb374(key, 0x00194810u, 8) == 0)   /* "IO_ADDR" */
+            EF_U16(record + INI_IO_ADDR) = (uint16_t)parse_number_103e5c(0, 0, 0, 0, value, 16, 0);
+        else if (compare_nocase_eb374(key, 0x00194818u, 4) == 0)   /* "IRQ" */
+            EF_U16(record + INI_IRQ) = (uint16_t)parse_number_103e5c(0, 0, 0, 0, value, 10, 0);
+        else if (compare_nocase_eb374(key, 0x0019481cu, 10) == 0)  /* "DMA_8_bit" */
+            EF_U16(record + INI_DMA_8) = (uint16_t)parse_number_103e5c(0, 0, 0, 0, value, 10, 0);
+        else if (compare_nocase_eb374(key, 0x00194828u, 11) == 0)  /* "DMA_16_bit" */
+            EF_U16(record + INI_DMA_16) = (uint16_t)parse_number_103e5c(0, 0, 0, 0, value, 10, 0);
+    }
+    open_list_node_bc421(stream); /* fclose */
+
+    if (strlen_ds(record + INI_DRIVER_NAME) == 0 || strlen_ds(record + INI_DEVICE_NAME) == 0) {
+        set_ail_error(0x00194834u); /* "Corrupted .INI file\n" */
+        return 0;
+    }
+    for (i = 0; i < INI_SIZE; i += 4u)
+        EF_U32(ini + i) = EF_U32(record + i);
+    return 1;
+}
