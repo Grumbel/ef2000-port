@@ -92,7 +92,7 @@ void init_entries_2a720(void)
     for (i = 0; i < 0x14; ++i) {
         uint32_t entry = (uint32_t)(int32_t)i * 0x16u + 0x0019b980u;
         if (EF_U16(0x00425bc4u) & 1u)
-            EF_U16(entry + 8u) = (uint16_t)guest_fn_9ddfc(0x001824d4u, entry);
+            EF_U16(entry + 8u) = (uint16_t)call_9de08_9ddfc(0x001824d4u);
         EF_U32(entry + 0x12u) = EF_U32(0x0019bb40u);
         EF_U32(0x0019bb40u) = entry;
     }
@@ -104,7 +104,7 @@ void init_entries_2a7ac(ef_addr32 text, uint32_t slot)
     int16_t i;
     for (i = 0; i < 0x14; ++i) {
         uint32_t entry = (uint32_t)(int32_t)i * 0x16u + 0x0019b980u;
-        EF_U16(entry + slot * 2u + 8u) = (uint16_t)guest_fn_9ddfc(text, entry);
+        EF_U16(entry + slot * 2u + 8u) = (uint16_t)call_9de08_9ddfc(text);
         EF_U32(entry + 0x12u) = EF_U32(0x0019bb40u);
         EF_U32(0x0019bb40u) = entry;
     }

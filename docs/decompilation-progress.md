@@ -213,3 +213,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-26  B3  recover 0x9e7bc run_page_script_9e7bc (page_script.c; page script interpreter, opcodes 0..0x80 with skips and nested sub-scripts, mis-triaged as segment code); differential 200; hybrid regression 4/4
 2026-11-26  B3  recover 0x20ec select_aid_message_20ec (aid_message.c; Aid.c rule selection and subject/object texts, mis-triaged as segment code); differential 200; hybrid regression 4/4
 2026-11-26  B3  recover 0xe882c parse_config_line_e882c (config_line_parser.c; settings line parser, mis-triaged as segment code; replaces partial subsets); differential 400; hybrid regression 4/4
+2026-11-26  B3  fix 0x9ddfc callers 0x540d0/0x90a70/0x92f98/0x2a7ac (two-argument declaration leaked a stack slot through the generated pragma); hybrid regression 4/4

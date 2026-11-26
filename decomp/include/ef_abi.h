@@ -1555,7 +1555,6 @@ void guest_fn_391d0(void); /* 0x391d0 */
 uint32_t guest_fn_39744(int32_t a, uint32_t b, int32_t c, uint32_t d); /* 0x39744 */
 void guest_fn_39db0(uint32_t v); /* 0x39db0 */
 void guest_fn_6b54c(ef_addr32 object); /* 0x6b54c */
-uint32_t guest_fn_9ddfc(ef_addr32 text, ef_addr32 entry); /* 0x9ddfc */
 uint32_t guest_fn_a4380(ef_addr32 a, ef_addr32 b); /* 0xa4380 */
 ef_addr32 guest_fn_a46cc(ef_addr32 text); /* 0xa46cc */
 void guest_fn_a4d90(ef_addr32 text); /* 0xa4d90 */

@@ -41,7 +41,7 @@ void init_entries_90a70(void)
     for (i = 0; i < 0x28; ++i) {
         uint32_t offset = (uint32_t)i * 0x30u;
         EF_U8(offset + 0x00211b14u) = (uint8_t)((EF_U8(offset + 0x00211b14u) | 2u) & 0xfau);
-        EF_U16(offset + 0x00211b10u) = (uint16_t)guest_fn_9ddfc(0x0018ab28u, offset);
+        EF_U16(offset + 0x00211b10u) = (uint16_t)call_9de08_9ddfc(0x0018ab28u);
         guest_fn_9e3f8(EF_S32(offset + 0x00211b0eu) >> 16);
     }
 }

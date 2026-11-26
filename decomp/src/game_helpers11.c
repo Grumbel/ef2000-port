@@ -73,7 +73,7 @@ void reset_selection_540d0(void)
     EF_U16(0x001a5c1cu) = 0;
     EF_U16(0x001a5c1au) = 0;
     if (cached == 0)
-        EF_U16(0x001a5c1eu) = (uint16_t)guest_fn_9ddfc(0x00185b9cu, 0);
+        EF_U16(0x001a5c1eu) = (uint16_t)call_9de08_9ddfc(0x00185b9cu);
 }
 
 /* 0x54e80, 26 bytes. */
