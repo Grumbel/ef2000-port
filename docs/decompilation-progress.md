@@ -212,3 +212,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-26  B3  recover 0x95e58 scene_view_dispatch_95e58 (scene_view_dispatch.c; per-frame camera dispatcher, 0x4a-view switch with same-frame re-dispatch, mis-triaged as segment code; 0xc4680 stack ABI and 0xc59b7 ESI/EDI/CL ABI fixed and unexcluded); differential 256 (c4680 64, c59b7 64); hybrid regression 4/4
 2026-11-26  B3  recover 0x9e7bc run_page_script_9e7bc (page_script.c; page script interpreter, opcodes 0..0x80 with skips and nested sub-scripts, mis-triaged as segment code); differential 200; hybrid regression 4/4
 2026-11-26  B3  recover 0x20ec select_aid_message_20ec (aid_message.c; Aid.c rule selection and subject/object texts, mis-triaged as segment code); differential 200; hybrid regression 4/4
+2026-11-26  B3  recover 0xe882c parse_config_line_e882c (config_line_parser.c; settings line parser, mis-triaged as segment code; replaces partial subsets); differential 400; hybrid regression 4/4

@@ -874,3 +874,14 @@ addr	size	type	name	evidence	notes
 0x001a8224	4	ef_addr32	g_tactical_tracked	0x59fa4 locks the cursor once it reaches the target	target the cursor is locked onto
 0x00146e34	1	uint8_t	g_iff_plane_count	0xc1e3c and 0xc1ee8 read it per row/column	ILBM bitplanes in the current picture
 0x00146e38	4	uint32_t	g_iff_plane_bytes	0xc1e3c decodes rows of this width; 0xc1ee8 uses it as the plane stride and column count	bytes per ILBM bitplane row
+0x0016007c	2	uint16_t	g_cfg_line_number	original e882c/e93dc ASM	current settings file line, set by the e93dc line loop
+0x00464380	4	ef_addr32	g_cfg_descriptors	original e882c ASM	0x12-byte descriptors: name, type, target, size, choices, notify
+0x00464384	4	ef_addr32	g_cfg_cursor	original e882c ASM	current position in the settings text
+0x00464388	4	ef_addr32	g_cfg_routine	original e882c ASM	value of the last routine-type setting
+0x0046438c	4	uint32_t	g_cfg_value	original e882c ASM	parsed enum/number value
+0x00464390	4	ef_addr32	g_cfg_file_name	original e882c ASM	settings file name for error messages
+0x00464394	2	uint16_t	g_cfg_text_length	original e882c ASM	strlen of g_cfg_text after text settings
+0x00464396	33	uint8_t[33]	g_cfg_key	original e882c ASM	setting name of the current line
+0x004643b7	129	uint8_t[129]	g_cfg_text	original e882c ASM	text value of the current line
+0x00464438	1	uint8_t	g_cfg_language	original e882c ASM	language of the current text line
+0x00464439	1	uint8_t	g_cfg_current_language	original e882c ASM	language whose text lines are kept

@@ -14028,455 +14028,31 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
     return 0u;
 }
 
-/* 0xe882c, semicolon-only entry. The original routine initializes these
- * three scratch globals before recognizing a leading semicolon and returning
- * AL=1. Scalar and two sound-setting paths are recovered separately. */
-uint8_t parse_comment_line_e882c(void)
-{
-    EF_U32(0x0046438cu) = 0u;
-    EF_U8(0x004643b7u) = 0u;
-    EF_U16(0x00464394u) = 0u;
-    return 1u;
-}
-
-/* 0x82710, 16 bytes: callback for the CONTROL entry in the original
- * 18-byte-stride options table at 0x12b370. */
-static void apply_control_setting_82710(void)
-{
-    uint8_t value = g_tactical_indicator_source;
-    EF_U8(0x001fcb30u) = value;
-    EF_U8(0x00420960u) = value;
-}
-
-/* Shared identifier/descriptor selection at the start of original 0xe882c.
- * The game uses its 0x195af0 classification table; all shipped identifiers
- * are ASCII letters, numbers or underscores. Other classes remain outside
- * this native subset, and unsupported tokens cause no state mutations. */
-static uint8_t find_setting_descriptor_e882c(uint32_t cursor,
-                                            uint32_t *line_length,
-                                            uint32_t *key_length,
-                                            uint32_t *entry,
-                                            char key[0x85])
-{
-    const uint32_t table = EF_U32(0x00464380u);
-    uint32_t length = 0u, nkey = 0u, offset;
-    *entry = 0u;
-
-    while (length < 0x84u && EF_U8(cursor + length) != 0u &&
-           EF_U8(cursor + length) != '\r')
-        length++;
-    if (length >= 0x84u)
-        return 0u;
-
-    while (nkey < length) {
-        uint8_t c = EF_U8(cursor + nkey);
-        if (!((c >= 'A' && c <= 'Z') || (c >= 'a' && c <= 'z') ||
-              (c >= '0' && c <= '9') || c == '_'))
-            break;
-        key[nkey++] = (char)c;
-    }
-    if (nkey == 0u)
-        return 0u;
-    key[nkey] = '\0';
-
-    /* No assumed descriptor ordering or hardcoded target addresses: both
-     * must come from the actual guest configuration table. */
-    for (offset = 0; offset < 0x100u; offset++) {
-        uint32_t candidate = table + offset * 18u;
-        uint32_t name = EF_U32(candidate);
-        uint32_t n;
-        if (name == 0u)
-            return 0u;
-        for (n = 0; n <= nkey; n++) {
-            uint8_t a = EF_U8(name + n);
-            uint8_t b = (uint8_t)key[n];
-            if (a >= 'A' && a <= 'Z')
-                a = (uint8_t)(a + ('a' - 'A'));
-            if (b >= 'A' && b <= 'Z')
-                b = (uint8_t)(b + ('a' - 'A'));
-            if (a != b)
-                break;
-            if (a == 0u) {
-                *entry = candidate;
-                break;
-            }
-        }
-        if (*entry)
-            break;
-    }
-    if (*entry == 0u)
-        return 0u;
-    *line_length = length;
-    *key_length = nkey;
-    return 1u;
-}
-
-/* 0xe882c (partial), the type-3 numeric-assignment route only. The original
- * skips spaces/tabs/'=', scans signed decimal with "%ld" (0x190ed8), stores
- * 1/2/4 bytes at descriptor +5, then invokes the optional callback. The
- * unusual sscanf input and diagnostic branches remain an explicit boundary.
- * Validate the entire supported input before mutating guest state. */
-uint8_t parse_scalar_setting_e882c(void)
-{
-    const uint32_t cursor = EF_U32(0x00464384u);
-    char key[0x85];
-    uint32_t length, key_length, offset, entry;
-    uint32_t destination, callback, value, magnitude = 0u;
-    uint8_t width;
-    uint32_t limit;
-    int negative = 0;
-    if (!find_setting_descriptor_e882c(cursor, &length, &key_length, &entry, key) ||
-        EF_U8(entry + 4u) != 3u)
-        return 0u;
-    destination = EF_U32(entry + 5u);
-    width = EF_U8(entry + 9u);
-    callback = EF_U32(entry + 14u);
-    /* Currently only the separately verified CONTROL callback is safe. */
-    if ((width != 1u && width != 2u && width != 4u) ||
-        destination == 0u ||
-        (callback != 0u &&
-         (callback != 0x00082710u || destination != 0x001a5c0bu)))
-        return 0u;
-
-    offset = key_length;
-    while (offset < length) {
-        uint8_t c = EF_U8(cursor + offset);
-        if (c != ' ' && c != '\t' && c != '=')
-            break;
-        offset++;
-    }
-    if (offset >= length)
-        return 0u;
-    if (EF_U8(cursor + offset) == '-' || EF_U8(cursor + offset) == '+') {
-        negative = EF_U8(cursor + offset) == '-';
-        offset++;
-    }
-    limit = negative ? 0x80000000u : 0x7fffffffu;
-    {
-        uint32_t digits = 0u;
-        while (offset < length) {
-            uint8_t c = EF_U8(cursor + offset);
-            uint32_t digit;
-            if (c < '0' || c > '9')
-                break;
-            digit = (uint32_t)c - (uint32_t)'0';
-            if (magnitude > (limit - digit) / 10u)
-                return 0u;
-            magnitude = magnitude * 10u + digit;
-            offset++;
-            digits++;
-        }
-        if (digits == 0u)
-            return 0u;
-    }
-    while (offset < length &&
-           (EF_U8(cursor + offset) == ' ' || EF_U8(cursor + offset) == '\t'))
-        offset++;
-    if (offset != length)
-        return 0u;
-
-    value = negative ? 0u - magnitude : magnitude;
-    EF_U32(0x0046438cu) = 0u;
-    EF_U8(0x004643b7u) = 0u;
-    EF_U16(0x00464394u) = 0u;
-    for (offset = 0u; offset <= key_length; offset++)
-        EF_U8(0x00464396u + offset) = (uint8_t)key[offset];
-    offset = key_length;
-    while (offset < length) {
-        uint8_t c = EF_U8(cursor + offset);
-        if (c != ' ' && c != '\t' && c != '=')
-            break;
-        offset++;
-    }
-    EF_U32(0x00464384u) = cursor + offset;
-    EF_U32(0x0046438cu) = value;
-    if (width == 1u)
-        EF_U8(destination) = (uint8_t)value;
-    else if (width == 2u)
-        EF_U16(destination) = (uint16_t)value;
-    else
-        EF_U32(destination) = value;
-    if (callback == 0x00082710u)
-        apply_control_setting_82710();
-    return 1u;
-}
-
-/* Watcom's scanf("%hd,%hd") uses 16-bit signed destinations here. Accept
- * only its unambiguous two-number subset; incomplete conversions (whose
- * uninitialized stack values are then read by the original callbacks) are
- * still unsupported by the native startup probe. */
-static uint8_t parse_setting_integer_e882c(const char *source, uint32_t count,
-                                          uint32_t *position, int32_t *result,
-                                          uint8_t width)
-{
-    uint32_t pos = *position;
-    uint32_t magnitude = 0u;
-    uint32_t maximum;
-    uint32_t digits = 0u;
-    int negative = 0;
-    while (pos < count && (source[pos] == ' ' || source[pos] == '\t'))
-        pos++;
-    if (pos < count && (source[pos] == '+' || source[pos] == '-')) {
-        negative = source[pos] == '-';
-        pos++;
-    }
-    maximum = width == 2u ? (negative ? 0x8000u : 0x7fffu)
-                          : (negative ? 0x80000000u : 0x7fffffffu);
-    while (pos < count && source[pos] >= '0' && source[pos] <= '9') {
-        uint32_t digit = (uint32_t)source[pos++] - (uint32_t)'0';
-        if (magnitude > (maximum - digit) / 10u)
-            return 0u;
-        magnitude = magnitude * 10u + digit;
-        digits++;
-    }
-    if (!digits)
-        return 0u;
-    *position = pos;
-    *result = (int32_t)(negative ? 0u - magnitude : magnitude);
-    return 1u;
-}
-
-static uint8_t parse_setting_short_e882c(const char *source, uint32_t count,
-                                        uint32_t *position, int16_t *result)
-{
-    int32_t value;
-    if (!parse_setting_integer_e882c(source, count, position, &value, 2u))
-        return 0u;
-    *result = (int16_t)value;
-    return 1u;
-}
-
-/* 0x8289c and 0x82814, the original MUSIC/SOUNDFX callbacks: parse two
- * signed shorts, clamp volume to [0,127], then update their runtime flags.
- * SOUNDFX additionally clamps its own just-written byte 0x15b7e5 via the
- * signed high byte of overlapping dword 0x15b7e2 (original aliasing). */
-static void apply_sound_setting_82814_8289c(uint32_t callback,
-                                            int16_t enabled, int16_t volume)
-{
-    uint8_t first = (uint8_t)enabled;
-    uint8_t clamped = (uint8_t)(volume < 0 ? 0 : volume > 127 ? 127 : volume);
-    if (callback == 0x0008289cu) {
-        g_ui_status_flag_c = first;
-        g_ui_status_flag_b = clamped;
-    } else {
-        g_ui_status_flag_a = clamped;
-        g_mode_input_enabled_a = first;
-        EF_U8(0x001a8581u) = first;
-        EF_U8(0x0015b7e5u) = first ? first : 0xffu;
-        if ((int32_t)EF_U32(0x0015b7e2u) >> 24 > 1)
-            EF_U8(0x0015b7e5u) = 1u;
-    }
-}
-
-/* 0x826f0 (31 bytes): nonzero decimal SPEECH input enables two byte flags. */
-static void apply_speech_setting_826f0(int32_t value)
-{
-    uint8_t enabled = value != 0;
-    g_mode_input_enabled_b = enabled;
-    EF_U8(0x001a8580u) = enabled;
-}
-
-/* 0x82c34 (183 bytes): the ten-case VRHELMET switch, selecting a mode
- * and submode at 0x464470/0x464472. Index 0 maps both fields to zero. */
-static void apply_vrhelmet_setting_82c34(int32_t value)
-{
-    uint16_t mode = 0u, submode = 0u;
-    if (value == 1)
-        mode = 1u;
-    else if (value >= 2 && value <= 5) {
-        mode = 2u;
-        submode = (uint16_t)(value - 1);
-    } else if (value >= 6 && value <= 9) {
-        mode = 3u;
-        submode = (uint16_t)(value - 5);
-    }
-    EF_U16(0x00464470u) = submode;
-    EF_U16(0x00464472u) = mode;
-}
-
-/* 0x1c548, 40 bytes: compare signed 16-bit value +/- tolerance against
- * dword 0x15ba78; 0x828f8 uses the result to update 0x198432. */
-static uint8_t joystick_center_matches_1c548(int16_t value, int16_t tolerance)
-{
-    int32_t center = (int32_t)EF_U32(0x0015ba78u);
-    int32_t x = (int32_t)value;
-    int32_t delta = (int32_t)tolerance;
-    return (x + delta > center && x - delta < center) ? 1u : 0u;
-}
-
-/* 0x828f8 (423 bytes), original JOYSTICK list callback, for the native
- * unplugged-joystick device model only. The scanf format at 0x188b9c has
- * ten signed %d fields and one %hd written directly to 0x198432. The
- * indirect callback [0x15bab8] normally points at 0xd6960; its no-device
- * branch samples 0xd66c2 and clamps existing axes without x87 operations. */
-static void apply_joystick_setting_828f8(const int32_t v[11])
-{
-    int32_t a, b;
-    uint32_t sensitivity = (uint32_t)v[6];
-    int32_t current;
-    int16_t stick, tolerance;
-
-    EF_U16(0x00198432u) = (uint16_t)v[10];
-    if (sensitivity == 0u)
-        sensitivity = 1u;
-    EF_U32(0x0015baacu) = sensitivity;
-    EF_U32(0x001fcba8u) = (uint32_t)v[8];
-    EF_U16(0x00420d9cu) = (uint16_t)v[8];
-    EF_U32(0x001fcba4u) = (uint32_t)v[6];
-    EF_U16(0x00420d9au) = (uint16_t)v[6];
-    EF_U16(0x00420d9eu) = (uint16_t)(v[7] > 1 ? v[7] : 1);
-    EF_U16(0x00420d96u) = (uint16_t)(v[5] > 1 ? v[5] : 1);
-
-    current = ((int32_t)EF_U32(0x00420d9cu) >> 16) * 2 / 100;
-    EF_U16(0x00420d90u) = (uint16_t)(current >= 1 ? current : 1);
-    current = ((int32_t)EF_U32(0x00420d94u) >> 16) * 2 / 100;
-    EF_U16(0x00420d94u) = (uint16_t)(current >= 1 ? current : 1);
-
-    EF_U16(0x00198450u) = (uint16_t)(v[4] < v[3] ? v[4] : v[3]);
-    EF_U16(0x00198448u) = (uint16_t)(v[4] > v[3] ? v[4] : v[3]);
-    a = v[0] - v[2];
-    b = v[1] - v[0];
-    EF_U16(0x00198446u) = (uint16_t)(a < b ? a : b);
-    EF_U32(0x001fcba0u) = (uint32_t)v[0];
-    EF_U16(0x0019844cu) = (uint16_t)v[0];
-
-    /* 0xd6960, no-joystick branch after 0xd66c2 returns zero: the
-     * deterministic port-0x201 value 0xff clears four button latches. */
-    EF_U8(0x0015ba2cu) = 0u;
-    EF_U8(0x0015ba2du) = 0u;
-    EF_U8(0x0015ba2eu) = 0u;
-    EF_U8(0x0015ba2fu) = 0u;
-    if (EF_S32(0x00420dc4u) < -0x200)
-        EF_U32(0x00420dc4u) = (uint32_t)-0x200;
-    if (EF_S32(0x00420dc4u) > 0x200)
-        EF_U32(0x00420dc4u) = 0x200u;
-    if (EF_S32(0x00420dc8u) < -0x200)
-        EF_U32(0x00420dc8u) = (uint32_t)-0x200;
-    if (EF_S32(0x00420dc8u) > 0x200)
-        EF_U32(0x00420dc8u) = 0x200u;
-    EF_U8(0x00425fccu) = EF_U8(0x0015ba2cu);
-    EF_U8(0x00425fcau) = EF_U8(0x0015ba2du);
-
-    stick = (int16_t)((int32_t)EF_U32(0x00198430u) >> 16);
-    tolerance = (int16_t)(stick / 11);
-    if (joystick_center_matches_1c548(stick, tolerance))
-        EF_U16(0x00198432u) = EF_U16(0x0015ba78u);
-}
-
-/* 0xe882c (partial), original type-5 text-copy path 0xe8e1d..0xe8f44,
- * 0xe935b and 0xe939d, with bounded callbacks for SOUND, SPEECH,
- * VRHELMET and unplugged JOYSTICK. Error paths remain native boundaries. */
-uint8_t parse_text_setting_e882c(void)
-{
-    const uint32_t cursor = EF_U32(0x00464384u);
-    char key[0x85];
-    char value[0x81];
-    uint32_t length, key_length, offset, entry;
-    uint32_t callback, destination, value_start, value_length = 0u, pos = 0u;
-    int16_t enabled = 0, volume = 0;
-    int32_t scalar = 0, joystick[11];
-    uint32_t i;
-
-    if (!find_setting_descriptor_e882c(cursor, &length, &key_length, &entry, key) ||
-        EF_U8(entry + 4u) != 5u || EF_U8(entry + 9u) != 0x50u ||
-        EF_U32(entry + 5u) != 0x001fcb50u)
-        return 0u;
-    destination = EF_U32(entry + 5u);
-    callback = EF_U32(entry + 14u);
-    if (callback != 0x00082814u && callback != 0x0008289cu &&
-        callback != 0x000828f8u && callback != 0x000826f0u &&
-        callback != 0x00082c34u)
-        return 0u;
-    if (callback == 0x000828f8u && EF_U32(0x0015bab8u) != 0x000d6960u)
-        return 0u;
-
-    value_start = key_length;
-    while (value_start < length) {
-        uint8_t c = EF_U8(cursor + value_start);
-        if (c != ' ' && c != '\t' && c != '=')
-            break;
-        value_start++;
-    }
-    for (offset = value_start; offset < length; offset++) {
-        uint8_t c = EF_U8(cursor + offset);
-        if (c == ';')
-            break;
-        if (value_length >= 0x4fu)
-            return 0u;
-        value[value_length++] = (char)c;
-    }
-    while (value_length &&
-           (value[value_length - 1u] == ' ' || value[value_length - 1u] == '\t'))
-        value_length--;
-    value[value_length] = '\0';
-    if (callback == 0x00082814u || callback == 0x0008289cu) {
-        if (!parse_setting_short_e882c(value, value_length, &pos, &enabled) ||
-            pos >= value_length || value[pos++] != ',' ||
-            !parse_setting_short_e882c(value, value_length, &pos, &volume))
-            return 0u;
-    } else if (callback == 0x000828f8u) {
-        for (i = 0u; i < 11u; i++) {
-            if (!parse_setting_integer_e882c(value, value_length, &pos,
-                                             &joystick[i], i == 10u ? 2u : 4u))
-                return 0u;
-            if (i < 10u && (pos >= value_length || value[pos++] != ','))
-                return 0u;
-        }
-    } else if (!parse_setting_integer_e882c(value, value_length, &pos,
-                                            &scalar, 4u)) {
-        return 0u;
-    }
-    while (pos < value_length && (value[pos] == ' ' || value[pos] == '\t'))
-        pos++;
-    if (pos != value_length)
-        return 0u;
-
-    EF_U32(0x0046438cu) = 0u;
-    EF_U8(0x004643b7u) = 0u;
-    EF_U16(0x00464394u) = 0u;
-    for (offset = 0u; offset <= key_length; offset++)
-        EF_U8(0x00464396u + offset) = (uint8_t)key[offset];
-    EF_U32(0x00464384u) = cursor + value_start;
-    for (offset = 0u; offset <= value_length; offset++)
-        EF_U8(0x004643b7u + offset) = (uint8_t)value[offset];
-    copy_string_9d749(destination, 0x004643b7u);
-    EF_U16(0x00464394u) = (uint16_t)value_length;
-    if (callback == 0x00082814u || callback == 0x0008289cu)
-        apply_sound_setting_82814_8289c(callback, enabled, volume);
-    else if (callback == 0x000828f8u)
-        apply_joystick_setting_828f8(joystick);
-    else if (callback == 0x000826f0u)
-        apply_speech_setting_826f0(scalar);
-    else
-        apply_vrhelmet_setting_82c34(scalar);
-    return 1u;
-}
-
 /* 0xe93dc, 272 bytes. Run the text parser over the script TEXT (EAX, stored at 0x464380; DL goes to byte 0x1600a6): the cursor 0x464384 starts at dword 0x1600a0, the line counter word 0x16007c at 1. Complains through the error hook when the parser mode byte 0x1600a4 is 0 (0x1912c0) or 2 (0x191304). Then loops: skip blanks and tabs, count CR LF pairs as lines, hand every other token to 0xe882c (a zero result makes the whole run fail) and skip the rest of its line. Returns 1 when all tokens parsed. */
 uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
 {
     uint8_t ok = 1u;
     uint16_t line = 1u;
     ef_addr32 cur;
-    EF_U32(0x00464380u) = text;
+    g_cfg_descriptors = text;
     EF_U8(0x001600a6u) = (uint8_t)flag;
     cur = EF_U32(0x001600a0u);
-    EF_U32(0x00464384u) = cur;
-    EF_U16(0x0016007cu) = 1u;
+    g_cfg_cursor = cur;
+    g_cfg_line_number = 1u;
     if (EF_U8(0x001600a4u) == 0u)
         guest_callptr1_x(g_gui_error_hook, 0x001912c0u);
     if (EF_U8(0x001600a4u) == 2u)
         guest_callptr1_x(g_gui_error_hook, 0x00191304u);
-    line = EF_U16(0x0016007cu);
-    cur = EF_U32(0x00464384u);
+    line = g_cfg_line_number;
+    cur = g_cfg_cursor;
     while (EF_U8(cur) != 0u) {
         uint8_t c = EF_U8(cur);
         if (c == 0x20u || c == 0x09u) {
             cur++;
             continue;
         }
-        EF_U32(0x00464384u) = cur;
-        EF_U16(0x0016007cu) = line;
+        g_cfg_cursor = cur;
+        g_cfg_line_number = line;
         if (c == 0x0du) {
             cur++;
             line++;
@@ -14484,10 +14060,10 @@ uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
                 cur++;
             continue;
         }
-        if (guest_fn_e882c_x() == 0u)
+        if (parse_config_line_e882c() == 0u)
             ok = 0u;
-        line = EF_U16(0x0016007cu);
-        cur = EF_U32(0x00464384u);
+        line = g_cfg_line_number;
+        cur = g_cfg_cursor;
         while (EF_U8(cur) != 0u && EF_U8(cur) != 0x0du)
             cur++;
         if (EF_U8(cur) == 0x0du) {
@@ -14497,8 +14073,8 @@ uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag)
                 cur++;
         }
     }
-    EF_U16(0x0016007cu) = line;
-    EF_U32(0x00464384u) = cur;
+    g_cfg_line_number = line;
+    g_cfg_cursor = cur;
     return ok;
 }
 

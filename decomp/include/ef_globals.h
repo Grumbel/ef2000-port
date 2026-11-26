@@ -181,6 +181,17 @@ extern uint8_t g_iff_plane_count; /* 0x00146e34, ILBM bitplanes in the current p
 extern uint32_t g_iff_plane_bytes; /* 0x00146e38, bytes per ILBM bitplane row */
 extern uint16_t g_page_scene_distance; /* 0x00132abc, set by measure_page_point_a0aa0 */
 extern int16_t g_active_page_identifier; /* 0x0041722a */
+extern uint16_t g_cfg_line_number; /* 0x0016007c */
+extern ef_addr32 g_cfg_descriptors; /* 0x00464380, 0x12-byte setting descriptors */
+extern ef_addr32 g_cfg_cursor; /* 0x00464384 */
+extern ef_addr32 g_cfg_routine; /* 0x00464388 */
+extern uint32_t g_cfg_value; /* 0x0046438c */
+extern ef_addr32 g_cfg_file_name; /* 0x00464390 */
+extern uint16_t g_cfg_text_length; /* 0x00464394 */
+extern uint8_t g_cfg_key[33]; /* 0x00464396 */
+extern uint8_t g_cfg_text[129]; /* 0x004643b7 */
+extern uint8_t g_cfg_language; /* 0x00464438 */
+extern uint8_t g_cfg_current_language; /* 0x00464439 */
 extern uint32_t g_video_height; /* 0x0015b748 */
 extern uint32_t g_view_origin_x; /* 0x15bdb8, word stored by 0xdc21c, read as a dword */
 extern uint32_t g_view_origin_y; /* 0x15bdbc */
