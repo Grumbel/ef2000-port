@@ -3601,7 +3601,7 @@ void run_page_text_9e508(int32_t page, uint32_t index)
         EF_U32(0x00417178u) = 0x000a0b5cu;
         p = (uint32_t)EF_U8(table + 9u) * 6u + (table + 0xau) + (uint32_t)(int32_t)(int16_t)index * 2u;
         p += (uint32_t)((int32_t)(int16_t)EF_U16(p) * 2);
-        guest_fn_9e7bc_x(p);
+        run_page_script_9e7bc(p);
     }
     EF_U16(0x0041722au) = saved_page;
     g_active_page_record_data = saved_rec;

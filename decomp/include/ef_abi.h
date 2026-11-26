@@ -4951,7 +4951,7 @@ void guest_callptr4s2_x(ef_addr32 fn, int32_t a, int32_t b, int32_t c, int32_t d
 void promote_entry_and_children_a4a20(uint32_t id);
 void run_text_on_page_9e494(uint32_t page, ef_addr32 text);
 void guest_fn_a48ac_x(uint32_t index); /* 0xa48ac EAX */
-void guest_fn_9e7bc_x(ef_addr32 text); /* 0x9e7bc EAX, preserves EBX/ECX/ESI/EDI */
+void run_page_script_9e7bc(ef_addr32 script); /* 0x9e7bc EAX */
 
 /* probe_helpers1.c */
 uint32_t probe_service_d9b30(void);

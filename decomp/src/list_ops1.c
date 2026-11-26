@@ -101,7 +101,7 @@ void run_text_on_page_9e494(uint32_t page, ef_addr32 text)
     EF_U32(0x00417174u) = cur;
     EF_U32(0x0041717cu) = EF_U32(0x0040d200u + (uint32_t)EF_U16(cur) * 4u);
     EF_U32(0x00417178u) = 0x000a0b5cu;
-    guest_fn_9e7bc_x(text);
+    run_page_script_9e7bc(text);
     EF_U16(0x0041722au) = saved_page;
     EF_U32(0x00417174u) = saved_cur;
     EF_U32(0x0041717cu) = saved_tab;
