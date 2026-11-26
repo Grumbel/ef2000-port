@@ -44,7 +44,7 @@ static uint32_t release_driver(ef_addr32 drv, ef_addr32 message)
 {
     set_ail_error(message);
     nop_10483c();
-    guest_fn_1047c4_c(drv, DRV_RECORD_SIZE);
+    free_block_1047c4(drv, DRV_RECORD_SIZE);
     return 0;
 }
 
@@ -58,7 +58,7 @@ uint32_t EF_CDECL install_driver_104200(ef_addr32 image, uint32_t size)
     uint32_t handle;
     uint32_t timer;
 
-    drv = guest_fn_1047a4_c(DRV_RECORD_SIZE);
+    drv = allocate_and_init_1047a4(DRV_RECORD_SIZE);
     if (drv == 0) {
         set_ail_error(0x0019484cu); /* "Insufficient memory for driver descriptor\n" */
         return 0;
@@ -67,7 +67,7 @@ uint32_t EF_CDECL install_driver_104200(ef_addr32 image, uint32_t size)
     if (dos_alloc_block_1047e4(0, 0, 0, 0, (size + 15u) >> 4, drv + DRV_LINEAR,
                                drv + DRV_SEGMENT, drv + DRV_SELECTOR) == 0) {
         set_ail_error(0x00194878u); /* "Insufficient low memory\n" */
-        guest_fn_1047c4_c(drv, DRV_RECORD_SIZE);
+        free_block_1047c4(drv, DRV_RECORD_SIZE);
         return 0;
     }
     guest_memmove_109e6f(EF_U32(drv + DRV_LINEAR), image, size);
@@ -110,7 +110,7 @@ uint32_t EF_CDECL install_driver_104200(ef_addr32 image, uint32_t size)
         set_ail_error(0x001948d4u); /* "Out of timer handles\n" */
         guest_fn_101ed4_c(0x66u, EF_U32(header + HDR_REAL_MODE));
         nop_10483c();
-        guest_fn_1047c4_c(drv, DRV_RECORD_SIZE);
+        free_block_1047c4(drv, DRV_RECORD_SIZE);
         return 0;
     }
     trace_call_102198(timer, drv);

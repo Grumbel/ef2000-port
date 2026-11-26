@@ -523,7 +523,6 @@ addr	reason
 0x00103778	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004 | EAX: original 0x2001984, patched 0x0 | guest RAM 0x8: original 0x85, patched 0x; keep original pending triage
 0x001041e4	tools/func_fuzz.py isolated run (only this redirect): 2: guest RAM 0x4ddf24: original 0x15, patched 0x00; keep original pending triage
 0x00104504	tools/func_fuzz.py isolated run (only this redirect): 2: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
-0x001047c4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x2f2: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
 0x001052f0	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
 0x001065c8	tools/func_fuzz.py isolated run (only this redirect): 17: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
 0x00106634	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x5: original 0x90, patched 0x01; keep original pending triage

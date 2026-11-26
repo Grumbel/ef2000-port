@@ -1845,6 +1845,17 @@ void strip_extension_113c24(ef_addr32 path);
 void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
 #pragma aux strip_extension_113c24 parm caller [] modify [eax ebx ecx edx]
 #pragma aux set_owner_slot_114994 parm caller [] modify [eax ebx ecx edx]
+/* AIL allocation, DPMI range locks and the 0x1112ed trace wrapper: cdecl,
+ * EBX not preserved (0x104840 and 0x1048b4 load it from the stack). */
+#pragma aux allocate_and_init_1047a4 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux free_block_1047c4 parm caller [] modify [eax ebx ecx edx]
+#pragma aux stack_range_104908 parm caller [] modify [eax ebx ecx edx]
+#pragma aux stack_range_104920 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_104920 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_104840 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_1048b4 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_101ff4 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_1112ed parm caller [] modify [eax ebx ecx edx]
 void clear_buffered_record_117ea8(ef_addr32 record);
 uint32_t alloc_serial_state_117f14(ef_addr32 record);
 int32_t ring_pop_1184c4(ef_addr32 record);
@@ -4815,8 +4826,6 @@ uint32_t EF_CDECL guest_fn_111365_t(uint32_t a0); /* 0x111365 cdecl */
 uint32_t EF_CDECL guest_fn_1113ac_t(uint32_t a0, uint32_t a1); /* 0x1113ac cdecl */
 uint32_t guest_fn_104504_t(uint32_t a0); /* 0x104504 cdecl */
 uint32_t EF_CDECL install_driver_104200(ef_addr32 image, uint32_t size); /* 0x104200 */
-uint32_t EF_CDECL guest_fn_1047a4_c(uint32_t size); /* 0x1047a4 cdecl */
-void EF_CDECL guest_fn_1047c4_c(ef_addr32 block, uint32_t size); /* 0x1047c4 cdecl */
 void EF_CDECL guest_fn_101ed4_c(uint32_t a, uint32_t b); /* 0x101ed4 cdecl */
 uint32_t guest_fn_106514_t(uint32_t a0); /* 0x106514 cdecl */
 uint32_t guest_fn_106464_t(uint32_t a0, uint32_t a1); /* 0x106464 cdecl */
