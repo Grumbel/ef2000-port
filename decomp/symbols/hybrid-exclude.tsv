@@ -90,7 +90,6 @@ addr	reason
 0x00035eb8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000371b0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x0003efa8	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
-0x0003f7fc	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000418c4	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x00042004	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
 0x000421c0	Unreviewed mechanical body (not hand-verified); keep original until reviewed (policy after bisect m2-bisect-050 went unresolved).
