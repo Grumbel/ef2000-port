@@ -1258,7 +1258,7 @@ void fill_table_fef26(void);
 void update_fc9f8(int32_t value);
 void trace_call_101f44(uint32_t a);
 void trace_call_101ff4(uint32_t a);
-void EF_CDECL trace_call_1022dc(uint32_t a);
+void trace_call_1022dc(uint32_t a);
 void EF_CDECL trace_call_102330(uint32_t a);
 void EF_CDECL trace_call_102384(uint32_t a);
 void trace_call_102488(uint32_t a);
@@ -1273,7 +1273,7 @@ void trace_call_103148(uint32_t a);
 void trace_call_1031a0(uint32_t a);
 void trace_call_101ed4(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_1021f4(uint32_t a, uint32_t b);
-void EF_CDECL trace_call_102228(uint32_t a, uint32_t b);
+void trace_call_102228(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_10225c(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102824(uint32_t a, uint32_t b);
 void EF_CDECL trace_call_102858(uint32_t a, uint32_t b);
@@ -1419,7 +1419,7 @@ void guest_fn_104840(uint32_t first, uint32_t last); /* 0x104840 cdecl */
 void guest_fn_1023b0(void); /* 0x1023b0 */
 void guest_fn_1110c5(void); /* 0x1110c5 */
 uint32_t guest_fn_c3f70(uint32_t size); /* 0xc3f70 EAX */
-void guest_fn_101f88(uint32_t handle, uint32_t message, uint32_t a, uint32_t b); /* 0x101f88 cdecl */
+uint32_t guest_fn_101f88(uint32_t handle, uint32_t message, uint32_t a, uint32_t b); /* 0x101f88 cdecl */
 void guest_fn_10535c(ef_addr32 object); /* 0x10535c cdecl */
 void guest_fn_1052f0(uint32_t handle); /* 0x1052f0 cdecl */
 uint32_t guest_fn_f8248(void); /* 0xf8248 */
@@ -1856,6 +1856,14 @@ void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
 #pragma aux guest_fn_1048b4 parm caller [] modify [eax ebx ecx edx]
 #pragma aux trace_call_101ff4 parm caller [] modify [eax ebx ecx edx]
 #pragma aux guest_fn_1112ed parm caller [] modify [eax ebx ecx edx]
+/* AIL timer trace wrappers: cdecl, EBX/ECX/EDX not preserved. */
+#pragma aux trace_call_102144 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux trace_call_102198 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux trace_call_102228 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_1022dc parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_101f88 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux apply_default_record_1132b8 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux stop_object_105334 parm caller [] modify [eax ebx ecx edx]
 void clear_buffered_record_117ea8(ef_addr32 record);
 uint32_t alloc_serial_state_117f14(ef_addr32 record);
 int32_t ring_pop_1184c4(ef_addr32 record);
@@ -4796,8 +4804,8 @@ uint32_t EF_CDECL trace_call_101e14(uint32_t a0, uint32_t a1);
 uint32_t trace_call_101e80(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_101f08(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2);
 uint32_t trace_call_101f88(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1, uint32_t a2, uint32_t a3);
-uint32_t EF_CDECL trace_call_102144(uint32_t a0);
-uint32_t EF_CDECL trace_call_102198(uint32_t a0, uint32_t a1);
+uint32_t trace_call_102144(uint32_t a0);
+uint32_t trace_call_102198(uint32_t a0, uint32_t a1);
 uint32_t trace_call_1023d8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
 uint32_t trace_call_10242c(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0, uint32_t a1);
 uint32_t trace_call_1024b4(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t a0);
@@ -5963,7 +5971,7 @@ uint32_t store_scaled_vectors_7b08c(uint32_t a, uint32_t b);
 
 void update_stock_e6d78(void);
 
-void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t rec);
+uint32_t apply_default_record_1132b8(uint32_t obj, uint32_t rec);
 
 void scan_nodes_near_unit_18a68(void);
 
@@ -7623,8 +7631,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux trace_call_101e80 parm caller [eax] [edx] [ebx] [ecx] /* 0x101e80 */
 #pragma aux trace_call_101f08 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f08 */
 #pragma aux forward_to_1111e5_101f78 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f78 */
-#pragma aux trace_call_101f88 parm caller [eax] [edx] [ebx] [ecx] /* 0x101f88 */
-#pragma aux trace_call_1023d8 parm caller [eax] [edx] [ebx] [ecx] /* 0x1023d8 */
+#pragma aux trace_call_101f88 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx] /* 0x101f88 */
+#pragma aux trace_call_1023d8 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx] /* 0x1023d8 */
 #pragma aux trace_call_10242c parm caller [eax] [edx] [ebx] [ecx] /* 0x10242c */
 #pragma aux trace_call_1024b4 parm caller [eax] [edx] [ebx] [ecx] /* 0x1024b4 */
 #pragma aux trace_call_102508 parm caller [eax] [edx] [ebx] [ecx] /* 0x102508 */
@@ -7650,8 +7658,8 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux deactivate_record_1068b8 parm caller [eax] [edx] [ebx] [ecx] /* 0x1068b8 */
 #pragma aux dword_shr8_1115f0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1115f0 */
 #pragma aux teardown_record_1115fc parm caller [eax] [edx] [ebx] [ecx] /* 0x1115fc */
-#pragma aux send_pending_count_message_111df0 parm caller [eax] [edx] [ebx] [ecx] /* 0x111df0 */
-#pragma aux append_midi_event_111e40 parm caller [eax] [edx] [ebx] [ecx] /* 0x111e40 */
+#pragma aux send_pending_count_message_111df0 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx] /* 0x111df0 */
+#pragma aux append_midi_event_111e40 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx] /* 0x111e40 */
 #pragma aux append_midi_block_111ed4 parm caller [eax] [edx] [ebx] [ecx] /* 0x111ed4 */
 #pragma aux read_varlen_111f20 parm caller [eax] [edx] [ebx] [ecx] /* 0x111f20 */
 #pragma aux find_chunk_111f84 parm caller [eax] [edx] [ebx] [ecx] /* 0x111f84 */
@@ -7702,7 +7710,6 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux lookup_pair_106514 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux reset_stream_block_106644 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux flush_pending_slots_112808 parm caller [eax] [edx] [ebx] [ecx]
-#pragma aux apply_default_record_1132b8 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux lookup_pair_113af0 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux classify_record_113b78 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux claim_slot_113c7c parm caller [eax] [edx] [ebx] [ecx]

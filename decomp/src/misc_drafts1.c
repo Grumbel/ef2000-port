@@ -7830,13 +7830,12 @@ void update_stock_e6d78(void)
 #undef EF_D
 }
 
-/* 0x1132b8, 221 bytes. cdecl (OBJ, REC): copy the 24-byte record REC, fill every part of it that is below 1 (four signed words, then four signed dwords) from the default table addressed by dword +0xc of the object's descriptor (real-mode seg:off plus 0x120cc6), provided word +0x10 of that descriptor is non-zero, store the result at descriptor +0x16 and send message 0x304 to the object. */
-void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t obj, uint32_t rec)
+/* 0x1132b8, 221 bytes. cdecl (OBJ, REC): copy the 24-byte record REC, fill every part of it that is below 1 (four signed words, then four signed dwords) from the default table addressed by dword +0xc of the object's descriptor (real-mode seg:off plus 0x120cc6), provided word +0x10 of that descriptor is non-zero, store the result at descriptor +0x16 and send message 0x304 to the object; returns the message result. */
+uint32_t apply_default_record_1132b8(uint32_t obj, uint32_t rec)
 {
     uint16_t w[4];
     uint32_t d[4];
     uint32_t desc, p, def, i;
-    (void)u0; (void)u1; (void)u2; (void)u3;
     for (i = 0; i < 4u; i++)
         w[i] = EF_U16(rec + i * 2u);
     for (i = 0; i < 4u; i++)
@@ -7857,7 +7856,7 @@ void apply_default_record_1132b8(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t
         EF_U16(desc + 0x16u + i * 2u) = w[i];
     for (i = 0; i < 4u; i++)
         EF_U32(desc + 0x1eu + i * 4u) = d[i];
-    guest_fn_101f88(EF_U32(obj), 0x304u, 0u, 0u);
+    return guest_fn_101f88(EF_U32(obj), 0x304u, 0u, 0u);
 }
 
 /* 0x18a68, 222 bytes. Advance the scene-node scan cursor (word 0x211ae2, starting at 0x2001) for the unit whose index is the signed word at 0x1f71ca: step through the nodes (0x8ffe8) until one has its position (three ints scaled by the double at 0x181830, taken from the 0x45-byte records at 0x1a14f8 indexed by the high word of node +0x36) within the distance (double 0x181838) of the unit's position at +0x49, or the node list runs out (cursor reset to 0x2001, at most twice). */
