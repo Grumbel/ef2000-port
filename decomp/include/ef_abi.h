@@ -1864,6 +1864,7 @@ void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
 #pragma aux guest_fn_101f88 parm caller [] value [eax] modify [eax ebx ecx edx]
 #pragma aux apply_default_record_1132b8 parm caller [] value [eax] modify [eax ebx ecx edx]
 #pragma aux stop_object_105334 parm caller [] modify [eax ebx ecx edx]
+#pragma aux install_xmidi_driver_1133f8 parm caller [] value [eax] modify [eax ebx ecx edx]
 void clear_buffered_record_117ea8(ef_addr32 record);
 uint32_t alloc_serial_state_117f14(ef_addr32 record);
 int32_t ring_pop_1184c4(ef_addr32 record);
@@ -5165,6 +5166,7 @@ uint32_t load_resource_113a40(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3
 uint32_t guest_fn_105070_x(uint32_t a0, uint32_t a1); /* 0x105070 cdecl, two stack arguments, caller cleanup */
 uint32_t guest_fn_105e38_x(uint32_t a0, uint32_t a1); /* 0x105e38 cdecl, two stack arguments, caller cleanup */
 uint32_t guest_fn_1133f8_x(uint32_t a0, uint32_t a1); /* 0x1133f8 cdecl, two stack arguments, caller cleanup */
+uint32_t install_xmidi_driver_1133f8(ef_addr32 driver, ef_addr32 io_params);
 
 /* text_metrics1.c */
 uint32_t formatted_width_48d5c(ef_addr32 fmt, ...);
