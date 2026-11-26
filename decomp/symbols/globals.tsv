@@ -872,3 +872,5 @@ addr	size	type	name	evidence	notes
 0x001a6cdc	2	int16_t	g_tactical_cursor_x	0x59fa4 steps it toward the target	tactical display cursor x
 0x001a820c	4	ef_addr32	g_tactical_target	0x59fa4 projects its position words	tactical display target object
 0x001a8224	4	ef_addr32	g_tactical_tracked	0x59fa4 locks the cursor once it reaches the target	target the cursor is locked onto
+0x00146e34	1	uint8_t	g_iff_plane_count	0xc1e3c and 0xc1ee8 read it per row/column	ILBM bitplanes in the current picture
+0x00146e38	4	uint32_t	g_iff_plane_bytes	0xc1e3c decodes rows of this width; 0xc1ee8 uses it as the plane stride and column count	bytes per ILBM bitplane row

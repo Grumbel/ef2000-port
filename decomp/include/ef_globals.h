@@ -177,6 +177,8 @@ extern uint8_t g_combat_skill_level; /* 0x001264e2 */
 extern uint32_t g_video_width; /* 0x0015b744 */
 extern ef_addr32 g_blit_src_row; /* 0x0015b738, packed blit source row */
 extern ef_addr32 g_blit_dst_row; /* 0x0015b73c, packed blit destination row */
+extern uint8_t g_iff_plane_count; /* 0x00146e34, ILBM bitplanes in the current picture */
+extern uint32_t g_iff_plane_bytes; /* 0x00146e38, bytes per ILBM bitplane row */
 extern uint32_t g_video_height; /* 0x0015b748 */
 extern uint32_t g_view_origin_x; /* 0x15bdb8, word stored by 0xdc21c, read as a dword */
 extern uint32_t g_view_origin_y; /* 0x15bdbc */

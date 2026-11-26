@@ -2963,7 +2963,7 @@ uint8_t load_iff_file_c3430(ef_addr32 name); /* 0xc3430, misc_drafts1.c */
 void guest_fn_c3364(ef_addr32 path, ef_addr32 name); /* 0xc3364 EAX/EDX */
 void guest_fn_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584 EAX/EDX/EBX/ECX + 1 stack, callee pops */
 void decode_iff_body_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest); /* 0xc3584, misc_drafts1.c */
-void guest_fn_c1ee8(ef_addr32 bytes, ef_addr32 planes, ef_addr32 pattern); /* 0xc1ee8 EAX/EDX/EBX, keeps ECX/ESI/EDI/EBP */
+void planes_to_pixels_c1ee8(ef_addr32 pixels, ef_addr32 planes, ef_addr32 pattern); /* 0xc1ee8 EAX/EDX/EBX, keeps ECX/ESI/EDI/EBP */
 void draw_iff_to_buffer_c36b4(ef_addr32 name, uint32_t x, uint32_t y, uint32_t w, uint32_t h, ef_addr32 dest); /* 0xc36b4, misc_drafts1.c */
 void guest_fn_e3cac(ef_addr32 name); /* 0xe3cac one stack argument, callee pops */
 uint8_t guest_callptr_esi_carry_x(ef_addr32 fn, uint32_t esi); /* indirect call, ESI in, carry out as AL; EBP saved */
@@ -7859,7 +7859,7 @@ uint16_t run_node_passes_bc610(int16_t value, ef_addr32 list, uint32_t arg_b, ui
 #pragma aux draw_iff_to_buffer_c36b4 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #pragma aux guest_fn_c3584 modify [eax ebx ecx edx]
 #pragma aux decode_iff_body_c3584 parm routine [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
-#pragma aux guest_fn_c1ee8 modify [eax ebx edx]
+#pragma aux planes_to_pixels_c1ee8 modify [eax ebx edx]
 #pragma aux guest_callptr_esi_carry_x parm [eax] [esi] value [al] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_x parm [eax] [esi] modify [eax ebx ecx edx esi edi]
 #pragma aux guest_callptr_esi_frame_x parm [eax] [esi] [edx] modify [eax ebx ecx edx esi edi]

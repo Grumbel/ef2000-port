@@ -71,11 +71,11 @@ void draw_mode_dispatch_a8660(uint32_t eax, uint32_t edx, uint32_t ebx, uint32_t
     }
 }
 
-/* 0xc1e3c, 136 bytes. Decode a PackBits-style run-length stream at the pointer 0x41f3a0 into dst: rows (byte 0x146e34) of width 0x146e38; control byte >= 0 copies n+1 literals, negative repeats the next byte -n+1 times (-128 is a no-op). */
+/* 0xc1e3c, 136 bytes. Decode a PackBits-style run-length stream at the pointer 0x41f3a0 into dst: rows (g_iff_plane_count) of width g_iff_plane_bytes; control byte >= 0 copies n+1 literals, negative repeats the next byte -n+1 times (-128 is a no-op). */
 void decode_rle_rows_c1e3c(uint32_t dst)
 {
     int32_t row;
-    for (row = 0; (int32_t)EF_U8(0x00146e34u) > row; row++) {
+    for (row = 0; (int32_t)g_iff_plane_count > row; row++) {
         int32_t done = 0;
         do {
             uint32_t p = EF_U32(0x0041f3a0u);
@@ -99,7 +99,7 @@ void decode_rle_rows_c1e3c(uint32_t dst)
                     dst += (uint32_t)n;
                 }
             }
-        } while (done < (int32_t)EF_U32(0x00146e38u));
+        } while (done < (int32_t)g_iff_plane_bytes);
     }
 }
 
@@ -22267,7 +22267,7 @@ void *iff_stack_alloc(uint32_t size);
 /* 0xc3584, 234 bytes. Decode the BODY of the loaded IFF picture: two
  * row-sized stack buffers (fatal if the stack is short), the bit pattern
  * table, Y rows skipped, then H rows each decoded into planes (0xc1e3c),
- * converted to bytes through the pattern table (0xc1ee8), and W bytes from
+ * converted to bytes through the pattern table (planes_to_pixels_c1ee8), and W bytes from
  * column X copied to DEST, which advances by W in its argument slot. X, Y, W, H are words;
  * callee pops DEST. */
 void decode_iff_body_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32 dest)
@@ -22293,7 +22293,7 @@ void decode_iff_body_c3584(int32_t x, int32_t y, int32_t w, int32_t h, ef_addr32
 		decode_rle_rows_c1e3c(planes);
 	for (rows = (int16_t)h; rows != 0; rows--) {
 		decode_rle_rows_c1e3c(planes);
-		guest_fn_c1ee8(bytes, planes, (ef_addr32)(uintptr_t)pattern);
+		planes_to_pixels_c1ee8(bytes, planes, (ef_addr32)(uintptr_t)pattern);
 		copy_blocks_e9a24((uint32_t)(int32_t)(int16_t)w, bytes + (uint32_t)(int32_t)(int16_t)x, *cursor);
 		*cursor += (uint32_t)(int32_t)(int16_t)w;
 	}
