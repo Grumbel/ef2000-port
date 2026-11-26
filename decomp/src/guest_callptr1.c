@@ -317,3 +317,11 @@ void guest_callptr7_x(ef_addr32 fn, uint32_t a, uint32_t b, uint32_t c,
     args[4] = e; args[5] = f; args[6] = g;
     (void)call_cdecl_array(fn, args, 7u);
 }
+
+uint32_t guest_callptr3_ret_x(ef_addr32 fn, uint32_t arg0, uint32_t arg1,
+                              uint32_t arg2)
+{
+    uint32_t args[3];
+    args[0] = arg0; args[1] = arg1; args[2] = arg2;
+    return call_cdecl_array(fn, args, 3u);
+}
