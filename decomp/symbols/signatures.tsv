@@ -3906,3 +3906,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000c1ee8	planes_to_pixels_c1ee8	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32		ecx,esi,edi,ebp	0	Original 0x000c1ee8 (4139 bytes); ILBM bitplanes (count byte 0x146e34, stride 0x146e38) to chunky pixels through the 512-byte nibble pattern table; EBX read-only, EDX ends as the stride; callers c3584@c3637; docs/compiler-abi.md
 0x00095e58	scene_view_dispatch_95e58			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00095e58 (4618 bytes); per-frame camera dispatcher, switch on g_scene_control_code; callers 3dd30@3e13c
 0x0009e7bc	run_page_script_9e7bc	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0009e7bc (3752 bytes); page script interpreter, opcode 0 returns through the shared epilogue at 0x9dbe7
+0x000020ec	select_aid_message_20ec			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000020ec (3211 bytes); Aid.c rule selection and subject/object text

@@ -14705,7 +14705,7 @@ void start_mission_step_1b70(void)
         return;
     }
     select_active_entry_1f64();
-    guest_fn_20ec_x();
+    select_aid_message_20ec();
     if (EF_U8(0x00196ff0u) != 0u)
         reset_selection_3cf0();
     rec = EF_U32(0x00197061u);

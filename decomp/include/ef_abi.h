@@ -6516,7 +6516,7 @@ void guest_fn_83734_x(ef_addr32 out, int32_t x, int32_t z, int32_t y); /* 0x8373
 
 void start_mission_step_1b70(void);
 void guest_fn_2e04_x(void); /* 0x2e04 */
-void guest_fn_20ec_x(void); /* 0x20ec */
+void select_aid_message_20ec(void); /* 0x20ec */
 
 void init_slot_table_76cc4(void);
 
