@@ -226,3 +226,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-26  B6  0x106f10 head-tracker open recovered (mislabeled segment/DOS block; Watcom EAX/DL/EBX/ECX -> AL, 120-case spec, mutations caught 19/120 and 42/120); 0x107004 passes EBX/ECX through, new 60-case spec; hybrid regression 4/4
 2026-11-26  B6  0xfd164 quadratic curve drawer recovered (mislabeled segment/DOS block; stack args, ret 0x10, 200-case spec, mutations caught 28/200 and 120/200); hybrid regression 4/4
 2026-11-26  B6  0x103f04 AIL_read_INI recovered (mislabeled segment/DOS block; cdecl, 200-case spec with stubbed stdio, mutations caught 20/200 and 45/200); hybrid regression 4/4
+2026-11-26  B3  0xfe730 segment/clip-rectangle test recovered (mislabeled segment/DOS block; outcode-pair switch, ret 0x10, 400-case spec, mutations caught 37/400 and 2/400); hybrid regression 4/4
