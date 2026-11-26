@@ -198,7 +198,6 @@ addr	reason
 0x000dc1e9	Static ABI check (tools/abi_check.py): original takes ST0/ST1, C takes stack doubles (ret 16); fix the declaration, then re-enable.
 0x440f4	abi_check: stack/x87 convention differs from the original (original 8, compiled 12  ); declare before linking
 0xb45b6	abi_check: stack/x87 convention differs from the original (original 0, compiled 12  ); declare before linking
-0xc4680	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xd35b0	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xd36c4	abi_check: stack/x87 convention differs from the original (original 4, compiled 0  ); declare before linking
 0xdeb1a	abi_check: stack/x87 convention differs from the original (original 0, compiled 8  ); declare before linking
@@ -309,7 +308,6 @@ addr	reason
 0x000c5372	abi_check --inputs: C reads different entry registers than the original (reads ebx, C reads eax); fix the register declaration before linking
 0x000c5409	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
 0x000c5441	abi_check --inputs: C reads different entry registers than the original (reads eax,esi, C reads eax,edx); fix the register declaration before linking
-0x000c59b7	abi_check --inputs: C reads different entry registers than the original (reads edi,esi, C reads eax,ebx,edx); fix the register declaration before linking
 0x000c5e56	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
 0x000c5f08	abi_check --inputs: C reads different entry registers than the original (reads esi, C reads eax); fix the register declaration before linking
 0x000c737c	abi_check --inputs: C reads different entry registers than the original (reads ebx,edi,esi, C reads eax,ebx,edx); fix the register declaration before linking

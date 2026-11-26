@@ -6794,6 +6794,21 @@ void guest_fn_3122c(void); /* 0x3122c, preserves all but EAX */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_fn_3122c parm [] modify [eax]
 #endif
+void guest_fn_1b4a4(void); /* 0x1b4a4 */
+void guest_fn_92c28(ef_addr32 object); /* 0x92c28 EAX */
+void guest_fn_93170(void); /* 0x93170 */
+void guest_fn_94d08(void); /* 0x94d08 */
+void guest_fn_95020(void); /* 0x95020 */
+void scene_view_dispatch_95e58(void); /* 0x95e58 */
+#if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
+#pragma aux guest_fn_1b4a4 parm [] modify [eax ebx]
+#pragma aux guest_fn_92c28 parm [eax] modify [eax]
+#pragma aux guest_fn_93170 parm [] modify [eax]
+#pragma aux guest_fn_94d08 parm [] modify [eax esi]
+#pragma aux guest_fn_95020 parm [] modify [eax]
+#pragma aux shift_triples_to_1590c0_c4680 parm routine [] modify [eax ebx ecx edx] /* 0xc4680, ret 4 */
+#pragma aux shift_triples_c59b7 parm [esi] [edi] [ecx] modify [eax ebx ecx edx esi edi] /* 0xc59b7 */
+#endif
 uint32_t mpMission3Click(ef_addr32 widget); /* 0x4f494 */
 uint32_t mpMission4Click(ef_addr32 widget); /* 0x4f548 */
 uint32_t mpClickATC(ef_addr32 widget); /* 0x4f608 */
