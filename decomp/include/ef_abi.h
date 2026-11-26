@@ -6490,6 +6490,7 @@ uint8_t hit_map_entry_910f4(uint32_t u0, int32_t x, uint32_t u2, int32_t y, uint
 
 uint8_t parse_script_text_e93dc(ef_addr32 text, uint32_t flag);
 uint8_t parse_config_line_e882c(void); /* 0xe882c -> AL, settings line at 0x464384 */
+void mission_loop_3dd30(void); /* 0x3dd30 */
 
 void setup_disk_request_ddd48(void);
 uint32_t guest_fn_604_x(uint32_t addr); /* 0x604 EAX -> EAX, linear address to segment:offset */
