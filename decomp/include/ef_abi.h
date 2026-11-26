@@ -1865,6 +1865,11 @@ void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
 #pragma aux apply_default_record_1132b8 parm caller [] value [eax] modify [eax ebx ecx edx]
 #pragma aux stop_object_105334 parm caller [] modify [eax ebx ecx edx]
 #pragma aux install_xmidi_driver_1133f8 parm caller [] value [eax] modify [eax ebx ecx edx]
+/* AIL digital driver install and its callees: cdecl, EBX/ECX/EDX not preserved. */
+#pragma aux install_dig_driver_105e38 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux apply_defaults_105c94 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux guest_fn_10585c parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux trace_call_101f44 parm caller [] modify [eax ebx ecx edx]
 void clear_buffered_record_117ea8(ef_addr32 record);
 uint32_t alloc_serial_state_117f14(ef_addr32 record);
 int32_t ring_pop_1184c4(ef_addr32 record);
@@ -5167,6 +5172,8 @@ uint32_t guest_fn_105070_x(uint32_t a0, uint32_t a1); /* 0x105070 cdecl, two sta
 uint32_t guest_fn_105e38_x(uint32_t a0, uint32_t a1); /* 0x105e38 cdecl, two stack arguments, caller cleanup */
 uint32_t guest_fn_1133f8_x(uint32_t a0, uint32_t a1); /* 0x1133f8 cdecl, two stack arguments, caller cleanup */
 uint32_t install_xmidi_driver_1133f8(ef_addr32 driver, ef_addr32 io_params);
+uint32_t install_dig_driver_105e38(ef_addr32 driver, ef_addr32 io_params);
+uint32_t guest_fn_10585c(ef_addr32 state); /* 0x10585c cdecl */
 
 /* text_metrics1.c */
 uint32_t formatted_width_48d5c(ef_addr32 fmt, ...);
@@ -7540,8 +7547,7 @@ void accum_depth_force_11a5c0(ef_addr32 obj); /* 0x11a5c0 */
 double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, double a, double b);
 double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, double a, double b); /* 0x2ccf0 */
 
-void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src);
-void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src); /* 0x105c94 */
+uint32_t apply_defaults_105c94(ef_addr32 state, ef_addr32 params); /* 0x105c94 */
 
 void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p);
 void load_named_resource_e3cac(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 p); /* 0xe3cac */
@@ -7680,7 +7686,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux start_value_ramp_1141b0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1141b0 */
 #pragma aux refresh_player_channels_1142cc parm caller [eax] [edx] [ebx] [ecx] /* 0x1142cc */
 #pragma aux dispatch_midi_event_1149e0 parm caller [eax] [edx] [ebx] [ecx] /* 0x1149e0 */
-#pragma aux clear_buffer_117aa2 parm caller [eax] [edx] [ebx] [ecx] /* 0x117aa2 */
+#pragma aux clear_buffer_117aa2 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx] /* 0x117aa2 */
 #endif
 /* Original callee pops stack arguments (`ret N`); the registers named in the
  * signature stay register arguments. Found by tools/abi_check.py. */
@@ -7705,10 +7711,9 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
 #pragma aux send_guarded_message_103e0c parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux parse_number_103e5c parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux send_303_104504 parm caller [eax] [edx] [ebx] [ecx]
-#pragma aux dos_alloc_block_1047e4 parm caller [eax] [edx] [ebx] [ecx]
+#pragma aux dos_alloc_block_1047e4 parm caller [eax] [edx] [ebx] [ecx] modify [eax ebx ecx edx]
 #pragma aux dos_range_104840 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux dos_range_1048b4 parm caller [eax] [edx] [ebx] [ecx]
-#pragma aux apply_defaults_105c94 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux lookup_pair_106514 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux reset_stream_block_106644 parm caller [eax] [edx] [ebx] [ecx]
 #pragma aux flush_pending_slots_112808 parm caller [eax] [edx] [ebx] [ecx]

@@ -345,3 +345,213 @@ uint32_t install_xmidi_driver_1133f8(ef_addr32 driver, ef_addr32 io_params)
     trace_call_1022dc(EF_U32(state + MDI_TIMER));
     return state;
 }
+
+/* Digital audio driver state, 0x8c bytes. */
+#define DIG_DRIVER         0x00u  /* AIL driver descriptor */
+#define DIG_INFO           0x04u  /* driver info returned in DX:AX */
+#define DIG_BUFFER         0x08u  /* transfer buffer returned in CX:BX */
+#define DIG_TIMER          0x0cu
+#define DIG_BUFFER_SIZE    0x10u  /* bytes per DMA half buffer, set by 0x10585c */
+#define DIG_DMA_SEGMENT    0x20u  /* real-mode segment << 16 */
+#define DIG_DMA_SELECTOR   0x24u
+#define DIG_DMA_LINEAR     0x28u
+#define DIG_BUFFER_INFO    0x34u  /* transfer buffer + 8 */
+#define DIG_FIELD_38       0x38u
+#define DIG_CHANNELS       0x3cu  /* set by 0x10585c */
+#define DIG_SAMPLE_BYTES   0x40u  /* set by 0x10585c */
+#define DIG_SAMPLES        0x44u  /* buffer size / sample bytes */
+#define DIG_FRAMES         0x48u  /* buffer size / (channels * sample bytes) */
+#define DIG_BUILD_SIZE     0x4cu  /* DIG_SAMPLES dwords */
+#define DIG_BUILD_BUFFER   0x50u  /* mixing buffer */
+#define DIG_FIELD_54       0x54u
+#define DIG_FIELD_58       0x58u
+#define DIG_SAMPLE_LIST    0x5cu  /* array of SAMPLE_SIZE records */
+#define DIG_SAMPLE_COUNT   0x60u
+#define DIG_FIELD_64       0x64u
+#define DIG_MASTER_VOLUME  0x68u
+#define DIG_STATE_SIZE     0x8cu
+
+#define SAMPLE_SIZE        0x894u
+#define SAMPLE_STATE       0x000u
+#define SAMPLE_STATUS      0x004u  /* 1 = free */
+
+#define DOS_PAGE_MASK      0x000f0000u  /* 64K physical page of a linear address */
+
+#define g_dig_full_buffer   EF_U32(0x004dd814u)  /* nonzero: always 0x2000 bytes */
+#define g_dig_buffer_size   EF_S32(0x004dd7d4u)
+#define g_dig_service_rate  EF_U32(0x004dd7ccu)
+#define g_dig_samples       EF_S32(0x004dd7dcu)
+#define DIG_SERVICE         0x00105648u
+#define DIG_RELEASE         0x00105da0u
+
+static void free_dma_buffer(ef_addr32 state)
+{
+    (void)state;
+    nop_10483c(); /* the original passes linear, segment and selector */
+}
+
+/* Hands the parameter set to the driver, then lets it probe the hardware. */
+static int try_dig_io_params(ef_addr32 state, ef_addr32 params, int publish)
+{
+    if (publish)
+        copy_io_params(g_io_params, params);
+    return apply_defaults_105c94(state, params) != 0;
+}
+
+/* Shuts the driver down after a failed install and frees the state;
+   the caller frees anything allocated after the DMA buffer first. */
+static uint32_t fail_dig_install(ef_addr32 state, ef_addr32 driver, ef_addr32 message)
+{
+    set_ail_error(message);
+    if (EF_U32(driver + DRV_FIELD_1C) != 0xffffffffu)
+        trace_call_101f44(EF_U32(driver + DRV_FIELD_1C));
+    guest_fn_101f88(EF_U32(state + DIG_DRIVER), AIL_SHUTDOWN, 0, 0);
+    EF_U32(EF_U32(state + DIG_DRIVER) + DRV_FIELD_18) = 0;
+    free_dma_buffer(state);
+    return 0;
+}
+
+/* 0x105e38, 1580 bytes. AIL_install_DIG_driver: set up the state of a
+   digital audio driver, find working I/O parameters (the caller's, the
+   driver's default, or with g_xmidi_scan_io one of the driver's list),
+   allocate a DMA buffer that does not cross a 64K page, initialise the
+   device, allocate the mixing buffer and the sample records and start
+   the service timer. Returns the state, or 0 with a message in the AIL
+   error buffer. */
+uint32_t install_dig_driver_105e38(ef_addr32 driver, ef_addr32 io_params)
+{
+    uint16_t regs[4];             /* AX, BX, CX, DX */
+    uint32_t dma_selector;
+    uint32_t dma_segment;
+    uint32_t dma_linear;
+    ef_addr32 state;
+    ef_addr32 found = 0;
+    ef_addr32 defaults;
+    ef_addr32 header;
+    int32_t size;
+    uint32_t page;
+    int32_t i;
+
+    init_once_105230();
+    state = allocate_and_init_1047a4(DIG_STATE_SIZE);
+    if (state == 0) {
+        set_ail_error(0x0019491cu); /* "Could not allocate memory for driver\n" */
+        return 0;
+    }
+    EF_U32(state + DIG_DRIVER) = driver;
+    if (EF_U32(driver + DRV_TYPE) != 0) {
+        set_ail_error(0x00194944u); /* ".DIG driver required\n" */
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+
+    guest_fn_101f88(driver, AIL_DESCRIBE, 0, (uint32_t)(uintptr_t)regs);
+    EF_U32(state + DIG_INFO) = ((uint32_t)regs[3] << 4) + regs[0];
+    EF_U32(state + DIG_BUFFER) = ((uint32_t)regs[2] << 4) + regs[1];
+    EF_U32(state + DIG_FIELD_38) = 0xffffffffu;
+    EF_U32(state + DIG_FIELD_54) = 0;
+    EF_U32(state + DIG_FIELD_58) = 0;
+    EF_U32(state + DIG_FIELD_64) = 0;
+    EF_U32(state + DIG_MASTER_VOLUME) = 0x7fu;
+    EF_U32(state + DIG_INFO) += g_runtime_segment_base;
+    EF_U32(state + DIG_BUFFER) += g_runtime_segment_base;
+    EF_U32(state + DIG_BUFFER_INFO) = EF_U32(state + DIG_BUFFER) + 8u;
+
+    fill_bytes_b3fb0(g_io_params, 0xffu, IO_PARAMS_SIZE);
+    if (io_params != 0 && try_dig_io_params(state, io_params, 1))
+        found = io_params;
+    if (found == 0) {
+        defaults = trace_call_1023d8(0, 0, 0, 0, EF_U32(state + DIG_DRIVER));
+        if (defaults != 0 && try_dig_io_params(state, defaults, 1))
+            found = defaults;
+    }
+    if (found == 0 && g_xmidi_scan_io == 1) {
+        for (i = 0;; i++) {
+            header = EF_U32(EF_U32(state + DIG_DRIVER) + DRV_HEADER);
+            if ((int32_t)EF_U16(header + HDR_IO_COUNT) <= i)
+                break;
+            defaults = real_to_linear(EF_U32(header + HDR_IO_LIST)) + (uint32_t)i * IO_PARAMS_SIZE;
+            /* only the first set is handed over before the probe */
+            if (try_dig_io_params(state, defaults, i == 0)) {
+                found = defaults;
+                break;
+            }
+        }
+    }
+    if (found == 0) {
+        set_ail_error(0x0019495cu); /* "Digital sound hardware not found\n" */
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+    copy_io_params(g_io_params, found);
+
+    size = g_dig_full_buffer != 0 ? 0x2000 : g_dig_buffer_size;
+    EF_U32(state + DIG_DMA_LINEAR) = 0;
+    do {
+        if (dos_alloc_block_1047e4(0, 0, 0, 0, (uint32_t)((size + 15) / 16),
+                                   (uint32_t)(uintptr_t)&dma_linear,
+                                   (uint32_t)(uintptr_t)&dma_segment,
+                                   (uint32_t)(uintptr_t)&dma_selector) == 0) {
+            set_ail_error(0x00194980u); /* "Could not allocate DMA buffer\n" */
+            free_block_1047c4(state, DIG_STATE_SIZE);
+            return 0;
+        }
+        /* a buffer crossing a 64K page is kept until the next one is in hand */
+        if (EF_U32(state + DIG_DMA_LINEAR) != 0)
+            free_dma_buffer(state);
+        EF_U32(state + DIG_DMA_LINEAR) = dma_linear;
+        EF_U32(state + DIG_DMA_SEGMENT) = dma_segment;
+        EF_U32(state + DIG_DMA_SELECTOR) = dma_selector;
+        page = dma_segment >> 12;
+    } while ((page & DOS_PAGE_MASK) != ((page + (uint32_t)size - 1u) & DOS_PAGE_MASK));
+
+    if (guest_fn_10585c(state) == 0) {
+        free_dma_buffer(state);
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+
+    guest_fn_101f88(EF_U32(state + DIG_DRIVER), AIL_INIT_DEVICE, 0, 0);
+    EF_U32(EF_U32(state + DIG_DRIVER) + DRV_FIELD_18) = 1;
+    EF_S32(state + DIG_FRAMES) = EF_S32(state + DIG_BUFFER_SIZE)
+        / (EF_S32(state + DIG_CHANNELS) * EF_S32(state + DIG_SAMPLE_BYTES));
+    EF_S32(state + DIG_SAMPLES) = EF_S32(state + DIG_BUFFER_SIZE) / EF_S32(state + DIG_SAMPLE_BYTES);
+    EF_U32(state + DIG_BUILD_SIZE) = EF_U32(state + DIG_SAMPLES) << 2;
+    EF_U32(state + DIG_BUILD_BUFFER) = allocate_and_init_1047a4(EF_U32(state + DIG_BUILD_SIZE));
+    if (EF_U32(state + DIG_BUILD_BUFFER) == 0) {
+        fail_dig_install(state, driver, 0x001949a0u); /* "Could not allocate build buffer\n" */
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+
+    EF_S32(state + DIG_SAMPLE_COUNT) = g_dig_samples;
+    EF_U32(state + DIG_SAMPLE_LIST) = allocate_and_init_1047a4((uint32_t)g_dig_samples * SAMPLE_SIZE);
+    if (EF_U32(state + DIG_SAMPLE_LIST) == 0) {
+        fail_dig_install(state, driver, 0x001949c4u); /* "Could not allocate SAMPLE structures\n" */
+        free_block_1047c4(EF_U32(state + DIG_BUILD_BUFFER), EF_U32(state + DIG_BUILD_SIZE));
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+    for (i = 0; i < EF_S32(state + DIG_SAMPLE_COUNT); i++) {
+        EF_U32(EF_U32(state + DIG_SAMPLE_LIST) + (uint32_t)i * SAMPLE_SIZE + SAMPLE_STATUS) = 1;
+        EF_U32(EF_U32(state + DIG_SAMPLE_LIST) + (uint32_t)i * SAMPLE_SIZE + SAMPLE_STATE) = state;
+    }
+
+    EF_U32(state + DIG_TIMER) = trace_call_102144(DIG_SERVICE);
+    if (EF_U32(state + DIG_TIMER) == 0xffffffffu) {
+        fail_dig_install(state, driver, 0x001949ecu); /* "Out of timer handles\n" */
+        free_block_1047c4(EF_U32(state + DIG_SAMPLE_LIST), EF_U32(state + DIG_SAMPLE_COUNT) * SAMPLE_SIZE);
+        free_block_1047c4(EF_U32(state + DIG_BUILD_BUFFER), EF_U32(state + DIG_BUILD_SIZE));
+        free_block_1047c4(state, DIG_STATE_SIZE);
+        return 0;
+    }
+    trace_call_102198(EF_U32(state + DIG_TIMER), state);
+    trace_call_102228(EF_U32(state + DIG_TIMER), g_dig_service_rate);
+    trace_call_1022dc(EF_U32(state + DIG_TIMER));
+    EF_U32(EF_U32(state + DIG_DRIVER) + DRV_FIELD_24) = DIG_RELEASE;
+    EF_U32(EF_U32(state + DIG_DRIVER) + DRV_FIELD_28) = state;
+    clear_buffer_117aa2(0, 0, 0, 0, state);
+    guest_fn_117a0f_x(state, 0);
+    guest_fn_117a0f_x(state, 1);
+    return state;
+}

@@ -23896,8 +23896,8 @@ double record_term_2ccf0(uint32_t sel, uint32_t idx, uint32_t u2, uint32_t u3, d
 	return acc * md_rd_f64(0x00182582u);
 }
 
-/* 0x105c94, 266 bytes. Fill negative fields of a 24-byte block from defaults, store it, send message 0x304. */
-void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 pobj, ef_addr32 src)
+/* 0x105c94, 266 bytes. Fill negative fields of a 24-byte block from defaults, store it, send message 0x304 and return its result. */
+uint32_t apply_defaults_105c94(ef_addr32 pobj, ef_addr32 src)
 {
 	uint16_t w[4];
 	uint32_t d[4];
@@ -23909,10 +23909,6 @@ void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 	uint32_t i;
 	uint32_t obj;
 
-	(void)u0;
-	(void)u1;
-	(void)u2;
-	(void)u3;
 	memcpy(buf, ef_guest_memory_ptr(src), 24);
 	memcpy(w, buf, 8);
 	memcpy(d, buf + 8, 16);
@@ -23937,7 +23933,7 @@ void apply_defaults_105c94(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, e
 	memset(blk, 0, sizeof(blk));
 	obj = EF_U32(pobj);
 	blk[1] = ((EF_U32(0x004dd7f0u) == 0 ? 1u : 3u) << 16) | (blk[1] & 0xffffu);
-	guest_fn_101f88(obj, 0x304u, (ef_addr32)(uintptr_t)blk, 0);
+	return guest_fn_101f88(obj, 0x304u, (ef_addr32)(uintptr_t)blk, 0);
 }
 
 /* 0xe3cac, 396 bytes. Load a named resource into the cached list and fill the request record. */
