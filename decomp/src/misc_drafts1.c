@@ -2252,10 +2252,48 @@ uint32_t run_steps_d6694(void)
     return 0xffffffffu;
 }
 
-/* 0x107004, 56 bytes. Try 0x106f10 with the object A and the current slot index [0x464470] - 1: on success (0) store the index through OUT and return 0, otherwise release the object and return 2. */
-uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out)
+#define g_tracker_verbose  EF_U32(0x0017d364u)
+#define TRACKER_RECORD_SIZE 0x58u
+#define TRACKER_FIFO_SIZE   0x400u
+
+/* 0x106f10, 244 bytes. Open the head tracker on COM(PORT+1): release
+   any record already in *SLOT, allocate a cleared serial record, open
+   the port with 1K receive and transmit buffers (0x117f68), set the
+   baud rate, raise DTR and RTS, turn hardware flow control off and wait
+   up to DURATION for the tracker's answer (0x106d34). Returns that
+   answer (0 = found), 1 for a bad port, no memory or a failed open,
+   and 9 for any other open error. */
+uint8_t open_tracker_106f10(ef_addr32 slot, uint8_t port, uint32_t rate, uint32_t duration)
 {
-    uint8_t r = (uint8_t)guest_fn_106f10_x(a, (uint8_t)(EF_U8(0x00464470u) - 1u));
+    int32_t result;
+
+    if (EF_U32(slot) != 0)
+        release_object_10703c(slot);
+    if (port > 3u)
+        return 1u;
+    if (g_tracker_verbose != 0)
+        stdout_printf_cd12e(0x00194a98u, (uint32_t)port + 1u); /* "Searching for Tracker on COM%d:\n" */
+    EF_U32(slot) = allocate_cleared(1u, TRACKER_RECORD_SIZE);
+    if (EF_U32(slot) == 0) {
+        stdout_printf_cd12e(0x00194abcu); /* "No memory for serial data.\n" */
+        return 1u;
+    }
+    result = guest_fn_117f68(EF_U32(slot), port, 1u, TRACKER_FIFO_SIZE, TRACKER_FIFO_SIZE);
+    if (result == -1)
+        return 1u;
+    if (result != 0)
+        return 9u;
+    set_serial_rate_117e0c(EF_U32(slot), (int32_t)rate);
+    serial_set_dtr_118694(EF_U32(slot), 1u);
+    serial_set_rts_1186cc(EF_U32(slot), 1u);
+    serial_set_flow_118664(EF_U32(slot), 0u);
+    return (uint8_t)poll_device_106d34(slot, duration);
+}
+
+/* 0x107004, 56 bytes. Try 0x106f10 with the object A and the current slot index [0x464470] - 1, passing the rate and duration in EBX/ECX through: on success (0) store the index through OUT and return 0, otherwise release the object and return 2. */
+uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out, uint32_t rate, uint32_t duration)
+{
+    uint8_t r = (uint8_t)guest_fn_106f10_x(a, (uint8_t)(EF_U8(0x00464470u) - 1u), rate, duration);
     if (r == 0u) {
         EF_U8(out) = (uint8_t)(EF_U8(0x00464470u) - 1u);
         return r;

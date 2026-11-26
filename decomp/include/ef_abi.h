@@ -5464,10 +5464,18 @@ uint32_t guest_seg_x(uint32_t which); /* segment register selector: 0 ES, 1 CS, 
 void guest_dos_int_x(uint32_t intno, uint32_t in, uint32_t out, uint32_t sregs); /* software interrupt through the stub table at 0x9c558 */
 
 uint32_t run_steps_d6694(void);
-uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out);
+uint8_t try_open_slot_107004(ef_addr32 a, ef_addr32 out, uint32_t rate, uint32_t duration);
 uint32_t hash_and_run_ea20c(ef_addr32 obj, ef_addr32 text);
 uint32_t guest_fn_d66c2_x(void); /* 0xd66c2 unknown, no arguments, result in EAX */
-uint8_t guest_fn_106f10_x(uint32_t a, uint32_t b); /* 0x106f10 EAX/EDX -> AL */
+uint8_t guest_fn_106f10_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x106f10 EAX/EDX/EBX/ECX -> AL */
+uint8_t open_tracker_106f10(ef_addr32 slot, uint8_t port, uint32_t rate, uint32_t duration);
+int32_t guest_fn_117f68(ef_addr32 record, uint32_t port, uint32_t a, uint32_t b, uint32_t c); /* 0x117f68 EAX/EDX/EBX/ECX + 1 stack, ret 4 */
+/* Head tracker open: EBX/ECX/EDX are not preserved. */
+#pragma aux guest_fn_117f68 value [eax] modify [eax ebx ecx edx]
+#pragma aux guest_fn_106f10_x parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
+#pragma aux open_tracker_106f10 parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
+#pragma aux try_open_slot_107004 parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
+#pragma aux guest_fn_107004_w parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
 void guest_fn_10d9e3_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x10d9e3 EAX/EDX/EBX/ECX */
 
 uint32_t classify_record_113b78(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, ef_addr32 ctx);
