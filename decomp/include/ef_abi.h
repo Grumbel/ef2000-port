@@ -5474,6 +5474,11 @@ int32_t guest_fn_117f68(ef_addr32 record, uint32_t port, uint32_t a, uint32_t b,
 #pragma aux guest_fn_117f68 value [eax] modify [eax ebx ecx edx]
 #pragma aux guest_fn_106f10_x parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
 #pragma aux open_tracker_106f10 parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
+void draw_quad_curve_fd164(uint32_t shift, uint32_t control, uint32_t end, uint32_t start);
+void guest_fn_c8c78_si(ef_addr32 points, uint32_t count); /* 0xc8c78 ESI/ECX, may clobber EBP */
+/* Curve drawer: four stack arguments popped by the callee; the polyline renderer it calls clobbers everything. */
+#pragma aux draw_quad_curve_fd164 parm routine [] modify [eax ecx edx edi]
+#pragma aux guest_fn_c8c78_si parm [esi] [ecx] modify [eax ebx ecx edx esi edi ebp]
 #pragma aux try_open_slot_107004 parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
 #pragma aux guest_fn_107004_w parm [eax] [edx] [ebx] [ecx] value [al] modify [eax ebx ecx edx]
 void guest_fn_10d9e3_x(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0x10d9e3 EAX/EDX/EBX/ECX */

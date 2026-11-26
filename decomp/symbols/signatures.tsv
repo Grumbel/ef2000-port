@@ -46,6 +46,7 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000de864	load_shape_de864	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000de864 (620 bytes); docs/compiler-abi.md
 0x000f8e44	create_mission_f8e44	EAX:ef_addr32,EDX:uint32_t,EBX:ef_addr32,ECX:uint32_t,[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:uint32_t,[ESP+24]:uint32_t,[ESP+28]:uint32_t,[ESP+32]:uint32_t,[ESP+36]:uint32_t,[ESP+40]:uint32_t	EAX:uint32_t	esi,edi,ebp	40	Original 0x000f8e44 (615 bytes); docs/compiler-abi.md
 0x000456e8	draw_war_replay_456e8			ebx,ecx,edx,esi,edi,ebp	0	Original 0x000456e8 (625 bytes); docs/compiler-abi.md
+0x000fd164	draw_quad_curve_fd164	[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t,[ESP+16]:uint32_t		ebx,esi,ebp	16	Original 0x000fd164 (335 bytes); Quadratic curve (shift, control, end, start) as a polyline; callee pops 16 bytes; callers c7300..c7369 and others; docs/compiler-abi.md
 0x00104200	install_driver_104200	[ESP+4]:ef_addr32,[ESP+8]:uint32_t	EAX:uint32_t	esi,edi,ebp	0	Original 0x00104200 (609 bytes); docs/compiler-abi.md
 0x000cb9f4	purge_groups_cb9f4	EAX:ef_addr32,EDX:ef_addr32,EBX:ef_addr32,ECX:uint32_t,[ESP+4]:ef_addr32,[ESP+8]:int32_t		esi,edi,ebp	8	Original 0x000cb9f4 (608 bytes); docs/compiler-abi.md
 0x0000e490	spawn_route_events_e490			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0000e490 (625 bytes); docs/compiler-abi.md
