@@ -1395,6 +1395,25 @@ void guest_fn_113c24(uint32_t a); /* 0x113c24 cdecl */
 void guest_fn_11458c(uint32_t a, uint32_t b); /* 0x11458c cdecl */
 void guest_fn_114878(uint32_t a, uint32_t b); /* 0x114878 cdecl */
 void guest_fn_114994(uint32_t a, uint32_t b, uint32_t c); /* 0x114994 cdecl */
+/* AIL trace wrappers and their targets: cdecl, EBX not preserved. */
+#pragma aux trace_call_10311c parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_103148 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_1031a0 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_103244 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_1033c8 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_103504 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_1037e0 parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_103b5c parm caller [] modify [eax ebx ecx edx]
+#pragma aux trace_call_103b90 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_11402c parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_114058 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_114170 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_1141a0 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_1142cc parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_113c24 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_11458c parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_114878 parm caller [] modify [eax ebx ecx edx]
+#pragma aux guest_fn_114994 parm caller [] modify [eax ebx ecx edx]
 void guest_fn_1048b4(uint32_t first, uint32_t last); /* 0x1048b4 cdecl */
 void guest_fn_104840(uint32_t first, uint32_t last); /* 0x104840 cdecl */
 void guest_fn_1023b0(void); /* 0x1023b0 */
@@ -1820,8 +1839,12 @@ ef_addr32 insert_heap_block_10d5c7(ef_addr32 block);
 ef_addr32 alloc_stream_buffer_10f071(ef_addr32 stream);
 uint32_t midi_data_length_111d98(uint32_t status);
 uint32_t byte_swap_111f50(uint32_t value);
+#pragma aux midi_data_length_111d98 parm caller [] value [eax] modify [eax ebx ecx edx]
+#pragma aux byte_swap_111f50 parm caller [] value [eax] modify [eax ebx ecx edx]
 void strip_extension_113c24(ef_addr32 path);
 void set_owner_slot_114994(ef_addr32 owner, uint32_t slot, uint32_t index);
+#pragma aux strip_extension_113c24 parm caller [] modify [eax ebx ecx edx]
+#pragma aux set_owner_slot_114994 parm caller [] modify [eax ebx ecx edx]
 void clear_buffered_record_117ea8(ef_addr32 record);
 uint32_t alloc_serial_state_117f14(ef_addr32 record);
 int32_t ring_pop_1184c4(ef_addr32 record);

@@ -654,9 +654,9 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x001027a0	trace_call_1027a0	[ESP+4]:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027a0 (44 bytes); cdecl caller-clean trace wrapper for 0x10687c.; caller d7490@d74c1; docs/compiler-abi.md
 0x001027cc	trace_call_1027cc	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027cc (44 bytes); Trace wrapper for 0x106894.; callers d7530@d7561; docs/compiler-abi.md
 0x001027f8	trace_call_1027f8	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001027f8 (44 bytes); Trace wrapper for 0x1068b8.; callers d74d0@d7501; docs/compiler-abi.md
-0x0010311c	trace_call_10311c	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010311c (44 bytes); Trace wrapper for 0x11402c.; callers d5e0c@d5ea5; docs/compiler-abi.md
-0x00103148	trace_call_103148	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103148 (44 bytes); Trace wrapper for 0x114058.; callers 112c10@112e38,112c10@11308a,113cf4@113cfe; docs/compiler-abi.md
-0x001031a0	trace_call_1031a0	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001031a0 (44 bytes); Trace wrapper for 0x114170.; callers d5ec0@d5ed6,113398@1133b1; docs/compiler-abi.md
+0x0010311c	trace_call_10311c	[ESP+4]:uint32_t		esi,edi,ebp	0	Original 0x0010311c (44 bytes); Trace wrapper for 0x11402c.; callers d5e0c@d5ea5; docs/compiler-abi.md
+0x00103148	trace_call_103148	[ESP+4]:uint32_t		esi,edi,ebp	0	Original 0x00103148 (44 bytes); Trace wrapper for 0x114058.; callers 112c10@112e38,112c10@11308a,113cf4@113cfe; docs/compiler-abi.md
+0x001031a0	trace_call_1031a0	[ESP+4]:uint32_t		esi,edi,ebp	0	Original 0x001031a0 (44 bytes); Trace wrapper for 0x114170.; callers d5ec0@d5ed6,113398@1133b1; docs/compiler-abi.md
 0x00101ed4	trace_call_101ed4	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00101ed4 (52 bytes); Trace wrapper for 0x111142.; callers 104200@104393,104200@104402,104464@1044be; docs/compiler-abi.md
 0x001021f4	trace_call_1021f4	[ESP+4]:uint32_t,[ESP+8]:uint32_t		ebx,ecx,edx,esi,edi,ebp	8	Original 0x001021f4 (52 bytes); Trace wrapper for 0x1114c7.; callers 110fd4@1110ab,1114f7@111515,111527@111557; docs/compiler-abi.md
 0x00102228	trace_call_102228	[ESP+4]:uint32_t,[ESP+8]:uint32_t		ebx,ecx,edx,esi,edi,ebp	8	Original 0x00102228 (52 bytes); Trace wrapper for 0x1114f7.; callers e28e8@e2962,104200@104447,105e38@106418; docs/compiler-abi.md
@@ -666,12 +666,12 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x0010288c	trace_call_10288c	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010288c (52 bytes); Trace wrapper for 0x1067cc.; callers none direct; docs/compiler-abi.md
 0x001028c0	trace_call_1028c0	[ESP+4]:uint32_t,[ESP+8]:uint32_t		esi,ebp	0	Original 0x001028c0 (52 bytes); two caller-clean stack inputs; EAX/EBX/ECX/EDX are scratch; Trace wrapper for 0x10682c.; caller d7158@d7273; docs/compiler-abi.md
 0x00102a98	trace_call_102a98	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00102a98 (52 bytes); Trace wrapper for 0x106988.; callers d6e58@d6f32; docs/compiler-abi.md
-0x00103244	trace_call_103244	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103244 (52 bytes); Trace wrapper for 0x1141a0.; callers d5e0c@d5e96; docs/compiler-abi.md
-0x001033c8	trace_call_1033c8	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001033c8 (52 bytes); Trace wrapper for 0x1142cc.; callers d5fc8@d5fe5; docs/compiler-abi.md
-0x00103504	trace_call_103504	EAX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103504 (44 bytes); Trace wrapper for 0x113c24.; callers d5d18@d5d31; docs/compiler-abi.md
-0x001037e0	trace_call_1037e0	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x001037e0 (52 bytes); Trace wrapper for 0x11458c.; callers 1123a4@1126c1; docs/compiler-abi.md
-0x00103b5c	trace_call_103b5c	EAX:uint32_t,EDX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103b5c (52 bytes); Trace wrapper for 0x114878.; callers 1123a4@112761,114058@1140ea; docs/compiler-abi.md
-0x00103b90	trace_call_103b90	EAX:uint32_t,EDX:uint32_t,EBX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103b90 (58 bytes); Trace wrapper for 0x114994.; callers 1123a4@112725,1123a4@11276c; docs/compiler-abi.md
+0x00103244	trace_call_103244	[ESP+4]:uint32_t,[ESP+8]:uint32_t		esi,edi,ebp	0	Original 0x00103244 (52 bytes); Trace wrapper for 0x1141a0.; callers d5e0c@d5e96; docs/compiler-abi.md
+0x001033c8	trace_call_1033c8	[ESP+4]:uint32_t,[ESP+8]:uint32_t		esi,edi,ebp	0	Original 0x001033c8 (52 bytes); Trace wrapper for 0x1142cc.; callers d5fc8@d5fe5; docs/compiler-abi.md
+0x00103504	trace_call_103504	[ESP+4]:uint32_t		esi,edi,ebp	0	Original 0x00103504 (44 bytes); Trace wrapper for 0x113c24.; callers d5d18@d5d31; docs/compiler-abi.md
+0x001037e0	trace_call_1037e0	[ESP+4]:uint32_t,[ESP+8]:uint32_t		esi,edi,ebp	0	Original 0x001037e0 (52 bytes); Trace wrapper for 0x11458c.; callers 1123a4@1126c1; docs/compiler-abi.md
+0x00103b5c	trace_call_103b5c	[ESP+4]:uint32_t,[ESP+8]:uint32_t		esi,edi,ebp	0	Original 0x00103b5c (52 bytes); Trace wrapper for 0x114878.; callers 1123a4@112761,114058@1140ea; docs/compiler-abi.md
+0x00103b90	trace_call_103b90	[ESP+4]:uint32_t,[ESP+8]:uint32_t,[ESP+12]:uint32_t		esi,edi,ebp	0	Original 0x00103b90 (58 bytes); Trace wrapper for 0x114994.; callers 1123a4@112725,1123a4@11276c; docs/compiler-abi.md
 0x00103d48	shutdown_103d48			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00103d48 (42 bytes); If dword 0x17d2cc is set, run 0x1048b4(0x101a90, 0x103d48) and clear it.; callers none direct; docs/compiler-abi.md
 0x001041e4	exchange_slot_1041e4	[ESP+4]:uint32_t,[ESP+8]:uint32_t	EAX:uint32_t	ecx,esi,edi,ebp	0	Original 0x001041e4 (25 bytes); cdecl caller-clean index/value; clobbers EBX and EDX; exchange dword 0x4dd7cc[index], return old value.; caller 101e14@101e40; docs/compiler-abi.md
 0x00104694	shutdown_104694			ebx,ecx,edx,esi,edi,ebp	0	Original 0x00104694 (45 bytes); Call 0x102488 on each non-null dword 0x4dd670[0..15], then 0x1023b0 and 0x1110c5.; callers 101ddc@101df9; docs/compiler-abi.md
@@ -902,10 +902,10 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000fc4e4	find_linear_mode_fc4e4		EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000fc4e4 (80 bytes); Find the first VESA mode in the list whose info has bit 7 set; returns dword +0x28 of its info.; callers fc534@fc5da; docs/compiler-abi.md
 0x0010d5c7	insert_heap_block_10d5c7	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010d5c7 (116 bytes); Insert a heap block into the address-sorted list at 0x16464c and reset it.; callers 10d4c4@10d568,10d75c@10d7db,10d80b@10d91c; docs/compiler-abi.md
 0x0010f071	alloc_stream_buffer_10f071	EAX:ef_addr32	EAX:ef_addr32	ebx,ecx,edx,esi,edi,ebp	0	Original 0x0010f071 (119 bytes); Allocate the buffer of a stream record.; callers f1d90@f1dd0,f1f5a@f1f95,f22af@f230d; docs/compiler-abi.md
-0x00111d98	midi_data_length_111d98	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00111d98 (88 bytes); Number of data bytes of a MIDI status byte (cdecl).; callers 111e40@111e4b,112c10@113021; docs/compiler-abi.md
-0x00111f50	byte_swap_111f50	EAX:uint32_t	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00111f50 (52 bytes); Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; docs/compiler-abi.md
-0x00113c24	strip_extension_113c24	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00113c24 (86 bytes); Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; docs/compiler-abi.md
-0x00114994	set_owner_slot_114994	EAX:ef_addr32,EDX:uint32_t,EBX:uint32_t		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00114994 (52 bytes); Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; docs/compiler-abi.md
+0x00111d98	midi_data_length_111d98	[ESP+4]:uint32_t	EAX:uint32_t	esi,edi,ebp	0	Original 0x00111d98 (88 bytes); Number of data bytes of a MIDI status byte (cdecl).; callers 111e40@111e4b,112c10@113021; docs/compiler-abi.md
+0x00111f50	byte_swap_111f50	[ESP+4]:uint32_t	EAX:uint32_t	esi,edi,ebp	0	Original 0x00111f50 (52 bytes); Byte-swap a dword (cdecl).; callers 111f84@111fc4,111f84@112031,113d10@113d60; docs/compiler-abi.md
+0x00113c24	strip_extension_113c24	[ESP+4]:ef_addr32		esi,edi,ebp	0	Original 0x00113c24 (86 bytes); Copy a path to 0x17e1d8 and cut the extension (cdecl).; callers 103504@103527; docs/compiler-abi.md
+0x00114994	set_owner_slot_114994	[ESP+4]:ef_addr32,[ESP+8]:uint32_t,[ESP+12]:uint32_t		esi,edi,ebp	0	Original 0x00114994 (52 bytes); Record slot b of owner a as value c-1 (cdecl).; callers 103b90@103bc0; docs/compiler-abi.md
 0x00117ea8	clear_buffered_record_117ea8	EAX:ef_addr32		ebx,ecx,edx,esi,edi,ebp	0	Original 0x00117ea8 (44 bytes); Free the buffer of a record and clear the record.; callers 118290@118384,118290@1183a5; docs/compiler-abi.md
 0x00117f14	alloc_serial_state_117f14	EAX:ef_addr32	EAX:uint32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x00117f14 (82 bytes); Allocate the 0x1a-byte state block of a serial record.; callers 117f68@11800a; docs/compiler-abi.md
 0x001184c4	ring_pop_1184c4	EAX:ef_addr32	EAX:int32_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x001184c4 (92 bytes); Pop one byte from the ring buffer of a serial record, -1 if empty.; callers 106cb0@106cd7,106d34@106d6b,106dc4@106de0; docs/compiler-abi.md

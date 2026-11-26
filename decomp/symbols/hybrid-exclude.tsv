@@ -520,16 +520,8 @@ addr	reason
 0x00102dbc	tools/func_fuzz.py isolated run (only this redirect): 1: EAX: original 0xfeaeffdc, patched 0x859d945e | guest RAM 0x20088f0: original 0xff, patched 0xdc; keep original pending triage
 0x0010303c	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004 | EAX: original 0xffffffff, patched 0x0 | guest RAM 0x3: original 0x02, patched 0; keep original pending triage
 0x001030bc	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004 | guest RAM 0x8: original 0x02, patched 0x90; keep original pending triage
-0x0010311c	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x137f28: original 0xff, patched 0x04; keep original pending triage
-0x00103148	tools/func_fuzz.py isolated run (only this redirect): 7: patched: fuzz7: guest fault at 0x11406a: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x001031a0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x55203a20: Invalid memory fetch (UC_ERR_FETCH_UNMAPPED); keep original pending triage
 0x001031cc	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004; keep original pending triage
-0x00103244	tools/func_fuzz.py isolated run (only this redirect): 0: guest RAM 0x1002b: original 0x24, patched 0x3f; keep original pending triage
-0x001033c8	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: instruction budget 20000 exceeded (ip=0x114305); keep original pending triage
 0x00103778	tools/func_fuzz.py isolated run (only this redirect): 0: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004 | EAX: original 0x2001984, patched 0x0 | guest RAM 0x8: original 0x85, patched 0x; keep original pending triage
-0x001037e0	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1145ac: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x00103b5c	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x114890: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
-0x00103b90	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1149a7: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
 0x001041e4	tools/func_fuzz.py isolated run (only this redirect): 2: guest RAM 0x4ddf24: original 0x15, patched 0x00; keep original pending triage
 0x00104504	tools/func_fuzz.py isolated run (only this redirect): 2: ESP cleanup expected 0x3fff008, got 0x3fff004/0x3fff004; keep original pending triage
 0x001047c4	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x2f2: Unhandled CPU exception (UC_ERR_EXCEPTION); keep original pending triage
@@ -576,7 +568,6 @@ addr	reason
 0x001142cc	tools/func_fuzz.py isolated run (only this redirect): 4: ESP cleanup expected 0x3fff00c, got 0x3fff004/0x3fff004; keep original pending triage
 0x0011451c	tools/func_fuzz.py isolated run (only this redirect): 1: ESP cleanup expected 0x3fff010, got 0x3fff004/0x3fff004; keep original pending triage
 0x0011458c	tools/func_fuzz.py isolated run (only this redirect): 5: ESP cleanup expected 0x3fff00c, got 0x3fff004/0x3fff004; keep original pending triage
-0x00114994	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x3063f1d: Invalid memory write (UC_ERR_WRITE_UNMAPPED); keep original pending triage
 0x00119acc	tools/func_fuzz.py isolated run (only this redirect): 0: patched: fuzz0: guest fault at 0x1f7: Unhandled CPU exception (UC_ERR_EXCEPTION); 1: patched: fuzz1: guest fault at 0x1f7: Unhandled CPU ; keep original pending triage
 0x0011ac3c	tools/func_fuzz.py isolated run (only this redirect): 2: EAX: original 0x7, patched 0x773a; keep original pending triage
 0x0011aff4	tools/func_fuzz.py isolated run (only this redirect): 1: patched: fuzz1: guest fault at 0x26: Invalid memory read (UC_ERR_READ_UNMAPPED); keep original pending triage
