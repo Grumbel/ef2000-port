@@ -2600,7 +2600,7 @@ addr	size	name	module	state	kind	sig_status	test	notes
 0x000b80ac	1121			blocked	game	unverified		Re-triaged 2026-11-26: the old "segment registers/DOS interrupts" note was wrong; objdump scan finds no segment-register, interrupt or port instructions; 6 x87 instructions. Not yet attempted: x87 code (rev 5 B4).
 0x000b8510	2021			blocked	game	unverified		Skipped as too difficult: x87 floating-point code whose register-stack and precision behaviour needs hand-checked double/pragma conventions; deferred.
 0x000b8cf8	1057			blocked	game	unverified		Re-triaged 2026-11-26: the old "segment registers/DOS interrupts" note was wrong; objdump scan finds no segment-register, interrupt or port instructions. Not yet attempted: ordinary integer code (rev 5 B6).
-0x000b914c	1623			blocked	game	unverified		Re-triaged 2026-11-26: the old "segment registers/DOS interrupts" note was wrong; objdump scan finds no segment-register, interrupt or port instructions; 2 cs: jump table(s), i.e. a plain C switch. Not yet attempted: switch (rev 5 B3).
+0x000b914c	1623	plan_group_route_b914c	group_route_plan	spliced	game	confirmed	decomp/tests/0x000b914c.json	Group waypoint plan home->target (4 or 5 waypoints, escort slot via 0xb513c, jittered midpoint); the old "segment registers/DOS interrupts" note was wrong (two cs: jump tables with identical case groups).
 0x000b97a4	768	build_slot_records_b97a4	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b97a4.json	Original 0xb97a4 (768 bytes)
 0x000b9aa4	450	build_path_slot_records_b9aa4	game_helpers130	spliced	game	confirmed	decomp/tests/0x000b9aa4.json	
 0x000b9c68	426	build_object_records_b9c68	game_helpers130	compiles	game	confirmed	decomp/tests/0x000b9c68.json	Original 0xb9c68 (426 bytes)

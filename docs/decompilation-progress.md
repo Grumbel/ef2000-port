@@ -216,3 +216,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-26  B3  fix 0x9ddfc callers 0x540d0/0x90a70/0x92f98/0x2a7ac (two-argument declaration leaked a stack slot through the generated pragma); hybrid regression 4/4
 2026-11-26  B3  recover 0x3dd30 mission_loop_3dd30 (mission_loop.c; mission main loop with pause, wait text, scores, debug pages and end timer, mis-triaged as segment code); differential 300; hybrid regression 4/4
 2026-11-26  B3  recover 0x3f7fc draw_unit_debug_page_3f7fc (debug_object_page.c; unit debug page with tracking, threat, flight, base and dogfight lines plus taxi outlines, mis-triaged as segment code); differential 300; hybrid regression 4/4
+2026-11-26  B3  recover 0xb914c plan_group_route_b914c (group_route_plan.c; group waypoint plan home->target with escort slot and jittered midpoint, mis-triaged as segment code); differential 300; hybrid regression 4/4

@@ -3910,3 +3910,4 @@ addr	name	inputs	outputs	preserved	stack_bytes	evidence
 0x000e882c	parse_config_line_e882c		AL:uint8_t	ebx,ecx,edx,esi,edi,ebp	0	Original 0x000e882c (2990 bytes); settings line parser; caller e93dc@e948b
 0x0003dd30	mission_loop_3dd30			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003dd30 (2924 bytes); mission main loop
 0x0003f7fc	draw_unit_debug_page_3f7fc			ebx,ecx,edx,esi,edi,ebp	0	Original 0x0003f7fc (2477 bytes); unit debug page
+0x000b914c	plan_group_route_b914c	EAX:ef_addr32,EDX:int32_t,EBX:int32_t,CX:uint16_t,[ESP+4]:uint32_t,[ESP+8]:ef_addr32,[ESP+12]:uint32_t,[ESP+16]:uint32_t,[ESP+20]:ef_addr32		esi,edi,ebp	20	Original 0x000b914c (1623 bytes); group waypoint plan; callers b83cc@b83f2, b8b65@b8b88
