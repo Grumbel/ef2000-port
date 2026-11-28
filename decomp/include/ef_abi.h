@@ -4269,6 +4269,8 @@ void transfer_entry_weights_be77c(ef_addr32 object, ef_addr32 list);
 uint32_t instantiate_list_records_bd2f4(ef_addr32 list, uint32_t arg_b, uint32_t dest_head, uint32_t dest_tail, uint32_t extra);
 uint16_t guest_fn_bcc2c_x(ef_addr32 node); /* 0xbcc2c EAX -> AX */
 uint32_t guest_fn_bcf44_x(ef_addr32 node, uint32_t b, uint32_t c); /* 0xbcf44 EAX EDX EBX -> EAX */
+ef_addr32 create_site_record_bcf44(ef_addr32 template_record, ef_addr32 units, ef_addr32 groups);
+int16_t add_virtual_ports_f90ac(ef_addr32 head, ef_addr32 tail, ef_addr32 units, int16_t first);
 
 /* game_helpers86.c */
 uint32_t byte_swap32_c1bd0(uint32_t value);
