@@ -229,3 +229,4 @@ History before rev 5: `docs/decompilation-log-archive.md`.
 2026-11-26  B3  0xfe730 segment/clip-rectangle test recovered (mislabeled segment/DOS block; outcode-pair switch, ret 0x10, 400-case spec, mutations caught 37/400 and 2/400); hybrid regression 4/4
 2026-11-26  B3  0x113d10 AIL_init_sequence recovered in xmidi_sequence.c (mislabeled segment/DOS block; IFF chunk walk, timbre filter and install, 200-case spec, mutations caught 5-36/200); hybrid regression 4/4 (german-campaign-map marker-timeout flake passed on rerun)
 2026-11-28  B3  0x2e04 aid group selection recovered in aid_group.c (mislabeled segment/DOS block; step and scan modes with filter switch, 300-case spec, mutations caught 3-255/300); hybrid regression 4/4
+2026-11-28  B3  0xcc90c slot group requests recovered in group_slot_requests.c (mislabeled segment/DOS block; two switches for the slot type rotation, 300-case spec, mutations caught 1-175/300, two equivalent); hybrid regression 4/4
