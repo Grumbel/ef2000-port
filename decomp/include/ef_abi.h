@@ -5446,6 +5446,7 @@ void guest_fn_c8ccc_x(uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32
 void round_double_to_int64_10e28a(ef_addr32 p);
 void show_main_widgets_7cc5c(void);
 void guest_fn_7bee8_x(uint32_t a); /* 0x7bee8 EAX */
+void load_ui_mission_list_7bee8(ef_addr32 rows);
 
 void write_log_d1c54(ef_addr32 name, ef_addr32 src, int32_t mode);
 void classify_double_110130(uint32_t u0, uint32_t u1, uint32_t u2, uint32_t u3, uint32_t s0, uint32_t s1, uint32_t s2);
@@ -7639,6 +7640,7 @@ void guest_tactcom_sequence_string_guard_3001d(ef_addr32 stream,
  * Their indirect-call shim uses ECX to hold the callback address. */
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 #pragma aux guest_callptr_eax_ret_x parm [eax] [edx] modify [eax ecx edx]
+#pragma aux reallocate_heap_e8651 parm [eax] [edx] value [eax] modify [eax edx]
 #pragma aux guest_callptr_eaxedx_ret_x parm [eax] [edx] [ebx] modify [eax ecx edx]
 #pragma aux guest_callptr_eax_x parm [eax] [edx] modify [eax ecx edx]
 #endif
