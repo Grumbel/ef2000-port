@@ -4588,6 +4588,7 @@ void draw_stat_row_275e0(int16_t x, int16_t y, uint32_t colour, int16_t row, uin
 void update_scene_camera_9457c(ef_addr32 object, uint32_t enabled);
 int32_t collect_list_entries_c193c(ef_addr32 collection, ef_addr32 listHead, uint32_t keyA, uint32_t keyB);
 void find_nearest_object_33b4(int16_t group);
+void select_aid_group_2e04(void);
 void draw_button_11e7c(int16_t index);
 #if defined(__WATCOMC__) && !defined(__GNUC__) && !defined(__clang__)
 /* The original also reads the caller's EDI as the destination bitmap when the record has no text slot. */
