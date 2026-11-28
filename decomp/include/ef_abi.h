@@ -960,6 +960,7 @@ void guest_fn_91df4(void); /* 0x91df4 */
 void guest_fn_9202c(void); /* 0x9202c */
 void guest_fn_93a8c(void); /* 0x93a8c */
 void update_offset_camera_93a8c(void);
+void write_combat_log_9b2a4(ef_addr32 stream);
 void guest_fn_979c8(ef_addr32 record); /* 0x979c8 EAX */
 void guest_fn_97914(ef_addr32 record); /* 0x97914 EAX */
 void guest_fn_97950(ef_addr32 record); /* 0x97950 EAX */
