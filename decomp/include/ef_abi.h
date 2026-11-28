@@ -4705,6 +4705,7 @@ uint32_t guest_fn_b5580(uint32_t a); /* 0xb5580 EAX */
 uint32_t guest_fn_b55a4(uint32_t a); /* 0xb55a4 EAX */
 uint32_t guest_fn_cc6c0_q(uint32_t a, uint32_t b, uint32_t c, uint32_t d); /* 0xcc6c0 4 stack, caller cleanup */
 void guest_fn_b8cf8_x(uint32_t rec, uint32_t d, uint32_t b, uint32_t c, uint32_t s0, uint32_t s1, uint32_t s2, uint32_t s3, uint32_t s4, uint32_t s5); /* 0xb8cf8 EAX/EDX/EBX/ECX + 6 stack */
+void build_route_points_b8cf8(ef_addr32 flight, ef_addr32 outbound, ef_addr32 return_path, uint32_t x, uint32_t y, uint16_t w8, uint16_t wa, uint8_t skip_first, uint8_t return_direct, uint16_t speed);
 void guest_fn_b5640(uint32_t a, uint32_t b, uint32_t c, uint32_t d, uint32_t s0); /* 0xb5640 EAX/EDX/EBX/ECX + 1 stack */
 void guest_fn_b52bc_x(uint32_t a, uint32_t b, uint32_t c); /* 0xb52bc EAX/EDX/EBX */
 void guest_fn_b5800(uint32_t a, uint32_t b, uint32_t c); /* 0xb5800 EAX/EDX/EBX */
